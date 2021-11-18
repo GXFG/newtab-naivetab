@@ -1,6 +1,6 @@
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
 import { globalState } from './store'
-import { log } from './util'
+import { log, exportStringToFile } from './util'
 
 export const storageDemo = useLocalStorage('webext-demo', 'Storage Demo', { listenToStorageChanges: true })
 
@@ -35,6 +35,7 @@ export const downloadSetting = () => {
   return new Promise((resolve) => {
     chrome.storage.sync.get(null, ({ MyNewTabSetting }) => {
       if (!MyNewTabSetting) {
+        log('No settings')
         return
       }
       const cloudSetting = JSON.parse(MyNewTabSetting)
@@ -50,4 +51,31 @@ export const downloadSetting = () => {
       resolve(null)
     })
   })
+}
+
+export const importSetting = (text: string) => {
+  if (!text) {
+    return
+  }
+  let fileContent = {} as any
+  try {
+    fileContent = JSON.parse(text)
+  } catch (e) {
+    log('Parse error', e)
+  }
+  if (Object.keys(fileContent).length === 0) {
+    return
+  }
+  log('FileContent', fileContent)
+  if (fileContent.common) {
+    globalState.setting.common = fileContent.common
+  }
+  if (fileContent.bookmarks) {
+    globalState.setting.bookmarks = fileContent.bookmarks
+  }
+}
+
+export const exportSetting = () => {
+  const filename = `newtab-export-setting-${Date.now()}.json`
+  exportStringToFile(globalState.setting, filename)
 }

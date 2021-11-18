@@ -14,3 +14,12 @@ export const sleep = (time: number) => {
     setTimeout(() => { resolve(null) }, time)
   })
 }
+
+export const exportStringToFile = (result: any, filename: string) => {
+  const text = JSON.stringify(result, null, 4)
+  const url = `data:application/json;base64,${window.btoa(text)}`
+  chrome.downloads.download({
+    url,
+    filename,
+  })
+}

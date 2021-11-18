@@ -25,6 +25,7 @@ export async function getManifest() {
     permissions: [
       'tabs',
       'storage',
+      'downloads',
       'activeTab',
       'chrome://favicon/',
       'http://*/',

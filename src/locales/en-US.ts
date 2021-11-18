@@ -8,6 +8,8 @@ export default {
     language: 'Language',
     backupSettings: 'Backup settings',
     restoreSettings: 'Restore settings',
+    importSettings: 'Import settings',
+    exportSettings: 'Export settings',
     // bookmarks
     urlLabel: 'url',
     urlPlaceholder: '',

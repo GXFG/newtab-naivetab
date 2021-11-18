@@ -8,6 +8,8 @@ export default {
     language: '语言',
     backupSettings: '备份设置',
     restoreSettings: '恢复设置',
+    importSettings: '导入设置',
+    exportSettings: '导出设置',
     // bookmarks
     urlLabel: '地址',
     urlPlaceholder: '',
