@@ -9,7 +9,11 @@
           <ic:outline-chevron-left />
         </span>
         <select v-model="state.currMonth" class="item__select" @change="onMonthChange()">
-          <option v-for="month in MONTHS" :key="month.value" :value="month.value">
+          <option
+            v-for="month in MONTHS_ENUM"
+            :key="month.value"
+            :value="month.value"
+          >
             {{ `${month.label}-${month.value}` }}
           </option>
         </select>
@@ -17,13 +21,20 @@
           <ic:outline-chevron-right />
         </span>
       </div>
-      <div class="options__item" @click="onReset()">
-        <button>返回今天</button>
+      <div class="options__item">
+        <span class="item__btn" @click="onReset()">
+          <ic:twotone-settings-backup-restore />
+        </span>
       </div>
     </div>
     <!-- header -->
     <ul class="calendar__header">
-      <li v-for="item in state.weekList" :key="item.value" class="header__item">
+      <li
+        v-for="item in state.weekList"
+        :key="item.value"
+        class="header__item"
+        :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
+      >
         {{ item.label }}
       </li>
     </ul>
@@ -34,7 +45,9 @@
         :key="item.date"
         class="body__item"
         :class="{
-          'body__item--blur': item.isNotCurrMonth
+          'body__item--active': item.isToday,
+          'body__item--blur': item.isNotCurrMonth,
+          'body__item--weekend': item.isWeekend,
         }"
       >
         {{ item.day }}
@@ -46,21 +59,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import dayjs from 'dayjs'
-
-const MONTHS = [
-  { label: 'January', value: 1 },
-  { label: 'February', value: 2 },
-  { label: 'March', value: 3 },
-  { label: 'April', value: 4 },
-  { label: 'May', value: 5 },
-  { label: 'June', value: 6 },
-  { label: 'July', value: 7 },
-  { label: 'August', value: 8 },
-  { label: 'September', value: 9 },
-  { label: 'October', value: 10 },
-  { label: 'November', value: 11 },
-  { label: 'December', value: 12 },
-]
+import { MONTHS_ENUM } from '@/logic/store'
 
 const state = reactive({
   currYear: dayjs().get('year'),
@@ -80,9 +79,15 @@ const state = reactive({
     day: string // DD
     desc?: string
     label?: string
+    isToday?: boolean
+    isWeekend?: boolean
     isNotCurrMonth?: boolean
   }[],
 })
+
+const getIsWeekend = (date: string) => {
+  return [0, 6].includes(dayjs(date).day())
+}
 
 const onRender = () => {
   state.dateList = []
@@ -97,11 +102,13 @@ const onRender = () => {
   if (!isPadStartEmpty) {
     for (const index of [...Array(padStartCount).keys()]) {
       const dateEl = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
+      const date = dateEl.format('YYYY-MM-DD')
       const day = dateEl.get('date')
       state.dateList.unshift({
-        date: dateEl.format('YYYY-MM-DD'),
+        date,
         day: `${day}`,
         isNotCurrMonth: true,
+        isWeekend: getIsWeekend(date),
       })
     }
   }
@@ -116,21 +123,27 @@ const onRender = () => {
     state.dateList.push({
       date,
       day: `${index + 1}`,
+      isToday: dayjs().format('YYYY-MM-DD') === date,
+      isWeekend: getIsWeekend(date),
+      isNotCurrMonth: false,
     })
   }
 
   // padEnd
   let padEndCount = 7 - currMonthLastWeek
   if (state.dateList.length + padEndCount === 35) {
+    // 保证为6行日期
     padEndCount += 7
   }
   for (const index of [...Array(padEndCount).keys()]) {
     const dateEl = dayjs(currMonthLastDate).add(index + 1, 'day')
+    const date = dateEl.format('YYYY-MM-DD')
     const day = dateEl.get('date')
     state.dateList.push({
-      date: dateEl.format('YYYY-MM-DD'),
+      date,
       day: `${day}`,
       isNotCurrMonth: true,
+      isWeekend: getIsWeekend(date),
     })
   }
 }
@@ -172,12 +185,13 @@ const onReset = () => {
 
 <style scoped>
 #calendar {
-  width: 350px;
-  color: var(--text-color-watch);
+  width: 315px;
+  color: var(--text-color-main);
   text-align: center;
   text-shadow: 2px 8px 6px var(--shadow-watch-a),
     0px -5px 35px var(--shadow-watch-b);
-  color: #000;
+  border-radius: 5px;
+  overflow: hidden;
   user-select: none;
   .calendar__options {
     padding: 5px;
@@ -187,39 +201,63 @@ const onReset = () => {
     font-size: 16px;
     .options__item {
       display: flex;
+      justify-content: center;
       align-items: center;
       .item__btn {
+        display: flex;
+        align-items: center;
         width: 40px;
-        font-size: 26px;
+        font-size: 20px;
         cursor: pointer;
       }
       .item__select {
+        cursor: pointer;
         background-color: rgba(0, 0, 0, 0);
       }
     }
   }
   .calendar__header {
     display: flex;
+    font-weight: bold;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    overflow: hidden;
     .header__item {
-      width: 50px;
+      width: 45px;
       height: 30px;
       line-height: 30px;
       text-align: center;
-      background-color: rgb(179, 176, 176);
+      background-color: var(--bg-header-main);
+    }
+    .header__item--weekend {
+      color: var(--text-color-weekend);
     }
   }
   .calendar__body {
     display: flex;
     flex-wrap: wrap;
+    background-color: var(--bg-body-main);
     .body__item {
-      width: 50px;
-      height: 50px;
-      line-height: 50px;
+      box-sizing: border-box;
+      padding: 3px;
+      width: 45px;
+      height: 45px;
       text-align: center;
-      background-color: #444;
+      border-radius: 5px;
+      border: 1px solid rgba(0, 0, 0, 0);
+      overflow: hidden;
+    }
+    .body__item:hover {
+      border: 1px solid var(--bg-item-hover);
+    }
+    .body__item--weekend {
+      color: var(--text-color-weekend);
+    }
+    .body__item--active {
+      background-color: var(--bg-item-active);
     }
     .body__item--blur {
-      opacity: 0.5;
+      opacity: 0.3;
     }
   }
 }

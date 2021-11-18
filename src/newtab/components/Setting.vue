@@ -46,6 +46,19 @@
           <p>{{ syncTime }}</p>
         </div>
         <div class="generic__item">
+          <label class="item__label">{{ $t('setting.importSettings') }}:</label>
+          <button class="item__btn">
+            <mdi:file-import-outline class="icon__main" />
+          </button>
+          <input type="file" @change="onImportFileChange" />
+        </div>
+        <div class="generic__item">
+          <label class="item__label">{{ $t('setting.exportSettings') }}:</label>
+          <button class="item__btn" @click="exportSetting()">
+            <mdi:file-export-outline class="icon__main" />
+          </button>
+        </div>
+        <div class="generic__item">
           <label class="item__label">{{ $t('setting.language') }}:</label>
           <select v-model="proxy.$i18n.locale" class="item__locale" @change="onChangeLocale">
             <option
@@ -95,7 +108,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import i18n from '@/locales'
-import { SETTING_TAB_LIST, KEYBOARD_KEY, uploadSetting, downloadSetting, globalState, isSettingMode, toggleIsSettingMode } from '@/logic'
+import { SETTING_TAB_LIST, KEYBOARD_KEY, uploadSetting, downloadSetting, importSetting, exportSetting, globalState, isSettingMode, toggleIsSettingMode } from '@/logic'
 
 const currTab = ref(1)
 
@@ -125,6 +138,19 @@ const onAddKey = (key: string) => {
 
 const onDeleteKey = (key: string) => {
   delete globalState.setting.bookmarks[key]
+}
+
+const onImportFileChange = (e: any) => {
+  const file = e.target.files[0]
+  if (!file.name.includes('.json')) {
+    e.target.value = null
+    return
+  }
+  const reader = new FileReader()
+  reader.readAsText(file)
+  reader.onload = () => {
+    importSetting(reader.result as any)
+  }
 }
 
 </script>
@@ -176,7 +202,6 @@ const onDeleteKey = (key: string) => {
       }
       .tab__item--active {
         background-color: var(--bg-operation-main) !important;
-        /* background-color: var(--bg-operation-key) !important; */
       }
     }
     .modal__generic {

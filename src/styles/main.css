@@ -17,6 +17,12 @@
     --text-color-watch: #2c3e50;
     --shadow-watch-a: rgba(0, 0, 0, 0.2);
     --shadow-watch-b: rgba(200, 255, 255, 0.3);
+    /* calendar */
+    --text-color-weekend: #e03131;
+    --bg-header-main: #a1a1aa;
+    --bg-body-main: #444;
+    --bg-item-hover: #fff;
+    --bg-item-active: #ccc;
   }
 }
 
@@ -39,6 +45,12 @@
     --text-color-watch: #e4e4e7;
     --shadow-watch-a: rgba(0, 0, 0, 40%);
     --shadow-watch-b: rgba(0, 0, 0, 5%);
+    /* calendar */
+    --text-color-weekend: #e03131;
+    --bg-header-main: #a1a1aa;
+    --bg-body-main: #444;
+    --bg-item-hover: #fff;
+    --bg-item-active: #ccc;
   }
 }
 

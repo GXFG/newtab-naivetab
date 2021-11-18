@@ -1,12 +1,12 @@
 <template>
-  <Operation class="app__operation" />
+  <Setting class="app__setting" />
   <Bookmark class="app__bookmark" />
   <DigitalWatch class="app__digital_watch" />
   <Calendar class="app__calendar" />
 </template>
 
 <script setup lang="ts">
-import Operation from './components/Operation.vue'
+import Setting from './components/Setting.vue'
 import Bookmark from './components/Bookmark.vue'
 import DigitalWatch from './components/DigitalWatch.vue'
 import Calendar from './components/Calendar.vue'
@@ -31,7 +31,7 @@ downloadSetting()
 }
 .app__calendar {
   position: absolute;
-  bottom: 2%;
-  left: 2%;
+  bottom: 1%;
+  left: 1%;
 }
 </style>
