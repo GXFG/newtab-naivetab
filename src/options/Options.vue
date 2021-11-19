@@ -6,7 +6,7 @@
       This is the options page
     </p>
 
-    <input v-model="storageDemo" class="text-dark-300 border border-gray-400 rounded px-2 py-1 mt-2" />
+    <!-- <input v-model="storageDemo" class="text-dark-300 border border-gray-400 rounded px-2 py-1 mt-2" /> -->
 
     <div class="mt-4">
       Powered by Vite <pixelarticons-zap class="align-middle" />
@@ -15,5 +15,4 @@
 </template>
 
 <script setup lang="ts">
-import { storageDemo } from '@/logic/storage'
 </script>

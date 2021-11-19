@@ -1,27 +1,25 @@
 <template>
-  <div>
-    <div id="bookmark">
-      <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
-        <div
-          v-for="item in rowData"
-          :key="item.key"
-          :title="item.url"
-          class="row__item"
-          :class="{ 'row__item--active': item.key === state.currSelectKey }"
-          @click="onOpenBookmark(item.url)"
-        >
-          <p class="item__key">
-            {{ `${item.key.toUpperCase()}` }}
-          </p>
-          <div class="item__img">
-            <img v-if="item.url" :src="`chrome://favicon/size/16@2x/${item.url}`" />
-          </div>
-          <p class="item__name">
-            {{ item.name }}
-          </p>
-          <!-- 按键定位标志F & J -->
-          <div v-if="['f', 'j'].includes(item.key)" class="item__cursor"></div>
+  <div id="bookmark">
+    <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
+      <div
+        v-for="item in rowData"
+        :key="item.key"
+        :title="item.url"
+        class="row__item"
+        :class="{ 'row__item--active': item.key === state.currSelectKey }"
+        @click="onOpenBookmark(item.url)"
+      >
+        <p class="item__key">
+          {{ `${item.key.toUpperCase()}` }}
+        </p>
+        <div class="item__img">
+          <img v-if="item.url" :src="`chrome://favicon/size/16@2x/${item.url}`" />
         </div>
+        <p class="item__name">
+          {{ item.name }}
+        </p>
+        <!-- 按键定位标志F & J -->
+        <div v-if="['f', 'j'].includes(item.key)" class="item__cursor"></div>
       </div>
     </div>
   </div>
