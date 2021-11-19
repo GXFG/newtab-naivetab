@@ -30,7 +30,7 @@
     <!-- header -->
     <ul class="calendar__header">
       <li
-        v-for="item in state.weekList"
+        v-for="item in WEEK_ENUM"
         :key="item.value"
         class="header__item"
         :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
@@ -61,38 +61,33 @@
           }"
         >{{ LEGAL_HOLIDAY_TYPE_TO_DESC[item.type as 1 | 2] }}</span>
         <span class="item__day">{{ item.day }}</span>
-        <span class="item__desc">{{ item.desc }}</span>
+        <span
+          class="item__desc"
+          :class="{ 'item__desc--highlight': item.isFestival }"
+        >{{ item.desc }}</span>
       </li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
 import dayjs from 'dayjs'
-import { MONTHS_ENUM, INN_HOLIDAY_ENUM, LEGAL_HOLIDAY_ENUM, LEGAL_HOLIDAY_TYPE_TO_DESC } from '@/logic/store'
+import { WEEK_ENUM, MONTHS_ENUM, LEGAL_HOLIDAY_ENUM, LEGAL_HOLIDAY_TYPE_TO_DESC } from '@/logic'
+import { calendar } from '@/lib/calendar'
 
 const state = reactive({
   today: dayjs().format('YYYY-MM-DD'),
   currYear: dayjs().get('year'),
   currMonth: dayjs().get('month') + 1,
   currDay: dayjs().get('date'),
-  weekList: [
-    { label: 'Mon', value: 1 },
-    { label: 'Tue', value: 2 },
-    { label: 'Wed', value: 3 },
-    { label: 'Thu', value: 4 },
-    { label: 'Fri', value: 5 },
-    { label: 'Sat', value: 6 },
-    { label: 'Sun', value: 7 },
-  ],
   dateList: [] as {
     date: string // YYYY-MM-DD
     day: string // DD
     desc: string
-    type: number
+    type: number // 1休，2班
     isToday: boolean
     isWeekend: boolean
+    isFestival: boolean
     isNotCurrMonth: boolean
   }[],
 })
@@ -103,18 +98,28 @@ const getIsWeekend = (date: string) => {
 
 /**
  * type: 1start, 2main, 3end
+ * dateEl: dayjs element
  */
 const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
   const formatDate = dateEl.format('YYYY-MM-DD')
-  const shortDate = dateEl.format('MM-DD')
+  const shortDate = dateEl.format('MMDD')
   const day = dateEl.format('D')
+  const lunar = calendar.solar2lunar(...formatDate.split('-'))
+  // desc优先级：阳历节日，阴历节日，节气，阴历月份，阴历日期
+  let desc = lunar.festival || lunar.lunarFestival || lunar.Term || ''
+  let isFestival = true
+  if (desc.length === 0) {
+    desc = lunar.lDay === 1 ? lunar.IMonthCn : lunar.IDayCn
+    isFestival = false
+  }
   const param = {
     date: formatDate,
     day,
-    desc: INN_HOLIDAY_ENUM[shortDate as keyof typeof INN_HOLIDAY_ENUM] || '',
+    desc,
     type: (LEGAL_HOLIDAY_ENUM[state.currYear] && LEGAL_HOLIDAY_ENUM[state.currYear][shortDate]) || 0,
     isToday: formatDate === state.today,
     isWeekend: getIsWeekend(formatDate),
+    isFestival,
     isNotCurrMonth: type !== 2,
   }
   if (type === 1) {
@@ -163,7 +168,9 @@ const onRender = () => {
   }
 }
 
-onRender()
+onMounted(() => {
+  onRender()
+})
 
 const onPrevMonth = () => {
   if (state.currMonth === 1) {
@@ -200,7 +207,7 @@ const onReset = () => {
 
 <style scoped>
 #calendar {
-  width: 315px;
+  width: 330px;
   color: var(--text-color-main);
   text-align: center;
   text-shadow: 2px 8px 6px var(--shadow-watch-a),
@@ -220,6 +227,7 @@ const onReset = () => {
       align-items: center;
       .item__btn {
         display: flex;
+        justify-content: center;
         align-items: center;
         width: 40px;
         font-size: 20px;
@@ -233,14 +241,16 @@ const onReset = () => {
   }
   .calendar__header {
     display: flex;
-    font-weight: bold;
+    justify-content: center;
+    align-items: center;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     overflow: hidden;
     .header__item {
-      width: 45px;
+      flex: 1;
       height: 30px;
       line-height: 30px;
+      /* font-weight: bold; */
       text-align: center;
       background-color: var(--bg-calendar-header-main);
     }
@@ -260,16 +270,23 @@ const onReset = () => {
       align-items: center;
       box-sizing: border-box;
       padding: 3px;
+      margin: 1px;
       width: 45px;
       height: 45px;
       text-align: center;
       border-radius: 5px;
       border: 1px solid rgba(0, 0, 0, 0);
       overflow: hidden;
-      .item__day {}
+      .item__day {
+      }
       .item__desc {
+        height: 10px;
+        color: var(--text-color-main);
         font-size: 12px;
         transform: scale(0.8);
+      }
+      .item__desc--highlight {
+        color: var(--text-color-red);
       }
       .item__label {
         position: absolute;
@@ -305,7 +322,7 @@ const onReset = () => {
       background-color: var(--bg-calendar-item-active);
     }
     .body__item--blur {
-      opacity: 0.3;
+      opacity: 0.4;
     }
   }
 }

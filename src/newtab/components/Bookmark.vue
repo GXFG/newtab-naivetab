@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
 import { KEYBOARD_KEY, KEY_OF_INDEX, PRESS_INTERVAL_TIME, isSettingMode, globalState, sleep, log } from '@/logic'
 

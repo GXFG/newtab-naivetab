@@ -2,8 +2,6 @@ import { useThrottleFn } from '@vueuse/core'
 import { globalState } from './store'
 import { log, exportStringToFile } from './util'
 
-// export const storageDemo = useLocalStorage('webext-demo', 'Storage Demo', { listenToStorageChanges: true })
-
 // chrome.storage.onChanged.addListener((changes: any, namespace: any) => {
 //   for (const [key, { oldValue, newValue }] of Object.entries(changes) as any) {
 //     console.log(
@@ -24,6 +22,7 @@ export const uploadSetting = useThrottleFn(() => {
 }, 2000)
 
 watch([
+  () => globalState.setting.generic,
   () => globalState.setting.bookmarks,
 ], () => {
   uploadSetting()

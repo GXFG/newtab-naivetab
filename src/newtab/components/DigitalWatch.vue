@@ -13,7 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onUnmounted } from 'vue'
 import dayjs from 'dayjs'
 
 const state = reactive({
