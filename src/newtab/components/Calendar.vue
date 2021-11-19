@@ -48,9 +48,20 @@
           'body__item--active': item.isToday,
           'body__item--blur': item.isNotCurrMonth,
           'body__item--weekend': item.isWeekend,
+          'body__item--rest': item.type === 1,
+          'body__item--work': item.type === 2,
         }"
       >
-        {{ item.day }}
+        <span
+          v-if="item.type"
+          class="item__label"
+          :class="{
+            'item__label--rest': item.type === 1,
+            'item__label--work': item.type === 2,
+          }"
+        >{{ LEGAL_HOLIDAY_TYPE_TO_DESC[item.type as 1 | 2] }}</span>
+        <span class="item__day">{{ item.day }}</span>
+        <span class="item__desc">{{ item.desc }}</span>
       </li>
     </ul>
   </div>
@@ -59,9 +70,10 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import dayjs from 'dayjs'
-import { MONTHS_ENUM } from '@/logic/store'
+import { MONTHS_ENUM, INN_HOLIDAY_ENUM, LEGAL_HOLIDAY_ENUM, LEGAL_HOLIDAY_TYPE_TO_DESC } from '@/logic/store'
 
 const state = reactive({
+  today: dayjs().format('YYYY-MM-DD'),
   currYear: dayjs().get('year'),
   currMonth: dayjs().get('month') + 1,
   currDay: dayjs().get('date'),
@@ -77,16 +89,39 @@ const state = reactive({
   dateList: [] as {
     date: string // YYYY-MM-DD
     day: string // DD
-    desc?: string
-    label?: string
-    isToday?: boolean
-    isWeekend?: boolean
-    isNotCurrMonth?: boolean
+    desc: string
+    type: number
+    isToday: boolean
+    isWeekend: boolean
+    isNotCurrMonth: boolean
   }[],
 })
 
 const getIsWeekend = (date: string) => {
   return [0, 6].includes(dayjs(date).day())
+}
+
+/**
+ * type: 1start, 2main, 3end
+ */
+const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
+  const formatDate = dateEl.format('YYYY-MM-DD')
+  const shortDate = dateEl.format('MM-DD')
+  const day = dateEl.format('D')
+  const param = {
+    date: formatDate,
+    day,
+    desc: INN_HOLIDAY_ENUM[shortDate as keyof typeof INN_HOLIDAY_ENUM] || '',
+    type: (LEGAL_HOLIDAY_ENUM[state.currYear] && LEGAL_HOLIDAY_ENUM[state.currYear][shortDate]) || 0,
+    isToday: formatDate === state.today,
+    isWeekend: getIsWeekend(formatDate),
+    isNotCurrMonth: type !== 2,
+  }
+  if (type === 1) {
+    state.dateList.unshift(param)
+  } else {
+    state.dateList.push(param)
+  }
 }
 
 const onRender = () => {
@@ -100,16 +135,9 @@ const onRender = () => {
   const padStartCount = currMonthFirstWeek - 1
   const isPadStartEmpty = padStartCount === 0
   if (!isPadStartEmpty) {
-    for (const index of [...Array(padStartCount).keys()]) {
-      const dateEl = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
-      const date = dateEl.format('YYYY-MM-DD')
-      const day = dateEl.get('date')
-      state.dateList.unshift({
-        date,
-        day: `${day}`,
-        isNotCurrMonth: true,
-        isWeekend: getIsWeekend(date),
-      })
+    for (let index = 0; index < padStartCount; index += 1) {
+      const dateEL = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
+      genDateList(1, dateEL)
     }
   }
 
@@ -118,33 +146,20 @@ const onRender = () => {
   let currMonthLastWeek = dayjs(currMonthLastDate).day()
   currMonthLastWeek = currMonthLastWeek === 0 ? 7 : currMonthLastWeek
   // add main
-  for (const index of [...Array(currMonthLastDay).keys()]) {
-    const date = dayjs(`${state.currYear}-${state.currMonth}-${index + 1}`).format('YYYY-MM-DD')
-    state.dateList.push({
-      date,
-      day: `${index + 1}`,
-      isToday: dayjs().format('YYYY-MM-DD') === date,
-      isWeekend: getIsWeekend(date),
-      isNotCurrMonth: false,
-    })
+  for (let index = 0; index < currMonthLastDay; index += 1) {
+    const dateEL = dayjs(`${state.currYear}-${state.currMonth}-${index + 1}`)
+    genDateList(2, dateEL)
   }
 
   // padEnd
   let padEndCount = 7 - currMonthLastWeek
   if (state.dateList.length + padEndCount === 35) {
-    // 保证为6行日期
+    // 确保为6行
     padEndCount += 7
   }
-  for (const index of [...Array(padEndCount).keys()]) {
+  for (let index = 0; index < padEndCount; index += 1) {
     const dateEl = dayjs(currMonthLastDate).add(index + 1, 'day')
-    const date = dateEl.format('YYYY-MM-DD')
-    const day = dateEl.get('date')
-    state.dateList.push({
-      date,
-      day: `${day}`,
-      isNotCurrMonth: true,
-      isWeekend: getIsWeekend(date),
-    })
+    genDateList(3, dateEl)
   }
 }
 
@@ -227,17 +242,22 @@ const onReset = () => {
       height: 30px;
       line-height: 30px;
       text-align: center;
-      background-color: var(--bg-header-main);
+      background-color: var(--bg-calendar-header-main);
     }
     .header__item--weekend {
-      color: var(--text-color-weekend);
+      color: var(--text-color-red);
     }
   }
   .calendar__body {
     display: flex;
     flex-wrap: wrap;
-    background-color: var(--bg-body-main);
+    background-color: var(--bg-calendar-body-main);
     .body__item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
       box-sizing: border-box;
       padding: 3px;
       width: 45px;
@@ -246,15 +266,43 @@ const onReset = () => {
       border-radius: 5px;
       border: 1px solid rgba(0, 0, 0, 0);
       overflow: hidden;
+      .item__day {}
+      .item__desc {
+        font-size: 12px;
+        transform: scale(0.8);
+      }
+      .item__label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 2px;
+        color: var(--text-color-main);
+        font-size: 12px;
+        transform: scale(0.7);
+      }
+      .item__label--work {
+        background-color: var(--bg-calendar-item-label);
+      }
+      .item__label--rest {
+        background-color: var(--text-color-red);
+      }
     }
     .body__item:hover {
-      border: 1px solid var(--bg-item-hover);
+      border: 1px solid var(--bg-calendar-item-hover);
+    }
+    .body__item--work {
+      color: var(--text-color-red) !important;
+      background-color: var(--bg-calendar-work);
+    }
+    .body__item--rest {
+      color: var(--text-color-main) !important;
+      background-color: var(--bg-calendar-rest);
     }
     .body__item--weekend {
-      color: var(--text-color-weekend);
+      color: var(--text-color-red);
     }
     .body__item--active {
-      background-color: var(--bg-item-active);
+      background-color: var(--bg-calendar-item-active);
     }
     .body__item--blur {
       opacity: 0.3;

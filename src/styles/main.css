@@ -18,11 +18,11 @@
     --shadow-watch-a: rgba(0, 0, 0, 0.2);
     --shadow-watch-b: rgba(200, 255, 255, 0.3);
     /* calendar */
-    --text-color-weekend: #e03131;
-    --bg-header-main: #a1a1aa;
-    --bg-body-main: #444;
-    --bg-item-hover: #fff;
-    --bg-item-active: #ccc;
+    --text-color-red: #e03131;
+    --bg-calendar-header-main: #a1a1aa;
+    --bg-calendar-body-main: #444;
+    --bg-calendar-item-hover: #fff;
+    --bg-calendar-item-active: #ccc;
   }
 }
 
@@ -46,11 +46,14 @@
     --shadow-watch-a: rgba(0, 0, 0, 40%);
     --shadow-watch-b: rgba(0, 0, 0, 5%);
     /* calendar */
-    --text-color-weekend: #e03131;
-    --bg-header-main: #a1a1aa;
-    --bg-body-main: #444;
-    --bg-item-hover: #fff;
-    --bg-item-active: #ccc;
+    --text-color-red: #e03131;
+    --bg-calendar-header-main: #a1a1aa;
+    --bg-calendar-body-main: #444;
+    --bg-calendar-work: #e9ecef;
+    --bg-calendar-rest: #ffa8a8;
+    --bg-calendar-item-hover: #fff;
+    --bg-calendar-item-active: #ccc;
+    --bg-calendar-item-label: #ccc;
   }
 }
 
