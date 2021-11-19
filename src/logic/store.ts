@@ -33,7 +33,7 @@ const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 interface IState {
   setting: {
     lastSyncTimestamp: number
-    common: {
+    generic: {
       localLanguage: string
     }
     bookmarks: {
@@ -49,7 +49,7 @@ interface IState {
 export const globalState: IState = reactive({
   setting: {
     lastSyncTimestamp: useLocalStorage('lastSyncTimestamp', 0, { listenToStorageChanges: true }),
-    common: {
+    generic: {
       localLanguage: useLocalStorage('localLanguage', defaultLang, { listenToStorageChanges: true }),
     },
     bookmarks: useLocalStorage('bookmarks', {}, { listenToStorageChanges: true }),

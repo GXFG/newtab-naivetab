@@ -121,7 +121,7 @@ const { proxy }: any = getCurrentInstance()
 const onChangeLocale = (e: any) => {
   const data = (e.target as HTMLInputElement).value
   proxy.$i18n.locale = data
-  globalState.setting.common.localLanguage = data
+  globalState.setting.generic.localLanguage = data
 }
 
 const syncTime = computed(() => {
