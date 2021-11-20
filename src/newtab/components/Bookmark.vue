@@ -147,6 +147,7 @@ document.onkeydown = function(e: KeyboardEvent) {
 
 <style scoped>
 #bookmark {
+  user-select: none;
   .bookmark__row {
     display: flex;
     justify-content: center;

@@ -43,6 +43,7 @@ onUnmounted(() => {
   text-align: center;
   text-shadow: 2px 8px 6px var(--shadow-watch-a),
     0px -5px 35px var(--shadow-watch-b);
+  user-select: none;
 }
 #clock .clock__time {
   display: flex;
