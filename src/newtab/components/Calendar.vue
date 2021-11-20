@@ -10,11 +10,11 @@
         </span>
         <select v-model="state.currMonth" class="item__select" @change="onMonthChange()">
           <option
-            v-for="month in MONTHS_ENUM"
+            v-for="month in state.monthsList"
             :key="month.value"
             :value="month.value"
           >
-            {{ `${month.label}-${month.value}` }}
+            {{ `${month.label}` }}
           </option>
         </select>
         <span class="item__btn" @click="onNextMonth()">
@@ -30,7 +30,7 @@
     <!-- header -->
     <ul class="calendar__header">
       <li
-        v-for="item in WEEK_ENUM"
+        v-for="item in state.weekList"
         :key="item.value"
         class="header__item"
         :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
@@ -59,7 +59,7 @@
             'item__label--rest': item.type === 1,
             'item__label--work': item.type === 2,
           }"
-        >{{ LEGAL_HOLIDAY_TYPE_TO_DESC[item.type as 1 | 2] }}</span>
+        >{{ state.holidayTypeToDesc[item.type as 1 | 2] }}</span>
         <span class="item__day">{{ item.day }}</span>
         <span
           class="item__desc"
@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { WEEK_ENUM, MONTHS_ENUM, LEGAL_HOLIDAY_ENUM, LEGAL_HOLIDAY_TYPE_TO_DESC } from '@/logic'
+import { globalState, LEGAL_HOLIDAY_ENUM } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
 const state = reactive({
@@ -80,9 +80,12 @@ const state = reactive({
   currYear: dayjs().get('year'),
   currMonth: dayjs().get('month') + 1,
   currDay: dayjs().get('date'),
+  monthsList: [] as TEnum[],
+  weekList: [] as TEnum[],
+  holidayTypeToDesc: {},
   dateList: [] as {
     date: string // YYYY-MM-DD
-    day: string // DD
+    day: number // D
     desc: string
     type: number // 1休，2班
     isToday: boolean
@@ -92,9 +95,41 @@ const state = reactive({
   }[],
 })
 
-const getIsWeekend = (date: string) => {
-  return [0, 6].includes(dayjs(date).day())
+const initEnumData = () => {
+  state.monthsList = [
+    { label: window.$t('calendar.january'), value: 1 },
+    { label: window.$t('calendar.february'), value: 2 },
+    { label: window.$t('calendar.march'), value: 3 },
+    { label: window.$t('calendar.april'), value: 4 },
+    { label: window.$t('calendar.may'), value: 5 },
+    { label: window.$t('calendar.june'), value: 6 },
+    { label: window.$t('calendar.july'), value: 7 },
+    { label: window.$t('calendar.august'), value: 8 },
+    { label: window.$t('calendar.september'), value: 9 },
+    { label: window.$t('calendar.october'), value: 10 },
+    { label: window.$t('calendar.november'), value: 11 },
+    { label: window.$t('calendar.december'), value: 12 },
+  ]
+  state.weekList = [
+    { label: window.$t('calendar.monday'), value: 1 },
+    { label: window.$t('calendar.tuesday'), value: 2 },
+    { label: window.$t('calendar.wednesday'), value: 3 },
+    { label: window.$t('calendar.thursday'), value: 4 },
+    { label: window.$t('calendar.friday'), value: 5 },
+    { label: window.$t('calendar.saturday'), value: 6 },
+    { label: window.$t('calendar.sunday'), value: 7 },
+  ]
+  state.holidayTypeToDesc = {
+    1: window.$t('calendar.rest'),
+    2: window.$t('calendar.work'),
+  }
 }
+
+initEnumData()
+
+watch(() => globalState.setting.generic.localLanguage, () => {
+  initEnumData()
+})
 
 /**
  * type: 1start, 2main, 3end
@@ -103,22 +138,22 @@ const getIsWeekend = (date: string) => {
 const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
   const formatDate = dateEl.format('YYYY-MM-DD')
   const shortDate = dateEl.format('MMDD')
-  const day = dateEl.format('D')
-  const lunar = calendar.solar2lunar(...formatDate.split('-'))
+  const lunar: TCalendar = calendar.solar2lunar(...formatDate.split('-'))
+  const { cYear, cDay, nWeek, isToday, festival, lunarFestival, Term, IMonthCn, IDayCn, lDay } = lunar
   // desc优先级：阳历节日，阴历节日，节气，阴历月份，阴历日期
-  let desc = lunar.festival || lunar.lunarFestival || lunar.Term || ''
   let isFestival = true
+  let desc = festival || lunarFestival || Term || ''
   if (desc.length === 0) {
-    desc = lunar.lDay === 1 ? lunar.IMonthCn : lunar.IDayCn
     isFestival = false
+    desc = lDay === 1 ? IMonthCn : IDayCn
   }
   const param = {
     date: formatDate,
-    day,
+    day: cDay,
     desc,
-    type: (LEGAL_HOLIDAY_ENUM[state.currYear] && LEGAL_HOLIDAY_ENUM[state.currYear][shortDate]) || 0,
-    isToday: formatDate === state.today,
-    isWeekend: getIsWeekend(formatDate),
+    type: (LEGAL_HOLIDAY_ENUM[cYear] && LEGAL_HOLIDAY_ENUM[cYear][shortDate]) || 0,
+    isToday,
+    isWeekend: [6, 7].includes(nWeek),
     isFestival,
     isNotCurrMonth: type !== 2,
   }
@@ -137,13 +172,11 @@ const onRender = () => {
   currMonthFirstWeek = currMonthFirstWeek === 0 ? 7 : currMonthFirstWeek
 
   // padStart
-  const padStartCount = currMonthFirstWeek - 1
-  const isPadStartEmpty = padStartCount === 0
-  if (!isPadStartEmpty) {
-    for (let index = 0; index < padStartCount; index += 1) {
-      const dateEL = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
-      genDateList(1, dateEL)
-    }
+  let padStartCount = currMonthFirstWeek - 1
+  padStartCount = padStartCount === 0 ? 7 : padStartCount
+  for (let index = 0; index < padStartCount; index += 1) {
+    const dateEL = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
+    genDateList(1, dateEL)
   }
 
   const currMonthLastDate = dayjs(`${state.currYear}-${state.currMonth + 1}-01`).subtract(1, 'day').format('YYYY-MM-DD')
@@ -234,6 +267,8 @@ const onReset = () => {
         cursor: pointer;
       }
       .item__select {
+        width: 100px;
+        text-align: center;
         cursor: pointer;
         background-color: rgba(0, 0, 0, 0);
       }

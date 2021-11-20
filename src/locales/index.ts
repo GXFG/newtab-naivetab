@@ -22,12 +22,14 @@ function getLangAll(): any {
   return target
 }
 
-const i18n = createI18n({
+const i18n: any = createI18n({
   legacy: false,
   locale: globalState.setting.generic.localLanguage,
   fallbackLocale: 'en-US',
   globalInjection: true,
   messages: getLangAll(),
 })
+
+window.$t = i18n.global.t
 
 export default i18n
