@@ -1,7 +1,9 @@
 import { useThrottleFn } from '@vueuse/core'
+import { useMessage } from 'naive-ui'
 import { globalState } from './store'
 import { log, exportStringToFile } from './util'
 
+const message = useMessage()
 // chrome.storage.onChanged.addListener((changes: any, namespace: any) => {
 //   for (const [key, { oldValue, newValue }] of Object.entries(changes) as any) {
 //     console.log(
@@ -61,6 +63,7 @@ export const importSetting = (text: string) => {
     fileContent = JSON.parse(text)
   } catch (e) {
     log('Parse error', e)
+    message.error('Once upon a time you dressed so fine')
   }
   if (Object.keys(fileContent).length === 0) {
     return

@@ -2,41 +2,34 @@
   <div id="calendar">
     <div class="calendar__options">
       <div class="options__item">
-        <select
-          v-model="state.currYear"
-          class="item__select item__select_year"
-          @change="onDateChange()"
+        <NSelect
+          v-model:value="state.currYear"
+          size="small"
+          :options="state.yearList"
+          @update:value="onDateChange()"
         >
-          <option v-for="year in state.yearList" :key="year" :value="year">
-            {{ `${year}` }}
-          </option>
-        </select>
+        </NSelect>
       </div>
       <div class="options__item">
-        <span class="item__btn" @click="onPrevMonth()">
+        <NButton class="item__btn" text @click="onPrevMonth()">
           <fa-solid:angle-left />
-        </span>
-        <select
-          v-model="state.currMonth"
-          class="item__select item__select_month"
-          @change="onDateChange()"
+        </NButton>
+        <NSelect
+          v-model:value="state.currMonth"
+          class="item__select_month"
+          size="small"
+          :options="state.monthsList"
+          @update:value="onDateChange()"
         >
-          <option
-            v-for="month in state.monthsList"
-            :key="month.value"
-            :value="month.value"
-          >
-            {{ `${month.label}` }}
-          </option>
-        </select>
-        <span class="item__btn" @click="onNextMonth()">
+        </NSelect>
+        <NButton class="item__btn" text @click="onNextMonth()">
           <fa-solid:angle-right />
-        </span>
+        </NButton>
       </div>
       <div class="options__item">
-        <span class="item__btn" @click="onReset()">
+        <NButton class="item__btn" text @click="onReset()">
           <si-glyph:arrow-backward />
-        </span>
+        </NButton>
       </div>
     </div>
     <!-- header -->
@@ -84,6 +77,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { NButton, NSelect } from 'naive-ui'
 import { globalState, LEGAL_HOLIDAY_ENUM } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
@@ -92,7 +86,7 @@ const state = reactive({
   currYear: dayjs().get('year'),
   currMonth: dayjs().get('month') + 1,
   currDay: dayjs().get('date'),
-  yearList: Array.from(Array(150), (v, i) => 1900 + i),
+  yearList: Array.from(Array(51), (v, i) => ({ label: `${2000 + i}`, value: `${2000 + i}` })),
   monthsList: [] as TEnum[],
   weekList: [] as TEnum[],
   holidayTypeToDesc: {},
