@@ -2,13 +2,25 @@
   <div id="calendar">
     <div class="calendar__options">
       <div class="options__item">
-        <span>{{ state.currYear }}</span>
+        <select
+          v-model="state.currYear"
+          class="item__select item__select_year"
+          @change="onDateChange()"
+        >
+          <option v-for="year in state.yearList" :key="year" :value="year">
+            {{ `${year}` }}
+          </option>
+        </select>
       </div>
       <div class="options__item">
         <span class="item__btn" @click="onPrevMonth()">
-          <ic:outline-chevron-left />
+          <fa-solid:angle-left />
         </span>
-        <select v-model="state.currMonth" class="item__select" @change="onMonthChange()">
+        <select
+          v-model="state.currMonth"
+          class="item__select item__select_month"
+          @change="onDateChange()"
+        >
           <option
             v-for="month in state.monthsList"
             :key="month.value"
@@ -18,12 +30,12 @@
           </option>
         </select>
         <span class="item__btn" @click="onNextMonth()">
-          <ic:outline-chevron-right />
+          <fa-solid:angle-right />
         </span>
       </div>
       <div class="options__item">
         <span class="item__btn" @click="onReset()">
-          <ic:twotone-settings-backup-restore />
+          <si-glyph:arrow-backward />
         </span>
       </div>
     </div>
@@ -80,6 +92,7 @@ const state = reactive({
   currYear: dayjs().get('year'),
   currMonth: dayjs().get('month') + 1,
   currDay: dayjs().get('date'),
+  yearList: Array.from(Array(150), (v, i) => 1900 + i),
   monthsList: [] as TEnum[],
   weekList: [] as TEnum[],
   holidayTypeToDesc: {},
@@ -225,7 +238,7 @@ const onNextMonth = () => {
   onRender()
 }
 
-const onMonthChange = () => {
+const onDateChange = () => {
   onRender()
 }
 
@@ -243,17 +256,20 @@ const onReset = () => {
   width: 330px;
   color: var(--text-color-main);
   text-align: center;
-  text-shadow: 2px 8px 6px var(--shadow-watch-a),
-    0px -5px 35px var(--shadow-watch-b);
+  user-select: none;
   border-radius: 5px;
   overflow: hidden;
-  user-select: none;
+  transition: all 0.3s ease;
+  box-shadow: rgb(14 30 37 / 12%) 0px 2px 4px 0px,
+    rgb(14 30 37 / 32%) 0px 2px 16px 0px;
+
   .calendar__options {
     padding: 5px;
     display: flex;
     justify-content: space-around;
     align-items: center;
     font-size: 16px;
+    background-color: var(--bg-calendar-options-main);
     .options__item {
       display: flex;
       justify-content: center;
@@ -263,14 +279,19 @@ const onReset = () => {
         justify-content: center;
         align-items: center;
         width: 40px;
-        font-size: 20px;
         cursor: pointer;
       }
       .item__select {
-        width: 100px;
+        font-size: 15px;
         text-align: center;
         cursor: pointer;
         background-color: rgba(0, 0, 0, 0);
+      }
+      .item__select_year {
+        width: 60px;
+      }
+      .item__select_month {
+        width: 100px;
       }
     }
   }
@@ -278,16 +299,13 @@ const onReset = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    background-color: var(--bg-calendar-header-main);
     overflow: hidden;
     .header__item {
       flex: 1;
       height: 30px;
       line-height: 30px;
-      /* font-weight: bold; */
       text-align: center;
-      background-color: var(--bg-calendar-header-main);
     }
     .header__item--weekend {
       color: var(--text-color-red);
@@ -325,11 +343,11 @@ const onReset = () => {
       }
       .item__label {
         position: absolute;
-        top: 0;
-        left: 0;
-        padding: 2px;
+        top: -3px;
+        left: -3px;
+        padding: 3px;
         color: var(--text-color-main);
-        font-size: 12px;
+        font-size: 13px;
         transform: scale(0.7);
       }
       .item__label--work {

@@ -172,6 +172,7 @@ document.onkeydown = function(e: KeyboardEvent) {
         var(--shadow-bookmark-item) 0px 8px 4px,
         var(--shadow-bookmark-item) 0px 16px 8px;
       cursor: pointer;
+      transition: all 0.3s ease;
       &:hover {
         background-color: var(--bg-bookmark-item-active) !important;
       }

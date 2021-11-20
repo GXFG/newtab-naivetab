@@ -19,12 +19,13 @@
     --shadow-watch-b: rgba(200, 255, 255, 0.3);
     /* calendar */
     --text-color-red: #fa5252;
-    --bg-calendar-header-main: #a1a1aa;
-    --bg-calendar-body-main: #444;
+    --bg-calendar-options-main: #adb5bd;
+    --bg-calendar-header-main: #d4d4d8;
+    --bg-calendar-body-main: #d1d5db;
     --bg-calendar-work: #e9ecef;
-    --bg-calendar-rest: #ffa8a8;
-    --bg-calendar-item-hover: #fff;
-    --bg-calendar-item-active: #ccc;
+    --bg-calendar-rest: #FDE3E4;
+    --bg-calendar-item-hover: #2c3e50;
+    --bg-calendar-item-active: #fff;
     --bg-calendar-item-label: #ccc;
   }
 }
@@ -50,13 +51,14 @@
     --shadow-watch-b: rgba(0, 0, 0, 5%);
     /* calendar */
     --text-color-red: #fa5252;
-    --bg-calendar-header-main: #a1a1aa;
-    --bg-calendar-body-main: #444;
+    --bg-calendar-options-main: #444;
+    --bg-calendar-header-main: #555;
+    --bg-calendar-body-main: #0000000;
     --bg-calendar-work: #e9ecef;
-    --bg-calendar-rest: #ffa8a8;
-    --bg-calendar-item-hover: #fff;
+    --bg-calendar-rest: #ffcdd2;
     --bg-calendar-item-active: #ccc;
-    --bg-calendar-item-label: #ccc;
+    --bg-calendar-item-label: #9e9e9e;
+    --bg-calendar-item-hover: #e4e4e7;
   }
 }
 

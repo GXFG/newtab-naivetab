@@ -17,21 +17,24 @@ downloadSetting()
 </script>
 
 <style>
-.app__bookmark {
-  position: absolute;
-  top: 12%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.app__digital_watch {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.app__calendar {
-  position: absolute;
-  bottom: 1%;
-  left: 1%;
+#app {
+  transition: all 0.3s ease;
+  .app__bookmark {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .app__digital_watch {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .app__calendar {
+    position: absolute;
+    bottom: 1.5%;
+    left: 1.5%;
+  }
 }
 </style>
