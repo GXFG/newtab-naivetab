@@ -7,6 +7,7 @@ declare module '*.vue' {
 
 interface Window {
   $t: any // vue-i18n
+  $message: any
 }
 
 type TEnum = {

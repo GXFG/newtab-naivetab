@@ -1,9 +1,7 @@
 import { useThrottleFn } from '@vueuse/core'
-import { useMessage } from 'naive-ui'
 import { globalState } from './store'
 import { log, exportStringToFile } from './util'
 
-const message = useMessage()
 // chrome.storage.onChanged.addListener((changes: any, namespace: any) => {
 //   for (const [key, { oldValue, newValue }] of Object.entries(changes) as any) {
 //     console.log(
@@ -20,6 +18,7 @@ export const uploadSetting = useThrottleFn(() => {
   const localSetting = JSON.stringify(globalState.setting)
   chrome.storage.sync.set({ MyNewTabSetting: localSetting }, () => {
     log('Upload settings success')
+    window.$message.success('Save success')
   })
 }, 2000)
 
@@ -63,7 +62,7 @@ export const importSetting = (text: string) => {
     fileContent = JSON.parse(text)
   } catch (e) {
     log('Parse error', e)
-    message.error('Once upon a time you dressed so fine')
+    window.$message.error('Parse error')
   }
   if (Object.keys(fileContent).length === 0) {
     return
