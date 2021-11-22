@@ -15,11 +15,13 @@ export const sleep = (time: number) => {
   })
 }
 
-export const exportStringToFile = (result: any, filename = 'file') => {
-  const text = JSON.stringify(result, null, 4)
-  const url = `data:application/json;base64,${window.btoa(text)}`
-  chrome.downloads.download({
-    url,
-    filename,
-  })
+export const downloadByTagA = (result: any, filename = 'file') => {
+  const content = JSON.stringify(result, null, 4)
+  const blob = new Blob([content], { type: 'text/json' })
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.setAttribute('href', url)
+  link.setAttribute('download', filename)
+  link.click()
 }

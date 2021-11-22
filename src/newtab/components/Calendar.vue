@@ -134,7 +134,7 @@ const initEnumData = () => {
 
 initEnumData()
 
-watch(() => globalState.setting.generic.localLanguage, () => {
+watch(() => globalState.setting.general.localLanguage, () => {
   initEnumData()
 })
 

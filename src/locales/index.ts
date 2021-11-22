@@ -24,7 +24,7 @@ function getLangAll(): any {
 
 const i18n: any = createI18n({
   legacy: false,
-  locale: globalState.setting.generic.localLanguage,
+  locale: globalState.setting.general.localLanguage,
   fallbackLocale: 'en-US',
   globalInjection: true,
   messages: getLangAll(),

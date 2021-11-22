@@ -33,7 +33,6 @@ interface bookmarkList {
   key: string
   url: string
   name?: string
-  icon?: string
 }
 
 const state = reactive({
@@ -52,7 +51,6 @@ const initBookmarkListData = () => {
       key,
       url: '',
       name: '',
-      icon: '',
     })
   })
   isInitialized.value = true
@@ -76,30 +74,26 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
     const item = globalState.setting.bookmarks[key]
     const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
     // 重置没有配置信息的按键
-    if (!(item && (item.url || item.name || item.icon))) {
+    if (!(item && (item.url || item.name))) {
       localBookmarkList.value[index] = {
         key,
         url: '',
         name: '',
-        icon: '',
       }
       continue
     }
     const url = item.url.includes('//') ? item.url : `https://${item.url}`
     const domain = url.split('/')[2]
     let name = ''
-    let icon = ''
     if (domain && !domain.includes(':')) {
       // 非端口地址
       const tempSplitList = domain.split('.')
       name = tempSplitList[tempSplitList.length - 2] // 默认name为主域名去掉后缀
-      icon = `https://${domain}/favicon.ico`
     }
     localBookmarkList.value[index] = {
       key,
       url,
       name: item.name ? item.name : name,
-      icon: item.icon ? item.icon : icon,
     }
   }
 }, 1000)

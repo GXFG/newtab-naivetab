@@ -3,20 +3,18 @@ export default {
     mainLabel: '设置',
     tabGeneral: '通用',
     tabBookmarks: '书签',
+    tabClock: '时钟',
+    tabCalendar: '日历',
     // general
-    lastSyncTime: '上次同步时间',
-    language: '语言',
-    backupSettings: '备份设置',
-    restoreSettings: '恢复设置',
+    lastSyncTime: '同步时间',
     importSettings: '导入设置',
     exportSettings: '导出设置',
+    language: '语言',
     // bookmarks
     urlLabel: '地址',
     urlPlaceholder: '',
     nameLabel: '名称',
     namePlaceholder: '',
-    iconLabel: '图标',
-    iconPlaceholder: '',
   },
   calendar: {
     // monthsList

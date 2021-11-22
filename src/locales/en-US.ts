@@ -3,20 +3,18 @@ export default {
     mainLabel: 'Setting',
     tabGeneral: 'General',
     tabBookmarks: 'Bookmarks',
+    tabClock: 'Clock',
+    tabCalendar: 'Calendar',
     // general
     lastSyncTime: 'Last sync time',
-    language: 'Language',
-    backupSettings: 'Backup settings',
-    restoreSettings: 'Restore settings',
     importSettings: 'Import settings',
     exportSettings: 'Export settings',
+    language: 'Language',
     // bookmarks
     urlLabel: 'url',
     urlPlaceholder: '',
     nameLabel: 'name',
     namePlaceholder: '',
-    iconLabel: 'icon',
-    iconPlaceholder: '',
   },
   calendar: {
     // monthsList

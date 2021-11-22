@@ -1,6 +1,7 @@
+import dayjs from 'dayjs'
 import { useThrottleFn } from '@vueuse/core'
 import { globalState } from './store'
-import { log, exportStringToFile } from './util'
+import { log, downloadByTagA } from './util'
 
 // chrome.storage.onChanged.addListener((changes: any, namespace: any) => {
 //   for (const [key, { oldValue, newValue }] of Object.entries(changes) as any) {
@@ -18,12 +19,12 @@ export const uploadSetting = useThrottleFn(() => {
   const localSetting = JSON.stringify(globalState.setting)
   chrome.storage.sync.set({ MyNewTabSetting: localSetting }, () => {
     log('Upload settings success')
-    window.$message.success('Save success')
+    window.$message.success('Update setting')
   })
 }, 2000)
 
 watch([
-  () => globalState.setting.generic,
+  () => globalState.setting.general,
   () => globalState.setting.bookmarks,
 ], () => {
   uploadSetting()
@@ -68,8 +69,8 @@ export const importSetting = (text: string) => {
     return
   }
   log('FileContent', fileContent)
-  if (fileContent.generic) {
-    globalState.setting.generic = fileContent.generic
+  if (fileContent.general) {
+    globalState.setting.general = fileContent.general
   }
   if (fileContent.bookmarks) {
     globalState.setting.bookmarks = fileContent.bookmarks
@@ -77,6 +78,6 @@ export const importSetting = (text: string) => {
 }
 
 export const exportSetting = () => {
-  const filename = `newtab-export-setting-${Date.now()}.json`
-  exportStringToFile(globalState.setting, filename)
+  const filename = `newtab-setting-${dayjs().format('YYYYMMDD-hhmmss')}.json`
+  downloadByTagA(globalState.setting, filename)
 }

@@ -1,5 +1,6 @@
 import { reactive } from 'vue'
 import { useToggle, useLocalStorage } from '@vueuse/core'
+import pkg from '../../package.json'
 
 // 键盘布局
 export const KEYBOARD_KEY = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
@@ -18,7 +19,7 @@ const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 interface IState {
   setting: {
     lastSyncTimestamp: number
-    generic: {
+    general: {
       localLanguage: string
     }
     bookmarks: {
@@ -33,8 +34,9 @@ interface IState {
 
 export const globalState: IState = reactive({
   setting: {
+    version: pkg.version,
     lastSyncTimestamp: useLocalStorage('lastSyncTimestamp', 0, { listenToStorageChanges: true }),
-    generic: {
+    general: {
       localLanguage: useLocalStorage('localLanguage', defaultLang, { listenToStorageChanges: true }),
     },
     bookmarks: useLocalStorage('bookmarks', {}, { listenToStorageChanges: true }),
