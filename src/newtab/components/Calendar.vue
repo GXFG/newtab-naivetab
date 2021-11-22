@@ -1,5 +1,5 @@
 <template>
-  <div id="calendar">
+  <div v-if="globalState.setting.calendar.enabled" id="calendar" :style="positionStyle">
     <div class="calendar__options">
       <div class="options__item">
         <NSelect
@@ -7,8 +7,7 @@
           size="small"
           :options="state.yearList"
           @update:value="onDateChange()"
-        >
-        </NSelect>
+        ></NSelect>
       </div>
       <div class="options__item">
         <NButton class="item__btn" text @click="onPrevMonth()">
@@ -20,8 +19,7 @@
           size="small"
           :options="state.monthsList"
           @update:value="onDateChange()"
-        >
-        </NSelect>
+        ></NSelect>
         <NButton class="item__btn" text @click="onNextMonth()">
           <fa-solid:angle-right />
         </NButton>
@@ -78,8 +76,10 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
-import { globalState, LEGAL_HOLIDAY_ENUM } from '@/logic'
+import { globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle } from '@/logic'
 import { calendar } from '@/lib/calendar'
+
+const positionStyle = computed(() => getLayoutStyle('calendar'))
 
 const state = reactive({
   today: dayjs().format('YYYY-MM-DD'),
@@ -134,7 +134,7 @@ const initEnumData = () => {
 
 initEnumData()
 
-watch(() => globalState.setting.general.localLanguage, () => {
+watch(() => globalState.setting.general.lang, () => {
   initEnumData()
 })
 
@@ -247,6 +247,7 @@ const onReset = () => {
 
 <style scoped>
 #calendar {
+  position: fixed;
   width: 330px;
   color: var(--text-color-main);
   text-align: center;

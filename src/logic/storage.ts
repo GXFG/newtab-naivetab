@@ -3,29 +3,19 @@ import { useThrottleFn } from '@vueuse/core'
 import { globalState } from './store'
 import { log, downloadByTagA } from './util'
 
-// chrome.storage.onChanged.addListener((changes: any, namespace: any) => {
-//   for (const [key, { oldValue, newValue }] of Object.entries(changes) as any) {
-//     console.log(
-//       `Storage key "${key}" in namespace "${namespace}" changed.`,
-//       `Old value was "${oldValue}", new value is "${newValue}".`,
-//     )
-//   }
-// })
-
 export const uploadSetting = useThrottleFn(() => {
   // chrome.storage.sync.clear()
   log('uploadSetting')
-  globalState.setting.lastSyncTimestamp = Date.now()
+  globalState.setting.syncTime = Date.now()
   const localSetting = JSON.stringify(globalState.setting)
   chrome.storage.sync.set({ MyNewTabSetting: localSetting }, () => {
     log('Upload settings success')
-    window.$message.success('Update setting')
   })
 }, 2000)
 
 watch([
-  () => globalState.setting.general,
   () => globalState.setting.bookmarks,
+  () => globalState.setting.general,
 ], () => {
   uploadSetting()
 }, {
@@ -40,12 +30,12 @@ export const downloadSetting = () => {
         return
       }
       const cloudSetting = JSON.parse(MyNewTabSetting)
-      if (cloudSetting.lastSyncTimestamp === globalState.setting.lastSyncTimestamp) {
+      if (cloudSetting.syncTime === globalState.setting.syncTime) {
         log('No settings update')
         return
       }
       log('Update settings', MyNewTabSetting)
-      globalState.setting.lastSyncTimestamp = cloudSetting.lastSyncTimestamp
+      globalState.setting.syncTime = cloudSetting.syncTime
       if (cloudSetting.bookmarks) {
         globalState.setting.bookmarks = cloudSetting.bookmarks
       }
@@ -78,6 +68,6 @@ export const importSetting = (text: string) => {
 }
 
 export const exportSetting = () => {
-  const filename = `newtab-setting-${dayjs().format('YYYYMMDD-hhmmss')}.json`
+  const filename = `newtab-setting-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadByTagA(globalState.setting, filename)
 }

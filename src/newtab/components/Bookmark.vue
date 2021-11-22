@@ -1,5 +1,5 @@
 <template>
-  <div id="bookmark">
+  <div v-if="globalState.setting.bookmarks.enabled" id="bookmark" :style="positionStyle">
     <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
       <div
         v-for="item in rowData"
@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, PRESS_INTERVAL_TIME, isSettingMode, globalState, sleep, log } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, isSettingMode, globalState, getLayoutStyle, sleep, log } from '@/logic'
 
 interface bookmarkList {
   key: string
@@ -38,6 +38,8 @@ interface bookmarkList {
 const state = reactive({
   currSelectKey: '',
 })
+
+const positionStyle = computed(() => getLayoutStyle('bookmarks'))
 
 const isInitialized = useLocalStorage('isInitialized', false, { listenToStorageChanges: true })
 const localBookmarkList = useLocalStorage('bookmarkList', [] as bookmarkList[], { listenToStorageChanges: true })
@@ -71,7 +73,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
     await sleep(100)
   }
   for (const key of KEYBOARD_KEY) {
-    const item = globalState.setting.bookmarks[key]
+    const item = globalState.setting.bookmarks.keymap[key]
     const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
     // 重置没有配置信息的按键
     if (!(item && (item.url || item.name))) {
@@ -98,7 +100,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
   }
 }, 1000)
 
-watch(() => globalState.setting.bookmarks,
+watch(() => globalState.setting.bookmarks.keymap,
   () => {
     mergeBookmarkSetting()
   }, {
@@ -133,7 +135,7 @@ document.onkeydown = function(e: KeyboardEvent) {
     clearTimeout(timer)
     timer = setTimeout(() => {
       state.currSelectKey = ''
-    }, PRESS_INTERVAL_TIME)
+    }, BOOKMARK_ACTIVE_PRESS_INTERVAL)
   }
 }
 
@@ -141,7 +143,9 @@ document.onkeydown = function(e: KeyboardEvent) {
 
 <style scoped>
 #bookmark {
+  position: fixed;
   user-select: none;
+  transition: all 0.3s ease;
   .bookmark__row {
     display: flex;
     justify-content: center;

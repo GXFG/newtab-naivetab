@@ -1,20 +1,45 @@
 export default {
+  common: {
+    enabled: 'Enabled',
+    layout: 'Layout',
+    position: 'Position',
+    leftTop: 'LeftTop',
+    centerTop: 'CenterTop',
+    rightTop: 'RightTop',
+    leftCenter: 'LeftCenter',
+    centerCenter: 'CenterCenter',
+    rightCenter: 'RightCenter',
+    leftBottom: 'LeftBottom',
+    centerBottom: 'CenterBottom',
+    rightBottom: 'RightBottom',
+    xOffset: 'XOffset',
+    yOffset: 'YOffset',
+  },
   setting: {
     mainLabel: 'Setting',
-    tabGeneral: 'General',
     tabBookmarks: 'Bookmarks',
     tabClock: 'Clock',
     tabCalendar: 'Calendar',
-    // general
+    tabGeneral: 'General',
+  },
+  general: {
+    generalLabel: 'General',
+    settingDividerSetting: 'Setting',
     lastSyncTime: 'Last sync time',
-    importSettings: 'Import settings',
-    exportSettings: 'Export settings',
+    importSettingsLabel: 'Import settings',
+    importSettingsValue: 'Select File',
+    exportSettingLabel: 'Export settings',
+    exportSettingValue: 'Export',
+    settingDividerLanguage: 'Language',
     language: 'Language',
-    // bookmarks
+  },
+  bookmarks: {
+    bookmarksLabel: 'Bookmarks',
+    bookmarksDividerConfig: 'Config',
     urlLabel: 'url',
     urlPlaceholder: '',
     nameLabel: 'name',
-    namePlaceholder: '',
+    namePlaceholder: 'optional',
   },
   calendar: {
     // monthsList

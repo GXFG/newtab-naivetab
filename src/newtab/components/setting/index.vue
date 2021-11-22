@@ -13,14 +13,18 @@
     <NDrawer v-model:show="isSettingMode" :width="500" placement="right">
       <NDrawerContent>
         <NTabs class="setting__tabs" type="line">
-          <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
-            <GeneralSetting />
-          </NTabPane>
           <NTabPane name="tabBookmarks" :tab="$t('setting.tabBookmarks')">
             <BookmarkSetting />
           </NTabPane>
-          <NTabPane name="tabClock" :tab="$t('setting.tabClock')"></NTabPane>
-          <NTabPane name="tabCalendar" :tab="$t('setting.tabCalendar')"></NTabPane>
+          <NTabPane name="tabClock" :tab="$t('setting.tabClock')">
+            <ClockSetting />
+          </NTabPane>
+          <NTabPane name="tabCalendar" :tab="$t('setting.tabCalendar')">
+            <CalendarSetting />
+          </NTabPane>
+          <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
+            <GeneralSetting />
+          </NTabPane>
         </NTabs>
       </NDrawerContent>
     </NDrawer>
@@ -29,8 +33,10 @@
 
 <script setup lang="ts">
 import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
-import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
+import ClockSetting from './components/ClockSetting.vue'
+import CalendarSetting from './components/CalendarSetting.vue'
+import GeneralSetting from './components/GeneralSetting.vue'
 import { isSettingMode, toggleIsSettingMode } from '@/logic'
 
 </script>

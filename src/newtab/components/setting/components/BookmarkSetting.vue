@@ -1,20 +1,25 @@
 <template>
+  <ElementLayout name="bookmarks" />
+  <NDivider title-placement="left">
+    {{ $t('bookmarks.bookmarksDividerConfig') }}
+  </NDivider>
+
   <ul class="modal__bookmarks">
     <li v-for="key of KEYBOARD_KEY" :key="key" class="bookmarks__item">
       <div class="item__key">
         <span>{{ `${key.toUpperCase()}` }}</span>
       </div>
       <!-- 存在配置的书签 -->
-      <div v-if="globalState.setting.bookmarks[key]" class="item__content">
+      <div v-if="globalState.setting.bookmarks.keymap[key]" class="item__content">
         <div v-for="field of ['url', 'name']" :key="field" class="content__input">
-          <label class="input__label">{{ $t(`setting.${field}Label`) }}:</label>
+          <label class="input__label">{{ $t(`bookmarks.${field}Label`) }}:</label>
           <NInput
-            v-model:value="globalState.setting.bookmarks[key][field as 'url' | 'name']"
+            v-model:value="globalState.setting.bookmarks.keymap[key][field as 'url' | 'name']"
             class="input__main"
             size="small"
             type="text"
             clearable
-            :placeholder="$t(`setting.${field}Placeholder`)"
+            :placeholder="$t(`bookmarks.${field}Placeholder`)"
           />
         </div>
         <NButton class="content__icon" text @click="onDeleteKey(key)">
@@ -32,18 +37,18 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NInput } from 'naive-ui'
+import { NDivider, NButton, NInput } from 'naive-ui'
 import { KEYBOARD_KEY, globalState } from '@/logic'
 
 const onAddKey = (key: string) => {
-  globalState.setting.bookmarks[key] = {
+  globalState.setting.bookmarks.keymap[key] = {
     url: '',
     name: '',
   }
 }
 
 const onDeleteKey = (key: string) => {
-  delete globalState.setting.bookmarks[key]
+  delete globalState.setting.bookmarks.keymap[key]
 }
 
 </script>

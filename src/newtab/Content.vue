@@ -1,8 +1,8 @@
 <template>
   <Setting class="app__setting" />
-  <Bookmark class="app__bookmark" />
-  <DigitalClock class="app__digital_clock" />
-  <Calendar class="app__calendar" />
+  <Bookmark />
+  <DigitalClock />
+  <Calendar />
 </template>
 
 <script setup lang="ts">
@@ -16,21 +16,4 @@ window.$message = useMessage()
 </script>
 
 <style>
-.app__bookmark {
-  position: absolute;
-  top: 12%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.app__digital_clock {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.app__calendar {
-  position: absolute;
-  bottom: 1.5%;
-  left: 1.5%;
-}
 </style>

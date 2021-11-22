@@ -1,5 +1,5 @@
 <template>
-  <div id="clock">
+  <div v-if="globalState.setting.clock.enabled" id="clock" :style="positionStyle">
     <div class="clock__time">
       <p class="time__text">
         {{ state.time }}
@@ -14,6 +14,9 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { globalState, getLayoutStyle } from '@/logic'
+
+const positionStyle = computed(() => getLayoutStyle('clock'))
 
 const state = reactive({
   time: '',
@@ -38,6 +41,7 @@ onUnmounted(() => {
 
 <style scoped>
 #clock {
+  position: fixed;
   font-family: "Arial Rounded MT Bold", "Rockwell", "Andale Mono", monospace;
   color: var(--text-color-watch);
   text-align: center;

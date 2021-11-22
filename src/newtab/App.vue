@@ -18,11 +18,11 @@ const currTheme = computed(() => (osThemeRef.value === 'dark' ? darkTheme : null
 
 const themeOverrides: GlobalThemeOverrides = {
   common: {
-    baseColor: '#78909c',
-    primaryColor: '#78909c',
-    primaryColorHover: '#78909c',
-    primaryColorPressed: '#78909c',
-    primaryColorSuppl: '#78909c',
+    // baseColor: '#78909c',
+    // primaryColor: '#78909c',
+    // primaryColorHover: '#78909c',
+    // primaryColorPressed: '#78909c',
+    // primaryColorSuppl: '#78909c',
   },
 }
 
