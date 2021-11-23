@@ -7,7 +7,7 @@
       {{ $t('common.layout') }}
     </NDivider>
     <NFormItem :label="$t('common.position')">
-      <ElementLayoutSelect
+      <LayoutSelect
         :curr-type="globalState.setting[props.name].layout.positionType"
         @onConfirm="onPositionChange"
       />
@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { NDivider, NForm, NFormItem, NSwitch, NSlider, NInputNumber } from 'naive-ui'
-import ElementLayoutSelect from './ElementLayoutSelect.vue'
+import LayoutSelect from './LayoutSelect.vue'
 import { POSITION_TYPE_TO_STYLE_MAP, globalState } from '@/logic'
 
 const props = defineProps({

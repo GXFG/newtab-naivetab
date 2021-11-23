@@ -71,4 +71,5 @@ export const importSetting = (text: string) => {
 export const exportSetting = () => {
   const filename = `newtab-setting-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadByTagA(globalState.setting, filename)
+  window.$message.success('success')
 }
