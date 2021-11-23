@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { useThrottleFn } from '@vueuse/core'
 import { globalState } from './store'
+import { MERGE_SETTING_DELAY } from './const'
 import { log, downloadByTagA } from './util'
 
 export const uploadSetting = useThrottleFn(() => {
@@ -11,7 +12,7 @@ export const uploadSetting = useThrottleFn(() => {
   chrome.storage.sync.set({ MyNewTabSetting: localSetting }, () => {
     log('Upload settings success')
   })
-}, 2000)
+}, MERGE_SETTING_DELAY)
 
 watch([
   () => globalState.setting.bookmarks,

@@ -23,9 +23,9 @@
     --bg-calendar-body-main: #d1d5db;
     --bg-calendar-work: #e9ecef;
     --bg-calendar-rest: #FDE3E4;
-    --bg-calendar-item-hover: #2c3e50;
     --bg-calendar-item-active: #fff;
     --bg-calendar-item-label: #ccc;
+    --bg-calendar-item-hover: #2c3e50;
   }
 }
 
@@ -54,7 +54,7 @@
     --bg-calendar-body-main: #0000000;
     --bg-calendar-work: #e9ecef;
     --bg-calendar-rest: #ffcdd2;
-    --bg-calendar-item-active: #ccc;
+    --bg-calendar-item-active: #868e96;
     --bg-calendar-item-label: #9e9e9e;
     --bg-calendar-item-hover: #e4e4e7;
   }

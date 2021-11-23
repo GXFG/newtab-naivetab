@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, isSettingMode, globalState, getLayoutStyle, sleep, log } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, sleep, log } from '@/logic'
 
 interface bookmarkList {
   key: string
@@ -98,7 +98,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
       name: item.name ? item.name : name,
     }
   }
-}, 1000)
+}, MERGE_SETTING_DELAY)
 
 watch(() => globalState.setting.bookmarks.keymap,
   () => {
