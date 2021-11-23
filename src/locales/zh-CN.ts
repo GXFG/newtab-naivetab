@@ -1,5 +1,7 @@
 export default {
   common: {
+    success: '成功',
+    fail: '失败',
     enabled: '启用',
     layout: '布局',
     position: '位置',
@@ -24,6 +26,7 @@ export default {
   },
   general: {
     generalLabel: '通用',
+    pageTitle: '页面标题',
     settingDividerSetting: '设置',
     lastSyncTime: '同步时间',
     importSettingsLabel: '导入设置',

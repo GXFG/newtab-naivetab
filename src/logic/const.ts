@@ -4,7 +4,7 @@ export const KEY_OF_INDEX = { q: 0, w: 1, e: 2, r: 3, t: 4, y: 5, u: 6, i: 7, o:
 
 export const BOOKMARK_ACTIVE_PRESS_INTERVAL = 200
 
-export const MERGE_SETTING_DELAY = 1300
+export const MERGE_SETTING_DELAY = 2000
 
 export const POSITION_TYPE_TO_STYLE_MAP = {
   1: [

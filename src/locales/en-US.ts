@@ -1,5 +1,7 @@
 export default {
   common: {
+    success: 'Success',
+    fail: 'Fail',
     enabled: 'Enabled',
     layout: 'Layout',
     position: 'Position',
@@ -24,6 +26,7 @@ export default {
   },
   general: {
     generalLabel: 'General',
+    pageTitle: 'Page title',
     settingDividerSetting: 'Setting',
     lastSyncTime: 'Last sync time',
     importSettingsLabel: 'Import settings',

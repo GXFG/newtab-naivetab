@@ -1,10 +1,10 @@
 <template>
   <div class="modal__general">
-    <NForm
-      ref="formRef"
-      label-placement="left"
-      :label-width="100"
-    >
+    <NForm ref="formRef" label-placement="left" :label-width="100">
+      <NFormItem :label="$t('general.pageTitle')">
+        <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
+      </NFormItem>
+
       <NDivider title-placement="left">
         {{ $t('general.settingDividerSetting') }}
       </NDivider>
@@ -32,7 +32,6 @@
         <NSelect
           v-model:value="proxy.$i18n.locale"
           class="item__locale"
-          size="small"
           :options="i18n.global.availableLocales.map((locale: string) => ({
             label: locale,
             value: locale
@@ -46,7 +45,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { NForm, NFormItem, NButton, NSelect, NDivider } from 'naive-ui'
+import { NForm, NFormItem, NButton, NSelect, NInput, NDivider } from 'naive-ui'
 import { importSetting, exportSetting, globalState } from '@/logic'
 import i18n from '@/locales'
 

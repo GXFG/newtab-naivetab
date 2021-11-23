@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
-import { useThrottleFn } from '@vueuse/core'
+import { useDebounceFn } from '@vueuse/core'
 import { globalState } from './store'
 import { MERGE_SETTING_DELAY } from './const'
 import { log, downloadByTagA } from './util'
 
-export const uploadSetting = useThrottleFn(() => {
+const uploadFn = () => {
   // chrome.storage.sync.clear()
   log('uploadSetting')
   globalState.setting.syncTime = Date.now()
@@ -12,11 +12,14 @@ export const uploadSetting = useThrottleFn(() => {
   chrome.storage.sync.set({ MyNewTabSetting: localSetting }, () => {
     log('Upload settings success')
   })
-}, MERGE_SETTING_DELAY)
+}
+const uploadSetting = useDebounceFn(uploadFn, MERGE_SETTING_DELAY)
 
 watch([
-  () => globalState.setting.bookmarks,
   () => globalState.setting.general,
+  () => globalState.setting.clock,
+  () => globalState.setting.calendar,
+  () => globalState.setting.bookmarks,
 ], () => {
   uploadSetting()
 }, {
@@ -37,6 +40,15 @@ export const downloadSetting = () => {
       }
       log('Update settings', MyNewTabSetting)
       globalState.setting.syncTime = cloudSetting.syncTime
+      if (cloudSetting.general) {
+        globalState.setting.general = cloudSetting.general
+      }
+      if (cloudSetting.clock) {
+        globalState.setting.clock = cloudSetting.clock
+      }
+      if (cloudSetting.calendar) {
+        globalState.setting.calendar = cloudSetting.calendar
+      }
       if (cloudSetting.bookmarks) {
         globalState.setting.bookmarks = cloudSetting.bookmarks
       }
@@ -71,5 +83,5 @@ export const importSetting = (text: string) => {
 export const exportSetting = () => {
   const filename = `newtab-setting-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadByTagA(globalState.setting, filename)
-  window.$message.success('success')
+  window.$message.success(window.$t('common.success'))
 }

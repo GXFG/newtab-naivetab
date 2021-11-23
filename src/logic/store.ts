@@ -10,21 +10,8 @@ interface IState {
     version: string
     syncTime: number
     general: {
+      pageTitle: string
       lang: string
-    }
-    bookmarks: {
-      enabled: boolean
-      layout: {
-        positionType: number
-        xOffset: number
-        yOffset: number
-      }
-      keymap: {
-        [propName: string]: {
-          url: string
-          name?: string
-        }
-      }
     }
     clock: {
       enabled: boolean
@@ -42,6 +29,20 @@ interface IState {
         yOffset: number
       }
     }
+    bookmarks: {
+      enabled: boolean
+      layout: {
+        positionType: number
+        xOffset: number
+        yOffset: number
+      }
+      keymap: {
+        [propName: string]: {
+          url: string
+          name?: string
+        }
+      }
+    }
   }
 }
 
@@ -50,16 +51,8 @@ export const globalState: IState = reactive({
     version: pkg.version,
     syncTime: useLocalStorage('syncTime', 0, { listenToStorageChanges: true }),
     general: useLocalStorage('general', {
+      pageTitle: 'NewTab',
       lang: defaultLang,
-    }, { listenToStorageChanges: true }),
-    bookmarks: useLocalStorage('bookmarks', {
-      enabled: true,
-      layout: {
-        positionType: 2,
-        xOffset: 0,
-        yOffset: 0,
-      },
-      keymap: {},
     }, { listenToStorageChanges: true }),
     clock: useLocalStorage('clock', {
       enabled: true,
@@ -77,7 +70,20 @@ export const globalState: IState = reactive({
         yOffset: 0,
       },
     }, { listenToStorageChanges: true }),
+    bookmarks: useLocalStorage('bookmarks', {
+      enabled: true,
+      layout: {
+        positionType: 2,
+        xOffset: 50,
+        yOffset: 1,
+      },
+      keymap: {},
+    }, { listenToStorageChanges: true }),
   },
+})
+
+watch(() => globalState.setting.general.pageTitle, (value) => {
+  document.title = value
 })
 
 export const [isSettingMode, toggleIsSettingMode] = useToggle(false)

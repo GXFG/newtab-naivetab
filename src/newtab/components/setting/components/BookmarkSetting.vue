@@ -12,15 +12,17 @@
       <!-- 存在配置的书签 -->
       <div v-if="globalState.setting.bookmarks.keymap[key]" class="item__content">
         <div v-for="field of ['url', 'name']" :key="field" class="content__input">
-          <label class="input__label">{{ $t(`bookmarks.${field}Label`) }}:</label>
           <NInput
             v-model:value="globalState.setting.bookmarks.keymap[key][field as 'url' | 'name']"
             class="input__main"
-            size="small"
             type="text"
             clearable
             :placeholder="$t(`bookmarks.${field}Placeholder`)"
-          />
+          >
+            <template #prefix>
+              {{ $t(`bookmarks.${field}Label`) }}
+            </template>
+          </NInput>
         </div>
         <NButton class="content__icon" text @click="onDeleteKey(key)">
           <ri:delete-bin-6-line class="item__icon" />
@@ -93,17 +95,8 @@ const onDeleteKey = (key: string) => {
         }
         &:nth-of-type(2) {
           .input__main {
-            width: 95px;
+            width: 130px;
           }
-        }
-        &:nth-of-type(3) {
-          .input__main {
-            width: 90px;
-          }
-        }
-        .input__label {
-          flex: 0 0 auto;
-          padding-right: 5px;
         }
       }
     }
