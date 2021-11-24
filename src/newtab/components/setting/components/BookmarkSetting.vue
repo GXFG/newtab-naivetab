@@ -1,10 +1,18 @@
 <template>
-  <ElementLayout name="bookmarks" />
+  <ComponentLayout name="bookmarks" />
   <NDivider title-placement="left">
     {{ $t('bookmarks.bookmarksDividerConfig') }}
   </NDivider>
 
   <ul class="modal__bookmarks">
+    <li class="bookmarks__label">
+      <p class="label__text">
+        {{ $t('bookmarks.urlLabel') }}
+      </p>
+      <p class="label__text">
+        {{ $t('bookmarks.nameLabel') }}
+      </p>
+    </li>
     <li v-for="key of KEYBOARD_KEY" :key="key" class="bookmarks__item">
       <div class="item__key">
         <span>{{ `${key.toUpperCase()}` }}</span>
@@ -19,9 +27,6 @@
             clearable
             :placeholder="$t(`bookmarks.${field}Placeholder`)"
           >
-            <template #prefix>
-              {{ $t(`bookmarks.${field}Label`) }}
-            </template>
           </NInput>
         </div>
         <NButton class="content__icon" text @click="onDeleteKey(key)">
@@ -57,6 +62,20 @@ const onDeleteKey = (key: string) => {
 
 <style>
 .modal__bookmarks {
+  .bookmarks__label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: -10px;
+    .label__text {
+      &:nth-of-type(1) {
+        margin-left: 30%;
+      }
+      &:nth-of-type(2) {
+        margin-right: 18%;
+      }
+    }
+  }
   .bookmarks__item {
     display: flex;
     align-items: center;
@@ -90,13 +109,14 @@ const onDeleteKey = (key: string) => {
         display: flex;
         align-items: center;
         margin-right: 10px;
+        .input__label {
+          width: 70px;
+        }
         &:nth-of-type(1) {
           flex: 1;
         }
         &:nth-of-type(2) {
-          .input__main {
-            width: 130px;
-          }
+          width: 25%;
         }
       }
     }

@@ -13,12 +13,26 @@
       />
     </NFormItem>
     <NFormItem :label="$t('common.xOffset')">
-      <NSlider v-model:value="globalState.setting[props.name].layout.xOffset" :step="1" />
-      <NInputNumber v-model:value="globalState.setting[props.name].layout.xOffset" class="layout__input_number" size="small" :min="0" :max="100" />
+      <NSlider v-model:value="globalState.setting[props.name].layout.xOffset" :step="0.1" />
+      <NInputNumber
+        v-model:value="globalState.setting[props.name].layout.xOffset"
+        class="layout__input_number"
+        size="small"
+        :step="0.1"
+        :min="0"
+        :max="100"
+      />
     </NFormItem>
     <NFormItem :label="$t('common.yOffset')">
-      <NSlider v-model:value="globalState.setting[props.name].layout.yOffset" :step="1" />
-      <NInputNumber v-model:value="globalState.setting[props.name].layout.yOffset" class="layout__input_number" size="small" :min="0" :max="100" />
+      <NSlider v-model:value="globalState.setting[props.name].layout.yOffset" :step="0.1" />
+      <NInputNumber
+        v-model:value="globalState.setting[props.name].layout.yOffset"
+        class="layout__input_number"
+        size="small"
+        :step="0.1"
+        :min="0"
+        :max="100"
+      />
     </NFormItem>
   </NForm>
 </template>

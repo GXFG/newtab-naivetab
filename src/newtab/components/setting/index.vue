@@ -19,6 +19,9 @@
           <NTabPane name="tabClock" :tab="$t('setting.tabClock')">
             <ClockSetting />
           </NTabPane>
+          <NTabPane name="tabDate" :tab="$t('setting.tabDate')">
+            <DateSetting />
+          </NTabPane>
           <NTabPane name="tabCalendar" :tab="$t('setting.tabCalendar')">
             <CalendarSetting />
           </NTabPane>
@@ -35,6 +38,7 @@
 import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
 import BookmarkSetting from './components/BookmarkSetting.vue'
 import ClockSetting from './components/ClockSetting.vue'
+import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import GeneralSetting from './components/GeneralSetting.vue'
 import { isSettingMode, toggleIsSettingMode } from '@/logic'

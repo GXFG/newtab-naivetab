@@ -21,6 +21,7 @@ export default {
     mainLabel: 'Setting',
     tabBookmarks: 'Bookmarks',
     tabClock: 'Clock',
+    tabDate: 'Date',
     tabCalendar: 'Calendar',
     tabGeneral: 'General',
   },

@@ -21,6 +21,7 @@ export default {
     mainLabel: '设置',
     tabBookmarks: '书签',
     tabClock: '时钟',
+    tabDate: '日期',
     tabCalendar: '日历',
     tabGeneral: '通用',
   },

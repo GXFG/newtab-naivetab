@@ -13,6 +13,14 @@ interface IState {
       pageTitle: string
       lang: string
     }
+    date: {
+      enabled: boolean
+      layout: {
+        positionType: number
+        xOffset: number
+        yOffset: number
+      }
+    }
     clock: {
       enabled: boolean
       layout: {
@@ -54,6 +62,14 @@ export const globalState: IState = reactive({
       pageTitle: 'NewTab',
       lang: defaultLang,
     }, { listenToStorageChanges: true }),
+    date: useLocalStorage('date', {
+      enabled: true,
+      layout: {
+        positionType: 5,
+        xOffset: 50,
+        yOffset: 70,
+      },
+    }, { listenToStorageChanges: true }),
     clock: useLocalStorage('clock', {
       enabled: true,
       layout: {
@@ -88,7 +104,7 @@ watch(() => globalState.setting.general.pageTitle, (value) => {
 
 export const [isSettingMode, toggleIsSettingMode] = useToggle(false)
 
-export const getLayoutStyle = (name: 'bookmarks' | 'clock' | 'calendar') => {
+export const getLayoutStyle = (name: 'bookmarks' | 'date' | 'clock' | 'calendar') => {
   const layout = globalState.setting[name].layout
   const styleList = POSITION_TYPE_TO_STYLE_MAP[layout.positionType]
   let res = `${styleList[0].prop}:${layout.xOffset}%;${styleList[1].prop}:${layout.yOffset}%;`

@@ -43,6 +43,9 @@ export const downloadSetting = () => {
       if (cloudSetting.general) {
         globalState.setting.general = cloudSetting.general
       }
+      if (cloudSetting.date) {
+        globalState.setting.date = cloudSetting.date
+      }
       if (cloudSetting.clock) {
         globalState.setting.clock = cloudSetting.clock
       }
@@ -66,7 +69,7 @@ export const importSetting = (text: string) => {
     fileContent = JSON.parse(text)
   } catch (e) {
     log('Parse error', e)
-    window.$message.error('Parse error')
+    window.$message.error(window.$t('common.fail'))
   }
   if (Object.keys(fileContent).length === 0) {
     return
