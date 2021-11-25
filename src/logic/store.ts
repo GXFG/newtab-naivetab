@@ -88,7 +88,10 @@ watch(() => globalState.setting.general.pageTitle, () => {
   initPageTitle()
 })
 
-watch(() => globalState.setting.general.style, () => {
+watch(() => [
+  globalState.setting.general.style,
+  globalState.localState.currThemeCode,
+], () => {
   document.body.style.setProperty('--text-color-main', globalState.setting.general.style.fontColor[globalState.localState.currThemeCode])
   document.body.style.setProperty('--bg-main', globalState.setting.general.style.backgroundColor[globalState.localState.currThemeCode])
 }, {

@@ -24,7 +24,7 @@ watch(() => osTheme.value, (themeName) => {
     globalState.localState.currThemeCode = THEME_CODE_MAP[globalState.setting.general.theme]
     return
   }
-  globalState.localState.currThemeCode = THEME_CODE_MAP[themeName as any] || 2
+  globalState.localState.currThemeCode = THEME_CODE_MAP[themeName as any]
 }, {
   immediate: true,
 })
