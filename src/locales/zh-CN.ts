@@ -16,6 +16,13 @@ export default {
     rightBottom: '右下',
     xOffset: 'X轴偏移',
     yOffset: 'Y轴偏移',
+    style: '样式',
+    light: '浅色',
+    dark: '深色',
+    font: '字体',
+    fontSize: '字体大小',
+    fontColor: '字体颜色',
+    backgroundColor: '背景颜色',
   },
   setting: {
     mainLabel: '设置',

@@ -1,5 +1,5 @@
 <template>
-  <ComponentLayout name="calendar" />
+  <ComponentLayout field="calendar" />
 </template>
 
 <script setup lang="ts">

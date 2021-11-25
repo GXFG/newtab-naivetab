@@ -1,19 +1,17 @@
 @media (prefers-color-scheme: light) {
   :root {
     --text-color-main: #2c3e50;
-    --text-color-main-reverse: #fff;
-    --bg-main: #fff;
+    --text-color-main-reverse: #ffffff;
+    --bg-main: #ffffff;
     /* setting */
-    --bg-operation-main: #adb5bd;
     --bg-operation-item: #d4d4d8;
     --bg-operation-key: #f4f4f5;
     /* bookmark */
     --text-color-bookmark: #0f172a;
     --bg-bookmark-item-default: #d1d5db;
-    --bg-bookmark-item-active: #fff;
+    --bg-bookmark-item-active: #ffffff;
     --shadow-bookmark-item: rgba(44, 62, 80, 10%);
     /* watch */
-    --text-color-watch: #2c3e50;
     --shadow-watch-a: rgba(0, 0, 0, 0.2);
     --shadow-watch-b: rgba(200, 255, 255, 0.3);
     /* calendar */
@@ -23,19 +21,18 @@
     --bg-calendar-body-main: #d1d5db;
     --bg-calendar-work: #e9ecef;
     --bg-calendar-rest: #FDE3E4;
-    --bg-calendar-item-active: #fff;
-    --bg-calendar-item-label: #ccc;
+    --bg-calendar-item-active: #ffffff;
+    --bg-calendar-item-label: #cccccc;
     --bg-calendar-item-hover: #2c3e50;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text-color-main: #fff;
+    --text-color-main: #ffffff;
     --text-color-main-reverse: #2c3e50;
     --bg-main: #35363a;
     /* setting */
-    --bg-operation-main: rgba(13, 17, 23, 1);
     --bg-operation-item: #35363a;
     --bg-operation-key: #52525b;
     /* bookmark */
@@ -44,7 +41,6 @@
     --bg-bookmark-item-active: #ecf0f1;
     --shadow-bookmark-item: rgba(0, 0, 0, 15%);
     /* watch */
-    --text-color-watch: #e4e4e7;
     --shadow-watch-a: rgba(0, 0, 0, 40%);
     --shadow-watch-b: rgba(0, 0, 0, 5%);
     /* calendar */
@@ -69,16 +65,3 @@ body {
   background-color: var(--bg-main);
 }
 
-.btn {
-  @apply px-4 py-1 rounded inline-block
-    bg-teal-600 text-white cursor-pointer
-    hover:bg-teal-700
-    disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50;
-}
-
-.icon-btn {
-  @apply inline-block cursor-pointer select-none
-    opacity-75 transition duration-200 ease-in-out
-    hover:(opacity-100 text-teal-600);
-  font-size: 0.9em;
-}

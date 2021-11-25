@@ -10,10 +10,10 @@
       <ic:baseline-settings v-show="!isSettingMode" class="item__icon" />
     </NButton>
     <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingMode" :width="500" placement="right">
+    <NDrawer v-model:show="isSettingMode" :width="540" placement="right">
       <NDrawerContent>
-        <NTabs class="setting__tabs" type="line">
-          <NTabPane name="tabBookmarks" :tab="$t('setting.tabBookmarks')">
+        <NTabs type="line">
+          <NTabPane class="setting__content" name="tabBookmarks" :tab="$t('setting.tabBookmarks')">
             <BookmarkSetting />
           </NTabPane>
           <NTabPane name="tabClock" :tab="$t('setting.tabClock')">
@@ -57,7 +57,23 @@ import { isSettingMode, toggleIsSettingMode } from '@/logic'
     }
   }
 }
-.setting__tabs {
+.n-tab-pane {
   user-select: none;
+  padding: 15px 15px 0 0 !important;
+  height: 92vh;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: #000;
+  }
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background: #535353;
+  }
 }
 </style>

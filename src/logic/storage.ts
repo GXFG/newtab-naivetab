@@ -5,18 +5,18 @@ import { MERGE_SETTING_DELAY } from './const'
 import { log, downloadByTagA } from './util'
 
 const uploadFn = () => {
-  // chrome.storage.sync.clear()
-  log('uploadSetting')
+  log('Start syncing settings')
   globalState.setting.syncTime = Date.now()
   const localSetting = JSON.stringify(globalState.setting)
   chrome.storage.sync.set({ MyNewTabSetting: localSetting }, () => {
-    log('Upload settings success')
+    log('Sync settings complete')
   })
 }
 const uploadSetting = useDebounceFn(uploadFn, MERGE_SETTING_DELAY)
 
 watch([
   () => globalState.setting.general,
+  () => globalState.setting.date,
   () => globalState.setting.clock,
   () => globalState.setting.calendar,
   () => globalState.setting.bookmarks,
@@ -26,19 +26,21 @@ watch([
   deep: true,
 })
 
-export const downloadSetting = () => {
+export const loadSyncSetting = () => {
   return new Promise((resolve) => {
     chrome.storage.sync.get(null, ({ MyNewTabSetting }) => {
       if (!MyNewTabSetting) {
-        log('No settings')
+        log('Notfound settings')
         return
       }
+
       const cloudSetting = JSON.parse(MyNewTabSetting)
       if (cloudSetting.syncTime === globalState.setting.syncTime) {
-        log('No settings update')
+        log('None modification settings')
         return
       }
-      log('Update settings', MyNewTabSetting)
+
+      log('Load settings', cloudSetting)
       globalState.setting.syncTime = cloudSetting.syncTime
       if (cloudSetting.general) {
         globalState.setting.general = cloudSetting.general

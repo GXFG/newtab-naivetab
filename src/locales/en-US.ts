@@ -16,6 +16,13 @@ export default {
     rightBottom: 'RightBottom',
     xOffset: 'XOffset',
     yOffset: 'YOffset',
+    style: 'Style',
+    light: 'Light',
+    dark: 'Dark',
+    font: 'Font',
+    fontSize: 'Font size',
+    fontColor: 'Font color',
+    backgroundColor: 'Background color',
   },
   setting: {
     mainLabel: 'Setting',

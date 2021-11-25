@@ -1,5 +1,8 @@
 <template>
-  <ComponentLayout name="bookmarks" />
+  <ComponentLayout field="bookmarks" />
+
+  <ElementConfig field="bookmarks"></ElementConfig>
+
   <NDivider title-placement="left">
     {{ $t('bookmarks.bookmarksDividerConfig') }}
   </NDivider>
@@ -68,6 +71,8 @@ const onDeleteKey = (key: string) => {
     align-items: center;
     margin-bottom: -10px;
     .label__text {
+      font-size: 14px;
+      opacity: 0.6;
       &:nth-of-type(1) {
         margin-left: 30%;
       }

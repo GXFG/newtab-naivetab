@@ -5,69 +5,35 @@ import { POSITION_TYPE_TO_STYLE_MAP } from './const'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
-interface IState {
-  setting: {
-    version: string
-    syncTime: number
-    general: {
-      pageTitle: string
-      lang: string
-    }
-    date: {
-      enabled: boolean
-      layout: {
-        positionType: number
-        xOffset: number
-        yOffset: number
-      }
-    }
-    clock: {
-      enabled: boolean
-      layout: {
-        positionType: number
-        xOffset: number
-        yOffset: number
-      }
-    }
-    calendar: {
-      enabled: boolean
-      layout: {
-        positionType: number
-        xOffset: number
-        yOffset: number
-      }
-    }
-    bookmarks: {
-      enabled: boolean
-      layout: {
-        positionType: number
-        xOffset: number
-        yOffset: number
-      }
-      keymap: {
-        [propName: string]: {
-          url: string
-          name?: string
-        }
-      }
-    }
-  }
-}
-
-export const globalState: IState = reactive({
+export const globalState = reactive({
+  localState: useLocalStorage('localState', {
+    currThemeCode: 0,
+  }, { listenToStorageChanges: true }),
   setting: {
     version: pkg.version,
     syncTime: useLocalStorage('syncTime', 0, { listenToStorageChanges: true }),
     general: useLocalStorage('general', {
+      theme: 'auto', // 0light, 1dark, 2auto
       pageTitle: 'NewTab',
       lang: defaultLang,
+      style: {
+        fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei',
+        fontSize: 14,
+        fontColor: ['#2c3e50', '#ffffff'],
+        backgroundColor: ['#ffffff', '#35363a'],
+      },
     }, { listenToStorageChanges: true }),
     date: useLocalStorage('date', {
       enabled: true,
       layout: {
         positionType: 5,
         xOffset: 50,
-        yOffset: 70,
+        yOffset: 60,
+      },
+      style: {
+        fontFamily: '"Arial Rounded MT Bold"',
+        fontSize: 20,
+        fontColor: ['#2c3e50', '#e4e4e7'],
       },
     }, { listenToStorageChanges: true }),
     clock: useLocalStorage('clock', {
@@ -77,6 +43,11 @@ export const globalState: IState = reactive({
         xOffset: 50,
         yOffset: 50,
       },
+      style: {
+        fontFamily: '"Arial Rounded MT Bold"',
+        fontSize: 30,
+        fontColor: ['#2c3e50', '#e4e4e7'],
+      },
     }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('calendar', {
       enabled: true,
@@ -84,6 +55,10 @@ export const globalState: IState = reactive({
         positionType: 7,
         xOffset: 0,
         yOffset: 0,
+      },
+      style: {
+        fontFamily: '',
+        fontSize: 14,
       },
     }, { listenToStorageChanges: true }),
     bookmarks: useLocalStorage('bookmarks', {
@@ -93,16 +68,33 @@ export const globalState: IState = reactive({
         xOffset: 50,
         yOffset: 1,
       },
+      style: {
+        fontFamily: '',
+        fontSize: 12,
+        fontColor: ['#0f172a', '#0f172a'],
+      },
       keymap: {},
     }, { listenToStorageChanges: true }),
   },
 })
 
-watch(() => globalState.setting.general.pageTitle, (value) => {
-  document.title = value
+export const [isSettingMode, toggleIsSettingMode] = useToggle(false)
+
+export const initPageTitle = () => {
+  document.title = globalState.setting.general.pageTitle
+}
+
+watch(() => globalState.setting.general.pageTitle, () => {
+  initPageTitle()
 })
 
-export const [isSettingMode, toggleIsSettingMode] = useToggle(false)
+watch(() => globalState.setting.general.style, () => {
+  document.body.style.setProperty('--text-color-main', globalState.setting.general.style.fontColor[globalState.localState.currThemeCode])
+  document.body.style.setProperty('--bg-main', globalState.setting.general.style.backgroundColor[globalState.localState.currThemeCode])
+}, {
+  immediate: true,
+  deep: true,
+})
 
 export const getLayoutStyle = (name: 'bookmarks' | 'date' | 'clock' | 'calendar') => {
   const layout = globalState.setting[name].layout
@@ -112,4 +104,8 @@ export const getLayoutStyle = (name: 'bookmarks' | 'date' | 'clock' | 'calendar'
     res += `${style.prop}:${style.value};`
   }
   return res
+}
+
+export const getCustomFontSize = (name: 'general' | 'bookmarks' | 'date' | 'clock' | 'calendar') => {
+  return `${globalState.setting[name].style.fontSize}px`
 }

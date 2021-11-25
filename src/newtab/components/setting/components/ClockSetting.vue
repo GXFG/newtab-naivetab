@@ -1,5 +1,7 @@
 <template>
-  <ComponentLayout name="clock" />
+  <ComponentLayout field="clock" />
+
+  <ElementConfig field="clock" />
 </template>
 
 <script setup lang="ts">

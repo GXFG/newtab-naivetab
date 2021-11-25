@@ -5,10 +5,11 @@
         <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
       </NFormItem>
 
+      <ElementConfig field="general" />
+
       <NDivider title-placement="left">
         {{ $t('general.settingDividerSetting') }}
       </NDivider>
-
       <NFormItem :label="$t('general.lastSyncTime')">
         <p>{{ syncTime }}</p>
       </NFormItem>
@@ -27,7 +28,6 @@
       <NDivider title-placement="left">
         {{ $t('general.settingDividerLanguage') }}
       </NDivider>
-
       <NFormItem :label="$t('general.language')">
         <NSelect
           v-model:value="proxy.$i18n.locale"

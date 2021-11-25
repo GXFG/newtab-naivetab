@@ -11,9 +11,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { globalState, getLayoutStyle } from '@/logic'
-
-const positionStyle = computed(() => getLayoutStyle('clock'))
+import { globalState, getLayoutStyle, getCustomFontSize } from '@/logic'
 
 const state = reactive({
   time: '',
@@ -32,13 +30,17 @@ onUnmounted(() => {
   clearInterval(timer)
 })
 
+const positionStyle = computed(() => getLayoutStyle('clock'))
+
+const customFontSize = computed(() => getCustomFontSize('clock'))
+
 </script>
 
 <style scoped>
 #clock {
   position: fixed;
-  font-family: "Arial Rounded MT Bold", "Rockwell", "Andale Mono", monospace;
-  color: var(--text-color-watch);
+  font-family: v-bind(globalState.setting.clock.style.fontFamily);
+  color: v-bind(globalState.setting.clock.style.fontColor[globalState.localState.currThemeCode]);
   text-align: center;
   text-shadow: 2px 8px 6px var(--shadow-watch-a),
     0px -5px 35px var(--shadow-watch-b);
@@ -48,10 +50,10 @@ onUnmounted(() => {
     display: flex;
     align-items: baseline;
     .time__text {
-      font-size: 90px;
+      font-size: v-bind(customFontSize);
     }
     .time__mid {
-      font-size: 20px;
+      font-size: v-bind(customFontSize);
     }
   }
 }
