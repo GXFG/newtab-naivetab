@@ -17,6 +17,8 @@ export default {
     xOffset: 'X轴偏移',
     yOffset: 'Y轴偏移',
     style: '样式',
+    theme: '主题',
+    auto: '自动',
     light: '浅色',
     dark: '深色',
     font: '字体',

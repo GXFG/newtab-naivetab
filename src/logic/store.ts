@@ -7,20 +7,20 @@ const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const globalState = reactive({
   localState: useLocalStorage('localState', {
-    currThemeCode: 0,
+    currThemeCode: 0, // 0light | 1dark | 2auto
   }, { listenToStorageChanges: true }),
   setting: {
     version: pkg.version,
     syncTime: useLocalStorage('syncTime', 0, { listenToStorageChanges: true }),
     general: useLocalStorage('general', {
-      theme: 'auto', // 0light, 1dark, 2auto
+      theme: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
       lang: defaultLang,
       style: {
         fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei',
         fontSize: 14,
-        fontColor: ['#2c3e50', '#ffffff'],
-        backgroundColor: ['#ffffff', '#35363a'],
+        fontColor: ['#2C3E50', '#FFFFFF'],
+        backgroundColor: ['#FFFFFF', '#35363A'],
       },
     }, { listenToStorageChanges: true }),
     date: useLocalStorage('date', {
@@ -31,9 +31,9 @@ export const globalState = reactive({
         yOffset: 60,
       },
       style: {
-        fontFamily: '"Arial Rounded MT Bold"',
+        fontFamily: 'Arial Rounded MT Bold',
         fontSize: 20,
-        fontColor: ['#2c3e50', '#e4e4e7'],
+        fontColor: ['#2C3E50', '#E4E4E7'],
       },
     }, { listenToStorageChanges: true }),
     clock: useLocalStorage('clock', {
@@ -44,9 +44,9 @@ export const globalState = reactive({
         yOffset: 50,
       },
       style: {
-        fontFamily: '"Arial Rounded MT Bold"',
+        fontFamily: 'Arial Rounded MT Bold',
         fontSize: 30,
-        fontColor: ['#2c3e50', '#e4e4e7'],
+        fontColor: ['#2C3E50', '#E4E4E7'],
       },
     }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('calendar', {
@@ -71,7 +71,7 @@ export const globalState = reactive({
       style: {
         fontFamily: '',
         fontSize: 12,
-        fontColor: ['#0f172a', '#0f172a'],
+        fontColor: ['#0F172A', '#0F172A'],
       },
       keymap: {},
     }, { listenToStorageChanges: true }),

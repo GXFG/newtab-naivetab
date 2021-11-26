@@ -1,11 +1,9 @@
 <template>
-  <div id="container">
-    <NConfigProvider :theme="currTheme" :theme-overrides="themeOverrides">
-      <NMessageProvider>
-        <Content />
-      </NMessageProvider>
-    </NConfigProvider>
-  </div>
+  <NConfigProvider id="container" :theme="currTheme" :theme-overrides="themeOverrides">
+    <NMessageProvider>
+      <Content />
+    </NMessageProvider>
+  </NConfigProvider>
 </template>
 
 <script setup lang="ts">
@@ -17,14 +15,19 @@ loadSyncSetting()
 initPageTitle()
 
 const osTheme = useOsTheme() // light | dark | null
-const currTheme = computed(() => (osTheme.value === 'dark' ? darkTheme : null))
+const currTheme = ref()
 
-watch(() => osTheme.value, (themeName) => {
-  if (globalState.setting.general.theme !== 'auto') {
-    globalState.localState.currThemeCode = THEME_CODE_MAP[globalState.setting.general.theme]
+watch(() => [
+  osTheme.value,
+  globalState.setting.general.theme,
+], () => {
+  if (globalState.setting.general.theme === 'auto') {
+    globalState.localState.currThemeCode = THEME_CODE_MAP[osTheme.value as any]
+    currTheme.value = osTheme.value === 'dark' ? darkTheme : null
     return
   }
-  globalState.localState.currThemeCode = THEME_CODE_MAP[themeName as any]
+  globalState.localState.currThemeCode = THEME_CODE_MAP[globalState.setting.general.theme]
+  currTheme.value = globalState.setting.general.theme === 'dark' ? darkTheme : null
 }, {
   immediate: true,
 })

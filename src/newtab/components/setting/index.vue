@@ -13,6 +13,9 @@
     <NDrawer v-model:show="isSettingMode" :width="540" placement="right">
       <NDrawerContent>
         <NTabs type="line">
+          <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
+            <GeneralSetting />
+          </NTabPane>
           <NTabPane class="setting__content" name="tabBookmarks" :tab="$t('setting.tabBookmarks')">
             <BookmarkSetting />
           </NTabPane>
@@ -24,9 +27,6 @@
           </NTabPane>
           <NTabPane name="tabCalendar" :tab="$t('setting.tabCalendar')">
             <CalendarSetting />
-          </NTabPane>
-          <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
-            <GeneralSetting />
           </NTabPane>
         </NTabs>
       </NDrawerContent>

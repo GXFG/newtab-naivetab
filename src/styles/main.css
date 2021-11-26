@@ -1,8 +1,8 @@
 @media (prefers-color-scheme: light) {
   :root {
-    --text-color-main: #2c3e50;
-    --text-color-main-reverse: #ffffff;
-    --bg-main: #ffffff;
+    --text-color-main: #2C3E50;
+    --text-color-main-reverse: #FFFFFF;
+    --bg-main: #FFFFFF;
     /* setting */
     --bg-operation-item: #d4d4d8;
     --bg-operation-key: #f4f4f5;
@@ -29,9 +29,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text-color-main: #ffffff;
-    --text-color-main-reverse: #2c3e50;
-    --bg-main: #35363a;
+    --text-color-main: #FFFFFF;
+    --text-color-main-reverse: #2C3E50;
+    --bg-main: #35363A;
     /* setting */
     --bg-operation-item: #35363a;
     --bg-operation-key: #52525b;

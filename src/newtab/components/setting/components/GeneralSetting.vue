@@ -1,6 +1,9 @@
 <template>
   <div class="modal__general">
     <NForm ref="formRef" label-placement="left" :label-width="100">
+      <NFormItem :label="$t('common.theme')">
+        <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList"></NSelect>
+      </NFormItem>
       <NFormItem :label="$t('general.pageTitle')">
         <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
       </NFormItem>
@@ -31,7 +34,6 @@
       <NFormItem :label="$t('general.language')">
         <NSelect
           v-model:value="proxy.$i18n.locale"
-          class="item__locale"
           :options="i18n.global.availableLocales.map((locale: string) => ({
             label: locale,
             value: locale
@@ -50,6 +52,24 @@ import { importSetting, exportSetting, globalState } from '@/logic'
 import i18n from '@/locales'
 
 const { proxy }: any = getCurrentInstance()
+
+const state = reactive({
+  themeList: [] as { label: string; value: string }[],
+})
+
+const initEnumData = () => {
+  state.themeList = [
+    { label: window.$t('common.light'), value: 'light' },
+    { label: window.$t('common.dark'), value: 'dark' },
+    { label: window.$t('common.auto'), value: 'auto' },
+  ]
+}
+
+initEnumData()
+
+watch(() => globalState.setting.general.lang, () => {
+  initEnumData()
+})
 
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale

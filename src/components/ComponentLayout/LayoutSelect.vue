@@ -1,20 +1,21 @@
 <template>
   <div class="position__select">
     <NButton
-      v-for="position in state.positionList"
-      :key="position.type"
-      :type="props.currType === position.type ? 'primary' : undefined"
+      v-for="item in state.positionList"
+      :key="item.type"
+      :type="props.currType === item.type ? 'primary' : undefined"
       class="select__btn"
       size="small"
-      @click="onChangePositionType(position.type)"
+      @click="onChangePositionType(item.type)"
     >
-      {{ position.label }}
+      <Icon :icon="item.icon" />
     </NButton>
   </div>
 </template>
 
 <script setup lang="ts">
 import { NButton } from 'naive-ui'
+import { Icon } from '@iconify/vue'
 import { globalState } from '@/logic'
 
 const props = defineProps({
@@ -27,20 +28,20 @@ const props = defineProps({
 const emit = defineEmits(['onConfirm'])
 
 const state = reactive({
-  positionList: [] as { label: string; type: number }[],
+  positionList: [] as { type: number; icon: string }[],
 })
 
 const initEnumData = () => {
   state.positionList = [
-    { label: window.$t('common.leftTop'), type: 1 },
-    { label: window.$t('common.centerTop'), type: 2 },
-    { label: window.$t('common.rightTop'), type: 3 },
-    { label: window.$t('common.leftCenter'), type: 4 },
-    { label: window.$t('common.centerCenter'), type: 5 },
-    { label: window.$t('common.rightCenter'), type: 6 },
-    { label: window.$t('common.leftBottom'), type: 7 },
-    { label: window.$t('common.centerBottom'), type: 8 },
-    { label: window.$t('common.rightBottom'), type: 9 },
+    { type: 1, icon: 'mdi:arrow-top-left-thick' },
+    { type: 2, icon: 'mdi:arrow-up-thick' },
+    { type: 3, icon: 'mdi:arrow-top-right-thick' },
+    { type: 4, icon: 'mdi:arrow-left-thick' },
+    { type: 5, icon: 'mdi:image-filter-center-focus-strong' },
+    { type: 6, icon: 'mdi:arrow-right-thick' },
+    { type: 7, icon: 'mdi:arrow-bottom-left-thick' },
+    { type: 8, icon: 'mdi:arrow-down-thick' },
+    { type: 9, icon: 'mdi:arrow-bottom-right-thick' },
   ]
 }
 
@@ -58,8 +59,9 @@ const onChangePositionType = (type: number) => {
 
 <style scoped>
 .position__select {
-  width: 150px;
+  width: 200px;
   .select__btn {
+    width: 33%;
   }
 }
 </style>

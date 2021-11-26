@@ -17,6 +17,8 @@ export default {
     xOffset: 'XOffset',
     yOffset: 'YOffset',
     style: 'Style',
+    theme: 'Theme',
+    auto: 'Auto',
     light: 'Light',
     dark: 'Dark',
     font: 'Font',
