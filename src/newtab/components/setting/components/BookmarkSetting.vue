@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { NDivider, NButton, NSpace, NInputGroup, NInputGroupLabel, NInput } from 'naive-ui'
+import { NButton, NSpace, NInputGroup, NInputGroupLabel, NInput } from 'naive-ui'
 import { KEYBOARD_KEY, globalState } from '@/logic'
 
 const onAddKey = (key: string) => {
@@ -65,14 +65,15 @@ const onDeleteKey = (key: string) => {
     .label__text {
       opacity: 0.6;
       &:nth-of-type(1) {
-        margin-left: 12%;
+        margin-left: 14%;
       }
       &:nth-of-type(2) {
-        margin-right: 26%;
+        margin-right: 24%;
       }
     }
   }
   .bookmark__item {
+    padding: 0 0px 0 15px;
     .item__key {
       flex: 0 0 auto;
       display: flex;

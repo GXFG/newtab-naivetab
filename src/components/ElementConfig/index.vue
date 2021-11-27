@@ -17,7 +17,7 @@
       />
       <NInputNumber
         v-model:value="globalState.style[props.field].fontSize"
-        class="input_number"
+        class="setting__input-number"
         :min="12"
         :step="1"
       ></NInputNumber>
@@ -30,7 +30,7 @@
       />
       <NInputNumber
         v-model:value="globalState.style[props.field].letterSpacing"
-        class="input_number"
+        class="setting__input-number"
         :step="1"
       ></NInputNumber>
     </NFormItem>

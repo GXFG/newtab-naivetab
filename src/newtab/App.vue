@@ -60,8 +60,13 @@ const customFontSize = computed(() => getCustomFontSize('general'))
   font-family: v-bind(globalState.style.general.fontFamily);
 }
 
-.input_number {
+.setting__row-element {
   margin-left: 10px;
-  width: 120px;
+}
+
+.setting__input-number {
+  flex: 0 0 auto;
+  margin-left: 10px;
+  width: 90px;
 }
 </style>

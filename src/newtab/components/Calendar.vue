@@ -288,7 +288,7 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
         }
         .item__select_month {
           flex: 0 0 auto;
-          width: 90px;
+          width: 110px;
         }
       }
     }

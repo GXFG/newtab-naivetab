@@ -6,17 +6,18 @@
 
     <NFormItem :label="$t('clock.apMark')">
       <NSwitch v-model:value="globalState.setting.clock.unitEnabled" />
-    </NFormItem>
-    <NFormItem :label="$t('common.fontSize')">
       <NSlider
+        v-if="globalState.setting.clock.unitEnabled"
         v-model:value="globalState.style.clock.unit.fontSize"
+        class="setting__row-element"
         :step="1"
         :min="12"
         :max="200"
       />
       <NInputNumber
+        v-if="globalState.setting.clock.unitEnabled"
         v-model:value="globalState.style.clock.unit.fontSize"
-        class="input_number"
+        class="setting__input-number"
         :min="12"
         :step="1"
       ></NInputNumber>

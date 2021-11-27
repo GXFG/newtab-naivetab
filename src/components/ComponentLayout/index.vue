@@ -22,7 +22,7 @@
       <NSlider v-model:value="globalState.setting[props.field].layout.xOffset" :step="1" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.xOffset"
-        class="input_number"
+        class="setting__input-number"
         size="small"
         :step="1"
         :min="0"
@@ -33,7 +33,7 @@
       <NSlider v-model:value="globalState.setting[props.field].layout.yOffset" :step="1" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.yOffset"
-        class="input_number"
+        class="setting__input-number"
         size="small"
         :step="1"
         :min="0"

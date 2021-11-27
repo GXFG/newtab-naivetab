@@ -4,6 +4,9 @@
       <NDivider title-placement="left">
         {{ $t('common.config') }}
       </NDivider>
+      <NFormItem :label="$t('general.pageTitle')">
+        <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
+      </NFormItem>
       <NFormItem :label="$t('common.theme')">
         <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList"></NSelect>
       </NFormItem>
@@ -16,9 +19,6 @@
           }))"
           @update:value="onChangeLocale"
         ></NSelect>
-      </NFormItem>
-      <NFormItem :label="$t('general.pageTitle')">
-        <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
       </NFormItem>
 
       <ElementConfig field="general" />
