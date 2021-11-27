@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { globalState, getLayoutStyle, getCustomFontSize } from '@/logic'
+import { globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
 
 const CNAME = 'date'
 
@@ -30,7 +30,7 @@ watch(() => globalState.setting.date.format, () => {
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
-const customFontSize = computed(() => getCustomFontSize(CNAME))
+const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 
 </script>
 

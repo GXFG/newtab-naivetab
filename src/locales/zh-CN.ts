@@ -30,6 +30,7 @@ export default {
     activeColor: '激活颜色',
     shadowColor: '阴影颜色',
     borderColor: '边框颜色',
+    margin: '边距',
     config: '配置',
     format: '格式',
   },

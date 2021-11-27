@@ -18,7 +18,7 @@ export const globalState = reactive({
     },
     date: {
       fontFamily: 'Arial Rounded MT Bold',
-      fontSize: 20,
+      fontSize: 24,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
     },
@@ -48,6 +48,7 @@ export const globalState = reactive({
       activeColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
       shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
       borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
+      margin: 4,
     },
   }, { listenToStorageChanges: true }),
   setting: {
@@ -128,6 +129,7 @@ export const getLayoutStyle = (name: 'bookmark' | 'date' | 'clock' | 'calendar')
   return res
 }
 
-export const getCustomFontSize = (name: 'general' | 'bookmark' | 'date' | 'clock' | 'calendar') => {
-  return `${globalState.style[name].fontSize}px`
+export const formatNumWithPixl = (component: 'general' | 'bookmark' | 'date' | 'clock' | 'calendar', ...field: any) => {
+  const res = field.reduce((r: any, c: string) => r[c], globalState.style[component])
+  return `${res}px`
 }

@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
-import { globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, getCustomFontSize } from '@/logic'
+import { globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, formatNumWithPixl } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
 const CNAME = 'calendar'
@@ -248,7 +248,7 @@ const onReset = () => {
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
-const customFontSize = computed(() => getCustomFontSize(CNAME))
+const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 
 </script>
 
@@ -256,6 +256,7 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
 #calendar {
   color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]);
   font-size: v-bind(customFontSize);
+  font-family: v-bind(globalState.style.calendar.fontFamily);
   .calendar__container {
     position: fixed;
     width: 330px;

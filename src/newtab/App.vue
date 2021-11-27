@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider } from 'naive-ui'
 import Content from './Content.vue'
-import { THEME_CODE_MAP, globalState, loadSyncSetting, initPageTitle, getCustomFontSize } from '@/logic'
+import { THEME_CODE_MAP, globalState, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
 
 loadSyncSetting()
 initPageTitle()
@@ -50,7 +50,7 @@ watch(() => globalState.setting.general.lang, () => {
   nativeUiLocale.value = NATIVE_UI_LOCALE_MAP[globalState.setting.general.lang] || enUS
 }, { immediate: true })
 
-const customFontSize = computed(() => getCustomFontSize('general'))
+const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
 
 </script>
 

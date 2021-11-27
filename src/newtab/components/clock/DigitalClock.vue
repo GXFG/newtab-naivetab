@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { globalState, getLayoutStyle, getCustomFontSize } from '@/logic'
+import { globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
 
 const CNAME = 'clock'
 
@@ -36,11 +36,11 @@ onUnmounted(() => {
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
-const customFontSize = computed(() => getCustomFontSize(CNAME))
+const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 
-const customUnitFontSize = computed(() => `${globalState.style.clock.unit.fontSize}px`)
+const customUnitFontSize = computed(() => formatNumWithPixl(CNAME, 'unit', 'fontSize'))
 
-const customLetterSpacing = computed(() => `${globalState.style.clock.letterSpacing}px`)
+const customLetterSpacing = computed(() => formatNumWithPixl(CNAME, 'letterSpacing'))
 
 </script>
 

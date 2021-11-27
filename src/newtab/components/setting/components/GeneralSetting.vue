@@ -1,57 +1,55 @@
 <template>
-  <div class="modal__general">
-    <NForm ref="formRef" label-placement="left" :label-width="100">
-      <NDivider title-placement="left">
-        {{ $t('common.config') }}
-      </NDivider>
-      <NFormItem :label="$t('general.pageTitle')">
-        <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
-      </NFormItem>
-      <NFormItem :label="$t('common.theme')">
-        <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList"></NSelect>
-      </NFormItem>
-      <NFormItem :label="$t('general.language')">
-        <NSelect
-          v-model:value="proxy.$i18n.locale"
-          :options="i18n.global.availableLocales.map((locale: string) => ({
-            label: locale,
-            value: locale
-          }))"
-          @update:value="onChangeLocale"
-        ></NSelect>
-      </NFormItem>
+  <NForm ref="formRef" label-placement="left" :label-width="100">
+    <NDivider title-placement="left">
+      {{ $t('common.config') }}
+    </NDivider>
+    <NFormItem :label="$t('general.pageTitle')">
+      <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
+    </NFormItem>
+    <NFormItem :label="$t('common.theme')">
+      <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList"></NSelect>
+    </NFormItem>
+    <NFormItem :label="$t('general.language')">
+      <NSelect
+        v-model:value="proxy.$i18n.locale"
+        :options="i18n.global.availableLocales.map((locale: string) => ({
+          label: locale,
+          value: locale
+        }))"
+        @update:value="onChangeLocale"
+      ></NSelect>
+    </NFormItem>
 
-      <ElementConfig field="general" />
+    <ElementConfig field="general" />
 
-      <NDivider title-placement="left">
-        {{ $t('general.settingDividerSetting') }}
-      </NDivider>
-      <NFormItem :label="$t('general.lastSyncTime')">
-        <p>{{ syncTime }}</p>
-      </NFormItem>
-      <NFormItem :label="$t('general.importSettingsLabel')">
-        <NButton @click="onImportSetting">
-          {{ $t('general.importSettingsValue') }}
-        </NButton>
-        <input ref="fileInputEl" style="display: none" type="file" @change="onImportFileChange" />
-      </NFormItem>
-      <NFormItem :label="$t('general.exportSettingLabel')">
-        <NButton @click="exportSetting()">
-          {{ $t('general.exportSettingValue') }}
-        </NButton>
-      </NFormItem>
-      <NFormItem :label="$t('general.resetSettingLabel')">
-        <NPopconfirm @positive-click="resetSetting()">
-          <template #trigger>
-            <NButton dashed type="error">
-              {{ $t('general.resetSettingValue') }}
-            </NButton>
-          </template>
-          {{ $t('common.confirm') }}?
-        </NPopconfirm>
-      </NFormItem>
-    </NForm>
-  </div>
+    <NDivider title-placement="left">
+      {{ $t('general.settingDividerSetting') }}
+    </NDivider>
+    <NFormItem :label="$t('general.lastSyncTime')">
+      <p>{{ syncTime }}</p>
+    </NFormItem>
+    <NFormItem :label="$t('general.importSettingsLabel')">
+      <NButton @click="onImportSetting">
+        {{ $t('general.importSettingsValue') }}
+      </NButton>
+      <input ref="fileInputEl" style="display: none" type="file" @change="onImportFileChange" />
+    </NFormItem>
+    <NFormItem :label="$t('general.exportSettingLabel')">
+      <NButton @click="exportSetting()">
+        {{ $t('general.exportSettingValue') }}
+      </NButton>
+    </NFormItem>
+    <NFormItem :label="$t('general.resetSettingLabel')">
+      <NPopconfirm @positive-click="resetSetting()">
+        <template #trigger>
+          <NButton dashed type="error">
+            {{ $t('general.resetSettingValue') }}
+          </NButton>
+        </template>
+        {{ $t('common.confirm') }}?
+      </NPopconfirm>
+    </NFormItem>
+  </NForm>
 </template>
 
 <script setup lang="ts">
@@ -112,6 +110,4 @@ const onImportFileChange = (e: any) => {
 </script>
 
 <style>
-.modal__general {
-}
 </style>

@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, getCustomFontSize, sleep, log } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, formatNumWithPixl, sleep, log } from '@/logic'
 
 const CNAME = 'bookmark'
 
@@ -143,8 +143,9 @@ document.onkeydown = function(e: KeyboardEvent) {
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
-const customFontSize = computed(() => getCustomFontSize(CNAME))
+const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 
+const customMargin = computed(() => formatNumWithPixl(CNAME, 'margin'))
 </script>
 
 <style scoped>
@@ -165,7 +166,7 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
       .row__item {
         flex: 0 0 auto;
         position: relative;
-        margin: 4px;
+        margin: v-bind(customMargin);
         padding: 3px;
         width: 50px;
         height: 50px;

@@ -30,6 +30,7 @@ export default {
     activeColor: 'Active color',
     shadowColor: 'Shadow color',
     borderColor: 'Border color',
+    margin: 'Margin',
     config: 'Config',
     format: 'Format',
   },

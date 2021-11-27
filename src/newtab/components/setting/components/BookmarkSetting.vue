@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NSpace, NInputGroup, NInputGroupLabel, NInput } from 'naive-ui'
+import { NSpace, NButton, NInputGroup, NInputGroupLabel, NInput } from 'naive-ui'
 import { KEYBOARD_KEY, globalState } from '@/logic'
 
 const onAddKey = (key: string) => {

@@ -4,6 +4,19 @@
       {{ $t('common.style') }}
     </NDivider>
 
+    <NFormItem v-if="globalState.style[props.field].margin" :label="$t('common.margin')">
+      <NSlider
+        v-model:value="globalState.style[props.field].margin"
+        :step="1"
+        :max="200"
+      />
+      <NInputNumber
+        v-model:value="globalState.style[props.field].margin"
+        class="setting__input-number"
+        :step="1"
+      ></NInputNumber>
+    </NFormItem>
+
     <NFormItem :label="$t('common.font')">
       <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" "></NInput>
     </NFormItem>
@@ -87,8 +100,6 @@
         <NColorPicker v-model:value="globalState.style[props.field].borderColor[1]" />
       </div>
     </NFormItem>
-
-    <slot></slot>
   </NForm>
 </template>
 
