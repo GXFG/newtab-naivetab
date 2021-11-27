@@ -10,13 +10,13 @@
       <ic:baseline-settings v-show="!isSettingMode" class="item__icon" />
     </NButton>
     <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingMode" :width="540" placement="right">
+    <NDrawer v-model:show="isSettingMode" :width="570" placement="right">
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
             <GeneralSetting />
           </NTabPane>
-          <NTabPane class="setting__content" name="tabBookmarks" :tab="$t('setting.tabBookmarks')">
+          <NTabPane class="setting__content" name="tabBookmark" :tab="$t('setting.tabBookmark')">
             <BookmarkSetting />
           </NTabPane>
           <NTabPane name="tabClock" :tab="$t('setting.tabClock')">

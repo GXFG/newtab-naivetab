@@ -7,19 +7,23 @@ import { log, downloadByTagA } from './util'
 const uploadFn = () => {
   log('Start syncing settings')
   globalState.setting.syncTime = Date.now()
-  const localSetting = JSON.stringify(globalState.setting)
-  chrome.storage.sync.set({ MyNewTabSetting: localSetting }, () => {
+  const localData = JSON.stringify({
+    style: globalState.style,
+    setting: globalState.setting,
+  })
+  chrome.storage.sync.set({ MyNewTabSetting: localData }, () => {
     log('Sync settings complete')
   })
 }
 const uploadSetting = useDebounceFn(uploadFn, MERGE_SETTING_DELAY)
 
 watch([
+  () => globalState.style,
   () => globalState.setting.general,
   () => globalState.setting.date,
   () => globalState.setting.clock,
   () => globalState.setting.calendar,
-  () => globalState.setting.bookmarks,
+  () => globalState.setting.bookmark,
 ], () => {
   uploadSetting()
 }, {
@@ -35,13 +39,16 @@ export const loadSyncSetting = () => {
       }
 
       const cloudSetting = JSON.parse(MyNewTabSetting)
-      if (cloudSetting.syncTime === globalState.setting.syncTime) {
+      if (cloudSetting.setting.syncTime === globalState.setting.syncTime) {
         log('None modification settings')
         return
       }
 
       log('Load settings', cloudSetting)
       globalState.setting.syncTime = cloudSetting.syncTime
+      if (cloudSetting.style) {
+        globalState.style = cloudSetting.style
+      }
       if (cloudSetting.general) {
         globalState.setting.general = cloudSetting.general
       }
@@ -54,8 +61,8 @@ export const loadSyncSetting = () => {
       if (cloudSetting.calendar) {
         globalState.setting.calendar = cloudSetting.calendar
       }
-      if (cloudSetting.bookmarks) {
-        globalState.setting.bookmarks = cloudSetting.bookmarks
+      if (cloudSetting.bookmark) {
+        globalState.setting.bookmark = cloudSetting.bookmark
       }
       resolve(null)
     })
@@ -77,16 +84,37 @@ export const importSetting = (text: string) => {
     return
   }
   log('FileContent', fileContent)
-  if (fileContent.general) {
-    globalState.setting.general = fileContent.general
+  if (fileContent.style) {
+    globalState.style = fileContent.style
   }
-  if (fileContent.bookmarks) {
-    globalState.setting.bookmarks = fileContent.bookmarks
+  if (fileContent.setting.general) {
+    globalState.setting.general = fileContent.setting.general
+  }
+  if (fileContent.setting.clock) {
+    globalState.setting.clock = fileContent.setting.clock
+  }
+  if (fileContent.setting.date) {
+    globalState.setting.date = fileContent.setting.date
+  }
+  if (fileContent.setting.calendar) {
+    globalState.setting.calendar = fileContent.setting.calendar
+  }
+  if (fileContent.setting.bookmark) {
+    globalState.setting.bookmark = fileContent.setting.bookmark
   }
 }
 
 export const exportSetting = () => {
   const filename = `newtab-setting-${dayjs().format('YYYYMMDD-HHmmss')}.json`
-  downloadByTagA(globalState.setting, filename)
+  downloadByTagA({
+    style: globalState.style,
+    setting: globalState.setting,
+  }, filename)
   window.$message.success(window.$t('common.success'))
+}
+
+export const resetSetting = () => {
+  chrome.storage.sync.clear()
+  localStorage.clear()
+  location.reload()
 }

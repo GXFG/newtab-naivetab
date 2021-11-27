@@ -42,9 +42,9 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
 
 <style scoped>
 #clock {
-  font-family: v-bind(globalState.setting.clock.style.fontFamily);
-  color: v-bind(globalState.setting.clock.style.fontColor[globalState.localState.currThemeCode]);
-  text-shadow: 2px 8px 6px var(--shadow-watch-a), 0px -5px 35px var(--shadow-watch-b);
+  font-family: v-bind(globalState.style.clock.fontFamily);
+  color: v-bind(globalState.style.clock.fontColor[globalState.localState.currThemeCode]);
+  text-shadow: 2px 8px 6px v-bind(globalState.style.clock.shadowColor[globalState.localState.currThemeCode]);
   user-select: none;
   transition: all 0.3s ease;
   .clock__container {

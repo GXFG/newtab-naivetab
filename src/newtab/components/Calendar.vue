@@ -1,85 +1,88 @@
 <template>
-  <div v-if="globalState.setting.calendar.enabled" id="calendar" :style="positionStyle">
-    <div class="calendar__options">
-      <div class="options__item">
-        <NSelect
-          v-model:value="state.currYear"
-          size="small"
-          :options="state.yearList"
-          @update:value="onDateChange()"
-        ></NSelect>
+  <div v-if="globalState.setting.calendar.enabled" id="calendar">
+    <div class="calendar__container" :style="positionStyle">
+      <div class="calendar__options">
+        <div class="options__item">
+          <NSelect
+            v-model:value="state.currYear"
+            class="item__select_year"
+            size="small"
+            :options="state.yearList"
+            @update:value="onDateChange()"
+          ></NSelect>
+        </div>
+        <div class="options__item">
+          <NButton class="item__btn" text @click="onPrevMonth()">
+            <fa-solid:angle-left />
+          </NButton>
+          <NSelect
+            v-model:value="state.currMonth"
+            class="item__select_month"
+            size="small"
+            :options="state.monthsList"
+            @update:value="onDateChange()"
+          ></NSelect>
+          <NButton class="item__btn" text @click="onNextMonth()">
+            <fa-solid:angle-right />
+          </NButton>
+        </div>
+        <div class="options__item">
+          <NButton class="item__btn" text @click="onReset()">
+            <si-glyph:arrow-backward />
+          </NButton>
+        </div>
       </div>
-      <div class="options__item">
-        <NButton class="item__btn" text @click="onPrevMonth()">
-          <fa-solid:angle-left />
-        </NButton>
-        <NSelect
-          v-model:value="state.currMonth"
-          class="item__select_month"
-          size="small"
-          :options="state.monthsList"
-          @update:value="onDateChange()"
-        ></NSelect>
-        <NButton class="item__btn" text @click="onNextMonth()">
-          <fa-solid:angle-right />
-        </NButton>
-      </div>
-      <div class="options__item">
-        <NButton class="item__btn" text @click="onReset()">
-          <si-glyph:arrow-backward />
-        </NButton>
-      </div>
-    </div>
-    <!-- header -->
-    <ul class="calendar__header">
-      <li
-        v-for="item in state.weekList"
-        :key="item.value"
-        class="header__item"
-        :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
-      >
-        {{ item.label }}
-      </li>
-    </ul>
-    <!-- body -->
-    <ul class="calendar__body">
-      <li
-        v-for="item in state.dateList"
-        :key="item.date"
-        class="body__item"
-        :class="{
-          'body__item--active': item.isToday,
-          'body__item--blur': item.isNotCurrMonth,
-          'body__item--weekend': item.isWeekend,
-          'body__item--rest': item.type === 1,
-          'body__item--work': item.type === 2,
-        }"
-      >
-        <span
-          v-if="item.type"
-          class="item__label"
+      <!-- header -->
+      <ul class="calendar__header">
+        <li
+          v-for="item in state.weekList"
+          :key="item.value"
+          class="header__item"
+          :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
+        >
+          {{ item.label }}
+        </li>
+      </ul>
+      <!-- body -->
+      <ul class="calendar__body">
+        <li
+          v-for="item in state.dateList"
+          :key="item.date"
+          class="body__item"
           :class="{
-            'item__label--rest': item.type === 1,
-            'item__label--work': item.type === 2,
+            'body__item--active': item.isToday,
+            'body__item--blur': item.isNotCurrMonth,
+            'body__item--weekend': item.isWeekend,
+            'body__item--rest': item.type === 1,
+            'body__item--work': item.type === 2,
           }"
-        >{{ state.holidayTypeToDesc[item.type as 1 | 2] }}</span>
-        <span class="item__day">{{ item.day }}</span>
-        <span
-          class="item__desc"
-          :class="{ 'item__desc--highlight': item.isFestival }"
-        >{{ item.desc }}</span>
-      </li>
-    </ul>
+        >
+          <span
+            v-if="item.type"
+            class="item__label"
+            :class="{
+              'item__label--rest': item.type === 1,
+              'item__label--work': item.type === 2,
+            }"
+          >{{ state.holidayTypeToDesc[item.type as 1 | 2] }}</span>
+          <span class="item__day">{{ item.day }}</span>
+          <span
+            class="item__desc"
+            :class="{ 'item__desc--highlight': item.isFestival }"
+          >{{ item.desc }}</span>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
-import { globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle } from '@/logic'
+import { globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, getCustomFontSize } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
-const positionStyle = computed(() => getLayoutStyle('calendar'))
+const CNAME = 'calendar'
 
 const state = reactive({
   today: dayjs().format('YYYY-MM-DD'),
@@ -243,134 +246,138 @@ const onReset = () => {
   onRender()
 }
 
+const positionStyle = computed(() => getLayoutStyle(CNAME))
+
+const customFontSize = computed(() => getCustomFontSize(CNAME))
+
 </script>
 
 <style scoped>
 #calendar {
-  position: fixed;
-  width: 330px;
-  color: var(--text-color-main);
-  text-align: center;
-  user-select: none;
-  border-radius: 5px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: rgb(14 30 37 / 12%) 0px 2px 4px 0px,
-    rgb(14 30 37 / 32%) 0px 2px 16px 0px;
-
-  .calendar__options {
-    padding: 5px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    font-size: 16px;
-    background-color: var(--bg-calendar-options-main);
-    .options__item {
+  color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]);
+  font-size: v-bind(customFontSize);
+  .calendar__container {
+    position: fixed;
+    width: 330px;
+    text-align: center;
+    user-select: none;
+    border-radius: 5px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 4px 0px,
+      v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 16px 0px;
+    .calendar__options {
+      padding: 5px;
       display: flex;
-      justify-content: center;
+      justify-content: space-around;
       align-items: center;
-      .item__btn {
+      font-size: 16px;
+      .options__item {
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 40px;
-        cursor: pointer;
-      }
-      .item__select {
-        font-size: 15px;
-        text-align: center;
-        cursor: pointer;
-        background-color: rgba(0, 0, 0, 0);
-      }
-      .item__select_year {
-        width: 60px;
-      }
-      .item__select_month {
-        width: 100px;
+        .item__btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 25%;
+          cursor: pointer;
+        }
+        .item__select_year {
+          width: 75px;
+        }
+        .item__select_month {
+          flex: 0 0 auto;
+          width: 90px;
+        }
       }
     }
-  }
-  .calendar__header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--bg-calendar-header-main);
-    overflow: hidden;
-    .header__item {
-      flex: 1;
-      height: 30px;
-      line-height: 30px;
-      text-align: center;
-    }
-    .header__item--weekend {
-      color: var(--text-color-red);
-    }
-  }
-  .calendar__body {
-    display: flex;
-    flex-wrap: wrap;
-    background-color: var(--bg-calendar-body-main);
-    .body__item {
-      position: relative;
+    .calendar__header {
       display: flex;
-      flex-direction: column;
-      justify-content: space-around;
+      justify-content: center;
       align-items: center;
-      box-sizing: border-box;
-      padding: 3px;
-      margin: 1px;
-      width: 45px;
-      height: 45px;
-      text-align: center;
-      border-radius: 5px;
-      border: 1px solid rgba(0, 0, 0, 0);
       overflow: hidden;
-      .item__day {
+      font-weight: 500;
+      .header__item {
+        flex: 1;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
       }
-      .item__desc {
-        height: 10px;
-        color: var(--text-color-main);
-        font-size: 12px;
-        transform: scale(0.8);
-      }
-      .item__desc--highlight {
+      .header__item--weekend {
         color: var(--text-color-red);
       }
-      .item__label {
-        position: absolute;
-        top: -3px;
-        left: -3px;
+    }
+    .calendar__body {
+      display: flex;
+      flex-wrap: wrap;
+      .body__item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        box-sizing: border-box;
         padding: 3px;
-        color: var(--text-color-main);
-        font-size: 13px;
-        transform: scale(0.7);
+        margin: 1px;
+        width: 13.6%;
+        height: 45px;
+        text-align: center;
+        border-radius: 5px;
+        border: 1px solid rgba(0, 0, 0, 0);
+        overflow: hidden;
+        .item__day {
+        }
+        .item__desc {
+          height: 10px;
+          color: var(--text-color-main);
+          font-size: 12px;
+          transform: scale(0.8);
+        }
+        .item__desc--highlight {
+          color: var(--text-color-red);
+        }
+        .item__label {
+          position: absolute;
+          top: -3px;
+          left: -3px;
+          padding: 3px;
+          color: var(--text-color-main);
+          font-size: 13px;
+          transform: scale(0.7);
+        }
+        .item__label--work {
+          background-color: var(--bg-calendar-label-work);
+        }
+        .item__label--rest {
+          background-color: var(--text-color-red);
+        }
       }
-      .item__label--work {
-        background-color: var(--bg-calendar-item-label);
+      .body__item:hover {
+        border: 1px solid
+          v-bind(
+            globalState.style.calendar.activeColor[globalState.localState.currThemeCode]
+          );
       }
-      .item__label--rest {
-        background-color: var(--text-color-red);
+      .body__item--work {
+        color: var(--text-color-red) !important;
+        background-color: var(--bg-calendar-work);
       }
-    }
-    .body__item:hover {
-      border: 1px solid var(--bg-calendar-item-hover);
-    }
-    .body__item--work {
-      color: var(--text-color-red) !important;
-      background-color: var(--bg-calendar-work);
-    }
-    .body__item--rest {
-      color: var(--text-color-main) !important;
-      background-color: var(--bg-calendar-rest);
-    }
-    .body__item--weekend {
-      color: var(--text-color-red);
-    }
-    .body__item--active {
-      background-color: var(--bg-calendar-item-active);
-    }
-    .body__item--blur {
-      opacity: 0.4;
+      .body__item--rest {
+        color: var(--text-color-main) !important;
+        background-color: var(--bg-calendar-rest);
+      }
+      .body__item--weekend {
+        color: var(--text-color-red);
+      }
+      .body__item--active {
+        background-color: v-bind(
+          globalState.style.calendar.activeColor[globalState.localState.currThemeCode]
+        );
+      }
+      .body__item--blur {
+        opacity: 0.4;
+      }
     }
   }
 }

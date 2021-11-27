@@ -1,50 +1,24 @@
 @media (prefers-color-scheme: light) {
   :root {
-    --text-color-main: #2C3E50;
     --bg-main: #FFFFFF;
-    /* bookmark */
-    --text-color-bookmark: #0f172a;
-    --bg-bookmark-item-default: #d1d5db;
-    --bg-bookmark-item-active: #ffffff;
-    --shadow-bookmark-item: rgba(44, 62, 80, 10%);
-    /* watch */
-    --shadow-watch-a: rgba(0, 0, 0, 0.2);
-    --shadow-watch-b: rgba(200, 255, 255, 0.3);
+    --text-color-main: #2C3E50;
     /* calendar */
-    --text-color-red: #fa5252;
-    --bg-calendar-options-main: #adb5bd;
-    --bg-calendar-header-main: #d4d4d8;
-    --bg-calendar-body-main: #d1d5db;
-    --bg-calendar-work: #e9ecef;
-    --bg-calendar-rest: #FDE3E4;
-    --bg-calendar-item-active: #ffffff;
-    --bg-calendar-item-label: #cccccc;
-    --bg-calendar-item-hover: #2c3e50;
+    --text-color-red: #FA5252;
+    --bg-calendar-rest: rgba(255, 110, 110, 0.4);
+    --bg-calendar-work: rgba(122, 122, 122, 0.5);
+    --bg-calendar-label-work: rgba(122, 122, 122, 0.6);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text-color-main: #FFFFFF;
     --bg-main: #35363A;
-    /* bookmark */
-    --text-color-bookmark: #0f172a;
-    --bg-bookmark-item-default: #d4d4d8;
-    --bg-bookmark-item-active: #ecf0f1;
-    --shadow-bookmark-item: rgba(0, 0, 0, 15%);
-    /* watch */
-    --shadow-watch-a: rgba(0, 0, 0, 40%);
-    --shadow-watch-b: rgba(0, 0, 0, 5%);
+    --text-color-main: #FFFFFF;
     /* calendar */
-    --text-color-red: #fa5252;
-    --bg-calendar-options-main: #444;
-    --bg-calendar-header-main: #555;
-    --bg-calendar-body-main: #0000000;
-    --bg-calendar-work: #e9ecef;
-    --bg-calendar-rest: #ffcdd2;
-    --bg-calendar-item-active: #868e96;
-    --bg-calendar-item-label: #9e9e9e;
-    --bg-calendar-item-hover: #e4e4e7;
+    --text-color-red: #FA5252;
+    --bg-calendar-rest: rgba(255, 110, 110, 0.4);
+    --bg-calendar-work: rgba(122, 122, 122, 0.5);
+    --bg-calendar-label-work: rgba(122, 122, 122, 0.6);
   }
 }
 

@@ -1,35 +1,35 @@
 <template>
-  <ComponentLayout field="bookmarks" />
+  <ComponentLayout field="bookmark" />
 
-  <ElementConfig field="bookmarks"></ElementConfig>
+  <ElementConfig field="bookmark" />
 
   <NDivider title-placement="left">
-    {{ $t('bookmarks.bookmarksDividerConfig') }}
+    {{ $t('bookmark.bookmarkDividerConfig') }}
   </NDivider>
 
-  <div class="modal__bookmarks">
+  <div class="modal__bookmark">
     <NSpace vertical>
-      <NInputGroup class="bookmarks__label">
+      <NInputGroup class="bookmark__label">
         <p class="label__text">
-          {{ $t('bookmarks.urlLabel') }}
+          {{ $t('bookmark.urlLabel') }}
         </p>
         <p class="label__text">
-          {{ $t('bookmarks.nameLabel') }}
+          {{ $t('bookmark.nameLabel') }}
         </p>
       </NInputGroup>
-      <NInputGroup v-for="key of KEYBOARD_KEY" :key="key" class="bookmarks__item">
-        <NInputGroupLabel class="item__label">
+      <NInputGroup v-for="key of KEYBOARD_KEY" :key="key" class="bookmark__item">
+        <NInputGroupLabel class="item__key">
           {{ `${key.toUpperCase()}` }}
         </NInputGroupLabel>
-        <template v-if="globalState.setting.bookmarks.keymap[key]">
+        <template v-if="globalState.setting.bookmark.keymap[key]">
           <NInput
             v-for="field of ['url', 'name']"
             :key="field"
-            v-model:value="globalState.setting.bookmarks.keymap[key][field as 'url' | 'name']"
+            v-model:value="globalState.setting.bookmark.keymap[key][field as 'url' | 'name']"
             class="input__main"
             type="text"
             clearable
-            :placeholder="$t(`bookmarks.${field}Placeholder`)"
+            :placeholder="$t(`bookmark.${field}Placeholder`)"
           />
           <NButton @click="onDeleteKey(key)">
             <ri:delete-bin-6-line class="item__icon" />
@@ -48,26 +48,25 @@ import { NDivider, NButton, NSpace, NInputGroup, NInputGroupLabel, NInput } from
 import { KEYBOARD_KEY, globalState } from '@/logic'
 
 const onAddKey = (key: string) => {
-  globalState.setting.bookmarks.keymap[key] = {
+  globalState.setting.bookmark.keymap[key] = {
     url: '',
     name: '',
   }
 }
 
 const onDeleteKey = (key: string) => {
-  delete globalState.setting.bookmarks.keymap[key]
+  delete globalState.setting.bookmark.keymap[key]
 }
 
 </script>
 
 <style>
-.modal__bookmarks {
-  .bookmarks__label {
+.modal__bookmark {
+  .bookmark__label {
     display: flex;
     justify-content: space-between;
     align-items: center;
     .label__text {
-      font-size: 14px;
       opacity: 0.6;
       &:nth-of-type(1) {
         margin-left: 12%;
@@ -77,8 +76,8 @@ const onDeleteKey = (key: string) => {
       }
     }
   }
-  .bookmarks__item {
-    .item__label {
+  .bookmark__item {
+    .item__key {
       flex: 0 0 auto;
       display: flex;
       justify-content: center;

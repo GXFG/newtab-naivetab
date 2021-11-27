@@ -1,5 +1,6 @@
 export default {
   common: {
+    confirm: 'Confirm',
     success: 'Success',
     fail: 'Fail',
     enabled: 'Enabled',
@@ -25,10 +26,13 @@ export default {
     fontSize: 'Font size',
     fontColor: 'Font color',
     backgroundColor: 'Background color',
+    activeColor: 'Active color',
+    shadowColor: 'Shadow color',
+    borderColor: 'Border color',
   },
   setting: {
     mainLabel: 'Setting',
-    tabBookmarks: 'Bookmarks',
+    tabBookmark: 'Bookmark',
     tabClock: 'Clock',
     tabDate: 'Date',
     tabCalendar: 'Calendar',
@@ -43,12 +47,14 @@ export default {
     importSettingsValue: 'Select File',
     exportSettingLabel: 'Export settings',
     exportSettingValue: 'Export',
+    resetSettingLabel: 'Reset settings',
+    resetSettingValue: 'Reset',
     settingDividerLanguage: 'Language',
     language: 'Language',
   },
-  bookmarks: {
-    bookmarksLabel: 'Bookmarks',
-    bookmarksDividerConfig: 'Config',
+  bookmark: {
+    bookmarkLabel: 'Bookmark',
+    bookmarkDividerConfig: 'Config',
     urlLabel: 'url',
     urlPlaceholder: '',
     nameLabel: 'name',

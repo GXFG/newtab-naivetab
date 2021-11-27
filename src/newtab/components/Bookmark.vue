@@ -1,25 +1,27 @@
 <template>
-  <div v-if="globalState.setting.bookmarks.enabled" id="bookmark" :style="positionStyle">
-    <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
-      <div
-        v-for="item in rowData"
-        :key="item.key"
-        :title="item.url"
-        class="row__item"
-        :class="{ 'row__item--active': item.key === state.currSelectKey }"
-        @click="onOpenBookmark(item.url)"
-      >
-        <p class="item__key">
-          {{ `${item.key.toUpperCase()}` }}
-        </p>
-        <div class="item__img">
-          <img v-if="item.url" :src="`chrome://favicon/size/16@2x/${item.url}`" />
+  <div v-if="globalState.setting.bookmark.enabled" id="bookmark">
+    <div class="bookmark__container" :style="positionStyle">
+      <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
+        <div
+          v-for="item in rowData"
+          :key="item.key"
+          :title="item.url"
+          class="row__item"
+          :class="{ 'row__item--active': item.key === state.currSelectKey }"
+          @click="onOpenBookmark(item.url)"
+        >
+          <p class="item__key">
+            {{ `${item.key.toUpperCase()}` }}
+          </p>
+          <div class="item__img">
+            <img v-if="item.url" :src="`chrome://favicon/size/16@2x/${item.url}`" />
+          </div>
+          <p class="item__name">
+            {{ item.name }}
+          </p>
+          <!-- 按键定位标志F & J -->
+          <div v-if="['f', 'j'].includes(item.key)" class="item__cursor"></div>
         </div>
-        <p class="item__name">
-          {{ item.name }}
-        </p>
-        <!-- 按键定位标志F & J -->
-        <div v-if="['f', 'j'].includes(item.key)" class="item__cursor"></div>
       </div>
     </div>
   </div>
@@ -27,7 +29,9 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, sleep, log } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, getCustomFontSize, sleep, log } from '@/logic'
+
+const CNAME = 'bookmark'
 
 interface bookmarkList {
   key: string
@@ -38,8 +42,6 @@ interface bookmarkList {
 const state = reactive({
   currSelectKey: '',
 })
-
-const positionStyle = computed(() => getLayoutStyle('bookmarks'))
 
 const isInitialized = useLocalStorage('isInitialized', false, { listenToStorageChanges: true })
 const localBookmarkList = useLocalStorage('bookmarkList', [] as bookmarkList[], { listenToStorageChanges: true })
@@ -73,7 +75,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
     await sleep(100)
   }
   for (const key of KEYBOARD_KEY) {
-    const item = globalState.setting.bookmarks.keymap[key]
+    const item = globalState.setting.bookmark.keymap[key]
     const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
     // 重置没有配置信息的按键
     if (!(item && (item.url || item.name))) {
@@ -100,7 +102,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
   }
 }, MERGE_SETTING_DELAY)
 
-watch(() => globalState.setting.bookmarks.keymap,
+watch(() => globalState.setting.bookmark.keymap,
   () => {
     mergeBookmarkSetting()
   }, {
@@ -139,79 +141,83 @@ document.onkeydown = function(e: KeyboardEvent) {
   }
 }
 
+const positionStyle = computed(() => getLayoutStyle(CNAME))
+
+const customFontSize = computed(() => getCustomFontSize(CNAME))
+
 </script>
 
 <style scoped>
 #bookmark {
-  position: fixed;
   user-select: none;
   transition: all 0.3s ease;
-  .bookmark__row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .row__item--active {
-      background-color: var(--bg-bookmark-item-active) !important;
+  font-size: v-bind(customFontSize);
+  font-family: v-bind(globalState.style.bookmark.fontFamily);
+  .bookmark__container {
+    position: fixed;
+    .bookmark__row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .row__item--active {
+        background-color: v-bind(globalState.style.bookmark.activeColor[globalState.localState.currThemeCode]) !important;
+      }
+      .row__item {
+        flex: 0 0 auto;
+        position: relative;
+        margin: 4px;
+        padding: 3px;
+        width: 50px;
+        height: 50px;
+        color: v-bind(globalState.style.bookmark.fontColor[globalState.localState.currThemeCode]);
+        text-align: center;
+        border-radius: 5px;
+        background-color: v-bind(globalState.style.bookmark.backgroundColor[globalState.localState.currThemeCode]);
+        box-shadow: v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 2px 1px,
+          v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 4px 2px,
+          v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 8px 4px,
+          v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 16px 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        &:hover {
+          background-color: v-bind(globalState.style.bookmark.activeColor[globalState.localState.currThemeCode]) !important;
+        }
+        .item__key {
+        }
+        .item__img {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 2px;
+          height: 15px;
+        }
+        .item__img > img {
+          width: 15px;
+          height: 15px;
+        }
+        .item__name {
+          margin-top: 3px;
+          height: 15px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .item__cursor {
+          position: absolute;
+          left: 18px;
+          bottom: 2px;
+          width: 13px;
+          border: 1px solid
+            v-bind(globalState.style.bookmark.borderColor[globalState.localState.currThemeCode]);
+        }
+      }
     }
-    .row__item {
-      flex: 0 0 auto;
-      position: relative;
-      margin: 4px;
-      padding: 3px;
-      width: 50px;
-      height: 50px;
-      color: var(--text-color-bookmark);
-      font-size: 12px;
-      text-align: center;
-      border-radius: 5px;
-      background-color: var(--bg-bookmark-item-default);
-      box-shadow: var(--shadow-bookmark-item) 0px 2px 1px,
-        var(--shadow-bookmark-item) 0px 4px 2px,
-        var(--shadow-bookmark-item) 0px 8px 4px,
-        var(--shadow-bookmark-item) 0px 16px 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      &:hover {
-        background-color: var(--bg-bookmark-item-active) !important;
-      }
-      .item__key {
-      }
-
-      .item__img {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 2px;
-        height: 15px;
-      }
-
-      .item__img > img {
-        width: 15px;
-        height: 15px;
-      }
-
-      .item__name {
-        margin-top: 3px;
-        height: 15px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-
-      .item__cursor {
-        position: absolute;
-        left: 18px;
-        bottom: 2px;
-        width: 13px;
-        border: 1px solid #475569;
-      }
+    .bookmark__row:nth-child(2) {
+      margin-left: -25px;
     }
-  }
-  .bookmark__row:nth-child(2) {
-    margin-left: -25px;
-  }
-  .bookmark__row:nth-child(3) {
-    margin-left: -85px;
+    .bookmark__row:nth-child(3) {
+      margin-left: -85px;
+    }
   }
 }
 </style>

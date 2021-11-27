@@ -1,5 +1,6 @@
 export default {
   common: {
+    confirm: '确认',
     success: '成功',
     fail: '失败',
     enabled: '启用',
@@ -25,10 +26,13 @@ export default {
     fontSize: '字体大小',
     fontColor: '字体颜色',
     backgroundColor: '背景颜色',
+    activeColor: '激活颜色',
+    shadowColor: '阴影颜色',
+    borderColor: '边框颜色',
   },
   setting: {
     mainLabel: '设置',
-    tabBookmarks: '书签',
+    tabBookmark: '书签',
     tabClock: '时钟',
     tabDate: '日期',
     tabCalendar: '日历',
@@ -43,12 +47,14 @@ export default {
     importSettingsValue: '选择文件',
     exportSettingLabel: '导出设置',
     exportSettingValue: '导出',
+    resetSettingLabel: '重置设置',
+    resetSettingValue: '重置',
     settingDividerLanguage: '语言',
     language: '语言',
   },
-  bookmarks: {
-    bookmarksLabel: '书签',
-    bookmarksDividerConfig: '配置',
+  bookmark: {
+    bookmarkLabel: '书签',
+    bookmarkDividerConfig: '配置',
     urlLabel: '地址',
     urlPlaceholder: '',
     nameLabel: '名称',

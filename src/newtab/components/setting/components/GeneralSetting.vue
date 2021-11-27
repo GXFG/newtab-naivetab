@@ -4,6 +4,16 @@
       <NFormItem :label="$t('common.theme')">
         <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList"></NSelect>
       </NFormItem>
+      <NFormItem :label="$t('general.language')">
+        <NSelect
+          v-model:value="proxy.$i18n.locale"
+          :options="i18n.global.availableLocales.map((locale: string) => ({
+            label: locale,
+            value: locale
+          }))"
+          @update:value="onChangeLocale"
+        ></NSelect>
+      </NFormItem>
       <NFormItem :label="$t('general.pageTitle')">
         <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
       </NFormItem>
@@ -27,19 +37,15 @@
           {{ $t('general.exportSettingValue') }}
         </NButton>
       </NFormItem>
-
-      <NDivider title-placement="left">
-        {{ $t('general.settingDividerLanguage') }}
-      </NDivider>
-      <NFormItem :label="$t('general.language')">
-        <NSelect
-          v-model:value="proxy.$i18n.locale"
-          :options="i18n.global.availableLocales.map((locale: string) => ({
-            label: locale,
-            value: locale
-          }))"
-          @update:value="onChangeLocale"
-        ></NSelect>
+      <NFormItem :label="$t('general.resetSettingLabel')">
+        <NPopconfirm @positive-click="resetSetting()">
+          <template #trigger>
+            <NButton dashed type="error">
+              {{ $t('general.resetSettingValue') }}
+            </NButton>
+          </template>
+          {{ $t('common.confirm') }}?
+        </NPopconfirm>
       </NFormItem>
     </NForm>
   </div>
@@ -47,8 +53,8 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { NForm, NFormItem, NButton, NSelect, NInput, NDivider } from 'naive-ui'
-import { importSetting, exportSetting, globalState } from '@/logic'
+import { NForm, NFormItem, NButton, NSelect, NInput, NDivider, NPopconfirm } from 'naive-ui'
+import { importSetting, exportSetting, resetSetting, globalState } from '@/logic'
 import i18n from '@/locales'
 
 const { proxy }: any = getCurrentInstance()

@@ -5,56 +5,74 @@
     </NDivider>
 
     <NFormItem :label="$t('common.font')">
-      <NInput v-model:value="globalState.setting[props.field].style.fontFamily" placeholder=" "></NInput>
+      <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" "></NInput>
     </NFormItem>
 
     <NFormItem :label="$t('common.fontSize')">
       <NSlider
-        v-model:value="globalState.setting[props.field].style.fontSize"
+        v-model:value="globalState.style[props.field].fontSize"
         :step="1"
+        :min="12"
         :max="200"
       />
       <NInputNumber
-        v-model:value="globalState.setting[props.field].style.fontSize"
+        v-model:value="globalState.style[props.field].fontSize"
         class="layout__input_number"
+        :min="12"
         :step="1"
       ></NInputNumber>
     </NFormItem>
 
-    <NFormItem :label="$t('common.fontColor')">
+    <div class="form__label">
+      <label class="label__item">{{ $t('common.light') }}</label>
+      <label class="label__item">{{ $t('common.dark') }}</label>
+    </div>
+
+    <NFormItem v-if="globalState.style[props.field].fontColor" :label="$t('common.fontColor')">
       <div class="color__picker">
-        <label class="picker__label">{{ $t('common.light') }}</label>
-        <NColorPicker
-          v-model:value="globalState.setting[props.field].style.fontColor[0]"
-          :show-alpha="false"
-        />
+        <NColorPicker v-model:value="globalState.style[props.field].fontColor[0]" />
       </div>
       <div class="color__picker">
-        <label class="picker__label">{{ $t('common.dark') }}</label>
-        <NColorPicker
-          v-model:value="globalState.setting[props.field].style.fontColor[1]"
-          :show-alpha="false"
-        />
+        <NColorPicker v-model:value="globalState.style[props.field].fontColor[1]" />
       </div>
     </NFormItem>
 
     <NFormItem
-      v-if="globalState.setting[props.field].style.backgroundColor"
+      v-if="globalState.style[props.field].backgroundColor"
       :label="$t('common.backgroundColor')"
     >
       <div class="color__picker">
-        <label class="picker__label">{{ $t('common.light') }}</label>
-        <NColorPicker
-          v-model:value="globalState.setting[props.field].style.backgroundColor[0]"
-          :show-alpha="false"
-        />
+        <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[0]" />
       </div>
       <div class="color__picker">
-        <label class="picker__label">{{ $t('common.dark') }}</label>
-        <NColorPicker
-          v-model:value="globalState.setting[props.field].style.backgroundColor[1]"
-          :show-alpha="false"
-        />
+        <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[1]" />
+      </div>
+    </NFormItem>
+
+    <NFormItem v-if="globalState.style[props.field].activeColor" :label="$t('common.activeColor')">
+      <div class="color__picker">
+        <NColorPicker v-model:value="globalState.style[props.field].activeColor[0]" />
+      </div>
+      <div class="color__picker">
+        <NColorPicker v-model:value="globalState.style[props.field].activeColor[1]" />
+      </div>
+    </NFormItem>
+
+    <NFormItem v-if="globalState.style[props.field].shadowColor" :label="$t('common.shadowColor')">
+      <div class="color__picker">
+        <NColorPicker v-model:value="globalState.style[props.field].shadowColor[0]" />
+      </div>
+      <div class="color__picker">
+        <NColorPicker v-model:value="globalState.style[props.field].shadowColor[1]" />
+      </div>
+    </NFormItem>
+
+    <NFormItem v-if="globalState.style[props.field].borderColor" :label="$t('common.borderColor')">
+      <div class="color__picker">
+        <NColorPicker v-model:value="globalState.style[props.field].borderColor[0]" />
+      </div>
+      <div class="color__picker">
+        <NColorPicker v-model:value="globalState.style[props.field].borderColor[1]" />
       </div>
     </NFormItem>
 
@@ -84,11 +102,21 @@ const props = defineProps({
     margin-left: 10px;
   }
   flex: 1;
-  .picker__label {
-    flex: 0 0 auto;
-    padding-right: 5px;
-    font-size: 14px;
+}
+.form__label {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  .label__item {
     opacity: 0.6;
+    &:nth-of-type(1) {
+      margin-left: 23%;
+    }
+    &:nth-of-type(2) {
+      margin-right: 31%;
+    }
   }
 }
 
