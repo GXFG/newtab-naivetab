@@ -19,10 +19,14 @@ const state = reactive({
 })
 
 const updateDate = () => {
-  state.date = dayjs().format('YYYY-MM-DD dddd')
+  state.date = dayjs().format(globalState.setting.date.format)
 }
 
 updateDate()
+
+watch(() => globalState.setting.date.format, () => {
+  updateDate()
+})
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 

@@ -207,8 +207,7 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
           left: 18px;
           bottom: 2px;
           width: 13px;
-          border: 1px solid
-            v-bind(globalState.style.bookmark.borderColor[globalState.localState.currThemeCode]);
+          border: 1px solid v-bind(globalState.style.bookmark.borderColor[globalState.localState.currThemeCode]);
         }
       }
     }

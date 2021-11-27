@@ -17,8 +17,20 @@
       />
       <NInputNumber
         v-model:value="globalState.style[props.field].fontSize"
-        class="layout__input_number"
+        class="input_number"
         :min="12"
+        :step="1"
+      ></NInputNumber>
+    </NFormItem>
+    <NFormItem v-if="globalState.style[props.field].letterSpacing" :label="$t('common.letterSpacing')">
+      <NSlider
+        v-model:value="globalState.style[props.field].letterSpacing"
+        :step="1"
+        :max="200"
+      />
+      <NInputNumber
+        v-model:value="globalState.style[props.field].letterSpacing"
+        class="input_number"
         :step="1"
       ></NInputNumber>
     </NFormItem>
@@ -118,10 +130,5 @@ const props = defineProps({
       margin-right: 31%;
     }
   }
-}
-
-.layout__input_number {
-  margin-left: 10px;
-  width: 120px;
 }
 </style>

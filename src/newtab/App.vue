@@ -59,4 +59,9 @@ const customFontSize = computed(() => getCustomFontSize('general'))
   font-size: v-bind(customFontSize);
   font-family: v-bind(globalState.style.general.fontFamily);
 }
+
+.input_number {
+  margin-left: 10px;
+  width: 120px;
+}
 </style>

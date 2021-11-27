@@ -5,7 +5,7 @@
         <p class="time__text">
           {{ state.time }}
         </p>
-        <span class="time__mid">{{ state.mid }}</span>
+        <span v-if="globalState.setting.clock.unitEnabled" class="time__unit">{{ state.unit }}</span>
       </div>
     </div>
   </div>
@@ -19,13 +19,13 @@ const CNAME = 'clock'
 
 const state = reactive({
   time: '',
-  mid: '',
+  unit: '',
 })
-
 const updateTime = () => {
-  state.time = dayjs().format('hh:mm:ss')
-  state.mid = dayjs().format('a')
+  state.time = dayjs().format(globalState.setting.clock.format)
+  state.unit = dayjs().format('a')
 }
+
 updateTime()
 
 const timer = setInterval(updateTime, 1000)
@@ -37,6 +37,10 @@ onUnmounted(() => {
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
 const customFontSize = computed(() => getCustomFontSize(CNAME))
+
+const customUnitFontSize = computed(() => `${globalState.style.clock.unit.fontSize}px`)
+
+const customLetterSpacing = computed(() => `${globalState.style.clock.letterSpacing}px`)
 
 </script>
 
@@ -56,9 +60,10 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
       align-items: baseline;
       .time__text {
         font-size: v-bind(customFontSize);
+        letter-spacing: v-bind(customLetterSpacing);
       }
-      .time__mid {
-        font-size: v-bind(customFontSize);
+      .time__unit {
+        font-size: v-bind(customUnitFontSize);
       }
     }
   }

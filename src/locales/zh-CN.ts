@@ -24,11 +24,14 @@ export default {
     dark: '深色',
     font: '字体',
     fontSize: '字体大小',
+    letterSpacing: '字体间距',
     fontColor: '字体颜色',
     backgroundColor: '背景颜色',
     activeColor: '激活颜色',
     shadowColor: '阴影颜色',
     borderColor: '边框颜色',
+    config: '配置',
+    format: '格式',
   },
   setting: {
     mainLabel: '设置',
@@ -52,9 +55,11 @@ export default {
     settingDividerLanguage: '语言',
     language: '语言',
   },
+  clock: {
+    apMark: 'a.p./p.m.',
+  },
   bookmark: {
     bookmarkLabel: '书签',
-    bookmarkDividerConfig: '配置',
     urlLabel: '地址',
     urlPlaceholder: '',
     nameLabel: '名称',

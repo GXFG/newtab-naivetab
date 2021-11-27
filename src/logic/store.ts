@@ -11,7 +11,7 @@ export const globalState = reactive({
   }, { listenToStorageChanges: true }),
   style: useLocalStorage('style', {
     general: {
-      fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei',
+      fontFamily: 'PingFang SC, Microsoft YaHei',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
       backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
@@ -20,13 +20,18 @@ export const globalState = reactive({
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 20,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
-      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(0, 0, 0, 1)'],
+      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
     },
     clock: {
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 80,
+      letterSpacing: 2,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
-      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(0, 0, 0, 1)'],
+      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
+      unit: {
+        fontSize: 30,
+        fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
+      },
     },
     calendar: {
       fontFamily: '',
@@ -40,7 +45,7 @@ export const globalState = reactive({
       fontSize: 12,
       fontColor: ['rgba(15, 23, 42, 1)', 'rgba(15, 23, 42, 1)'],
       backgroundColor: ['rgba(209, 213, 219, 1)', 'rgba(212, 212, 216, 1)'],
-      activeColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+      activeColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
       shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
       borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
     },
@@ -58,8 +63,9 @@ export const globalState = reactive({
       layout: {
         positionType: 5,
         xOffset: 50,
-        yOffset: 60,
+        yOffset: 58,
       },
+      format: 'YYYY-MM-DD dddd',
     }, { listenToStorageChanges: true }),
     clock: useLocalStorage('clock', {
       enabled: true,
@@ -68,13 +74,15 @@ export const globalState = reactive({
         xOffset: 50,
         yOffset: 50,
       },
+      format: 'hh:mm:ss',
+      unitEnabled: true,
     }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('calendar', {
       enabled: true,
       layout: {
         positionType: 7,
-        xOffset: 0,
-        yOffset: 0,
+        xOffset: 1,
+        yOffset: 1,
       },
     }, { listenToStorageChanges: true }),
     bookmark: useLocalStorage('bookmark', {

@@ -1,8 +1,14 @@
 <template>
   <NForm ref="formRef" label-placement="left" :label-width="100">
+    <NDivider title-placement="left">
+      {{ $t('common.config') }}
+    </NDivider>
     <NFormItem :label="$t('common.enabled')">
       <NSwitch v-model:value="globalState.setting[props.field].enabled" />
     </NFormItem>
+
+    <slot></slot>
+
     <NDivider title-placement="left">
       {{ $t('common.layout') }}
     </NDivider>
@@ -16,7 +22,7 @@
       <NSlider v-model:value="globalState.setting[props.field].layout.xOffset" :step="1" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.xOffset"
-        class="layout__input_number"
+        class="input_number"
         size="small"
         :step="1"
         :min="0"
@@ -27,7 +33,7 @@
       <NSlider v-model:value="globalState.setting[props.field].layout.yOffset" :step="1" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.yOffset"
-        class="layout__input_number"
+        class="input_number"
         size="small"
         :step="1"
         :min="0"
@@ -56,10 +62,3 @@ const onPositionChange = (type: number) => {
 }
 
 </script>
-
-<style scoped>
-.layout__input_number {
-  margin-left: 10px;
-  width: 120px;
-}
-</style>

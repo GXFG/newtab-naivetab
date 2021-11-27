@@ -326,6 +326,7 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
         border-radius: 5px;
         border: 1px solid rgba(0, 0, 0, 0);
         overflow: hidden;
+        transition: all 0.3s ease;
         .item__day {
         }
         .item__desc {
@@ -355,9 +356,7 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
       }
       .body__item:hover {
         border: 1px solid
-          v-bind(
-            globalState.style.calendar.activeColor[globalState.localState.currThemeCode]
-          );
+          v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);
       }
       .body__item--work {
         color: var(--text-color-red) !important;
@@ -371,9 +370,7 @@ const customFontSize = computed(() => getCustomFontSize(CNAME))
         color: var(--text-color-red);
       }
       .body__item--active {
-        background-color: v-bind(
-          globalState.style.calendar.activeColor[globalState.localState.currThemeCode]
-        );
+        background-color: v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);
       }
       .body__item--blur {
         opacity: 0.4;

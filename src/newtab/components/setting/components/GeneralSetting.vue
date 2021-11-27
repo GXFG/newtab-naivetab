@@ -1,6 +1,9 @@
 <template>
   <div class="modal__general">
     <NForm ref="formRef" label-placement="left" :label-width="100">
+      <NDivider title-placement="left">
+        {{ $t('common.config') }}
+      </NDivider>
       <NFormItem :label="$t('common.theme')">
         <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList"></NSelect>
       </NFormItem>

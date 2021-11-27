@@ -24,11 +24,14 @@ export default {
     dark: 'Dark',
     font: 'Font',
     fontSize: 'Font size',
+    letterSpacing: 'Letter spacing',
     fontColor: 'Font color',
     backgroundColor: 'Background color',
     activeColor: 'Active color',
     shadowColor: 'Shadow color',
     borderColor: 'Border color',
+    config: 'Config',
+    format: 'Format',
   },
   setting: {
     mainLabel: 'Setting',
@@ -52,9 +55,11 @@ export default {
     settingDividerLanguage: 'Language',
     language: 'Language',
   },
+  clock: {
+    apMark: 'a.p./p.m.',
+  },
   bookmark: {
     bookmarkLabel: 'Bookmark',
-    bookmarkDividerConfig: 'Config',
     urlLabel: 'url',
     urlPlaceholder: '',
     nameLabel: 'name',

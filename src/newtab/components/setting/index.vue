@@ -50,30 +50,30 @@ import { isSettingMode, toggleIsSettingMode } from '@/logic'
   .setting__entry {
     position: fixed;
     top: 50vh;
-    right: 20px;
+    right: 2vw;
     z-index: 10;
     .item__icon {
-      font-size: 22px;
+      font-size: 24px;
     }
   }
 }
 .n-tab-pane {
   user-select: none;
-  padding: 15px 15px 0 0 !important;
+  padding: 0 15px 0 0 !important;
   height: 92vh;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
+  /* &::-webkit-scrollbar {
     width: 10px;
   }
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    background: #000;
+    background: #808080;
   }
   &::-webkit-scrollbar-track {
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    background: #535353;
-  }
+    background: #ccc;
+  } */
 }
 </style>
