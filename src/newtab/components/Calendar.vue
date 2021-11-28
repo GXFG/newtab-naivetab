@@ -1,6 +1,6 @@
 <template>
   <div v-if="globalState.setting.calendar.enabled" id="calendar">
-    <div class="calendar__container" :style="positionStyle">
+    <div class="calendar__container" :style="containerStyle">
       <div class="calendar__options">
         <div class="options__item">
           <NSelect
@@ -248,7 +248,21 @@ const onReset = () => {
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
-const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
+const containerStyle = computed(() => {
+  let style = ''
+  if (globalState.style.calendar.isBorderEnabled) {
+    style += `outline: 1px solid ${globalState.style.calendar.borderColor[globalState.localState.currThemeCode]};`
+  }
+  if (globalState.style.calendar.isShadowEnabled) {
+    style += `box-shadow: ${globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]} 0px 2px 4px 0px,
+      ${globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]} 0px 2px 16px 0px;`
+  }
+  return style + positionStyle.value
+})
+
+const customContainerWidth = computed(() => `${globalState.style.calendar.width * 7.4}px`)
+const customItemWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
+const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 
 </script>
 
@@ -259,20 +273,18 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
   font-family: v-bind(globalState.style.calendar.fontFamily);
   .calendar__container {
     position: fixed;
-    width: 330px;
+    width: v-bind(customContainerWidth);
+    background-color: v-bind(globalState.style.calendar.backgroundColor[globalState.localState.currThemeCode]);
     text-align: center;
     user-select: none;
     border-radius: 5px;
-    overflow: hidden;
     transition: all 0.3s ease;
-    box-shadow: v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 4px 0px,
-      v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 16px 0px;
+    overflow: hidden;
     .calendar__options {
-      padding: 5px;
+      padding: 1.5%;
       display: flex;
       justify-content: space-around;
       align-items: center;
-      font-size: 16px;
       .options__item {
         display: flex;
         justify-content: center;
@@ -319,19 +331,20 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
         justify-content: space-around;
         align-items: center;
         box-sizing: border-box;
-        padding: 3px;
+        padding: 1%;
         margin: 1px;
-        width: 13.6%;
-        height: 45px;
+        width: v-bind(customItemWidth);
+        height: v-bind(customItemWidth);
         text-align: center;
         border-radius: 5px;
         border: 1px solid rgba(0, 0, 0, 0);
-        overflow: hidden;
         transition: all 0.3s ease;
-        .item__day {
+        overflow: hidden;
+        &:hover {
+          border: 1px solid v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);
         }
+        .item__day {}
         .item__desc {
-          height: 10px;
           color: var(--text-color-main);
           font-size: 12px;
           transform: scale(0.8);
@@ -341,9 +354,9 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
         }
         .item__label {
           position: absolute;
-          top: -3px;
-          left: -3px;
-          padding: 3px;
+          top: -7%;
+          left: -7%;
+          padding: 7%;
           color: var(--text-color-main);
           font-size: 13px;
           transform: scale(0.7);
@@ -354,10 +367,6 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
         .item__label--rest {
           background-color: var(--text-color-red);
         }
-      }
-      .body__item:hover {
-        border: 1px solid
-          v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);
       }
       .body__item--work {
         color: var(--text-color-red) !important;

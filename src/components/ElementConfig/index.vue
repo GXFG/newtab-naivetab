@@ -5,15 +5,24 @@
     </NDivider>
 
     <NFormItem v-if="globalState.style[props.field].margin" :label="$t('common.margin')">
-      <NSlider
-        v-model:value="globalState.style[props.field].margin"
-        :step="1"
-        :max="200"
-      />
+      <NSlider v-model:value="globalState.style[props.field].margin" :step="1" :min="1" :max="100" />
       <NInputNumber
         v-model:value="globalState.style[props.field].margin"
         class="setting__input-number"
         :step="1"
+        :min="1"
+        :max="100"
+      ></NInputNumber>
+    </NFormItem>
+
+    <NFormItem v-if="globalState.style[props.field].width" :label="$t('common.width')">
+      <NSlider v-model:value="globalState.style[props.field].width" :step="1" :min="45" :max="200" />
+      <NInputNumber
+        v-model:value="globalState.style[props.field].width"
+        class="setting__input-number"
+        :step="1"
+        :min="45"
+        :max="200"
       ></NInputNumber>
     </NFormItem>
 
@@ -35,12 +44,12 @@
         :step="1"
       ></NInputNumber>
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].letterSpacing" :label="$t('common.letterSpacing')">
-      <NSlider
-        v-model:value="globalState.style[props.field].letterSpacing"
-        :step="1"
-        :max="200"
-      />
+
+    <NFormItem
+      v-if="globalState.style[props.field].letterSpacing"
+      :label="$t('common.letterSpacing')"
+    >
+      <NSlider v-model:value="globalState.style[props.field].letterSpacing" :step="1" :max="200" />
       <NInputNumber
         v-model:value="globalState.style[props.field].letterSpacing"
         class="setting__input-number"
@@ -83,28 +92,42 @@
       </div>
     </NFormItem>
 
-    <NFormItem v-if="globalState.style[props.field].shadowColor" :label="$t('common.shadowColor')">
+    <NFormItem v-if="globalState.style[props.field].borderColor" :label="$t('common.borderColor')">
+      <NSwitch v-model:value="globalState.style[props.field].isBorderEnabled" />
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].shadowColor[0]" />
+        <NColorPicker
+          v-if="globalState.style[props.field].isBorderEnabled"
+          v-model:value="globalState.style[props.field].borderColor[0]"
+        />
       </div>
-      <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].shadowColor[1]" />
+      <div class="color__picker setting__row-element">
+        <NColorPicker
+          v-if="globalState.style[props.field].isBorderEnabled"
+          v-model:value="globalState.style[props.field].borderColor[1]"
+        />
       </div>
     </NFormItem>
 
-    <NFormItem v-if="globalState.style[props.field].borderColor" :label="$t('common.borderColor')">
+    <NFormItem v-if="globalState.style[props.field].shadowColor" :label="$t('common.shadowColor')">
+      <NSwitch v-model:value="globalState.style[props.field].isShadowEnabled" />
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].borderColor[0]" />
+        <NColorPicker
+          v-if="globalState.style[props.field].isShadowEnabled"
+          v-model:value="globalState.style[props.field].shadowColor[0]"
+        />
       </div>
-      <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].borderColor[1]" />
+      <div class="color__picker setting__row-element">
+        <NColorPicker
+          v-if="globalState.style[props.field].isShadowEnabled"
+          v-model:value="globalState.style[props.field].shadowColor[1]"
+        />
       </div>
     </NFormItem>
   </NForm>
 </template>
 
 <script setup lang="ts">
-import { NDivider, NForm, NFormItem, NInput, NInputNumber, NSlider, NColorPicker } from 'naive-ui'
+import { NDivider, NForm, NFormItem, NInput, NInputNumber, NSwitch, NSlider, NColorPicker } from 'naive-ui'
 import { globalState } from '@/logic'
 
 const props = defineProps({
@@ -121,10 +144,10 @@ const props = defineProps({
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
   &:nth-of-type(2) {
     margin-left: 10px;
   }
-  flex: 1;
 }
 .form__label {
   flex: 1;

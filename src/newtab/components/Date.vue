@@ -1,6 +1,6 @@
 <template>
   <div v-if="globalState.setting.date.enabled" id="date">
-    <div class="date__container" :style="positionStyle">
+    <div class="date__container" :style="containerStyle">
       <p class="date__text">
         {{ state.date }}
       </p>
@@ -30,6 +30,14 @@ watch(() => globalState.setting.date.format, () => {
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
+const containerStyle = computed(() => {
+  let style = ''
+  if (globalState.style.date.isShadowEnabled) {
+    style += `text-shadow: 2px 8px 6px ${globalState.style.date.shadowColor[globalState.localState.currThemeCode]};`
+  }
+  return style + positionStyle.value
+})
+
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 
 </script>
@@ -38,12 +46,11 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 #date {
   font-family: v-bind(globalState.style.date.fontFamily);
   color: v-bind(globalState.style.date.fontColor[globalState.localState.currThemeCode]);
-  text-shadow: 2px 8px 6px v-bind(globalState.style.clock.shadowColor[globalState.localState.currThemeCode]);
   user-select: none;
-  transition: all 0.3s ease;
   .date__container {
     position: fixed;
     text-align: center;
+    transition: all 0.3s ease;
     .date__text {
       font-size: v-bind(customFontSize);
     }

@@ -8,13 +8,16 @@
           :title="item.url"
           class="row__item"
           :class="{ 'row__item--active': item.key === state.currSelectKey }"
+          :style="itemStyle"
           @click="onOpenBookmark(item.url)"
         >
           <p class="item__key">
             {{ `${item.key.toUpperCase()}` }}
           </p>
           <div class="item__img">
-            <img v-if="item.url" :src="`chrome://favicon/size/16@2x/${item.url}`" />
+            <div class="img__wrap">
+              <img v-if="item.url" class="img__main" :src="`chrome://favicon/size/16@2x/${item.url}`" />
+            </div>
           </div>
           <p class="item__name">
             {{ item.name }}
@@ -141,25 +144,45 @@ document.onkeydown = function(e: KeyboardEvent) {
   }
 }
 
+const itemStyle = computed(() => {
+  let style = ''
+  if (globalState.style.bookmark.isBorderEnabled) {
+    style += `outline: 1px solid ${globalState.style.bookmark.borderColor[globalState.localState.currThemeCode]};`
+  }
+  if (globalState.style.bookmark.isShadowEnabled) {
+    style += `box-shadow: ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 2px 1px,
+          ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 4px 2px,
+          ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 8px 4px,
+          ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 16px 8px;`
+  }
+  return style
+})
+
 const positionStyle = computed(() => getLayoutStyle(CNAME))
-
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-
 const customMargin = computed(() => formatNumWithPixl(CNAME, 'margin'))
+const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
+
 </script>
 
 <style scoped>
 #bookmark {
-  user-select: none;
-  transition: all 0.3s ease;
   font-size: v-bind(customFontSize);
   font-family: v-bind(globalState.style.bookmark.fontFamily);
+  user-select: none;
+  transition: all 0.3s ease;
   .bookmark__container {
     position: fixed;
     .bookmark__row {
       display: flex;
       justify-content: center;
       align-items: center;
+      &:nth-child(2) {
+        margin-left: -5%;
+      }
+      &:nth-child(3) {
+        margin-left: -16%;
+      }
       .row__item--active {
         background-color: v-bind(globalState.style.bookmark.activeColor[globalState.localState.currThemeCode]) !important;
       }
@@ -167,17 +190,13 @@ const customMargin = computed(() => formatNumWithPixl(CNAME, 'margin'))
         flex: 0 0 auto;
         position: relative;
         margin: v-bind(customMargin);
-        padding: 3px;
-        width: 50px;
-        height: 50px;
-        color: v-bind(globalState.style.bookmark.fontColor[globalState.localState.currThemeCode]);
+        padding: 0.8%;
+        width: v-bind(customwidth);
+        height: v-bind(customwidth);
         text-align: center;
-        border-radius: 5px;
+        border-radius: 4px;
+        color: v-bind(globalState.style.bookmark.fontColor[globalState.localState.currThemeCode]);
         background-color: v-bind(globalState.style.bookmark.backgroundColor[globalState.localState.currThemeCode]);
-        box-shadow: v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 2px 1px,
-          v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 4px 2px,
-          v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 8px 4px,
-          v-bind(globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]) 0px 16px 8px;
         cursor: pointer;
         transition: all 0.3s ease;
         &:hover {
@@ -189,34 +208,30 @@ const customMargin = computed(() => formatNumWithPixl(CNAME, 'margin'))
           display: flex;
           justify-content: center;
           align-items: center;
-          margin-top: 2px;
-          height: 15px;
-        }
-        .item__img > img {
-          width: 15px;
-          height: 15px;
+          margin-top: 4%;
+          .img__wrap {
+            width: 39%;
+            .img__main {
+              width: 100%;
+              height: 100%;
+            }
+          }
         }
         .item__name {
-          margin-top: 3px;
-          height: 15px;
+          margin-top: 5%;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
         }
         .item__cursor {
           position: absolute;
-          left: 18px;
-          bottom: 2px;
-          width: 13px;
+          left: 50%;
+          bottom: 4%;
+          width: 25%;
           border: 1px solid v-bind(globalState.style.bookmark.borderColor[globalState.localState.currThemeCode]);
+          transform: translate(-50%, 0);
         }
       }
-    }
-    .bookmark__row:nth-child(2) {
-      margin-left: -25px;
-    }
-    .bookmark__row:nth-child(3) {
-      margin-left: -85px;
     }
   }
 }

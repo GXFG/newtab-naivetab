@@ -31,6 +31,7 @@ export default {
     shadowColor: '阴影颜色',
     borderColor: '边框颜色',
     margin: '边距',
+    width: '宽度',
     config: '配置',
     format: '格式',
   },

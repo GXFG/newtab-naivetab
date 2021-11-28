@@ -31,6 +31,7 @@ export default {
     shadowColor: 'Shadow color',
     borderColor: 'Border color',
     margin: 'Margin',
+    width: 'Width',
     config: 'Config',
     format: 'Format',
   },

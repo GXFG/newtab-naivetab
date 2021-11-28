@@ -1,6 +1,6 @@
 <template>
   <div v-if="globalState.setting.clock.enabled" id="clock">
-    <div class="clock__container" :style="positionStyle">
+    <div class="clock__container" :style="containerStyle">
       <div class="clock__time">
         <p class="time__text">
           {{ state.time }}
@@ -36,10 +36,16 @@ onUnmounted(() => {
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
+const containerStyle = computed(() => {
+  let style = ''
+  if (globalState.style.clock.isShadowEnabled) {
+    style += `text-shadow: 2px 8px 6px ${globalState.style.clock.shadowColor[globalState.localState.currThemeCode]};`
+  }
+  return style + positionStyle.value
+})
+
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-
 const customUnitFontSize = computed(() => formatNumWithPixl(CNAME, 'unit', 'fontSize'))
-
 const customLetterSpacing = computed(() => formatNumWithPixl(CNAME, 'letterSpacing'))
 
 </script>
@@ -48,12 +54,11 @@ const customLetterSpacing = computed(() => formatNumWithPixl(CNAME, 'letterSpaci
 #clock {
   font-family: v-bind(globalState.style.clock.fontFamily);
   color: v-bind(globalState.style.clock.fontColor[globalState.localState.currThemeCode]);
-  text-shadow: 2px 8px 6px v-bind(globalState.style.clock.shadowColor[globalState.localState.currThemeCode]);
   user-select: none;
-  transition: all 0.3s ease;
   .clock__container {
     position: fixed;
     text-align: center;
+    transition: all 0.3s ease;
     .clock__time {
       display: flex;
       justify-content: center;
