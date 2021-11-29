@@ -23,10 +23,7 @@ export async function getManifest() {
       128: './assets/img/icon.png',
     },
     permissions: [
-      'tabs',
       'storage',
-      'downloads',
-      'activeTab',
       'chrome://favicon/',
       'http://*/',
       'https://*/',

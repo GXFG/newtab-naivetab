@@ -105,7 +105,7 @@ export const importSetting = (text: string) => {
 }
 
 export const exportSetting = () => {
-  const filename = `newtab-setting-${dayjs().format('YYYYMMDD-HHmmss')}.json`
+  const filename = `pazzletab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadByTagA({
     style: globalState.style,
     setting: globalState.setting,

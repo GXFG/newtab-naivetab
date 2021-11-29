@@ -62,18 +62,18 @@ import { isSettingMode, toggleIsSettingMode } from '@/logic'
   padding: 0 15px 0 0 !important;
   height: 92vh;
   overflow-y: scroll;
-  /* &::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     width: 10px;
   }
   &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
     background: #808080;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   }
   &::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
     background: #ccc;
-  } */
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
 }
 </style>

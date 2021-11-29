@@ -1,8 +1,8 @@
 {
-  "name": "newtab",
-  "displayName": "新标签页",
-  "version": "1.0.0",
-  "description": "个人定制的新标签页",
+  "name": "newtab-pazzletab",
+  "displayName": "PazzleTab",
+  "version": "0.1.0",
+  "description": "",
   "private": true,
   "scripts": {
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:*",
