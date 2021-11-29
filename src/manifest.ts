@@ -12,7 +12,8 @@ export async function getManifest() {
     manifest_version: 2,
     name: pkg.displayName || pkg.name,
     version: pkg.version,
-    description: pkg.description,
+    description: '__MSG_appDesc__',
+    default_locale: 'en',
     browser_action: {
       default_icon: './assets/img/icon.png',
       // default_popup: './dist/popup/index.html',
