@@ -60,7 +60,7 @@ import { isSettingMode, toggleIsSettingMode } from '@/logic'
 .n-tab-pane {
   user-select: none;
   padding: 0 15px 0 0 !important;
-  height: 92vh;
+  height: 89vh;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     width: 10px;
