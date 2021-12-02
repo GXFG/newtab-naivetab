@@ -56,7 +56,7 @@
 import dayjs from 'dayjs'
 import { NForm, NFormItem, NButton, NSelect, NInput, NDivider, NPopconfirm } from 'naive-ui'
 import { importSetting, exportSetting, resetSetting, globalState } from '@/logic'
-import i18n from '@/locales'
+import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
 

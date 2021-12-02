@@ -1,6 +1,7 @@
-import { dirname, relative } from 'path'
+import { dirname, relative, resolve } from 'path'
 import { defineConfig, UserConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
+import vueI18n from '@intlify/vite-plugin-vue-i18n'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
@@ -15,6 +16,7 @@ export const sharedConfig: UserConfig = {
   resolve: {
     alias: {
       '@/': `${r('src')}/`,
+      'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js',
     },
   },
   define: {
@@ -22,6 +24,10 @@ export const sharedConfig: UserConfig = {
   },
   plugins: [
     Vue(),
+
+    vueI18n({
+      include: resolve(__dirname, './src/locales/**'),
+    }),
 
     AutoImport({
       imports: [

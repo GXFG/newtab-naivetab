@@ -28,6 +28,7 @@
     "@ffflorian/jszip-cli": "^3.1.5",
     "@iconify/json": "^1.1.408",
     "@iconify/vue": "^3.1.1",
+    "@intlify/vite-plugin-vue-i18n": "^3.2.1",
     "@types/chrome": "^0.0.162",
     "@types/fs-extra": "^9.0.13",
     "@types/node": "^16.10.2",

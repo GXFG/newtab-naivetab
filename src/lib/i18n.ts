@@ -1,7 +1,7 @@
 import { createI18n } from 'vue-i18n'
 import { globalState } from '@/logic/store'
 
-const modules = import.meta.globEager('./*')
+const modules = import.meta.globEager('../locales/*')
 
 function getLangAll(): any {
   const target: any = {}
@@ -9,7 +9,11 @@ function getLangAll(): any {
     if (!modules[path].default) {
       return
     }
-    const pathName = path.slice(2, -3) // ./pathName.ts
+
+    const tempList = path.split('/')
+    const lastPath = tempList[tempList.length - 1]
+    const pathName = lastPath.slice(0, -5)
+
     if (target[pathName]) {
       target[pathName] = {
         ...target[pathName],
