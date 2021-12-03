@@ -25,8 +25,6 @@ export async function getManifest() {
     permissions: [
       'storage',
       'chrome://favicon/',
-      'http://*/',
-      'https://*/',
     ],
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',
@@ -44,9 +42,9 @@ export async function getManifest() {
     //   matches: ['http://*/*', 'https://*/*'],
     //   js: ['./dist/contentScripts/index.global.js'],
     // }],
-    web_accessible_resources: [
-      'dist/contentScripts/style.css',
-    ],
+    // web_accessible_resources: [
+    //   'dist/contentScripts/style.css',
+    // ],
     content_security_policy: 'script-src \'self\'; object-src \'self\'',
   }
 

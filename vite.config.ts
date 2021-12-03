@@ -103,7 +103,7 @@ export default defineConfig(({ command }) => ({
     },
     rollupOptions: {
       input: {
-        background: r('src/background/index.html'),
+        // background: r('src/background/index.html'),
         newtab: r('src/newtab/index.html'),
       },
     },
