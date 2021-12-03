@@ -1,5 +1,7 @@
 # PazzleTab 新标签页
 
+[英文文档](https://github.com/cmd-cv/newtab-pazzletab/blob/main/README-en.md)
+
 ## 💡简介
 
 一款简洁的浏览器新标签页扩展
@@ -23,11 +25,12 @@
 
 ## 📷
 
-| 功能 | 描述 | 预览 |
-| ---- | ---- | ---- |
-|      |      |      |
-|      |      |      |
-|      |      |      |
+| 描述 | 预览 |
+| ---- | ---- |
+| 目前包含的组件如图，其中通过键盘按键触发书签为避免误触需要双击对应按键 |   <img width="1286" alt="iShot2021-12-03 10 02 33" src="https://user-images.githubusercontent.com/20944987/144532338-7ef3fc3c-5537-40d6-81ce-18d356c095f0.png">  |
+| 点击右侧齿轮图标可展开详细设置抽屉，包含“通用”以及“各个组件”的具体配置项  |   <img width="1286" alt="iShot2021-12-03 10 02 41" src="https://user-images.githubusercontent.com/20944987/144532371-31859838-f075-4652-8670-d20ab2286ce3.png">  |
+|  每个组件都包含“布局”以及“样式”的配置项，可进行任意位置的摆放、字体与颜色的调整  | <img width="1286" alt="iShot2021-12-03 10 03 38" src="https://user-images.githubusercontent.com/20944987/144532407-01345f5b-b4e4-4b23-bbb7-1bff766be35c.png"> |
+| 支持自动 / 手动切换主题模式  | <img width="1286" alt="iShot2021-12-03 10 03 50" src="https://user-images.githubusercontent.com/20944987/144532427-ab8c8c71-a098-4b69-8dff-e31afc5d47c6.png"> |
 
 ## 🛠️安装
 
@@ -35,11 +38,11 @@
 
 ## 📜更新日志
 
-跳转到 CHANGELOG.md
+[查看 CHANGELOG.md](https://github.com/cmd-cv/newtab-pazzletab/blob/main/CHANGELOG.md)
 
 ## 🏗 开发
 
-- 欢迎 pr & issue
+- 欢迎 PR & issue
 
 ## 🙏 感谢
 
