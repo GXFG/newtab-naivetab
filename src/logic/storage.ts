@@ -36,6 +36,27 @@ watch([
   deep: true,
 })
 
+const updateSetting = (data: any) => {
+  if (data.style) {
+    globalState.style = data.style
+  }
+  if (data.setting.general) {
+    globalState.setting.general = data.setting.general
+  }
+  if (data.setting.date) {
+    globalState.setting.date = data.setting.date
+  }
+  if (data.setting.clock) {
+    globalState.setting.clock = data.setting.clock
+  }
+  if (data.setting.calendar) {
+    globalState.setting.calendar = data.setting.calendar
+  }
+  if (data.setting.bookmark) {
+    globalState.setting.bookmark = data.setting.bookmark
+  }
+}
+
 export const loadSyncSetting = () => {
   chrome.storage.sync.get(null, ({ MyNewTabSetting }) => {
     if (!MyNewTabSetting) {
@@ -51,26 +72,8 @@ export const loadSyncSetting = () => {
 
     isDownLoading = true
     log('Load settings', cloudSetting)
-
     globalState.setting.syncTime = cloudSetting.setting.syncTime
-    if (cloudSetting.style) {
-      globalState.style = cloudSetting.style
-    }
-    if (cloudSetting.setting.general) {
-      globalState.setting.general = cloudSetting.setting.general
-    }
-    if (cloudSetting.setting.date) {
-      globalState.setting.date = cloudSetting.setting.date
-    }
-    if (cloudSetting.setting.clock) {
-      globalState.setting.clock = cloudSetting.setting.clock
-    }
-    if (cloudSetting.setting.calendar) {
-      globalState.setting.calendar = cloudSetting.setting.calendar
-    }
-    if (cloudSetting.setting.bookmark) {
-      globalState.setting.bookmark = cloudSetting.setting.bookmark
-    }
+    updateSetting(cloudSetting)
 
     nextTick(() => {
       isDownLoading = false
@@ -96,24 +99,7 @@ export const importSetting = (text: string) => {
   }
 
   log('FileContent', fileContent)
-  if (fileContent.style) {
-    globalState.style = fileContent.style
-  }
-  if (fileContent.setting.general) {
-    globalState.setting.general = fileContent.setting.general
-  }
-  if (fileContent.setting.clock) {
-    globalState.setting.clock = fileContent.setting.clock
-  }
-  if (fileContent.setting.date) {
-    globalState.setting.date = fileContent.setting.date
-  }
-  if (fileContent.setting.calendar) {
-    globalState.setting.calendar = fileContent.setting.calendar
-  }
-  if (fileContent.setting.bookmark) {
-    globalState.setting.bookmark = fileContent.setting.bookmark
-  }
+  updateSetting(fileContent)
 }
 
 export const exportSetting = () => {
