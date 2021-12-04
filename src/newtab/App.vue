@@ -14,10 +14,12 @@
 <script setup lang="ts">
 import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider } from 'naive-ui'
 import Content from './Content.vue'
-import { THEME_CODE_MAP, globalState, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
+import { gaEvent, THEME_CODE_MAP, globalState, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
 
 loadSyncSetting()
 initPageTitle()
+
+gaEvent('page-home', 'view', 'view')
 
 const osTheme = useOsTheme() // light | dark | null
 const currTheme = ref()

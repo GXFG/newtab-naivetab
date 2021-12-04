@@ -5,7 +5,7 @@
       class="setting__entry"
       text
       :title="`${$t('setting.mainLabel')}`"
-      @click="toggleIsSettingMode()"
+      @click="openSettingModal()"
     >
       <ic:baseline-settings v-show="!isSettingMode" class="item__icon" />
     </NButton>
@@ -41,7 +41,12 @@ import ClockSetting from './components/ClockSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import GeneralSetting from './components/GeneralSetting.vue'
-import { isSettingMode, toggleIsSettingMode } from '@/logic'
+import { gaEvent, isSettingMode, toggleIsSettingMode } from '@/logic'
+
+const openSettingModal = () => {
+  toggleIsSettingMode()
+  gaEvent('setting-button', 'click', 'open')
+}
 
 </script>
 

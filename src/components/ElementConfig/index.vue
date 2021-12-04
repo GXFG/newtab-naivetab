@@ -27,7 +27,7 @@
     </NFormItem>
 
     <NFormItem :label="$t('common.font')">
-      <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" "></NInput>
+      <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" " @blur="onFontBlur"></NInput>
     </NFormItem>
 
     <NFormItem :label="$t('common.fontSize')">
@@ -128,7 +128,7 @@
 
 <script setup lang="ts">
 import { NDivider, NForm, NFormItem, NInput, NInputNumber, NSwitch, NSlider, NColorPicker } from 'naive-ui'
-import { globalState } from '@/logic'
+import { gaEvent, globalState } from '@/logic'
 
 const props = defineProps({
   field: {
@@ -136,6 +136,10 @@ const props = defineProps({
     required: true,
   },
 })
+
+const onFontBlur = (value: any) => {
+  gaEvent(`${props.field}-font`, 'blur', `${value.target.value}`)
+}
 
 </script>
 

@@ -35,12 +35,12 @@
       <input ref="fileInputEl" style="display: none" type="file" @change="onImportFileChange" />
     </NFormItem>
     <NFormItem :label="$t('general.exportSettingLabel')">
-      <NButton @click="exportSetting()">
+      <NButton @click="onExportSetting()">
         {{ $t('general.exportSettingValue') }}
       </NButton>
     </NFormItem>
     <NFormItem :label="$t('general.resetSettingLabel')">
-      <NPopconfirm @positive-click="resetSetting()">
+      <NPopconfirm @positive-click="onResetSetting()">
         <template #trigger>
           <NButton dashed type="error">
             {{ $t('general.resetSettingValue') }}
@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NForm, NFormItem, NButton, NSelect, NInput, NDivider, NPopconfirm } from 'naive-ui'
-import { importSetting, exportSetting, resetSetting, globalState } from '@/logic'
+import { gaEvent, importSetting, exportSetting, resetSetting, globalState } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -81,6 +81,7 @@ watch(() => globalState.setting.general.lang, () => {
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
   globalState.setting.general.lang = locale
+  gaEvent('setting-locale', 'click', 'change')
 }
 
 const syncTime = computed(() => {
@@ -92,6 +93,7 @@ const fileInputEl = ref()
 const onImportSetting = () => {
   (fileInputEl as any).value.value = null
   fileInputEl.value.click()
+  gaEvent('setting-import', 'click', 'open')
 }
 
 const onImportFileChange = (e: any) => {
@@ -105,6 +107,17 @@ const onImportFileChange = (e: any) => {
   reader.onload = () => {
     importSetting(reader.result as any)
   }
+  gaEvent('setting-import', 'click', 'select-file')
+}
+
+const onExportSetting = () => {
+  exportSetting()
+  gaEvent('setting-export', 'click', 'open')
+}
+
+const onResetSetting = () => {
+  resetSetting()
+  gaEvent('setting-reset', 'click', 'open')
 }
 
 </script>

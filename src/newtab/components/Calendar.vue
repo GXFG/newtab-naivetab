@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
-import { globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { gaEvent, globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, formatNumWithPixl } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
 const CNAME = 'calendar'
@@ -223,6 +223,7 @@ const onPrevMonth = () => {
     state.currMonth -= 1
   }
   onRender()
+  gaEvent('calendar-prev', 'click', '')
 }
 
 const onNextMonth = () => {
@@ -233,6 +234,7 @@ const onNextMonth = () => {
     state.currMonth += 1
   }
   onRender()
+  gaEvent('calendar-next', 'click', '')
 }
 
 const onDateChange = () => {
@@ -244,6 +246,7 @@ const onReset = () => {
   state.currMonth = dayjs().get('month') + 1
   state.currDay = dayjs().get('date')
   onRender()
+  gaEvent('calendar-reset', 'click', '')
 }
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
