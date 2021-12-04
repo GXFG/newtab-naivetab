@@ -1,8 +1,11 @@
 import dayjs from 'dayjs'
+import { nextTick } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { globalState } from './store'
 import { MERGE_SETTING_DELAY } from './const'
 import { log, downloadByTagA } from './util'
+
+let isDownLoading = false
 
 const uploadFn = () => {
   log('Start syncing settings')
@@ -25,46 +28,52 @@ watch([
   () => globalState.setting.calendar,
   () => globalState.setting.bookmark,
 ], () => {
+  if (isDownLoading) {
+    return
+  }
   uploadSetting()
 }, {
   deep: true,
 })
 
 export const loadSyncSetting = () => {
-  return new Promise((resolve) => {
-    chrome.storage.sync.get(null, ({ MyNewTabSetting }) => {
-      if (!MyNewTabSetting) {
-        log('Notfound settings')
-        return
-      }
+  chrome.storage.sync.get(null, ({ MyNewTabSetting }) => {
+    if (!MyNewTabSetting) {
+      log('Notfound settings')
+      return
+    }
 
-      const cloudSetting = JSON.parse(MyNewTabSetting)
-      if (cloudSetting.setting.syncTime === globalState.setting.syncTime) {
-        log('None modification settings')
-        return
-      }
+    const cloudSetting = JSON.parse(MyNewTabSetting)
+    if (cloudSetting.setting.syncTime === globalState.setting.syncTime) {
+      log('None modification settings')
+      return
+    }
 
-      log('Load settings', cloudSetting)
-      globalState.setting.syncTime = cloudSetting.syncTime
-      if (cloudSetting.style) {
-        globalState.style = cloudSetting.style
-      }
-      if (cloudSetting.general) {
-        globalState.setting.general = cloudSetting.general
-      }
-      if (cloudSetting.date) {
-        globalState.setting.date = cloudSetting.date
-      }
-      if (cloudSetting.clock) {
-        globalState.setting.clock = cloudSetting.clock
-      }
-      if (cloudSetting.calendar) {
-        globalState.setting.calendar = cloudSetting.calendar
-      }
-      if (cloudSetting.bookmark) {
-        globalState.setting.bookmark = cloudSetting.bookmark
-      }
-      resolve(null)
+    isDownLoading = true
+    log('Load settings', cloudSetting)
+
+    globalState.setting.syncTime = cloudSetting.setting.syncTime
+    if (cloudSetting.style) {
+      globalState.style = cloudSetting.style
+    }
+    if (cloudSetting.setting.general) {
+      globalState.setting.general = cloudSetting.setting.general
+    }
+    if (cloudSetting.setting.date) {
+      globalState.setting.date = cloudSetting.setting.date
+    }
+    if (cloudSetting.setting.clock) {
+      globalState.setting.clock = cloudSetting.setting.clock
+    }
+    if (cloudSetting.setting.calendar) {
+      globalState.setting.calendar = cloudSetting.setting.calendar
+    }
+    if (cloudSetting.setting.bookmark) {
+      globalState.setting.bookmark = cloudSetting.setting.bookmark
+    }
+
+    nextTick(() => {
+      isDownLoading = false
     })
   })
 }
@@ -73,6 +82,7 @@ export const importSetting = (text: string) => {
   if (!text) {
     return
   }
+
   let fileContent = {} as any
   try {
     fileContent = JSON.parse(text)
@@ -80,9 +90,11 @@ export const importSetting = (text: string) => {
     log('Parse error', e)
     window.$message.error(window.$t('common.fail'))
   }
+
   if (Object.keys(fileContent).length === 0) {
     return
   }
+
   log('FileContent', fileContent)
   if (fileContent.style) {
     globalState.style = fileContent.style

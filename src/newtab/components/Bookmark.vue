@@ -73,7 +73,7 @@ const keyBoardRowList = computed(() => {
 })
 
 const mergeBookmarkSetting = useThrottleFn(async() => {
-  log('mergeBookmarkSetting')
+  log('Merge BookmarkSetting')
   if (!isInitialized) {
     await sleep(100)
   }
