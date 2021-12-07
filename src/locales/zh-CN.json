@@ -38,7 +38,8 @@
   "setting": {
     "mainLabel": "设置",
     "tabBookmark": "书签",
-    "tabClock": "时钟",
+    "tabDigitalClock": "数字时钟",
+    "tabAnalogClock": "模拟时钟",
     "tabDate": "日期",
     "tabCalendar": "日历",
     "tabGeneral": "通用"

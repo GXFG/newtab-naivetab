@@ -26,11 +26,11 @@
       ></NInputNumber>
     </NFormItem>
 
-    <NFormItem :label="$t('common.font')">
+    <NFormItem v-if="'fontFamily' in globalState.style[props.field]" :label="$t('common.font')">
       <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" " @blur="onFontBlur"></NInput>
     </NFormItem>
 
-    <NFormItem :label="$t('common.fontSize')">
+    <NFormItem v-if="globalState.style[props.field].fontSize" :label="$t('common.fontSize')">
       <NSlider
         v-model:value="globalState.style[props.field].fontSize"
         :step="1"
@@ -57,7 +57,7 @@
       ></NInputNumber>
     </NFormItem>
 
-    <div class="form__label">
+    <div v-if="isColorLabelVisible" class="form__label">
       <label class="label__item">{{ $t('common.light') }}</label>
       <label class="label__item">{{ $t('common.dark') }}</label>
     </div>
@@ -140,6 +140,14 @@ const props = defineProps({
 const onFontBlur = (value: any) => {
   gaEvent(`${props.field}-font`, 'blur', `${value.target.value}`)
 }
+
+const isColorLabelVisible = computed(() => {
+  return globalState.style[props.field].fontColor
+  || globalState.style[props.field].backgroundColor
+  || globalState.style[props.field].activeColor
+  || globalState.style[props.field].borderColor
+  || globalState.style[props.field].shadowColor
+})
 
 </script>
 

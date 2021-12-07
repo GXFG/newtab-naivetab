@@ -7,7 +7,7 @@ const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const globalState = reactive({
   localState: useLocalStorage('localState', {
-    currThemeCode: 0, // 0light | 1dark | 2auto
+    currThemeCode: 0, // 0light | 1dark
   }, { listenToStorageChanges: true }),
   style: useLocalStorage('style', {
     general: {
@@ -23,7 +23,7 @@ export const globalState = reactive({
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
     },
-    clock: {
+    clockDigital: {
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 80,
       letterSpacing: 2,
@@ -34,6 +34,9 @@ export const globalState = reactive({
         fontSize: 30,
         fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       },
+    },
+    clockAnalog: {
+      width: 130,
     },
     calendar: {
       width: 45,
@@ -78,7 +81,7 @@ export const globalState = reactive({
       },
       format: 'YYYY-MM-DD dddd',
     }, { listenToStorageChanges: true }),
-    clock: useLocalStorage('clock', {
+    clockDigital: useLocalStorage('clockDigital', {
       enabled: true,
       layout: {
         positionType: 5,
@@ -87,6 +90,15 @@ export const globalState = reactive({
       },
       format: 'hh:mm:ss',
       unitEnabled: true,
+    }, { listenToStorageChanges: true }),
+    clockAnalog: useLocalStorage('clockAnalog', {
+      enabled: true,
+      layout: {
+        positionType: 8,
+        xOffset: 50,
+        yOffset: 5,
+      },
+      theme: 1,
     }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('calendar', {
       enabled: true,
@@ -129,7 +141,7 @@ watch(() => [
   deep: true,
 })
 
-export const getLayoutStyle = (name: 'bookmark' | 'date' | 'clock' | 'calendar') => {
+export const getLayoutStyle = (name: 'bookmark' | 'date' | 'clockDigital' | 'calendar') => {
   const layout = globalState.setting[name].layout
   const styleList = POSITION_TYPE_TO_STYLE_MAP[layout.positionType]
   let res = `${styleList[0].prop}:${layout.xOffset}%;${styleList[1].prop}:${layout.yOffset}%;`
@@ -139,7 +151,7 @@ export const getLayoutStyle = (name: 'bookmark' | 'date' | 'clock' | 'calendar')
   return res
 }
 
-export const formatNumWithPixl = (component: 'general' | 'bookmark' | 'date' | 'clock' | 'calendar', ...field: any) => {
+export const formatNumWithPixl = (component: 'general' | 'bookmark' | 'date' | 'clockDigital' | 'clockAnalog' | 'calendar', ...field: any) => {
   const res = field.reduce((r: any, c: string) => r[c], globalState.style[component])
   return `${res}px`
 }

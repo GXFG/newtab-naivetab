@@ -1,11 +1,8 @@
 import dayjs from 'dayjs'
-import { nextTick } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { globalState } from './store'
 import { MERGE_SETTING_DELAY } from './const'
 import { log, downloadByTagA } from './util'
-
-let isDownLoading = false
 
 const uploadFn = () => {
   log('Start syncing settings')
@@ -24,36 +21,52 @@ watch([
   () => globalState.style,
   () => globalState.setting.general,
   () => globalState.setting.date,
-  () => globalState.setting.clock,
+  () => globalState.setting.clockDigital,
   () => globalState.setting.calendar,
   () => globalState.setting.bookmark,
 ], () => {
-  if (isDownLoading) {
-    return
-  }
   uploadSetting()
 }, {
   deep: true,
 })
 
 const updateSetting = (data: any) => {
-  if (data.style) {
-    globalState.style = data.style
+  if (data.style.general) {
+    globalState.style.general = { ...globalState.style.general, ...data.style.general }
   }
+  if (data.style.date) {
+    globalState.style.date = { ...globalState.style.date, ...data.style.date }
+  }
+  if (data.style.clockDigital) {
+    globalState.style.clockDigital = { ...globalState.style.clockDigital, ...data.style.clockDigital }
+  }
+  if (data.style.clockAnalog) {
+    globalState.style.clockAnalog = { ...globalState.style.clockAnalog, ...data.style.clockAnalog }
+  }
+  if (data.style.calendar) {
+    globalState.style.calendar = { ...globalState.style.calendar, ...data.style.calendar }
+  }
+  if (data.style.bookmark) {
+    globalState.style.bookmark = { ...globalState.style.bookmark, ...data.style.bookmark }
+  }
+
   if (data.setting.general) {
-    globalState.setting.general = data.setting.general
+    globalState.setting.general = { ...globalState.setting.general, ...data.setting.general }
   }
   if (data.setting.date) {
-    globalState.setting.date = data.setting.date
+    globalState.setting.date = { ...globalState.setting.date, ...data.setting.date }
   }
-  if (data.setting.clock) {
-    globalState.setting.clock = data.setting.clock
+  if (data.setting.clockDigital) {
+    globalState.setting.clockDigital = { ...globalState.setting.clockDigital, ...data.setting.clockDigital }
+  }
+  if (data.setting.clockAnalog) {
+    globalState.setting.clockAnalog = { ...globalState.setting.clockAnalog, ...data.setting.clockAnalog }
   }
   if (data.setting.calendar) {
-    globalState.setting.calendar = data.setting.calendar
+    globalState.setting.calendar = { ...globalState.setting.calendar, ...data.setting.calendar }
   }
   if (data.setting.bookmark) {
-    globalState.setting.bookmark = data.setting.bookmark
+    globalState.setting.bookmark = { ...globalState.setting.bookmark, ...data.setting.bookmark }
   }
 }
 
@@ -70,14 +83,9 @@ export const loadSyncSetting = () => {
       return
     }
 
-    isDownLoading = true
     log('Load settings', cloudSetting)
     globalState.setting.syncTime = cloudSetting.setting.syncTime
     updateSetting(cloudSetting)
-
-    nextTick(() => {
-      isDownLoading = false
-    })
   })
 }
 

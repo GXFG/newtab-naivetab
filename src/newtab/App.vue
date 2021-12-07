@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider } from 'naive-ui'
 import Content from './Content.vue'
-import { gaEvent, THEME_CODE_MAP, globalState, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
+import { gaEvent, THEME_TO_CODE_MAP, globalState, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
 
 loadSyncSetting()
 initPageTitle()
@@ -29,11 +29,11 @@ watch(() => [
   globalState.setting.general.theme,
 ], () => {
   if (globalState.setting.general.theme === 'auto') {
-    globalState.localState.currThemeCode = THEME_CODE_MAP[osTheme.value as any]
+    globalState.localState.currThemeCode = THEME_TO_CODE_MAP[osTheme.value as any]
     currTheme.value = osTheme.value === 'dark' ? darkTheme : null
     return
   }
-  globalState.localState.currThemeCode = THEME_CODE_MAP[globalState.setting.general.theme]
+  globalState.localState.currThemeCode = THEME_TO_CODE_MAP[globalState.setting.general.theme]
   currTheme.value = globalState.setting.general.theme === 'dark' ? darkTheme : null
 }, { immediate: true })
 

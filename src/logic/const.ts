@@ -6,10 +6,15 @@ export const BOOKMARK_ACTIVE_PRESS_INTERVAL = 200
 
 export const MERGE_SETTING_DELAY = 2000
 
-export const THEME_CODE_MAP = {
+export const THEME_TO_CODE_MAP = {
   light: 0,
   dark: 1,
 }
+
+export const ANALOG_CLOCK_THEME = [
+  { label: 'light', value: 0 },
+  { label: 'dark', value: 1 },
+]
 
 export const POSITION_TYPE_TO_STYLE_MAP = {
   1: [

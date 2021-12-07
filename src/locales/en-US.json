@@ -38,7 +38,8 @@
   "setting": {
     "mainLabel": "Setting",
     "tabBookmark": "Bookmark",
-    "tabClock": "Clock",
+    "tabDigitalClock": "DigitalClock",
+    "tabAnalogClock": "AnalogClock",
     "tabDate": "Date",
     "tabCalendar": "Calendar",
     "tabGeneral": "General"

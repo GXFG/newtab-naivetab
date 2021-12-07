@@ -19,8 +19,11 @@
           <NTabPane class="setting__content" name="tabBookmark" :tab="$t('setting.tabBookmark')">
             <BookmarkSetting />
           </NTabPane>
-          <NTabPane name="tabClock" :tab="$t('setting.tabClock')">
-            <ClockSetting />
+          <NTabPane name="tabDigitalClock" :tab="$t('setting.tabDigitalClock')">
+            <ClockDigitalSetting />
+          </NTabPane>
+          <NTabPane name="tabAnalogClock" :tab="$t('setting.tabAnalogClock')">
+            <ClockAnalogSetting />
           </NTabPane>
           <NTabPane name="tabDate" :tab="$t('setting.tabDate')">
             <DateSetting />
@@ -37,7 +40,8 @@
 <script setup lang="ts">
 import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
 import BookmarkSetting from './components/BookmarkSetting.vue'
-import ClockSetting from './components/ClockSetting.vue'
+import ClockDigitalSetting from './components/ClockDigitalSetting.vue'
+import ClockAnalogSetting from './components/ClockAnalogSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import GeneralSetting from './components/GeneralSetting.vue'
