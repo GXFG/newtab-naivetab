@@ -18,8 +18,8 @@ A clean browser with newtab page extensions
 
 ## 📝Todo
 
-- Analog clock
-- Weather
+- ✅Analog clock
+- ✅Weather
 - Background image
 - Preset theme config
 
