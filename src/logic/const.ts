@@ -16,6 +16,21 @@ export const ANALOG_CLOCK_THEME = [
   { label: 'dark', value: 1 },
 ]
 
+export const WEATHER_LANG_MAP = {
+  'zh-CN': 'zh',
+  'en-US': '',
+}
+
+export const WEATHER_TEMPERATURE_UNIT_MAP = {
+  c: '℃',
+  f: '℉',
+}
+
+export const WEATHER_SPEED_UNIT_MAP = {
+  mph: 'mph',
+  kph: 'km/h',
+}
+
 export const POSITION_TYPE_TO_STYLE_MAP = {
   1: [
     { prop: 'left', value: 0 },

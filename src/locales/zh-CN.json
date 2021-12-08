@@ -36,13 +36,14 @@
     "format": "格式"
   },
   "setting": {
+    "tabGeneral": "通用",
     "mainLabel": "设置",
     "tabBookmark": "书签",
     "tabDigitalClock": "数字时钟",
     "tabAnalogClock": "模拟时钟",
     "tabDate": "日期",
     "tabCalendar": "日历",
-    "tabGeneral": "通用"
+    "tabWeather": "天气"
   },
   "general": {
     "generalLabel": "通用",
@@ -90,5 +91,11 @@
     "sunday": "周日",
     "work": "班",
     "rest": "休"
+  },
+  "weather": {
+    "city": "城市",
+    "temperatureUnit": "温度单位",
+    "speedUnit": "速度单位",
+    "forecastEnabled": "预报"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "newtab-pazzletab",
   "displayName": "PazzleTab",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "",
   "private": true,
   "scripts": {
@@ -61,6 +61,8 @@
     "webextension-polyfill": "^0.8.0"
   },
   "dependencies": {
-    "dayjs": "^1.10.7"
+    "axios": "^0.24.0",
+    "dayjs": "^1.10.7",
+    "echarts": "^5.2.2"
   }
 }

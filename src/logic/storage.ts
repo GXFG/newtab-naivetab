@@ -20,10 +20,12 @@ const uploadSetting = useDebounceFn(uploadFn, MERGE_SETTING_DELAY)
 watch([
   () => globalState.style,
   () => globalState.setting.general,
-  () => globalState.setting.date,
-  () => globalState.setting.clockDigital,
-  () => globalState.setting.calendar,
   () => globalState.setting.bookmark,
+  () => globalState.setting.clockDigital,
+  () => globalState.setting.clockAnalog,
+  () => globalState.setting.date,
+  () => globalState.setting.calendar,
+  () => globalState.setting.weather,
 ], () => {
   uploadSetting()
 }, {
@@ -34,8 +36,8 @@ const updateSetting = (data: any) => {
   if (data.style.general) {
     globalState.style.general = { ...globalState.style.general, ...data.style.general }
   }
-  if (data.style.date) {
-    globalState.style.date = { ...globalState.style.date, ...data.style.date }
+  if (data.style.bookmark) {
+    globalState.style.bookmark = { ...globalState.style.bookmark, ...data.style.bookmark }
   }
   if (data.style.clockDigital) {
     globalState.style.clockDigital = { ...globalState.style.clockDigital, ...data.style.clockDigital }
@@ -43,18 +45,21 @@ const updateSetting = (data: any) => {
   if (data.style.clockAnalog) {
     globalState.style.clockAnalog = { ...globalState.style.clockAnalog, ...data.style.clockAnalog }
   }
+  if (data.style.date) {
+    globalState.style.date = { ...globalState.style.date, ...data.style.date }
+  }
   if (data.style.calendar) {
     globalState.style.calendar = { ...globalState.style.calendar, ...data.style.calendar }
   }
-  if (data.style.bookmark) {
-    globalState.style.bookmark = { ...globalState.style.bookmark, ...data.style.bookmark }
+  if (data.style.weather) {
+    globalState.style.weather = { ...globalState.style.weather, ...data.style.weather }
   }
 
   if (data.setting.general) {
     globalState.setting.general = { ...globalState.setting.general, ...data.setting.general }
   }
-  if (data.setting.date) {
-    globalState.setting.date = { ...globalState.setting.date, ...data.setting.date }
+  if (data.setting.bookmark) {
+    globalState.setting.bookmark = { ...globalState.setting.bookmark, ...data.setting.bookmark }
   }
   if (data.setting.clockDigital) {
     globalState.setting.clockDigital = { ...globalState.setting.clockDigital, ...data.setting.clockDigital }
@@ -62,11 +67,14 @@ const updateSetting = (data: any) => {
   if (data.setting.clockAnalog) {
     globalState.setting.clockAnalog = { ...globalState.setting.clockAnalog, ...data.setting.clockAnalog }
   }
+  if (data.setting.date) {
+    globalState.setting.date = { ...globalState.setting.date, ...data.setting.date }
+  }
   if (data.setting.calendar) {
     globalState.setting.calendar = { ...globalState.setting.calendar, ...data.setting.calendar }
   }
-  if (data.setting.bookmark) {
-    globalState.setting.bookmark = { ...globalState.setting.bookmark, ...data.setting.bookmark }
+  if (data.setting.weather) {
+    globalState.setting.weather = { ...globalState.setting.weather, ...data.setting.weather }
   }
 }
 

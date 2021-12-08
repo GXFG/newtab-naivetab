@@ -25,6 +25,7 @@ export async function getManifest() {
     permissions: [
       'storage',
       'chrome://favicon/',
+      'https://api.weatherapi.com/',
     ],
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',

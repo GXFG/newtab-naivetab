@@ -5,6 +5,7 @@
   <AnalogClock />
   <Date />
   <Calendar />
+  <Weather />
 </template>
 
 <script setup lang="ts">
@@ -15,6 +16,7 @@ import DigitalClock from './components/clock/DigitalClock.vue'
 import AnalogClock from './components/clock/AnalogClock.vue'
 import Date from './components/Date.vue'
 import Calendar from './components/Calendar.vue'
+import Weather from './components/weather/index.vue'
 
 window.$message = useMessage()
 </script>

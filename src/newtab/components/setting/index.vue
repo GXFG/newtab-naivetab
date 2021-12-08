@@ -31,6 +31,9 @@
           <NTabPane name="tabCalendar" :tab="$t('setting.tabCalendar')">
             <CalendarSetting />
           </NTabPane>
+          <NTabPane name="tabWeather" :tab="$t('setting.tabWeather')">
+            <WeatherSetting />
+          </NTabPane>
         </NTabs>
       </NDrawerContent>
     </NDrawer>
@@ -39,12 +42,13 @@
 
 <script setup lang="ts">
 import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
+import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
 import ClockDigitalSetting from './components/ClockDigitalSetting.vue'
 import ClockAnalogSetting from './components/ClockAnalogSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
-import GeneralSetting from './components/GeneralSetting.vue'
+import WeatherSetting from './components/WeatherSetting.vue'
 import { gaEvent, isSettingMode, toggleIsSettingMode } from '@/logic'
 
 const openSettingModal = () => {

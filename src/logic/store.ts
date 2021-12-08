@@ -7,7 +7,39 @@ const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const globalState = reactive({
   localState: useLocalStorage('localState', {
-    currThemeCode: 0, // 0light | 1dark
+    currThemeCode: 0, // 0:light | 1:dark
+    weather: {
+      current: {
+        last_updated_epoch: 0, // 1638929700
+        last_updated: '', // "2021-12-08 10:15"
+        temp_c: '', // 1.0
+        temp_f: '', // 33.8
+        is_day: '', // 1
+        condition: {
+          text: '', // "Sunny"
+          icon: '', // "//cdn.weatherapi.com/weather/64x64/day/113.png"
+          code: '', // 1000
+        },
+        wind_mph: '', // 0.0
+        wind_kph: '', // 0.0
+        wind_degree: '', // 49
+        wind_dir: '', // "NE"
+        pressure_mb: '', // 1033.0
+        pressure_in: '', // 30.5
+        precip_mm: '', // 0.0
+        precip_in: '', // 0.0
+        humidity: '', // 69
+        cloud: '', // 0
+        feelslike_c: '', // 1.0
+        feelslike_f: '', // 33.8
+        vis_km: '', // 10.0
+        vis_miles: '', // 6.0
+        uv: '', // 1.0
+        gust_mph: '', // 2.2
+        gust_kph: '', // 3.6
+      },
+      forecastday: [] as TWeatherForecastdayItem[],
+    },
   }, { listenToStorageChanges: true }),
   style: useLocalStorage('style', {
     general: {
@@ -15,40 +47,6 @@ export const globalState = reactive({
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
       backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
-    },
-    date: {
-      fontFamily: 'Arial Rounded MT Bold',
-      fontSize: 24,
-      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
-      isShadowEnabled: true,
-      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
-    },
-    clockDigital: {
-      fontFamily: 'Arial Rounded MT Bold',
-      fontSize: 80,
-      letterSpacing: 2,
-      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
-      isShadowEnabled: true,
-      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
-      unit: {
-        fontSize: 30,
-        fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
-      },
-    },
-    clockAnalog: {
-      width: 130,
-    },
-    calendar: {
-      width: 45,
-      fontFamily: '',
-      fontSize: 14,
-      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-      backgroundColor: ['rgba(209, 213, 219, 1)', 'rgba(58, 58, 58, 1)'],
-      activeColor: ['rgba(209, 213, 219, 1)', 'rgba(113, 113, 113, 1)'],
-      isBorderEnabled: true,
-      borderColor: ['rgba(71,85,105, 1)', 'rgba(82, 82, 82, 1)'],
-      isShadowEnabled: true,
-      shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
     },
     bookmark: {
       margin: 4,
@@ -63,6 +61,46 @@ export const globalState = reactive({
       isShadowEnabled: true,
       shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
     },
+    clockDigital: {
+      fontFamily: 'Arial Rounded MT Bold',
+      fontSize: 80,
+      letterSpacing: 2,
+      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
+      isShadowEnabled: true,
+      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
+      unit: {
+        fontSize: 30,
+        fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
+      },
+    },
+    clockAnalog: {
+      width: 150,
+    },
+    date: {
+      fontFamily: 'Arial Rounded MT Bold',
+      fontSize: 24,
+      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
+      isShadowEnabled: true,
+      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
+    },
+    calendar: {
+      width: 45,
+      fontFamily: '',
+      fontSize: 14,
+      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+      backgroundColor: ['rgba(209, 213, 219, 1)', 'rgba(58, 58, 58, 1)'],
+      activeColor: ['rgba(209, 213, 219, 1)', 'rgba(113, 113, 113, 1)'],
+      isBorderEnabled: true,
+      borderColor: ['rgba(71,85,105, 1)', 'rgba(82, 82, 82, 1)'],
+      isShadowEnabled: true,
+      shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
+    },
+    weather: {
+      width: 130,
+      fontFamily: 'Arial Rounded MT Bold',
+      fontSize: 14,
+      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+    },
   }, { listenToStorageChanges: true }),
   setting: {
     version: pkg.version,
@@ -72,14 +110,14 @@ export const globalState = reactive({
       pageTitle: 'NewTab',
       lang: defaultLang,
     }, { listenToStorageChanges: true }),
-    date: useLocalStorage('date', {
+    bookmark: useLocalStorage('bookmark', {
       enabled: true,
       layout: {
-        positionType: 5,
+        positionType: 2,
         xOffset: 50,
-        yOffset: 58,
+        yOffset: 1,
       },
-      format: 'YYYY-MM-DD dddd',
+      keymap: {},
     }, { listenToStorageChanges: true }),
     clockDigital: useLocalStorage('clockDigital', {
       enabled: true,
@@ -94,11 +132,20 @@ export const globalState = reactive({
     clockAnalog: useLocalStorage('clockAnalog', {
       enabled: true,
       layout: {
-        positionType: 8,
+        positionType: 5,
         xOffset: 50,
-        yOffset: 5,
+        yOffset: 35,
       },
       theme: 1,
+    }, { listenToStorageChanges: true }),
+    date: useLocalStorage('date', {
+      enabled: true,
+      layout: {
+        positionType: 5,
+        xOffset: 50,
+        yOffset: 58,
+      },
+      format: 'YYYY-MM-DD dddd',
     }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('calendar', {
       enabled: true,
@@ -108,14 +155,22 @@ export const globalState = reactive({
         yOffset: 1,
       },
     }, { listenToStorageChanges: true }),
-    bookmark: useLocalStorage('bookmark', {
+    weather: useLocalStorage('weather', {
       enabled: true,
+      forecastEnabled: true,
       layout: {
-        positionType: 2,
+        positionType: 8,
         xOffset: 50,
-        yOffset: 1,
+        yOffset: 0,
       },
-      keymap: {},
+      apiKey: 'bc9a224f841945f0bb2104157212811',
+      city: {
+        label: 'Beijing, Beijing, China',
+        value: 'beijing-shi-beijing-china',
+      },
+      aqi: 'no',
+      temperatureUnit: 'c', // 'c' | 'f'
+      speedUnit: 'kph', // 'kph' | 'mph'
     }, { listenToStorageChanges: true }),
   },
 })
@@ -141,7 +196,7 @@ watch(() => [
   deep: true,
 })
 
-export const getLayoutStyle = (name: 'bookmark' | 'date' | 'clockDigital' | 'calendar') => {
+export const getLayoutStyle = (name: string) => {
   const layout = globalState.setting[name].layout
   const styleList = POSITION_TYPE_TO_STYLE_MAP[layout.positionType]
   let res = `${styleList[0].prop}:${layout.xOffset}%;${styleList[1].prop}:${layout.yOffset}%;`
@@ -151,7 +206,7 @@ export const getLayoutStyle = (name: 'bookmark' | 'date' | 'clockDigital' | 'cal
   return res
 }
 
-export const formatNumWithPixl = (component: 'general' | 'bookmark' | 'date' | 'clockDigital' | 'clockAnalog' | 'calendar', ...field: any) => {
+export const formatNumWithPixl = (component: TComponents, ...field: any) => {
   const res = field.reduce((r: any, c: string) => r[c], globalState.style[component])
   return `${res}px`
 }

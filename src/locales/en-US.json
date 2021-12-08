@@ -36,13 +36,14 @@
     "format": "Format"
   },
   "setting": {
+    "tabGeneral": "General",
     "mainLabel": "Setting",
     "tabBookmark": "Bookmark",
     "tabDigitalClock": "DigitalClock",
     "tabAnalogClock": "AnalogClock",
     "tabDate": "Date",
     "tabCalendar": "Calendar",
-    "tabGeneral": "General"
+    "tabWeather": "Weather"
   },
   "general": {
     "generalLabel": "General",
@@ -90,5 +91,11 @@
     "sunday": "Sun",
     "work": "W",
     "rest": "R"
+  },
+  "weather": {
+    "city": "City",
+    "temperatureUnit": "TEMP unit",
+    "speedUnit": "Speed unit",
+    "forecastEnabled": "Forecast"
   }
 }
