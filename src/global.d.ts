@@ -17,6 +17,11 @@ type TEnum = {
   value: number
 }
 
+type TSelectItem = {
+  label: string
+  value: string
+}
+
 type TCalendar = {
   Animal: string // "牛"
   IDayCn: string // "廿九"

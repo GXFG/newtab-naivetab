@@ -106,9 +106,15 @@ export const globalState = reactive({
     version: pkg.version,
     syncTime: useLocalStorage('syncTime', 0, { listenToStorageChanges: true }),
     general: useLocalStorage('general', {
+      layout: {
+        positionType: 6,
+        xOffset: 1,
+        yOffset: 50,
+      },
       theme: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
       lang: defaultLang,
+      drawerPlacement: 'right' as any,
     }, { listenToStorageChanges: true }),
     bookmark: useLocalStorage('bookmark', {
       enabled: true,
@@ -157,7 +163,7 @@ export const globalState = reactive({
     }, { listenToStorageChanges: true }),
     weather: useLocalStorage('weather', {
       enabled: true,
-      forecastEnabled: true,
+      forecastEnabled: false,
       layout: {
         positionType: 8,
         xOffset: 50,

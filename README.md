@@ -32,7 +32,7 @@
 
 ## 🛠️安装
 
-- **Chrome webstore** 地址：发布中
+- **Chrome webstore** 地址：[pazzletab](https://chrome.google.com/webstore/detail/pazzletab/leljgmnhffbjbflmbohlhbhjpllijegb)
 
 ## 📜更新日志
 

@@ -1,16 +1,13 @@
 <template>
   <div id="setting">
     <!-- 入口 -->
-    <NButton
-      class="setting__entry"
-      text
-      :title="`${$t('setting.mainLabel')}`"
-      @click="openSettingModal()"
-    >
-      <ic:baseline-settings v-show="!isSettingMode" class="item__icon" />
-    </NButton>
+    <div class="setting__entry" :style="containerStyle">
+      <NButton text :title="`${$t('setting.mainLabel')}`" @click="openSettingModal()">
+        <ic:baseline-settings v-show="!isSettingMode" class="item__icon" />
+      </NButton>
+    </div>
     <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingMode" :width="570" placement="right">
+    <NDrawer v-model:show="isSettingMode" :width="570" :height="500" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
@@ -49,22 +46,28 @@ import ClockAnalogSetting from './components/ClockAnalogSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { gaEvent, isSettingMode, toggleIsSettingMode } from '@/logic'
+import { gaEvent, isSettingMode, toggleIsSettingMode, globalState, getLayoutStyle } from '@/logic'
 
 const openSettingModal = () => {
   toggleIsSettingMode()
   gaEvent('setting-button', 'click', 'open')
 }
 
+const CNAME = 'general'
+
+const positionStyle = computed(() => getLayoutStyle(CNAME))
+
+const containerStyle = computed(() => {
+  return positionStyle.value
+})
 </script>
 
 <style>
 #setting {
   .setting__entry {
+    z-index: 9999;
     position: fixed;
-    top: 50vh;
-    right: 2vw;
-    z-index: 10;
+    transition: all 0.3s ease;
     .item__icon {
       font-size: 24px;
     }

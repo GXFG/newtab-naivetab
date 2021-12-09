@@ -32,7 +32,7 @@ A clean browser with newtab page extensions
 
 ## 🛠️Install
 
-- **Chrome webstore** url: publishing
+- **Chrome webstore** url: [pazzletab](https://chrome.google.com/webstore/detail/pazzletab/leljgmnhffbjbflmbohlhbhjpllijegb)
 
 ## 📜Changelog
 

@@ -6,6 +6,10 @@
     "enabled": "启用",
     "layout": "布局",
     "position": "位置",
+    "left": "左",
+    "right": "右",
+    "top": "上",
+    "bottom": "下",
     "leftTop": "左上",
     "centerTop": "中上",
     "rightTop": "右上",
@@ -49,7 +53,7 @@
     "generalLabel": "通用",
     "pageTitle": "页面标题",
     "settingDividerSetting": "设置",
-    "lastSyncTime": "同步时间",
+    "syncTime": "同步时间",
     "importSettingsLabel": "导入设置",
     "importSettingsValue": "选择文件",
     "exportSettingLabel": "导出设置",
@@ -57,7 +61,8 @@
     "resetSettingLabel": "重置设置",
     "resetSettingValue": "重置",
     "settingDividerLanguage": "语言",
-    "language": "语言"
+    "language": "语言",
+    "drawerPlacement": "抽屉位置"
   },
   "clock": {
     "apMark": "a.p./p.m."

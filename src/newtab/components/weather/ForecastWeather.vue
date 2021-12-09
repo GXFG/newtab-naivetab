@@ -3,9 +3,15 @@
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts'
 import dayjs from 'dayjs'
+import * as echarts from 'echarts/core'
+import { TitleComponent, ToolboxComponent, TooltipComponent, GridComponent, LegendComponent, MarkPointComponent } from 'echarts/components'
+import { LineChart } from 'echarts/charts'
+import { UniversalTransition } from 'echarts/features'
+import { CanvasRenderer } from 'echarts/renderers'
 import { globalState } from '@/logic'
+
+echarts.use([TitleComponent, ToolboxComponent, TooltipComponent, GridComponent, LegendComponent, MarkPointComponent, LineChart, CanvasRenderer, UniversalTransition])
 
 const WEEK_MAP = {
   0: window.$t('calendar.sunday'),
@@ -129,18 +135,24 @@ const onSetOptions = () => {
 
 onMounted(() => {
   onRender()
-  watch(() => globalState.localState.weather.current.last_updated_epoch, () => {
-    onSetOptions()
-  }, { immediate: true })
+  watch(
+    () => globalState.localState.weather.current.last_updated_epoch,
+    () => {
+      onSetOptions()
+    },
+    { immediate: true },
+  )
 })
 
-watch(() => globalState.setting.weather.forecastEnabled, () => {
-  nextTick(() => {
-    onRender()
-    onSetOptions()
-  })
-})
-
+watch(
+  () => globalState.setting.weather.forecastEnabled,
+  () => {
+    nextTick(() => {
+      onRender()
+      onSetOptions()
+    })
+  },
+)
 </script>
 
 <style>

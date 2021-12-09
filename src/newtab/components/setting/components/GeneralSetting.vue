@@ -1,8 +1,5 @@
 <template>
-  <NForm ref="formRef" label-placement="left" :label-width="100">
-    <NDivider title-placement="left">
-      {{ $t('common.config') }}
-    </NDivider>
+  <ComponentLayout field="general">
     <NFormItem :label="$t('general.pageTitle')">
       <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
     </NFormItem>
@@ -19,13 +16,18 @@
         @update:value="onChangeLocale"
       ></NSelect>
     </NFormItem>
+    <NFormItem :label="$t('general.drawerPlacement')">
+      <NSelect v-model:value="globalState.setting.general.drawerPlacement" :options="state.drawerPlacementList"></NSelect>
+    </NFormItem>
+  </ComponentLayout>
 
-    <ElementConfig field="general" />
+  <ElementConfig field="general" />
 
+  <NForm label-placement="left" :label-width="100">
     <NDivider title-placement="left">
       {{ $t('general.settingDividerSetting') }}
     </NDivider>
-    <NFormItem :label="$t('general.lastSyncTime')">
+    <NFormItem :label="$t('general.syncTime')">
       <p>{{ syncTime }}</p>
     </NFormItem>
     <NFormItem :label="$t('general.importSettingsLabel')">
@@ -61,7 +63,8 @@ import i18n from '@/lib/i18n'
 const { proxy }: any = getCurrentInstance()
 
 const state = reactive({
-  themeList: [] as { label: string; value: string }[],
+  themeList: [] as TSelectItem[],
+  drawerPlacementList: [] as TSelectItem[],
 })
 
 const initEnumData = () => {
@@ -70,13 +73,22 @@ const initEnumData = () => {
     { label: window.$t('common.dark'), value: 'dark' },
     { label: window.$t('common.auto'), value: 'auto' },
   ]
+  state.drawerPlacementList = [
+    { label: window.$t('common.left'), value: 'left' },
+    { label: window.$t('common.right'), value: 'right' },
+    { label: window.$t('common.top'), value: 'top' },
+    { label: window.$t('common.bottom'), value: 'bottom' },
+  ]
 }
 
 initEnumData()
 
-watch(() => globalState.setting.general.lang, () => {
-  initEnumData()
-})
+watch(
+  () => globalState.setting.general.lang,
+  () => {
+    initEnumData()
+  },
+)
 
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
@@ -119,8 +131,4 @@ const onResetSetting = () => {
   resetSetting()
   gaEvent('setting-reset', 'click', 'open')
 }
-
 </script>
-
-<style>
-</style>

@@ -1,7 +1,12 @@
 <template>
   <ComponentLayout field="weather">
     <NFormItem :label="$t('weather.forecastEnabled')">
-      <NSwitch v-model:value="globalState.setting.weather.forecastEnabled" />
+      <NTooltip trigger="hover">
+        <template #trigger>
+          <NSwitch v-model:value="globalState.setting.weather.forecastEnabled" :disabled="true" />
+        </template>
+        In development, Stay tuned.
+      </NTooltip>
     </NFormItem>
     <NFormItem :label="$t('weather.city')">
       <NInputGroup>
@@ -50,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { NFormItem, NInputGroup, NAutoComplete, NInput, NSelect, NButton, NSwitch } from 'naive-ui'
+import { NFormItem, NInputGroup, NAutoComplete, NInput, NSelect, NButton, NSwitch, NTooltip } from 'naive-ui'
 import { WEATHER_LANG_MAP, globalState } from '@/logic'
 import http from '@/lib/http'
 
@@ -72,7 +77,7 @@ const speedUnitOptions = [
 const state = reactive({
   isSearchLoading: false,
   cityLabel: globalState.setting.weather.city.label,
-  cityList: [] as { label: string; value: string }[],
+  cityList: [] as TSelectItem[],
 })
 
 const getSearch = async() => {

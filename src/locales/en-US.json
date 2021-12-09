@@ -6,6 +6,10 @@
     "enabled": "Enabled",
     "layout": "Layout",
     "position": "Position",
+    "left": "Left",
+    "right": "Right",
+    "top": "Top",
+    "bottom": "Bottom",
     "leftTop": "LeftTop",
     "centerTop": "CenterTop",
     "rightTop": "RightTop",
@@ -49,7 +53,7 @@
     "generalLabel": "General",
     "pageTitle": "Page title",
     "settingDividerSetting": "Setting",
-    "lastSyncTime": "Last sync time",
+    "syncTime": "Sync time",
     "importSettingsLabel": "Import setting",
     "importSettingsValue": "Select File",
     "exportSettingLabel": "Export setting",
@@ -57,7 +61,8 @@
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
     "settingDividerLanguage": "Language",
-    "language": "Language"
+    "language": "Language",
+    "drawerPlacement": "Drawer site"
   },
   "clock": {
     "apMark": "a.p./p.m."

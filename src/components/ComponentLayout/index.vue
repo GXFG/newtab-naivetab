@@ -3,7 +3,7 @@
     <NDivider title-placement="left">
       {{ $t('common.config') }}
     </NDivider>
-    <NFormItem :label="$t('common.enabled')">
+    <NFormItem v-if="'enabled' in globalState.setting[props.field]" :label="$t('common.enabled')">
       <NSwitch v-model:value="globalState.setting[props.field].enabled" @update:value="onEnabledSwitchUpdate" />
     </NFormItem>
 
