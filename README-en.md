@@ -8,7 +8,7 @@ A clean browser with newtab page extensions
 
 ## 🌟Feature
 
-- Includes clock, date, bookmark, perpetual calendar and more
+- Includes digital clock, analog clock, date, bookmark, perpetual calendar, weather and more
 - Components can customize most layouts (position, margins)
 - Components can customize most styles (fonts, colors)
 - Supports automatic theme switching based on system appearance (light, dark)
@@ -18,8 +18,6 @@ A clean browser with newtab page extensions
 
 ## 📝Todo
 
-- ✅Analog clock
-- ✅Weather
 - Background image
 - Preset theme config
 
@@ -27,10 +25,10 @@ A clean browser with newtab page extensions
 
 | Description | Preview |
 | ---- | ---- |
-| The components currently included are shown in the figure, where triggering a bookmark with a keyboard key requires double-clicking the corresponding key to avoid accidental touch | <img width="1286" alt="iShot2021-12-03 10 02 33" src="https://user-images.githubusercontent.com/20944987/144532338-7ef3fc3c-5537-40d6-81ce-18d356c095f0.png"> |
+| The components currently included are shown in the figure, where triggering a bookmark with a keyboard key requires double-clicking the corresponding key to avoid accidental touch | <img width="1316" alt="iShot2021-12-09 10 05 44" src="https://user-images.githubusercontent.com/20944987/145321177-1faadf9e-584f-4e96-8426-a831344107bd.png"> |
 | Click on the gear icon on the right to expand the detailed settings drawer, which contains specific configuration items for 'General' and 'Each Components' | <img width="1286" alt="iShot2021-12-03 10 02 41" src="https://user-images.githubusercontent.com/20944987/144532371-31859838-f075-4652-8670-d20ab2286ce3.png"> |
 | Each component contains configuration items for 'Layout' and 'Style', which can be arranged anywhere, font, and color | <img width="1286" alt="iShot2021-12-03 10 03 38" src="https://user-images.githubusercontent.com/20944987/144532407-01345f5b-b4e4-4b23-bbb7-1bff766be35c.png"> |
-| Supports automatic /manual theme mode switching | <img width="1286" alt="iShot2021-12-03 10 03 50" src="https://user-images.githubusercontent.com/20944987/144532427-ab8c8c71-a098-4b69-8dff-e31afc5d47c6.png"> |
+| Supports automatic /manual theme mode switching | <img width="1316" alt="iShot2021-12-09 10 05 37" src="https://user-images.githubusercontent.com/20944987/145321339-126fdf8c-145a-458e-9e61-1486ceac41ab.png"> |
 
 ## 🛠️Install
 
