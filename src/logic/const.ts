@@ -2,8 +2,6 @@ export const KEYBOARD_KEY = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '
 
 export const KEY_OF_INDEX = { q: 0, w: 1, e: 2, r: 3, t: 4, y: 5, u: 6, i: 7, o: 8, p: 9, a: 10, s: 11, d: 12, f: 13, g: 14, h: 15, j: 16, k: 17, l: 18, z: 19, x: 20, c: 21, v: 22, b: 23, n: 24, m: 25 }
 
-export const BOOKMARK_ACTIVE_PRESS_INTERVAL = 200
-
 export const MERGE_SETTING_DELAY = 2000
 
 export const THEME_TO_CODE_MAP = {
@@ -75,6 +73,9 @@ export const POSITION_TYPE_TO_STYLE_MAP = {
   ],
 }
 
+/**
+ * 1休，2班
+ */
 export const LEGAL_HOLIDAY_ENUM: any = {
   2022: {
     '0101': 1,

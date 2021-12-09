@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, BOOKMARK_ACTIVE_PRESS_INTERVAL, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, formatNumWithPixl, sleep, log } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, formatNumWithPixl, sleep, log } from '@/logic'
 
 const CNAME = 'bookmark'
 
@@ -125,22 +125,28 @@ document.onkeydown = function(e: KeyboardEvent) {
   if (isSettingMode.value) {
     return
   }
-  if (!(e.key in KEY_OF_INDEX)) {
+  const { key } = e
+  if (!(key in KEY_OF_INDEX)) {
     return
   }
-  const index = KEY_OF_INDEX[e.key as keyof typeof KEY_OF_INDEX]
+  const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
   const url = localBookmarkList.value[index].url
   if (url.length === 0) {
     return
   }
-  if (e.key === state.currSelectKey) {
+  if (!globalState.setting.bookmark.isDblclickOpen) {
+    onOpenBookmark(url)
+    return
+  }
+
+  if (key === state.currSelectKey) {
     onOpenBookmark(url)
   } else {
-    state.currSelectKey = e.key
+    state.currSelectKey = key
     clearTimeout(timer)
     timer = setTimeout(() => {
       state.currSelectKey = ''
-    }, BOOKMARK_ACTIVE_PRESS_INTERVAL)
+    }, globalState.setting.bookmark.dblclickIntervalTime)
   }
 }
 

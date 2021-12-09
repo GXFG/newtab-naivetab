@@ -1,5 +1,23 @@
 <template>
   <ComponentLayout field="bookmark">
+    <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
+      <div class="setting__input_wrap">
+        <div class="setting__input_item">
+          <NSwitch v-model:value="globalState.setting.bookmark.isDblclickOpen" />
+          <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
+        </div>
+        <div v-if="globalState.setting.bookmark.isDblclickOpen" class="setting__input_item">
+          <span class="setting__input_label">{{ $t('bookmark.intervalTime') }}</span>
+          <NInputNumber v-model:value="globalState.setting.bookmark.dblclickIntervalTime" class="setting__input_number--unit" :min="0" :step="1">
+            <template #suffix>
+              ms
+            </template>
+          </NInputNumber>
+          <Tips :content="$t('bookmark.intervalTimeTips')" />
+        </div>
+      </div>
+    </NFormItem>
+
     <div class="modal__bookmark">
       <NSpace vertical>
         <NInputGroup class="bookmark__label">
@@ -40,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { NSpace, NButton, NInputGroup, NInputGroupLabel, NInput } from 'naive-ui'
+import { NSpace, NFormItem, NButton, NInputGroup, NInputGroupLabel, NInput, NInputNumber, NSwitch } from 'naive-ui'
 import { KEYBOARD_KEY, globalState } from '@/logic'
 
 const onAddKey = (key: string) => {
@@ -53,7 +71,6 @@ const onAddKey = (key: string) => {
 const onDeleteKey = (key: string) => {
   delete globalState.setting.bookmark.keymap[key]
 }
-
 </script>
 
 <style>

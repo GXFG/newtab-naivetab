@@ -68,9 +68,29 @@ const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
   margin-left: 10px;
 }
 
-.setting__input-number {
+.setting__input_wrap {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  .setting__input_item {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.setting__input_label {
+  margin-left: 10px;
+}
+
+.setting__input_number {
   flex: 0 0 auto;
   margin-left: 10px;
   width: 90px;
+}
+
+.setting__input_number--unit {
+  flex: 0 0 auto;
+  margin-left: 10px;
+  width: 150px;
 }
 </style>

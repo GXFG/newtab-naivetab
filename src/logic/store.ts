@@ -124,6 +124,8 @@ export const globalState = reactive({
         yOffset: 1,
       },
       keymap: {},
+      isDblclickOpen: true,
+      dblclickIntervalTime: 200, // ms
     }, { listenToStorageChanges: true }),
     clockDigital: useLocalStorage('clockDigital', {
       enabled: true,

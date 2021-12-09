@@ -8,7 +8,7 @@
       <NSlider v-model:value="globalState.style[props.field].margin" :step="1" :min="1" :max="100" />
       <NInputNumber
         v-model:value="globalState.style[props.field].margin"
-        class="setting__input-number"
+        class="setting__input_number"
         :step="1"
         :min="1"
         :max="100"
@@ -19,7 +19,7 @@
       <NSlider v-model:value="globalState.style[props.field].width" :step="1" :min="45" :max="200" />
       <NInputNumber
         v-model:value="globalState.style[props.field].width"
-        class="setting__input-number"
+        class="setting__input_number"
         :step="1"
         :min="45"
         :max="200"
@@ -39,7 +39,7 @@
       />
       <NInputNumber
         v-model:value="globalState.style[props.field].fontSize"
-        class="setting__input-number"
+        class="setting__input_number"
         :min="12"
         :step="1"
       ></NInputNumber>
@@ -52,7 +52,7 @@
       <NSlider v-model:value="globalState.style[props.field].letterSpacing" :step="1" :max="200" />
       <NInputNumber
         v-model:value="globalState.style[props.field].letterSpacing"
-        class="setting__input-number"
+        class="setting__input_number"
         :step="1"
       ></NInputNumber>
     </NFormItem>

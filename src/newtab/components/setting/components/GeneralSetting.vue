@@ -29,6 +29,7 @@
     </NDivider>
     <NFormItem :label="$t('general.syncTime')">
       <p>{{ syncTime }}</p>
+      <Tips :content="$t('general.syncTimeTips')" />
     </NFormItem>
     <NFormItem :label="$t('general.importSettingsLabel')">
       <NButton @click="onImportSetting">
@@ -40,6 +41,7 @@
       <NButton @click="onExportSetting()">
         {{ $t('general.exportSettingValue') }}
       </NButton>
+      <Tips :content="$t('general.exportSettingTips')" />
     </NFormItem>
     <NFormItem :label="$t('general.resetSettingLabel')">
       <NPopconfirm @positive-click="onResetSetting()">

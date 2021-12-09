@@ -2,6 +2,7 @@
   <ComponentLayout field="clockDigital">
     <NFormItem :label="$t('common.format')">
       <NInput v-model:value="globalState.setting.clockDigital.format"></NInput>
+      <Tips link :content="'https://dayjs.fenxianglu.cn/category/parse.html#%E5%AD%97%E7%AC%A6%E4%B8%B2'" />
     </NFormItem>
 
     <NFormItem :label="$t('clock.apMark')">
@@ -17,7 +18,7 @@
       <NInputNumber
         v-if="globalState.setting.clockDigital.unitEnabled"
         v-model:value="globalState.style.clockDigital.unit.fontSize"
-        class="setting__input-number"
+        class="setting__input_number"
         :min="12"
         :step="1"
       ></NInputNumber>

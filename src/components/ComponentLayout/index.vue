@@ -14,28 +14,31 @@
         :curr-type="globalState.setting[props.field].layout.positionType"
         @onConfirm="onPositionChange"
       />
+      <Tips :content="$t('common.positionTips')" />
     </NFormItem>
     <NFormItem :label="$t('common.xOffset')">
       <NSlider v-model:value="globalState.setting[props.field].layout.xOffset" :step="1" @update:value="onXOffsetUpdate" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.xOffset"
-        class="setting__input-number"
+        class="setting__input_number"
         size="small"
         :step="1"
         :min="0"
         :max="100"
       />
+      <Tips :content="$t('common.xOffsetTips')" />
     </NFormItem>
     <NFormItem :label="$t('common.yOffset')">
       <NSlider v-model:value="globalState.setting[props.field].layout.yOffset" :step="1" @update:value="onYOffsetUpdate" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.yOffset"
-        class="setting__input-number"
+        class="setting__input_number"
         size="small"
         :step="1"
         :min="0"
         :max="100"
       />
+      <Tips :content="$t('common.yOffsetTips')" />
     </NFormItem>
   </NForm>
 </template>
