@@ -50,6 +50,8 @@
     "tabWeather": "Weather"
   },
   "general": {
+    "entryIconLayout": "Entry icon layout",
+    "globalStyle": "Global style",
     "generalLabel": "General",
     "pageTitle": "Page title",
     "settingDividerSetting": "Setting",

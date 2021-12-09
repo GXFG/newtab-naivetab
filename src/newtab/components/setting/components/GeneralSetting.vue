@@ -1,5 +1,5 @@
 <template>
-  <ComponentLayout field="general">
+  <ComponentLayout field="general" :divider-name="$t('general.entryIconLayout')">
     <NFormItem :label="$t('general.pageTitle')">
       <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
     </NFormItem>
@@ -21,7 +21,7 @@
     </NFormItem>
   </ComponentLayout>
 
-  <ElementConfig field="general" />
+  <ElementConfig field="general" :divider-name="$t('general.globalStyle')" />
 
   <NForm label-placement="left" :label-width="100">
     <NDivider title-placement="left">

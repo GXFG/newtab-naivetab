@@ -1,7 +1,7 @@
 <template>
   <NForm ref="formRef" label-placement="left" :label-width="100">
     <NDivider title-placement="left">
-      {{ $t('common.style') }}
+      {{ `${dividerName ? dividerName : $t('common.style')}` }}
     </NDivider>
 
     <NFormItem v-if="globalState.style[props.field].margin" :label="$t('common.margin')">
@@ -134,6 +134,9 @@ const props = defineProps({
   field: {
     type: String,
     required: true,
+  },
+  dividerName: {
+    type: String,
   },
 })
 

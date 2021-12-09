@@ -1,8 +1,5 @@
 <template>
-  <NForm ref="formRef" label-placement="left" :label-width="100">
-    <NDivider title-placement="left">
-      {{ $t('common.config') }}
-    </NDivider>
+  <NForm ref="formRef" class="form__layout" label-placement="left" :label-width="100">
     <NFormItem v-if="'enabled' in globalState.setting[props.field]" :label="$t('common.enabled')">
       <NSwitch v-model:value="globalState.setting[props.field].enabled" @update:value="onEnabledSwitchUpdate" />
     </NFormItem>
@@ -10,7 +7,7 @@
     <slot></slot>
 
     <NDivider title-placement="left">
-      {{ $t('common.layout') }}
+      {{ `${dividerName ? dividerName : $t('common.layout')}` }}
     </NDivider>
     <NFormItem :label="$t('common.position')">
       <LayoutSelect
@@ -53,6 +50,9 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  dividerName: {
+    type: String,
+  },
 })
 
 const onPositionChange = (type: number) => {
@@ -75,3 +75,9 @@ const onYOffsetUpdate = (value: number) => {
 }
 
 </script>
+
+<style>
+.form__layout {
+  padding-top: 20px;
+}
+</style>

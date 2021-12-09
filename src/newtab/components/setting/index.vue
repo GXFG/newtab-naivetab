@@ -3,7 +3,7 @@
     <!-- 入口 -->
     <div class="setting__entry" :style="containerStyle">
       <NButton text :title="`${$t('setting.mainLabel')}`" @click="openSettingModal()">
-        <ic:baseline-settings v-show="!isSettingMode" class="item__icon" />
+        <ic:baseline-settings class="item__icon" />
       </NButton>
     </div>
     <!-- 抽屉 -->
@@ -65,7 +65,8 @@ const containerStyle = computed(() => {
 <style>
 #setting {
   .setting__entry {
-    z-index: 9999;
+    /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
+    z-index: 1999;
     position: fixed;
     transition: all 0.3s ease;
     .item__icon {

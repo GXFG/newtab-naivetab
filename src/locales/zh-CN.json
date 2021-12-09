@@ -50,6 +50,8 @@
     "tabWeather": "天气"
   },
   "general": {
+    "entryIconLayout": "入口图标布局",
+    "globalStyle": "全局样式",
     "generalLabel": "通用",
     "pageTitle": "页面标题",
     "settingDividerSetting": "设置",
