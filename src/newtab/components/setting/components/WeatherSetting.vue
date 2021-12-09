@@ -16,11 +16,10 @@
           :options="state.cityList"
           @update:value="onUpdateCity"
           @select="onSelectCity"
-          @search="onSearch()"
         ></NAutoComplete>
-        <NButton @click="onSearch()">
+        <!-- <NButton @click="onSearch()">
           <bx:bx-search class="item__icon" />
-        </NButton>
+        </NButton> -->
       </NInputGroup>
     </NFormItem>
     <NFormItem label="AQI">
@@ -43,11 +42,16 @@
     </NFormItem>
     <NFormItem label="API Key">
       <NInput v-model:value="globalState.setting.weather.apiKey"></NInput>
-      <div style="margin-left: 10px; padding: 3px 8px; background-color: #fff;border-radius: 2px;">
-        <a href="https://www.weatherapi.com/" title="Free Weather API">
-          <img src="https://cdn.weatherapi.com/v4/images/weatherapi_logo.png" alt="Weather data by WeatherAPI.com" border="0">
-        </a>
-      </div>
+      <NTooltip trigger="hover" placement="top-end">
+        <template #trigger>
+          <div style="margin-left: 10px; padding: 3px 5px; background-color: #fff;border-radius: 2px;">
+            <a href="https://www.weatherapi.com/" title="Free Weather API">
+              <img src="/assets/img/weatherapi.png" alt="Weather data by WeatherAPI.com" border="0">
+            </a>
+          </div>
+        </template>
+        Weather data by WeatherAPI.com
+      </NTooltip>
     </NFormItem>
   </ComponentLayout>
 
@@ -55,7 +59,8 @@
 </template>
 
 <script setup lang="ts">
-import { NFormItem, NInputGroup, NAutoComplete, NInput, NSelect, NButton, NSwitch, NTooltip } from 'naive-ui'
+import { NFormItem, NInputGroup, NAutoComplete, NInput, NSelect, NSwitch, NTooltip } from 'naive-ui'
+import { useDebounceFn } from '@vueuse/core'
 import { WEATHER_LANG_MAP, globalState } from '@/logic'
 import http from '@/lib/http'
 
@@ -81,7 +86,7 @@ const state = reactive({
 })
 
 const getSearch = async() => {
-  if (state.isSearchLoading || globalState.setting.weather.city.value.length === 0) {
+  if (state.isSearchLoading || globalState.setting.weather.city.label.length === 0) {
     return
   }
   state.isSearchLoading = true
@@ -114,15 +119,19 @@ const getSearch = async() => {
   }
 }
 
-const onUpdateCity = (label: any) => {}
+const onSearch = useDebounceFn(() => {
+  globalState.setting.weather.city.label = state.cityLabel
+  getSearch()
+}, 2500)
+
+const onUpdateCity = (label: any) => {
+  state.cityLabel = label.replace(/[^A-Za-z0-9, ]/g, '')
+  onSearch()
+}
 
 const onSelectCity = (value: any) => {
   globalState.setting.weather.city.label = state.cityLabel
   globalState.setting.weather.city.value = value
-}
-
-const onSearch = () => {
-  getSearch()
 }
 
 </script>

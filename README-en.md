@@ -1,5 +1,7 @@
 # PazzleTab Newtab Page
 
+[Home](https://github.com/cmd-cv/newtab-pazzletab)
+
 [Chinese document](https://github.com/cmd-cv/newtab-pazzletab/blob/main/README.md)
 
 ## 💡About

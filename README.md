@@ -1,5 +1,7 @@
 # PazzleTab 新标签页
 
+[主页](https://github.com/cmd-cv/newtab-pazzletab)
+
 [英文文档](https://github.com/cmd-cv/newtab-pazzletab/blob/main/README-en.md)
 
 ## 💡简介

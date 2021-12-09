@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { useMessage } from 'naive-ui'
+import { useMessage, useNotification } from 'naive-ui'
 import Setting from './components/setting/index.vue'
 import Bookmark from './components/Bookmark.vue'
 import DigitalClock from './components/clock/DigitalClock.vue'
@@ -19,6 +19,8 @@ import Calendar from './components/Calendar.vue'
 import Weather from './components/weather/index.vue'
 
 window.$message = useMessage()
+window.$notification = useNotification()
+
 </script>
 
 <style>

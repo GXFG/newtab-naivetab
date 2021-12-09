@@ -68,6 +68,11 @@ onMounted(() => {
   updateData()
 })
 
+// 修改城市后立即更新数据
+watch(() => globalState.setting.weather.city.value, () => {
+  getForecastData()
+})
+
 // 开启“预报”后立即更新数据
 watch(() => globalState.setting.weather.forecastEnabled, (value) => {
   if (!value) {

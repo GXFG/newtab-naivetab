@@ -5,14 +5,16 @@
     :theme-overrides="themeOverrides"
     :locale="nativeUiLocale"
   >
-    <NMessageProvider>
-      <Content />
-    </NMessageProvider>
+    <NNotificationProvider>
+      <NMessageProvider>
+        <Content />
+      </NMessageProvider>
+    </NNotificationProvider>
   </NConfigProvider>
 </template>
 
 <script setup lang="ts">
-import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider } from 'naive-ui'
+import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import Content from './Content.vue'
 import { gaEvent, THEME_TO_CODE_MAP, globalState, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
 

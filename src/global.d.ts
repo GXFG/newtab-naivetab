@@ -8,6 +8,7 @@ declare module '*.vue' {
 interface Window {
   $t: any // vue-i18n
   $message: any
+  $notification: any
 }
 
 type TComponents = 'general' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'weather'
