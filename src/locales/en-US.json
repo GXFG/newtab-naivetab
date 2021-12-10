@@ -1,5 +1,6 @@
 {
   "common": {
+    "version": "Version",
     "confirm": "Confirm",
     "success": "Success",
     "fail": "Fail",
@@ -44,7 +45,8 @@
     "iconWidth": "Icon width",
     "config": "Config",
     "format": "Format",
-    "linkTips": "Click on '?' to access the link below"
+    "linkTips": "Click on '?' to access the link below",
+    "whatsNew": "What's New"
   },
   "setting": {
     "tabGeneral": "General",

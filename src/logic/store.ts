@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import { useToggle, useLocalStorage } from '@vueuse/core'
 import pkg from '../../package.json'
+import currentLog from '../../CURRENTLOG.md'
 import { POSITION_TYPE_TO_STYLE_MAP } from './const'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
@@ -104,9 +105,9 @@ export const globalState = reactive({
     },
   }, { listenToStorageChanges: true }),
   setting: {
-    version: pkg.version,
     syncTime: useLocalStorage('syncTime', 0, { listenToStorageChanges: true }),
     general: useLocalStorage('general', {
+      version: pkg.version,
       layout: {
         positionType: 6,
         xOffset: 1,
@@ -186,6 +187,22 @@ export const globalState = reactive({
 })
 
 export const [isSettingMode, toggleIsSettingMode] = useToggle(false)
+
+export const changeLogNotify = () => {
+  const currSettingVersion = +globalState.setting.general.version.split('.').join('')
+  const currPkgVersion = +pkg.version.split('.').join('')
+  if (currSettingVersion >= currPkgVersion) {
+    return
+  }
+  globalState.setting.general.version = pkg.version
+  nextTick(() => {
+    window.$notification.info({
+      title: $t('common.whatsNew'),
+      description: 'From PuzzleTab',
+      content: () => currentLog.render(),
+    })
+  })
+}
 
 export const initPageTitle = () => {
   document.title = globalState.setting.general.pageTitle

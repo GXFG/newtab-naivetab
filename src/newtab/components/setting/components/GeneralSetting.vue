@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { NForm, NFormItem, NButton, NSelect, NInput, NSlider, NDivider, NPopconfirm } from 'naive-ui'
+import { NForm, NFormItem, NButton, NSelect, NInput, NDivider, NPopconfirm } from 'naive-ui'
 import { gaEvent, importSetting, exportSetting, resetSetting, globalState } from '@/logic'
 import i18n from '@/lib/i18n'
 

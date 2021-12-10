@@ -6,6 +6,7 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
+import Markdown from 'vite-plugin-md'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import WindiCSS from 'vite-plugin-windicss'
 import windiConfig from './windi.config'
@@ -23,11 +24,15 @@ export const sharedConfig: UserConfig = {
     __DEV__: isDev,
   },
   plugins: [
-    Vue(),
+    Vue({
+      include: [/\.vue$/, /\.md$/],
+    }),
 
     vueI18n({
       include: resolve(__dirname, './src/locales/**'),
     }),
+
+    Markdown(),
 
     AutoImport({
       imports: [

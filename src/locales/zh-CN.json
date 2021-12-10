@@ -1,5 +1,6 @@
 {
   "common": {
+    "version": "版本",
     "confirm": "确认",
     "success": "成功",
     "fail": "失败",
@@ -44,7 +45,8 @@
     "iconWidth": "图标宽度",
     "config": "配置",
     "format": "格式",
-    "linkTips": "点击'?'以访问下面链接"
+    "linkTips": "点击'?'以访问下面链接",
+    "whatsNew": "更新内容"
   },
   "setting": {
     "tabGeneral": "通用",

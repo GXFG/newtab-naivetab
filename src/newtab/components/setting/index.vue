@@ -8,12 +8,6 @@
     </div>
     <!-- 抽屉 -->
     <NDrawer v-model:show="isSettingMode" :style="drawerStyle" :width="570" :height="500" :placement="globalState.setting.general.drawerPlacement">
-      <!-- 预览 -->
-      <div class="drawer__preview">
-        <NButton text class="preview__icon" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
-          <ic:round-preview />
-        </NButton>
-      </div>
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
@@ -39,12 +33,30 @@
           </NTabPane>
         </NTabs>
       </NDrawerContent>
+      <!-- 底部信息 -->
+      <div class="bottom__left">
+        <NButton text class="preview__icon" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
+          <ic:round-preview />
+        </NButton>
+      </div>
+      <p class="bottom__version">
+        {{ `${$t('common.version')}: ${pkg.version}` }}
+      </p>
+      <div class="bottom__right">
+        <NButton text class="right__icon" title="ChangeLog" @click="openNewPage('https://github.com/cmd-cv/newtab-puzzletab/blob/main/CHANGELOG.md')">
+          <ic:round-new-releases />
+        </NButton>
+        <NButton text class="right__icon" title="Github" @click="openNewPage('https://github.com/cmd-cv/newtab-puzzletab')">
+          <carbon:logo-github />
+        </NButton>
+      </div>
     </NDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
+import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
 import ClockDigitalSetting from './components/ClockDigitalSetting.vue'
@@ -67,6 +79,10 @@ const handlerPreviewLeave = () => {
   drawerOpacity.value = 1
 }
 
+const openNewPage = (url: string) => {
+  window.open(url)
+}
+
 const CNAME = 'general'
 const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
 const positionStyle = computed(() => getLayoutStyle(CNAME))
@@ -76,7 +92,7 @@ const containerStyle = computed(() => {
 })
 </script>
 
-<style>
+<style scoped>
 #setting {
   .setting__entry {
     /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
@@ -113,12 +129,27 @@ const containerStyle = computed(() => {
   }
 }
 
-.drawer__preview {
+.bottom__left {
   position: absolute;
   left: 13px;
   bottom: 3px;
   .preview__icon {
     font-size: 26px;
+  }
+}
+.bottom__version {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translate(-50%, 0);
+}
+.bottom__right {
+  position: absolute;
+  right: 13px;
+  bottom: 3px;
+  .right__icon {
+    margin-left: 10px;
+    font-size: 20px;
   }
 }
 </style>

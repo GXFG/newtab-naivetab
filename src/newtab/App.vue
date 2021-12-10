@@ -16,8 +16,9 @@
 <script setup lang="ts">
 import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import Content from './Content.vue'
-import { gaEvent, THEME_TO_CODE_MAP, globalState, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
+import { gaEvent, THEME_TO_CODE_MAP, globalState, changeLogNotify, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
 
+changeLogNotify()
 loadSyncSetting()
 initPageTitle()
 
