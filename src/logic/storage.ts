@@ -119,7 +119,7 @@ export const importSetting = (text: string) => {
 }
 
 export const exportSetting = () => {
-  const filename = `pazzletab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
+  const filename = `puzzletab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadByTagA({
     style: globalState.style,
     setting: globalState.setting,

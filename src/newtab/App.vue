@@ -75,6 +75,11 @@ const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
   .setting__input_item {
     display: flex;
     align-items: center;
+    &:nth-of-type(2) {
+      flex: 1;
+      justify-content: flex-end;
+      margin-left: 10px;
+    }
   }
 }
 

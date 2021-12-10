@@ -9,6 +9,7 @@ export const globalState = reactive({
   localState: useLocalStorage('localState', {
     currThemeCode: 0, // 0:light | 1:dark
     weather: {
+      syncTime: 0,
       current: {
         last_updated_epoch: 0, // 1638929700
         last_updated: '', // "2021-12-08 10:15"
@@ -96,7 +97,7 @@ export const globalState = reactive({
       shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
     },
     weather: {
-      width: 130,
+      iconWidth: 70,
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
@@ -179,6 +180,7 @@ export const globalState = reactive({
       aqi: 'no',
       temperatureUnit: 'c', // 'c' | 'f'
       speedUnit: 'kph', // 'kph' | 'mph'
+      iconEnabled: true,
     }, { listenToStorageChanges: true }),
   },
 })

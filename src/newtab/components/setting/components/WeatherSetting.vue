@@ -46,12 +46,29 @@
         <template #trigger>
           <div style="margin-left: 10px; padding: 3px 5px; background-color: #fff;border-radius: 2px;">
             <a href="https://www.weatherapi.com/" title="Free Weather API">
-              <img src="/assets/img/weatherapi.png" alt="Weather data by WeatherAPI.com" border="0">
+              <img :src="'/assets/img/weatherapi.png'" alt="Weather data by WeatherAPI.com" border="0">
             </a>
           </div>
         </template>
         Weather data by WeatherAPI.com
       </NTooltip>
+    </NFormItem>
+    <NFormItem :label="$t('common.iconWidth')">
+      <div class="setting__input_wrap">
+        <div class="setting__input_item">
+          <NSwitch v-model:value="globalState.setting.weather.iconEnabled" />
+        </div>
+        <div v-if="globalState.setting.weather.iconEnabled" class="setting__input_item">
+          <NSlider v-model:value="globalState.style.weather.iconWidth" class="item__grow" :step="1" :min="30" :max="200" />
+          <NInputNumber
+            v-model:value="globalState.style.weather.iconWidth"
+            class="setting__input_number"
+            :step="1"
+            :min="30"
+            :max="200"
+          ></NInputNumber>
+        </div>
+      </div>
     </NFormItem>
   </ComponentLayout>
 
@@ -59,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { NFormItem, NInputGroup, NAutoComplete, NInput, NSelect, NSwitch, NTooltip } from 'naive-ui'
+import { NFormItem, NInputGroup, NAutoComplete, NInput, NSelect, NSwitch, NTooltip, NSlider, NInputNumber } from 'naive-ui'
 import { useDebounceFn } from '@vueuse/core'
 import { WEATHER_LANG_MAP, globalState } from '@/logic'
 import http from '@/lib/http'

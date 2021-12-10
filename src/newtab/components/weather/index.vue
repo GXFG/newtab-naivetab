@@ -26,6 +26,7 @@ const getCurrentData = async() => {
       lang: WEATHER_LANG_MAP[globalState.setting.general.lang],
     },
   })
+  globalState.localState.weather.syncTime = dayjs().valueOf()
   globalState.localState.weather.current = data.current
   log('Update current weather')
 }
@@ -42,6 +43,7 @@ const getForecastData = async() => {
       lang: WEATHER_LANG_MAP[globalState.setting.general.lang],
     },
   })
+  globalState.localState.weather.syncTime = dayjs().valueOf()
   globalState.localState.weather.current = data.current
   globalState.localState.weather.forecastday = data.forecast.forecastday
   log('Update forecast weather')
@@ -52,13 +54,11 @@ const updateData = () => {
     return
   }
   const currTS = dayjs().unix()
-  if (globalState.setting.weather.forecastEnabled
-    && (currTS - globalState.localState.weather.current.last_updated_epoch > 3600 * 4)
-  ) {
+  if (globalState.setting.weather.forecastEnabled && (currTS - globalState.localState.weather.syncTime > 3600000 * 4)) {
     getForecastData()
     return
   }
-  if (currTS - globalState.localState.weather.current.last_updated_epoch < 3600) {
+  if (currTS - globalState.localState.weather.syncTime < 3600000) {
     return
   }
   getCurrentData()

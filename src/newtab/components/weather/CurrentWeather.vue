@@ -1,7 +1,7 @@
 <template>
   <div id="current">
     <div class="current__legend">
-      <div class="legend__img">
+      <div v-if="globalState.setting.weather.iconEnabled" class="legend__img">
         <img class="img__main" :src="`https://${globalState.localState.weather.current.condition.icon}`" />
       </div>
     </div>
@@ -64,10 +64,14 @@
 </template>
 
 <script setup lang="ts">
-import { WEATHER_TEMPERATURE_UNIT_MAP, WEATHER_SPEED_UNIT_MAP, globalState } from '@/logic'
+import { WEATHER_TEMPERATURE_UNIT_MAP, WEATHER_SPEED_UNIT_MAP, globalState, formatNumWithPixl } from '@/logic'
+
+const CNAME = 'weather'
 
 const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[globalState.setting.weather.temperatureUnit])
 const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[globalState.setting.weather.speedUnit])
+
+const customwidth = computed(() => formatNumWithPixl(CNAME, 'iconWidth'))
 
 const customIconSize = computed(() => `${globalState.style.weather.fontSize * 1.4}px`)
 const customLargerFontSize = computed(() => `${globalState.style.weather.fontSize * 3.5}px`)
@@ -81,8 +85,8 @@ const customLargeFontSize = computed(() => `${globalState.style.weather.fontSize
   align-items: center;
   .current__legend {
     .legend__img {
-      width: 100px;
-      height: 100px;
+      width: v-bind(customwidth);
+      height: v-bind(customwidth);
       .img__main {
         width: 100%;
       }
