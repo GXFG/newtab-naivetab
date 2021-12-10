@@ -1,4 +1,7 @@
 {
+  "appName": {
+    "message": "PuzzleTab - New Tab"
+  },
   "appDesc": {
     "message": "Customize your new tabs: Includes bookmarks, clocks, dates, weather, perpetual calendars, and more."
   }

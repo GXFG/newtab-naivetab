@@ -1,8 +1,6 @@
-# PazzleTab Newtab Page
+# PuzzleTab Newtab Page
 
-[Home](https://github.com/cmd-cv/newtab-pazzletab)
-
-[Chinese document](https://github.com/cmd-cv/newtab-pazzletab/blob/main/README.md)
+[Chinese document](https://github.com/cmd-cv/newtab-puzzletab/blob/main/README.md)
 
 ## 💡About
 
@@ -34,11 +32,11 @@ A clean browser with newtab page extensions
 
 ## 🛠️Install
 
-- **Chrome webstore** url: [pazzletab](https://chrome.google.com/webstore/detail/pazzletab/leljgmnhffbjbflmbohlhbhjpllijegb)
+- **Chrome webstore** url: [puzzletab](https://chrome.google.com/webstore/detail/puzzletab/leljgmnhffbjbflmbohlhbhjpllijegb)
 
 ## 📜Changelog
 
-[View Changelog](https://github.com/cmd-cv/newtab-pazzletab/blob/main/CHANGELOG.md)
+[View Changelog](https://github.com/cmd-cv/newtab-puzzletab/blob/main/CHANGELOG.md)
 
 ## 🏗 Contribute
 

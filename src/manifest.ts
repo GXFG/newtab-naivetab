@@ -10,10 +10,10 @@ export async function getManifest() {
   // can also be conditional based on your need
   const manifest: Manifest.WebExtensionManifest = {
     manifest_version: 2,
-    name: pkg.displayName || pkg.name,
+    name: '__MSG_appName__',
     version: pkg.version,
     description: '__MSG_appDesc__',
-    default_locale: 'en',
+    default_locale: 'zh_CN',
     browser_action: {
       default_icon: './assets/img/icon.png',
     },

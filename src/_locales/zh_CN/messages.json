@@ -1,4 +1,7 @@
 {
+  "appName": {
+    "message": "PuzzleTab - 新标签页"
+  },
   "appDesc": {
     "message": "自定义你的新标签页：包含书签、时钟、日期、天气、万年历等模块。"
   }

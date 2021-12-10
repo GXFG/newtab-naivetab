@@ -39,9 +39,10 @@
     "borderColor": "边框颜色",
     "margin": "边距",
     "width": "宽度",
+    "iconWidth": "图标宽度",
     "config": "配置",
     "format": "格式",
-    "formatTips": "点击'?'以访问下面链接"
+    "linkTips": "点击'?'以访问下面链接"
   },
   "setting": {
     "tabGeneral": "通用",

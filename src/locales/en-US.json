@@ -39,9 +39,10 @@
     "borderColor": "Border color",
     "margin": "Margin",
     "width": "Width",
+    "iconWidth": "Icon width",
     "config": "Config",
     "format": "Format",
-    "formatTips": "Click on '?' to access the link below"
+    "linkTips": "Click on '?' to access the link below"
   },
   "setting": {
     "tabGeneral": "General",

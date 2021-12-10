@@ -1,8 +1,6 @@
-# PazzleTab 新标签页
+# PuzzleTab 新标签页
 
-[主页](https://github.com/cmd-cv/newtab-pazzletab)
-
-[英文文档](https://github.com/cmd-cv/newtab-pazzletab/blob/main/README-en.md)
+[英文文档](https://github.com/cmd-cv/newtab-puzzletab/blob/main/README-en.md)
 
 ## 💡简介
 
@@ -34,11 +32,11 @@
 
 ## 🛠️安装
 
-- **Chrome webstore** 地址：[pazzletab](https://chrome.google.com/webstore/detail/pazzletab/leljgmnhffbjbflmbohlhbhjpllijegb)
+- **Chrome webstore** 地址：[puzzletab](https://chrome.google.com/webstore/detail/puzzletab/leljgmnhffbjbflmbohlhbhjpllijegb)
 
 ## 📜更新日志
 
-[查看 CHANGELOG.md](https://github.com/cmd-cv/newtab-pazzletab/blob/main/CHANGELOG.md)
+[查看 CHANGELOG.md](https://github.com/cmd-cv/newtab-puzzletab/blob/main/CHANGELOG.md)
 
 ## 🏗 开发
 
