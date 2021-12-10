@@ -37,6 +37,8 @@
     "activeColor": "激活颜色",
     "shadowColor": "阴影颜色",
     "borderColor": "边框颜色",
+    "opacity": "透明度",
+    "site": "位置",
     "margin": "边距",
     "width": "宽度",
     "iconWidth": "图标宽度",
@@ -59,19 +61,19 @@
     "globalStyle": "全局样式",
     "generalLabel": "通用",
     "pageTitle": "页面标题",
+    "settingDividerDrawer": "抽屉",
     "settingDividerSetting": "设置",
     "syncTime": "同步时间",
     "syncTimeTips": "多设备同步设置，仅在登录Google账号后生效",
     "importSettingsLabel": "导入设置",
     "importSettingsValue": "选择文件",
+    "importSettingsTips":"从本地文件导入设置。如果遇到问题，请点击下面的导出配置，与当前准备导入的本地文件进行差异比对、合并，最后重新导入",
     "exportSettingLabel": "导出设置",
     "exportSettingValue": "导出",
     "exportSettingTips": "建议定期导出应用设置，防止丢失重要数据",
     "resetSettingLabel": "重置设置",
     "resetSettingValue": "重置",
-    "settingDividerLanguage": "语言",
-    "language": "语言",
-    "drawerPlacement": "抽屉位置"
+    "language": "语言"
   },
   "clock": {
     "apMark": "a.p./p.m."

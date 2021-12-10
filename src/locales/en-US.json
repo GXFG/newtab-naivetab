@@ -37,6 +37,8 @@
     "activeColor": "Active color",
     "shadowColor": "Shadow color",
     "borderColor": "Border color",
+    "opacity": "Opacity",
+    "site": "Site",
     "margin": "Margin",
     "width": "Width",
     "iconWidth": "Icon width",
@@ -59,19 +61,19 @@
     "globalStyle": "Global style",
     "generalLabel": "General",
     "pageTitle": "Page title",
+    "settingDividerDrawer": "Drawer",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your Google account",
     "importSettingsLabel": "Import setting",
     "importSettingsValue": "Select File",
+    "importSettingsTips":"Import settings from a local file. If you encounter problems, please click the export configuration below to compare and merge the differences with the local files currently to be imported, and finally re import",
     "exportSettingLabel": "Export setting",
     "exportSettingValue": "Export",
     "exportSettingTips": "It is recommended that you export your app settings regularly to prevent the loss of important data",
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
-    "settingDividerLanguage": "Language",
-    "language": "Language",
-    "drawerPlacement": "Drawer site"
+    "language": "Language"
   },
   "clock": {
     "apMark": "a.p./p.m."

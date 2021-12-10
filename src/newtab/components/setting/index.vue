@@ -7,13 +7,19 @@
       </NButton>
     </div>
     <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingMode" :width="570" :height="500" :placement="globalState.setting.general.drawerPlacement">
+    <NDrawer v-model:show="isSettingMode" :style="drawerStyle" :width="570" :height="500" :placement="globalState.setting.general.drawerPlacement">
+      <!-- 预览 -->
+      <div class="drawer__preview">
+        <NButton text class="preview__icon" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
+          <ic:round-preview />
+        </NButton>
+      </div>
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
             <GeneralSetting />
           </NTabPane>
-          <NTabPane class="setting__content" name="tabBookmark" :tab="$t('setting.tabBookmark')">
+          <NTabPane name="tabBookmark" :tab="$t('setting.tabBookmark')">
             <BookmarkSetting />
           </NTabPane>
           <NTabPane name="tabDigitalClock" :tab="$t('setting.tabDigitalClock')">
@@ -53,8 +59,16 @@ const openSettingModal = () => {
   gaEvent('setting-button', 'click', 'open')
 }
 
-const CNAME = 'general'
+const drawerOpacity = ref(1)
+const handlerPreviewEnter = () => {
+  drawerOpacity.value = 0
+}
+const handlerPreviewLeave = () => {
+  drawerOpacity.value = 1
+}
 
+const CNAME = 'general'
+const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 
 const containerStyle = computed(() => {
@@ -74,6 +88,11 @@ const containerStyle = computed(() => {
     }
   }
 }
+
+.n-tabs-tab__label {
+  user-select: none;
+}
+
 .n-tab-pane {
   user-select: none;
   padding: 0 15px 0 0 !important;
@@ -91,6 +110,15 @@ const containerStyle = computed(() => {
     background: #ccc;
     border-radius: 5px;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.drawer__preview {
+  position: absolute;
+  left: 13px;
+  bottom: 3px;
+  .preview__icon {
+    font-size: 26px;
   }
 }
 </style>

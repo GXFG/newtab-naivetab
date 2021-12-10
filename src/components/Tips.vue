@@ -5,7 +5,7 @@
         <ph:question-bold class="btn__icon" />
       </NButton>
     </template>
-    {{ `${link ? $t('common.linkTips') : ''}${props.content}` }}
+    {{ `${link ? $t('common.linkTips') + '\n ' : ''}${props.content}` }}
   </NTooltip>
 </template>
 
