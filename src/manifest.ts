@@ -15,12 +15,12 @@ export async function getManifest() {
     description: '__MSG_appDesc__',
     default_locale: 'zh_CN',
     browser_action: {
-      default_icon: './assets/img/icon.png',
+      default_icon: './assets/img/icon/icon.png',
     },
     icons: {
-      16: './assets/img/icon.png',
-      48: './assets/img/icon.png',
-      128: './assets/img/icon.png',
+      16: './assets/img/icon/icon-16.png',
+      48: './assets/img/icon/icon-48.png',
+      128: './assets/img/icon/icon-128.png',
     },
     permissions: [
       'storage',
