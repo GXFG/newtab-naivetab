@@ -11,7 +11,7 @@ const uploadFn = () => {
     style: globalState.style,
     setting: globalState.setting,
   })
-  chrome.storage.sync.set({ MyNewTabSetting: localData }, () => {
+  chrome.storage.sync.set({ PuzzleTabSetting: localData }, () => {
     log('Sync settings complete')
   })
 }
@@ -79,13 +79,14 @@ const updateSetting = (data: any) => {
 }
 
 export const loadSyncSetting = () => {
-  chrome.storage.sync.get(null, ({ MyNewTabSetting }) => {
-    if (!MyNewTabSetting) {
+  chrome.storage.sync.get(null, ({ PuzzleTabSetting }) => {
+    if (!PuzzleTabSetting) {
       log('Notfound settings')
+      uploadFn() // 初始化云端设置数据
       return
     }
 
-    const cloudSetting = JSON.parse(MyNewTabSetting)
+    const cloudSetting = JSON.parse(PuzzleTabSetting)
     if (cloudSetting.setting.syncTime === globalState.setting.syncTime) {
       log('None modification settings')
       return

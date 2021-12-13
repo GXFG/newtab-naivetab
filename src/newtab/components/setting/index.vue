@@ -7,7 +7,14 @@
       </NButton>
     </div>
     <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingDrawerVisible" :style="drawerStyle" :width="570" :height="500" :placement="globalState.setting.general.drawerPlacement">
+    <NDrawer
+      v-model:show="isSettingDrawerVisible"
+      display-directive="show"
+      :style="drawerStyle"
+      :width="570"
+      :height="500"
+      :placement="globalState.setting.general.drawerPlacement"
+    >
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
