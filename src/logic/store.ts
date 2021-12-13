@@ -235,7 +235,7 @@ export const formatNumWithPixl = (component: TComponents, ...field: any) => {
 }
 
 export const openNewPage = (url: string) => {
-  if (url && url.length === 0) {
+  if (url.length === 0) {
     return
   }
   window.open(url)
