@@ -1,4 +1,5 @@
 <template>
+  <WhatsNew />
   <Setting />
   <Bookmark />
   <DigitalClock />

@@ -1,12 +1,14 @@
 import { reactive } from 'vue'
 import { useToggle, useLocalStorage } from '@vueuse/core'
 import pkg from '../../package.json'
-import currentLog from '../../CURRENTLOG.md'
 import { POSITION_TYPE_TO_STYLE_MAP } from './const'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const globalState = reactive({
+  state: {
+    isCurrentLogModal: false,
+  },
   localState: useLocalStorage('localState', {
     currThemeCode: 0, // 0:light | 1:dark
     weather: {
@@ -186,7 +188,7 @@ export const globalState = reactive({
   },
 })
 
-export const [isSettingMode, toggleIsSettingMode] = useToggle(false)
+export const [isSettingDrawerVisible, toggleIsSettingDrawVisible] = useToggle(false)
 
 export const changeLogNotify = () => {
   const currSettingVersion = +globalState.setting.general.version.split('.').join('')
@@ -195,13 +197,7 @@ export const changeLogNotify = () => {
     return
   }
   globalState.setting.general.version = pkg.version
-  nextTick(() => {
-    window.$notification.info({
-      title: $t('common.whatsNew'),
-      description: 'From PuzzleTab',
-      content: () => currentLog.render(),
-    })
-  })
+  globalState.state.isCurrentLogModal = true
 }
 
 export const initPageTitle = () => {
@@ -236,4 +232,11 @@ export const getLayoutStyle = (name: string) => {
 export const formatNumWithPixl = (component: TComponents, ...field: any) => {
   const res = field.reduce((r: any, c: string) => r[c], globalState.style[component])
   return `${res}px`
+}
+
+export const openNewPage = (url: string) => {
+  if (url && url.length === 0) {
+    return
+  }
+  window.open(url)
 }

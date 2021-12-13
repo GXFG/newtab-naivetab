@@ -32,7 +32,7 @@ A clean browser with newtab page extensions
 
 ## 🛠️Install
 
-- **Chrome webstore** url: [puzzletab](https://chrome.google.com/webstore/detail/puzzletab/leljgmnhffbjbflmbohlhbhjpllijegb)
+- **Chrome webstore** url: [puzzletab](https://chrome.google.com/webstore/detail/puzzletab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem/related)
 
 ## 📜Changelog
 

@@ -7,7 +7,7 @@
       </NButton>
     </div>
     <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingMode" :style="drawerStyle" :width="570" :height="500" :placement="globalState.setting.general.drawerPlacement">
+    <NDrawer v-model:show="isSettingDrawerVisible" :style="drawerStyle" :width="570" :height="500" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
@@ -43,10 +43,10 @@
         {{ `${$t('common.version')}: ${pkg.version}` }}
       </p>
       <div class="bottom__right">
-        <NButton text class="right__icon" title="ChangeLog" @click="openNewPage('https://github.com/cmd-cv/newtab-puzzletab/blob/main/CHANGELOG.md')">
+        <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">
           <ic:round-new-releases />
         </NButton>
-        <NButton text class="right__icon" title="Github" @click="openNewPage('https://github.com/cmd-cv/newtab-puzzletab')">
+        <NButton text class="right__icon" title="Github" @click="openNewPage(URL_GITHUB)">
           <carbon:logo-github />
         </NButton>
       </div>
@@ -64,10 +64,10 @@ import ClockAnalogSetting from './components/ClockAnalogSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { gaEvent, isSettingMode, toggleIsSettingMode, globalState, getLayoutStyle } from '@/logic'
+import { URL_CHANGELOG, URL_GITHUB, gaEvent, isSettingDrawerVisible, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
 
 const openSettingModal = () => {
-  toggleIsSettingMode()
+  toggleIsSettingDrawVisible()
   gaEvent('setting-button', 'click', 'open')
 }
 
@@ -77,10 +77,6 @@ const handlerPreviewEnter = () => {
 }
 const handlerPreviewLeave = () => {
   drawerOpacity.value = 1
-}
-
-const openNewPage = (url: string) => {
-  window.open(url)
 }
 
 const CNAME = 'general'

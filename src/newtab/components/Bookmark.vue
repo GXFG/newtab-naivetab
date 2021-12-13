@@ -9,7 +9,7 @@
           class="row__item"
           :class="{ 'row__item--active': item.key === state.currSelectKey }"
           :style="itemStyle"
-          @click="onOpenBookmark(item.url)"
+          @click="openNewPage(item.url)"
         >
           <p class="item__key">
             {{ `${item.key.toUpperCase()}` }}
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isSettingMode, globalState, getLayoutStyle, formatNumWithPixl, sleep, log } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isSettingDrawerVisible, globalState, getLayoutStyle, formatNumWithPixl, sleep, log, openNewPage } from '@/logic'
 
 const CNAME = 'bookmark'
 
@@ -112,17 +112,10 @@ watch(() => globalState.setting.bookmark.keymap,
     deep: true,
   })
 
-const onOpenBookmark = (url: string) => {
-  if (url.length === 0) {
-    return
-  }
-  window.open(url)
-}
-
 // 监听键盘按键
 let timer = null as any
 document.onkeydown = function(e: KeyboardEvent) {
-  if (isSettingMode.value) {
+  if (isSettingDrawerVisible.value) {
     return
   }
   const { key } = e
@@ -135,12 +128,12 @@ document.onkeydown = function(e: KeyboardEvent) {
     return
   }
   if (!globalState.setting.bookmark.isDblclickOpen) {
-    onOpenBookmark(url)
+    openNewPage(url)
     return
   }
 
   if (key === state.currSelectKey) {
-    onOpenBookmark(url)
+    openNewPage(url)
   } else {
     state.currSelectKey = key
     clearTimeout(timer)
