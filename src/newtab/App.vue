@@ -3,7 +3,7 @@
     id="container"
     :theme="currTheme"
     :theme-overrides="themeOverrides"
-    :locale="nativeUiLocale"
+    :locale="nativeUILang"
   >
     <NNotificationProvider>
       <NMessageProvider>
@@ -16,11 +16,16 @@
 <script setup lang="ts">
 import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import Content from './Content.vue'
-import { gaEvent, THEME_TO_CODE_MAP, globalState, changeLogNotify, loadSyncSetting, initPageTitle, formatNumWithPixl } from '@/logic'
+import { gaEvent, THEME_TO_CODE_MAP, globalState, changeLogNotify, loadSyncSetting, initPageTitle, startTimer, stopTimer, formatNumWithPixl } from '@/logic'
 
 changeLogNotify()
 loadSyncSetting()
 initPageTitle()
+startTimer()
+
+onUnmounted(() => {
+  stopTimer()
+})
 
 gaEvent('page-home', 'view', 'view')
 
@@ -49,10 +54,10 @@ const NATIVE_UI_LOCALE_MAP = {
   'en-US': enUS,
 }
 
-const nativeUiLocale = ref(enUS)
+const nativeUILang = ref(enUS)
 
 watch(() => globalState.setting.general.lang, () => {
-  nativeUiLocale.value = NATIVE_UI_LOCALE_MAP[globalState.setting.general.lang] || enUS
+  nativeUILang.value = NATIVE_UI_LOCALE_MAP[globalState.setting.general.lang] || enUS
 }, { immediate: true })
 
 const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))

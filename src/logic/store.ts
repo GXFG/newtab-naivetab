@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import { useToggle, useLocalStorage } from '@vueuse/core'
 import pkg from '../../package.json'
-import { POSITION_TYPE_TO_STYLE_MAP } from './const'
+import { POSITION_TYPE_TO_STYLE_MAP, DAYJS_LANG_MAP } from './const'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
@@ -187,6 +187,8 @@ export const globalState = reactive({
     }, { listenToStorageChanges: true }),
   },
 })
+
+export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
 
 export const [isSettingDrawerVisible, toggleIsSettingDrawVisible] = useToggle(false)
 

@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { ANALOG_CLOCK_THEME, globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
 
 const CNAME = 'clockAnalog'
 
@@ -42,21 +42,30 @@ const updateTime = () => {
   const s = dayjs().second()
   const m = dayjs().minute()
   state.secondDeg += 6
-  if (s === 0) {
-    state.minuteDeg += 6
+  if (s !== 0) {
+    return
   }
-  if (m === 0) {
-    state.hourDeg += 30
+  state.minuteDeg += 6
+  if (m !== 0) {
+    return
   }
+  state.hourDeg += 30
+  // if (s === 0) {
+  //   state.minuteDeg += 6
+  //   if (m === 0) {
+  //     state.hourDeg += 30
+  //   }
+  // }
 }
 
-initTime()
-
-const timer = setInterval(updateTime, 1000)
-
-onUnmounted(() => {
-  clearInterval(timer)
-})
+watch(() => globalState.setting.clockAnalog.enabled, (value) => {
+  if (value) {
+    initTime()
+    addTimerTask(CNAME, updateTime)
+  } else {
+    removeTimerTask(CNAME)
+  }
+}, { immediate: true })
 
 const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'dark')
 

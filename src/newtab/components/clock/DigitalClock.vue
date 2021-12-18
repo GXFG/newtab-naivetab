@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { globalState, addTimerTask, removeTimerTask, getLayoutStyle, formatNumWithPixl } from '@/logic'
 
 const CNAME = 'clockDigital'
 
@@ -27,13 +27,14 @@ const updateTime = () => {
   state.unit = dayjs().format('a')
 }
 
-updateTime()
-
-const timer = setInterval(updateTime, 1000)
-
-onUnmounted(() => {
-  clearInterval(timer)
-})
+watch(() => globalState.setting.clockDigital.enabled, (value) => {
+  if (value) {
+    updateTime()
+    addTimerTask(CNAME, updateTime)
+  } else {
+    removeTimerTask(CNAME)
+  }
+}, { immediate: true })
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 

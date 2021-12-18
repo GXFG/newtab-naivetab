@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { currDayjsLang, globalState, addTimerTask, removeTimerTask, getLayoutStyle, formatNumWithPixl } from '@/logic'
 
 const CNAME = 'date'
 
@@ -19,14 +19,17 @@ const state = reactive({
 })
 
 const updateDate = () => {
-  state.date = dayjs().format(globalState.setting.date.format)
+  state.date = dayjs().locale(currDayjsLang.value).format(globalState.setting.date.format)
 }
 
-updateDate()
-
-watch(() => globalState.setting.date.format, () => {
-  updateDate()
-})
+watch(() => globalState.setting.date.enabled, (value) => {
+  if (value) {
+    updateDate()
+    addTimerTask(CNAME, updateDate)
+  } else {
+    removeTimerTask(CNAME)
+  }
+}, { immediate: true })
 
 const positionStyle = computed(() => getLayoutStyle(CNAME))
 

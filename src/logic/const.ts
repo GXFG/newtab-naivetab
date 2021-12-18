@@ -15,6 +15,11 @@ export const ANALOG_CLOCK_THEME = [
   { label: 'dark', value: 1 },
 ]
 
+export const DAYJS_LANG_MAP = {
+  'zh-CN': 'zh-cn',
+  'en-US': 'en',
+}
+
 export const WEATHER_LANG_MAP = {
   'zh-CN': 'zh',
   'en-US': '',

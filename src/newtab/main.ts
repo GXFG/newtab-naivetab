@@ -3,6 +3,7 @@ import '../styles'
 import '../lib/ga.js'
 import App from './App.vue'
 import i18n from '@/lib/i18n'
+import 'dayjs/locale/zh-cn.js'
 
 const app = createApp(App)
 
