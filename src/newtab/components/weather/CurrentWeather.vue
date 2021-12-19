@@ -2,7 +2,7 @@
   <div id="current">
     <div class="current__legend">
       <div v-if="globalState.setting.weather.iconEnabled" class="legend__img">
-        <img class="img__main" :src="`https://${globalState.localState.weather.current.condition.icon}`" />
+        <img class="img__main" :src="`http://${globalState.localState.weather.current.condition.icon}`" />
       </div>
     </div>
     <div class="current__info">
