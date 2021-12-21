@@ -3,6 +3,7 @@
   "rules": {
     "no-console": 0,
     "curly": 0,
-    "brace-style": 0
+    "brace-style": 0,
+    "vue/attribute-hyphenation": 0
   }
 }
