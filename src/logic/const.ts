@@ -6,6 +6,8 @@ export const KEY_OF_INDEX = { q: 0, w: 1, e: 2, r: 3, t: 4, y: 5, u: 6, i: 7, o:
 
 export const MERGE_SETTING_DELAY = 2000
 
+export const DRAG_TRIGGER_DISTANCE = 10
+
 export const THEME_TO_CODE_MAP = {
   light: 0,
   dark: 1,

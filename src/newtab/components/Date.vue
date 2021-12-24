@@ -1,6 +1,6 @@
 <template>
-  <Moveable componentName="date" @onDrag="onStyleChange">
-    <div v-if="globalState.setting.date.enabled" id="date">
+  <Moveable componentName="date" @onDrag="onDragChange">
+    <div v-if="globalState.setting.date.enabled" id="date" cname="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
           {{ state.date }}
@@ -37,9 +37,9 @@ watch(
   { immediate: true },
 )
 
-const containerStyle = ref(`${globalState.setting.date.layout.xOffsetKey}:${globalState.setting.date.layout.xOffsetValue}%; ${globalState.setting.date.layout.yOffsetKey}:${globalState.setting.date.layout.yOffsetValue}%;`)
+const containerStyle = ref(`${globalState.setting.date.layout.xOffsetKey}:${globalState.setting.date.layout.xOffsetValue}vw; ${globalState.setting.date.layout.yOffsetKey}:${globalState.setting.date.layout.yOffsetValue}vh;`)
 
-const onStyleChange = (style: string) => {
+const onDragChange = (style: string) => {
   console.log(style)
   containerStyle.value = style
 }
@@ -54,7 +54,7 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
   user-select: none;
   .date__container {
     position: absolute;
-    text-align: center;
+    /* text-align: center; */
     /* transition: all 0.3s ease; */
     /* transform: translate(-50%, -50%); */
     .date__text {

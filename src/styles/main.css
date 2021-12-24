@@ -1,9 +1,10 @@
 @media (prefers-color-scheme: light) {
   :root {
-    --bg-main: #FFFFFF;
-    --text-color-main: #2C3E50;
+    --bg-main: #ffffff;
+    --text-color-main: #2c3e50;
+    --bg-auxiliary-line: #40a9ff;
     /* calendar */
-    --text-color-red: #FA5252;
+    --text-color-red: #fa5252;
     --bg-calendar-rest: rgba(255, 110, 110, 0.4);
     --bg-calendar-work: rgba(122, 122, 122, 0.5);
     --bg-calendar-label-work: rgba(122, 122, 122, 0.6);
@@ -12,10 +13,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-main: #35363A;
-    --text-color-main: #FFFFFF;
+    --bg-main: #35363a;
+    --text-color-main: #ffffff;
+    --bg-auxiliary-line: #40a9ff;
     /* calendar */
-    --text-color-red: #FA5252;
+    --text-color-red: #fa5252;
     --bg-calendar-rest: rgba(255, 110, 110, 0.4);
     --bg-calendar-work: rgba(122, 122, 122, 0.5);
     --bg-calendar-label-work: rgba(122, 122, 122, 0.6);
@@ -23,11 +25,8 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC,
-    Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial,
-    sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   font-size: 14px;
   color: var(--text-color-main);
   background-color: var(--bg-main);
 }
-

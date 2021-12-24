@@ -7,8 +7,7 @@ const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const globalState = reactive({
   state: {
-    isCurrentLogModal: false,
-    dragTaskList: [] as any,
+    isWhatsNewModalVisible: false,
   },
   localState: useLocalStorage('localState', {
     currThemeCode: 0, // 0:light | 1:dark
@@ -191,7 +190,6 @@ export const globalState = reactive({
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
 
-export const [isDragMode, toggleIsDragMode] = useToggle(true)
 export const [isSettingDrawerVisible, toggleIsSettingDrawVisible] = useToggle(false)
 
 export const changeLogNotify = () => {
@@ -201,7 +199,7 @@ export const changeLogNotify = () => {
     return
   }
   globalState.setting.general.version = pkg.version
-  globalState.state.isCurrentLogModal = true
+  globalState.state.isWhatsNewModalVisible = true
 }
 
 export const initPageTitle = () => {

@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import Content from './Content.vue'
-import { gaEvent, THEME_TO_CODE_MAP, isDragMode, globalState, changeLogNotify, loadSyncSetting, initPageTitle, startTimer, stopTimer, formatNumWithPixl } from '@/logic'
+import { gaEvent, THEME_TO_CODE_MAP, globalState, changeLogNotify, loadSyncSetting, initPageTitle, startTimer, stopTimer, formatNumWithPixl } from '@/logic'
 
 changeLogNotify()
 loadSyncSetting()
@@ -60,40 +60,14 @@ watch(() => globalState.setting.general.lang, () => {
   nativeUILang.value = NATIVE_UI_LOCALE_MAP[globalState.setting.general.lang] || enUS
 }, { immediate: true })
 
-// bodyListener
-const bodyEl = ref()
-
-const handleBodyClick = (e: MouseEvent) => {
-  console.log(e.target.className)
-}
-const handleBodyMove = (e: MouseEvent) => {
-  for (const task of globalState.state.dragTaskList) {
-    task(e)
-  }
-}
-
-const initBodyListener = () => {
-  bodyEl.value = document.querySelector('body')
-  bodyEl.value?.addEventListener('mousedown', handleBodyClick)
-  bodyEl.value?.addEventListener('mousemove', handleBodyMove)
-}
-
-watch(() => isDragMode, (value) => {
-  if (!value.value) {
-    bodyEl.value?.removeEventListener('mousemove', handleBodyMove)
-    return
-  }
-  nextTick(() => {
-    initBodyListener()
-  })
-}, { immediate: true })
-
 const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
 
 </script>
 
 <style>
 #container {
+  width: 100vw;
+  height: 100vh;
   font-size: v-bind(customFontSize);
   font-family: v-bind(globalState.style.general.fontFamily);
 }

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="globalState.setting.clockDigital.enabled" id="digital-clock">
+  <div v-if="globalState.setting.clockDigital.enabled" id="digital-clock" cname="clockDigital">
     <div class="digital__container" :style="containerStyle">
       <div class="clock__time">
         <p class="time__text">

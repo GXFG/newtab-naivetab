@@ -1,45 +1,40 @@
 <template>
-  <slot />
+  <div :style="targetStyle">
+    <slot />
+  </div>
 </template>
 
 <script setup lang="ts">
-// import Moveable from 'vue3-moveable'
-// import { globalState } from '@/logic'
-
-import { globalState } from '@/logic'
+import { DRAG_TRIGGER_DISTANCE, globalState, moveState, isDragMode } from '@/logic'
 
 const props = defineProps({
   componentName: {
     type: String,
+    required: true,
   },
 })
 
 const emit = defineEmits(['onDrag'])
 
-// const state = reactive({
-//   boundsValue: {},
-//   verticalGuidelinesValue: [] as number[],
-//   horizontalGuidelinesValue: [] as number[],
-// })
-
-// const initDefaultValue = () => {
-//   state.boundsValue = { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }
-//   state.verticalGuidelinesValue = [Math.floor(window.innerWidth / 2), 50, 400]
-//   state.horizontalGuidelinesValue = [Math.floor(window.innerHeight / 2), 50, 400]
-// }
-// initDefaultValue()
-
-const state = reactive({
-  isDraging: false,
-  startData: {} as any,
-})
+const targetStyle = computed(() => isDragMode ? 'cursor: move;' : '')
 
 const targetEl = ref()
 
+const state = reactive({
+  isDraging: false,
+  startState: {} as any,
+})
+
+const offsetData = reactive({
+  xOffsetKey: '',
+  yOffsetKey: '',
+  xOffsetValue: 0,
+  yOffsetValue: 0,
+})
+
 const startDrag = (e: MouseEvent) => {
   const { top, right, bottom, left } = targetEl.value.getBoundingClientRect()
-  state.isDraging = true
-  state.startData = {
+  state.startState = {
     top,
     right,
     bottom,
@@ -47,68 +42,93 @@ const startDrag = (e: MouseEvent) => {
     clientX: e.clientX,
     clientY: e.clientY,
   }
+  state.isDraging = true
 }
 
 const stopDrag = () => {
   state.isDraging = false
+  moveState.isXAxisCenterVisible = false
+  moveState.isYAxisCenterVisible = false
+  globalState.setting[props.componentName as any].layout.xOffsetKey = offsetData.xOffsetKey
+  globalState.setting[props.componentName as any].layout.xOffsetValue = offsetData.xOffsetValue
+  globalState.setting[props.componentName as any].layout.yOffsetKey = offsetData.yOffsetKey
+  globalState.setting[props.componentName as any].layout.yOffsetValue = offsetData.yOffsetValue
 }
+
+const getPercentageInWidth = (currWidth: number) => currWidth / window.innerWidth * 100
+const getPercentageInHeight = (currHeight: number) => currHeight / window.innerHeight * 100
 
 const onDrag = (e: MouseEvent) => {
   if (!state.isDraging) {
     return
   }
-  // console.log(e)
-  const mouseDiffX = e.clientX - state.startData.clientX
-  const mouseDiffY = e.clientY - state.startData.clientY
-  // const { top, right, bottom, left } = targetEl.value.getBoundingClientRect()
-  // console.log(top, right, bottom, left)
-  let xOffsetKey = ''
-  let yOffsetKey = ''
-  let xOffsetValue = state.startData.left + mouseDiffX
-  let yOffsetValue = state.startData.top + mouseDiffY
-  // const { innerWidth, innerHeight } = window
-  // const xLine = innerWidth / 2
-  // const yLine = innerHeight / 2
-  // if (xOffsetValue <= xLine) {
-  //   xOffsetKey = 'left'
-  //   xOffsetValue = `${(xOffsetValue / innerWidth) * 100}`
-  // } else {
-  //   xOffsetKey = 'right'
-  //   xOffsetValue = `${((innerWidth - xOffsetValue) / innerWidth) * 100}`
-  // }
-  // if (yOffsetValue <= yLine) {
-  //   yOffsetKey = 'top'
-  //   yOffsetValue = `${(yOffsetValue / innerHeight) * 100}`
-  // } else {
-  //   yOffsetKey = 'bottom'
-  //   yOffsetValue = `${(innerHeight - yOffsetValue / innerHeight) * 100}`
-  // }
+  const mouseDiffX = e.clientX - state.startState.clientX
+  const mouseDiffY = e.clientY - state.startState.clientY
+  offsetData.xOffsetKey = ''
+  offsetData.yOffsetKey = ''
+  offsetData.xOffsetValue = state.startState.left + mouseDiffX
+  offsetData.yOffsetValue = state.startState.top + mouseDiffY
 
-  xOffsetKey = 'left'
-  xOffsetValue = `${(xOffsetValue / innerWidth) * 100}`
-  yOffsetKey = 'top'
-  yOffsetValue = `${(yOffsetValue / innerHeight) * 100}`
-  emit('onDrag', `${xOffsetKey}:${xOffsetValue}%; ${yOffsetKey}:${yOffsetValue}%`)
+  const { innerWidth, innerHeight } = window
+  const xCenterLine = innerWidth / 2
+  const yCenterLine = innerHeight / 2
+  const { width, height } = targetEl.value.getBoundingClientRect()
+  const targetCenterX = offsetData.xOffsetValue + width / 2
+  const targetCenterY = offsetData.yOffsetValue + height / 2
+
+  if (offsetData.xOffsetValue <= xCenterLine) {
+    offsetData.xOffsetKey = 'left'
+    offsetData.xOffsetValue = getPercentageInWidth(offsetData.xOffsetValue)
+  } else {
+    offsetData.xOffsetKey = 'right'
+    offsetData.xOffsetValue = getPercentageInWidth(innerWidth - width - offsetData.xOffsetValue)
+  }
+  if (offsetData.yOffsetValue <= yCenterLine) {
+    offsetData.yOffsetKey = 'top'
+    offsetData.yOffsetValue = getPercentageInHeight(offsetData.yOffsetValue)
+  } else {
+    offsetData.yOffsetKey = 'bottom'
+    offsetData.yOffsetValue = getPercentageInHeight(innerHeight - height - offsetData.yOffsetValue)
+  }
+  // 辅助线
+  if (Math.abs(targetCenterX - xCenterLine) <= DRAG_TRIGGER_DISTANCE) {
+    moveState.isXAxisCenterVisible = true
+    // 水平居中
+    offsetData.xOffsetKey = 'left'
+    offsetData.xOffsetValue = getPercentageInWidth(innerWidth / 2 - width / 2)
+  } else {
+    moveState.isXAxisCenterVisible = false
+  }
+  if (Math.abs(targetCenterY - yCenterLine) <= DRAG_TRIGGER_DISTANCE) {
+    moveState.isYAxisCenterVisible = true
+    // 垂直居中
+    offsetData.yOffsetKey = 'top'
+    offsetData.yOffsetValue = getPercentageInHeight(innerHeight / 2 - height / 2)
+  } else {
+    moveState.isYAxisCenterVisible = false
+  }
+  // 边界
+  if (offsetData.xOffsetValue < 0) {
+    offsetData.xOffsetValue = 0
+  }
+  if (offsetData.yOffsetValue < 0) {
+    offsetData.yOffsetValue = 0
+  }
+
+  emit('onDrag', `${offsetData.xOffsetKey}:${offsetData.xOffsetValue}vw; ${offsetData.yOffsetKey}:${offsetData.yOffsetValue}vh`)
 }
 
-// const onDragEnd = (e: any) => {
-//   const { xOffsetKey, xOffsetValue, yOffsetKey, yOffsetValue } = handleDrag(e.lastEvent)
-//   globalState.setting[props.componentName as any].layout.xOffsetKey = xOffsetKey
-//   globalState.setting[props.componentName as any].layout.xOffsetValue = xOffsetValue
-//   globalState.setting[props.componentName as any].layout.yOffsetKey = yOffsetKey
-//   globalState.setting[props.componentName as any].layout.yOffsetValue = yOffsetValue
-// }
-
-const init = () => {
+const initDrag = () => {
   targetEl.value = document.querySelector(`.${props.componentName}__container`)
-  targetEl.value.addEventListener('mousedown', startDrag)
-  globalState.state.dragTaskList.push(onDrag)
-  targetEl.value.addEventListener('mouseup', stopDrag)
+  moveState.MouseDownTaskList[props.componentName as any] = startDrag
+  moveState.MouseMoveTaskList.push(onDrag)
+  moveState.MouseUpTaskList[props.componentName as any] = stopDrag
 }
 
 onMounted(() => {
-  init()
+  initDrag()
 })
 </script>
 
-<style></style>
+<style scoped>
+</style>

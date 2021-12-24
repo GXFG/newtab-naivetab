@@ -1,5 +1,5 @@
 <template>
-  <NModal v-model:show="globalState.state.isCurrentLogModal" preset="dialog" :title="$t('common.whatsNew')">
+  <NModal v-model:show="globalState.state.isWhatsNewModalVisible" preset="dialog" :title="$t('common.whatsNew')">
     <Currentlog />
     <div class="modal__footer">
       <NButton text class="footer__btn" title="more" @click="openNewPage(URL_CHANGELOG)">
