@@ -1,5 +1,5 @@
 <template>
-  <div v-if="globalState.setting.date.enabled" id="weather">
+  <div v-if="globalState.setting.weather.enabled" id="weather">
     <div class="weather__container" :style="containerStyle">
       <CurrentWeather />
       <ForecastWeather />

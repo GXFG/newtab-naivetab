@@ -66,8 +66,6 @@ const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
 
 <style>
 #container {
-  width: 100vw;
-  height: 100vh;
   font-size: v-bind(customFontSize);
   font-family: v-bind(globalState.style.general.fontFamily);
 }

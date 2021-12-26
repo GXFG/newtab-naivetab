@@ -11,6 +11,7 @@ export const moveState = reactive({
 })
 
 const containerEl = ref()
+
 let currDragComponentName = ''
 
 const handleBodyMousedown = (e: MouseEvent) => {
@@ -20,6 +21,9 @@ const handleBodyMousedown = (e: MouseEvent) => {
       target = target.parentNode
     }
   } catch (e) {}
+  if (!(target.getAttribute && target.getAttribute('cname'))) {
+    return
+  }
   const componentName = target.getAttribute('cname')
   currDragComponentName = componentName
   moveState.MouseDownTaskList[componentName](e)
@@ -43,7 +47,7 @@ const handleBodyMousemove = (e: MouseEvent) => {
 }
 
 const initBodyListener = () => {
-  containerEl.value = document.querySelector('#container')
+  containerEl.value = document.querySelector('body')
   containerEl.value.addEventListener('mousedown', handleBodyMousedown)
   containerEl.value.addEventListener('mousemove', handleBodyMousemove)
   containerEl.value.addEventListener('mouseup', handleBodyMouseup)
