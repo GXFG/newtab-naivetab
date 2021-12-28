@@ -46,7 +46,9 @@
     "config": "Config",
     "format": "Format",
     "linkTips": "Click on '?' to access the link below",
-    "whatsNew": "What's New"
+    "whatsNew": "What's New",
+    "preview": "Preview",
+    "dragMode": "Drag Mode"
   },
   "setting": {
     "tabGeneral": "General",

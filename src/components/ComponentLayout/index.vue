@@ -9,15 +9,12 @@
     <NDivider title-placement="left">
       {{ `${dividerName ? dividerName : $t('common.layout')}` }}
     </NDivider>
-    <NFormItem :label="$t('common.position')">
-      <LayoutSelect
-        :curr-type="globalState.setting[props.field].layout.positionType"
-        @onConfirm="onPositionChange"
-      />
+    <!-- <NFormItem :label="$t('common.position')">
+      <LayoutSelect :field="props.field" />
       <Tips :content="$t('common.positionTips')" />
-    </NFormItem>
+    </NFormItem> -->
     <NFormItem :label="$t('common.xOffset')">
-      <NSlider v-model:value="globalState.setting[props.field].layout.xOffsetValue" :step="1" @update:value="onXOffsetUpdate" />
+      <NSlider v-model:value="globalState.setting[props.field].layout.xOffsetValue" :step="1" :max="50" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.xOffsetValue"
         class="setting__input_number"
@@ -29,7 +26,7 @@
       <Tips :content="$t('common.xOffsetTips')" />
     </NFormItem>
     <NFormItem :label="$t('common.yOffset')">
-      <NSlider v-model:value="globalState.setting[props.field].layout.yOffsetValue" :step="1" @update:value="onYOffsetUpdate" />
+      <NSlider v-model:value="globalState.setting[props.field].layout.yOffsetValue" :step="1" :max="50" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.yOffsetValue"
         class="setting__input_number"
@@ -45,8 +42,8 @@
 
 <script setup lang="ts">
 import { NDivider, NForm, NFormItem, NSwitch, NSlider, NInputNumber } from 'naive-ui'
-import LayoutSelect from './LayoutSelect.vue'
-import { gaEvent, POSITION_TYPE_TO_STYLE_MAP, globalState } from '@/logic'
+// import LayoutSelect from './LayoutSelect.vue'
+import { gaEvent, globalState } from '@/logic'
 
 const props = defineProps({
   field: {
@@ -58,23 +55,8 @@ const props = defineProps({
   },
 })
 
-const onPositionChange = (type: number) => {
-  globalState.setting[props.field].layout.positionType = type
-  globalState.setting[props.field].layout.xOffset = POSITION_TYPE_TO_STYLE_MAP[type][0].value
-  globalState.setting[props.field].layout.yOffset = POSITION_TYPE_TO_STYLE_MAP[type][1].value
-  gaEvent(`${props.field}-positionType`, 'click', `${type}`)
-}
-
 const onEnabledSwitchUpdate = (value: boolean) => {
   gaEvent(`${props.field}-enabled`, 'click', `${value}`)
-}
-
-const onXOffsetUpdate = (value: number) => {
-  // gaEvent(`${props.field}-XOffset`, 'slide', `${value}`)
-}
-
-const onYOffsetUpdate = (value: number) => {
-  // gaEvent(`${props.field}-YOffset`, 'slide', `${value}`)
 }
 
 </script>

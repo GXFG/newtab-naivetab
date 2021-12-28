@@ -3,10 +3,10 @@
     <NButton
       v-for="item in state.positionList"
       :key="item.type"
-      :type="props.currType === item.type ? 'primary' : undefined"
+      :type="currType === item.type ? 'primary' : undefined"
       class="select__btn"
       size="small"
-      @click="onChangePositionType(item.type)"
+      @click="onChangePosition(item.type)"
     >
       <Icon :icon="item.icon" />
     </NButton>
@@ -16,20 +16,26 @@
 <script setup lang="ts">
 import { NButton } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { globalState } from '@/logic'
+import { globalState, POSITION_TYPE_TO_STYLE_MAP } from '@/logic'
 
 const props = defineProps({
-  currType: {
-    type: Number,
+  field: {
+    type: String,
     required: true,
   },
 })
 
-const emit = defineEmits(['onConfirm'])
+// globalState.setting[props.field].layout
+
+const currType = computed(() => {
+  return 2
+})
 
 const state = reactive({
   positionList: [] as { type: number; icon: string }[],
 })
+
+const onChangePosition = (type: number) => {}
 
 const initEnumData = () => {
   state.positionList = [
@@ -45,21 +51,19 @@ const initEnumData = () => {
   ]
 }
 
-initEnumData()
-
-watch(() => globalState.setting.general.lang, () => {
-  initEnumData()
-})
-
-const onChangePositionType = (type: number) => {
-  emit('onConfirm', type)
-}
+watch(
+  () => globalState.setting.general.lang,
+  () => {
+    initEnumData()
+  },
+  { immediate: true },
+)
 
 </script>
 
 <style scoped>
 .position__select {
-  width: 200px;
+  width: 256px;
   .select__btn {
     width: 33%;
   }

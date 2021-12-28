@@ -1,6 +1,9 @@
 <template>
-  <div :style="targetStyle">
-    <slot />
+  <!-- 最外层div的style会被用来存放v-bind的变量，不能在进行:style操作 -->
+  <div>
+    <div :style="targetStyle">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -16,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(['onDrag'])
 
-const targetStyle = computed(() => isDragMode ? 'cursor: move;' : '')
+const targetStyle = computed(() => isDragMode.value ? 'cursor: move;' : '')
 
 const targetEl = ref()
 
@@ -27,9 +30,11 @@ const state = reactive({
 
 const offsetData = reactive({
   xOffsetKey: '',
-  yOffsetKey: '',
   xOffsetValue: 0,
+  xTranslateValue: 0,
+  yOffsetKey: '',
   yOffsetValue: 0,
+  yTranslateValue: 0,
 })
 
 const startDrag = (e: MouseEvent) => {
@@ -49,14 +54,16 @@ const stopDrag = () => {
   state.isDraging = false
   moveState.isXAxisCenterVisible = false
   moveState.isYAxisCenterVisible = false
-  globalState.setting[props.componentName as any].layout.xOffsetKey = offsetData.xOffsetKey
-  globalState.setting[props.componentName as any].layout.xOffsetValue = offsetData.xOffsetValue
-  globalState.setting[props.componentName as any].layout.yOffsetKey = offsetData.yOffsetKey
-  globalState.setting[props.componentName as any].layout.yOffsetValue = offsetData.yOffsetValue
+  if (offsetData.xOffsetKey.length !== 0) globalState.setting[props.componentName as any].layout.xOffsetKey = offsetData.xOffsetKey
+  if (offsetData.xOffsetValue !== 0) globalState.setting[props.componentName as any].layout.xOffsetValue = offsetData.xOffsetValue
+  if (offsetData.xTranslateValue !== 0) globalState.setting[props.componentName as any].layout.xTranslateValue = offsetData.xTranslateValue
+  if (offsetData.yOffsetKey.length !== 0) globalState.setting[props.componentName as any].layout.yOffsetKey = offsetData.yOffsetKey
+  if (offsetData.yOffsetValue !== 0) globalState.setting[props.componentName as any].layout.yOffsetValue = offsetData.yOffsetValue
+  if (offsetData.yTranslateValue !== 0) globalState.setting[props.componentName as any].layout.yTranslateValue = offsetData.yTranslateValue
 }
 
-const getPercentageInWidth = (currWidth: number) => currWidth / window.innerWidth * 100
-const getPercentageInHeight = (currHeight: number) => currHeight / window.innerHeight * 100
+const getPercentageInWidth = (currWidth: number) => +(currWidth / window.innerWidth * 100).toFixed(2)
+const getPercentageInHeight = (currHeight: number) => +(currHeight / window.innerHeight * 100).toFixed(2)
 
 const onDrag = (e: MouseEvent) => {
   if (!state.isDraging) {
@@ -68,6 +75,8 @@ const onDrag = (e: MouseEvent) => {
   offsetData.yOffsetKey = ''
   offsetData.xOffsetValue = state.startState.left + mouseDiffX
   offsetData.yOffsetValue = state.startState.top + mouseDiffY
+  offsetData.xTranslateValue = 0
+  offsetData.yTranslateValue = 0
 
   const { innerWidth, innerHeight } = window
   const xCenterLine = innerWidth / 2
@@ -90,44 +99,64 @@ const onDrag = (e: MouseEvent) => {
     offsetData.yOffsetKey = 'bottom'
     offsetData.yOffsetValue = getPercentageInHeight(innerHeight - height - offsetData.yOffsetValue)
   }
-  // 辅助线
+  // 水平/垂直居中 & 展示对应辅助线
   if (Math.abs(targetCenterX - xCenterLine) <= DRAG_TRIGGER_DISTANCE) {
     moveState.isXAxisCenterVisible = true
-    // 水平居中
     offsetData.xOffsetKey = 'left'
-    offsetData.xOffsetValue = getPercentageInWidth(innerWidth / 2 - width / 2)
+    offsetData.xOffsetValue = 50
+    offsetData.xTranslateValue = -50
   } else {
     moveState.isXAxisCenterVisible = false
+    offsetData.xTranslateValue = 0
   }
   if (Math.abs(targetCenterY - yCenterLine) <= DRAG_TRIGGER_DISTANCE) {
     moveState.isYAxisCenterVisible = true
-    // 垂直居中
     offsetData.yOffsetKey = 'top'
-    offsetData.yOffsetValue = getPercentageInHeight(innerHeight / 2 - height / 2)
+    offsetData.yOffsetValue = 50
+    offsetData.yTranslateValue = -50
   } else {
     moveState.isYAxisCenterVisible = false
+    offsetData.yTranslateValue = 0
   }
-  // 边界
+  // 画布边界限制 & 展示对应辅助线
   if (offsetData.xOffsetValue < 0) {
     offsetData.xOffsetValue = 0
+    if (offsetData.xOffsetKey === 'left') {
+      moveState.isLeftVisible = true
+    } else {
+      moveState.isRightVisible = true
+    }
+  } else {
+    moveState.isLeftVisible = false
+    moveState.isRightVisible = false
   }
   if (offsetData.yOffsetValue < 0) {
     offsetData.yOffsetValue = 0
+    if (offsetData.yOffsetKey === 'top') {
+      moveState.isTopVisible = true
+    } else {
+      moveState.isBottomVisible = true
+    }
+  } else {
+    moveState.isTopVisible = false
+    moveState.isBottomVisible = false
   }
-
-  emit('onDrag', `${offsetData.xOffsetKey}:${offsetData.xOffsetValue}vw; ${offsetData.yOffsetKey}:${offsetData.yOffsetValue}vh`)
+  const style = `${offsetData.xOffsetKey}:${offsetData.xOffsetValue}vw; ${offsetData.yOffsetKey}:${offsetData.yOffsetValue}vh; transform:translate(${offsetData.xTranslateValue}%, ${offsetData.yTranslateValue}%)`
+  console.log(style)
+  emit('onDrag', style)
 }
 
 const initDrag = () => {
   targetEl.value = document.querySelector(`.${props.componentName}__container`)
-  moveState.MouseDownTaskList[props.componentName as any] = startDrag
-  moveState.MouseMoveTaskList.push(onDrag)
-  moveState.MouseUpTaskList[props.componentName as any] = stopDrag
+  moveState.MouseDownTaskMap.set(props.componentName, startDrag)
+  moveState.MouseMoveTaskMap.set(props.componentName, onDrag)
+  moveState.MouseUpTaskMap.set(props.componentName, stopDrag)
 }
 
 onMounted(() => {
   initDrag()
 })
+
 </script>
 
 <style scoped>

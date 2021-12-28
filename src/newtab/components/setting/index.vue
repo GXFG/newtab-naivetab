@@ -1,9 +1,17 @@
 <template>
   <div id="setting">
-    <!-- 入口 -->
-    <div class="setting__entry" :style="containerStyle">
-      <NButton text :title="`${$t('setting.mainLabel')}`" @click="openSettingModal()">
-        <ic:baseline-settings class="item__icon" />
+    <!-- setting按钮 -->
+    <Moveable componentName="general" @onDrag="(style) => (containerStyle = style)">
+      <div class="general__container" :style="containerStyle" cname="general">
+        <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
+          <ic:baseline-settings class="item__icon" />
+        </NButton>
+      </div>
+    </Moveable>
+    <!-- drag_confirm按钮 -->
+    <div v-if="isDragMode" class="drag_confirm__container">
+      <NButton type="primary" @click="toggleIsDragMode()">
+        <line-md:confirm-circle class="item__icon" />&nbsp;{{ $t('common.confirm') }}
       </NButton>
     </div>
     <!-- 抽屉 -->
@@ -17,33 +25,18 @@
     >
       <NDrawerContent>
         <NTabs type="line">
-          <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
-            <GeneralSetting />
-          </NTabPane>
-          <NTabPane name="tabBookmark" :tab="$t('setting.tabBookmark')">
-            <BookmarkSetting />
-          </NTabPane>
-          <NTabPane name="tabDigitalClock" :tab="$t('setting.tabDigitalClock')">
-            <ClockDigitalSetting />
-          </NTabPane>
-          <NTabPane name="tabAnalogClock" :tab="$t('setting.tabAnalogClock')">
-            <ClockAnalogSetting />
-          </NTabPane>
-          <NTabPane name="tabDate" :tab="$t('setting.tabDate')">
-            <DateSetting />
-          </NTabPane>
-          <NTabPane name="tabCalendar" :tab="$t('setting.tabCalendar')">
-            <CalendarSetting />
-          </NTabPane>
-          <NTabPane name="tabWeather" :tab="$t('setting.tabWeather')">
-            <WeatherSetting />
+          <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
+            <component :is="item.component" />
           </NTabPane>
         </NTabs>
       </NDrawerContent>
-      <!-- 底部信息 -->
+      <!-- 底部按钮 -->
       <div class="bottom__left">
-        <NButton text class="preview__icon" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
-          <ic:round-preview />
+        <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
+          <ic:round-preview />&nbsp;{{ $t('common.preview') }}
+        </NButton>
+        <NButton class="left__item" size="small" title="DragMode" @click="openDragMode()">
+          <tabler:drag-drop />&nbsp;{{ $t('common.dragMode') }}
         </NButton>
       </div>
       <p class="bottom__version">
@@ -71,11 +64,60 @@ import ClockAnalogSetting from './components/ClockAnalogSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_CHANGELOG, URL_GITHUB, gaEvent, isSettingDrawerVisible, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
+import { URL_CHANGELOG, URL_GITHUB, gaEvent, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
+
+const tabPaneList = [
+  {
+    name: 'tabGeneral',
+    label: window.$t('setting.tabGeneral'),
+    component: GeneralSetting,
+  },
+  {
+    name: 'tabBookmark',
+    label: window.$t('setting.tabBookmark'),
+    component: BookmarkSetting,
+  },
+  {
+    name: 'tabDigitalClock',
+    label: window.$t('setting.tabDigitalClock'),
+    component: ClockDigitalSetting,
+  },
+  {
+    name: 'tabAnalogClock',
+    label: window.$t('setting.tabAnalogClock'),
+    component: ClockAnalogSetting,
+  },
+  {
+    name: 'tabDate',
+    label: window.$t('setting.tabDate'),
+    component: DateSetting,
+  },
+  {
+    name: 'tabCalendar',
+    label: window.$t('setting.tabCalendar'),
+    component: CalendarSetting,
+  },
+  {
+    name: 'tabWeather',
+    label: window.$t('setting.tabWeather'),
+    component: WeatherSetting,
+  },
+]
 
 const openSettingModal = () => {
+  if (isDragMode.value) {
+    return
+  }
   toggleIsSettingDrawVisible()
   gaEvent('setting-button', 'click', 'open')
+}
+
+const openDragMode = () => {
+  if (isDragMode.value) {
+    return
+  }
+  toggleIsSettingDrawVisible()
+  toggleIsDragMode()
 }
 
 const drawerOpacity = ref(1)
@@ -87,24 +129,27 @@ const handlerPreviewLeave = () => {
 }
 
 const CNAME = 'general'
-const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
-const positionStyle = computed(() => getLayoutStyle(CNAME))
+const containerStyle = ref(getLayoutStyle(CNAME))
+// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 
-const containerStyle = computed(() => {
-  return positionStyle.value
-})
+const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
 </script>
 
 <style scoped>
 #setting {
-  .setting__entry {
+  .general__container {
     /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
     z-index: 1999;
-    position: fixed;
-    transition: all 0.3s ease;
+    position: absolute;
     .item__icon {
       font-size: 24px;
     }
+  }
+  .drag_confirm__container {
+    z-index: 1999;
+    position: absolute;
+    top: 5%;
+    right: 5%;
   }
 }
 
@@ -135,9 +180,9 @@ const containerStyle = computed(() => {
 .bottom__left {
   position: absolute;
   left: 13px;
-  bottom: 3px;
-  .preview__icon {
-    font-size: 26px;
+  bottom: 6px;
+  .left__item {
+    margin-right: 10px;
   }
 }
 .bottom__version {

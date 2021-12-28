@@ -1,13 +1,17 @@
 import { useToggle } from '@vueuse/core'
 
-export const [isDragMode, toggleIsDragMode] = useToggle(true)
+export const [isDragMode, toggleIsDragMode] = useToggle(false)
 
 export const moveState = reactive({
   isXAxisCenterVisible: false,
   isYAxisCenterVisible: false,
-  MouseDownTaskList: {} as any,
-  MouseMoveTaskList: [] as any,
-  MouseUpTaskList: {} as any,
+  isTopVisible: false,
+  isBottomVisible: false,
+  isLeftVisible: false,
+  isRightVisible: false,
+  MouseDownTaskMap: new Map() as any,
+  MouseMoveTaskMap: new Map() as any,
+  MouseUpTaskMap: new Map() as any,
 })
 
 const containerEl = ref()
@@ -15,6 +19,9 @@ const containerEl = ref()
 let currDragComponentName = ''
 
 const handleBodyMousedown = (e: MouseEvent) => {
+  if (!isDragMode.value) {
+    return
+  }
   let target: any = e.target
   try {
     while (!target.getAttribute('cname')) {
@@ -24,24 +31,23 @@ const handleBodyMousedown = (e: MouseEvent) => {
   if (!(target.getAttribute && target.getAttribute('cname'))) {
     return
   }
-  const componentName = target.getAttribute('cname')
+  const componentName: TComponents = target.getAttribute('cname')
   currDragComponentName = componentName
-  moveState.MouseDownTaskList[componentName](e)
+  moveState.MouseDownTaskMap.get(componentName)(e)
 }
 
 const handleBodyMouseup = () => {
-  if (!currDragComponentName) {
+  if (!isDragMode.value || !currDragComponentName) {
     return
   }
-  moveState.MouseUpTaskList[currDragComponentName]()
+  moveState.MouseUpTaskMap.get(currDragComponentName)()
 }
 
 const handleBodyMousemove = (e: MouseEvent) => {
-  // 鼠标左键
-  if (e.button !== 0) {
+  if (!isDragMode.value || e.button !== 0) {
     return
   }
-  for (const task of moveState.MouseMoveTaskList) {
+  for (const task of moveState.MouseMoveTaskMap.values()) {
     task(e)
   }
 }
@@ -53,10 +59,17 @@ const initBodyListener = () => {
   containerEl.value.addEventListener('mouseup', handleBodyMouseup)
   containerEl.value.addEventListener('mouseleave', handleBodyMouseup)
 }
+const removeBodyListener = () => {
+  containerEl.value = document.querySelector('body')
+  containerEl.value.removeEventListener('mousedown', handleBodyMousedown)
+  containerEl.value.removeEventListener('mousemove', handleBodyMousemove)
+  containerEl.value.removeEventListener('mouseup', handleBodyMouseup)
+  containerEl.value.removeEventListener('mouseleave', handleBodyMouseup)
+}
 
-watch(() => isDragMode, (value) => {
-  if (!value.value) {
-    containerEl.value?.removeEventListener('mousemove', handleBodyMousemove)
+watch(isDragMode, (value) => {
+  if (!value) {
+    removeBodyListener()
     return
   }
   nextTick(() => {

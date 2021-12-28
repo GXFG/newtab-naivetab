@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="date" @onDrag="onDragChange">
+  <Moveable componentName="date" @onDrag="(style) => containerStyle = style">
     <div v-if="globalState.setting.date.enabled" id="date" cname="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { currDayjsLang, globalState, addTimerTask, removeTimerTask, formatNumWithPixl } from '@/logic'
+import { currDayjsLang, globalState, addTimerTask, removeTimerTask, getLayoutStyle, formatNumWithPixl } from '@/logic'
 
 const CNAME = 'date'
 
@@ -37,14 +37,10 @@ watch(
   { immediate: true },
 )
 
-const containerStyle = ref(`${globalState.setting.date.layout.xOffsetKey}:${globalState.setting.date.layout.xOffsetValue}vw; ${globalState.setting.date.layout.yOffsetKey}:${globalState.setting.date.layout.yOffsetValue}vh;`)
-
-const onDragChange = (style: string) => {
-  console.log(style)
-  containerStyle.value = style
-}
-
+const containerStyle = ref(getLayoutStyle(CNAME))
+// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
+
 </script>
 
 <style scoped>
@@ -54,9 +50,6 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
   user-select: none;
   .date__container {
     position: absolute;
-    /* text-align: center; */
-    /* transition: all 0.3s ease; */
-    /* transform: translate(-50%, -50%); */
     .date__text {
       font-size: v-bind(customFontSize);
     }

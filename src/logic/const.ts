@@ -36,47 +36,48 @@ export const WEATHER_SPEED_UNIT_MAP = {
   kph: 'km/h',
 }
 
+// TODO 通过设置面板调整屏幕区域配置
 export const POSITION_TYPE_TO_STYLE_MAP = {
   1: [
-    { prop: 'left', value: 0 },
-    { prop: 'top', value: 0 },
+    { xOffsetKey: 'left', xOffsetValue: 0 },
+    { yOffsetKey: 'top', yOffsetValue: 0 },
   ],
   2: [
-    { prop: 'left', value: 50 },
-    { prop: 'top', value: 0 },
+    { xOffsetKey: 'left', xOffsetValue: 50 },
+    { yOffsetKey: 'top', yOffsetValue: 0 },
     { prop: 'transform', value: 'translate(-50%, 0)' },
   ],
   3: [
-    { prop: 'right', value: 0 },
-    { prop: 'top', value: 0 },
+    { xOffsetKey: 'right', xOffsetValue: 0 },
+    { yOffsetKey: 'top', yOffsetValue: 0 },
   ],
   4: [
-    { prop: 'left', value: 0 },
-    { prop: 'top', value: 50 },
+    { xOffsetKey: 'left', xOffsetValue: 0 },
+    { yOffsetKey: 'top', yOffsetValue: 50 },
     { prop: 'transform', value: 'translate(0, -50%)' },
   ],
   5: [
-    { prop: 'left', value: 50 },
-    { prop: 'top', value: 50 },
+    { xOffsetKey: 'left', xOffsetValue: 50 },
+    { yOffsetKey: 'top', yOffsetValue: 50 },
     { prop: 'transform', value: 'translate(-50%, -50%)' },
   ],
   6: [
-    { prop: 'right', value: 0 },
-    { prop: 'top', value: 50 },
+    { xOffsetKey: 'right', xOffsetValue: 0 },
+    { yOffsetKey: 'top', yOffsetValue: 50 },
     { prop: 'transform', value: 'translate(0, -50%)' },
   ],
   7: [
-    { prop: 'left', value: 0 },
-    { prop: 'bottom', value: 0 },
+    { xOffsetKey: 'left', xOffsetValue: 0 },
+    { yOffsetKey: 'bottom', yOffsetValue: 0 },
   ],
   8: [
-    { prop: 'left', value: 50 },
-    { prop: 'bottom', value: 0 },
+    { xOffsetKey: 'left', xOffsetValue: 50 },
+    { yOffsetKey: 'bottom', yOffsetValue: 0 },
     { prop: 'transform', value: 'translate(-50%, 0)' },
   ],
   9: [
-    { prop: 'right', value: 0 },
-    { prop: 'bottom', value: 0 },
+    { xOffsetKey: 'right', xOffsetValue: 0 },
+    { yOffsetKey: 'bottom', yOffsetValue: 0 },
   ],
 }
 

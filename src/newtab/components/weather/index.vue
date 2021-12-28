@@ -1,10 +1,12 @@
 <template>
-  <div v-if="globalState.setting.weather.enabled" id="weather">
-    <div class="weather__container" :style="containerStyle">
-      <CurrentWeather />
-      <ForecastWeather />
+  <Moveable componentName="weather" @onDrag="(style) => containerStyle = style">
+    <div v-if="globalState.setting.weather.enabled" id="weather" cname="weather">
+      <div class="weather__container" :style="containerStyle">
+        <CurrentWeather />
+        <ForecastWeather />
+      </div>
     </div>
-  </div>
+  </Moveable>
 </template>
 
 <script setup lang="ts">
@@ -81,11 +83,8 @@ watch(() => globalState.setting.weather.forecastEnabled, (value) => {
   getForecastData()
 })
 
-const positionStyle = computed(() => getLayoutStyle(CNAME))
-
-const containerStyle = computed(() => {
-  return positionStyle.value
-})
+const containerStyle = ref(getLayoutStyle(CNAME))
+// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 </script>
@@ -96,9 +95,8 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
   color: v-bind(globalState.style.weather.fontColor[globalState.localState.currThemeCode]);
   user-select: none;
   .weather__container {
-    position: fixed;
+    position: absolute;
     text-align: center;
-    transition: all 0.3s ease;
     font-size: v-bind(customFontSize);
   }
 }

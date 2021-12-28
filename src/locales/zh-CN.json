@@ -46,7 +46,9 @@
     "config": "配置",
     "format": "格式",
     "linkTips": "点击'?'以访问下面链接",
-    "whatsNew": "更新内容"
+    "whatsNew": "更新内容",
+    "preview": "预览",
+    "dragMode": "画布模式"
   },
   "setting": {
     "tabGeneral": "通用",

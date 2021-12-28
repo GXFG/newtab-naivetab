@@ -96,7 +96,7 @@ const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
 .setting__input_number {
   flex: 0 0 auto;
   margin-left: 10px;
-  width: 90px;
+  width: 110px;
 }
 
 .setting__input_number--unit {

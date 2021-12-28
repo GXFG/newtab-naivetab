@@ -1,20 +1,19 @@
 <template>
-  <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock">
-    <div class="analog__container" :style="containerStyle">
-      <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
-        <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"></div>
-        <div class="base hour" :style="`transform: rotateZ(${state.hourDeg}deg);`">
-          <img :src="`/assets/img/clock/${currTheme}/hour.png`" />
-        </div>
-        <div class="base minute" :style="`transform: rotateZ(${state.minuteDeg}deg);`">
-          <img :src="`/assets/img/clock/${currTheme}/minute.png`" />
-        </div>
-        <div class="base second" :style="`transform: rotateZ(${state.secondDeg}deg);`">
-          <img :src="`/assets/img/clock/${currTheme}/second.png`" />
-        </div>
-      </article>
+  <Moveable componentName="clockAnalog" @onDrag="(style) => containerStyle = style">
+    <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock" cname="clockAnalog">
+      <div class="clockAnalog__container" :style="containerStyle">
+        <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
+          <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"></div>
+          <div class="base hour" :style="`transform: rotateZ(${state.hourDeg}deg);background-image: url(/assets/img/clock/${currTheme}/hour.png)`">
+          </div>
+          <div class="base minute" :style="`transform: rotateZ(${state.minuteDeg}deg);background-image: url(/assets/img/clock/${currTheme}/minute.png)`">
+          </div>
+          <div class="base second" :style="`transform: rotateZ(${state.secondDeg}deg);background-image: url(/assets/img/clock/${currTheme}/second.png)`">
+          </div>
+        </article>
+      </div>
     </div>
-  </div>
+  </Moveable>
 </template>
 
 <script setup lang="ts">
@@ -69,11 +68,15 @@ watch(() => globalState.setting.clockAnalog.enabled, (value) => {
 
 const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'dark')
 
-const positionStyle = computed(() => getLayoutStyle(CNAME))
-
-const containerStyle = computed(() => {
-  return positionStyle.value
-})
+const containerStyle = ref(getLayoutStyle(CNAME))
+// watch([
+//   () => globalState.setting[CNAME].layout.xOffsetValue,
+//   () => globalState.setting[CNAME].layout.xOffsetValue,
+// ], () => {
+//   containerStyle.value = getLayoutStyle(CNAME)
+// })
+// TODO 通过面板设置时无效
+// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 
 const customWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 </script>
@@ -82,10 +85,9 @@ const customWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 /* https://cssanimation.rocks/clocks/ */
 #analog-clock {
   user-select: none;
-  .analog__container {
-    position: fixed;
+  .clockAnalog__container {
+    position: absolute;
     text-align: center;
-    transition: all 0.3s ease;
     .clock {
       position: relative;
       height: v-bind(customWidth);

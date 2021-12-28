@@ -6,24 +6,12 @@
 
     <NFormItem v-if="globalState.style[props.field].margin" :label="$t('common.margin')">
       <NSlider v-model:value="globalState.style[props.field].margin" :step="1" :min="1" :max="100" />
-      <NInputNumber
-        v-model:value="globalState.style[props.field].margin"
-        class="setting__input_number"
-        :step="1"
-        :min="1"
-        :max="100"
-      ></NInputNumber>
+      <NInputNumber v-model:value="globalState.style[props.field].margin" class="setting__input_number" :step="1" :min="1" :max="100"></NInputNumber>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].width" :label="$t('common.width')">
       <NSlider v-model:value="globalState.style[props.field].width" :step="1" :min="45" :max="200" />
-      <NInputNumber
-        v-model:value="globalState.style[props.field].width"
-        class="setting__input_number"
-        :step="1"
-        :min="45"
-        :max="200"
-      ></NInputNumber>
+      <NInputNumber v-model:value="globalState.style[props.field].width" class="setting__input_number" :step="1" :min="45" :max="200"></NInputNumber>
     </NFormItem>
 
     <NFormItem v-if="'fontFamily' in globalState.style[props.field]" :label="$t('common.font')">
@@ -31,96 +19,50 @@
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].fontSize" :label="$t('common.fontSize')">
-      <NSlider
-        v-model:value="globalState.style[props.field].fontSize"
-        :step="1"
-        :min="12"
-        :max="200"
-      />
-      <NInputNumber
-        v-model:value="globalState.style[props.field].fontSize"
-        class="setting__input_number"
-        :min="12"
-        :step="1"
-      ></NInputNumber>
+      <NSlider v-model:value="globalState.style[props.field].fontSize" :step="1" :min="12" :max="200" />
+      <NInputNumber v-model:value="globalState.style[props.field].fontSize" class="setting__input_number" :min="12" :step="1"></NInputNumber>
     </NFormItem>
 
-    <NFormItem
-      v-if="globalState.style[props.field].letterSpacing"
-      :label="$t('common.letterSpacing')"
-    >
+    <NFormItem v-if="globalState.style[props.field].letterSpacing" :label="$t('common.letterSpacing')">
       <NSlider v-model:value="globalState.style[props.field].letterSpacing" :step="1" :max="200" />
-      <NInputNumber
-        v-model:value="globalState.style[props.field].letterSpacing"
-        class="setting__input_number"
-        :step="1"
-      ></NInputNumber>
+      <NInputNumber v-model:value="globalState.style[props.field].letterSpacing" class="setting__input_number" :step="1"></NInputNumber>
     </NFormItem>
 
-    <div v-if="isColorLabelVisible" class="form__label">
+    <!-- 仅展示当前主题颜色 -->
+    <!-- <div v-if="isColorLabelVisible" class="form__label">
       <label class="label__item">{{ $t('common.light') }}</label>
       <label class="label__item">{{ $t('common.dark') }}</label>
-    </div>
+    </div> -->
 
     <NFormItem v-if="globalState.style[props.field].fontColor" :label="$t('common.fontColor')">
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].fontColor[0]" />
-      </div>
-      <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].fontColor[1]" />
+        <NColorPicker v-model:value="globalState.style[props.field].fontColor[globalState.localState.currThemeCode]" />
       </div>
     </NFormItem>
 
-    <NFormItem
-      v-if="globalState.style[props.field].backgroundColor"
-      :label="$t('common.backgroundColor')"
-    >
+    <NFormItem v-if="globalState.style[props.field].backgroundColor" :label="$t('common.backgroundColor')">
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[0]" />
-      </div>
-      <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[1]" />
+        <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[globalState.localState.currThemeCode]" />
       </div>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].activeColor" :label="$t('common.activeColor')">
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].activeColor[0]" />
-      </div>
-      <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].activeColor[1]" />
+        <NColorPicker v-model:value="globalState.style[props.field].activeColor[globalState.localState.currThemeCode]" />
       </div>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].borderColor" :label="$t('common.borderColor')">
       <NSwitch v-model:value="globalState.style[props.field].isBorderEnabled" />
       <div class="color__picker">
-        <NColorPicker
-          v-if="globalState.style[props.field].isBorderEnabled"
-          v-model:value="globalState.style[props.field].borderColor[0]"
-        />
-      </div>
-      <div class="color__picker setting__row-element">
-        <NColorPicker
-          v-if="globalState.style[props.field].isBorderEnabled"
-          v-model:value="globalState.style[props.field].borderColor[1]"
-        />
+        <NColorPicker v-if="globalState.style[props.field].isBorderEnabled" v-model:value="globalState.style[props.field].borderColor[globalState.localState.currThemeCode]" />
       </div>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].shadowColor" :label="$t('common.shadowColor')">
       <NSwitch v-model:value="globalState.style[props.field].isShadowEnabled" />
       <div class="color__picker">
-        <NColorPicker
-          v-if="globalState.style[props.field].isShadowEnabled"
-          v-model:value="globalState.style[props.field].shadowColor[0]"
-        />
-      </div>
-      <div class="color__picker setting__row-element">
-        <NColorPicker
-          v-if="globalState.style[props.field].isShadowEnabled"
-          v-model:value="globalState.style[props.field].shadowColor[1]"
-        />
+        <NColorPicker v-if="globalState.style[props.field].isShadowEnabled" v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]" />
       </div>
     </NFormItem>
   </NForm>
@@ -145,13 +87,8 @@ const onFontBlur = (value: any) => {
 }
 
 const isColorLabelVisible = computed(() => {
-  return globalState.style[props.field].fontColor
-  || globalState.style[props.field].backgroundColor
-  || globalState.style[props.field].activeColor
-  || globalState.style[props.field].borderColor
-  || globalState.style[props.field].shadowColor
+  return globalState.style[props.field].fontColor || globalState.style[props.field].backgroundColor || globalState.style[props.field].activeColor || globalState.style[props.field].borderColor || globalState.style[props.field].shadowColor
 })
-
 </script>
 
 <style scoped>

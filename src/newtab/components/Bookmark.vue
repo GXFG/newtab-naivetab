@@ -1,38 +1,40 @@
 <template>
-  <div v-if="globalState.setting.bookmark.enabled" id="bookmark">
-    <div class="bookmark__container" :style="positionStyle">
-      <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
-        <div
-          v-for="item in rowData"
-          :key="item.key"
-          :title="item.url"
-          class="row__item"
-          :class="{ 'row__item--active': item.key === state.currSelectKey }"
-          :style="itemStyle"
-          @click="openNewPage(item.url)"
-        >
-          <p class="item__key">
-            {{ `${item.key.toUpperCase()}` }}
-          </p>
-          <div class="item__img">
-            <div class="img__wrap">
-              <img v-if="item.url" class="img__main" :src="`chrome://favicon/size/16@2x/${item.url}`" />
+  <Moveable componentName="bookmark" @onDrag="(style) => containerStyle = style">
+    <div v-if="globalState.setting.bookmark.enabled" id="bookmark" cname="bookmark">
+      <div class="bookmark__container" :style="containerStyle">
+        <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
+          <div
+            v-for="item in rowData"
+            :key="item.key"
+            :title="item.url"
+            class="row__item"
+            :class="{ 'row__item--active': item.key === state.currSelectKey }"
+            :style="itemStyle"
+            @click="onPressItem(item.url)"
+          >
+            <p class="item__key">
+              {{ `${item.key.toUpperCase()}` }}
+            </p>
+            <div class="item__img">
+              <div class="img__wrap">
+                <img v-if="item.url" class="img__main" :src="`chrome://favicon/size/16@2x/${item.url}`" />
+              </div>
             </div>
+            <p class="item__name">
+              {{ item.name }}
+            </p>
+            <!-- 按键定位标志F & J -->
+            <div v-if="['f', 'j'].includes(item.key)" class="item__cursor"></div>
           </div>
-          <p class="item__name">
-            {{ item.name }}
-          </p>
-          <!-- 按键定位标志F & J -->
-          <div v-if="['f', 'j'].includes(item.key)" class="item__cursor"></div>
         </div>
       </div>
     </div>
-  </div>
+  </Moveable>
 </template>
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isSettingDrawerVisible, globalState, getLayoutStyle, formatNumWithPixl, sleep, log, openNewPage } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, isSettingDrawerVisible, globalState, getLayoutStyle, formatNumWithPixl, sleep, log, openNewPage } from '@/logic'
 
 const CNAME = 'bookmark'
 
@@ -112,6 +114,13 @@ watch(() => globalState.setting.bookmark.keymap,
     deep: true,
   })
 
+const onPressItem = (url: string) => {
+  if (isDragMode.value) {
+    return
+  }
+  openNewPage(url)
+}
+
 // 监听键盘按键
 let timer = null as any
 document.onkeydown = function(e: KeyboardEvent) {
@@ -154,10 +163,14 @@ const itemStyle = computed(() => {
           ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 8px 4px,
           ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 16px 8px;`
   }
+  if (isDragMode.value) {
+    style += 'cursor: move;'
+  }
   return style
 })
 
-const positionStyle = computed(() => getLayoutStyle(CNAME))
+const containerStyle = ref(getLayoutStyle(CNAME))
+// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 const customMargin = computed(() => formatNumWithPixl(CNAME, 'margin'))
 const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
@@ -171,7 +184,7 @@ const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
   user-select: none;
   transition: all 0.3s ease;
   .bookmark__container {
-    position: fixed;
+    position: absolute;
     .bookmark__row {
       display: flex;
       justify-content: center;
@@ -198,6 +211,7 @@ const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
         background-color: v-bind(globalState.style.bookmark.backgroundColor[globalState.localState.currThemeCode]);
         cursor: pointer;
         transition: all 0.3s ease;
+        /* TODO 修改hover触发方式 */
         &:hover {
           background-color: v-bind(globalState.style.bookmark.activeColor[globalState.localState.currThemeCode]) !important;
         }

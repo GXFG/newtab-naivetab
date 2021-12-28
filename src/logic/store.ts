@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import { useToggle, useLocalStorage } from '@vueuse/core'
 import pkg from '../../package.json'
-import { POSITION_TYPE_TO_STYLE_MAP, DAYJS_LANG_MAP } from './const'
+import { DAYJS_LANG_MAP } from './const'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
@@ -111,9 +111,12 @@ export const globalState = reactive({
     general: useLocalStorage('general', {
       version: pkg.version,
       layout: {
-        positionType: 6,
-        xOffset: 1,
-        yOffset: 50,
+        xOffsetKey: 'right',
+        xOffsetValue: 1,
+        xTranslateValue: 0,
+        yOffsetKey: 'top',
+        yOffsetValue: 50,
+        yTranslateValue: -50,
       },
       theme: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
@@ -123,9 +126,12 @@ export const globalState = reactive({
     bookmark: useLocalStorage('bookmark', {
       enabled: true,
       layout: {
-        positionType: 2,
-        xOffset: 50,
-        yOffset: 1,
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 1,
+        yTranslateValue: 0,
       },
       keymap: {},
       isDblclickOpen: true,
@@ -134,9 +140,12 @@ export const globalState = reactive({
     clockDigital: useLocalStorage('clockDigital', {
       enabled: true,
       layout: {
-        positionType: 5,
-        xOffset: 50,
-        yOffset: 50,
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 50,
+        yTranslateValue: -50,
       },
       format: 'hh:mm:ss',
       unitEnabled: true,
@@ -144,36 +153,48 @@ export const globalState = reactive({
     clockAnalog: useLocalStorage('clockAnalog', {
       enabled: true,
       layout: {
-        positionType: 5,
-        xOffset: 50,
-        yOffset: 35,
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 28,
+        yTranslateValue: 0,
       },
       theme: 1,
     }, { listenToStorageChanges: true }),
     date: useLocalStorage('date', {
       enabled: true,
       layout: {
-        positionType: 5,
-        xOffset: 50,
-        yOffset: 58,
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 58,
+        yTranslateValue: 0,
       },
       format: 'YYYY-MM-DD dddd',
     }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('calendar', {
       enabled: true,
       layout: {
-        positionType: 7,
-        xOffset: 1,
-        yOffset: 1,
+        xOffsetKey: 'left',
+        xOffsetValue: 0,
+        xTranslateValue: 0,
+        yOffsetKey: 'bottom',
+        yOffsetValue: 0,
+        yTranslateValue: 0,
       },
     }, { listenToStorageChanges: true }),
     weather: useLocalStorage('weather', {
       enabled: true,
       forecastEnabled: false,
       layout: {
-        positionType: 8,
-        xOffset: 50,
-        yOffset: 0,
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'bottom',
+        yOffsetValue: 0,
+        yTranslateValue: 0,
       },
       apiKey: 'bc9a224f841945f0bb2104157212811',
       city: {
@@ -221,19 +242,24 @@ watch(() => [
   deep: true,
 })
 
+// export const getLayoutStyle = (name: string) => {
+//   const layout = globalState.setting[name].layout
+//   const styleList = POSITION_TYPE_TO_STYLE_MAP[layout.positionType]
+//   let res = `${styleList[0].prop}:${layout.xOffset}%;${styleList[1].prop}:${layout.yOffset}%;`
+//   for (const style of styleList.slice(2)) {
+//     res += `${style.prop}:${style.value};`
+//   }
+//   return res
+// }
+
 export const getLayoutStyle = (name: string) => {
-  const layout = globalState.setting[name].layout
-  const styleList = POSITION_TYPE_TO_STYLE_MAP[layout.positionType]
-  let res = `${styleList[0].prop}:${layout.xOffset}%;${styleList[1].prop}:${layout.yOffset}%;`
-  for (const style of styleList.slice(2)) {
-    res += `${style.prop}:${style.value};`
-  }
-  return res
+  const style = `${globalState.setting[name].layout.xOffsetKey}:${globalState.setting[name].layout.xOffsetValue}vw; ${globalState.setting[name].layout.yOffsetKey}:${globalState.setting[name].layout.yOffsetValue}vh; transform:translate(${globalState.setting[name].layout.xTranslateValue}%, ${globalState.setting[name].layout.yTranslateValue}%);`
+  return style
 }
 
 export const formatNumWithPixl = (component: TComponents, ...field: any) => {
-  const res = field.reduce((r: any, c: string) => r[c], globalState.style[component])
-  return `${res}px`
+  const style = field.reduce((r: any, c: string) => r[c], globalState.style[component])
+  return `${style}px`
 }
 
 export const openNewPage = (url: string) => {
