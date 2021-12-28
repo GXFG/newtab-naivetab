@@ -1,5 +1,5 @@
 <template>
-  <ComponentLayout field="clockDigital">
+  <ElementLayout field="clockDigital">
     <NFormItem :label="$t('common.format')">
       <NInput v-model:value="globalState.setting.clockDigital.format"></NInput>
       <Tips link :content="'https://dayjs.fenxianglu.cn/category/parse.html#%E5%AD%97%E7%AC%A6%E4%B8%B2'" />
@@ -23,7 +23,7 @@
         :step="1"
       ></NInputNumber>
     </NFormItem>
-  </ComponentLayout>
+  </ElementLayout>
 
   <ElementConfig field="clockDigital" />
 </template>

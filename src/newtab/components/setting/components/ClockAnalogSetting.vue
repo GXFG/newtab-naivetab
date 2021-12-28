@@ -1,9 +1,9 @@
 <template>
-  <ComponentLayout field="clockAnalog">
+  <ElementLayout field="clockAnalog">
     <NFormItem :label="$t('common.theme')">
       <NSelect v-model:value="globalState.setting.clockAnalog.theme" :options="ANALOG_CLOCK_THEME"></NSelect>
     </NFormItem>
-  </ComponentLayout>
+  </ElementLayout>
 
   <ElementConfig field="clockAnalog" />
 </template>

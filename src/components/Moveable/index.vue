@@ -54,6 +54,10 @@ const stopDrag = () => {
   state.isDraging = false
   moveState.isXAxisCenterVisible = false
   moveState.isYAxisCenterVisible = false
+  moveState.isTopVisible = false
+  moveState.isBottomVisible = false
+  moveState.isLeftVisible = false
+  moveState.isRightVisible = false
   if (offsetData.xOffsetKey.length !== 0) globalState.setting[props.componentName as any].layout.xOffsetKey = offsetData.xOffsetKey
   if (offsetData.xOffsetValue !== 0) globalState.setting[props.componentName as any].layout.xOffsetValue = offsetData.xOffsetValue
   if (offsetData.xTranslateValue !== 0) globalState.setting[props.componentName as any].layout.xTranslateValue = offsetData.xTranslateValue

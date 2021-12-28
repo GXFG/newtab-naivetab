@@ -1,5 +1,5 @@
 <template>
-  <ComponentLayout field="calendar" />
+  <ElementLayout field="calendar" />
 
   <ElementConfig field="calendar" />
 </template>

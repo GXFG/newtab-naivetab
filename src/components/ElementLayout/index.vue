@@ -6,14 +6,16 @@
 
     <slot></slot>
 
-    <NDivider title-placement="left">
-      {{ `${dividerName ? dividerName : $t('common.layout')}` }}
-    </NDivider>
+    <!-- <NDivider title-placement="left">
+      {{ $t('common.layout') }}
+    </NDivider> -->
+
     <!-- <NFormItem :label="$t('common.position')">
       <LayoutSelect :field="props.field" />
       <Tips :content="$t('common.positionTips')" />
     </NFormItem> -->
-    <NFormItem :label="$t('common.xOffset')">
+
+    <!-- <NFormItem :label="$t('common.xOffset')">
       <NSlider v-model:value="globalState.setting[props.field].layout.xOffsetValue" :step="1" :max="50" />
       <NInputNumber
         v-model:value="globalState.setting[props.field].layout.xOffsetValue"
@@ -36,12 +38,12 @@
         :max="100"
       />
       <Tips :content="$t('common.yOffsetTips')" />
-    </NFormItem>
+    </NFormItem> -->
   </NForm>
 </template>
 
 <script setup lang="ts">
-import { NDivider, NForm, NFormItem, NSwitch, NSlider, NInputNumber } from 'naive-ui'
+import { NForm, NFormItem, NSwitch } from 'naive-ui'
 // import LayoutSelect from './LayoutSelect.vue'
 import { gaEvent, globalState } from '@/logic'
 
@@ -49,9 +51,6 @@ const props = defineProps({
   field: {
     type: String,
     required: true,
-  },
-  dividerName: {
-    type: String,
   },
 })
 

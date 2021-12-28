@@ -1,5 +1,5 @@
 <template>
-  <ComponentLayout field="bookmark">
+  <ElementLayout field="bookmark">
     <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
       <div class="setting__input_wrap">
         <div class="setting__input_item">
@@ -52,7 +52,7 @@
         </NInputGroup>
       </NSpace>
     </div>
-  </ComponentLayout>
+  </ElementLayout>
 
   <ElementConfig field="bookmark" />
 </template>

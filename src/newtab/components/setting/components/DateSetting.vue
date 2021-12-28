@@ -1,10 +1,10 @@
 <template>
-  <ComponentLayout field="date">
+  <ElementLayout field="date">
     <NFormItem :label="$t('common.format')">
       <NInput v-model:value="globalState.setting.date.format"></NInput>
       <Tips link :content="'https://dayjs.fenxianglu.cn/category/parse.html#%E5%AD%97%E7%AC%A6%E4%B8%B2'" />
     </NFormItem>
-  </ComponentLayout>
+  </ElementLayout>
 
   <ElementConfig field="date" />
 </template>

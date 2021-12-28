@@ -157,7 +157,7 @@ export const globalState = reactive({
         xOffsetValue: 50,
         xTranslateValue: -50,
         yOffsetKey: 'top',
-        yOffsetValue: 28,
+        yOffsetValue: 25,
         yTranslateValue: 0,
       },
       theme: 1,

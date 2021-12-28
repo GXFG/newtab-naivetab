@@ -10,8 +10,8 @@
     </Moveable>
     <!-- drag_confirm按钮 -->
     <div v-if="isDragMode" class="drag_confirm__container">
-      <NButton type="primary" @click="toggleIsDragMode()">
-        <line-md:confirm-circle class="item__icon" />&nbsp;{{ $t('common.confirm') }}
+      <NButton text type="primary" @click="toggleIsDragMode()">
+        <mdi:exit-to-app class="item__icon" />
       </NButton>
     </div>
     <!-- 抽屉 -->
@@ -148,8 +148,11 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
   .drag_confirm__container {
     z-index: 1999;
     position: absolute;
-    top: 5%;
-    right: 5%;
+    top: 3%;
+    right: 2%;
+    .item__icon {
+      font-size: 28px;
+    }
   }
 }
 

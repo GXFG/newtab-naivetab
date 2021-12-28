@@ -1,5 +1,5 @@
 <template>
-  <ComponentLayout field="weather">
+  <ElementLayout field="weather">
     <NFormItem :label="$t('weather.forecastEnabled')">
       <NTooltip trigger="hover">
         <template #trigger>
@@ -70,7 +70,7 @@
         </div>
       </div>
     </NFormItem>
-  </ComponentLayout>
+  </ElementLayout>
 
   <ElementConfig field="weather" />
 </template>
