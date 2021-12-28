@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="weather" @onDrag="(style) => containerStyle = style">
+  <Moveable componentName="weather" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.weather.enabled" id="weather" cname="weather">
       <div class="weather__container" :style="containerStyle">
         <CurrentWeather />
@@ -56,7 +56,7 @@ const updateData = () => {
     return
   }
   const currTS = dayjs().unix()
-  if (globalState.setting.weather.forecastEnabled && (currTS - globalState.localState.weather.syncTime > 3600000 * 4)) {
+  if (globalState.setting.weather.forecastEnabled && currTS - globalState.localState.weather.syncTime > 3600000 * 4) {
     getForecastData()
     return
   }
@@ -71,20 +71,25 @@ onMounted(() => {
 })
 
 // 修改城市后立即更新数据
-watch(() => globalState.setting.weather.city.value, () => {
-  getForecastData()
-})
+watch(
+  () => globalState.setting.weather.city.value,
+  () => {
+    getForecastData()
+  },
+)
 
 // 开启“预报”后立即更新数据
-watch(() => globalState.setting.weather.forecastEnabled, (value) => {
-  if (!value) {
-    return
-  }
-  getForecastData()
-})
+watch(
+  () => globalState.setting.weather.forecastEnabled,
+  (value) => {
+    if (!value) {
+      return
+    }
+    getForecastData()
+  },
+)
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 </script>

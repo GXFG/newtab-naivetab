@@ -43,12 +43,10 @@ watch(
 )
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 const customUnitFontSize = computed(() => formatNumWithPixl(CNAME, 'unit', 'fontSize'))
 const customLetterSpacing = computed(() => formatNumWithPixl(CNAME, 'letterSpacing'))
-
 </script>
 
 <style scoped>

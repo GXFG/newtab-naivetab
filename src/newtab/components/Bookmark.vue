@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="bookmark" @onDrag="(style) => containerStyle = style">
+  <Moveable componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.bookmark.enabled" id="bookmark" cname="bookmark">
       <div class="bookmark__container" :style="containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
@@ -67,11 +67,7 @@ const initBookmarkListData = () => {
 initBookmarkListData()
 
 const keyBoardRowList = computed(() => {
-  return [
-    localBookmarkList.value.slice(0, 10),
-    localBookmarkList.value.slice(10, 19),
-    localBookmarkList.value.slice(19),
-  ]
+  return [localBookmarkList.value.slice(0, 10), localBookmarkList.value.slice(10, 19), localBookmarkList.value.slice(19)]
 })
 
 const mergeBookmarkSetting = useThrottleFn(async() => {
@@ -107,12 +103,15 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
   }
 }, MERGE_SETTING_DELAY)
 
-watch(() => globalState.setting.bookmark.keymap,
+watch(
+  () => globalState.setting.bookmark.keymap,
   () => {
     mergeBookmarkSetting()
-  }, {
+  },
+  {
     deep: true,
-  })
+  },
+)
 
 const onPressItem = (url: string) => {
   if (isDragMode.value) {
@@ -170,11 +169,9 @@ const itemStyle = computed(() => {
 })
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 const customMargin = computed(() => formatNumWithPixl(CNAME, 'margin'))
 const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
-
 </script>
 
 <style scoped>

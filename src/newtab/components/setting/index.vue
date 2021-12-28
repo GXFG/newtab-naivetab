@@ -130,7 +130,6 @@ const handlerPreviewLeave = () => {
 
 const CNAME = 'general'
 const containerStyle = ref(getLayoutStyle(CNAME))
-// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 
 const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
 </script>

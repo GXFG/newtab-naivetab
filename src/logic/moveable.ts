@@ -27,7 +27,7 @@ const handleBodyMousedown = (e: MouseEvent) => {
     while (!target.getAttribute('cname')) {
       target = target.parentNode
     }
-  } catch (e) {}
+  } catch (e) { }
   if (!(target.getAttribute && target.getAttribute('cname'))) {
     return
   }

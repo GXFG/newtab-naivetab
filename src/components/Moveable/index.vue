@@ -19,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(['onDrag'])
 
-const targetStyle = computed(() => isDragMode.value ? 'cursor: move;' : '')
+const targetStyle = computed(() => (isDragMode.value ? 'cursor: move;' : ''))
 
 const targetEl = ref()
 
@@ -66,8 +66,8 @@ const stopDrag = () => {
   if (offsetData.yTranslateValue !== 0) globalState.setting[props.componentName as any].layout.yTranslateValue = offsetData.yTranslateValue
 }
 
-const getPercentageInWidth = (currWidth: number) => +(currWidth / window.innerWidth * 100).toFixed(2)
-const getPercentageInHeight = (currHeight: number) => +(currHeight / window.innerHeight * 100).toFixed(2)
+const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(2)
+const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(2)
 
 const onDrag = (e: MouseEvent) => {
   if (!state.isDraging) {
@@ -160,8 +160,6 @@ const initDrag = () => {
 onMounted(() => {
   initDrag()
 })
-
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

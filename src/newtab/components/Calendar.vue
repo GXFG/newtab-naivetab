@@ -253,11 +253,9 @@ const onReset = () => {
 }
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 const customContainerWidth = computed(() => `${globalState.style.calendar.width * 7.4}px`)
 const customItemWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-
 </script>
 
 <style scoped>

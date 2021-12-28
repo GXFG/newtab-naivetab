@@ -1,15 +1,12 @@
 <template>
-  <Moveable componentName="clockAnalog" @onDrag="(style) => containerStyle = style">
+  <Moveable componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock" cname="clockAnalog">
       <div class="clockAnalog__container" :style="containerStyle">
         <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
           <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"></div>
-          <div class="base hour" :style="`transform: rotateZ(${state.hourDeg}deg);background-image: url(/assets/img/clock/${currTheme}/hour.png)`">
-          </div>
-          <div class="base minute" :style="`transform: rotateZ(${state.minuteDeg}deg);background-image: url(/assets/img/clock/${currTheme}/minute.png)`">
-          </div>
-          <div class="base second" :style="`transform: rotateZ(${state.secondDeg}deg);background-image: url(/assets/img/clock/${currTheme}/second.png)`">
-          </div>
+          <div class="base hour" :style="`transform: rotateZ(${state.hourDeg}deg);background-image: url(/assets/img/clock/${currTheme}/hour.png)`"></div>
+          <div class="base minute" :style="`transform: rotateZ(${state.minuteDeg}deg);background-image: url(/assets/img/clock/${currTheme}/minute.png)`"></div>
+          <div class="base second" :style="`transform: rotateZ(${state.secondDeg}deg);background-image: url(/assets/img/clock/${currTheme}/second.png)`"></div>
         </article>
       </div>
     </div>
@@ -49,35 +46,24 @@ const updateTime = () => {
     return
   }
   state.hourDeg += 30
-  // if (s === 0) {
-  //   state.minuteDeg += 6
-  //   if (m === 0) {
-  //     state.hourDeg += 30
-  //   }
-  // }
 }
 
-watch(() => globalState.setting.clockAnalog.enabled, (value) => {
-  if (value) {
-    initTime()
-    addTimerTask(CNAME, updateTime)
-  } else {
-    removeTimerTask(CNAME)
-  }
-}, { immediate: true })
+watch(
+  () => globalState.setting.clockAnalog.enabled,
+  (value) => {
+    if (value) {
+      initTime()
+      addTimerTask(CNAME, updateTime)
+    } else {
+      removeTimerTask(CNAME)
+    }
+  },
+  { immediate: true },
+)
 
-const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'dark')
+const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'light')
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-// watch([
-//   () => globalState.setting[CNAME].layout.xOffsetValue,
-//   () => globalState.setting[CNAME].layout.xOffsetValue,
-// ], () => {
-//   containerStyle.value = getLayoutStyle(CNAME)
-// })
-// TODO 通过面板设置时无效
-// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
-
 const customWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="date" @onDrag="(style) => containerStyle = style">
+  <Moveable componentName="date" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.date.enabled" id="date" cname="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
@@ -38,9 +38,7 @@ watch(
 )
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-// watchEffect(() => containerStyle.value = getLayoutStyle(CNAME))
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-
 </script>
 
 <style scoped>

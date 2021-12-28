@@ -160,7 +160,7 @@ export const globalState = reactive({
         yOffsetValue: 25,
         yTranslateValue: 0,
       },
-      theme: 1,
+      theme: 0, // theme list 索引
     }, { listenToStorageChanges: true }),
     date: useLocalStorage('date', {
       enabled: true,
