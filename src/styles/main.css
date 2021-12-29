@@ -3,6 +3,8 @@
     --bg-main: #ffffff;
     --text-color-main: #2c3e50;
     --bg-auxiliary-line: #40a9ff;
+    /* setting */
+    --bg-bottom-bar: #D1D5DB;
     /* calendar */
     --text-color-red: #fa5252;
     --bg-calendar-rest: rgba(255, 110, 110, 0.4);
@@ -16,6 +18,8 @@
     --bg-main: #35363a;
     --text-color-main: #ffffff;
     --bg-auxiliary-line: #40a9ff;
+    /* setting */
+    --bg-bottom-bar: #424247;
     /* calendar */
     --text-color-red: #fa5252;
     --bg-calendar-rest: rgba(255, 110, 110, 0.4);

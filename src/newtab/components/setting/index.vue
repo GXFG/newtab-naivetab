@@ -20,7 +20,6 @@
       display-directive="show"
       :style="drawerStyle"
       :width="570"
-      :height="500"
       :placement="globalState.setting.general.drawerPlacement"
     >
       <NDrawerContent>
@@ -31,24 +30,26 @@
         </NTabs>
       </NDrawerContent>
       <!-- 底部按钮 -->
-      <div class="bottom__left">
-        <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
-          <ic:round-preview />&nbsp;{{ $t('common.preview') }}
-        </NButton>
-        <NButton class="left__item" size="small" title="DragMode" @click="openDragMode()">
-          <tabler:drag-drop />&nbsp;{{ $t('common.dragMode') }}
-        </NButton>
-      </div>
-      <p class="bottom__version">
-        {{ `${$t('common.version')}: ${pkg.version}` }}
-      </p>
-      <div class="bottom__right">
-        <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">
-          <ic:round-new-releases />
-        </NButton>
-        <NButton text class="right__icon" title="Github" @click="openNewPage(URL_GITHUB)">
-          <carbon:logo-github />
-        </NButton>
+      <div class="setting__bottom">
+        <div class="bottom__left">
+          <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
+            <ic:round-preview />&nbsp;{{ $t('common.preview') }}
+          </NButton>
+          <NButton class="left__item" size="small" title="DragMode" @click="openDragMode()">
+            <tabler:drag-drop />&nbsp;{{ $t('common.dragMode') }}
+          </NButton>
+        </div>
+        <p class="bottom__version">
+          {{ `${$t('common.version')}: ${pkg.version}` }}
+        </p>
+        <div class="bottom__right">
+          <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">
+            <ic:round-new-releases />
+          </NButton>
+          <NButton text class="right__icon" title="Github" @click="openNewPage(URL_GITHUB)">
+            <carbon:logo-github />
+          </NButton>
+        </div>
       </div>
     </NDrawer>
   </div>
@@ -66,43 +67,55 @@ import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import { URL_CHANGELOG, URL_GITHUB, gaEvent, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
 
-const tabPaneList = [
-  {
-    name: 'tabGeneral',
-    label: window.$t('setting.tabGeneral'),
-    component: GeneralSetting,
+const tabPaneList: any = shallowRef([])
+
+const initEnumData = () => {
+  tabPaneList.value = [
+    {
+      name: 'tabGeneral',
+      label: window.$t('setting.tabGeneral'),
+      component: GeneralSetting,
+    },
+    {
+      name: 'tabBookmark',
+      label: window.$t('setting.tabBookmark'),
+      component: BookmarkSetting,
+    },
+    {
+      name: 'tabDigitalClock',
+      label: window.$t('setting.tabDigitalClock'),
+      component: ClockDigitalSetting,
+    },
+    {
+      name: 'tabAnalogClock',
+      label: window.$t('setting.tabAnalogClock'),
+      component: ClockAnalogSetting,
+    },
+    {
+      name: 'tabDate',
+      label: window.$t('setting.tabDate'),
+      component: DateSetting,
+    },
+    {
+      name: 'tabCalendar',
+      label: window.$t('setting.tabCalendar'),
+      component: CalendarSetting,
+    },
+    {
+      name: 'tabWeather',
+      label: window.$t('setting.tabWeather'),
+      component: WeatherSetting,
+    },
+  ]
+}
+
+watch(
+  () => globalState.setting.general.lang,
+  () => {
+    initEnumData()
   },
-  {
-    name: 'tabBookmark',
-    label: window.$t('setting.tabBookmark'),
-    component: BookmarkSetting,
-  },
-  {
-    name: 'tabDigitalClock',
-    label: window.$t('setting.tabDigitalClock'),
-    component: ClockDigitalSetting,
-  },
-  {
-    name: 'tabAnalogClock',
-    label: window.$t('setting.tabAnalogClock'),
-    component: ClockAnalogSetting,
-  },
-  {
-    name: 'tabDate',
-    label: window.$t('setting.tabDate'),
-    component: DateSetting,
-  },
-  {
-    name: 'tabCalendar',
-    label: window.$t('setting.tabCalendar'),
-    component: CalendarSetting,
-  },
-  {
-    name: 'tabWeather',
-    label: window.$t('setting.tabWeather'),
-    component: WeatherSetting,
-  },
-]
+  { immediate: true },
+)
 
 const openSettingModal = () => {
   if (isDragMode.value) {
@@ -134,7 +147,7 @@ const containerStyle = ref(getLayoutStyle(CNAME))
 const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
 </script>
 
-<style scoped>
+<style>
 #setting {
   .general__container {
     /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
@@ -159,11 +172,21 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
   user-select: none;
 }
 
-.n-tab-pane {
+.n-tabs-nav {
+  z-index: 1999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 15px 0 0 20px;
+  width: 570px;
   user-select: none;
-  padding: 0 15px 0 0 !important;
-  height: 89vh;
+  background-color: var(--color);
+}
+.n-tab-pane {
+  padding: 40px 15px 30px 0 !important;
+  height: 92vh;
   overflow-y: scroll;
+  user-select: none;
   &::-webkit-scrollbar {
     width: 10px;
   }
@@ -179,27 +202,34 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
   }
 }
 
-.bottom__left {
+.setting__bottom {
   position: absolute;
-  left: 13px;
-  bottom: 6px;
-  .left__item {
-    margin-right: 10px;
+  left: 0px;
+  bottom: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px 8px 10px;
+  width: 570px;
+  background-color: var(--bg-bottom-bar);
+  .bottom__left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .left__item {
+      margin-right: 10px;
+    }
   }
-}
-.bottom__version {
-  position: absolute;
-  left: 50%;
-  bottom: 10px;
-  transform: translate(-50%, 0);
-}
-.bottom__right {
-  position: absolute;
-  right: 13px;
-  bottom: 3px;
-  .right__icon {
-    margin-left: 10px;
-    font-size: 20px;
+  .bottom__version {
+  }
+  .bottom__right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .right__icon {
+      margin-left: 10px;
+      font-size: 20px;
+    }
   }
 }
 </style>

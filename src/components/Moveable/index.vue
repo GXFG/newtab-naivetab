@@ -30,11 +30,11 @@ const state = reactive({
 
 const offsetData = reactive({
   xOffsetKey: '',
-  xOffsetValue: 0,
-  xTranslateValue: 0,
+  xOffsetValue: -1,
+  xTranslateValue: -1,
   yOffsetKey: '',
-  yOffsetValue: 0,
-  yTranslateValue: 0,
+  yOffsetValue: -1,
+  yTranslateValue: -1,
 })
 
 const startDrag = (e: MouseEvent) => {
@@ -59,11 +59,11 @@ const stopDrag = () => {
   moveState.isLeftVisible = false
   moveState.isRightVisible = false
   if (offsetData.xOffsetKey.length !== 0) globalState.setting[props.componentName as any].layout.xOffsetKey = offsetData.xOffsetKey
-  if (offsetData.xOffsetValue !== 0) globalState.setting[props.componentName as any].layout.xOffsetValue = offsetData.xOffsetValue
-  if (offsetData.xTranslateValue !== 0) globalState.setting[props.componentName as any].layout.xTranslateValue = offsetData.xTranslateValue
+  if (offsetData.xOffsetValue !== -1) globalState.setting[props.componentName as any].layout.xOffsetValue = offsetData.xOffsetValue
+  if (offsetData.xTranslateValue !== -1) globalState.setting[props.componentName as any].layout.xTranslateValue = offsetData.xTranslateValue
   if (offsetData.yOffsetKey.length !== 0) globalState.setting[props.componentName as any].layout.yOffsetKey = offsetData.yOffsetKey
-  if (offsetData.yOffsetValue !== 0) globalState.setting[props.componentName as any].layout.yOffsetValue = offsetData.yOffsetValue
-  if (offsetData.yTranslateValue !== 0) globalState.setting[props.componentName as any].layout.yTranslateValue = offsetData.yTranslateValue
+  if (offsetData.yOffsetValue !== -1) globalState.setting[props.componentName as any].layout.yOffsetValue = offsetData.yOffsetValue
+  if (offsetData.yTranslateValue !== -1) globalState.setting[props.componentName as any].layout.yTranslateValue = offsetData.yTranslateValue
 }
 
 const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(2)

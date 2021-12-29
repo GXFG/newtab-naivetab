@@ -131,13 +131,12 @@ const initEnumData = () => {
   }
 }
 
-initEnumData()
-
 watch(
   () => globalState.setting.general.lang,
   () => {
     initEnumData()
   },
+  { immediate: true },
 )
 
 /**
