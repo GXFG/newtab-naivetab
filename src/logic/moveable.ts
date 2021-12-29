@@ -24,14 +24,14 @@ const handleBodyMousedown = (e: MouseEvent) => {
   }
   let target: any = e.target
   try {
-    while (!target.getAttribute('cname')) {
+    while (!target.getAttribute('data-cname')) {
       target = target.parentNode
     }
   } catch (e) { }
-  if (!(target.getAttribute && target.getAttribute('cname'))) {
+  if (!(target.getAttribute && target.getAttribute('data-cname'))) {
     return
   }
-  const componentName: TComponents = target.getAttribute('cname')
+  const componentName: TComponents = target.getAttribute('data-cname')
   currDragComponentName = componentName
   moveState.MouseDownTaskMap.get(componentName)(e)
 }

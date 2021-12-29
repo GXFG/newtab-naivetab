@@ -1,6 +1,6 @@
 <template>
   <Moveable componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.bookmark.enabled" id="bookmark" cname="bookmark">
+    <div v-if="globalState.setting.bookmark.enabled" id="bookmark" data-cname="bookmark">
       <div class="bookmark__container" :style="containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
           <div
@@ -10,6 +10,9 @@
             class="row__item"
             :class="{ 'row__item--active': item.key === state.currSelectKey }"
             :style="itemStyle"
+            :data-key="item.key"
+            @mouseenter="handleContainerEnter"
+            @mouseleave="handleContainerLeave"
             @click="onPressItem(item.url)"
           >
             <p class="item__key">
@@ -151,6 +154,17 @@ document.onkeydown = function(e: KeyboardEvent) {
   }
 }
 
+const handleContainerEnter = (e: MouseEvent) => {
+  if (isDragMode.value) {
+    return
+  }
+  const el = e.target as HTMLInputElement
+  state.currSelectKey = el.getAttribute('data-key') || ''
+}
+const handleContainerLeave = () => {
+  state.currSelectKey = ''
+}
+
 const itemStyle = computed(() => {
   let style = ''
   if (globalState.style.bookmark.isBorderEnabled) {
@@ -208,10 +222,6 @@ const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
         background-color: v-bind(globalState.style.bookmark.backgroundColor[globalState.localState.currThemeCode]);
         cursor: pointer;
         transition: all 0.3s ease;
-        /* TODO 修改hover触发方式 */
-        &:hover {
-          background-color: v-bind(globalState.style.bookmark.activeColor[globalState.localState.currThemeCode]) !important;
-        }
         .item__key {
         }
         .item__img {

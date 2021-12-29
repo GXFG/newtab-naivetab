@@ -2,7 +2,7 @@
   <div id="setting">
     <!-- setting按钮 -->
     <Moveable componentName="general" @onDrag="(style) => (containerStyle = style)">
-      <div class="general__container" :style="containerStyle" cname="general">
+      <div class="general__container" :style="containerStyle" data-cname="general">
         <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
           <ic:baseline-settings class="item__icon" />
         </NButton>

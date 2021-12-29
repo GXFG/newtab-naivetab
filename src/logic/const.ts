@@ -36,7 +36,7 @@ export const WEATHER_SPEED_UNIT_MAP = {
   kph: 'km/h',
 }
 
-// TODO 通过设置面板调整屏幕区域配置
+// 废弃-通过设置面板调整屏幕区域配置，被画布模式替换
 export const POSITION_TYPE_TO_STYLE_MAP = {
   1: [
     { xOffsetKey: 'left', xOffsetValue: 0 },

@@ -1,6 +1,6 @@
 <template>
   <Moveable componentName="date" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.date.enabled" id="date" cname="date">
+    <div v-if="globalState.setting.date.enabled" id="date" data-cname="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
           {{ state.date }}
