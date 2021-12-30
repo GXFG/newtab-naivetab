@@ -2,10 +2,12 @@
   <div id="setting">
     <!-- setting按钮 -->
     <Moveable componentName="general" @onDrag="(style) => (containerStyle = style)">
-      <div class="general__container" :style="containerStyle" data-cname="general">
-        <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
-          <ic:baseline-settings class="item__icon" />
-        </NButton>
+      <div data-cname="general">
+        <div class="general__container" :style="containerStyle">
+          <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
+            <ic:baseline-settings class="item__icon" />
+          </NButton>
+        </div>
       </div>
     </Moveable>
     <!-- drag_confirm按钮 -->
@@ -154,7 +156,7 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
     z-index: 1999;
     position: absolute;
     .item__icon {
-      font-size: 24px;
+      font-size: 26px;
     }
   }
   .drag_confirm__container {
@@ -177,14 +179,15 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
   position: absolute;
   top: 0;
   left: 0;
-  padding: 15px 0 0 20px;
+  padding: 15px 50px 0 20px;
   width: 570px;
   user-select: none;
-  background-color: var(--color);
+  background-color: var(--n-color);
 }
 .n-tab-pane {
-  padding: 40px 15px 30px 0 !important;
-  height: 92vh;
+  margin-top: 43px;
+  padding: 0 15px 30px 0 !important;
+  height: 88vh;
   overflow-y: scroll;
   user-select: none;
   &::-webkit-scrollbar {

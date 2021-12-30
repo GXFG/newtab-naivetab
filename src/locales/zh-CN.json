@@ -45,7 +45,7 @@
     "iconWidth": "图标宽度",
     "config": "配置",
     "format": "格式",
-    "linkTips": "点击'?'以访问下面链接",
+    "linkTips": "点击'?'图标，以访问以下链接",
     "whatsNew": "更新内容",
     "preview": "预览",
     "dragMode": "画布模式"
@@ -61,7 +61,6 @@
     "tabWeather": "天气"
   },
   "general": {
-    "entryIconLayout": "入口图标布局",
     "globalStyle": "全局样式",
     "generalLabel": "通用",
     "pageTitle": "页面标题",

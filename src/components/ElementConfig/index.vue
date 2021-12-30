@@ -28,41 +28,36 @@
       <NInputNumber v-model:value="globalState.style[props.field].letterSpacing" class="setting__input_number" :step="1"></NInputNumber>
     </NFormItem>
 
-    <!-- 仅展示当前主题颜色 -->
-    <!-- <div v-if="isColorLabelVisible" class="form__label">
-      <label class="label__item">{{ $t('common.light') }}</label>
-      <label class="label__item">{{ $t('common.dark') }}</label>
-    </div> -->
-
+    <!-- color -->
     <NFormItem v-if="globalState.style[props.field].fontColor" :label="$t('common.fontColor')">
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].fontColor[globalState.localState.currThemeCode]" />
+        <NColorPicker v-model:value="globalState.style[props.field].fontColor[globalState.localState.currThemeCode]" show-preview :swatches="swatches" />
       </div>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].backgroundColor" :label="$t('common.backgroundColor')">
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[globalState.localState.currThemeCode]" />
+        <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[globalState.localState.currThemeCode]" show-preview :swatches="swatches" />
       </div>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].activeColor" :label="$t('common.activeColor')">
       <div class="color__picker">
-        <NColorPicker v-model:value="globalState.style[props.field].activeColor[globalState.localState.currThemeCode]" />
+        <NColorPicker v-model:value="globalState.style[props.field].activeColor[globalState.localState.currThemeCode]" show-preview :swatches="swatches" />
       </div>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].borderColor" :label="$t('common.borderColor')">
       <NSwitch v-model:value="globalState.style[props.field].isBorderEnabled" />
       <div class="color__picker">
-        <NColorPicker v-if="globalState.style[props.field].isBorderEnabled" v-model:value="globalState.style[props.field].borderColor[globalState.localState.currThemeCode]" />
+        <NColorPicker v-if="globalState.style[props.field].isBorderEnabled" v-model:value="globalState.style[props.field].borderColor[globalState.localState.currThemeCode]" show-preview :swatches="swatches" />
       </div>
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].shadowColor" :label="$t('common.shadowColor')">
       <NSwitch v-model:value="globalState.style[props.field].isShadowEnabled" />
       <div class="color__picker">
-        <NColorPicker v-if="globalState.style[props.field].isShadowEnabled" v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]" />
+        <NColorPicker v-if="globalState.style[props.field].isShadowEnabled" v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]" show-preview :swatches="swatches" />
       </div>
     </NFormItem>
   </NForm>
@@ -82,13 +77,12 @@ const props = defineProps({
   },
 })
 
+const swatches = ['rgba(255, 255, 255, 1)', 'rgba(209, 213, 219, 1)', 'rgba(71,85,105, 1)', 'rgba(44, 62, 80, 1)', 'rgba(113, 113, 113, 1)', 'rgba(53, 54, 58, 1)', 'rgba(15, 23, 42, 1)']
+
 const onFontBlur = (value: any) => {
   gaEvent(`${props.field}-font`, 'blur', `${value.target.value}`)
 }
 
-const isColorLabelVisible = computed(() => {
-  return globalState.style[props.field].fontColor || globalState.style[props.field].backgroundColor || globalState.style[props.field].activeColor || globalState.style[props.field].borderColor || globalState.style[props.field].shadowColor
-})
 </script>
 
 <style scoped>
@@ -101,20 +95,5 @@ const isColorLabelVisible = computed(() => {
     margin-left: 10px;
   }
 }
-.form__label {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-  .label__item {
-    opacity: 0.6;
-    &:nth-of-type(1) {
-      margin-left: 23%;
-    }
-    &:nth-of-type(2) {
-      margin-right: 31%;
-    }
-  }
-}
+
 </style>

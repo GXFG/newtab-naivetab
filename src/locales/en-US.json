@@ -45,7 +45,7 @@
     "iconWidth": "Icon width",
     "config": "Config",
     "format": "Format",
-    "linkTips": "Click on '?' to access the link below",
+    "linkTips": "Click on '?' icon to access the link below",
     "whatsNew": "What's New",
     "preview": "Preview",
     "dragMode": "Drag Mode"
@@ -61,7 +61,6 @@
     "tabWeather": "Weather"
   },
   "general": {
-    "entryIconLayout": "Entry icon layout",
     "globalStyle": "Global style",
     "generalLabel": "General",
     "pageTitle": "Page title",

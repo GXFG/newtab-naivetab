@@ -1,7 +1,7 @@
 <template>
-  <!-- 最外层div的style会被用来存放v-bind的变量，不能在进行:style操作 -->
+  <!-- 最外层div的style会被用来存放v-bind的变量，不能再进行:style操作 -->
   <div>
-    <div :style="targetStyle">
+    <div ref="moveableWrapEl" :style="targetStyle">
       <slot />
     </div>
   </div>
@@ -21,6 +21,7 @@ const emit = defineEmits(['onDrag'])
 
 const targetStyle = computed(() => (isDragMode.value ? 'cursor: move;' : ''))
 
+const moveableWrapEl = ref()
 const targetEl = ref()
 
 const state = reactive({
@@ -145,8 +146,8 @@ const onDrag = (e: MouseEvent) => {
     moveState.isTopVisible = false
     moveState.isBottomVisible = false
   }
+
   const style = `${offsetData.xOffsetKey}:${offsetData.xOffsetValue}vw; ${offsetData.yOffsetKey}:${offsetData.yOffsetValue}vh; transform:translate(${offsetData.xTranslateValue}%, ${offsetData.yTranslateValue}%)`
-  console.log(style)
   emit('onDrag', style)
 }
 
@@ -160,6 +161,13 @@ const initDrag = () => {
 onMounted(() => {
   initDrag()
 })
-</script>
 
-<style scoped></style>
+watch(isDragMode, (value) => {
+  const targetClassList = moveableWrapEl.value.children[0].children[0].classList
+  if (value) {
+    targetClassList.add('auxiliary-line')
+  } else {
+    targetClassList.remove('auxiliary-line')
+  }
+})
+</script>

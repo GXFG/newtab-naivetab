@@ -27,6 +27,7 @@
       />
       <Tips :content="$t('common.xOffsetTips')" />
     </NFormItem>
+
     <NFormItem :label="$t('common.yOffset')">
       <NSlider v-model:value="globalState.setting[props.field].layout.yOffsetValue" :step="1" :max="50" />
       <NInputNumber
@@ -44,8 +45,8 @@
 
 <script setup lang="ts">
 import { NForm, NFormItem, NSwitch } from 'naive-ui'
-// import LayoutSelect from './LayoutSelect.vue'
 import { gaEvent, globalState } from '@/logic'
+// import LayoutSelect from './LayoutSelect.vue'
 
 const props = defineProps({
   field: {

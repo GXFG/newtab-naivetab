@@ -231,9 +231,9 @@ watch(() => globalState.setting.general.pageTitle, () => {
   initPageTitle()
 })
 
-watch(() => [
-  globalState.style.general,
-  globalState.localState.currThemeCode,
+watch([
+  () => globalState.style.general,
+  () => globalState.localState.currThemeCode,
 ], () => {
   document.body.style.setProperty('--text-color-main', globalState.style.general.fontColor[globalState.localState.currThemeCode])
   document.body.style.setProperty('--bg-main', globalState.style.general.backgroundColor[globalState.localState.currThemeCode])
@@ -241,16 +241,6 @@ watch(() => [
   immediate: true,
   deep: true,
 })
-
-// export const getLayoutStyle = (name: string) => {
-//   const layout = globalState.setting[name].layout
-//   const styleList = POSITION_TYPE_TO_STYLE_MAP[layout.positionType]
-//   let res = `${styleList[0].prop}:${layout.xOffset}%;${styleList[1].prop}:${layout.yOffset}%;`
-//   for (const style of styleList.slice(2)) {
-//     res += `${style.prop}:${style.value};`
-//   }
-//   return res
-// }
 
 export const getLayoutStyle = (name: string) => {
   const style = `${globalState.setting[name].layout.xOffsetKey}:${globalState.setting[name].layout.xOffsetValue}vw; ${globalState.setting[name].layout.yOffsetKey}:${globalState.setting[name].layout.yOffsetValue}vh; transform:translate(${globalState.setting[name].layout.xTranslateValue}%, ${globalState.setting[name].layout.yTranslateValue}%);`

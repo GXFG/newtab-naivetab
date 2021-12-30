@@ -29,6 +29,7 @@ onUnmounted(() => {
 
 gaEvent('page-home', 'view', 'view')
 
+// theme
 const osTheme = useOsTheme() // light | dark | null
 const currTheme = ref()
 
@@ -54,6 +55,7 @@ const NATIVE_UI_LOCALE_MAP = {
   'en-US': enUS,
 }
 
+// UI language
 const nativeUILang = ref(enUS)
 
 watch(() => globalState.setting.general.lang, () => {

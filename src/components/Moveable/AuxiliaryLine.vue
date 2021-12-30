@@ -1,21 +1,26 @@
 <template>
   <div v-show="moveState.isXAxisCenterVisible" class="axis xaxis__center"></div>
   <div v-show="moveState.isYAxisCenterVisible" class="axis yaxis__center"></div>
-  <div v-show="moveState.isTopVisible" class="axis axis__top"></div>
-  <div v-show="moveState.isBottomVisible" class="axis axis__bottom"></div>
-  <div v-show="moveState.isLeftVisible" class="axis axis__left"></div>
-  <div v-show="moveState.isRightVisible" class="axis axis__right"></div>
+  <div v-show="moveState.isTopVisible" class="bound bound__top"></div>
+  <div v-show="moveState.isBottomVisible" class="bound bound__bottom"></div>
+  <div v-show="moveState.isLeftVisible" class="bound bound__left"></div>
+  <div v-show="moveState.isRightVisible" class="bound bound__right"></div>
 </template>
 
 <script setup lang="ts">
 import { moveState } from '@/logic'
-
 </script>
 
-<style scoped>
+<style>
+/* 元素辅助线 */
+.auxiliary-line {
+  outline: 1px dashed var(--auxiliary-line-element);
+}
+
+/* 画布中心辅助线 */
 .axis {
   z-index: 99;
-  background-color: var(--bg-auxiliary-line);
+  background-color: var(--auxiliary-line-main);
   transition: all 1s ease;
 }
 .xaxis__center {
@@ -32,28 +37,35 @@ import { moveState } from '@/logic'
   width: 100vw;
   height: 1px;
 }
-.axis__top {
+
+/* 画布边界辅助线 */
+.bound {
+  z-index: 99;
+  background-color: var(--auxiliary-line-bound);
+  transition: all 1s ease;
+}
+.bound__top {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 1px;
 }
-.axis__bottom {
+.bound__bottom {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100vw;
   height: 1px;
 }
-.axis__left {
+.bound__left {
   position: fixed;
   top: 0;
   left: 0;
   width: 1px;
   height: 100vh;
 }
-.axis__right {
+.bound__right {
   position: fixed;
   top: 0;
   right: 0;

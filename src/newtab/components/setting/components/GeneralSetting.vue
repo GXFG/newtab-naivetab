@@ -7,18 +7,13 @@
       <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList"></NSelect>
     </NFormItem>
     <NFormItem :label="$t('general.language')">
-      <NSelect
-        v-model:value="proxy.$i18n.locale"
-        :options="i18n.global.availableLocales.map((locale: string) => ({
-          label: locale,
-          value: locale
-        }))"
-        @update:value="onChangeLocale"
-      ></NSelect>
+      <NSelect v-model:value="proxy.$i18n.locale" :options="state.i18nList" @update:value="onChangeLocale"></NSelect>
     </NFormItem>
+
     <NDivider title-placement="left">
       {{ $t('general.settingDividerDrawer') }}
     </NDivider>
+
     <NFormItem :label="$t('common.site')">
       <NSelect v-model:value="globalState.setting.general.drawerPlacement" :options="state.drawerPlacementList"></NSelect>
     </NFormItem>
@@ -30,6 +25,7 @@
     <NDivider title-placement="left">
       {{ $t('general.settingDividerSetting') }}
     </NDivider>
+
     <NFormItem :label="$t('general.syncTime')">
       <p>{{ syncTime }}</p>
       <Tips :content="$t('general.syncTimeTips')" />
@@ -71,6 +67,10 @@ const { proxy }: any = getCurrentInstance()
 const state = reactive({
   themeList: [] as TSelectItem[],
   drawerPlacementList: [] as TSelectItem[],
+  i18nList: i18n.global.availableLocales.map((locale: string) => ({
+    label: locale,
+    value: locale,
+  })),
 })
 
 const initEnumData = () => {
@@ -87,13 +87,12 @@ const initEnumData = () => {
   ]
 }
 
-initEnumData()
-
 watch(
   () => globalState.setting.general.lang,
   () => {
     initEnumData()
   },
+  { immediate: true },
 )
 
 const onChangeLocale = (locale: string) => {

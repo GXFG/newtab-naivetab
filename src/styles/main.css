@@ -2,7 +2,9 @@
   :root {
     --bg-main: #ffffff;
     --text-color-main: #2c3e50;
-    --bg-auxiliary-line: #40a9ff;
+    --auxiliary-line-main: #40a9ff;
+    --auxiliary-line-bound: #ff7875;
+    --auxiliary-line-element: #69c0ff;
     /* setting */
     --bg-bottom-bar: #D1D5DB;
     /* calendar */
@@ -17,7 +19,9 @@
   :root {
     --bg-main: #35363a;
     --text-color-main: #ffffff;
-    --bg-auxiliary-line: #40a9ff;
+    --auxiliary-line-main: #40a9ff;
+    --auxiliary-line-bound: #ff7875;
+    --auxiliary-line-element: #69c0ff;
     /* setting */
     --bg-bottom-bar: #424247;
     /* calendar */
