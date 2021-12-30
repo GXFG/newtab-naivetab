@@ -42,7 +42,7 @@
           </NButton>
         </div>
         <p class="bottom__version">
-          {{ `${$t('common.version')}: ${pkg.version}` }}
+          {{ `${pkg.version}` }}
         </p>
         <div class="bottom__right">
           <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">
