@@ -12,11 +12,6 @@ import { moveState } from '@/logic'
 </script>
 
 <style>
-/* 元素辅助线 */
-.auxiliary-line {
-  outline: 1px dashed var(--auxiliary-line-element);
-}
-
 /* 画布中心辅助线 */
 .axis {
   z-index: 99;

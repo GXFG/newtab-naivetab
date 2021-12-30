@@ -1,7 +1,7 @@
 <template>
   <!-- 最外层div的style会被用来存放v-bind的变量，不能再进行:style操作 -->
   <div>
-    <div ref="moveableWrapEl" :style="targetStyle">
+    <div ref="moveableWrapEl" :style="moveableWrapStyle" class="moveable-wrap">
       <slot />
     </div>
   </div>
@@ -19,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(['onDrag'])
 
-const targetStyle = computed(() => (isDragMode.value ? 'cursor: move;' : ''))
+const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move;' : ''))
 
 const moveableWrapEl = ref()
 const targetEl = ref()
@@ -104,7 +104,8 @@ const onDrag = (e: MouseEvent) => {
     offsetData.yOffsetKey = 'bottom'
     offsetData.yOffsetValue = getPercentageInHeight(innerHeight - height - offsetData.yOffsetValue)
   }
-  // 水平/垂直居中 & 展示对应辅助线
+
+  // 水平/垂直居中 & 对应辅助线
   if (Math.abs(targetCenterX - xCenterLine) <= DRAG_TRIGGER_DISTANCE) {
     moveState.isXAxisCenterVisible = true
     offsetData.xOffsetKey = 'left'
@@ -123,7 +124,8 @@ const onDrag = (e: MouseEvent) => {
     moveState.isYAxisCenterVisible = false
     offsetData.yTranslateValue = 0
   }
-  // 画布边界限制 & 展示对应辅助线
+
+  // 画布边界限制 & 对应辅助线
   if (offsetData.xOffsetValue < 0) {
     offsetData.xOffsetValue = 0
     if (offsetData.xOffsetKey === 'left') {
@@ -165,9 +167,20 @@ onMounted(() => {
 watch(isDragMode, (value) => {
   const targetClassList = moveableWrapEl.value.children[0].children[0].classList
   if (value) {
-    targetClassList.add('auxiliary-line')
+    targetClassList.add('element-auxiliary-line', 'element-bg-hover')
   } else {
-    targetClassList.remove('auxiliary-line')
+    targetClassList.remove('element-auxiliary-line', 'element-bg-hover')
   }
 })
 </script>
+
+<style>
+/* 元素辅助线 */
+.element-auxiliary-line {
+  outline: 1px dashed var(--auxiliary-line-element);
+}
+
+.element-bg-hover:hover {
+  background-color: var(--bg-moveable-element) !important;
+}
+</style>

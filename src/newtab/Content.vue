@@ -1,6 +1,7 @@
 <template>
   <WhatsNew />
   <AuxiliaryLine />
+  <RightClickMenu />
   <KeyboardBookmark />
   <DigitalClock />
   <AnalogClock />

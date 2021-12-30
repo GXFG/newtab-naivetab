@@ -154,6 +154,7 @@ document.onkeydown = function(e: KeyboardEvent) {
   }
 }
 
+// 处理hover状态
 const handleContainerEnter = (e: MouseEvent) => {
   if (isDragMode.value) {
     return

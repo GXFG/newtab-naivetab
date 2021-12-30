@@ -2,9 +2,11 @@
   :root {
     --bg-main: #ffffff;
     --text-color-main: #2c3e50;
+    /* moveable */
     --auxiliary-line-main: #40a9ff;
     --auxiliary-line-bound: #ff7875;
     --auxiliary-line-element: #69c0ff;
+    --bg-moveable-element: #747d8c;
     /* setting */
     --bg-bottom-bar: #D1D5DB;
     /* calendar */
@@ -19,9 +21,11 @@
   :root {
     --bg-main: #35363a;
     --text-color-main: #ffffff;
+    /* moveable */
     --auxiliary-line-main: #40a9ff;
     --auxiliary-line-bound: #ff7875;
     --auxiliary-line-element: #69c0ff;
+    --bg-moveable-element: #747d8c;
     /* setting */
     --bg-bottom-bar: #424247;
     /* calendar */
