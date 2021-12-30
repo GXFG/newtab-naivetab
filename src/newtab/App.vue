@@ -11,9 +11,9 @@
 <script setup lang="ts">
 import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import Content from './Content.vue'
-import { gaEvent, THEME_TO_CODE_MAP, globalState, openChangeLogNotify, loadSyncSetting, startTimer, stopTimer, formatNumWithPixl } from '@/logic'
+import { gaEvent, THEME_TO_CODE_MAP, globalState, openWhatsNewModal, loadSyncSetting, startTimer, stopTimer, formatNumWithPixl } from '@/logic'
 
-openChangeLogNotify()
+openWhatsNewModal()
 loadSyncSetting()
 startTimer()
 

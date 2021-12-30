@@ -119,6 +119,7 @@ const onPressItem = (url: string) => {
     return
   }
   openNewPage(url)
+  state.currSelectKey = ''
 }
 
 // 监听键盘按键

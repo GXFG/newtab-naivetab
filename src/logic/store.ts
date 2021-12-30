@@ -228,7 +228,7 @@ watch([
   deep: true,
 })
 
-export const openChangeLogNotify = () => {
+export const openWhatsNewModal = () => {
   const currSettingVersion = +globalState.setting.general.version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
   if (currSettingVersion >= currPkgVersion) {
@@ -236,6 +236,9 @@ export const openChangeLogNotify = () => {
   }
   globalState.setting.general.version = pkg.version
   globalState.state.isWhatsNewModalVisible = true
+}
+export const closeWhatsNewModal = () => {
+  globalState.state.isWhatsNewModalVisible = false
 }
 
 export const openNewPage = (url: string) => {
