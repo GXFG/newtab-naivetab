@@ -82,7 +82,7 @@ export const loadSyncSetting = () => {
   chrome.storage.sync.get(null, ({ PuzzleTabSetting }) => {
     if (!PuzzleTabSetting) {
       log('Notfound settings')
-      uploadFn() // 初始化云端设置数据
+      uploadFn() // 初始化默认设置数据到云端
       return
     }
 

@@ -29,7 +29,6 @@ const onClick = () => {
   }
   window.open(props.content)
 }
-
 </script>
 
 <style scoped>

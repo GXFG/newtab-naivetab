@@ -26,7 +26,14 @@ const targetEl = ref()
 
 const state = reactive({
   isDraging: false,
-  startState: {} as any,
+  startState: {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    clientX: 0,
+    clientY: 0,
+  },
 })
 
 const offsetData = reactive({
@@ -59,16 +66,16 @@ const stopDrag = () => {
   moveState.isBottomVisible = false
   moveState.isLeftVisible = false
   moveState.isRightVisible = false
-  if (offsetData.xOffsetKey.length !== 0) globalState.setting[props.componentName as any].layout.xOffsetKey = offsetData.xOffsetKey
-  if (offsetData.xOffsetValue !== -1) globalState.setting[props.componentName as any].layout.xOffsetValue = offsetData.xOffsetValue
-  if (offsetData.xTranslateValue !== -1) globalState.setting[props.componentName as any].layout.xTranslateValue = offsetData.xTranslateValue
-  if (offsetData.yOffsetKey.length !== 0) globalState.setting[props.componentName as any].layout.yOffsetKey = offsetData.yOffsetKey
-  if (offsetData.yOffsetValue !== -1) globalState.setting[props.componentName as any].layout.yOffsetValue = offsetData.yOffsetValue
-  if (offsetData.yTranslateValue !== -1) globalState.setting[props.componentName as any].layout.yTranslateValue = offsetData.yTranslateValue
+  if (offsetData.xOffsetKey.length !== 0) globalState.setting[props.componentName as TComponents].layout.xOffsetKey = offsetData.xOffsetKey
+  if (offsetData.xOffsetValue !== -1) globalState.setting[props.componentName as TComponents].layout.xOffsetValue = offsetData.xOffsetValue
+  if (offsetData.xTranslateValue !== -1) globalState.setting[props.componentName as TComponents].layout.xTranslateValue = offsetData.xTranslateValue
+  if (offsetData.yOffsetKey.length !== 0) globalState.setting[props.componentName as TComponents].layout.yOffsetKey = offsetData.yOffsetKey
+  if (offsetData.yOffsetValue !== -1) globalState.setting[props.componentName as TComponents].layout.yOffsetValue = offsetData.yOffsetValue
+  if (offsetData.yTranslateValue !== -1) globalState.setting[props.componentName as TComponents].layout.yTranslateValue = offsetData.yTranslateValue
 }
 
-const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(2)
-const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(2)
+const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(3)
+const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(3)
 
 const onDrag = (e: MouseEvent) => {
   if (!state.isDraging) {
@@ -175,7 +182,6 @@ watch(isDragMode, (value) => {
 </script>
 
 <style>
-/* 元素辅助线 */
 .element-auxiliary-line {
   outline: 1px dashed var(--auxiliary-line-element);
 }

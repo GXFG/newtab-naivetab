@@ -1,18 +1,18 @@
 let timer = null as any
-const tasks = {}
+const tasks = new Map()
 
 export const addTimerTask = (key: string, task: () => void) => {
-  tasks[key] = task
+  tasks.set(key, task)
 }
 
 export const removeTimerTask = (key: string) => {
-  delete tasks[key]
+  tasks.delete(key)
 }
 
 export const startTimer = () => {
   timer = setInterval(() => {
-    for (const key of Object.keys(tasks)) {
-      tasks[key]()
+    for (const task of tasks.values()) {
+      task()
     }
   }, 1000)
 }

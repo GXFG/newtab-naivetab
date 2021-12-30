@@ -36,51 +36,6 @@ export const WEATHER_SPEED_UNIT_MAP = {
   kph: 'km/h',
 }
 
-// 废弃-通过设置面板调整屏幕区域配置，被画布模式替换
-export const POSITION_TYPE_TO_STYLE_MAP = {
-  1: [
-    { xOffsetKey: 'left', xOffsetValue: 0 },
-    { yOffsetKey: 'top', yOffsetValue: 0 },
-  ],
-  2: [
-    { xOffsetKey: 'left', xOffsetValue: 50 },
-    { yOffsetKey: 'top', yOffsetValue: 0 },
-    { prop: 'transform', value: 'translate(-50%, 0)' },
-  ],
-  3: [
-    { xOffsetKey: 'right', xOffsetValue: 0 },
-    { yOffsetKey: 'top', yOffsetValue: 0 },
-  ],
-  4: [
-    { xOffsetKey: 'left', xOffsetValue: 0 },
-    { yOffsetKey: 'top', yOffsetValue: 50 },
-    { prop: 'transform', value: 'translate(0, -50%)' },
-  ],
-  5: [
-    { xOffsetKey: 'left', xOffsetValue: 50 },
-    { yOffsetKey: 'top', yOffsetValue: 50 },
-    { prop: 'transform', value: 'translate(-50%, -50%)' },
-  ],
-  6: [
-    { xOffsetKey: 'right', xOffsetValue: 0 },
-    { yOffsetKey: 'top', yOffsetValue: 50 },
-    { prop: 'transform', value: 'translate(0, -50%)' },
-  ],
-  7: [
-    { xOffsetKey: 'left', xOffsetValue: 0 },
-    { yOffsetKey: 'bottom', yOffsetValue: 0 },
-  ],
-  8: [
-    { xOffsetKey: 'left', xOffsetValue: 50 },
-    { yOffsetKey: 'bottom', yOffsetValue: 0 },
-    { prop: 'transform', value: 'translate(-50%, 0)' },
-  ],
-  9: [
-    { xOffsetKey: 'right', xOffsetValue: 0 },
-    { yOffsetKey: 'bottom', yOffsetValue: 0 },
-  ],
-}
-
 /**
  * 1休，2班
  */

@@ -11,5 +11,4 @@
 <script setup lang="ts">
 import { NFormItem, NSelect } from 'naive-ui'
 import { ANALOG_CLOCK_THEME, globalState } from '@/logic'
-
 </script>

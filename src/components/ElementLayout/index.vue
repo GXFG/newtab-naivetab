@@ -5,48 +5,12 @@
     </NFormItem>
 
     <slot></slot>
-
-    <!-- <NDivider title-placement="left">
-      {{ $t('common.layout') }}
-    </NDivider> -->
-
-    <!-- <NFormItem :label="$t('common.position')">
-      <LayoutSelect :field="props.field" />
-      <Tips :content="$t('common.positionTips')" />
-    </NFormItem> -->
-
-    <!-- <NFormItem :label="$t('common.xOffset')">
-      <NSlider v-model:value="globalState.setting[props.field].layout.xOffsetValue" :step="1" :max="50" />
-      <NInputNumber
-        v-model:value="globalState.setting[props.field].layout.xOffsetValue"
-        class="setting__input_number"
-        size="small"
-        :step="1"
-        :min="0"
-        :max="100"
-      />
-      <Tips :content="$t('common.xOffsetTips')" />
-    </NFormItem>
-
-    <NFormItem :label="$t('common.yOffset')">
-      <NSlider v-model:value="globalState.setting[props.field].layout.yOffsetValue" :step="1" :max="50" />
-      <NInputNumber
-        v-model:value="globalState.setting[props.field].layout.yOffsetValue"
-        class="setting__input_number"
-        size="small"
-        :step="1"
-        :min="0"
-        :max="100"
-      />
-      <Tips :content="$t('common.yOffsetTips')" />
-    </NFormItem> -->
   </NForm>
 </template>
 
 <script setup lang="ts">
 import { NForm, NFormItem, NSwitch } from 'naive-ui'
 import { gaEvent, globalState } from '@/logic'
-// import LayoutSelect from './LayoutSelect.vue'
 
 const props = defineProps({
   field: {
@@ -58,7 +22,6 @@ const props = defineProps({
 const onEnabledSwitchUpdate = (value: boolean) => {
   gaEvent(`${props.field}-enabled`, 'click', `${value}`)
 }
-
 </script>
 
 <style>

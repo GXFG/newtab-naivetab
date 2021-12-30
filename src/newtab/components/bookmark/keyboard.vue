@@ -111,9 +111,7 @@ watch(
   () => {
     mergeBookmarkSetting()
   },
-  {
-    deep: true,
-  },
+  { deep: true },
 )
 
 const onPressItem = (url: string) => {

@@ -12,5 +12,4 @@
 <script setup lang="ts">
 import { NFormItem, NInput } from 'naive-ui'
 import { globalState } from '@/logic'
-
 </script>

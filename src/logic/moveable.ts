@@ -59,6 +59,7 @@ const initBodyListener = () => {
   containerEl.value.addEventListener('mouseup', handleBodyMouseup)
   containerEl.value.addEventListener('mouseleave', handleBodyMouseup)
 }
+
 const removeBodyListener = () => {
   containerEl.value = document.querySelector('body')
   containerEl.value.removeEventListener('mousedown', handleBodyMousedown)

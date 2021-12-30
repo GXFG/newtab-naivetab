@@ -82,7 +82,6 @@ const swatches = ['rgba(255, 255, 255, 1)', 'rgba(209, 213, 219, 1)', 'rgba(71,8
 const onFontBlur = (value: any) => {
   gaEvent(`${props.field}-font`, 'blur', `${value.target.value}`)
 }
-
 </script>
 
 <style scoped>
@@ -95,5 +94,4 @@ const onFontBlur = (value: any) => {
     margin-left: 10px;
   }
 }
-
 </style>

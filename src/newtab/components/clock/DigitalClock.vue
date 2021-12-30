@@ -43,7 +43,6 @@ watch(
 )
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 const customUnitFontSize = computed(() => formatNumWithPixl(CNAME, 'unit', 'fontSize'))
 const customLetterSpacing = computed(() => formatNumWithPixl(CNAME, 'letterSpacing'))

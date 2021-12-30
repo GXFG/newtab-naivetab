@@ -5,6 +5,8 @@ import { DAYJS_LANG_MAP } from './const'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
+export const [isSettingDrawerVisible, toggleIsSettingDrawVisible] = useToggle(false)
+
 export const globalState = reactive({
   state: {
     isWhatsNewModalVisible: false,
@@ -211,9 +213,22 @@ export const globalState = reactive({
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
 
-export const [isSettingDrawerVisible, toggleIsSettingDrawVisible] = useToggle(false)
+watch(() => globalState.setting.general.pageTitle, () => {
+  document.title = globalState.setting.general.pageTitle
+}, { immediate: true })
 
-export const changeLogNotify = () => {
+watch([
+  () => globalState.style.general,
+  () => globalState.localState.currThemeCode,
+], () => {
+  document.body.style.setProperty('--bg-main', globalState.style.general.backgroundColor[globalState.localState.currThemeCode])
+  document.body.style.setProperty('--text-color-main', globalState.style.general.fontColor[globalState.localState.currThemeCode])
+}, {
+  immediate: true,
+  deep: true,
+})
+
+export const openChangeLogNotify = () => {
   const currSettingVersion = +globalState.setting.general.version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
   if (currSettingVersion >= currPkgVersion) {
@@ -223,24 +238,12 @@ export const changeLogNotify = () => {
   globalState.state.isWhatsNewModalVisible = true
 }
 
-export const initPageTitle = () => {
-  document.title = globalState.setting.general.pageTitle
+export const openNewPage = (url: string) => {
+  if (url.length === 0) {
+    return
+  }
+  window.open(url)
 }
-
-watch(() => globalState.setting.general.pageTitle, () => {
-  initPageTitle()
-})
-
-watch([
-  () => globalState.style.general,
-  () => globalState.localState.currThemeCode,
-], () => {
-  document.body.style.setProperty('--text-color-main', globalState.style.general.fontColor[globalState.localState.currThemeCode])
-  document.body.style.setProperty('--bg-main', globalState.style.general.backgroundColor[globalState.localState.currThemeCode])
-}, {
-  immediate: true,
-  deep: true,
-})
 
 export const getLayoutStyle = (name: string) => {
   const style = `${globalState.setting[name].layout.xOffsetKey}:${globalState.setting[name].layout.xOffsetValue}vw; ${globalState.setting[name].layout.yOffsetKey}:${globalState.setting[name].layout.yOffsetValue}vh; transform:translate(${globalState.setting[name].layout.xTranslateValue}%, ${globalState.setting[name].layout.yTranslateValue}%);`
@@ -250,11 +253,4 @@ export const getLayoutStyle = (name: string) => {
 export const formatNumWithPixl = (component: TComponents, ...field: any) => {
   const style = field.reduce((r: any, c: string) => r[c], globalState.style[component])
   return `${style}px`
-}
-
-export const openNewPage = (url: string) => {
-  if (url.length === 0) {
-    return
-  }
-  window.open(url)
 }

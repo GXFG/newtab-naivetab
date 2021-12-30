@@ -23,8 +23,6 @@ import Setting from './components/setting/index.vue'
 
 window.$message = useMessage()
 window.$notification = useNotification()
-
 </script>
 
-<style>
-</style>
+<style></style>

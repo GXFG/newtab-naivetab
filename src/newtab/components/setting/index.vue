@@ -17,13 +17,7 @@
       </NButton>
     </div>
     <!-- 抽屉 -->
-    <NDrawer
-      v-model:show="isSettingDrawerVisible"
-      display-directive="show"
-      :style="drawerStyle"
-      :width="570"
-      :placement="globalState.setting.general.drawerPlacement"
-    >
+    <NDrawer v-model:show="isSettingDrawerVisible" display-directive="show" :style="drawerStyle" :width="570" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
@@ -145,7 +139,6 @@ const handlerPreviewLeave = () => {
 
 const CNAME = 'general'
 const containerStyle = ref(getLayoutStyle(CNAME))
-
 const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
 </script>
 

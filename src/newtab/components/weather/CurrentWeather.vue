@@ -72,7 +72,6 @@ const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[globalState.
 const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[globalState.setting.weather.speedUnit])
 
 const customwidth = computed(() => formatNumWithPixl(CNAME, 'iconWidth'))
-
 const customIconSize = computed(() => `${globalState.style.weather.fontSize * 1.4}px`)
 const customLargerFontSize = computed(() => `${globalState.style.weather.fontSize * 3.5}px`)
 const customLargeFontSize = computed(() => `${globalState.style.weather.fontSize * 2}px`)
