@@ -29,23 +29,19 @@ const initTime = () => {
   const h = dayjs().hour()
   const m = dayjs().minute()
   const s = dayjs().second()
-  state.hourDeg = h * 30
+  state.hourDeg = h * 30 + m * 0.5
   state.minuteDeg = m * 6
   state.secondDeg = s * 6
 }
 
 const updateTime = () => {
   const s = dayjs().second()
-  const m = dayjs().minute()
   state.secondDeg += 6
   if (s !== 0) {
     return
   }
   state.minuteDeg += 6
-  if (m !== 0) {
-    return
-  }
-  state.hourDeg += 30
+  state.hourDeg += 0.5
 }
 
 watch(
