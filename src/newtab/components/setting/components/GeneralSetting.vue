@@ -100,9 +100,9 @@ const state = reactive({
 
 const initEnumData = () => {
   state.themeList = [
+    { label: window.$t('common.auto'), value: 'auto' },
     { label: window.$t('common.light'), value: 'light' },
     { label: window.$t('common.dark'), value: 'dark' },
-    { label: window.$t('common.auto'), value: 'auto' },
   ]
   state.drawerPlacementList = [
     { label: window.$t('common.left'), value: 'left' },
