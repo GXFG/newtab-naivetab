@@ -4,5 +4,4 @@
 
 <script setup lang="ts">
 import { globalState } from '@/logic'
-
 </script>

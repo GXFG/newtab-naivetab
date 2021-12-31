@@ -1,61 +1,51 @@
 <template>
   <div id="setting">
-    <!-- 入口 -->
-    <div class="setting__entry" :style="containerStyle">
-      <NButton text :title="`${$t('setting.mainLabel')}`" @click="openSettingModal()">
-        <ic:baseline-settings class="item__icon" />
+    <!-- setting按钮 -->
+    <Moveable componentName="general" @onDrag="(style) => (containerStyle = style)">
+      <div data-cname="general">
+        <div class="general__container" :style="containerStyle">
+          <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
+            <ic:baseline-settings class="item__icon" />
+          </NButton>
+        </div>
+      </div>
+    </Moveable>
+    <!-- drag_confirm按钮 -->
+    <div v-if="isDragMode" class="drag_confirm__container">
+      <NButton text type="primary" @click="toggleIsDragMode()">
+        <mdi:exit-to-app class="item__icon" />
       </NButton>
     </div>
     <!-- 抽屉 -->
-    <NDrawer
-      v-model:show="isSettingDrawerVisible"
-      display-directive="show"
-      :style="drawerStyle"
-      :width="570"
-      :height="500"
-      :placement="globalState.setting.general.drawerPlacement"
-    >
+    <NDrawer v-model:show="isSettingDrawerVisible" display-directive="show" :style="drawerStyle" :width="570" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
         <NTabs type="line">
-          <NTabPane name="tabGeneral" :tab="$t('setting.tabGeneral')">
-            <GeneralSetting />
-          </NTabPane>
-          <NTabPane name="tabBookmark" :tab="$t('setting.tabBookmark')">
-            <BookmarkSetting />
-          </NTabPane>
-          <NTabPane name="tabDigitalClock" :tab="$t('setting.tabDigitalClock')">
-            <ClockDigitalSetting />
-          </NTabPane>
-          <NTabPane name="tabAnalogClock" :tab="$t('setting.tabAnalogClock')">
-            <ClockAnalogSetting />
-          </NTabPane>
-          <NTabPane name="tabDate" :tab="$t('setting.tabDate')">
-            <DateSetting />
-          </NTabPane>
-          <NTabPane name="tabCalendar" :tab="$t('setting.tabCalendar')">
-            <CalendarSetting />
-          </NTabPane>
-          <NTabPane name="tabWeather" :tab="$t('setting.tabWeather')">
-            <WeatherSetting />
+          <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
+            <component :is="item.component" />
           </NTabPane>
         </NTabs>
       </NDrawerContent>
-      <!-- 底部信息 -->
-      <div class="bottom__left">
-        <NButton text class="preview__icon" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
-          <ic:round-preview />
-        </NButton>
-      </div>
-      <p class="bottom__version">
-        {{ `${$t('common.version')}: ${pkg.version}` }}
-      </p>
-      <div class="bottom__right">
-        <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">
-          <ic:round-new-releases />
-        </NButton>
-        <NButton text class="right__icon" title="Github" @click="openNewPage(URL_GITHUB)">
-          <carbon:logo-github />
-        </NButton>
+      <!-- 底部按钮 -->
+      <div class="setting__bottom">
+        <div class="bottom__left">
+          <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
+            <ic:round-preview />&nbsp;{{ $t('common.preview') }}
+          </NButton>
+          <NButton class="left__item" size="small" title="DragMode" @click="openDragMode()">
+            <tabler:drag-drop />&nbsp;{{ $t('common.dragMode') }}
+          </NButton>
+        </div>
+        <p class="bottom__version">
+          {{ `${pkg.version}` }}
+        </p>
+        <div class="bottom__right">
+          <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">
+            <ic:round-new-releases />
+          </NButton>
+          <NButton text class="right__icon" title="Github" @click="openNewPage(URL_GITHUB)">
+            <carbon:logo-github />
+          </NButton>
+        </div>
       </div>
     </NDrawer>
   </div>
@@ -66,16 +56,71 @@ import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
-import ClockDigitalSetting from './components/ClockDigitalSetting.vue'
-import ClockAnalogSetting from './components/ClockAnalogSetting.vue'
+import ClockSetting from './components/ClockSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_CHANGELOG, URL_GITHUB, gaEvent, isSettingDrawerVisible, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
+import { URL_CHANGELOG, URL_GITHUB, gaEvent, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
+
+const tabPaneList: any = shallowRef([])
+
+const initEnumData = () => {
+  tabPaneList.value = [
+    {
+      name: 'tabGeneral',
+      label: window.$t('setting.tabGeneral'),
+      component: GeneralSetting,
+    },
+    {
+      name: 'tabBookmark',
+      label: window.$t('setting.tabBookmark'),
+      component: BookmarkSetting,
+    },
+    {
+      name: 'tabClock',
+      label: window.$t('setting.tabClock'),
+      component: ClockSetting,
+    },
+    {
+      name: 'tabDate',
+      label: window.$t('setting.tabDate'),
+      component: DateSetting,
+    },
+    {
+      name: 'tabCalendar',
+      label: window.$t('setting.tabCalendar'),
+      component: CalendarSetting,
+    },
+    {
+      name: 'tabWeather',
+      label: window.$t('setting.tabWeather'),
+      component: WeatherSetting,
+    },
+  ]
+}
+
+watch(
+  () => globalState.setting.general.lang,
+  () => {
+    initEnumData()
+  },
+  { immediate: true },
+)
 
 const openSettingModal = () => {
+  if (isDragMode.value) {
+    return
+  }
   toggleIsSettingDrawVisible()
   gaEvent('setting-button', 'click', 'open')
+}
+
+const openDragMode = () => {
+  if (isDragMode.value) {
+    return
+  }
+  toggleIsSettingDrawVisible()
+  toggleIsDragMode()
 }
 
 const drawerOpacity = ref(1)
@@ -87,23 +132,27 @@ const handlerPreviewLeave = () => {
 }
 
 const CNAME = 'general'
+const containerStyle = ref(getLayoutStyle(CNAME))
 const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
-const positionStyle = computed(() => getLayoutStyle(CNAME))
-
-const containerStyle = computed(() => {
-  return positionStyle.value
-})
 </script>
 
-<style scoped>
+<style>
 #setting {
-  .setting__entry {
+  .general__container {
     /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
     z-index: 1999;
-    position: fixed;
-    transition: all 0.3s ease;
+    position: absolute;
     .item__icon {
-      font-size: 24px;
+      font-size: 26px;
+    }
+  }
+  .drag_confirm__container {
+    z-index: 1999;
+    position: absolute;
+    top: 3%;
+    right: 2%;
+    .item__icon {
+      font-size: 28px;
     }
   }
 }
@@ -112,11 +161,22 @@ const containerStyle = computed(() => {
   user-select: none;
 }
 
-.n-tab-pane {
+.n-tabs-nav {
+  z-index: 1999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 15px 50px 0 20px;
+  width: 570px;
   user-select: none;
-  padding: 0 15px 0 0 !important;
-  height: 89vh;
+  background-color: var(--n-color);
+}
+.n-tab-pane {
+  margin-top: 43px;
+  padding: 0 15px 20px 0 !important;
+  height: 88vh;
   overflow-y: scroll;
+  user-select: none;
   &::-webkit-scrollbar {
     width: 10px;
   }
@@ -132,27 +192,34 @@ const containerStyle = computed(() => {
   }
 }
 
-.bottom__left {
+.setting__bottom {
   position: absolute;
-  left: 13px;
-  bottom: 3px;
-  .preview__icon {
-    font-size: 26px;
+  left: 0px;
+  bottom: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px 8px 10px;
+  width: 570px;
+  background-color: var(--bg-bottom-bar);
+  .bottom__left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .left__item {
+      margin-right: 10px;
+    }
   }
-}
-.bottom__version {
-  position: absolute;
-  left: 50%;
-  bottom: 10px;
-  transform: translate(-50%, 0);
-}
-.bottom__right {
-  position: absolute;
-  right: 13px;
-  bottom: 3px;
-  .right__icon {
-    margin-left: 10px;
-    font-size: 20px;
+  .bottom__version {
+  }
+  .bottom__right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .right__icon {
+      margin-left: 10px;
+      font-size: 20px;
+    }
   }
 }
 </style>

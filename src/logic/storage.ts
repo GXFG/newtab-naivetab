@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { globalState } from './store'
 import { MERGE_SETTING_DELAY } from './const'
-import { log, downloadByTagA } from './util'
+import { log, downloadJsonByTagA } from './util'
 
 const uploadFn = () => {
   log('Start syncing settings')
@@ -82,7 +82,7 @@ export const loadSyncSetting = () => {
   chrome.storage.sync.get(null, ({ PuzzleTabSetting }) => {
     if (!PuzzleTabSetting) {
       log('Notfound settings')
-      uploadFn() // 初始化云端设置数据
+      uploadFn() // 初始化默认设置数据到云端
       return
     }
 
@@ -121,7 +121,7 @@ export const importSetting = (text: string) => {
 
 export const exportSetting = () => {
   const filename = `puzzletab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
-  downloadByTagA({
+  downloadJsonByTagA({
     style: globalState.style,
     setting: globalState.setting,
   }, filename)

@@ -1,5 +1,5 @@
 <template>
-  <ComponentLayout field="weather">
+  <ElementLayout field="weather">
     <NFormItem :label="$t('weather.forecastEnabled')">
       <NTooltip trigger="hover">
         <template #trigger>
@@ -10,43 +10,28 @@
     </NFormItem>
     <NFormItem :label="$t('weather.city')">
       <NInputGroup>
-        <NAutoComplete
-          v-model:value="state.cityLabel"
-          :loading="state.isSearchLoading"
-          :options="state.cityList"
-          @update:value="onUpdateCity"
-          @select="onSelectCity"
-        ></NAutoComplete>
+        <NAutoComplete v-model:value="state.cityLabel" :loading="state.isSearchLoading" :options="state.cityList" @update:value="onUpdateCity" @select="onSelectCity"></NAutoComplete>
         <!-- <NButton @click="onSearch()">
           <bx:bx-search class="item__icon" />
         </NButton> -->
       </NInputGroup>
     </NFormItem>
     <NFormItem label="AQI">
-      <NSelect
-        v-model:value="globalState.setting.weather.aqi"
-        :options="aqiOptions"
-      ></NSelect>
+      <NSelect v-model:value="globalState.setting.weather.aqi" :options="aqiOptions"></NSelect>
     </NFormItem>
     <NFormItem :label="$t('weather.temperatureUnit')">
-      <NSelect
-        v-model:value="globalState.setting.weather.temperatureUnit"
-        :options="temperatureUnitOptions"
-      ></NSelect>
+      <NSelect v-model:value="globalState.setting.weather.temperatureUnit" :options="temperatureUnitOptions"></NSelect>
     </NFormItem>
     <NFormItem :label="$t('weather.speedUnit')">
-      <NSelect
-        v-model:value="globalState.setting.weather.speedUnit"
-        :options="speedUnitOptions"
-      ></NSelect>
+      <NSelect v-model:value="globalState.setting.weather.speedUnit" :options="speedUnitOptions"></NSelect>
     </NFormItem>
     <NFormItem label="API Key">
       <NInput v-model:value="globalState.setting.weather.apiKey"></NInput>
       <NTooltip trigger="hover" placement="top-end">
         <template #trigger>
-          <div style="margin-left: 10px; padding: 3px 5px; background-color: #fff;border-radius: 2px;">
+          <div style="margin-left: 10px; padding: 3px 5px; background-color: #fff; border-radius: 2px">
             <a href="https://www.weatherapi.com/" title="Free Weather API">
-              <img :src="'/assets/img/weatherapi.png'" alt="Weather data by WeatherAPI.com" border="0">
+              <img :src="'/assets/img/weatherapi.png'" alt="Weather data by WeatherAPI.com" border="0" />
             </a>
           </div>
         </template>
@@ -54,23 +39,17 @@
       </NTooltip>
     </NFormItem>
     <NFormItem :label="$t('common.iconWidth')">
-      <div class="setting__input_wrap">
+      <div class="setting__input-wrap">
         <div class="setting__input_item">
           <NSwitch v-model:value="globalState.setting.weather.iconEnabled" />
         </div>
         <div v-if="globalState.setting.weather.iconEnabled" class="setting__input_item">
           <NSlider v-model:value="globalState.style.weather.iconWidth" class="item__grow" :step="1" :min="30" :max="200" />
-          <NInputNumber
-            v-model:value="globalState.style.weather.iconWidth"
-            class="setting__input_number"
-            :step="1"
-            :min="30"
-            :max="200"
-          ></NInputNumber>
+          <NInputNumber v-model:value="globalState.style.weather.iconWidth" class="setting__input-number" :step="1" :min="30" :max="200" />
         </div>
       </div>
     </NFormItem>
-  </ComponentLayout>
+  </ElementLayout>
 
   <ElementConfig field="weather" />
 </template>
@@ -150,5 +129,4 @@ const onSelectCity = (value: any) => {
   globalState.setting.weather.city.label = state.cityLabel
   globalState.setting.weather.city.value = value
 }
-
 </script>

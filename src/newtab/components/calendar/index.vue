@@ -1,85 +1,81 @@
 <template>
-  <div v-if="globalState.setting.calendar.enabled" id="calendar">
-    <div class="calendar__container" :style="containerStyle">
-      <div class="calendar__options">
-        <div class="options__item">
-          <NSelect
-            v-model:value="state.currYear"
-            class="item__select_year"
-            size="small"
-            :options="state.yearList"
-            @update:value="onDateChange()"
-          ></NSelect>
+  <Moveable componentName="calendar" @onDrag="(style) => (containerStyle = style)">
+    <div v-if="globalState.setting.calendar.enabled" id="calendar" data-cname="calendar">
+      <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
+        <div class="calendar__options">
+          <div class="options__item">
+            <NSelect
+              v-model:value="state.currYear"
+              class="item__select_year"
+              size="small"
+              :options="state.yearList"
+              :disabled="isDragMode"
+              @update:value="onDateChange()"
+            ></NSelect>
+          </div>
+          <div class="options__item">
+            <NButton class="item__btn" text :disabled="isDragMode" @click="onPrevMonth()">
+              <fa-solid:angle-left />
+            </NButton>
+            <NSelect
+              v-model:value="state.currMonth"
+              class="item__select_month"
+              size="small"
+              :options="state.monthsList"
+              :disabled="isDragMode"
+              @update:value="onDateChange()"
+            ></NSelect>
+            <NButton class="item__btn" text :disabled="isDragMode" @click="onNextMonth()">
+              <fa-solid:angle-right />
+            </NButton>
+          </div>
+          <div class="options__item">
+            <NButton class="item__btn" text :disabled="isDragMode" @click="onReset()">
+              <si-glyph:arrow-backward />
+            </NButton>
+          </div>
         </div>
-        <div class="options__item">
-          <NButton class="item__btn" text @click="onPrevMonth()">
-            <fa-solid:angle-left />
-          </NButton>
-          <NSelect
-            v-model:value="state.currMonth"
-            class="item__select_month"
-            size="small"
-            :options="state.monthsList"
-            @update:value="onDateChange()"
-          ></NSelect>
-          <NButton class="item__btn" text @click="onNextMonth()">
-            <fa-solid:angle-right />
-          </NButton>
-        </div>
-        <div class="options__item">
-          <NButton class="item__btn" text @click="onReset()">
-            <si-glyph:arrow-backward />
-          </NButton>
-        </div>
-      </div>
-      <!-- header -->
-      <ul class="calendar__header">
-        <li
-          v-for="item in state.weekList"
-          :key="item.value"
-          class="header__item"
-          :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
-        >
-          {{ item.label }}
-        </li>
-      </ul>
-      <!-- body -->
-      <ul class="calendar__body">
-        <li
-          v-for="item in state.dateList"
-          :key="item.date"
-          class="body__item"
-          :class="{
-            'body__item--active': item.isToday,
-            'body__item--blur': item.isNotCurrMonth,
-            'body__item--weekend': item.isWeekend,
-            'body__item--rest': item.type === 1,
-            'body__item--work': item.type === 2,
-          }"
-        >
-          <span
-            v-if="item.type"
-            class="item__label"
+        <!-- header -->
+        <ul class="calendar__header">
+          <li v-for="item in state.weekList" :key="item.value" class="header__item" :class="{ 'header__item--weekend': [6, 7].includes(item.value) }">
+            {{ item.label }}
+          </li>
+        </ul>
+        <!-- body -->
+        <ul class="calendar__body">
+          <li
+            v-for="item in state.dateList"
+            :key="item.date"
+            class="body__item"
             :class="{
-              'item__label--rest': item.type === 1,
-              'item__label--work': item.type === 2,
+              'body__item--active': item.isToday,
+              'body__item--blur': item.isNotCurrMonth,
+              'body__item--weekend': item.isWeekend,
+              'body__item--rest': item.type === 1,
+              'body__item--work': item.type === 2,
             }"
-          >{{ state.holidayTypeToDesc[item.type as 1 | 2] }}</span>
-          <span class="item__day">{{ item.day }}</span>
-          <span
-            class="item__desc"
-            :class="{ 'item__desc--highlight': item.isFestival }"
-          >{{ item.desc }}</span>
-        </li>
-      </ul>
+          >
+            <span
+              v-if="item.type"
+              class="item__label"
+              :class="{
+                'item__label--rest': item.type === 1,
+                'item__label--work': item.type === 2,
+              }"
+            >{{ state.holidayTypeToDesc[item.type as 1 | 2] }}</span>
+            <span class="item__day">{{ item.day }}</span>
+            <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
+  </Moveable>
 </template>
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
-import { gaEvent, globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { gaEvent, isDragMode, globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, formatNumWithPixl } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
 const CNAME = 'calendar'
@@ -135,11 +131,13 @@ const initEnumData = () => {
   }
 }
 
-initEnumData()
-
-watch(() => globalState.setting.general.lang, () => {
-  initEnumData()
-})
+watch(
+  () => globalState.setting.general.lang,
+  () => {
+    initEnumData()
+  },
+  { immediate: true },
+)
 
 /**
  * type: 1start, 2main, 3end
@@ -189,8 +187,12 @@ const onRender = () => {
     genDateList(1, dateEL)
   }
 
-  const currMonthLastDate = dayjs(`${state.currYear}-${state.currMonth + 1}-01`).subtract(1, 'day').format('YYYY-MM-DD')
-  const currMonthLastDay = dayjs(`${state.currYear}-${state.currMonth + 1}-01`).subtract(1, 'day').get('date')
+  const currMonthLastDate = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
+    .subtract(1, 'day')
+    .format('YYYY-MM-DD')
+  const currMonthLastDay = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
+    .subtract(1, 'day')
+    .get('date')
   let currMonthLastWeek = dayjs(currMonthLastDate).day()
   currMonthLastWeek = currMonthLastWeek === 0 ? 7 : currMonthLastWeek
   // add main
@@ -249,24 +251,10 @@ const onReset = () => {
   gaEvent('calendar-reset', 'click', '')
 }
 
-const positionStyle = computed(() => getLayoutStyle(CNAME))
-
-const containerStyle = computed(() => {
-  let style = ''
-  if (globalState.style.calendar.isBorderEnabled) {
-    style += `outline: 1px solid ${globalState.style.calendar.borderColor[globalState.localState.currThemeCode]};`
-  }
-  if (globalState.style.calendar.isShadowEnabled) {
-    style += `box-shadow: ${globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]} 0px 2px 4px 0px,
-      ${globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]} 0px 2px 16px 0px;`
-  }
-  return style + positionStyle.value
-})
-
+const containerStyle = ref(getLayoutStyle(CNAME))
 const customContainerWidth = computed(() => `${globalState.style.calendar.width * 7.4}px`)
 const customItemWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-
 </script>
 
 <style scoped>
@@ -275,13 +263,12 @@ const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
   font-size: v-bind(customFontSize);
   font-family: v-bind(globalState.style.calendar.fontFamily);
   .calendar__container {
-    position: fixed;
+    position: absolute;
     width: v-bind(customContainerWidth);
     background-color: v-bind(globalState.style.calendar.backgroundColor[globalState.localState.currThemeCode]);
     text-align: center;
     user-select: none;
     border-radius: 5px;
-    transition: all 0.3s ease;
     overflow: hidden;
     .calendar__options {
       padding: 1.5%;
@@ -346,7 +333,8 @@ const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
         &:hover {
           border: 1px solid v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);
         }
-        .item__day {}
+        .item__day {
+        }
         .item__desc {
           color: var(--text-color-main);
           font-size: 12px;
@@ -389,6 +377,12 @@ const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
         opacity: 0.4;
       }
     }
+  }
+  .calendar__container-border {
+    outline: 1px solid v-bind(globalState.style.calendar.borderColor[globalState.localState.currThemeCode]);
+  }
+  .calendar__container-shadow {
+    box-shadow: v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 4px 0px, v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 16px 0px;
   }
 }
 </style>

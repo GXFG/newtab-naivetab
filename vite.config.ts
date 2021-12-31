@@ -112,6 +112,7 @@ export default defineConfig(({ command }) => ({
         newtab: r('src/newtab/index.html'),
       },
     },
+    chunkSizeWarningLimit: 1000,
   },
   plugins: [
     ...sharedConfig.plugins!,

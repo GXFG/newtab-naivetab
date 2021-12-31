@@ -1,20 +1,16 @@
 <template>
-  <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock">
-    <div class="analog__container" :style="containerStyle">
-      <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
-        <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"></div>
-        <div class="base hour" :style="`transform: rotateZ(${state.hourDeg}deg);`">
-          <img :src="`/assets/img/clock/${currTheme}/hour.png`" />
-        </div>
-        <div class="base minute" :style="`transform: rotateZ(${state.minuteDeg}deg);`">
-          <img :src="`/assets/img/clock/${currTheme}/minute.png`" />
-        </div>
-        <div class="base second" :style="`transform: rotateZ(${state.secondDeg}deg);`">
-          <img :src="`/assets/img/clock/${currTheme}/second.png`" />
-        </div>
-      </article>
+  <Moveable componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
+    <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock" data-cname="clockAnalog">
+      <div class="clockAnalog__container" :style="containerStyle">
+        <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
+          <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"></div>
+          <div class="base hour" :style="`transform: rotateZ(${state.hourDeg}deg);background-image: url(/assets/img/clock/${currTheme}/hour.png)`"></div>
+          <div class="base minute" :style="`transform: rotateZ(${state.minuteDeg}deg);background-image: url(/assets/img/clock/${currTheme}/minute.png)`"></div>
+          <div class="base second" :style="`transform: rotateZ(${state.secondDeg}deg);background-image: url(/assets/img/clock/${currTheme}/second.png)`"></div>
+        </article>
+      </div>
     </div>
-  </div>
+  </Moveable>
 </template>
 
 <script setup lang="ts">
@@ -33,48 +29,37 @@ const initTime = () => {
   const h = dayjs().hour()
   const m = dayjs().minute()
   const s = dayjs().second()
-  state.hourDeg = h * 30
+  state.hourDeg = h * 30 + m * 0.5
   state.minuteDeg = m * 6
   state.secondDeg = s * 6
 }
 
 const updateTime = () => {
   const s = dayjs().second()
-  const m = dayjs().minute()
   state.secondDeg += 6
   if (s !== 0) {
     return
   }
   state.minuteDeg += 6
-  if (m !== 0) {
-    return
-  }
-  state.hourDeg += 30
-  // if (s === 0) {
-  //   state.minuteDeg += 6
-  //   if (m === 0) {
-  //     state.hourDeg += 30
-  //   }
-  // }
+  state.hourDeg += 0.5
 }
 
-watch(() => globalState.setting.clockAnalog.enabled, (value) => {
-  if (value) {
-    initTime()
-    addTimerTask(CNAME, updateTime)
-  } else {
-    removeTimerTask(CNAME)
-  }
-}, { immediate: true })
+watch(
+  () => globalState.setting.clockAnalog.enabled,
+  (value) => {
+    if (value) {
+      initTime()
+      addTimerTask(CNAME, updateTime)
+    } else {
+      removeTimerTask(CNAME)
+    }
+  },
+  { immediate: true },
+)
 
-const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'dark')
+const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'light')
 
-const positionStyle = computed(() => getLayoutStyle(CNAME))
-
-const containerStyle = computed(() => {
-  return positionStyle.value
-})
-
+const containerStyle = ref(getLayoutStyle(CNAME))
 const customWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 </script>
 
@@ -82,10 +67,9 @@ const customWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 /* https://cssanimation.rocks/clocks/ */
 #analog-clock {
   user-select: none;
-  .analog__container {
-    position: fixed;
+  .clockAnalog__container {
+    position: absolute;
     text-align: center;
-    transition: all 0.3s ease;
     .clock {
       position: relative;
       height: v-bind(customWidth);

@@ -5,7 +5,9 @@
         <ph:question-bold class="btn__icon" />
       </NButton>
     </template>
-    {{ `${link ? $t('common.linkTips') + '\n ' : ''}${props.content}` }}
+    <p class="tips-content">
+      {{ `${link ? $t('common.linkTips') + '\n ' : ''}${props.content}` }}
+    </p>
   </NTooltip>
 </template>
 
@@ -29,10 +31,12 @@ const onClick = () => {
   }
   window.open(props.content)
 }
-
 </script>
 
 <style scoped>
+.tips-content {
+  white-space: pre-line;
+}
 .tips__btn {
   margin-left: 8px;
   .btn__icon {

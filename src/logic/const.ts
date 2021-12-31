@@ -1,15 +1,19 @@
 export const URL_CHANGELOG = 'https://github.com/cmd-cv/newtab-puzzletab/blob/main/CHANGELOG.md'
 export const URL_GITHUB = 'https://github.com/cmd-cv/newtab-puzzletab'
+export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
 
 export const KEYBOARD_KEY = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
 export const KEY_OF_INDEX = { q: 0, w: 1, e: 2, r: 3, t: 4, y: 5, u: 6, i: 7, o: 8, p: 9, a: 10, s: 11, d: 12, f: 13, g: 14, h: 15, j: 16, k: 17, l: 18, z: 19, x: 20, c: 21, v: 22, b: 23, n: 24, m: 25 }
 
 export const MERGE_SETTING_DELAY = 2000
 
+export const DRAG_TRIGGER_DISTANCE = 10
+
 export const THEME_TO_CODE_MAP = {
   light: 0,
   dark: 1,
 }
+
 export const ANALOG_CLOCK_THEME = [
   { label: 'light', value: 0 },
   { label: 'dark', value: 1 },
@@ -24,7 +28,6 @@ export const WEATHER_LANG_MAP = {
   'zh-CN': 'zh',
   'en-US': '',
 }
-
 export const WEATHER_TEMPERATURE_UNIT_MAP = {
   c: '℃',
   f: '℉',
@@ -32,50 +35,6 @@ export const WEATHER_TEMPERATURE_UNIT_MAP = {
 export const WEATHER_SPEED_UNIT_MAP = {
   mph: 'mph',
   kph: 'km/h',
-}
-
-export const POSITION_TYPE_TO_STYLE_MAP = {
-  1: [
-    { prop: 'left', value: 0 },
-    { prop: 'top', value: 0 },
-  ],
-  2: [
-    { prop: 'left', value: 50 },
-    { prop: 'top', value: 0 },
-    { prop: 'transform', value: 'translate(-50%, 0)' },
-  ],
-  3: [
-    { prop: 'right', value: 0 },
-    { prop: 'top', value: 0 },
-  ],
-  4: [
-    { prop: 'left', value: 0 },
-    { prop: 'top', value: 50 },
-    { prop: 'transform', value: 'translate(0, -50%)' },
-  ],
-  5: [
-    { prop: 'left', value: 50 },
-    { prop: 'top', value: 50 },
-    { prop: 'transform', value: 'translate(-50%, -50%)' },
-  ],
-  6: [
-    { prop: 'right', value: 0 },
-    { prop: 'top', value: 50 },
-    { prop: 'transform', value: 'translate(0, -50%)' },
-  ],
-  7: [
-    { prop: 'left', value: 0 },
-    { prop: 'bottom', value: 0 },
-  ],
-  8: [
-    { prop: 'left', value: 50 },
-    { prop: 'bottom', value: 0 },
-    { prop: 'transform', value: 'translate(-50%, 0)' },
-  ],
-  9: [
-    { prop: 'right', value: 0 },
-    { prop: 'bottom', value: 0 },
-  ],
 }
 
 /**

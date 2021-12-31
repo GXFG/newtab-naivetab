@@ -1,10 +1,12 @@
 <template>
-  <div v-if="globalState.setting.date.enabled" id="weather">
-    <div class="weather__container" :style="containerStyle">
-      <CurrentWeather />
-      <ForecastWeather />
+  <Moveable componentName="weather" @onDrag="(style) => (containerStyle = style)">
+    <div v-if="globalState.setting.weather.enabled" id="weather" data-cname="weather">
+      <div class="weather__container" :style="containerStyle">
+        <CurrentWeather />
+        <ForecastWeather />
+      </div>
     </div>
-  </div>
+  </Moveable>
 </template>
 
 <script setup lang="ts">
@@ -54,7 +56,7 @@ const updateData = () => {
     return
   }
   const currTS = dayjs().unix()
-  if (globalState.setting.weather.forecastEnabled && (currTS - globalState.localState.weather.syncTime > 3600000 * 4)) {
+  if (globalState.setting.weather.forecastEnabled && currTS - globalState.localState.weather.syncTime > 3600000 * 4) {
     getForecastData()
     return
   }
@@ -69,23 +71,25 @@ onMounted(() => {
 })
 
 // 修改城市后立即更新数据
-watch(() => globalState.setting.weather.city.value, () => {
-  getForecastData()
-})
+watch(
+  () => globalState.setting.weather.city.value,
+  () => {
+    getForecastData()
+  },
+)
 
 // 开启“预报”后立即更新数据
-watch(() => globalState.setting.weather.forecastEnabled, (value) => {
-  if (!value) {
-    return
-  }
-  getForecastData()
-})
+watch(
+  () => globalState.setting.weather.forecastEnabled,
+  (value) => {
+    if (!value) {
+      return
+    }
+    getForecastData()
+  },
+)
 
-const positionStyle = computed(() => getLayoutStyle(CNAME))
-
-const containerStyle = computed(() => {
-  return positionStyle.value
-})
+const containerStyle = ref(getLayoutStyle(CNAME))
 
 const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
 </script>
@@ -96,9 +100,8 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
   color: v-bind(globalState.style.weather.fontColor[globalState.localState.currThemeCode]);
   user-select: none;
   .weather__container {
-    position: fixed;
+    position: absolute;
     text-align: center;
-    transition: all 0.3s ease;
     font-size: v-bind(customFontSize);
   }
 }
