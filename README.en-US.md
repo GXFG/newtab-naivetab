@@ -26,10 +26,12 @@ A clean browser with newtab page extensions
 
 | Description | Preview |
 | ---- | ---- |
-| The components currently included are shown in the figure | <img width="1316" alt="iShot2021-12-09 10 05 44" src="https://user-images.githubusercontent.com/20944987/145321177-1faadf9e-584f-4e96-8426-a831344107bd.png"> |
-| Click on the gear icon on the right, or right-click menu to expand the detailed settings drawer, which contains specific configuration items for 'General' and 'Each Components' | <img width="1286" alt="iShot2021-12-03 10 02 41" src="https://user-images.githubusercontent.com/20944987/144532371-31859838-f075-4652-8670-d20ab2286ce3.png"> |
-| Each component contains configuration items for 'Style', You can modify the font, color... | <img width="1286" alt="iShot2021-12-03 10 03 38" src="https://user-images.githubusercontent.com/20944987/144532407-01345f5b-b4e4-4b23-bbb7-1bff766be35c.png"> |
-| Supports automatic /manual theme mode switching | <img width="1316" alt="iShot2021-12-09 10 05 37" src="https://user-images.githubusercontent.com/20944987/145321339-126fdf8c-145a-458e-9e61-1486ceac41ab.png"> |
+| Overview | <img width="1280" alt="iShot2021-12-31 21 44 21" src="https://user-images.githubusercontent.com/20944987/147826447-76b01988-c5ad-4952-b449-26cb05df832f.png"> |
+| Click on the gear icon on the right, or right-click menu to expand the detailed settings drawer, which contains specific configuration items for 'General' and 'Each Components' | <img width="1280" alt="iShot2021-12-31 21 44 27" src="https://user-images.githubusercontent.com/20944987/147826477-f3c115d1-c511-4af3-854f-01411d4dff7a.png"> |
+| Each component contains configuration items for 'Style', You can modify the font, color... | <img width="1280" alt="iShot2021-12-31 21 44 53" src="https://user-images.githubusercontent.com/20944987/147826497-f3ff5b35-051b-440c-b736-807fc4c8e82d.png"> |
+| Each component can be placed anywhere on the screen via dragMode | <img width="1280" alt="iShot2021-12-31 21 44 44" src="https://user-images.githubusercontent.com/20944987/147826572-40698af1-2461-41bc-b377-c0e2473b08ac.png"> |
+| Support Bing, local pictures for background image settings | <img width="1280" alt="iShot2021-12-31 21 45 24" src="https://user-images.githubusercontent.com/20944987/147826598-75de69cd-5cd7-4c66-afcc-b551f027b3f3.png"> |
+| Supports automatic /manual theme mode switching | <img width="1280" alt="iShot2021-12-31 21 45 09" src="https://user-images.githubusercontent.com/20944987/147826515-422299e3-74c0-452b-8656-30f49eee985d.png"> |
 
 ## 🛠️Install
 
