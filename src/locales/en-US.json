@@ -34,12 +34,17 @@
     "fontSize": "Font size",
     "letterSpacing": "Letter spacing",
     "fontColor": "Font color",
-    "backgroundColor": "Background",
+    "backgroundColor": "BG color",
+    "backgroundImage": "BG image",
+    "source": "Source",
+    "blur": "Blur",
     "activeColor": "Active color",
     "shadowColor": "Shadow color",
     "borderColor": "Border color",
     "opacity": "Opacity",
-    "site": "Site",
+    "drawerSite": "Drawer Site",
+    "local": "Local",
+    "bing": "Bing",
     "margin": "Margin",
     "width": "Width",
     "iconWidth": "Icon width",
@@ -48,8 +53,13 @@
     "linkTips": "Click on ? icon to access the link below",
     "whatsNew": "What's New",
     "preview": "Preview",
+    "switch": "Switch",
+    "save": "Save",
     "setting": "Setting",
     "dragMode": "Drag Mode"
+  },
+  "prompts": {
+    "imageTooLarge": "Image too large"
   },
   "setting": {
     "tabGeneral": "General",
@@ -66,19 +76,19 @@
     "globalStyle": "Global style",
     "generalLabel": "General",
     "pageTitle": "Page title",
-    "settingDividerDrawer": "Drawer",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your Google account",
     "importSettingsLabel": "Import setting",
-    "importSettingsValue": "Select File",
+    "importSettingsValue": "Import",
     "importSettingsTips":"Import settings from a local file. If you encounter problems, please click the export configuration below to compare and merge the differences with the local files currently to be imported, and finally re import",
     "exportSettingLabel": "Export setting",
     "exportSettingValue": "Export",
     "exportSettingTips": "It is recommended that you export your app settings regularly to prevent the loss of important data",
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
-    "language": "Language"
+    "language": "Language",
+    "localBackgroundTips": "Local file will not be synchronized"
   },
   "clock": {
     "apMark": "a.p./p.m."

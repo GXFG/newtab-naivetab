@@ -1,14 +1,14 @@
 <template>
   <ElementLayout field="bookmark">
     <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
-      <div class="setting__input_wrap">
+      <div class="setting__input-wrap">
         <div class="setting__input_item">
           <NSwitch v-model:value="globalState.setting.bookmark.isDblclickOpen" />
           <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
         </div>
         <div v-if="globalState.setting.bookmark.isDblclickOpen" class="setting__input_item">
-          <span class="setting__input_label">{{ $t('bookmark.intervalTime') }}</span>
-          <NInputNumber v-model:value="globalState.setting.bookmark.dblclickIntervalTime" class="setting__input_number--unit" :min="0" :step="1">
+          <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
+          <NInputNumber v-model:value="globalState.setting.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
             <template #suffix>
               ms
             </template>

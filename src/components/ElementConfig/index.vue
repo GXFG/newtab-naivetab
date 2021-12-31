@@ -6,12 +6,12 @@
 
     <NFormItem v-if="globalState.style[props.field].margin" :label="$t('common.margin')">
       <NSlider v-model:value="globalState.style[props.field].margin" :step="1" :min="1" :max="100" />
-      <NInputNumber v-model:value="globalState.style[props.field].margin" class="setting__input_number" :step="1" :min="1" :max="100"></NInputNumber>
+      <NInputNumber v-model:value="globalState.style[props.field].margin" class="setting__input-number" :step="1" :min="1" :max="100" />
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].width" :label="$t('common.width')">
       <NSlider v-model:value="globalState.style[props.field].width" :step="1" :min="45" :max="200" />
-      <NInputNumber v-model:value="globalState.style[props.field].width" class="setting__input_number" :step="1" :min="45" :max="200"></NInputNumber>
+      <NInputNumber v-model:value="globalState.style[props.field].width" class="setting__input-number" :step="1" :min="45" :max="200" />
     </NFormItem>
 
     <NFormItem v-if="'fontFamily' in globalState.style[props.field]" :label="$t('common.font')">
@@ -20,12 +20,12 @@
 
     <NFormItem v-if="globalState.style[props.field].fontSize" :label="$t('common.fontSize')">
       <NSlider v-model:value="globalState.style[props.field].fontSize" :step="1" :min="12" :max="200" />
-      <NInputNumber v-model:value="globalState.style[props.field].fontSize" class="setting__input_number" :min="12" :step="1"></NInputNumber>
+      <NInputNumber v-model:value="globalState.style[props.field].fontSize" class="setting__input-number" :min="12" :step="1" />
     </NFormItem>
 
     <NFormItem v-if="globalState.style[props.field].letterSpacing" :label="$t('common.letterSpacing')">
       <NSlider v-model:value="globalState.style[props.field].letterSpacing" :step="1" :max="200" />
-      <NInputNumber v-model:value="globalState.style[props.field].letterSpacing" class="setting__input_number" :step="1"></NInputNumber>
+      <NInputNumber v-model:value="globalState.style[props.field].letterSpacing" class="setting__input-number" :step="1" />
     </NFormItem>
 
     <!-- color -->
@@ -60,6 +60,8 @@
         <NColorPicker v-if="globalState.style[props.field].isShadowEnabled" v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]" show-preview :swatches="swatches" />
       </div>
     </NFormItem>
+
+    <slot></slot>
   </NForm>
 </template>
 

@@ -39,13 +39,13 @@
       </NTooltip>
     </NFormItem>
     <NFormItem :label="$t('common.iconWidth')">
-      <div class="setting__input_wrap">
+      <div class="setting__input-wrap">
         <div class="setting__input_item">
           <NSwitch v-model:value="globalState.setting.weather.iconEnabled" />
         </div>
         <div v-if="globalState.setting.weather.iconEnabled" class="setting__input_item">
           <NSlider v-model:value="globalState.style.weather.iconWidth" class="item__grow" :step="1" :min="30" :max="200" />
-          <NInputNumber v-model:value="globalState.style.weather.iconWidth" class="setting__input_number" :step="1" :min="30" :max="200"></NInputNumber>
+          <NInputNumber v-model:value="globalState.style.weather.iconWidth" class="setting__input-number" :step="1" :min="30" :max="200" />
         </div>
       </div>
     </NFormItem>

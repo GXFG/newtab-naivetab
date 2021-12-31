@@ -54,11 +54,6 @@ setTimeout(() => {
   margin-top: 20px;
   .footer__btn {
     margin: 0 10px;
-    .icon__wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
   }
 }
 </style>

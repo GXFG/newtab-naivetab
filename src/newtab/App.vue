@@ -71,11 +71,17 @@ const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
   font-family: v-bind(globalState.style.general.fontFamily);
 }
 
+.icon__wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .setting__row-element {
   margin-left: 10px;
 }
 
-.setting__input_wrap {
+.setting__input-wrap {
   flex: 1;
   display: flex;
   justify-content: space-between;
@@ -90,17 +96,13 @@ const customFontSize = computed(() => formatNumWithPixl('general', 'fontSize'))
   }
 }
 
-.setting__input_label {
-  margin-left: 10px;
-}
-
-.setting__input_number {
+.setting__input-number {
   flex: 0 0 auto;
   margin-left: 10px;
   width: 110px;
 }
 
-.setting__input_number--unit {
+.setting__input-number--unit {
   flex: 0 0 auto;
   margin-left: 10px;
   width: 150px;

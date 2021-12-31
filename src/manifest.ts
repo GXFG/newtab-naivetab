@@ -25,6 +25,7 @@ export async function getManifest() {
     permissions: [
       'storage',
       'chrome://favicon/',
+      'https://cn.bing.com/',
       'https://api.weatherapi.com/',
     ],
     chrome_url_overrides: {

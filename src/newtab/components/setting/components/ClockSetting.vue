@@ -29,7 +29,7 @@
         :min="12"
         :max="200"
       />
-      <NInputNumber v-if="globalState.setting.clockDigital.unitEnabled" v-model:value="globalState.style.clockDigital.unit.fontSize" class="setting__input_number" :min="12" :step="1"></NInputNumber>
+      <NInputNumber v-if="globalState.setting.clockDigital.unitEnabled" v-model:value="globalState.style.clockDigital.unit.fontSize" class="setting__input-number" :min="12" :step="1" />
     </NFormItem>
   </ElementLayout>
 
