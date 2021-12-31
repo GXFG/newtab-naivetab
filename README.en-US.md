@@ -12,6 +12,7 @@ A clean browser with newtab page extensions
 - Components can be placed anywhere (drag mode)
 - Components can customize most styles (fonts, colors, size, and more)
 - Supports automatic theme switching based on system appearance (light, dark)
+- Support custom background image (Bing, local image)
 - Sync your data across multiple devices (requires login to Google account)
 - Supports data export for self-backup
 - Language support (zh-CN, en-US)
