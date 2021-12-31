@@ -2,7 +2,7 @@
   <ElementLayout field="date">
     <NFormItem :label="$t('common.format')">
       <NInput v-model:value="globalState.setting.date.format"></NInput>
-      <Tips link :content="'https://dayjs.fenxianglu.cn/category/parse.html#%E5%AD%97%E7%AC%A6%E4%B8%B2'" />
+      <Tips link :content="URL_DAYJS_FORMAT" />
     </NFormItem>
   </ElementLayout>
 
@@ -11,5 +11,5 @@
 
 <script setup lang="ts">
 import { NFormItem, NInput } from 'naive-ui'
-import { globalState } from '@/logic'
+import { URL_DAYJS_FORMAT, globalState } from '@/logic'
 </script>

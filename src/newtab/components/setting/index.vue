@@ -56,8 +56,7 @@ import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
-import ClockDigitalSetting from './components/ClockDigitalSetting.vue'
-import ClockAnalogSetting from './components/ClockAnalogSetting.vue'
+import ClockSetting from './components/ClockSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
@@ -78,14 +77,9 @@ const initEnumData = () => {
       component: BookmarkSetting,
     },
     {
-      name: 'tabDigitalClock',
-      label: window.$t('setting.tabDigitalClock'),
-      component: ClockDigitalSetting,
-    },
-    {
-      name: 'tabAnalogClock',
-      label: window.$t('setting.tabAnalogClock'),
-      component: ClockAnalogSetting,
+      name: 'tabClock',
+      label: window.$t('setting.tabClock'),
+      component: ClockSetting,
     },
     {
       name: 'tabDate',
@@ -179,7 +173,7 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
 }
 .n-tab-pane {
   margin-top: 43px;
-  padding: 0 15px 30px 0 !important;
+  padding: 0 15px 20px 0 !important;
   height: 88vh;
   overflow-y: scroll;
   user-select: none;

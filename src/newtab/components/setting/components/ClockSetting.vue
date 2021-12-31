@@ -1,10 +1,24 @@
 <template>
+  <NDivider style="margin-bottom:0;">
+    {{ $t('setting.tabAnalogClock') }}
+  </NDivider>
+
+  <ElementLayout field="clockAnalog">
+    <NFormItem :label="$t('common.theme')">
+      <NSelect v-model:value="globalState.setting.clockAnalog.theme" :options="ANALOG_CLOCK_THEME"></NSelect>
+    </NFormItem>
+  </ElementLayout>
+  <ElementConfig field="clockAnalog" />
+
+  <NDivider style="margin-bottom:0;">
+    {{ $t('setting.tabDigitalClock') }}
+  </NDivider>
+
   <ElementLayout field="clockDigital">
     <NFormItem :label="$t('common.format')">
       <NInput v-model:value="globalState.setting.clockDigital.format"></NInput>
-      <Tips link :content="'https://dayjs.fenxianglu.cn/category/parse.html#%E5%AD%97%E7%AC%A6%E4%B8%B2'" />
+      <Tips link :content="URL_DAYJS_FORMAT" />
     </NFormItem>
-
     <NFormItem :label="$t('clock.apMark')">
       <NSwitch v-model:value="globalState.setting.clockDigital.unitEnabled" />
       <NSlider
@@ -23,6 +37,6 @@
 </template>
 
 <script setup lang="ts">
-import { NFormItem, NSwitch, NSlider, NInput, NInputNumber } from 'naive-ui'
-import { globalState } from '@/logic'
+import { NDivider, NFormItem, NSelect, NInput, NInputNumber, NSwitch, NSlider } from 'naive-ui'
+import { ANALOG_CLOCK_THEME, URL_DAYJS_FORMAT, globalState } from '@/logic'
 </script>
