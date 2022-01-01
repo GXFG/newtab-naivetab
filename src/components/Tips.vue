@@ -1,5 +1,5 @@
 <template>
-  <NTooltip triger="hover" placement="top-end">
+  <NTooltip triger="hover">
     <template #trigger>
       <NButton text class="tips__btn" @click="onClick()">
         <ph:question-bold class="btn__icon" />
