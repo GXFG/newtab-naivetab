@@ -2,6 +2,7 @@
   :root {
     --bg-main: #ffffff;
     --text-color-main: #2c3e50;
+    --border-main: #40a9ff;
     /* moveable */
     --auxiliary-line-main: #40a9ff;
     --auxiliary-line-bound: #ff7875;
@@ -21,6 +22,7 @@
   :root {
     --bg-main: #35363a;
     --text-color-main: #ffffff;
+    --border-main: #40a9ff;
     /* moveable */
     --auxiliary-line-main: #40a9ff;
     --auxiliary-line-bound: #ff7875;

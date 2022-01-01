@@ -54,7 +54,9 @@
     "whatsNew": "What's New",
     "preview": "Preview",
     "switch": "Switch",
+    "refresh": "Refresh",
     "save": "Save",
+    "current": "Current",
     "setting": "Setting",
     "dragMode": "Drag Mode"
   },
@@ -88,6 +90,8 @@
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
     "language": "Language",
+    "saveCurrendImage": "SaveCurrendImage",
+    "filename": "Filename",
     "localBackgroundTips": "Local file will not be synchronized"
   },
   "clock": {

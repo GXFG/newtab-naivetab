@@ -37,7 +37,7 @@
     "backgroundColor": "背景颜色",
     "backgroundImage": "背景图",
     "source": "来源",
-    "blur": "模糊",
+    "blur": "模糊度",
     "activeColor": "激活颜色",
     "shadowColor": "阴影颜色",
     "borderColor": "边框颜色",
@@ -54,7 +54,9 @@
     "whatsNew": "更新内容",
     "preview": "预览",
     "switch": "切换",
+    "refresh": "刷新",
     "save": "保存",
+    "current": "当前",
     "setting": "设置",
     "dragMode": "画布模式"
   },
@@ -88,6 +90,8 @@
     "resetSettingLabel": "重置设置",
     "resetSettingValue": "重置",
     "language": "语言",
+    "saveCurrendImage": "保存当前图片",
+    "filename": "文件名",
     "localBackgroundTips": "本地图片不会进行同步"
   },
   "clock": {

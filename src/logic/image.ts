@@ -8,47 +8,63 @@ export const imageState = ref(useLocalStorage('images', {
   syncDate: 0,
   dayOffsetNum: 0,
   currImageIndex: 0,
+  localBackgroundFileName: '',
   localBackgroundBase64: '',
 }, { listenToStorageChanges: true }))
 
-const getImageUrl = (url: string) => `http://cn.bing.com/${url}`
+export const currBackgroundImageId = computed(() => {
+  const tempList = globalState.style.general.backgroundImageUrl.split('?')
+  const tempParamList = tempList[1].split('=')
+  const currId = tempParamList[1].slice(0, -8)
+  return currId
+})
 
-/**
- *  idx=0 表示是显示当天的时间，1表示昨天...，支持查看历史 15 天以内的图片
- */
+// size: UHD, 1920x1080, 1366x768
+export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http://cn.bing.com/${url}_${size}.jpg`
+
+export const isImageListLoading = ref(false)
+
 const getBingImages = async() => {
-  const data: any = await http({
-    method: 'get',
-    url: 'https://cn.bing.com/HPImageArchive.aspx',
-    params: {
-      format: 'js',
-      idx: imageState.value.dayOffsetNum,
-      n: 10,
-    },
-  })
-  imageState.value.syncDate = dayjs().date()
-  imageState.value.imageList = data.images
-  imageState.value.currImageIndex = 0
-  globalState.style.general.backgroundImageUrl = getImageUrl(imageState.value.imageList[0].url)
+  try {
+    isImageListLoading.value = true
+    const data: any = await http({
+      method: 'get',
+      url: 'https://cn.bing.com/HPImageArchive.aspx',
+      params: {
+        format: 'js',
+        idx: 0, // idx=0 表示是显示当天的时间，1表示昨天...，支持查看历史 15 天以内的图片
+        n: 8, // 1-8 返回请求数量，目前最多一次获取8张
+      },
+    })
+    isImageListLoading.value = false
+    imageState.value.syncDate = dayjs().date()
+    imageState.value.imageList = data.images
+  } catch (e) {
+    isImageListLoading.value = false
+  }
 }
 
 const renderBackgroundImage = async(clearStyle = false) => {
   await nextTick()
-  const appEl: any = document.querySelector('#background')
+  const backgroundEl: any = document.querySelector('#background')
   if (clearStyle) {
-    appEl.style = ''
+    backgroundEl.style = ''
     return
   }
-  const currUrl = globalState.style.general.backgroundImageSource === 0 ? imageState.value.localBackgroundBase64 : globalState.style.general.backgroundImageUrl
+  const urlbase = imageState.value.imageList[imageState.value.currImageIndex].urlbase
+  const httpUrl = getImageUrlFromBing(urlbase)
+  const currUrl = globalState.style.general.backgroundImageSource === 0 ? imageState.value.localBackgroundBase64 : httpUrl
+  globalState.style.general.backgroundImageUrl = httpUrl
   let style = `background-image: url(${currUrl});`
   style += 'background-size: cover;background-repeat: no-repeat;'
   style += `opacity: ${globalState.style.general.bgOpacity};`
   style += `filter: blur(${globalState.style.general.bgBlur}px);`
-  appEl.style = style
+  backgroundEl.style = style
 }
 
 watch([
   () => globalState.style.general.backgroundImageSource,
+  () => imageState.value.currImageIndex,
   () => imageState.value.localBackgroundBase64,
   () => globalState.style.general.backgroundImageUrl,
   () => globalState.style.general.bgOpacity,
@@ -57,22 +73,13 @@ watch([
   renderBackgroundImage()
 })
 
-watch(() => globalState.style.general.isBackgroundImageEnabled, (value) => {
-  renderBackgroundImage(!value)
-  if (!value || imageState.value.syncDate === dayjs().date()) {
-    return
+watch(() => globalState.style.general.isBackgroundImageEnabled, async(value) => {
+  if (imageState.value.imageList.length === 0) {
+    await getBingImages()
   }
-  imageState.value.dayOffsetNum = 0
-  getBingImages()
+  renderBackgroundImage(!value)
 }, { immediate: true })
 
-export const onSwitchImage = () => {
-  if (imageState.value.currImageIndex >= imageState.value.imageList.length - 1) {
-    imageState.value.dayOffsetNum += 1
-    getBingImages()
-    return
-  }
-  imageState.value.currImageIndex += 1
-  const url = imageState.value.imageList[imageState.value.currImageIndex].url
-  globalState.style.general.backgroundImageUrl = getImageUrl(url)
+export const onRefreshImageList = () => {
+  getBingImages()
 }

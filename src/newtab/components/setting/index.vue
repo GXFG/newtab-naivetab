@@ -17,7 +17,7 @@
       </NButton>
     </div>
     <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingDrawerVisible" display-directive="show" :style="drawerStyle" :width="570" :placement="globalState.setting.general.drawerPlacement">
+    <NDrawer v-model:show="isSettingDrawerVisible" display-directive="show" :style="drawerStyle" :width="600" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
         <NTabs type="line">
           <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
@@ -167,7 +167,7 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
   top: 0;
   left: 0;
   padding: 15px 50px 0 20px;
-  width: 570px;
+  width: 600px;
   user-select: none;
   background-color: var(--n-color);
 }
@@ -200,7 +200,7 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
   justify-content: space-between;
   align-items: center;
   padding: 8px 10px 8px 10px;
-  width: 570px;
+  width: 600px;
   background-color: var(--bg-bottom-bar);
   .bottom__left {
     display: flex;

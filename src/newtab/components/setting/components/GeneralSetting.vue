@@ -22,28 +22,45 @@
     <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
       <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="state.backgroundImageSourceList" class="setting__row-element" style="width: 110px" />
       <div class="setting__row-element">
-        <template v-if="globalState.style.general.backgroundImageSource === 1">
-          <NButton @click="onSwitchImage()">
-            <icon-park-outline:refresh-one />&nbsp;{{ $t('common.switch') }}
+        <template v-if="globalState.style.general.backgroundImageSource === 0">
+          <NButton @click="onSelectBackgroundImage">
+            <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
           </NButton>
+          <Tips :content="$t('general.localBackgroundTips')" />
+        </template>
+        <template v-else-if="globalState.style.general.backgroundImageSource === 1">
           <NButton class="setting__row-element" @click="onSaveImage()">
-            <ion:save-outline />&nbsp;{{ $t('common.save') }}
+            <ion:save-outline />&nbsp;{{ $t('general.saveCurrendImage') }}
+          </NButton>
+          <NButton :loading="isImageListLoading" @click="onRefreshImageList()">
+            <template #icon>
+              <div class="icon__wrap">
+                <fontisto:spinner-refresh style="font-size: 14px" />
+              </div>
+            </template>
+            {{ $t('common.refresh') }}
           </NButton>
         </template>
-        <NButton v-else-if="globalState.style.general.backgroundImageSource === 0" @click="onSelectBackgroundImage">
-          {{ $t('general.importSettingsValue') }}
-        </NButton>
       </div>
-      <Tips v-if="globalState.style.general.backgroundImageSource === 0" :content="$t('general.localBackgroundTips')" />
       <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange" />
+    </NFormItem>
+    <NFormItem v-if="globalState.style.general.backgroundImageSource === 0" :label="$t('general.filename')">
+      <p>{{ imageState.localBackgroundFileName }}</p>
+    </NFormItem>
+    <NFormItem v-else-if="globalState.style.general.backgroundImageSource === 1" label=" ">
+      <div class="setting__image-wrap">
+        <div v-for="(item, index) in imageState.imageList" :key="item.url" class="image__item" :class="{ 'image__item--active': currBackgroundImageId === item.urlbase.slice(7) }" @click="onSelectImage(index)">
+          <img :src="getImageUrlFromBing(item.url, '1366x768')" alt="" />
+        </div>
+      </div>
     </NFormItem>
     <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.blur')">
       <NSlider v-model:value="globalState.style.general.bgBlur" :step="0.1" :min="0" :max="200" />
       <NInputNumber v-model:value="globalState.style.general.bgBlur" class="setting__input-number" :step="0.1" :min="0" :max="200" />
     </NFormItem>
     <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
-      <NSlider v-model:value="globalState.style.general.bgOpacity" :step="0.1" :min="0" :max="1" />
-      <NInputNumber v-model:value="globalState.style.general.bgOpacity" class="setting__input-number" :step="0.1" :min="0" :max="1" />
+      <NSlider v-model:value="globalState.style.general.bgOpacity" :step="0.01" :min="0" :max="1" />
+      <NInputNumber v-model:value="globalState.style.general.bgOpacity" class="setting__input-number" :step="0.01" :min="0" :max="1" />
     </NFormItem>
 
     <!-- setting -->
@@ -83,7 +100,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NDivider, NFormItem, NButton, NSelect, NInput, NInputNumber, NSlider, NSwitch, NPopconfirm } from 'naive-ui'
-import { gaEvent, importSetting, exportSetting, resetSetting, globalState, imageState, onSwitchImage, downloadUrlByTagA } from '@/logic'
+import { gaEvent, importSetting, exportSetting, resetSetting, globalState, imageState, currBackgroundImageId, getImageUrlFromBing, isImageListLoading, onRefreshImageList, downloadUrlByTagA } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -147,12 +164,15 @@ const onBackgroundImageFileChange = (e: any) => {
   reader.onload = () => {
     const res: any = reader.result // base64
     imageState.value.localBackgroundBase64 = res
+    imageState.value.localBackgroundFileName = file.name
   }
   gaEvent('setting-background-image', 'click', 'select-file')
 }
-
 const onSaveImage = () => {
-  downloadUrlByTagA(globalState.style.general.backgroundImageUrl, `${Date.now()}`)
+  window.open(globalState.style.general.backgroundImageUrl)
+}
+const onSelectImage = (index: number) => {
+  imageState.value.currImageIndex = index
 }
 
 const syncTime = computed(() => {
@@ -188,3 +208,19 @@ const onResetSetting = () => {
   gaEvent('setting-reset', 'click', 'open')
 }
 </script>
+
+<style scoped>
+.setting__image-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  .image__item {
+    margin: 1%;
+    width: 30%;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+.image__item--active {
+  outline: 2px solid var(--border-main);
+}
+</style>

@@ -52,11 +52,11 @@ export const globalState = reactive({
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
       backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
-      isBackgroundImageEnabled: false,
+      isBackgroundImageEnabled: true,
       backgroundImageSource: 1, // 0:localFile, 1:bing
       backgroundImageUrl: '',
       bgOpacity: 1,
-      bgBlur: 0,
+      bgBlur: 10,
     },
     bookmark: {
       margin: 4,
@@ -98,7 +98,7 @@ export const globalState = reactive({
       fontFamily: '',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-      backgroundColor: ['rgba(209, 213, 219, 0.35)', 'rgba(58, 58, 58, 0.35)'],
+      backgroundColor: ['rgba(209, 213, 219, 0.75)', 'rgba(58, 58, 58, 0.75)'],
       activeColor: ['rgba(209, 213, 219, 1)', 'rgba(113, 113, 113, 1)'],
       isBorderEnabled: true,
       borderColor: ['rgba(71,85,105, 1)', 'rgba(82, 82, 82, 1)'],
