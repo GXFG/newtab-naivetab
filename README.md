@@ -30,7 +30,8 @@
 
 ## 🛠️安装
 
-- **Chrome webstore** 地址：[PuzzleTab](https://chrome.google.com/webstore/detail/puzzletab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem/related)
+- **Chrome**: [PuzzleTab](https://chrome.google.com/webstore/detail/puzzletab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem/related)
+- **Edge**: 通过上方地址安装
 
 ## 📜更新日志
 

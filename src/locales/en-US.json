@@ -78,7 +78,7 @@
     "pageTitle": "Page title",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
-    "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your Google account",
+    "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",
     "importSettingsLabel": "Import setting",
     "importSettingsValue": "Import",
     "importSettingsTips":"Import settings from a local file. If you encounter problems, please click the export configuration below to compare and merge the differences with the local files currently to be imported, and finally re import",

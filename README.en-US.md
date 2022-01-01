@@ -13,7 +13,7 @@ A clean browser with newtab page extensions
 - Components can customize most styles (fonts, colors, size, and more)
 - Supports automatic theme switching based on system appearance (light, dark)
 - Support custom background image (Bing, local image)
-- Sync your data across multiple devices (requires login to Google account)
+- Sync your data across multiple devices (requires login to account)
 - Supports data export for self-backup
 - Language support (zh-CN, en-US)
 
@@ -30,7 +30,8 @@ A clean browser with newtab page extensions
 
 ## 🛠️Install
 
-- **Chrome webstore** url: [PuzzleTab](https://chrome.google.com/webstore/detail/puzzletab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem/related)
+- **Chrome** url: [PuzzleTab](https://chrome.google.com/webstore/detail/puzzletab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem/related)
+- **Edge**: Install via the address above.
 
 ## 📜Changelog
 

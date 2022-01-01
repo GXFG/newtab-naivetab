@@ -36,7 +36,7 @@
           </NButton>
         </div>
         <p class="bottom__version">
-          {{ `${pkg.version}` }}
+          Ver.{{ `${pkg.version}` }}
         </p>
         <div class="bottom__right">
           <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">

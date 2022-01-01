@@ -2,7 +2,7 @@
   "name": "newtab-puzzletab",
   "displayName": "PuzzleTab - New Tab",
   "version": "0.4.0",
-  "description": "",
+  "description": "一款简洁的浏览器新标签页扩展",
   "private": true,
   "scripts": {
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:*",
