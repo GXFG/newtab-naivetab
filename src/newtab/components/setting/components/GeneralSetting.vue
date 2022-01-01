@@ -105,6 +105,7 @@
 import dayjs from 'dayjs'
 import { NDivider, NFormItem, NButton, NSelect, NInput, NInputNumber, NSlider, NSwitch, NPopconfirm } from 'naive-ui'
 import { gaEvent, importSetting, exportSetting, resetSetting, globalState, imageState, currBackgroundImageId, getImageUrlFromBing, isImageListLoading, onRefreshImageList } from '@/logic'
+import { getStyleConst } from '@/styles/index'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -211,6 +212,8 @@ const onResetSetting = () => {
   resetSetting()
   gaEvent('setting-reset', 'click', 'open')
 }
+
+const borderMain = computed(() => getStyleConst('borderMain', globalState.localState.currThemeCode))
 </script>
 
 <style scoped>
@@ -225,6 +228,6 @@ const onResetSetting = () => {
   }
 }
 .image__item--active {
-  outline: 2px solid var(--border-main);
+  outline: 2px solid v-bind(borderMain);
 }
 </style>

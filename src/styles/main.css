@@ -2,20 +2,6 @@
   :root {
     --bg-main: #ffffff;
     --text-color-main: #2c3e50;
-    --border-main: #40a9ff;
-    /* moveable */
-    --auxiliary-line-main: #40a9ff;
-    --auxiliary-line-bound: #ff7875;
-    --auxiliary-line-element: #69c0ff;
-    --bg-moveable-element-main: rgba(100,181,246, 0.5);
-    --bg-moveable-element-active: rgba(100,181,246, 0.5);
-    /* setting */
-    --bg-bottom-bar: #eceff1;
-    /* calendar */
-    --text-color-red: #fa5252;
-    --bg-calendar-rest: rgba(255, 110, 110, 0.4);
-    --bg-calendar-work: rgba(122, 122, 122, 0.5);
-    --bg-calendar-label-work: rgba(122, 122, 122, 0.6);
   }
 }
 
@@ -23,20 +9,6 @@
   :root {
     --bg-main: #35363a;
     --text-color-main: #ffffff;
-    --border-main: #40a9ff;
-    /* moveable */
-    --auxiliary-line-main: #40a9ff;
-    --auxiliary-line-bound: #ff7875;
-    --auxiliary-line-element: #69c0ff;
-    --bg-moveable-element-main: rgba(100,181,246, 0.5);
-    --bg-moveable-element-active: rgba(100,181,246, 0.5);
-    /* setting */
-    --bg-bottom-bar: #424247;
-    /* calendar */
-    --text-color-red: #fa5252;
-    --bg-calendar-rest: rgba(255, 110, 110, 0.4);
-    --bg-calendar-work: rgba(122, 122, 122, 0.5);
-    --bg-calendar-label-work: rgba(122, 122, 122, 0.6);
   }
 }
 

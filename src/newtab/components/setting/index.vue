@@ -26,7 +26,7 @@
         </NTabs>
       </NDrawerContent>
       <!-- 底部按钮 -->
-      <div class="setting__bottom">
+      <div class="setting__bottom" :style="`background-color: ${bgBottomBar};`">
         <div class="bottom__left">
           <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
             <ic:round-preview />&nbsp;{{ $t('common.preview') }}
@@ -61,6 +61,7 @@ import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
+import { getStyleConst } from '@/styles/index'
 
 const tabPaneList: any = shallowRef([])
 
@@ -138,6 +139,7 @@ const handlerPreviewLeave = () => {
 const CNAME = 'general'
 const containerStyle = ref(getLayoutStyle(CNAME))
 const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
+const bgBottomBar = computed(() => getStyleConst('bgBottomBar', globalState.localState.currThemeCode))
 </script>
 
 <style>
@@ -205,7 +207,6 @@ const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOp
   align-items: center;
   padding: 8px 10px 8px 10px;
   width: 600px;
-  background-color: var(--bg-bottom-bar);
   .bottom__left {
     display: flex;
     justify-content: center;

@@ -8,14 +8,18 @@
 </template>
 
 <script setup lang="ts">
-import { moveState } from '@/logic'
+import { moveState, globalState } from '@/logic'
+import { getStyleConst } from '@/styles/index'
+
+const auxiliaryLineMain = computed(() => getStyleConst('auxiliaryLineMain', globalState.localState.currThemeCode))
+const auxiliaryLineBound = computed(() => getStyleConst('auxiliaryLineBound', globalState.localState.currThemeCode))
 </script>
 
 <style>
 /* 画布中心辅助线 */
 .axis {
   z-index: 99;
-  background-color: var(--auxiliary-line-main);
+  background-color: v-bind(auxiliaryLineMain);
   transition: all 1s ease;
 }
 .xaxis__center {
@@ -36,7 +40,7 @@ import { moveState } from '@/logic'
 /* 画布边界辅助线 */
 .bound {
   z-index: 99;
-  background-color: var(--auxiliary-line-bound);
+  background-color: v-bind(auxiliaryLineBound);
   transition: all 1s ease;
 }
 .bound__top {

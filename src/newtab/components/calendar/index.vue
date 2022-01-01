@@ -77,6 +77,7 @@ import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
 import { gaEvent, isDragMode, globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, formatNumWithPixl } from '@/logic'
 import { calendar } from '@/lib/calendar'
+import { getStyleConst } from '@/styles/index'
 
 const CNAME = 'calendar'
 
@@ -255,6 +256,10 @@ const containerStyle = ref(getLayoutStyle(CNAME))
 const customContainerWidth = computed(() => `${globalState.style.calendar.width * 7.4}px`)
 const customItemWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
 const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
+const textColorRed = computed(() => getStyleConst('textColorRed', globalState.localState.currThemeCode))
+const bgCalendarRest = computed(() => getStyleConst('bgCalendarRest', globalState.localState.currThemeCode))
+const bgCalendarWork = computed(() => getStyleConst('bgCalendarWork', globalState.localState.currThemeCode))
+const bgCalendarLabelWork = computed(() => getStyleConst('bgCalendarLabelWork', globalState.localState.currThemeCode))
 </script>
 
 <style scoped>
@@ -308,7 +313,7 @@ const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
         text-align: center;
       }
       .header__item--weekend {
-        color: var(--text-color-red);
+        color: v-bind(textColorRed);
       }
     }
     .calendar__body {
@@ -336,39 +341,39 @@ const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
         .item__day {
         }
         .item__desc {
-          color: var(--text-color-main);
+          color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]);
           font-size: 12px;
           transform: scale(0.8);
         }
         .item__desc--highlight {
-          color: var(--text-color-red);
+          color: v-bind(textColorRed);
         }
         .item__label {
           position: absolute;
           top: -7%;
           left: -7%;
           padding: 7%;
-          color: var(--text-color-main);
+          color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]);
           font-size: 13px;
           transform: scale(0.7);
         }
         .item__label--work {
-          background-color: var(--bg-calendar-label-work);
+          background-color: v-bind(bgCalendarLabelWork);
         }
         .item__label--rest {
-          background-color: var(--text-color-red);
+          background-color: v-bind(textColorRed);
         }
       }
       .body__item--work {
-        color: var(--text-color-red) !important;
-        background-color: var(--bg-calendar-work);
+        color: v-bind(textColorRed) !important;
+        background-color: v-bind(bgCalendarWork);
       }
       .body__item--rest {
-        color: var(--text-color-main) !important;
-        background-color: var(--bg-calendar-rest);
+        color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]) !important;
+        background-color: v-bind(bgCalendarRest);
       }
       .body__item--weekend {
-        color: var(--text-color-red);
+        color: v-bind(textColorRed);
       }
       .body__item--active {
         background-color: v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);

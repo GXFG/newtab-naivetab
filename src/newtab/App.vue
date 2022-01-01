@@ -28,7 +28,10 @@ const osTheme = useOsTheme() // light | dark | null
 const currTheme = ref()
 
 watch(
-  () => [osTheme.value, globalState.setting.general.theme],
+  [
+    () => osTheme.value,
+    () => globalState.setting.general.theme,
+  ],
   () => {
     if (globalState.setting.general.theme === 'auto') {
       globalState.localState.currThemeCode = THEME_TO_CODE_MAP[osTheme.value as any]

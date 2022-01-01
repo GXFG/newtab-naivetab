@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { DRAG_TRIGGER_DISTANCE, globalState, moveState, isDragMode, currDragComponentName } from '@/logic'
+import { getStyleConst } from '@/styles/index'
 
 const props = defineProps({
   componentName: {
@@ -190,18 +191,23 @@ watch(isDragMode, (value) => {
     targetClassList.remove('element-auxiliary-line', 'element-bg-hover', 'element-active')
   }
 })
+
+const auxiliaryLineElement = computed(() => getStyleConst('auxiliaryLineElement', globalState.localState.currThemeCode))
+const bgMoveableElementMain = computed(() => getStyleConst('bgMoveableElementMain', globalState.localState.currThemeCode))
+const bgMoveableElementActive = computed(() => getStyleConst('bgMoveableElementActive', globalState.localState.currThemeCode))
+
 </script>
 
 <style>
 .element-auxiliary-line {
-  outline: 1px dashed var(--auxiliary-line-element);
+  outline: 1px dashed v-bind(auxiliaryLineElement);
 }
 
 .element-bg-hover:hover {
-  background-color: var(--bg-moveable-element-main) !important;
+  background-color: v-bind(bgMoveableElementMain) !important;
 }
 
 .element-active {
-  background-color: var(--bg-moveable-element-active) !important;
+  background-color: v-bind(bgMoveableElementActive) !important;
 }
 </style>
