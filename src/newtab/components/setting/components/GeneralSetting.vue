@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NDivider, NFormItem, NButton, NSelect, NInput, NInputNumber, NSlider, NSwitch, NPopconfirm } from 'naive-ui'
-import { gaEvent, importSetting, exportSetting, resetSetting, globalState, imageState, currBackgroundImageId, getImageUrlFromBing, isImageListLoading, onRefreshImageList, downloadUrlByTagA } from '@/logic'
+import { gaEvent, importSetting, exportSetting, resetSetting, globalState, imageState, currBackgroundImageId, getImageUrlFromBing, isImageListLoading, onRefreshImageList } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()

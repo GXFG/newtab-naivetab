@@ -29,7 +29,7 @@
       <NInput v-model:value="globalState.setting.weather.apiKey"></NInput>
       <NTooltip trigger="hover" placement="top-end">
         <template #trigger>
-          <div style="margin-left: 10px; padding: 3px 5px; background-color: #fff; border-radius: 2px">
+          <div style="margin-left: 10px; padding: 0 10px; background-color: #fff; border-radius: 2px">
             <a href="https://www.weatherapi.com/" title="Free Weather API">
               <img :src="'/assets/img/weatherapi.png'" alt="Weather data by WeatherAPI.com" border="0" />
             </a>
@@ -38,7 +38,7 @@
         Weather data by WeatherAPI.com
       </NTooltip>
     </NFormItem>
-    <NFormItem :label="$t('common.iconWidth')">
+    <NFormItem :label="$t('common.icon')">
       <div class="setting__input-wrap">
         <div class="setting__input_item">
           <NSwitch v-model:value="globalState.setting.weather.iconEnabled" />

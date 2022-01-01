@@ -7,7 +7,7 @@
     --auxiliary-line-main: #40a9ff;
     --auxiliary-line-bound: #ff7875;
     --auxiliary-line-element: #69c0ff;
-    --bg-moveable-element: #747d8c;
+    --bg-moveable-element: rgba(100,181,246, 0.5);
     /* setting */
     --bg-bottom-bar: #eceff1;
     /* calendar */
@@ -27,7 +27,7 @@
     --auxiliary-line-main: #40a9ff;
     --auxiliary-line-bound: #ff7875;
     --auxiliary-line-element: #69c0ff;
-    --bg-moveable-element: #747d8c;
+    --bg-moveable-element: rgba(100,181,246, 0.5);
     /* setting */
     --bg-bottom-bar: #424247;
     /* calendar */
