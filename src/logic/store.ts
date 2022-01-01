@@ -5,6 +5,7 @@ import { DAYJS_LANG_MAP } from './const'
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const [isSettingDrawerVisible, toggleIsSettingDrawVisible] = useToggle(false)
+export const currSettingTabValue = ref('general')
 
 export const globalState = reactive({
   state: {
@@ -128,6 +129,7 @@ export const globalState = reactive({
       pageTitle: 'NewTab',
       lang: defaultLang,
       drawerPlacement: 'right' as any,
+      isSetttingIconEnabled: true,
     }, { listenToStorageChanges: true }),
     bookmark: useLocalStorage('bookmark', {
       enabled: true,

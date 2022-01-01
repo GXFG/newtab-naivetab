@@ -1,6 +1,6 @@
 <template>
   <NDivider style="margin-bottom:0;">
-    {{ $t('setting.tabAnalogClock') }}
+    {{ $t('setting.clockAnalog') }}
   </NDivider>
 
   <ElementLayout field="clockAnalog">
@@ -11,7 +11,7 @@
   <ElementConfig field="clockAnalog" />
 
   <NDivider style="margin-bottom:0;">
-    {{ $t('setting.tabDigitalClock') }}
+    {{ $t('setting.clockDigital') }}
   </NDivider>
 
   <ElementLayout field="clockDigital">

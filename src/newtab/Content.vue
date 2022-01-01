@@ -1,7 +1,7 @@
 <template>
   <WhatsNew />
   <BackgroundImg />
-  <AuxiliaryLine />
+  <MoveableAuxiliaryLine />
   <RightClickMenu />
   <KeyboardBookmark />
   <DigitalClock />

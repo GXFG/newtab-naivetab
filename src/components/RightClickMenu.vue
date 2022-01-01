@@ -12,45 +12,20 @@
 </template>
 
 <script setup lang="ts">
-import { globalState, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible } from '@/logic'
+import { globalState, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, currSettingTabValue, getComponentNameFromEvent } from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
   posX: 0,
   posY: 0,
   menuList: [] as any,
+  currComponentName: '',
 })
-
-const menuActionMap = {
-  setting: () => toggleIsSettingDrawVisible(),
-  dragMode: () => toggleIsDragMode(),
-}
-
-const onSelectMenu = (key: string) => {
-  state.isMenuVisible = false
-  const action = menuActionMap[key]
-  action && action()
-}
-
-const onCloseMenu = () => {
-  state.isMenuVisible = false
-}
-
-const handleContextMenu = async(e: MouseEvent) => {
-  e.preventDefault()
-  state.isMenuVisible = false
-  await nextTick()
-  state.posX = e.clientX
-  state.posY = e.clientY
-  state.isMenuVisible = true
-}
-
-document.oncontextmenu = handleContextMenu
 
 const initEnumData = () => {
   state.menuList = [
     {
-      label: window.$t('common.setting'),
+      label: (state.currComponentName.length === 0 ? '' : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
       key: 'setting',
       disabled: isDragMode,
     },
@@ -72,4 +47,42 @@ watch(
   },
   { immediate: true },
 )
+
+const menuActionMap = {
+  setting: () => {
+    let tabName = state.currComponentName
+    if (tabName.includes('clock')) {
+      tabName = 'clock'
+    }
+    if (tabName.length !== 0) {
+      currSettingTabValue.value = tabName
+    }
+    toggleIsSettingDrawVisible()
+  },
+  dragMode: () => toggleIsDragMode(),
+}
+
+const onSelectMenu = (key: string) => {
+  state.isMenuVisible = false
+  const action = menuActionMap[key]
+  action && action()
+}
+
+const onCloseMenu = () => {
+  state.isMenuVisible = false
+}
+
+const handleContextMenu = async(e: MouseEvent) => {
+  e.preventDefault()
+  state.isMenuVisible = false
+  state.posX = e.clientX
+  state.posY = e.clientY
+  const componentName = getComponentNameFromEvent(e)
+  state.currComponentName = componentName
+  initEnumData()
+  await nextTick()
+  state.isMenuVisible = true
+}
+
+document.oncontextmenu = handleContextMenu
 </script>

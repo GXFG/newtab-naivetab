@@ -1,7 +1,7 @@
 <template>
   <div id="setting">
     <!-- setting按钮 -->
-    <Moveable componentName="general" @onDrag="(style) => (containerStyle = style)">
+    <Moveable v-if="globalState.setting.general.isSetttingIconEnabled" componentName="general" @onDrag="(style) => (containerStyle = style)">
       <div data-cname="general">
         <div class="general__container" :style="containerStyle">
           <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
@@ -19,7 +19,7 @@
     <!-- 抽屉 -->
     <NDrawer v-model:show="isSettingDrawerVisible" display-directive="show" :style="drawerStyle" :width="600" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
-        <NTabs type="line">
+        <NTabs type="line" :value="currSettingTabValue" @update:value="onTabsChange">
           <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
             <component :is="item.component" />
           </NTabPane>
@@ -60,40 +60,40 @@ import ClockSetting from './components/ClockSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_CHANGELOG, URL_GITHUB, gaEvent, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
+import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
 
 const tabPaneList: any = shallowRef([])
 
 const initEnumData = () => {
   tabPaneList.value = [
     {
-      name: 'tabGeneral',
-      label: window.$t('setting.tabGeneral'),
+      name: 'general',
+      label: window.$t('setting.general'),
       component: GeneralSetting,
     },
     {
-      name: 'tabBookmark',
-      label: window.$t('setting.tabBookmark'),
+      name: 'bookmark',
+      label: window.$t('setting.bookmark'),
       component: BookmarkSetting,
     },
     {
-      name: 'tabClock',
-      label: window.$t('setting.tabClock'),
+      name: 'clock',
+      label: window.$t('setting.clock'),
       component: ClockSetting,
     },
     {
-      name: 'tabDate',
-      label: window.$t('setting.tabDate'),
+      name: 'date',
+      label: window.$t('setting.date'),
       component: DateSetting,
     },
     {
-      name: 'tabCalendar',
-      label: window.$t('setting.tabCalendar'),
+      name: 'calendar',
+      label: window.$t('setting.calendar'),
       component: CalendarSetting,
     },
     {
-      name: 'tabWeather',
-      label: window.$t('setting.tabWeather'),
+      name: 'weather',
+      label: window.$t('setting.weather'),
       component: WeatherSetting,
     },
   ]
@@ -106,6 +106,10 @@ watch(
   },
   { immediate: true },
 )
+
+const onTabsChange = (tabName: string) => {
+  currSettingTabValue.value = tabName
+}
 
 const openSettingModal = () => {
   if (isDragMode.value) {

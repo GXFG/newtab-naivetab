@@ -64,20 +64,22 @@
     "imageTooLarge": "Image too large"
   },
   "setting": {
-    "tabGeneral": "General",
+    "general": "General",
     "mainLabel": "Setting",
-    "tabBookmark": "Bookmark",
-    "tabClock": "Clock",
-    "tabDigitalClock": "DigitalClock",
-    "tabAnalogClock": "AnalogClock",
-    "tabDate": "Date",
-    "tabCalendar": "Calendar",
-    "tabWeather": "Weather"
+    "bookmark": "Bookmark",
+    "clock": "Clock",
+    "clockDigital": "DigitalClock",
+    "clockAnalog": "AnalogClock",
+    "date": "Date",
+    "calendar": "Calendar",
+    "weather": "Weather"
   },
   "general": {
     "globalStyle": "Global style",
     "generalLabel": "General",
     "pageTitle": "Page title",
+    "setttingIcon": "SetttingIcon",
+    "setttingIconTips": "Whether to display the setting icon, after closing, you can open the setting drawer with the right-click menu",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",

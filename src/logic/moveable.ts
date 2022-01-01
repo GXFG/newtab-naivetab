@@ -16,12 +16,9 @@ export const moveState = reactive({
 
 const containerEl = ref()
 
-let currDragComponentName = ''
+export const currDragComponentName = ref()
 
-const handleBodyMousedown = (e: MouseEvent) => {
-  if (!isDragMode.value) {
-    return
-  }
+export const getComponentNameFromEvent = (e: MouseEvent): string => {
   let target: any = e.target
   try {
     while (!target.getAttribute('data-cname')) {
@@ -29,18 +26,29 @@ const handleBodyMousedown = (e: MouseEvent) => {
     }
   } catch (e) { }
   if (!(target.getAttribute && target.getAttribute('data-cname'))) {
-    return
+    return ''
   }
   const componentName: TComponents = target.getAttribute('data-cname')
-  currDragComponentName = componentName
+  return componentName
+}
+
+const handleBodyMousedown = (e: MouseEvent) => {
+  if (!isDragMode.value) {
+    return
+  }
+  const componentName = getComponentNameFromEvent(e)
+  if (componentName.length === 0) {
+    return
+  }
+  currDragComponentName.value = componentName
   moveState.MouseDownTaskMap.get(componentName)(e)
 }
 
 const handleBodyMouseup = () => {
-  if (!isDragMode.value || !currDragComponentName) {
+  if (!isDragMode.value || !currDragComponentName.value) {
     return
   }
-  moveState.MouseUpTaskMap.get(currDragComponentName)()
+  moveState.MouseUpTaskMap.get(currDragComponentName.value)()
 }
 
 const handleBodyMousemove = (e: MouseEvent) => {

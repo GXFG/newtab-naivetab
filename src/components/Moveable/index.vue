@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { DRAG_TRIGGER_DISTANCE, globalState, moveState, isDragMode } from '@/logic'
+import { DRAG_TRIGGER_DISTANCE, globalState, moveState, isDragMode, currDragComponentName } from '@/logic'
 
 const props = defineProps({
   componentName: {
@@ -171,12 +171,23 @@ onMounted(() => {
   initDrag()
 })
 
+const getMoveableWrapEl = () => moveableWrapEl.value.children[0].children[0].classList
+
+watch(currDragComponentName, (value) => {
+  const targetClassList = getMoveableWrapEl()
+  if (value === props.componentName) {
+    targetClassList.add('element-active')
+  } else {
+    targetClassList.remove('element-active')
+  }
+})
+
 watch(isDragMode, (value) => {
-  const targetClassList = moveableWrapEl.value.children[0].children[0].classList
+  const targetClassList = getMoveableWrapEl()
   if (value) {
     targetClassList.add('element-auxiliary-line', 'element-bg-hover')
   } else {
-    targetClassList.remove('element-auxiliary-line', 'element-bg-hover')
+    targetClassList.remove('element-auxiliary-line', 'element-bg-hover', 'element-active')
   }
 })
 </script>
@@ -187,6 +198,10 @@ watch(isDragMode, (value) => {
 }
 
 .element-bg-hover:hover {
-  background-color: var(--bg-moveable-element) !important;
+  background-color: var(--bg-moveable-element-main) !important;
+}
+
+.element-active {
+  background-color: var(--bg-moveable-element-active) !important;
 }
 </style>
