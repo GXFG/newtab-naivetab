@@ -25,7 +25,7 @@
 | 点击右侧齿轮图标或右键菜单可展开详细的设置抽屉，包含“通用”以及“各个组件”的具体配置项 | <img width="1280" alt="iShot2021-12-31 21 44 27" src="https://user-images.githubusercontent.com/20944987/147826477-f3c115d1-c511-4af3-854f-01411d4dff7a.png"> |
 | 每个组件都包含“样式”的配置项，可调整字体、颜色、等... | <img width="1280" alt="iShot2021-12-31 21 44 53" src="https://user-images.githubusercontent.com/20944987/147826497-f3ff5b35-051b-440c-b736-807fc4c8e82d.png"> |
 | 每个组件都可以通过画布模式摆放在屏幕上的任意位置 | <img width="1280" alt="iShot2021-12-31 21 44 44" src="https://user-images.githubusercontent.com/20944987/147826572-40698af1-2461-41bc-b377-c0e2473b08ac.png"> |
-| 支持Bing、本地图片进行背景图的设置 | <img width="1280" alt="iShot2021-12-31 21 45 24" src="https://user-images.githubusercontent.com/20944987/147826598-75de69cd-5cd7-4c66-afcc-b551f027b3f3.png"> |
+| 支持Bing、本地图片进行背景图的设置 | <img width="1280" alt="iShot2022-01-02 17 09 56" src="https://user-images.githubusercontent.com/20944987/147871442-9d9f5b8b-78ce-4be0-a5f3-86fb42603486.png"> |
 | 支持自动 / 手动切换主题模式 | <img width="1280" alt="iShot2021-12-31 21 45 09" src="https://user-images.githubusercontent.com/20944987/147826515-422299e3-74c0-452b-8656-30f49eee985d.png"> |
 
 ## 🛠️安装
