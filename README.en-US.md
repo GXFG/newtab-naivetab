@@ -24,8 +24,8 @@ A clean browser with newtab page extensions
 | Overview | <img width="1280" alt="iShot2021-12-31 21 44 21" src="https://user-images.githubusercontent.com/20944987/147826447-76b01988-c5ad-4952-b449-26cb05df832f.png"> |
 | Click on the gear icon on the right, or right-click menu to expand the detailed settings drawer, which contains specific configuration items for 'General' and 'Each Components' | <img width="1280" alt="iShot2021-12-31 21 44 27" src="https://user-images.githubusercontent.com/20944987/147826477-f3c115d1-c511-4af3-854f-01411d4dff7a.png"> |
 | Each component contains configuration items for 'Style', You can modify the font, color... | <img width="1280" alt="iShot2021-12-31 21 44 53" src="https://user-images.githubusercontent.com/20944987/147826497-f3ff5b35-051b-440c-b736-807fc4c8e82d.png"> |
-| Each component can be placed anywhere on the screen via dragMode | <img width="1280" alt="iShot2021-12-31 21 44 44" src="https://user-images.githubusercontent.com/20944987/147826572-40698af1-2461-41bc-b377-c0e2473b08ac.png"> |
-| Support Bing, local pictures for background image settings | <img width="1280" alt="iShot2021-12-31 21 45 24" src="https://user-images.githubusercontent.com/20944987/147826598-75de69cd-5cd7-4c66-afcc-b551f027b3f3.png"> |
+| Each component can be placed anywhere on the screen via dragMode | <img width="1280" alt="iShot2022-01-02 17 12 22" src="https://user-images.githubusercontent.com/20944987/147871496-fe73f5a7-5b8f-46a6-a8d2-50528f784b0c.png"> |
+| Support Bing, local pictures for background image settings | <img width="1280" alt="iShot2022-01-02 17 09 56" src="https://user-images.githubusercontent.com/20944987/147871442-9d9f5b8b-78ce-4be0-a5f3-86fb42603486.png"> |
 | Supports automatic /manual theme mode switching | <img width="1280" alt="iShot2021-12-31 21 45 09" src="https://user-images.githubusercontent.com/20944987/147826515-422299e3-74c0-452b-8656-30f49eee985d.png"> |
 
 ## 🛠️Install
