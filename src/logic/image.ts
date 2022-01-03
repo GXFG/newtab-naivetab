@@ -3,16 +3,18 @@ import dayjs from 'dayjs'
 import { globalState } from './store'
 import http from '@/lib/http'
 
-export const imageState = ref(useLocalStorage('images', {
+export const imageState = ref(useLocalStorage('data-images', {
   imageList: [] as any,
-  syncDate: 0,
-  dayOffsetNum: 0,
+  syncDate: '',
   currImageIndex: 0,
   localBackgroundFileName: '',
   localBackgroundBase64: '',
 }, { listenToStorageChanges: true }))
 
 export const currBackgroundImageId = computed(() => {
+  if (globalState.style.general.backgroundImageUrl.length === 0) {
+    return ''
+  }
   const tempList = globalState.style.general.backgroundImageUrl.split('?')
   const tempParamList = tempList[1].split('=')
   const currId = tempParamList[1].slice(0, -8)
@@ -37,24 +39,33 @@ const getBingImages = async() => {
       },
     })
     isImageListLoading.value = false
-    imageState.value.syncDate = dayjs().date()
+    imageState.value.syncDate = dayjs().format('YYYY-MM-DD')
     imageState.value.imageList = data.images
   } catch (e) {
     isImageListLoading.value = false
   }
 }
 
-const renderBackgroundImage = async(clearStyle = false) => {
+const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
   await nextTick()
   const backgroundEl: any = document.querySelector('#background')
   if (clearStyle) {
     backgroundEl.style = ''
     return
   }
-  const urlbase = imageState.value.imageList[imageState.value.currImageIndex].urlbase
-  const httpUrl = getImageUrlFromBing(urlbase)
-  const currUrl = globalState.style.general.backgroundImageSource === 0 ? imageState.value.localBackgroundBase64 : httpUrl
-  globalState.style.general.backgroundImageUrl = httpUrl
+  let currUrl = ''
+  if (globalState.style.general.backgroundImageSource === 0) {
+    currUrl = imageState.value.localBackgroundBase64
+  } else {
+    if (initPage && globalState.style.general.backgroundImageUrl.length !== 0) {
+      currUrl = globalState.style.general.backgroundImageUrl
+    } else {
+      const urlbase = imageState.value.imageList[imageState.value.currImageIndex].urlbase
+      const httpUrl = getImageUrlFromBing(urlbase)
+      globalState.style.general.backgroundImageUrl = httpUrl
+      currUrl = httpUrl
+    }
+  }
   let style = `background-image: url(${currUrl});`
   style += 'background-size: cover;background-repeat: no-repeat;'
   style += `opacity: ${globalState.style.general.bgOpacity};`
@@ -70,14 +81,17 @@ watch([
   () => globalState.style.general.bgOpacity,
   () => globalState.style.general.bgBlur,
 ], () => {
-  renderBackgroundImage()
+  if (!globalState.style.general.isBackgroundImageEnabled) {
+    return
+  }
+  renderBackgroundImage(false)
 })
 
-watch(() => globalState.style.general.isBackgroundImageEnabled, async(value) => {
+watch(() => globalState.style.general.isBackgroundImageEnabled, async(isEnabled) => {
   if (imageState.value.imageList.length === 0) {
     await getBingImages()
   }
-  renderBackgroundImage(!value)
+  renderBackgroundImage(true, !isEnabled)
 }, { immediate: true })
 
 export const onRefreshImageList = () => {

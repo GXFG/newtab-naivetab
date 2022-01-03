@@ -46,10 +46,10 @@
       </template>
       <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange" />
     </NFormItem>
-    <NFormItem v-if="globalState.style.general.backgroundImageSource === 0" :label="$t('general.filename')">
+    <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled &&globalState.style.general.backgroundImageSource === 0" :label="$t('general.filename')">
       <p>{{ imageState.localBackgroundFileName }}</p>
     </NFormItem>
-    <NFormItem v-else-if="globalState.style.general.backgroundImageSource === 1" label=" ">
+    <NFormItem v-else-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 1" label=" ">
       <div class="setting__image-wrap">
         <div v-for="(item, index) in imageState.imageList" :key="item.url" class="image__item" :class="{ 'image__item--active': currBackgroundImageId === item.urlbase.slice(7) }" @click="onSelectImage(index)">
           <NTooltip triger="hover">

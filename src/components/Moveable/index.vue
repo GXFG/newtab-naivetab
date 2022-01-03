@@ -67,12 +67,12 @@ const stopDrag = () => {
   moveState.isBottomVisible = false
   moveState.isLeftVisible = false
   moveState.isRightVisible = false
-  if (offsetData.xOffsetKey.length !== 0) globalState.setting[props.componentName as TComponents].layout.xOffsetKey = offsetData.xOffsetKey
-  if (offsetData.xOffsetValue !== -1) globalState.setting[props.componentName as TComponents].layout.xOffsetValue = offsetData.xOffsetValue
-  if (offsetData.xTranslateValue !== -1) globalState.setting[props.componentName as TComponents].layout.xTranslateValue = offsetData.xTranslateValue
-  if (offsetData.yOffsetKey.length !== 0) globalState.setting[props.componentName as TComponents].layout.yOffsetKey = offsetData.yOffsetKey
-  if (offsetData.yOffsetValue !== -1) globalState.setting[props.componentName as TComponents].layout.yOffsetValue = offsetData.yOffsetValue
-  if (offsetData.yTranslateValue !== -1) globalState.setting[props.componentName as TComponents].layout.yTranslateValue = offsetData.yTranslateValue
+  if (offsetData.xOffsetKey.length !== 0) globalState.style[props.componentName as TComponents].layout.xOffsetKey = offsetData.xOffsetKey
+  if (offsetData.xOffsetValue !== -1) globalState.style[props.componentName as TComponents].layout.xOffsetValue = offsetData.xOffsetValue
+  if (offsetData.xTranslateValue !== -1) globalState.style[props.componentName as TComponents].layout.xTranslateValue = offsetData.xTranslateValue
+  if (offsetData.yOffsetKey.length !== 0) globalState.style[props.componentName as TComponents].layout.yOffsetKey = offsetData.yOffsetKey
+  if (offsetData.yOffsetValue !== -1) globalState.style[props.componentName as TComponents].layout.yOffsetValue = offsetData.yOffsetValue
+  if (offsetData.yTranslateValue !== -1) globalState.style[props.componentName as TComponents].layout.yTranslateValue = offsetData.yTranslateValue
 }
 
 const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(3)

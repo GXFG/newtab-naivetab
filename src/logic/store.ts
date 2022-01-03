@@ -11,7 +11,7 @@ export const globalState = reactive({
   state: {
     isWhatsNewModalVisible: false,
   },
-  localState: useLocalStorage('localState', {
+  localState: useLocalStorage('local-state', {
     currThemeCode: 0, // 0:light | 1:dark
     weather: {
       syncTime: 0,
@@ -47,8 +47,16 @@ export const globalState = reactive({
       forecastday: [] as TWeatherForecastdayItem[],
     },
   }, { listenToStorageChanges: true }),
-  style: useLocalStorage('style', {
-    general: {
+  style: {
+    general: useLocalStorage('style-general', {
+      layout: {
+        xOffsetKey: 'right',
+        xOffsetValue: 1,
+        xTranslateValue: 0,
+        yOffsetKey: 'top',
+        yOffsetValue: 50,
+        yTranslateValue: -50,
+      },
       fontFamily: 'PingFang SC, Microsoft YaHei',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
@@ -56,10 +64,18 @@ export const globalState = reactive({
       isBackgroundImageEnabled: true,
       backgroundImageSource: 1, // 0:localFile, 1:bing
       backgroundImageUrl: '',
-      bgOpacity: 1,
+      bgOpacity: 0.8,
       bgBlur: 10,
-    },
-    bookmark: {
+    }, { listenToStorageChanges: true }),
+    bookmark: useLocalStorage('style-bookmark', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 1,
+        yTranslateValue: 0,
+      },
       margin: 4,
       width: 50,
       fontFamily: '',
@@ -71,8 +87,16 @@ export const globalState = reactive({
       borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
-    },
-    clockDigital: {
+    }, { listenToStorageChanges: true }),
+    clockDigital: useLocalStorage('style-clock-digital', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 50,
+        yTranslateValue: -50,
+      },
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 80,
       letterSpacing: 2,
@@ -83,18 +107,42 @@ export const globalState = reactive({
         fontSize: 30,
         fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       },
-    },
-    clockAnalog: {
+    }, { listenToStorageChanges: true }),
+    clockAnalog: useLocalStorage('style-clock-analog', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 25,
+        yTranslateValue: 0,
+      },
       width: 150,
-    },
-    date: {
+    }, { listenToStorageChanges: true }),
+    date: useLocalStorage('style-date', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 58,
+        yTranslateValue: 0,
+      },
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 24,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
-    },
-    calendar: {
+    }, { listenToStorageChanges: true }),
+    calendar: useLocalStorage('style-calendar', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 0,
+        xTranslateValue: 0,
+        yOffsetKey: 'bottom',
+        yOffsetValue: 0,
+        yTranslateValue: 0,
+      },
       width: 45,
       fontFamily: '',
       fontSize: 14,
@@ -105,105 +153,57 @@ export const globalState = reactive({
       borderColor: ['rgba(71,85,105, 1)', 'rgba(82, 82, 82, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-    },
-    weather: {
+    }, { listenToStorageChanges: true }),
+    weather: useLocalStorage('style-weather', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'bottom',
+        yOffsetValue: 0,
+        yTranslateValue: 0,
+      },
       iconWidth: 70,
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    },
-  }, { listenToStorageChanges: true }),
+    }, { listenToStorageChanges: true }),
+  },
   setting: {
-    syncTime: useLocalStorage('syncTime', 0, { listenToStorageChanges: true }),
-    general: useLocalStorage('general', {
+    syncTime: useLocalStorage('setting-sync-time', 0, { listenToStorageChanges: true }),
+    general: useLocalStorage('setting-general', {
       version: pkg.version,
-      layout: {
-        xOffsetKey: 'right',
-        xOffsetValue: 1,
-        xTranslateValue: 0,
-        yOffsetKey: 'top',
-        yOffsetValue: 50,
-        yTranslateValue: -50,
-      },
       theme: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
       lang: defaultLang,
       drawerPlacement: 'right' as any,
       isSetttingIconEnabled: true,
     }, { listenToStorageChanges: true }),
-    bookmark: useLocalStorage('bookmark', {
+    bookmark: useLocalStorage('setting-bookmark', {
       enabled: true,
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 50,
-        xTranslateValue: -50,
-        yOffsetKey: 'top',
-        yOffsetValue: 1,
-        yTranslateValue: 0,
-      },
       keymap: {},
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
     }, { listenToStorageChanges: true }),
-    clockDigital: useLocalStorage('clockDigital', {
+    clockDigital: useLocalStorage('setting-clock-digital', {
       enabled: true,
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 50,
-        xTranslateValue: -50,
-        yOffsetKey: 'top',
-        yOffsetValue: 50,
-        yTranslateValue: -50,
-      },
       format: 'hh:mm:ss',
       unitEnabled: true,
     }, { listenToStorageChanges: true }),
-    clockAnalog: useLocalStorage('clockAnalog', {
+    clockAnalog: useLocalStorage('setting-clock-analog', {
       enabled: true,
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 50,
-        xTranslateValue: -50,
-        yOffsetKey: 'top',
-        yOffsetValue: 25,
-        yTranslateValue: 0,
-      },
       theme: 0, // theme list 索引
     }, { listenToStorageChanges: true }),
-    date: useLocalStorage('date', {
+    date: useLocalStorage('setting-date', {
       enabled: true,
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 50,
-        xTranslateValue: -50,
-        yOffsetKey: 'top',
-        yOffsetValue: 58,
-        yTranslateValue: 0,
-      },
       format: 'YYYY-MM-DD dddd',
     }, { listenToStorageChanges: true }),
-    calendar: useLocalStorage('calendar', {
+    calendar: useLocalStorage('setting-calendar', {
       enabled: true,
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 0,
-        xTranslateValue: 0,
-        yOffsetKey: 'bottom',
-        yOffsetValue: 0,
-        yTranslateValue: 0,
-      },
     }, { listenToStorageChanges: true }),
-    weather: useLocalStorage('weather', {
+    weather: useLocalStorage('setting-weather', {
       enabled: true,
       forecastEnabled: false,
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 50,
-        xTranslateValue: -50,
-        yOffsetKey: 'bottom',
-        yOffsetValue: 0,
-        yTranslateValue: 0,
-      },
       apiKey: 'bc9a224f841945f0bb2104157212811',
       city: {
         label: 'Beijing, Beijing, China',
@@ -255,7 +255,7 @@ export const openNewPage = (url: string) => {
 }
 
 export const getLayoutStyle = (name: string) => {
-  const style = `${globalState.setting[name].layout.xOffsetKey}:${globalState.setting[name].layout.xOffsetValue}vw; ${globalState.setting[name].layout.yOffsetKey}:${globalState.setting[name].layout.yOffsetValue}vh; transform:translate(${globalState.setting[name].layout.xTranslateValue}%, ${globalState.setting[name].layout.yTranslateValue}%);`
+  const style = `${globalState.style[name].layout.xOffsetKey}:${globalState.style[name].layout.xOffsetValue}vw; ${globalState.style[name].layout.yOffsetKey}:${globalState.style[name].layout.yOffsetValue}vh; transform:translate(${globalState.style[name].layout.xTranslateValue}%, ${globalState.style[name].layout.yTranslateValue}%);`
   return style
 }
 

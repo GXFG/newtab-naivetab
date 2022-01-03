@@ -4,7 +4,7 @@
     --text-color-main: #2c3e50;
   }
 }
-
+/* 避免在暗色模式下闪屏 */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-main: #35363a;

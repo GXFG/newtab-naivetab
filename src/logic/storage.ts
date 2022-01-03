@@ -32,49 +32,61 @@ watch([
   deep: true,
 })
 
+const mergeSetting = (state: any, acceptState: any) => {
+  const filterState = {} as any
+  const fieldList = Object.keys(acceptState)
+  for (const field of fieldList) {
+    if (field in state) {
+      filterState[field] = acceptState[field]
+    }
+  }
+  return { ...state, ...filterState }
+}
+
 const updateSetting = (data: any) => {
+  // style
   if (data.style.general) {
-    globalState.style.general = { ...globalState.style.general, ...data.style.general }
+    globalState.style.general = mergeSetting(globalState.style.general, data.style.general)
   }
   if (data.style.bookmark) {
-    globalState.style.bookmark = { ...globalState.style.bookmark, ...data.style.bookmark }
+    globalState.style.bookmark = mergeSetting(globalState.style.bookmark, data.style.bookmark)
   }
   if (data.style.clockDigital) {
-    globalState.style.clockDigital = { ...globalState.style.clockDigital, ...data.style.clockDigital }
+    globalState.style.clockDigital = mergeSetting(globalState.style.clockDigital, data.style.clockDigital)
   }
   if (data.style.clockAnalog) {
-    globalState.style.clockAnalog = { ...globalState.style.clockAnalog, ...data.style.clockAnalog }
+    globalState.style.clockAnalog = mergeSetting(globalState.style.clockAnalog, data.style.clockAnalog)
   }
   if (data.style.date) {
-    globalState.style.date = { ...globalState.style.date, ...data.style.date }
+    globalState.style.date = mergeSetting(globalState.style.date, data.style.date)
   }
   if (data.style.calendar) {
-    globalState.style.calendar = { ...globalState.style.calendar, ...data.style.calendar }
+    globalState.style.calendar = mergeSetting(globalState.style.calendar, data.style.calendar)
   }
   if (data.style.weather) {
-    globalState.style.weather = { ...globalState.style.weather, ...data.style.weather }
+    globalState.style.weather = mergeSetting(globalState.style.weather, data.style.weather)
   }
-
+  // setting
   if (data.setting.general) {
-    globalState.setting.general = { ...globalState.setting.general, ...data.setting.general }
+    globalState.setting.general = mergeSetting(globalState.setting.general, data.setting.general)
   }
   if (data.setting.bookmark) {
-    globalState.setting.bookmark = { ...globalState.setting.bookmark, ...data.setting.bookmark }
+    globalState.setting.bookmark = mergeSetting(globalState.setting.bookmark, data.setting.bookmark)
   }
   if (data.setting.clockDigital) {
-    globalState.setting.clockDigital = { ...globalState.setting.clockDigital, ...data.setting.clockDigital }
+    globalState.setting.clockDigital = mergeSetting(globalState.setting.clockDigital, data.setting.clockDigital)
   }
   if (data.setting.clockAnalog) {
-    globalState.setting.clockAnalog = { ...globalState.setting.clockAnalog, ...data.setting.clockAnalog }
+    globalState.setting.clockAnalog = mergeSetting(globalState.setting.clockAnalog, data.setting.clockAnalog)
   }
   if (data.setting.date) {
-    globalState.setting.date = { ...globalState.setting.date, ...data.setting.date }
+    globalState.setting.date = mergeSetting(globalState.setting.date, data.setting.date)
   }
   if (data.setting.calendar) {
-    globalState.setting.calendar = { ...globalState.setting.calendar, ...data.setting.calendar }
+    globalState.setting.calendar = mergeSetting(globalState.setting.calendar, data.setting.calendar)
   }
   if (data.setting.weather) {
-    globalState.setting.weather = { ...globalState.setting.weather, ...data.setting.weather }
+    globalState.setting.weather = mergeSetting(globalState.setting.weather, data.setting.weather)
   }
 }
 
@@ -102,7 +114,6 @@ export const importSetting = (text: string) => {
   if (!text) {
     return
   }
-
   let fileContent = {} as any
   try {
     fileContent = JSON.parse(text)
@@ -110,11 +121,9 @@ export const importSetting = (text: string) => {
     log('Parse error', e)
     window.$message.error(window.$t('common.fail'))
   }
-
   if (Object.keys(fileContent).length === 0) {
     return
   }
-
   log('FileContent', fileContent)
   updateSetting(fileContent)
 }

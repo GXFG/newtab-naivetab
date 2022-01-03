@@ -51,8 +51,8 @@ const state = reactive({
   currSelectKey: '',
 })
 
-const isInitialized = useLocalStorage('isInitialized', false, { listenToStorageChanges: true })
-const localBookmarkList = useLocalStorage('bookmarkList', [] as bookmarkList[], { listenToStorageChanges: true })
+const isInitialized = useLocalStorage('data-bookmark-initialized', false, { listenToStorageChanges: true })
+const localBookmarkList = useLocalStorage('data-bookmark', [] as bookmarkList[], { listenToStorageChanges: true })
 
 const initBookmarkListData = () => {
   if (isInitialized.value) {
@@ -76,7 +76,7 @@ const keyBoardRowList = computed(() => {
 const mergeBookmarkSetting = useThrottleFn(async() => {
   log('Merge BookmarkSetting')
   if (!isInitialized) {
-    await sleep(100)
+    await sleep(200)
   }
   for (const key of KEYBOARD_KEY) {
     const item = globalState.setting.bookmark.keymap[key]
