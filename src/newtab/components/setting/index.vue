@@ -89,14 +89,14 @@ const initEnumData = () => {
       component: DateSetting,
     },
     {
-      name: 'search',
-      label: window.$t('setting.search'),
-      component: SearchSetting,
-    },
-    {
       name: 'calendar',
       label: window.$t('setting.calendar'),
       component: CalendarSetting,
+    },
+    {
+      name: 'search',
+      label: window.$t('setting.search'),
+      component: SearchSetting,
     },
     {
       name: 'weather',

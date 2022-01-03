@@ -136,26 +136,6 @@ export const globalState = reactive({
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
     }, { listenToStorageChanges: true }),
-    search: useLocalStorage('style-search', {
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 50,
-        xTranslateValue: -50,
-        yOffsetKey: 'top',
-        yOffsetValue: 70,
-        yTranslateValue: 0,
-      },
-      width: 350,
-      fontFamily: 'Arial Rounded MT Bold',
-      fontSize: 24,
-      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
-      isBorderEnabled: true,
-      borderWidth: 2,
-      borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
-      activeColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-      isShadowEnabled: true,
-      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
-    }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('style-calendar', {
       layout: {
         xOffsetKey: 'left',
@@ -175,6 +155,26 @@ export const globalState = reactive({
       borderColor: ['rgba(71,85,105, 1)', 'rgba(82, 82, 82, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
+    }, { listenToStorageChanges: true }),
+    search: useLocalStorage('style-search', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'top',
+        yOffsetValue: 70,
+        yTranslateValue: 0,
+      },
+      width: 350,
+      fontFamily: 'Arial Rounded MT Bold',
+      fontSize: 24,
+      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
+      isBorderEnabled: true,
+      borderWidth: 2,
+      borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
+      activeColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+      isShadowEnabled: true,
+      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
     }, { listenToStorageChanges: true }),
     weather: useLocalStorage('style-weather', {
       layout: {
@@ -219,13 +219,13 @@ export const globalState = reactive({
       enabled: true,
       format: 'YYYY-MM-DD dddd',
     }, { listenToStorageChanges: true }),
+    calendar: useLocalStorage('setting-calendar', {
+      enabled: true,
+    }, { listenToStorageChanges: true }),
     search: useLocalStorage('setting-search', {
       enabled: true,
       urlName: 'baidu',
       urlValue: 'https://www.baidu.com/s?word={query}',
-    }, { listenToStorageChanges: true }),
-    calendar: useLocalStorage('setting-calendar', {
-      enabled: true,
     }, { listenToStorageChanges: true }),
     weather: useLocalStorage('setting-weather', {
       enabled: true,

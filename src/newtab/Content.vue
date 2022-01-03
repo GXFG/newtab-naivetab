@@ -7,8 +7,8 @@
   <DigitalClock />
   <AnalogClock />
   <Date />
-  <Search />
   <Calendar />
+  <Search />
   <Weather />
   <Setting />
 </template>
@@ -19,8 +19,8 @@ import KeyboardBookmark from './components/bookmark/keyboard.vue'
 import DigitalClock from './components/clock/DigitalClock.vue'
 import AnalogClock from './components/clock/AnalogClock.vue'
 import Date from './components/date/index.vue'
-import Search from './components/search/index.vue'
 import Calendar from './components/calendar/index.vue'
+import Search from './components/search/index.vue'
 import Weather from './components/weather/index.vue'
 import Setting from './components/setting/index.vue'
 
