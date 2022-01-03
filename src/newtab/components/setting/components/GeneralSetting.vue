@@ -226,7 +226,7 @@ const borderMain = computed(() => getStyleConst('borderMain', globalState.localS
   .image__item {
     margin: 0 3% 2% 0;
     width: 30%;
-    border-radius: 5px;
+    border-radius: 2px;
     cursor: pointer;
   }
 }
