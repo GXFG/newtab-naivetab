@@ -1,10 +1,6 @@
-# PuzzleTab 新标签页
-
-[英文文档](https://github.com/cmd-cv/newtab-puzzletab/blob/main/README.en-US.md)
-
-## 💡简介
-
-一款简洁的浏览器新标签页扩展
+<h1 align="center">PuzzleTab</h1>
+<p align="center">一款简洁的浏览器新标签页扩展</p>
+<p align="center">中文 | <a href="https://github.com/cmd-cv/newtab-puzzletab/blob/main/README.en-US.md">English</a></p>
 
 ## 🌟特性
 

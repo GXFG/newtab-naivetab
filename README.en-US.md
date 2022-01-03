@@ -1,10 +1,6 @@
-# PuzzleTab Newtab Page
-
-[Chinese document](https://github.com/cmd-cv/newtab-puzzletab/blob/main/README.md)
-
-## 💡About
-
-A clean browser with newtab page extensions
+<h1 align="center">PuzzleTab</h1>
+<p align="center">A clean browser with newtab page extensions</p>
+<p align="center">English | <a href="https://github.com/cmd-cv/newtab-puzzletab/blob/main/README.md">中文</a></p>
 
 ## 🌟Feature
 
