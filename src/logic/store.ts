@@ -47,6 +47,7 @@ export const globalState = reactive({
       forecastday: [] as TWeatherForecastdayItem[],
     },
   }, { listenToStorageChanges: true }),
+  syncTime: useLocalStorage('setting-sync-time', 0, { listenToStorageChanges: true }),
   style: {
     general: useLocalStorage('style-general', {
       layout: {
@@ -171,7 +172,6 @@ export const globalState = reactive({
     }, { listenToStorageChanges: true }),
   },
   setting: {
-    syncTime: useLocalStorage('setting-sync-time', 0, { listenToStorageChanges: true }),
     general: useLocalStorage('setting-general', {
       version: pkg.version,
       theme: 'auto', // light | dark | auto

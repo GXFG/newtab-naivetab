@@ -6,8 +6,9 @@ import { log, downloadJsonByTagA } from './util'
 
 const uploadFn = () => {
   log('Start syncing settings')
-  globalState.setting.syncTime = Date.now()
+  globalState.syncTime = Date.now()
   const localData = JSON.stringify({
+    syncTime: globalState.syncTime,
     style: globalState.style,
     setting: globalState.setting,
   })
@@ -19,13 +20,7 @@ const uploadSetting = useDebounceFn(uploadFn, MERGE_SETTING_DELAY)
 
 watch([
   () => globalState.style,
-  () => globalState.setting.general,
-  () => globalState.setting.bookmark,
-  () => globalState.setting.clockDigital,
-  () => globalState.setting.clockAnalog,
-  () => globalState.setting.date,
-  () => globalState.setting.calendar,
-  () => globalState.setting.weather,
+  () => globalState.setting,
 ], () => {
   uploadSetting()
 }, {
@@ -99,13 +94,13 @@ export const loadSyncSetting = () => {
     }
 
     const cloudSetting = JSON.parse(PuzzleTabSetting)
-    if (cloudSetting.setting.syncTime === globalState.setting.syncTime) {
+    if (cloudSetting.syncTime === globalState.syncTime) {
       log('None modification settings')
       return
     }
 
     log('Load settings', cloudSetting)
-    globalState.setting.syncTime = cloudSetting.setting.syncTime
+    globalState.syncTime = cloudSetting.syncTime
     updateSetting(cloudSetting)
   })
 }

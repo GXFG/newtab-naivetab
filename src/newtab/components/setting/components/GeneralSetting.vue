@@ -184,7 +184,7 @@ const onSelectImage = (item: TImageItem) => {
 }
 
 const syncTime = computed(() => {
-  return dayjs(globalState.setting.syncTime).format('YYYY-MM-DD HH:mm:ss')
+  return dayjs(globalState.syncTime).format('YYYY-MM-DD HH:mm:ss')
 })
 
 const settingFileInputEl = ref()
