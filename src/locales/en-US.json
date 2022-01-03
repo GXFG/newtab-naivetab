@@ -71,6 +71,7 @@
     "clockDigital": "DigitalClock",
     "clockAnalog": "AnalogClock",
     "date": "Date",
+    "search": "Search",
     "calendar": "Calendar",
     "weather": "Weather"
   },
@@ -109,6 +110,9 @@
     "urlPlaceholder": "",
     "nameLabel": "Name",
     "namePlaceholder": "optional"
+  },
+  "search": {
+    "searchEngine": "Search engine"
   },
   "calendar": {
     "january": "January",

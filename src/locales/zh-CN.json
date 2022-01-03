@@ -71,6 +71,7 @@
     "clockDigital": "数字时钟",
     "clockAnalog": "模拟时钟",
     "date": "日期",
+    "search": "搜索",
     "calendar": "日历",
     "weather": "天气"
   },
@@ -109,6 +110,9 @@
     "urlPlaceholder": "",
     "nameLabel": "名称",
     "namePlaceholder": "可选"
+  },
+  "search": {
+    "searchEngine": "搜索引擎"
   },
   "calendar": {
     "january": "一月",

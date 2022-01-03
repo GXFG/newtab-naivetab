@@ -58,6 +58,7 @@ import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
 import ClockSetting from './components/ClockSetting.vue'
 import DateSetting from './components/DateSetting.vue'
+import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
@@ -86,6 +87,11 @@ const initEnumData = () => {
       name: 'date',
       label: window.$t('setting.date'),
       component: DateSetting,
+    },
+    {
+      name: 'search',
+      label: window.$t('setting.search'),
+      component: SearchSetting,
     },
     {
       name: 'calendar',

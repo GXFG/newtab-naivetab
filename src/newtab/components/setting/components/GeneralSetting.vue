@@ -216,7 +216,7 @@ const onResetSetting = () => {
   gaEvent('setting-reset', 'click', 'open')
 }
 
-const borderMain = computed(() => getStyleConst('borderMain', globalState.localState.currThemeCode))
+const borderColorMain = computed(() => getStyleConst('borderColorMain', globalState.localState.currThemeCode))
 </script>
 
 <style scoped>
@@ -231,6 +231,6 @@ const borderMain = computed(() => getStyleConst('borderMain', globalState.localS
   }
 }
 .image__item--active {
-  outline: 3px solid v-bind(borderMain);
+  outline: 3px solid v-bind(borderColorMain);
 }
 </style>

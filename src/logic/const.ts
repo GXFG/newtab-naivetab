@@ -24,6 +24,13 @@ export const DAYJS_LANG_MAP = {
   'en-US': 'en',
 }
 
+export const SEARCH_ENGINE_LIST = [
+  { label: 'google', value: 'https://www.google.com/search?q={query}' },
+  { label: 'bing', value: 'https://cn.bing.com/search?q={query}' },
+  { label: 'baidu', value: 'https://www.baidu.com/s?word={query}' },
+  { label: 'github', value: 'https://github.com/search?q={query}' },
+]
+
 export const WEATHER_LANG_MAP = {
   'zh-CN': 'zh',
   'en-US': '',
