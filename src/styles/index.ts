@@ -4,7 +4,7 @@ import './main.css'
 
 const styleConst = ref({
   // common
-  borderMain: ['#40a9ff', ''],
+  borderMain: ['#18A058', ''],
   // setting
   bgBottomBar: ['#eceff1', '#424247'],
   // moveable

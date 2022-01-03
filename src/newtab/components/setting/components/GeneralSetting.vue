@@ -51,7 +51,7 @@
     </NFormItem>
     <NFormItem v-else-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 1" label=" ">
       <div class="setting__image-wrap">
-        <div v-for="(item, index) in imageState.imageList" :key="item.url" class="image__item" :class="{ 'image__item--active': currBackgroundImageId === item.urlbase.slice(7) }" @click="onSelectImage(index)">
+        <div v-for="item in imageState.imageList" :key="item.url" class="image__item" :class="{ 'image__item--active': globalState.style.general.backgroundImageId === item.urlbase }" @click="onSelectImage(item)">
           <NTooltip triger="hover">
             <template #trigger>
               <img :src="getImageUrlFromBing(item.url, '1366x768')" alt="" />
@@ -107,7 +107,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NDivider, NFormItem, NButton, NSelect, NInput, NInputNumber, NSlider, NSwitch, NPopconfirm, NTooltip } from 'naive-ui'
-import { gaEvent, importSetting, exportSetting, resetSetting, globalState, imageState, currBackgroundImageId, getImageUrlFromBing, isImageListLoading, onRefreshImageList } from '@/logic'
+import { gaEvent, importSetting, exportSetting, resetSetting, globalState, imageState, getImageUrlFromBing, isImageListLoading, onRefreshImageList } from '@/logic'
 import { getStyleConst } from '@/styles/index'
 import i18n from '@/lib/i18n'
 
@@ -179,8 +179,8 @@ const onBackgroundImageFileChange = (e: any) => {
 const onSaveImage = () => {
   window.open(globalState.style.general.backgroundImageUrl)
 }
-const onSelectImage = (index: number) => {
-  imageState.value.currImageIndex = index
+const onSelectImage = (item: TImageItem) => {
+  globalState.style.general.backgroundImageId = item.urlbase
 }
 
 const syncTime = computed(() => {
@@ -231,6 +231,6 @@ const borderMain = computed(() => getStyleConst('borderMain', globalState.localS
   }
 }
 .image__item--active {
-  outline: 2px solid v-bind(borderMain);
+  outline: 3px solid v-bind(borderMain);
 }
 </style>

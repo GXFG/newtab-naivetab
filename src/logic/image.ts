@@ -4,22 +4,11 @@ import { globalState } from './store'
 import http from '@/lib/http'
 
 export const imageState = ref(useLocalStorage('data-images', {
-  imageList: [] as any,
+  imageList: [] as TImageItem[],
   syncDate: '',
-  currImageIndex: 0,
   localBackgroundFileName: '',
   localBackgroundBase64: '',
 }, { listenToStorageChanges: true }))
-
-export const currBackgroundImageId = computed(() => {
-  if (globalState.style.general.backgroundImageUrl.length === 0) {
-    return ''
-  }
-  const tempList = globalState.style.general.backgroundImageUrl.split('?')
-  const tempParamList = tempList[1].split('=')
-  const currId = tempParamList[1].slice(0, -8)
-  return currId
-})
 
 // size: UHD, 1920x1080, 1366x768
 export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http://cn.bing.com/${url}_${size}.jpg`
@@ -60,7 +49,9 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
     if (initPage && globalState.style.general.backgroundImageUrl.length !== 0) {
       currUrl = globalState.style.general.backgroundImageUrl
     } else {
-      const urlbase = imageState.value.imageList[imageState.value.currImageIndex].urlbase
+      let index = imageState.value.imageList.findIndex((item: TImageItem) => item.urlbase === globalState.style.general.backgroundImageId)
+      index = index === -1 ? 0 : index
+      const urlbase = imageState.value.imageList[index].urlbase
       const httpUrl = getImageUrlFromBing(urlbase)
       globalState.style.general.backgroundImageUrl = httpUrl
       currUrl = httpUrl
@@ -75,7 +66,7 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
 
 watch([
   () => globalState.style.general.backgroundImageSource,
-  () => imageState.value.currImageIndex,
+  () => globalState.style.general.backgroundImageId,
   () => imageState.value.localBackgroundBase64,
   () => globalState.style.general.backgroundImageUrl,
   () => globalState.style.general.bgOpacity,

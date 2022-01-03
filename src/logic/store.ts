@@ -64,6 +64,7 @@ export const globalState = reactive({
       isBackgroundImageEnabled: true,
       backgroundImageSource: 1, // 0:localFile, 1:bing
       backgroundImageUrl: '',
+      backgroundImageId: '', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
       bgOpacity: 0.8,
       bgBlur: 10,
     }, { listenToStorageChanges: true }),
