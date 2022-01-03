@@ -17,7 +17,7 @@ A clean browser with newtab page extensions
 - Supports data export for self-backup
 - Language support (zh-CN, en-US)
 
-## 📷
+## 📷Preview
 
 | Description | Preview |
 | ---- | ---- |
