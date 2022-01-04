@@ -75,9 +75,8 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
-import { gaEvent, isDragMode, globalState, LEGAL_HOLIDAY_ENUM, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { gaEvent, isDragMode, globalState, LEGAL_HOLIDAY_ENUM, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 import { calendar } from '@/lib/calendar'
-import { getStyleConst } from '@/styles/index'
 
 const CNAME = 'calendar'
 
@@ -253,24 +252,30 @@ const onReset = () => {
 }
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-const customContainerWidth = computed(() => `${globalState.style.calendar.width * 7.4}px`)
-const customItemWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
-const customFontSsize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-const textColorRed = computed(() => getStyleConst('textColorRed', globalState.localState.currThemeCode))
-const bgCalendarRest = computed(() => getStyleConst('bgCalendarRest', globalState.localState.currThemeCode))
-const bgCalendarWork = computed(() => getStyleConst('bgCalendarWork', globalState.localState.currThemeCode))
-const bgCalendarLabelWork = computed(() => getStyleConst('bgCalendarLabelWork', globalState.localState.currThemeCode))
+const customContainerWidth = getStyleField(CNAME, 'width', 'px', 7.4)
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontColor = getStyleField(CNAME, 'fontColor')
+const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
+const customBorderColor = getStyleField(CNAME, 'borderColor')
+const customShadowColor = getStyleField(CNAME, 'shadowColor')
+const customItemWidth = getStyleField(CNAME, 'width', 'px')
+const customItemActiveColor = getStyleField(CNAME, 'activeColor')
+const textColorRed = getStyleConst('textColorRed')
+const bgCalendarRest = getStyleConst('bgCalendarRest')
+const bgCalendarWork = getStyleConst('bgCalendarWork')
+const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
 </script>
 
 <style scoped>
 #calendar {
-  color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]);
+  color: v-bind(customFontColor);
   font-size: v-bind(customFontSize);
-  font-family: v-bind(globalState.style.calendar.fontFamily);
+  font-family: v-bind(customFontFamily);
   .calendar__container {
     position: absolute;
+    background-color: v-bind(customBackgroundColor);
     width: v-bind(customContainerWidth);
-    background-color: v-bind(globalState.style.calendar.backgroundColor[globalState.localState.currThemeCode]);
     text-align: center;
     user-select: none;
     border-radius: 5px;
@@ -336,12 +341,12 @@ const bgCalendarLabelWork = computed(() => getStyleConst('bgCalendarLabelWork', 
         transition: all 0.3s ease;
         overflow: hidden;
         &:hover {
-          border: 1px solid v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);
+          border: 1px solid v-bind(customItemActiveColor);
         }
         .item__day {
         }
         .item__desc {
-          color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]);
+          color: v-bind(customFontColor);
           font-size: 12px;
           transform: scale(0.8);
         }
@@ -353,7 +358,7 @@ const bgCalendarLabelWork = computed(() => getStyleConst('bgCalendarLabelWork', 
           top: -7%;
           left: -7%;
           padding: 7%;
-          color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]);
+          color: v-bind(customFontColor);
           font-size: 13px;
           transform: scale(0.7);
         }
@@ -369,25 +374,25 @@ const bgCalendarLabelWork = computed(() => getStyleConst('bgCalendarLabelWork', 
         background-color: v-bind(bgCalendarWork);
       }
       .body__item--rest {
-        color: v-bind(globalState.style.calendar.fontColor[globalState.localState.currThemeCode]) !important;
+        color: v-bind(customFontColor) !important;
         background-color: v-bind(bgCalendarRest);
       }
       .body__item--weekend {
         color: v-bind(textColorRed);
       }
       .body__item--active {
-        background-color: v-bind(globalState.style.calendar.activeColor[globalState.localState.currThemeCode]);
+        background-color: v-bind(customItemActiveColor);
       }
       .body__item--blur {
         opacity: 0.4;
       }
     }
+    outline: 1px solid v-bind(customBorderColor);
   }
   .calendar__container-border {
-    outline: 1px solid v-bind(globalState.style.calendar.borderColor[globalState.localState.currThemeCode]);
   }
   .calendar__container-shadow {
-    box-shadow: v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 4px 0px, v-bind(globalState.style.calendar.shadowColor[globalState.localState.currThemeCode]) 0px 2px 16px 0px;
+    box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;
   }
 }
 </style>

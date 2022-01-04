@@ -2,7 +2,7 @@ import 'virtual:windi.css'
 import './reset.css'
 import './main.css'
 
-const styleConst = ref({
+export const styleConst = ref({
   // common
   borderColorMain: ['#18A058', ''],
   // setting
@@ -19,8 +19,3 @@ const styleConst = ref({
   bgCalendarWork: ['rgba(122, 122, 122, 0.5)', ''],
   bgCalendarLabelWork: ['rgba(122, 122, 122, 0.6)', ''],
 })
-
-// mode: light0, dark1
-export const getStyleConst = (field: string, mode: number): string => {
-  return styleConst.value[field][mode] || styleConst.value[field][0]
-}

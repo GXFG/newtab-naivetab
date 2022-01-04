@@ -8,11 +8,10 @@
 </template>
 
 <script setup lang="ts">
-import { moveState, globalState } from '@/logic'
-import { getStyleConst } from '@/styles/index'
+import { getStyleConst, moveState } from '@/logic'
 
-const auxiliaryLineMain = computed(() => getStyleConst('auxiliaryLineMain', globalState.localState.currThemeCode))
-const auxiliaryLineBound = computed(() => getStyleConst('auxiliaryLineBound', globalState.localState.currThemeCode))
+const auxiliaryLineMain = getStyleConst('auxiliaryLineMain')
+const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
 </script>
 
 <style>

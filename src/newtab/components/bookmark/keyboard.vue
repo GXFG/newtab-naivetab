@@ -8,8 +8,12 @@
             :key="item.key"
             :title="item.url"
             class="row__item"
-            :class="{ 'row__item--active': item.key === state.currSelectKey }"
-            :style="itemStyle"
+            :class="{
+              'row__item--move': isDragMode,
+              'row__item--active': item.key === state.currSelectKey,
+              'row__item--border': globalState.style.bookmark.isBorderEnabled,
+              'row__item--shadow': globalState.style.bookmark.isShadowEnabled,
+            }"
             :data-key="item.key"
             @mouseenter="handleContainerEnter"
             @mouseleave="handleContainerLeave"
@@ -37,7 +41,7 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, isSettingDrawerVisible, globalState, getLayoutStyle, formatNumWithPixl, sleep, log, openNewPage } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, isSettingDrawerVisible, globalState, getLayoutStyle, getStyleField, sleep, log, openNewPage } from '@/logic'
 
 const CNAME = 'bookmark'
 
@@ -141,7 +145,6 @@ document.onkeydown = function(e: KeyboardEvent) {
     openNewPage(url)
     return
   }
-
   if (key === state.currSelectKey) {
     openNewPage(url)
   } else {
@@ -165,33 +168,22 @@ const handleContainerLeave = () => {
   state.currSelectKey = ''
 }
 
-const itemStyle = computed(() => {
-  let style = ''
-  if (globalState.style.bookmark.isBorderEnabled) {
-    style += `outline: 1px solid ${globalState.style.bookmark.borderColor[globalState.localState.currThemeCode]};`
-  }
-  if (globalState.style.bookmark.isShadowEnabled) {
-    style += `box-shadow: ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 2px 1px,
-          ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 4px 2px,
-          ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 8px 4px,
-          ${globalState.style.bookmark.shadowColor[globalState.localState.currThemeCode]} 0px 16px 8px;`
-  }
-  if (isDragMode.value) {
-    style += 'cursor: move;'
-  }
-  return style
-})
-
 const containerStyle = ref(getLayoutStyle(CNAME))
-const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-const customMargin = computed(() => formatNumWithPixl(CNAME, 'margin'))
-const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
+const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customMargin = getStyleField(CNAME, 'margin', 'px')
+const customWidth = getStyleField(CNAME, 'width', 'px')
+const customFontColor = getStyleField(CNAME, 'fontColor')
+const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
+const customBorderColor = getStyleField(CNAME, 'borderColor')
+const customActiveColor = getStyleField(CNAME, 'activeColor')
+const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
 <style scoped>
 #bookmark {
   font-size: v-bind(customFontSize);
-  font-family: v-bind(globalState.style.bookmark.fontFamily);
+  font-family: v-bind(customFontFamily);
   user-select: none;
   transition: all 0.3s ease;
   .bookmark__container {
@@ -206,20 +198,29 @@ const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
       &:nth-child(3) {
         margin-left: -16%;
       }
+      .row__item--move {
+        cursor: move;
+      }
+      .row__item--border {
+        outline: 1px solid v-bind(customBorderColor);
+      }
       .row__item--active {
-        background-color: v-bind(globalState.style.bookmark.activeColor[globalState.localState.currThemeCode]) !important;
+        background-color: v-bind(customActiveColor) !important;
+      }
+      .row__item--shadow {
+        box-shadow: v-bind(customShadowColor) 0px 2px 1px, v-bind(customShadowColor) 0px 4px 2px, v-bind(customShadowColor) 0px 8px 4px, v-bind(customShadowColor) 0px 16px 8px;
       }
       .row__item {
         flex: 0 0 auto;
         position: relative;
         margin: v-bind(customMargin);
         padding: 0.8%;
-        width: v-bind(customwidth);
-        height: v-bind(customwidth);
+        width: v-bind(customWidth);
+        height: v-bind(customWidth);
         text-align: center;
         border-radius: 4px;
-        color: v-bind(globalState.style.bookmark.fontColor[globalState.localState.currThemeCode]);
-        background-color: v-bind(globalState.style.bookmark.backgroundColor[globalState.localState.currThemeCode]);
+        color: v-bind(customFontColor);
+        background-color: v-bind(customBackgroundColor);
         cursor: pointer;
         transition: all 0.3s ease;
         .item__key {
@@ -248,7 +249,7 @@ const customwidth = computed(() => formatNumWithPixl(CNAME, 'width'))
           left: 50%;
           bottom: 4%;
           width: 25%;
-          border: 1px solid v-bind(globalState.style.bookmark.borderColor[globalState.localState.currThemeCode]);
+          border: 1px solid v-bind(customBorderColor);
           transform: translate(-50%, 0);
         }
       }

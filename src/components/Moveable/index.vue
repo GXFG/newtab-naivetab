@@ -8,8 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { DRAG_TRIGGER_DISTANCE, globalState, moveState, isDragMode, currDragComponentName } from '@/logic'
-import { getStyleConst } from '@/styles/index'
+import { DRAG_TRIGGER_DISTANCE, getStyleConst, globalState, moveState, isDragMode, currDragComponentName } from '@/logic'
 
 const props = defineProps({
   componentName: {
@@ -192,9 +191,9 @@ watch(isDragMode, (value) => {
   }
 })
 
-const auxiliaryLineElement = computed(() => getStyleConst('auxiliaryLineElement', globalState.localState.currThemeCode))
-const bgMoveableElementMain = computed(() => getStyleConst('bgMoveableElementMain', globalState.localState.currThemeCode))
-const bgMoveableElementActive = computed(() => getStyleConst('bgMoveableElementActive', globalState.localState.currThemeCode))
+const auxiliaryLineElement = getStyleConst('auxiliaryLineElement')
+const bgMoveableElementMain = getStyleConst('bgMoveableElementMain')
+const bgMoveableElementActive = getStyleConst('bgMoveableElementActive')
 
 </script>
 

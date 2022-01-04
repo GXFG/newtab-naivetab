@@ -11,7 +11,7 @@
 
     <NFormItem v-if="globalState.style[props.field].width" :label="$t('common.width')">
       <NSlider v-model:value="globalState.style[props.field].width" :step="1" :min="1" :max="500" />
-      <NInputNumber v-model:value="globalState.style[props.field].width" class="setting__input-number" :step="1" :min="1" :max="300" />
+      <NInputNumber v-model:value="globalState.style[props.field].width" class="setting__input-number" :step="1" :min="1" :max="500" />
     </NFormItem>
 
     <NFormItem v-if="'fontFamily' in globalState.style[props.field]" :label="$t('common.font')">

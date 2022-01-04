@@ -1,6 +1,7 @@
 import { useToggle, useLocalStorage } from '@vueuse/core'
 import pkg from '../../package.json'
 import { DAYJS_LANG_MAP } from './const'
+import { styleConst } from '@/styles/index'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
@@ -245,21 +246,6 @@ export const globalState = reactive({
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
 
-watch(() => globalState.setting.general.pageTitle, () => {
-  document.title = globalState.setting.general.pageTitle
-}, { immediate: true })
-
-watch([
-  () => globalState.style.general,
-  () => globalState.localState.currThemeCode,
-], () => {
-  document.body.style.setProperty('--bg-main', globalState.style.general.backgroundColor[globalState.localState.currThemeCode])
-  document.body.style.setProperty('--text-color-main', globalState.style.general.fontColor[globalState.localState.currThemeCode])
-}, {
-  immediate: true,
-  deep: true,
-})
-
 export const openWhatsNewModal = () => {
   const currSettingVersion = +globalState.setting.general.version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
@@ -281,11 +267,46 @@ export const openNewPage = (url: string) => {
 }
 
 export const getLayoutStyle = (name: string) => {
-  const style = `${globalState.style[name].layout.xOffsetKey}:${globalState.style[name].layout.xOffsetValue}vw; ${globalState.style[name].layout.yOffsetKey}:${globalState.style[name].layout.yOffsetValue}vh; transform:translate(${globalState.style[name].layout.xTranslateValue}%, ${globalState.style[name].layout.yTranslateValue}%);`
+  let style = `${globalState.style[name].layout.xOffsetKey}:${globalState.style[name].layout.xOffsetValue}vw;`
+  style += `${globalState.style[name].layout.yOffsetKey}:${globalState.style[name].layout.yOffsetValue}vh;`
+  style += `transform:translate(${globalState.style[name].layout.xTranslateValue}%, ${globalState.style[name].layout.yTranslateValue}%);`
   return style
 }
 
-export const formatNumWithPixl = (component: TComponents, ...field: any) => {
-  const style = field.reduce((r: any, c: string) => r[c], globalState.style[component])
-  return `${style}px`
+export const getStyleConst = (field: string) => {
+  return computed(() => {
+    return styleConst.value[field][globalState.localState.currThemeCode] || styleConst.value[field][0]
+  })
 }
+
+// e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
+export const getStyleField = (component: TComponents, field: string, unit?: string, ratio?: number) => {
+  return computed(() => {
+    let style = field.split('.').reduce((r: any, c: string) => r[c], globalState.style[component])
+    if (style instanceof Array) {
+      return style[globalState.localState.currThemeCode]
+    }
+    if (ratio) {
+      style = style * ratio
+    }
+    if (unit) {
+      style = `${style}${unit}`
+    }
+    return style
+  })
+}
+
+watch(() => globalState.setting.general.pageTitle, () => {
+  document.title = globalState.setting.general.pageTitle
+}, { immediate: true })
+
+watch([
+  () => globalState.style.general,
+  () => globalState.localState.currThemeCode,
+], () => {
+  document.body.style.setProperty('--text-color-main', getStyleField('general', 'fontColor').value)
+  document.body.style.setProperty('--bg-main', getStyleField('general', 'backgroundColor').value)
+}, {
+  immediate: true,
+  deep: true,
+})

@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, globalState, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockAnalog'
 
@@ -60,7 +60,7 @@ watch(
 const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'light')
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-const customWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
+const customWidth = getStyleField(CNAME, 'width', 'px')
 </script>
 
 <style scoped>

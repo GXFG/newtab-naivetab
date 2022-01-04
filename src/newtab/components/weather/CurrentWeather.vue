@@ -64,17 +64,17 @@
 </template>
 
 <script setup lang="ts">
-import { WEATHER_TEMPERATURE_UNIT_MAP, WEATHER_SPEED_UNIT_MAP, globalState, formatNumWithPixl } from '@/logic'
+import { WEATHER_TEMPERATURE_UNIT_MAP, WEATHER_SPEED_UNIT_MAP, globalState, getStyleField } from '@/logic'
 
 const CNAME = 'weather'
 
 const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[globalState.setting.weather.temperatureUnit])
 const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[globalState.setting.weather.speedUnit])
 
-const customwidth = computed(() => formatNumWithPixl(CNAME, 'iconWidth'))
-const customIconSize = computed(() => `${globalState.style.weather.fontSize * 1.4}px`)
-const customLargerFontSize = computed(() => `${globalState.style.weather.fontSize * 3.5}px`)
-const customLargeFontSize = computed(() => `${globalState.style.weather.fontSize * 2}px`)
+const customwidth = getStyleField(CNAME, 'iconWidth', 'px')
+const customIconSize = getStyleField(CNAME, 'fontSize', 'px', 1.4)
+const customLargerFontSize = getStyleField(CNAME, 'fontSize', 'px', 3.5)
+const customLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 2)
 </script>
 
 <style>

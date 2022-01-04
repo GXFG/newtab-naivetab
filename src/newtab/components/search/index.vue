@@ -26,8 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { globalState, isDragMode, getLayoutStyle, formatNumWithPixl, openNewPage } from '@/logic'
-import { getStyleConst } from '@/styles/index'
+import { globalState, isDragMode, getLayoutStyle, getStyleField, openNewPage } from '@/logic'
 
 const CNAME = 'search'
 
@@ -55,16 +54,20 @@ const onSearch = () => {
 }
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-const customWidth = computed(() => formatNumWithPixl(CNAME, 'width'))
-const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-const customBorderWidth = computed(() => formatNumWithPixl(CNAME, 'borderWidth'))
-const borderColorMain = computed(() => getStyleConst('borderColorMain', globalState.localState.currThemeCode))
+const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontColor = getStyleField(CNAME, 'fontColor')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customWidth = getStyleField(CNAME, 'width', 'px')
+const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
+const customActiveColor = getStyleField(CNAME, 'activeColor')
+const customBorderColor = getStyleField(CNAME, 'borderColor')
+const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
 <style scoped>
 #search {
-  font-family: v-bind(globalState.style.search.fontFamily);
-  color: v-bind(globalState.style.search.fontColor[globalState.localState.currThemeCode]);
+  font-family: v-bind(customFontFamily);
+  color: v-bind(customFontColor);
   font-size: v-bind(customFontSize);
   user-select: none;
   .search__container {
@@ -84,13 +87,13 @@ const borderColorMain = computed(() => getStyleConst('borderColorMain', globalSt
     }
   }
   .search__container--focus {
-    border-bottom: v-bind(customBorderWidth) solid v-bind(globalState.style.search.activeColor[globalState.localState.currThemeCode]) !important;
+    border-bottom: v-bind(customBorderWidth) solid v-bind(customActiveColor) !important;
   }
   .search__container--border {
-    border-bottom: v-bind(customBorderWidth) solid v-bind(globalState.style.search.borderColor[globalState.localState.currThemeCode]);
+    border-bottom: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .search__container--shadow {
-    text-shadow: 2px 8px 6px v-bind(globalState.style.search.shadowColor[globalState.localState.currThemeCode]);
+    text-shadow: 2px 8px 6px v-bind(customShadowColor);
   }
 }
 </style>

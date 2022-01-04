@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { currDayjsLang, globalState, addTimerTask, removeTimerTask, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { currDayjsLang, globalState, addTimerTask, removeTimerTask, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'date'
 
@@ -38,13 +38,16 @@ watch(
 )
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
+const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontColor = getStyleField(CNAME, 'fontColor')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
 <style scoped>
 #date {
-  font-family: v-bind(globalState.style.date.fontFamily);
-  color: v-bind(globalState.style.date.fontColor[globalState.localState.currThemeCode]);
+  font-family: v-bind(customFontFamily);
+  color: v-bind(customFontColor);
   user-select: none;
   .date__container {
     position: absolute;
@@ -53,7 +56,7 @@ const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
     }
   }
   .date__container--shadow {
-    text-shadow: 2px 8px 6px v-bind(globalState.style.date.shadowColor[globalState.localState.currThemeCode]);
+    text-shadow: 2px 8px 6px v-bind(customShadowColor);
   }
 }
 </style>

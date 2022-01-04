@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { globalState, addTimerTask, removeTimerTask, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { globalState, addTimerTask, removeTimerTask, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockDigital'
 
@@ -43,15 +43,18 @@ watch(
 )
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
-const customUnitFontSize = computed(() => formatNumWithPixl(CNAME, 'unit', 'fontSize'))
-const customLetterSpacing = computed(() => formatNumWithPixl(CNAME, 'letterSpacing'))
+const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontColor = getStyleField(CNAME, 'fontColor')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customShadowColor = getStyleField(CNAME, 'shadowColor')
+const customUnitFontSize = getStyleField(CNAME, 'unit.fontSize', 'px')
+const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'px')
 </script>
 
 <style scoped>
 #digital-clock {
-  font-family: v-bind(globalState.style.clockDigital.fontFamily);
-  color: v-bind(globalState.style.clockDigital.fontColor[globalState.localState.currThemeCode]);
+  font-family: v-bind(customFontFamily);
+  color: v-bind(customFontColor);
   user-select: none;
   .clockDigital__container {
     position: fixed;
@@ -70,7 +73,7 @@ const customLetterSpacing = computed(() => formatNumWithPixl(CNAME, 'letterSpaci
     }
   }
   .clockDigital__container--shadow {
-    text-shadow: 2px 8px 6px v-bind(globalState.style.clockDigital.shadowColor[globalState.localState.currThemeCode]);
+    text-shadow: 2px 8px 6px v-bind(customShadowColor);
   }
 }
 </style>

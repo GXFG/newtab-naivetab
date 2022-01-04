@@ -13,7 +13,7 @@
 import dayjs from 'dayjs'
 import CurrentWeather from './CurrentWeather.vue'
 import ForecastWeather from './ForecastWeather.vue'
-import { WEATHER_LANG_MAP, log, globalState, getLayoutStyle, formatNumWithPixl } from '@/logic'
+import { WEATHER_LANG_MAP, log, globalState, getLayoutStyle, getStyleField } from '@/logic'
 import http from '@/lib/http'
 
 const CNAME = 'weather'
@@ -90,14 +90,15 @@ watch(
 )
 
 const containerStyle = ref(getLayoutStyle(CNAME))
-
-const customFontSize = computed(() => formatNumWithPixl(CNAME, 'fontSize'))
+const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontColor = getStyleField(CNAME, 'fontColor')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 </script>
 
 <style scoped>
 #weather {
-  font-family: v-bind(globalState.style.weather.fontFamily);
-  color: v-bind(globalState.style.weather.fontColor[globalState.localState.currThemeCode]);
+  font-family: v-bind(customFontFamily);
+  color: v-bind(customFontColor);
   user-select: none;
   .weather__container {
     position: absolute;

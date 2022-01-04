@@ -61,8 +61,7 @@ import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getLayoutStyle, openNewPage } from '@/logic'
-import { getStyleConst } from '@/styles/index'
+import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getStyleConst, getLayoutStyle, openNewPage } from '@/logic'
 
 const tabPaneList: any = shallowRef([])
 
@@ -145,7 +144,7 @@ const handlerPreviewLeave = () => {
 const CNAME = 'general'
 const containerStyle = ref(getLayoutStyle(CNAME))
 const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
-const bgBottomBar = computed(() => getStyleConst('bgBottomBar', globalState.localState.currThemeCode))
+const bgBottomBar = getStyleConst('bgBottomBar')
 </script>
 
 <style>
