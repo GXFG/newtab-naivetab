@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { useLocalStorage, useThrottleFn } from '@vueuse/core'
-import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, isSettingDrawerVisible, globalState, getLayoutStyle, getStyleField, sleep, log, openNewPage } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, globalState, getLayoutStyle, getStyleField, addKeyboardTask, sleep, log, openNewPage } from '@/logic'
 
 const CNAME = 'bookmark'
 
@@ -128,10 +128,7 @@ const onPressItem = (url: string) => {
 
 // 监听键盘按键
 let timer = null as any
-document.onkeydown = function(e: KeyboardEvent) {
-  if (isSettingDrawerVisible.value) {
-    return
-  }
+const keyboardTask = (e: KeyboardEvent) => {
   const { key } = e
   if (!(key in KEY_OF_INDEX)) {
     return
@@ -155,6 +152,8 @@ document.onkeydown = function(e: KeyboardEvent) {
     }, globalState.setting.bookmark.dblclickIntervalTime)
   }
 }
+
+addKeyboardTask(CNAME, keyboardTask)
 
 // 处理hover状态
 const handleContainerEnter = (e: MouseEvent) => {

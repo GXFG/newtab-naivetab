@@ -2,8 +2,10 @@
   "common": {
     "version": "版本",
     "confirm": "确认",
+    "close": "关闭",
     "success": "成功",
     "fail": "失败",
+    "more": "更多",
     "enabled": "启用",
     "layout": "布局",
     "position": "位置",
@@ -62,6 +64,10 @@
   },
   "prompts": {
     "imageTooLarge": "图片体积过大"
+  },
+  "help": {
+    "title": "帮助",
+    "content": "1. 按?键可再次打开此帮助\n 2. 选中组件后可按delete或backspace键移除\n 3. 按Esc键退出\n"
   },
   "setting": {
     "general": "通用",

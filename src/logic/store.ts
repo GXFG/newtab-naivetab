@@ -5,7 +5,7 @@ import { styleConst } from '@/styles/index'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
-export const [isSettingDrawerVisible, toggleIsSettingDrawVisible] = useToggle(false)
+export const [isSettingDrawerVisible, toggleIsSettingDrawerVisible] = useToggle(false)
 export const currSettingTabValue = ref('general')
 
 export const globalState = reactive({

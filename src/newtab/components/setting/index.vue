@@ -10,12 +10,6 @@
         </div>
       </div>
     </Moveable>
-    <!-- drag_confirm按钮 -->
-    <div v-if="isDragMode" class="drag_confirm__container">
-      <NButton text type="primary" @click="toggleIsDragMode()">
-        <mdi:exit-to-app class="item__icon" />
-      </NButton>
-    </div>
     <!-- 抽屉 -->
     <NDrawer v-model:show="isSettingDrawerVisible" display-directive="show" :style="drawerStyle" :width="600" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
@@ -61,7 +55,7 @@ import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, globalState, getStyleConst, getLayoutStyle, openNewPage } from '@/logic'
+import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, globalState, getStyleConst, getLayoutStyle, openNewPage } from '@/logic'
 
 const tabPaneList: any = shallowRef([])
 
@@ -121,7 +115,7 @@ const openSettingModal = () => {
   if (isDragMode.value) {
     return
   }
-  toggleIsSettingDrawVisible()
+  toggleIsSettingDrawerVisible()
   gaEvent('setting-button', 'click', 'open')
 }
 
@@ -129,7 +123,7 @@ const openDragMode = () => {
   if (isDragMode.value) {
     return
   }
-  toggleIsSettingDrawVisible()
+  toggleIsSettingDrawerVisible()
   toggleIsDragMode()
 }
 
@@ -155,15 +149,6 @@ const bgBottomBar = getStyleConst('bgBottomBar')
     position: absolute;
     .item__icon {
       font-size: 26px;
-    }
-  }
-  .drag_confirm__container {
-    z-index: 1999;
-    position: absolute;
-    top: 3%;
-    right: 2%;
-    .item__icon {
-      font-size: 28px;
     }
   }
 }

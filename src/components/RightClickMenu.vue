@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { globalState, isDragMode, toggleIsDragMode, toggleIsSettingDrawVisible, currSettingTabValue, getComponentNameFromEvent } from '@/logic'
+import { globalState, isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, currSettingTabValue, getComponentNameFromEvent } from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -57,7 +57,7 @@ const menuActionMap = {
     if (tabName.length !== 0) {
       currSettingTabValue.value = tabName
     }
-    toggleIsSettingDrawVisible()
+    toggleIsSettingDrawerVisible()
   },
   dragMode: () => toggleIsDragMode(),
 }

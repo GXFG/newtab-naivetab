@@ -17,7 +17,7 @@
               <ri:close-circle-line />
             </div>
           </template>
-          Close
+          {{ $t('common.close') }}
         </NButton>
         <NButton class="footer__btn" type="primary" ghost size="small" @click="openNewPage(URL_CHANGELOG)">
           <template #icon>
@@ -25,7 +25,7 @@
               <gg:more-o class="btn__icon" />
             </div>
           </template>
-          more
+          {{ $t('common.more') }}
         </NButton>
       </div>
     </NCard>

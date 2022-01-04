@@ -173,7 +173,17 @@ onMounted(() => {
 
 const getMoveableWrapEl = () => moveableWrapEl.value.children[0].children[0].classList
 
+const isEnabled = computed(() => {
+  if (props.componentName === 'general') {
+    return globalState.setting.general.isSetttingIconEnabled
+  }
+  return globalState.setting[props.componentName].enabled
+})
+
 watch(currDragComponentName, (value) => {
+  if (!isEnabled.value) {
+    return
+  }
   const targetClassList = getMoveableWrapEl()
   if (value === props.componentName) {
     targetClassList.add('element-active')
@@ -183,10 +193,14 @@ watch(currDragComponentName, (value) => {
 })
 
 watch(isDragMode, (value) => {
+  if (!isEnabled.value) {
+    return
+  }
   const targetClassList = getMoveableWrapEl()
   if (value) {
     targetClassList.add('element-auxiliary-line', 'element-bg-hover')
   } else {
+    // clear all class
     targetClassList.remove('element-auxiliary-line', 'element-bg-hover', 'element-active')
   }
 })
