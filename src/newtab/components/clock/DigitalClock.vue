@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="clockDigital" @onDrag="(style) => (containerStyle = style)">
+  <MoveableElement componentName="clockDigital" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.clockDigital.enabled" id="digital-clock" data-cname="clockDigital">
       <div class="clockDigital__container" :style="containerStyle" :class="{ 'clockDigital__container--shadow': globalState.style.clockDigital.isShadowEnabled }">
         <div class="clock__time">
@@ -10,7 +10,7 @@
         </div>
       </div>
     </div>
-  </Moveable>
+  </MoveableElement>
 </template>
 
 <script setup lang="ts">
@@ -57,7 +57,8 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'px')
   color: v-bind(customFontColor);
   user-select: none;
   .clockDigital__container {
-    position: fixed;
+    z-index: 10;
+    position: absolute;
     text-align: center;
     .clock__time {
       display: flex;

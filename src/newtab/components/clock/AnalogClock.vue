@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
+  <MoveableElement componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock" data-cname="clockAnalog">
       <div class="clockAnalog__container" :style="containerStyle">
         <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
@@ -10,7 +10,7 @@
         </article>
       </div>
     </div>
-  </Moveable>
+  </MoveableElement>
 </template>
 
 <script setup lang="ts">
@@ -68,6 +68,7 @@ const customWidth = getStyleField(CNAME, 'width', 'px')
 #analog-clock {
   user-select: none;
   .clockAnalog__container {
+    z-index: 10;
     position: absolute;
     text-align: center;
     .clock {

@@ -1,17 +1,24 @@
 <template>
   <div id="setting">
-    <!-- setting按钮 -->
-    <Moveable v-if="globalState.setting.general.isSetttingIconEnabled" componentName="general" @onDrag="(style) => (containerStyle = style)">
-      <div data-cname="general">
-        <div class="general__container" :style="containerStyle">
+    <!-- settingIcon -->
+    <MoveableElement componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
+      <div v-if="globalState.setting.settingIcon.enabled" data-cname="settingIcon">
+        <div class="settingIcon__container" :style="containerStyle">
           <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
             <ic:baseline-settings class="item__icon" />
           </NButton>
         </div>
       </div>
-    </Moveable>
-    <!-- 抽屉 -->
-    <NDrawer v-model:show="isSettingDrawerVisible" display-directive="show" :style="drawerStyle" :width="600" :placement="globalState.setting.general.drawerPlacement">
+    </MoveableElement>
+    <!-- Drawer -->
+    <NDrawer
+      v-model:show="isSettingDrawerVisible"
+      class="drawer-wrap"
+      :style="drawerStyle"
+      display-directive="show"
+      :width="600"
+      :placement="globalState.setting.general.drawerPlacement"
+    >
       <NDrawerContent>
         <NTabs type="line" :value="currSettingTabValue" @update:value="onTabsChange">
           <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
@@ -19,8 +26,8 @@
           </NTabPane>
         </NTabs>
       </NDrawerContent>
-      <!-- 底部按钮 -->
-      <div class="setting__bottom" :style="`background-color: ${bgBottomBar};`">
+      <!-- bottom -->
+      <div class="drawer__bottom" :style="`background-color: ${bgBottomBar};`">
         <div class="bottom__left">
           <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
             <ic:round-preview />&nbsp;{{ $t('common.preview') }}
@@ -33,7 +40,7 @@
           Ver.{{ `${pkg.version}` }}
         </p>
         <div class="bottom__right">
-          <NButton text class="right__icon" title="ChangeLog" @click="openNewPage(URL_CHANGELOG)">
+          <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal(true)">
             <ic:round-new-releases />
           </NButton>
           <NButton text class="right__icon" title="Github" @click="openNewPage(URL_GITHUB)">
@@ -55,7 +62,7 @@ import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_CHANGELOG, URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, globalState, getStyleConst, getLayoutStyle, openNewPage } from '@/logic'
+import { URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, globalState, getStyleConst, getLayoutStyle, openNewPage, openWhatsNewModal } from '@/logic'
 
 const tabPaneList: any = shallowRef([])
 
@@ -135,21 +142,18 @@ const handlerPreviewLeave = () => {
   drawerOpacity.value = 1
 }
 
-const CNAME = 'general'
+const CNAME = 'settingIcon'
+const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
 const containerStyle = ref(getLayoutStyle(CNAME))
-const drawerStyle = computed(() => `transition: all 0.3s ease;opacity:${drawerOpacity.value};`)
 const bgBottomBar = getStyleConst('bgBottomBar')
 </script>
 
 <style>
-#setting {
-  .general__container {
-    /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
-    z-index: 1999;
-    position: absolute;
-    .item__icon {
-      font-size: 26px;
-    }
+.settingIcon__container {
+  z-index: 10;
+  position: absolute;
+  .item__icon {
+    font-size: 26px;
   }
 }
 
@@ -158,6 +162,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 }
 
 .n-tabs-nav {
+  /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
   z-index: 1999;
   position: absolute;
   top: 0;
@@ -188,32 +193,35 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   }
 }
 
-.setting__bottom {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px 8px 10px;
-  width: 600px;
-  .bottom__left {
+.drawer-wrap {
+  transition: all 0.3s ease;
+  .drawer__bottom {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    .left__item {
-      margin-right: 10px;
+    padding: 8px 10px 8px 10px;
+    width: 600px;
+    .bottom__left {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .left__item {
+        margin-right: 10px;
+      }
     }
-  }
-  .bottom__version {
-  }
-  .bottom__right {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .right__icon {
-      margin-left: 10px;
-      font-size: 20px;
+    .bottom__version {
+    }
+    .bottom__right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .right__icon {
+        margin-left: 10px;
+        font-size: 20px;
+      }
     }
   }
 }

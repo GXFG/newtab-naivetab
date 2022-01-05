@@ -43,6 +43,9 @@ const updateSetting = (data: any) => {
   if (data.style.general) {
     globalState.style.general = mergeSetting(globalState.style.general, data.style.general)
   }
+  if (data.style.settingIcon) {
+    globalState.style.settingIcon = mergeSetting(globalState.style.settingIcon, data.style.settingIcon)
+  }
   if (data.style.bookmark) {
     globalState.style.bookmark = mergeSetting(globalState.style.bookmark, data.style.bookmark)
   }
@@ -64,6 +67,9 @@ const updateSetting = (data: any) => {
   // setting
   if (data.setting.general) {
     globalState.setting.general = mergeSetting(globalState.setting.general, data.setting.general)
+  }
+  if (data.setting.settingIcon) {
+    globalState.setting.settingIcon = mergeSetting(globalState.setting.settingIcon, data.setting.settingIcon)
   }
   if (data.setting.bookmark) {
     globalState.setting.bookmark = mergeSetting(globalState.setting.bookmark, data.setting.bookmark)

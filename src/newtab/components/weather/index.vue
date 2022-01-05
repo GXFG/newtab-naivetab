@@ -1,12 +1,12 @@
 <template>
-  <Moveable componentName="weather" @onDrag="(style) => (containerStyle = style)">
+  <MoveableElement componentName="weather" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.weather.enabled" id="weather" data-cname="weather">
       <div class="weather__container" :style="containerStyle">
         <CurrentWeather />
         <ForecastWeather />
       </div>
     </div>
-  </Moveable>
+  </MoveableElement>
 </template>
 
 <script setup lang="ts">
@@ -101,6 +101,7 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
   color: v-bind(customFontColor);
   user-select: none;
   .weather__container {
+    z-index: 10;
     position: absolute;
     text-align: center;
     font-size: v-bind(customFontSize);

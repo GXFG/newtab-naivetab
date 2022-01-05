@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="calendar" @onDrag="(style) => (containerStyle = style)">
+  <MoveableElement componentName="calendar" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.calendar.enabled" id="calendar" data-cname="calendar">
       <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
         <div class="calendar__options">
@@ -69,7 +69,7 @@
         </ul>
       </div>
     </div>
-  </Moveable>
+  </MoveableElement>
 </template>
 
 <script setup lang="ts">
@@ -273,6 +273,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
   font-size: v-bind(customFontSize);
   font-family: v-bind(customFontFamily);
   .calendar__container {
+    z-index: 10;
     position: absolute;
     background-color: v-bind(customBackgroundColor);
     width: v-bind(customContainerWidth);
@@ -343,8 +344,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         &:hover {
           border: 1px solid v-bind(customItemActiveColor);
         }
-        .item__day {
-        }
+        .item__day {}
         .item__desc {
           color: v-bind(customFontColor);
           font-size: 12px;

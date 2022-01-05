@@ -19,7 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(['onDrag'])
 
-const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move;' : ''))
+const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move !important;' : ''))
 
 const moveableWrapEl = ref()
 const targetEl = ref()
@@ -160,32 +160,35 @@ const onDrag = (e: MouseEvent) => {
   emit('onDrag', style)
 }
 
-const initDrag = () => {
+const isEnabled = computed(() => globalState.setting[props.componentName].enabled)
+const isCurrent = computed(() => currDragComponentName.value === props.componentName)
+
+const initDrag = async() => {
+  await nextTick()
   targetEl.value = document.querySelector(`.${props.componentName}__container`)
   moveState.MouseDownTaskMap.set(props.componentName, startDrag)
   moveState.MouseMoveTaskMap.set(props.componentName, onDrag)
   moveState.MouseUpTaskMap.set(props.componentName, stopDrag)
 }
 
-onMounted(() => {
-  initDrag()
-})
-
 const getMoveableWrapEl = () => moveableWrapEl.value.children[0].children[0].classList
 
-const isEnabled = computed(() => {
-  if (props.componentName === 'general') {
-    return globalState.setting.general.isSetttingIconEnabled
+const modifyMoveableWrapClass = async(isAdd: boolean) => {
+  await nextTick()
+  const targetClassList = getMoveableWrapEl()
+  if (isAdd) {
+    targetClassList.add('element-auxiliary-line', 'element-bg-hover')
+  } else {
+    targetClassList.remove('element-auxiliary-line', 'element-bg-hover', 'element-active')
   }
-  return globalState.setting[props.componentName].enabled
-})
+}
 
-watch(currDragComponentName, (value) => {
+watch(isCurrent, (value) => {
   if (!isEnabled.value) {
     return
   }
   const targetClassList = getMoveableWrapEl()
-  if (value === props.componentName) {
+  if (value) {
     targetClassList.add('element-active')
   } else {
     targetClassList.remove('element-active')
@@ -196,13 +199,16 @@ watch(isDragMode, (value) => {
   if (!isEnabled.value) {
     return
   }
-  const targetClassList = getMoveableWrapEl()
-  if (value) {
-    targetClassList.add('element-auxiliary-line', 'element-bg-hover')
-  } else {
-    // clear all class
-    targetClassList.remove('element-auxiliary-line', 'element-bg-hover', 'element-active')
+  initDrag()
+  modifyMoveableWrapClass(value)
+})
+
+watch(() => globalState.setting[props.componentName].enabled, (value: boolean) => {
+  if (!value) {
+    return
   }
+  initDrag()
+  modifyMoveableWrapClass(true)
 })
 
 const auxiliaryLineElement = getStyleConst('auxiliaryLineElement')

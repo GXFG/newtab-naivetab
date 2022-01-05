@@ -19,7 +19,6 @@ const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
 .axis {
   z-index: 99;
   background-color: v-bind(auxiliaryLineMain);
-  transition: all 1s ease;
 }
 .xaxis__center {
   position: fixed;
@@ -40,7 +39,6 @@ const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
 .bound {
   z-index: 99;
   background-color: v-bind(auxiliaryLineBound);
-  transition: all 1s ease;
 }
 .bound__top {
   position: fixed;

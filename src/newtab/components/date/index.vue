@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="date" @onDrag="(style) => (containerStyle = style)">
+  <MoveableElement componentName="date" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.date.enabled" id="date" data-cname="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
@@ -7,7 +7,7 @@
         </p>
       </div>
     </div>
-  </Moveable>
+  </MoveableElement>
 </template>
 
 <script setup lang="ts">
@@ -50,6 +50,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
   color: v-bind(customFontColor);
   user-select: none;
   .date__container {
+    z-index: 10;
     position: absolute;
     .date__text {
       font-size: v-bind(customFontSize);

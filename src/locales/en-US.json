@@ -2,7 +2,9 @@
   "common": {
     "version": "Version",
     "confirm": "Confirm",
+    "open": "Open",
     "close": "Close",
+    "exit": "Exit",
     "success": "Success",
     "fail": "Fail",
     "more": "More",

@@ -70,6 +70,16 @@ export const globalState = reactive({
       bgOpacity: 0.8,
       bgBlur: 10,
     }, { listenToStorageChanges: true }),
+    settingIcon: useLocalStorage('style-setting-icon', {
+      layout: {
+        xOffsetKey: 'right',
+        xOffsetValue: 1,
+        xTranslateValue: 0,
+        yOffsetKey: 'top',
+        yOffsetValue: 50,
+        yTranslateValue: -50,
+      },
+    }, { listenToStorageChanges: true }),
     bookmark: useLocalStorage('style-bookmark', {
       layout: {
         xOffsetKey: 'left',
@@ -199,29 +209,31 @@ export const globalState = reactive({
       pageTitle: 'NewTab',
       lang: defaultLang,
       drawerPlacement: 'right' as any,
-      isSetttingIconEnabled: true,
+    }, { listenToStorageChanges: true }),
+    settingIcon: useLocalStorage('setting-icon', {
+      enabled: false,
     }, { listenToStorageChanges: true }),
     bookmark: useLocalStorage('setting-bookmark', {
-      enabled: true,
+      enabled: false,
       keymap: {},
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
     }, { listenToStorageChanges: true }),
     clockDigital: useLocalStorage('setting-clock-digital', {
-      enabled: true,
+      enabled: false,
       format: 'hh:mm:ss',
       unitEnabled: true,
     }, { listenToStorageChanges: true }),
     clockAnalog: useLocalStorage('setting-clock-analog', {
-      enabled: true,
+      enabled: false,
       theme: 0, // theme list 索引
     }, { listenToStorageChanges: true }),
     date: useLocalStorage('setting-date', {
-      enabled: true,
+      enabled: false,
       format: 'YYYY-MM-DD dddd',
     }, { listenToStorageChanges: true }),
     calendar: useLocalStorage('setting-calendar', {
-      enabled: true,
+      enabled: false,
     }, { listenToStorageChanges: true }),
     search: useLocalStorage('setting-search', {
       enabled: true,
@@ -229,7 +241,7 @@ export const globalState = reactive({
       urlValue: 'https://www.baidu.com/s?word={query}',
     }, { listenToStorageChanges: true }),
     weather: useLocalStorage('setting-weather', {
-      enabled: true,
+      enabled: false,
       forecastEnabled: false,
       apiKey: 'bc9a224f841945f0bb2104157212811',
       city: {
@@ -246,7 +258,10 @@ export const globalState = reactive({
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
 
-export const openWhatsNewModal = () => {
+export const openWhatsNewModal = (forceOpen = false) => {
+  if (forceOpen) {
+    globalState.state.isWhatsNewModalVisible = true
+  }
   const currSettingVersion = +globalState.setting.general.version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
   if (currSettingVersion >= currPkgVersion) {
@@ -257,6 +272,10 @@ export const openWhatsNewModal = () => {
 }
 export const closeWhatsNewModal = () => {
   globalState.state.isWhatsNewModalVisible = false
+}
+
+export const changeElementEnabledStatus = (componentName: TComponents, status: boolean) => {
+  globalState.setting[componentName].enabled = status
 }
 
 export const openNewPage = (url: string) => {
@@ -280,7 +299,7 @@ export const getStyleConst = (field: string) => {
 }
 
 // e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
-export const getStyleField = (component: TComponents, field: string, unit?: string, ratio?: number) => {
+export const getStyleField = (component: 'general' | TComponents, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
     let style = field.split('.').reduce((r: any, c: string) => r[c], globalState.style[component])
     if (style instanceof Array) {

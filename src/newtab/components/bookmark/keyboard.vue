@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
+  <MoveableElement componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.bookmark.enabled" id="bookmark" data-cname="bookmark">
       <div class="bookmark__container" :style="containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
@@ -36,7 +36,7 @@
         </div>
       </div>
     </div>
-  </Moveable>
+  </MoveableElement>
 </template>
 
 <script setup lang="ts">
@@ -184,8 +184,8 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
   font-size: v-bind(customFontSize);
   font-family: v-bind(customFontFamily);
   user-select: none;
-  transition: all 0.3s ease;
   .bookmark__container {
+    z-index: 10;
     position: absolute;
     .bookmark__row {
       display: flex;

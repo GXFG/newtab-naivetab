@@ -1,5 +1,5 @@
 <template>
-  <Moveable componentName="search" @onDrag="(style) => (containerStyle = style)">
+  <MoveableElement componentName="search" @onDrag="(style) => (containerStyle = style)">
     <div v-if="globalState.setting.search.enabled" id="search" data-cname="search">
       <div
         class="search__container"
@@ -13,16 +13,17 @@
         <input
           v-model="state.searchValue"
           class="input__main"
+          :class="{ 'input__main--move': isDragMode }"
           :placeholder="placeholder"
           :disabled="isDragMode"
           @focus="onSearchFocus()"
           @blur="onSearchBlur"
           @keyup.enter="onSearch()"
         />
-        <il:search class="input__icon" @click="onSearch()" />
+        <il:search class="input__icon" :class="{ 'input__icon--move': isDragMode }" @click="onSearch()" />
       </div>
     </div>
-  </Moveable>
+  </MoveableElement>
 </template>
 
 <script setup lang="ts">
@@ -71,6 +72,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
   font-size: v-bind(customFontSize);
   user-select: none;
   .search__container {
+    z-index: 10;
     position: absolute;
     display: flex;
     justify-content: center;
@@ -81,9 +83,15 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       width: v-bind(customWidth);
       background-color: transparent;
     }
+    .input__main--move {
+      cursor: move !important;
+    }
     .input__icon {
       margin: 3px 0 0 10px;
       cursor: pointer;
+    }
+    .input__icon--move {
+      cursor: move !important;
     }
   }
   .search__container--focus {

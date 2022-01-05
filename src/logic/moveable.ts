@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useToggle } from '@vueuse/core'
+import { changeElementEnabledStatus } from '@/logic'
 
 export const [isDragMode, toggleIsDragMode] = useToggle(false)
 
@@ -16,7 +18,8 @@ export const moveState = reactive({
 
 const containerEl = ref()
 
-export const currDragComponentName = ref()
+export const currDragComponentName = ref('')
+export const currDragMaterielComponentName = ref('')
 
 export const getComponentNameFromEvent = (e: MouseEvent): string => {
   let target: any = e.target
@@ -32,7 +35,7 @@ export const getComponentNameFromEvent = (e: MouseEvent): string => {
   return componentName
 }
 
-const handleBodyMousedown = (e: MouseEvent) => {
+const handleMousedown = (e: MouseEvent) => {
   if (!isDragMode.value) {
     return
   }
@@ -44,14 +47,14 @@ const handleBodyMousedown = (e: MouseEvent) => {
   moveState.MouseDownTaskMap.get(componentName)(e)
 }
 
-const handleBodyMouseup = () => {
+const handleMouseup = () => {
   if (!isDragMode.value || !currDragComponentName.value) {
     return
   }
   moveState.MouseUpTaskMap.get(currDragComponentName.value)()
 }
 
-const handleBodyMousemove = (e: MouseEvent) => {
+const handleMousemove = (e: MouseEvent) => {
   if (!isDragMode.value || e.button !== 0) {
     return
   }
@@ -60,20 +63,52 @@ const handleBodyMousemove = (e: MouseEvent) => {
   }
 }
 
+const handleDragEnter = (e: any) => {
+  console.log('handleDragEnter')
+}
+
+// 当被拖动对象在另一对象容器范围内拖动时触发此事件（每隔 350 毫秒会触发一次）
+const handleDragOver = (e: any) => {
+  e.preventDefault()
+  console.log('handleDragOver')
+}
+
+const handleDragLeave = (e: any) => {
+  console.log('handleDragLeave')
+}
+
+const handleDrop = (e: any) => {
+  console.log('handleDrop')
+  // 阻止默认动作（如打开一些元素的链接）
+  // e.preventDefault()
+  if (currDragMaterielComponentName.value.length === 0) {
+    return
+  }
+  changeElementEnabledStatus(currDragMaterielComponentName.value as TComponents, true)
+}
+
 const initBodyListener = () => {
   containerEl.value = document.querySelector('body')
-  containerEl.value.addEventListener('mousedown', handleBodyMousedown)
-  containerEl.value.addEventListener('mousemove', handleBodyMousemove)
-  containerEl.value.addEventListener('mouseup', handleBodyMouseup)
-  containerEl.value.addEventListener('mouseleave', handleBodyMouseup)
+  containerEl.value.addEventListener('mousedown', handleMousedown)
+  containerEl.value.addEventListener('mousemove', handleMousemove)
+  containerEl.value.addEventListener('mouseup', handleMouseup)
+  containerEl.value.addEventListener('mouseleave', handleMouseup)
+  containerEl.value.addEventListener('dragenter', handleDragEnter)
+  containerEl.value.addEventListener('dragover', handleDragOver)
+  containerEl.value.addEventListener('dragleave', handleDragLeave)
+  containerEl.value.addEventListener('drop', handleDrop)
 }
 
 const removeBodyListener = () => {
   containerEl.value = document.querySelector('body')
-  containerEl.value.removeEventListener('mousedown', handleBodyMousedown)
-  containerEl.value.removeEventListener('mousemove', handleBodyMousemove)
-  containerEl.value.removeEventListener('mouseup', handleBodyMouseup)
-  containerEl.value.removeEventListener('mouseleave', handleBodyMouseup)
+  containerEl.value.removeEventListener('mousedown', handleMousedown)
+  containerEl.value.removeEventListener('mousemove', handleMousemove)
+  containerEl.value.removeEventListener('mouseup', handleMouseup)
+  containerEl.value.removeEventListener('mouseleave', handleMouseup)
+  containerEl.value.addEventListener('dragenter', handleDragEnter)
+  containerEl.value.addEventListener('dragover', handleDragOver)
+  containerEl.value.addEventListener('dragleave', handleDragLeave)
+  containerEl.value.addEventListener('drop', handleDrop)
 }
 
 watch(isDragMode, (value) => {

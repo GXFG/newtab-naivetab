@@ -13,7 +13,7 @@
       <NSelect v-model:value="globalState.setting.general.drawerPlacement" :options="state.drawerPlacementList" />
     </NFormItem>
     <NFormItem :label="$t('general.setttingIcon')">
-      <NSwitch v-model:value="globalState.setting.general.isSetttingIconEnabled" />
+      <NSwitch v-model:value="globalState.setting.settingIcon.enabled" />
       <Tips :content="$t('general.setttingIconTips')" />
     </NFormItem>
   </ElementLayout>
