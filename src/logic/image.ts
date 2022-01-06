@@ -1,14 +1,14 @@
-import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { globalState } from './store'
+import { useStorageLocal } from '@/composables/useStorageLocal'
 import http from '@/lib/http'
 
-export const imageState = ref(useLocalStorage('data-images', {
+export const imageState = ref(useStorageLocal('data-images', {
   imageList: [] as TImageItem[],
   syncDate: '',
   localBackgroundFileName: '',
   localBackgroundBase64: '',
-}, { listenToStorageChanges: true }))
+}))
 
 // size: UHD, 1920x1080, 1366x768
 export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http://cn.bing.com/${url}_${size}.jpg`

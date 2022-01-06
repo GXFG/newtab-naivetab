@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.bookmark.enabled" id="bookmark" data-cname="bookmark">
+    <div v-if="globalState.setting.bookmark.enabled" id="bookmark" data-target-type="1" data-target-name="bookmark">
       <div class="bookmark__container" :style="containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
           <div
@@ -40,7 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { useLocalStorage, useThrottleFn } from '@vueuse/core'
+import { useThrottleFn } from '@vueuse/core'
+import { useStorageLocal } from '@/composables/useStorageLocal'
 import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, globalState, getLayoutStyle, getStyleField, addKeyboardTask, sleep, log, openNewPage } from '@/logic'
 
 const CNAME = 'bookmark'
@@ -55,8 +56,8 @@ const state = reactive({
   currSelectKey: '',
 })
 
-const isInitialized = useLocalStorage('data-bookmark-initialized', false, { listenToStorageChanges: true })
-const localBookmarkList = useLocalStorage('data-bookmark', [] as bookmarkList[], { listenToStorageChanges: true })
+const isInitialized = useStorageLocal('data-bookmark-initialized', false)
+const localBookmarkList = useStorageLocal('data-bookmark', [] as bookmarkList[])
 
 const initBookmarkListData = () => {
   if (isInitialized.value) {

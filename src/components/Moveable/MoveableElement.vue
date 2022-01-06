@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { DRAG_TRIGGER_DISTANCE, getStyleConst, globalState, moveState, isDragMode, currDragComponentName } from '@/logic'
+import { DRAG_TRIGGER_DISTANCE, getStyleConst, globalState, moveState, isDragMode, currDragTargetName } from '@/logic'
 
 const props = defineProps({
   componentName: {
@@ -25,7 +25,7 @@ const moveableWrapEl = ref()
 const targetEl = ref()
 
 const state = reactive({
-  isDraging: false,
+  isCurrComponentDraging: false,
   startState: {
     top: 0,
     right: 0,
@@ -55,11 +55,13 @@ const startDrag = (e: MouseEvent) => {
     clientX: e.clientX,
     clientY: e.clientY,
   }
-  state.isDraging = true
+  state.isCurrComponentDraging = true
+  moveState.isComponentDraging = true
 }
 
 const stopDrag = () => {
-  state.isDraging = false
+  state.isCurrComponentDraging = false
+  moveState.isComponentDraging = false
   moveState.isXAxisCenterVisible = false
   moveState.isYAxisCenterVisible = false
   moveState.isTopVisible = false
@@ -78,7 +80,7 @@ const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerW
 const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(3)
 
 const onDrag = (e: MouseEvent) => {
-  if (!state.isDraging) {
+  if (!state.isCurrComponentDraging) {
     return
   }
   const mouseDiffX = e.clientX - state.startState.clientX
@@ -160,8 +162,8 @@ const onDrag = (e: MouseEvent) => {
   emit('onDrag', style)
 }
 
-const isEnabled = computed(() => globalState.setting[props.componentName].enabled)
-const isCurrent = computed(() => currDragComponentName.value === props.componentName)
+const isEnabled = computed(() => globalState.setting[props.componentName].enabled || globalState.state.dragTempEnabled[props.componentName])
+const isCurrent = computed(() => currDragTargetName.value === props.componentName)
 
 const initDrag = async() => {
   await nextTick()
@@ -169,6 +171,7 @@ const initDrag = async() => {
   moveState.MouseDownTaskMap.set(props.componentName, startDrag)
   moveState.MouseMoveTaskMap.set(props.componentName, onDrag)
   moveState.MouseUpTaskMap.set(props.componentName, stopDrag)
+  // Todo: remove
 }
 
 const getMoveableWrapEl = () => moveableWrapEl.value.children[0].children[0].classList
@@ -183,6 +186,22 @@ const modifyMoveableWrapClass = async(isAdd: boolean) => {
   }
 }
 
+watch(isDragMode, (value) => {
+  if (!isEnabled.value) {
+    return
+  }
+  initDrag()
+  modifyMoveableWrapClass(value)
+})
+
+watch(isEnabled, (value: boolean) => {
+  if (!isDragMode.value || !value) {
+    return
+  }
+  initDrag()
+  modifyMoveableWrapClass(true)
+})
+
 watch(isCurrent, (value) => {
   if (!isEnabled.value) {
     return
@@ -193,22 +212,6 @@ watch(isCurrent, (value) => {
   } else {
     targetClassList.remove('element-active')
   }
-})
-
-watch(isDragMode, (value) => {
-  if (!isEnabled.value) {
-    return
-  }
-  initDrag()
-  modifyMoveableWrapClass(value)
-})
-
-watch(() => globalState.setting[props.componentName].enabled, (value: boolean) => {
-  if (!value) {
-    return
-  }
-  initDrag()
-  modifyMoveableWrapClass(true)
 })
 
 const auxiliaryLineElement = getStyleConst('auxiliaryLineElement')

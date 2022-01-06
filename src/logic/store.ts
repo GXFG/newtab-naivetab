@@ -1,6 +1,7 @@
-import { useToggle, useLocalStorage } from '@vueuse/core'
+import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
 import { DAYJS_LANG_MAP } from './const'
+import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
@@ -11,8 +12,18 @@ export const currSettingTabValue = ref('general')
 export const globalState = reactive({
   state: {
     isWhatsNewModalVisible: false,
+    dragTempEnabled: {
+      settingIcon: false,
+      bookmark: false,
+      clockDigital: false,
+      clockAnalog: false,
+      date: false,
+      calendar: false,
+      search: false,
+      weather: false,
+    },
   },
-  localState: useLocalStorage('local-state', {
+  localState: useStorageLocal('local-state', {
     currThemeCode: 0, // 0:light | 1:dark
     weather: {
       syncTime: 0,
@@ -47,10 +58,10 @@ export const globalState = reactive({
       },
       forecastday: [] as TWeatherForecastdayItem[],
     },
-  }, { listenToStorageChanges: true }),
-  syncTime: useLocalStorage('setting-sync-time', 0, { listenToStorageChanges: true }),
+  }),
+  syncTime: useStorageLocal('setting-sync-time', 0),
   style: {
-    general: useLocalStorage('style-general', {
+    general: useStorageLocal('style-general', {
       layout: {
         xOffsetKey: 'right',
         xOffsetValue: 1,
@@ -69,8 +80,8 @@ export const globalState = reactive({
       backgroundImageId: '', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
       bgOpacity: 0.8,
       bgBlur: 10,
-    }, { listenToStorageChanges: true }),
-    settingIcon: useLocalStorage('style-setting-icon', {
+    }),
+    settingIcon: useStorageLocal('style-setting-icon', {
       layout: {
         xOffsetKey: 'right',
         xOffsetValue: 1,
@@ -79,8 +90,8 @@ export const globalState = reactive({
         yOffsetValue: 50,
         yTranslateValue: -50,
       },
-    }, { listenToStorageChanges: true }),
-    bookmark: useLocalStorage('style-bookmark', {
+    }),
+    bookmark: useStorageLocal('style-bookmark', {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -100,8 +111,8 @@ export const globalState = reactive({
       borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
-    }, { listenToStorageChanges: true }),
-    clockDigital: useLocalStorage('style-clock-digital', {
+    }),
+    clockDigital: useStorageLocal('style-clock-digital', {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -120,8 +131,8 @@ export const globalState = reactive({
         fontSize: 30,
         fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       },
-    }, { listenToStorageChanges: true }),
-    clockAnalog: useLocalStorage('style-clock-analog', {
+    }),
+    clockAnalog: useStorageLocal('style-clock-analog', {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -131,8 +142,8 @@ export const globalState = reactive({
         yTranslateValue: 0,
       },
       width: 150,
-    }, { listenToStorageChanges: true }),
-    date: useLocalStorage('style-date', {
+    }),
+    date: useStorageLocal('style-date', {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -146,8 +157,8 @@ export const globalState = reactive({
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
-    }, { listenToStorageChanges: true }),
-    calendar: useLocalStorage('style-calendar', {
+    }),
+    calendar: useStorageLocal('style-calendar', {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 0,
@@ -166,8 +177,8 @@ export const globalState = reactive({
       borderColor: ['rgba(71,85,105, 1)', 'rgba(82, 82, 82, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-    }, { listenToStorageChanges: true }),
-    search: useLocalStorage('style-search', {
+    }),
+    search: useStorageLocal('style-search', {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -186,8 +197,8 @@ export const globalState = reactive({
       activeColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
-    }, { listenToStorageChanges: true }),
-    weather: useLocalStorage('style-weather', {
+    }),
+    weather: useStorageLocal('style-weather', {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -200,47 +211,47 @@ export const globalState = reactive({
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    }, { listenToStorageChanges: true }),
+    }),
   },
   setting: {
-    general: useLocalStorage('setting-general', {
+    general: useStorageLocal('setting-general', {
       version: pkg.version,
       theme: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
       lang: defaultLang,
       drawerPlacement: 'right' as any,
-    }, { listenToStorageChanges: true }),
-    settingIcon: useLocalStorage('setting-icon', {
+    }),
+    settingIcon: useStorageLocal('setting-icon', {
       enabled: false,
-    }, { listenToStorageChanges: true }),
-    bookmark: useLocalStorage('setting-bookmark', {
+    }),
+    bookmark: useStorageLocal('setting-bookmark', {
       enabled: false,
       keymap: {},
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
-    }, { listenToStorageChanges: true }),
-    clockDigital: useLocalStorage('setting-clock-digital', {
+    }),
+    clockDigital: useStorageLocal('setting-clock-digital', {
       enabled: false,
       format: 'hh:mm:ss',
       unitEnabled: true,
-    }, { listenToStorageChanges: true }),
-    clockAnalog: useLocalStorage('setting-clock-analog', {
+    }),
+    clockAnalog: useStorageLocal('setting-clock-analog', {
       enabled: false,
       theme: 0, // theme list 索引
-    }, { listenToStorageChanges: true }),
-    date: useLocalStorage('setting-date', {
+    }),
+    date: useStorageLocal('setting-date', {
       enabled: false,
       format: 'YYYY-MM-DD dddd',
-    }, { listenToStorageChanges: true }),
-    calendar: useLocalStorage('setting-calendar', {
+    }),
+    calendar: useStorageLocal('setting-calendar', {
       enabled: false,
-    }, { listenToStorageChanges: true }),
-    search: useLocalStorage('setting-search', {
+    }),
+    search: useStorageLocal('setting-search', {
       enabled: true,
       urlName: 'baidu',
       urlValue: 'https://www.baidu.com/s?word={query}',
-    }, { listenToStorageChanges: true }),
-    weather: useLocalStorage('setting-weather', {
+    }),
+    weather: useStorageLocal('setting-weather', {
       enabled: false,
       forecastEnabled: false,
       apiKey: 'bc9a224f841945f0bb2104157212811',
@@ -252,7 +263,7 @@ export const globalState = reactive({
       temperatureUnit: 'c', // 'c' | 'f'
       speedUnit: 'kph', // 'kph' | 'mph'
       iconEnabled: true,
-    }, { listenToStorageChanges: true }),
+    }),
   },
 })
 

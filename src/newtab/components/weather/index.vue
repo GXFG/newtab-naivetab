@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="weather" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.weather.enabled" id="weather" data-cname="weather">
+    <div v-if="globalState.setting.weather.enabled" id="weather" data-target-type="1" data-target-name="weather">
       <div class="weather__container" :style="containerStyle">
         <CurrentWeather />
         <ForecastWeather />

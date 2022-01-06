@@ -5,7 +5,7 @@ interface Window {
   $notification: any
 }
 
-type TComponents = 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'search' | 'calendar' | 'weather'
+type TComponents = 'element' | 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'search' | 'calendar' | 'weather'
 
 type TEnum = {
   label: string

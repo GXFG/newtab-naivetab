@@ -2,7 +2,7 @@
   <div id="setting">
     <!-- settingIcon -->
     <MoveableElement componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
-      <div v-if="globalState.setting.settingIcon.enabled" data-cname="settingIcon">
+      <div v-if="globalState.setting.settingIcon.enabled" data-target-type="1" data-target-name="settingIcon">
         <div class="settingIcon__container" :style="containerStyle">
           <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
             <ic:baseline-settings class="item__icon" />

@@ -2,12 +2,17 @@ import 'virtual:windi.css'
 import './reset.css'
 import './main.css'
 
+/**
+ * key: ['lightColor', 'darkColor']
+ */
 export const styleConst = ref({
   // common
   borderColorMain: ['#18A058', ''],
   // setting
   bgBottomBar: ['#eceff1', '#424247'],
   // moveable
+  deleteColorMain: ['#fa5252', ''],
+  deleteColorActive: ['#ffa39e', ''],
   auxiliaryLineMain: ['#40a9ff', ''],
   auxiliaryLineBound: ['#ff7875', ''],
   auxiliaryLineElement: ['#69c0ff', ''],

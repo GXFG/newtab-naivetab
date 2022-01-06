@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="search" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.search.enabled" id="search" data-cname="search">
+    <div v-if="globalState.setting.search.enabled || globalState.state.dragTempEnabled.search" id="search" data-target-type="1" data-target-name="search">
       <div
         class="search__container"
         :style="containerStyle"

@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock" data-cname="clockAnalog">
+    <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
       <div class="clockAnalog__container" :style="containerStyle">
         <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
           <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"></div>

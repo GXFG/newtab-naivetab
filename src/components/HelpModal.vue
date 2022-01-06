@@ -26,10 +26,10 @@
 
 <script setup lang="ts">
 import { NModal, NCard, NButton } from 'naive-ui'
-import { useLocalStorage } from '@vueuse/core'
+import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isDragMode, addKeyboardTask } from '@/logic'
 
-const isOpenHelpVisible = ref(useLocalStorage('data-help-modal', true))
+const isOpenHelpVisible = ref(useStorageLocal('data-help-modal', true))
 
 const state = reactive({
   isHelpVisible: false,

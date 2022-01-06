@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="calendar" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.calendar.enabled" id="calendar" data-cname="calendar">
+    <div v-if="globalState.setting.calendar.enabled" id="calendar" data-target-type="1" data-target-name="calendar">
       <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
         <div class="calendar__options">
           <div class="options__item">

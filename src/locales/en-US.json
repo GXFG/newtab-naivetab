@@ -5,6 +5,8 @@
     "open": "Open",
     "close": "Close",
     "exit": "Exit",
+    "add": "Add",
+    "delete": "Delete",
     "success": "Success",
     "fail": "Fail",
     "more": "More",
