@@ -128,29 +128,6 @@ const handleMouseup = (e: MouseEvent) => {
   }
 }
 
-// const handleDragEnter = (e: any) => {
-//   // console.log('handleDragEnter')
-// }
-
-// 当被拖动对象在另一对象容器范围内拖动时触发此事件（每隔 350 毫秒会触发一次）
-// const handleDragOver = (e: any) => {
-//   e.preventDefault()
-//   // console.log('handleDragOver')
-// }
-
-// const handleDragLeave = (e: any) => {
-//   // console.log('handleDragLeave')
-// }
-
-// const handleDrop = (e: any) => {
-//   // 阻止默认动作（如打开一些元素的链接）
-//   // e.preventDefault()
-//   if (currDragElementComponentName.value.length === 0) {
-//     return
-//   }
-//   changeElementEnabledStatus(currDragElementComponentName.value as TComponents, true)
-// }
-
 const bodyEle = ref()
 
 const initListener = () => {
@@ -159,10 +136,6 @@ const initListener = () => {
   bodyEle.value.addEventListener('mousemove', handleMousemove)
   bodyEle.value.addEventListener('mouseup', handleMouseup)
   bodyEle.value.addEventListener('mouseleave', handleMouseup)
-  // bodyEle.value.addEventListener('dragenter', handleDragEnter)
-  // bodyEle.value.addEventListener('dragover', handleDragOver)
-  // bodyEle.value.addEventListener('dragleave', handleDragLeave)
-  // bodyEle.value.addEventListener('drop', handleDrop)
 }
 
 const removeListener = () => {
@@ -171,10 +144,6 @@ const removeListener = () => {
   bodyEle.value.removeEventListener('mousemove', handleMousemove)
   bodyEle.value.removeEventListener('mouseup', handleMouseup)
   bodyEle.value.removeEventListener('mouseleave', handleMouseup)
-  // bodyEle.value.addEventListener('dragenter', handleDragEnter)
-  // bodyEle.value.addEventListener('dragover', handleDragOver)
-  // bodyEle.value.addEventListener('dragleave', handleDragLeave)
-  // bodyEle.value.addEventListener('drop', handleDrop)
 }
 
 watch(isDragMode, (value) => {

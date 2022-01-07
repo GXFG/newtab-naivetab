@@ -7,7 +7,7 @@
       </div>
       <div class="drawer__header">
         <NButton ghost type="warning" @click="toggleIsDragMode()">
-          <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}${$t('common.dragMode')}` }}
+          <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}` }}
         </NButton>
       </div>
       <div class="drawer__content">
@@ -19,19 +19,12 @@
           :data-target-name="item.componentName"
           class="content__item"
         >
-          <!-- draggable="true" -->
           <span>{{ item.label }}</span>
         </div>
       </div>
     </div>
     <!-- delete -->
-    <div
-      v-if="isDeleteBtnVisible"
-      class="tool__delete"
-      @mouseenter="handlerDeleteMouseEnter"
-      @mouseleave="handlerDeleteMouseLeave"
-      @mouseup="handlerDeleteMouseUp"
-    >
+    <div v-show="isDeleteBtnVisible" class="tool__delete" @mouseenter="handlerDeleteMouseEnter" @mouseleave="handlerDeleteMouseLeave" @mouseup="handlerDeleteMouseUp">
       <ri:delete-bin-6-line class="delete__icon" />
     </div>
   </div>
@@ -42,7 +35,7 @@ import { NButton } from 'naive-ui'
 import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, addKeyboardTask, getStyleConst, moveState, globalState, changeElementEnabledStatus } from '@/logic'
 
 const state = reactive({
-  isInDrawer: false,
+  isCursorInElementDrawer: false,
 })
 
 const componentList = computed(() => [
@@ -57,35 +50,34 @@ const componentList = computed(() => [
 ])
 
 const handleContainerMouseEnter = () => {
-  state.isInDrawer = true
+  state.isCursorInElementDrawer = true
 }
 const handleContainerMouseLeave = () => {
-  state.isInDrawer = false
+  state.isCursorInElementDrawer = false
 }
 
+let isStartDragTaskRan = false
 const handleElementMouseDown = () => {
-
+  isStartDragTaskRan = false
 }
 
-let isRunStartDragTask = false
 const handleElementMouseMove = async(e: MouseEvent) => {
-  if (isRunStartDragTask || state.isInDrawer) {
+  if (isStartDragTaskRan) {
     return
   }
-  isRunStartDragTask = true
+  isStartDragTaskRan = true
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = true
-  await nextTick()
+  await nextTick() // 开启component后等待dom刷新才可进行移动组件
   moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true)
 }
 
 const handleElementMouseUp = (e: MouseEvent) => {
   moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
-  if (!state.isInDrawer) {
-    // save
+  if (!state.isCursorInElementDrawer) {
     globalState.setting[moveState.currDragTarget.name].enabled = true
   }
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
-  isRunStartDragTask = false
+  isStartDragTaskRan = false
 }
 
 const initMouseTask = () => {
@@ -103,6 +95,7 @@ const isDeleteBtnVisible = computed(() => isDragMode.value && moveState.isCompon
 
 const onDeleteComponent = () => {
   globalState.setting[moveState.currDragTarget.name].enabled = false
+  moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
 }
 
 const handlerDeleteMouseEnter = () => {
@@ -213,8 +206,8 @@ const bgMoveableElementDelete = getStyleConst('bgMoveableElementDelete')
   .tool__delete {
     z-index: 11;
     position: fixed;
-    top: 2vh;
-    right: 5vw;
+    top: 8vh;
+    right: 10vw;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -49,10 +49,10 @@ const getPercentageInHeight = (currHeight: number) => +((currHeight / window.inn
 
 /**
  * @param e
- * @param resite 是否以鼠标为元素的中心重置位置
+ * @param resite 是否重置位置（以光标位置为组件的中心）
  */
 const startDrag = async(e: MouseEvent, resite = false) => {
-  await nextTick()
+  await nextTick() // 确保可以获取到targetEle
   const { top, left, width, height } = targetEle.value.getBoundingClientRect()
   state.startState = {
     top,
@@ -63,6 +63,7 @@ const startDrag = async(e: MouseEvent, resite = false) => {
     clientY: e.clientY,
   }
   if (resite) {
+    // 默认光标位置为component的中心
     const _top = e.clientY - height / 2
     const _left = e.clientX - width / 2
     globalState.style[props.componentName as TComponents].layout.xOffsetValue = getPercentageInWidth(_left)
@@ -251,7 +252,7 @@ const deleteBtnColor = getStyleConst('deleteBtnColor')
 
 <style>
 .element-auxiliary-line {
-  outline: 1px dashed v-bind(auxiliaryLineElement);
+  outline: 1px dashed v-bind(auxiliaryLineElement) !important;
 }
 
 .element-bg-hover:hover {
