@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="search" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.search.enabled || globalState.state.dragTempEnabled.search" id="search" data-target-type="1" data-target-name="search">
+    <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
       <div
         class="search__container"
         :style="containerStyle"
@@ -27,9 +27,10 @@
 </template>
 
 <script setup lang="ts">
-import { globalState, isDragMode, getLayoutStyle, getStyleField, openNewPage } from '@/logic'
+import { globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, openNewPage } from '@/logic'
 
 const CNAME = 'search'
+const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
   isFocused: false,

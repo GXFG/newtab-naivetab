@@ -7,14 +7,20 @@
       </div>
       <div class="drawer__header">
         <NButton ghost type="warning" @click="toggleIsDragMode()">
-          <mdi:exit-to-app class="header__icon" />&nbsp;{{ `${$t('common.exit')}${$t('common.dragMode')}` }}
+          <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}${$t('common.dragMode')}` }}
         </NButton>
       </div>
       <div class="drawer__content">
-        <div v-for="item in componentList" :key="item.label" data-target-type="2" data-target-name="element">
-          <div v-if="!item.disabled" class="content__item" draggable="true">
-            <span>{{ item.label }}</span>
-          </div>
+        <div
+          v-for="item in componentList"
+          v-show="!item.disabled"
+          :key="item.label"
+          data-target-type="2"
+          :data-target-name="item.componentName"
+          class="content__item"
+        >
+          <!-- draggable="true" -->
+          <span>{{ item.label }}</span>
         </div>
       </div>
     </div>
@@ -22,7 +28,6 @@
     <div
       v-if="isDeleteBtnVisible"
       class="tool__delete"
-      :class="{ 'tool__delete--active': state.isDeleteHover }"
       @mouseenter="handlerDeleteMouseEnter"
       @mouseleave="handlerDeleteMouseLeave"
       @mouseup="handlerDeleteMouseUp"
@@ -34,13 +39,14 @@
 
 <script setup lang="ts">
 import { NButton } from 'naive-ui'
-import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, addKeyboardTask, currDragTargetName, getStyleConst, moveState, globalState, changeElementEnabledStatus } from '@/logic'
+import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, addKeyboardTask, getStyleConst, moveState, globalState, changeElementEnabledStatus } from '@/logic'
 
 const state = reactive({
-  isDeleteHover: false,
+  isInDrawer: false,
 })
 
 const componentList = computed(() => [
+  { label: 'SettingIcon', componentName: 'settingIcon', disabled: globalState.setting.settingIcon.enabled },
   { label: 'KeyboardBookmark', componentName: 'bookmark', disabled: globalState.setting.bookmark.enabled },
   { label: 'DigitalClock', componentName: 'clockDigital', disabled: globalState.setting.clockDigital.enabled },
   { label: 'AnalogClock', componentName: 'clockAnalog', disabled: globalState.setting.clockAnalog.enabled },
@@ -48,59 +54,69 @@ const componentList = computed(() => [
   { label: 'Calendar', componentName: 'calendar', disabled: globalState.setting.calendar.enabled },
   { label: 'Search', componentName: 'search', disabled: globalState.setting.search.enabled },
   { label: 'Weather', componentName: 'weather', disabled: globalState.setting.weather.enabled },
-  { label: 'Setting', componentName: 'settingIcon', disabled: globalState.setting.settingIcon.enabled },
 ])
 
 const handleContainerMouseEnter = () => {
-  // console.log('handleContainerMouseEnter')
+  state.isInDrawer = true
 }
-
 const handleContainerMouseLeave = () => {
-  // console.log('handleContainerMouseLeave')
+  state.isInDrawer = false
 }
 
 const handleElementMouseDown = () => {
-  console.log('handleElementMouseDown')
+
 }
 
-const handleElementMouseMove = () => {
-  console.log('handleElementMouseMove')
-  // currDragTargetName.value = componentName
-  // globalState.state.dragTempEnabled[currDragTargetName.value] = true
+let isRunStartDragTask = false
+const handleElementMouseMove = async(e: MouseEvent) => {
+  if (isRunStartDragTask || state.isInDrawer) {
+    return
+  }
+  isRunStartDragTask = true
+  moveState.dragTempEnabledMap[moveState.currDragTarget.name] = true
+  await nextTick()
+  moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true)
 }
 
-const handleElementMouseUp = () => {
-  console.log('handleElementMouseUp')
-  // globalState.state.dragTempEnabled[currDragTargetName.value] = false
-  // currDragTargetName.value = ''
+const handleElementMouseUp = (e: MouseEvent) => {
+  moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
+  if (!state.isInDrawer) {
+    // save
+    globalState.setting[moveState.currDragTarget.name].enabled = true
+  }
+  moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
+  isRunStartDragTask = false
 }
 
-const initDrag = () => {
+const initMouseTask = () => {
   moveState.MouseDownTaskMap.set('element', handleElementMouseDown)
   moveState.MouseMoveTaskMap.set('element', handleElementMouseMove)
   moveState.MouseUpTaskMap.set('element', handleElementMouseUp)
 }
 
-initDrag()
+onMounted(() => {
+  initMouseTask()
+})
 
+// delete
 const isDeleteBtnVisible = computed(() => isDragMode.value && moveState.isComponentDraging)
 
 const onDeleteComponent = () => {
-  globalState.setting[currDragTargetName.value].enabled = false
+  globalState.setting[moveState.currDragTarget.name].enabled = false
 }
 
 const handlerDeleteMouseEnter = () => {
   if (!moveState.isComponentDraging) {
     return
   }
-  state.isDeleteHover = true
+  moveState.isDeleteHover = true
 }
 
 const handlerDeleteMouseLeave = () => {
   if (!moveState.isComponentDraging) {
     return
   }
-  state.isDeleteHover = false
+  moveState.isDeleteHover = false
 }
 
 const handlerDeleteMouseUp = () => {
@@ -108,9 +124,10 @@ const handlerDeleteMouseUp = () => {
     return
   }
   onDeleteComponent()
-  state.isDeleteHover = false
+  moveState.isDeleteHover = false
 }
 
+// keyboard
 const keyboardHandler = (e: KeyboardEvent) => {
   if (!isDragMode.value) {
     return
@@ -118,19 +135,20 @@ const keyboardHandler = (e: KeyboardEvent) => {
   const { key } = e
   if (key === 'Escape') {
     toggleIsDragMode()
-  } else if (['Delete', 'Backspace'].includes(key)) {
-    if (currDragTargetName.value.length === 0) {
+    return
+  }
+  if (['Delete', 'Backspace'].includes(key)) {
+    if (moveState.currDragTarget.name.length === 0) {
       return
     }
-    changeElementEnabledStatus(currDragTargetName.value as TComponents, false)
+    changeElementEnabledStatus(moveState.currDragTarget.name as TComponents, false)
   }
 }
 
 const CNAME = 'moveable-tool'
 addKeyboardTask(CNAME, keyboardHandler)
 
-const deleteColorMain = getStyleConst('deleteColorMain')
-const deleteColorActive = getStyleConst('deleteColorActive')
+const bgMoveableElementDelete = getStyleConst('bgMoveableElementDelete')
 </script>
 
 <style>
@@ -181,10 +199,14 @@ const deleteColorActive = getStyleConst('deleteColorActive')
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
       .content__item {
+        width: 100%;
+        margin: 0 10px;
         padding: 10px;
         text-align: center;
         cursor: pointer;
+        user-select: none;
       }
     }
   }
@@ -192,21 +214,19 @@ const deleteColorActive = getStyleConst('deleteColorActive')
     z-index: 11;
     position: fixed;
     top: 2vh;
-    right: 2vw;
+    right: 5vw;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50px;
-    height: 50px;
-    border: 1px solid v-bind(deleteColorMain);
+    width: 45px;
+    height: 45px;
+    border: 1px solid v-bind(bgMoveableElementDelete);
     border-radius: 2px;
+    cursor: pointer;
     .delete__icon {
       font-size: 30px;
-      color: v-bind(deleteColorMain);
+      color: v-bind(bgMoveableElementDelete);
     }
-  }
-  .tool__delete--active {
-    background-color: v-bind(deleteColorActive);
   }
 }
 .moveable-tool--active {

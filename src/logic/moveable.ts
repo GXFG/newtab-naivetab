@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useToggle } from '@vueuse/core'
 import { changeElementEnabledStatus } from '@/logic'
 
@@ -10,21 +9,44 @@ export const moveState = reactive({
   MouseMoveTaskMap: new Map() as any,
   MouseUpTaskMap: new Map() as any,
   isComponentDraging: false,
+  isDeleteHover: false,
   isXAxisCenterVisible: false,
   isYAxisCenterVisible: false,
   isTopVisible: false,
   isBottomVisible: false,
   isLeftVisible: false,
   isRightVisible: false,
+  dragTempEnabledMap: {
+    settingIcon: false,
+    bookmark: false,
+    clockDigital: false,
+    clockAnalog: false,
+    date: false,
+    calendar: false,
+    search: false,
+    weather: false,
+  },
+  isDragingMap: {
+    settingIcon: false,
+    bookmark: false,
+    clockDigital: false,
+    clockAnalog: false,
+    date: false,
+    calendar: false,
+    search: false,
+    weather: false,
+  },
+  currDragTarget: {
+    type: -1,
+    name: '',
+  },
 })
-
-export const currDragTargetType = ref(0)
-export const currDragTargetName = ref('')
 
 let lastIsElementDrawerVisible: null | boolean = null
 
 const onResetState = () => {
-  currDragTargetName.value = ''
+  moveState.currDragTarget.type = -1
+  moveState.currDragTarget.name = ''
   lastIsElementDrawerVisible = null
 }
 
@@ -52,9 +74,16 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
       name: '',
     }
   }
-  const type = target.getAttribute('data-target-type') || -1
+  const type = (+target.getAttribute('data-target-type') as 1 | 2) || -1
   const name: TComponents = target.getAttribute('data-target-name') || ''
   return { type, name }
+}
+
+const getMouseTaskKeyList = () => {
+  if (moveState.currDragTarget.type === 2) {
+    return 'element'
+  }
+  return moveState.currDragTarget.name
 }
 
 const handleMousedown = (e: MouseEvent) => {
@@ -62,22 +91,23 @@ const handleMousedown = (e: MouseEvent) => {
     return
   }
   const targetData = getTargetDataFromEvent(e)
-  console.log(targetData)
-  currDragTargetType.value = targetData.type
-  currDragTargetName.value = targetData.name
-  if (currDragTargetType.value === -1) {
+  moveState.currDragTarget.type = targetData.type
+  moveState.currDragTarget.name = targetData.name
+  if (moveState.currDragTarget.type === -1) {
     return
   }
-  moveState.MouseDownTaskMap.get(currDragTargetName.value)(e)
+  const mouseTask = getMouseTaskKeyList()
+  moveState.MouseDownTaskMap.get(mouseTask)(e)
 }
 
 const handleMousemove = (e: MouseEvent) => {
-  if (!isDragMode.value || e.buttons === 0 || currDragTargetType.value === -1) {
+  if (!isDragMode.value || e.buttons === 0 || moveState.currDragTarget.type === -1) {
     return
   }
   for (const task of moveState.MouseMoveTaskMap.values()) {
     task(e)
   }
+  // 移动时隐藏物料抽屉
   if (lastIsElementDrawerVisible === null) {
     lastIsElementDrawerVisible = isElementDrawerVisible.value
     if (lastIsElementDrawerVisible) {
@@ -86,11 +116,12 @@ const handleMousemove = (e: MouseEvent) => {
   }
 }
 
-const handleMouseup = () => {
-  if (!isDragMode.value || currDragTargetType.value === -1) {
+const handleMouseup = (e: MouseEvent) => {
+  if (!isDragMode.value || moveState.currDragTarget.type === -1) {
     return
   }
-  moveState.MouseUpTaskMap.get(currDragTargetName.value)()
+  const mouseTask = getMouseTaskKeyList()
+  moveState.MouseUpTaskMap.get(mouseTask)(e)
   if (lastIsElementDrawerVisible) {
     toggleIsElementDrawerVisible(true)
     lastIsElementDrawerVisible = null

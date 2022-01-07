@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { DRAG_TRIGGER_DISTANCE, getStyleConst, globalState, moveState, isDragMode, currDragTargetName } from '@/logic'
+import { DRAG_TRIGGER_DISTANCE, getStyleConst, globalState, moveState, isDragMode } from '@/logic'
 
 const props = defineProps({
   componentName: {
@@ -22,15 +22,14 @@ const emit = defineEmits(['onDrag'])
 const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move !important;' : ''))
 
 const moveableWrapEl = ref()
-const targetEl = ref()
+const targetEle = ref()
 
 const state = reactive({
-  isCurrComponentDraging: false,
   startState: {
     top: 0,
-    right: 0,
-    bottom: 0,
     left: 0,
+    width: 0,
+    height: 0,
     clientX: 0,
     clientY: 0,
   },
@@ -45,22 +44,38 @@ const offsetData = reactive({
   yTranslateValue: -1,
 })
 
-const startDrag = (e: MouseEvent) => {
-  const { top, right, bottom, left } = targetEl.value.getBoundingClientRect()
+const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(3)
+const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(3)
+
+/**
+ * @param e
+ * @param resite 是否以鼠标为元素的中心重置位置
+ */
+const startDrag = async(e: MouseEvent, resite = false) => {
+  await nextTick()
+  const { top, left, width, height } = targetEle.value.getBoundingClientRect()
   state.startState = {
     top,
-    right,
-    bottom,
     left,
+    width,
+    height,
     clientX: e.clientX,
     clientY: e.clientY,
   }
-  state.isCurrComponentDraging = true
+  if (resite) {
+    const _top = e.clientY - height / 2
+    const _left = e.clientX - width / 2
+    globalState.style[props.componentName as TComponents].layout.xOffsetValue = getPercentageInWidth(_left)
+    globalState.style[props.componentName as TComponents].layout.yOffsetValue = getPercentageInHeight(_top)
+    state.startState.top = _top
+    state.startState.left = _left
+  }
+  moveState.isDragingMap[props.componentName] = true
   moveState.isComponentDraging = true
 }
 
 const stopDrag = () => {
-  state.isCurrComponentDraging = false
+  moveState.isDragingMap[props.componentName] = false
   moveState.isComponentDraging = false
   moveState.isXAxisCenterVisible = false
   moveState.isYAxisCenterVisible = false
@@ -76,11 +91,8 @@ const stopDrag = () => {
   if (offsetData.yTranslateValue !== -1) globalState.style[props.componentName as TComponents].layout.yTranslateValue = offsetData.yTranslateValue
 }
 
-const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(3)
-const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(3)
-
 const onDrag = (e: MouseEvent) => {
-  if (!state.isCurrComponentDraging) {
+  if (!moveState.isDragingMap[props.componentName]) {
     return
   }
   const mouseDiffX = e.clientX - state.startState.clientX
@@ -95,23 +107,22 @@ const onDrag = (e: MouseEvent) => {
   const { innerWidth, innerHeight } = window
   const xCenterLine = innerWidth / 2
   const yCenterLine = innerHeight / 2
-  const { width, height } = targetEl.value.getBoundingClientRect()
-  const targetCenterX = offsetData.xOffsetValue + width / 2
-  const targetCenterY = offsetData.yOffsetValue + height / 2
+  const targetCenterX = offsetData.xOffsetValue + state.startState.width / 2
+  const targetCenterY = offsetData.yOffsetValue + state.startState.height / 2
 
   if (offsetData.xOffsetValue <= xCenterLine) {
     offsetData.xOffsetKey = 'left'
     offsetData.xOffsetValue = getPercentageInWidth(offsetData.xOffsetValue)
   } else {
     offsetData.xOffsetKey = 'right'
-    offsetData.xOffsetValue = getPercentageInWidth(innerWidth - width - offsetData.xOffsetValue)
+    offsetData.xOffsetValue = getPercentageInWidth(innerWidth - state.startState.width - offsetData.xOffsetValue)
   }
   if (offsetData.yOffsetValue <= yCenterLine) {
     offsetData.yOffsetKey = 'top'
     offsetData.yOffsetValue = getPercentageInHeight(offsetData.yOffsetValue)
   } else {
     offsetData.yOffsetKey = 'bottom'
-    offsetData.yOffsetValue = getPercentageInHeight(innerHeight - height - offsetData.yOffsetValue)
+    offsetData.yOffsetValue = getPercentageInHeight(innerHeight - state.startState.height - offsetData.yOffsetValue)
   }
 
   // 水平/垂直居中 & 对应辅助线
@@ -162,27 +173,42 @@ const onDrag = (e: MouseEvent) => {
   emit('onDrag', style)
 }
 
-const isEnabled = computed(() => globalState.setting[props.componentName].enabled || globalState.state.dragTempEnabled[props.componentName])
-const isCurrent = computed(() => currDragTargetName.value === props.componentName)
-
-const initDrag = async() => {
-  await nextTick()
-  targetEl.value = document.querySelector(`.${props.componentName}__container`)
+const initMouseTask = () => {
   moveState.MouseDownTaskMap.set(props.componentName, startDrag)
   moveState.MouseMoveTaskMap.set(props.componentName, onDrag)
   moveState.MouseUpTaskMap.set(props.componentName, stopDrag)
-  // Todo: remove
 }
 
-const getMoveableWrapEl = () => moveableWrapEl.value.children[0].children[0].classList
+onMounted(() => {
+  initMouseTask()
+})
 
-const modifyMoveableWrapClass = async(isAdd: boolean) => {
+const isEnabled = computed(() => globalState.setting[props.componentName].enabled || moveState.dragTempEnabledMap[props.componentName])
+const isCurrent = computed(() => props.componentName === moveState.currDragTarget.name)
+
+const initTargetEle = async() => {
   await nextTick()
-  const targetClassList = getMoveableWrapEl()
+  targetEle.value = document.querySelector(`.${props.componentName}__container`)
+}
+
+const modifyMoveableWrapClass = async(isAdd: boolean, ...classList: string[]) => {
+  await nextTick()
+  const targetClassList = moveableWrapEl.value?.children[0]?.children[0]?.classList
+  if (targetClassList === undefined) {
+    return
+  }
   if (isAdd) {
-    targetClassList.add('element-auxiliary-line', 'element-bg-hover')
+    targetClassList.add(...classList)
   } else {
-    targetClassList.remove('element-auxiliary-line', 'element-bg-hover', 'element-active')
+    targetClassList.remove(...classList)
+  }
+}
+
+const modifyMoveableWrapBorder = async(isAdd: boolean) => {
+  if (isAdd) {
+    modifyMoveableWrapClass(true, 'element-auxiliary-line', 'element-bg-hover')
+  } else {
+    modifyMoveableWrapClass(false, 'element-auxiliary-line', 'element-bg-hover', 'element-active', 'element-delete')
   }
 }
 
@@ -190,33 +216,36 @@ watch(isDragMode, (value) => {
   if (!isEnabled.value) {
     return
   }
-  initDrag()
-  modifyMoveableWrapClass(value)
-})
+  initTargetEle()
+  modifyMoveableWrapBorder(value)
+}, { immediate: true })
 
 watch(isEnabled, (value: boolean) => {
   if (!isDragMode.value || !value) {
     return
   }
-  initDrag()
-  modifyMoveableWrapClass(true)
+  initTargetEle()
+  modifyMoveableWrapBorder(true)
 })
 
-watch(isCurrent, (value) => {
+watch(isCurrent, async(value) => {
   if (!isEnabled.value) {
     return
   }
-  const targetClassList = getMoveableWrapEl()
-  if (value) {
-    targetClassList.add('element-active')
-  } else {
-    targetClassList.remove('element-active')
+  modifyMoveableWrapClass(value, 'element-active')
+})
+
+watch(() => moveState.isDeleteHover, async(value) => {
+  if (!isCurrent.value) {
+    return
   }
+  modifyMoveableWrapClass(value, 'element-delete')
 })
 
 const auxiliaryLineElement = getStyleConst('auxiliaryLineElement')
 const bgMoveableElementMain = getStyleConst('bgMoveableElementMain')
 const bgMoveableElementActive = getStyleConst('bgMoveableElementActive')
+const deleteBtnColor = getStyleConst('deleteBtnColor')
 
 </script>
 
@@ -231,5 +260,8 @@ const bgMoveableElementActive = getStyleConst('bgMoveableElementActive')
 
 .element-active {
   background-color: v-bind(bgMoveableElementActive) !important;
+}
+.element-delete {
+  background-color: v-bind(deleteBtnColor) !important;
 }
 </style>

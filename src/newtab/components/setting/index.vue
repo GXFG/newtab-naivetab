@@ -2,7 +2,7 @@
   <div id="setting">
     <!-- settingIcon -->
     <MoveableElement componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
-      <div v-if="globalState.setting.settingIcon.enabled" data-target-type="1" data-target-name="settingIcon">
+      <div v-if="isRender" data-target-type="1" data-target-name="settingIcon">
         <div class="settingIcon__container" :style="containerStyle">
           <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
             <ic:baseline-settings class="item__icon" />
@@ -62,7 +62,10 @@ import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, globalState, getStyleConst, getLayoutStyle, openNewPage, openWhatsNewModal } from '@/logic'
+import { URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, globalState, getIsComponentRender, getStyleConst, getLayoutStyle, openNewPage, openWhatsNewModal } from '@/logic'
+
+const CNAME = 'settingIcon'
+const isRender = getIsComponentRender(CNAME)
 
 const tabPaneList: any = shallowRef([])
 
@@ -142,7 +145,6 @@ const handlerPreviewLeave = () => {
   drawerOpacity.value = 1
 }
 
-const CNAME = 'settingIcon'
 const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
 const containerStyle = ref(getLayoutStyle(CNAME))
 const bgBottomBar = getStyleConst('bgBottomBar')

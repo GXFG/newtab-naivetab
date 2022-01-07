@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.clockAnalog.enabled" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
+    <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
       <div class="clockAnalog__container" :style="containerStyle">
         <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
           <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"></div>
@@ -15,9 +15,10 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, globalState, getLayoutStyle, getStyleField } from '@/logic'
+import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, globalState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockAnalog'
+const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
   hourDeg: 0,

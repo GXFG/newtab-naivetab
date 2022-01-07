@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="weather" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.weather.enabled" id="weather" data-target-type="1" data-target-name="weather">
+    <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
       <div class="weather__container" :style="containerStyle">
         <CurrentWeather />
         <ForecastWeather />
@@ -13,10 +13,11 @@
 import dayjs from 'dayjs'
 import CurrentWeather from './CurrentWeather.vue'
 import ForecastWeather from './ForecastWeather.vue'
-import { WEATHER_LANG_MAP, log, globalState, getLayoutStyle, getStyleField } from '@/logic'
+import { WEATHER_LANG_MAP, log, globalState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 import http from '@/lib/http'
 
 const CNAME = 'weather'
+const isRender = getIsComponentRender(CNAME)
 
 const getCurrentData = async() => {
   const data: any = await http({

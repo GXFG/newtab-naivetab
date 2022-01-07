@@ -1,8 +1,8 @@
 import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
-import { DAYJS_LANG_MAP } from './const'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
+import { DAYJS_LANG_MAP, moveState } from '@/logic'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
@@ -12,16 +12,6 @@ export const currSettingTabValue = ref('general')
 export const globalState = reactive({
   state: {
     isWhatsNewModalVisible: false,
-    dragTempEnabled: {
-      settingIcon: false,
-      bookmark: false,
-      clockDigital: false,
-      clockAnalog: false,
-      date: false,
-      calendar: false,
-      search: false,
-      weather: false,
-    },
   },
   localState: useStorageLocal('local-state', {
     currThemeCode: 0, // 0:light | 1:dark
@@ -295,6 +285,8 @@ export const openNewPage = (url: string) => {
   }
   window.open(url)
 }
+
+export const getIsComponentRender = (componentName: TComponents) => computed(() => globalState.setting[componentName].enabled || moveState.dragTempEnabledMap[componentName])
 
 export const getLayoutStyle = (name: string) => {
   let style = `${globalState.style[name].layout.xOffsetKey}:${globalState.style[name].layout.xOffsetValue}vw;`

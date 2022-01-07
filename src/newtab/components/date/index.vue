@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="date" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.date.enabled" id="date" data-target-type="1" data-target-name="date">
+    <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
           {{ state.date }}
@@ -12,9 +12,10 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { currDayjsLang, globalState, addTimerTask, removeTimerTask, getLayoutStyle, getStyleField } from '@/logic'
+import { currDayjsLang, globalState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'date'
+const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
   date: '',

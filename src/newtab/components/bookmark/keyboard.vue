@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.bookmark.enabled" id="bookmark" data-target-type="1" data-target-name="bookmark">
+    <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
       <div class="bookmark__container" :style="containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
           <div
@@ -42,9 +42,10 @@
 <script setup lang="ts">
 import { useThrottleFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, globalState, getLayoutStyle, getStyleField, addKeyboardTask, sleep, log, openNewPage } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, globalState, getIsComponentRender, getLayoutStyle, getStyleField, addKeyboardTask, sleep, log, openNewPage } from '@/logic'
 
 const CNAME = 'bookmark'
+const isRender = getIsComponentRender(CNAME)
 
 interface bookmarkList {
   key: string
@@ -199,7 +200,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         margin-left: -16%;
       }
       .row__item--move {
-        cursor: move;
+        cursor: move !important;
       }
       .row__item--border {
         outline: 1px solid v-bind(customBorderColor);

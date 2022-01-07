@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="calendar" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.calendar.enabled" id="calendar" data-target-type="1" data-target-name="calendar">
+    <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
       <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
         <div class="calendar__options">
           <div class="options__item">
@@ -75,10 +75,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NButton, NSelect } from 'naive-ui'
-import { gaEvent, isDragMode, globalState, LEGAL_HOLIDAY_ENUM, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
+import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, globalState, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
 const CNAME = 'calendar'
+const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
   today: dayjs().format('YYYY-MM-DD'),

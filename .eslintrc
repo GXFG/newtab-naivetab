@@ -4,6 +4,7 @@
     "no-console": 0,
     "curly": 0,
     "brace-style": 0,
-    "vue/attribute-hyphenation": 0
+    "vue/attribute-hyphenation": 0,
+    "@typescript-eslint/no-unused-vars": 0
   }
 }

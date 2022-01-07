@@ -1,6 +1,6 @@
 <template>
   <MoveableElement componentName="clockDigital" @onDrag="(style) => (containerStyle = style)">
-    <div v-if="globalState.setting.clockDigital.enabled" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
+    <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
       <div class="clockDigital__container" :style="containerStyle" :class="{ 'clockDigital__container--shadow': globalState.style.clockDigital.isShadowEnabled }">
         <div class="clock__time">
           <p class="time__text">
@@ -15,9 +15,10 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { globalState, addTimerTask, removeTimerTask, getLayoutStyle, getStyleField } from '@/logic'
+import { globalState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockDigital'
+const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
   time: '',
