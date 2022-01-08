@@ -37,8 +37,8 @@ export const moveState = reactive({
     weather: false,
   },
   currDragTarget: {
-    type: -1,
-    name: '',
+    type: -1 as TTargetType | -1,
+    name: '' as TComponents | '',
   },
 })
 
@@ -80,10 +80,13 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
 }
 
 const getMouseTaskKeyList = () => {
-  if (moveState.currDragTarget.type === 2) {
-    return 'element'
+  let taskKey = ''
+  if (moveState.currDragTarget.type === 1) {
+    taskKey = moveState.currDragTarget.name
+  } else if (moveState.currDragTarget.type === 2) {
+    taskKey = 'element'
   }
-  return moveState.currDragTarget.name
+  return taskKey
 }
 
 const handleMousedown = (e: MouseEvent) => {
@@ -107,7 +110,7 @@ const handleMousemove = (e: MouseEvent) => {
   for (const task of moveState.MouseMoveTaskMap.values()) {
     task(e)
   }
-  // 移动时隐藏物料抽屉
+  // 鼠标移动时隐藏Element抽屉
   if (lastIsElementDrawerVisible === null) {
     lastIsElementDrawerVisible = isElementDrawerVisible.value
     if (lastIsElementDrawerVisible) {
@@ -128,31 +131,33 @@ const handleMouseup = (e: MouseEvent) => {
   }
 }
 
-const bodyEle = ref()
-
-const initListener = () => {
-  bodyEle.value = document.querySelector('body')
-  bodyEle.value.addEventListener('mousedown', handleMousedown)
-  bodyEle.value.addEventListener('mousemove', handleMousemove)
-  bodyEle.value.addEventListener('mouseup', handleMouseup)
-  bodyEle.value.addEventListener('mouseleave', handleMouseup)
+const mouseTaskMap = {
+  mousedown: handleMousedown,
+  mousemove: handleMousemove,
+  mouseup: handleMouseup,
+  mouseleave: handleMouseup,
 }
 
-const removeListener = () => {
-  bodyEle.value = document.querySelector('body')
-  bodyEle.value.removeEventListener('mousedown', handleMousedown)
-  bodyEle.value.removeEventListener('mousemove', handleMousemove)
-  bodyEle.value.removeEventListener('mouseup', handleMouseup)
-  bodyEle.value.removeEventListener('mouseleave', handleMouseup)
+const onHandleListener = (isInit: boolean) => {
+  const bodyEle = document.querySelector('body') as HTMLElement
+  const listenerFunc = isInit ? bodyEle.addEventListener : bodyEle.removeEventListener
+  for (const eventName of Object.keys(mouseTaskMap)) {
+    listenerFunc(eventName, mouseTaskMap[eventName])
+  }
+  bodyEle.addEventListener('mousedown', handleMousedown)
+  bodyEle.addEventListener('mousemove', handleMousemove)
+  bodyEle.addEventListener('mouseup', handleMouseup)
+  bodyEle.addEventListener('mouseleave', handleMouseup)
 }
 
 watch(isDragMode, (value) => {
   if (!value) {
-    removeListener()
+    onHandleListener(false)
     onResetState()
     return
   }
+  toggleIsElementDrawerVisible(true) // 开启画布模式时默认打开Element抽屉
   nextTick(() => {
-    initListener()
+    onHandleListener(true)
   })
 }, { immediate: true })

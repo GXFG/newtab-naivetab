@@ -64,7 +64,7 @@
     "save": "Save",
     "current": "Current",
     "setting": "Setting",
-    "dragMode": "Drag Mode"
+    "dragMode": "DragMode"
   },
   "prompts": {
     "imageTooLarge": "Image too large"

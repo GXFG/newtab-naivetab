@@ -78,7 +78,7 @@ const speedUnitOptions = [
 const state = reactive({
   isSearchLoading: false,
   cityLabel: globalState.setting.weather.city.label,
-  cityList: [] as TSelectItem[],
+  cityList: [] as TSelectStringItem[],
 })
 
 const getSearch = async() => {

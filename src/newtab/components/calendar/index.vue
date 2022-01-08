@@ -1,5 +1,5 @@
 <template>
-  <MoveableElement componentName="calendar" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponent componentName="calendar" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
       <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
         <div class="calendar__options">
@@ -21,7 +21,7 @@
               v-model:value="state.currMonth"
               class="item__select_month"
               size="small"
-              :options="state.monthsList"
+              :options="monthsList"
               :disabled="isDragMode"
               @update:value="onDateChange()"
             ></NSelect>
@@ -37,7 +37,7 @@
         </div>
         <!-- header -->
         <ul class="calendar__header">
-          <li v-for="item in state.weekList" :key="item.value" class="header__item" :class="{ 'header__item--weekend': [6, 7].includes(item.value) }">
+          <li v-for="item in weekList" :key="item.value" class="header__item" :class="{ 'header__item--weekend': [6, 7].includes(item.value) }">
             {{ item.label }}
           </li>
         </ul>
@@ -62,14 +62,14 @@
                 'item__label--rest': item.type === 1,
                 'item__label--work': item.type === 2,
               }"
-            >{{ state.holidayTypeToDesc[item.type as 1 | 2] }}</span>
+            >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
             <span class="item__day">{{ item.day }}</span>
             <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
           </li>
         </ul>
       </div>
     </div>
-  </MoveableElement>
+  </MoveableComponent>
 </template>
 
 <script setup lang="ts">
@@ -87,9 +87,6 @@ const state = reactive({
   currMonth: dayjs().get('month') + 1,
   currDay: dayjs().get('date'),
   yearList: Array.from(Array(51), (v, i) => ({ label: `${2000 + i}`, value: 2000 + i })),
-  monthsList: [] as TEnum[],
-  weekList: [] as TEnum[],
-  holidayTypeToDesc: {},
   dateList: [] as {
     date: string // YYYY-MM-DD
     day: number // D
@@ -102,43 +99,35 @@ const state = reactive({
   }[],
 })
 
-const initEnumData = () => {
-  state.monthsList = [
-    { label: window.$t('calendar.january'), value: 1 },
-    { label: window.$t('calendar.february'), value: 2 },
-    { label: window.$t('calendar.march'), value: 3 },
-    { label: window.$t('calendar.april'), value: 4 },
-    { label: window.$t('calendar.may'), value: 5 },
-    { label: window.$t('calendar.june'), value: 6 },
-    { label: window.$t('calendar.july'), value: 7 },
-    { label: window.$t('calendar.august'), value: 8 },
-    { label: window.$t('calendar.september'), value: 9 },
-    { label: window.$t('calendar.october'), value: 10 },
-    { label: window.$t('calendar.november'), value: 11 },
-    { label: window.$t('calendar.december'), value: 12 },
-  ]
-  state.weekList = [
-    { label: window.$t('calendar.monday'), value: 1 },
-    { label: window.$t('calendar.tuesday'), value: 2 },
-    { label: window.$t('calendar.wednesday'), value: 3 },
-    { label: window.$t('calendar.thursday'), value: 4 },
-    { label: window.$t('calendar.friday'), value: 5 },
-    { label: window.$t('calendar.saturday'), value: 6 },
-    { label: window.$t('calendar.sunday'), value: 7 },
-  ]
-  state.holidayTypeToDesc = {
-    1: window.$t('calendar.rest'),
-    2: window.$t('calendar.work'),
-  }
-}
+const monthsList = computed(() => ([
+  { label: window.$t('calendar.january'), value: 1 },
+  { label: window.$t('calendar.february'), value: 2 },
+  { label: window.$t('calendar.march'), value: 3 },
+  { label: window.$t('calendar.april'), value: 4 },
+  { label: window.$t('calendar.may'), value: 5 },
+  { label: window.$t('calendar.june'), value: 6 },
+  { label: window.$t('calendar.july'), value: 7 },
+  { label: window.$t('calendar.august'), value: 8 },
+  { label: window.$t('calendar.september'), value: 9 },
+  { label: window.$t('calendar.october'), value: 10 },
+  { label: window.$t('calendar.november'), value: 11 },
+  { label: window.$t('calendar.december'), value: 12 },
+]))
 
-watch(
-  () => globalState.setting.general.lang,
-  () => {
-    initEnumData()
-  },
-  { immediate: true },
-)
+const weekList = computed(() => ([
+  { label: window.$t('calendar.monday'), value: 1 },
+  { label: window.$t('calendar.tuesday'), value: 2 },
+  { label: window.$t('calendar.wednesday'), value: 3 },
+  { label: window.$t('calendar.thursday'), value: 4 },
+  { label: window.$t('calendar.friday'), value: 5 },
+  { label: window.$t('calendar.saturday'), value: 6 },
+  { label: window.$t('calendar.sunday'), value: 7 },
+]))
+
+const holidayTypeToDesc = computed(() => ({
+  1: window.$t('calendar.rest'),
+  2: window.$t('calendar.work'),
+}))
 
 /**
  * type: 1start, 2main, 3end

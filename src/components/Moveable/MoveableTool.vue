@@ -1,5 +1,5 @@
 <template>
-  <div class="moveable-tool" :class="{ 'moveable-tool--active': isDragMode && isElementDrawerVisible }" @mouseenter="handleContainerMouseEnter" @mouseleave="handleContainerMouseLeave">
+  <div id="moveable-tool" :class="{ 'moveable-tool--active': isDragMode && isElementDrawerVisible }" @mouseenter="handleContainerMouseEnter" @mouseleave="handleContainerMouseLeave">
     <!-- drawer -->
     <div class="tool__drawer">
       <div v-if="isDragMode" class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
@@ -12,19 +12,22 @@
       </div>
       <div class="drawer__content">
         <div
-          v-for="item in componentList"
+          v-for="item in elementList"
           v-show="!item.disabled"
           :key="item.label"
+          class="content__item"
           data-target-type="2"
           :data-target-name="item.componentName"
-          class="content__item"
         >
-          <span>{{ item.label }}</span>
+          <div class="item__icon" :style="`font-size:${item.iconSize}px`">
+            <Icon :icon="item.iconName" />
+          </div>
+          <span class="item__text">{{ item.label }}</span>
         </div>
       </div>
     </div>
     <!-- delete -->
-    <div v-show="isDeleteBtnVisible" class="tool__delete" @mouseenter="handlerDeleteMouseEnter" @mouseleave="handlerDeleteMouseLeave" @mouseup="handlerDeleteMouseUp">
+    <div class="tool__delete" :class="{ 'tool__delete--active': isDeleteBtnVisible }" @mouseenter="handlerDeleteMouseEnter" @mouseleave="handlerDeleteMouseLeave" @mouseup="handlerDeleteMouseUp">
       <ri:delete-bin-6-line class="delete__icon" />
     </div>
   </div>
@@ -32,23 +35,73 @@
 
 <script setup lang="ts">
 import { NButton } from 'naive-ui'
+import { Icon } from '@iconify/vue'
 import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, addKeyboardTask, getStyleConst, moveState, globalState, changeElementEnabledStatus } from '@/logic'
 
 const state = reactive({
   isCursorInElementDrawer: false,
 })
 
-const componentList = computed(() => [
-  { label: 'SettingIcon', componentName: 'settingIcon', disabled: globalState.setting.settingIcon.enabled },
-  { label: 'KeyboardBookmark', componentName: 'bookmark', disabled: globalState.setting.bookmark.enabled },
-  { label: 'DigitalClock', componentName: 'clockDigital', disabled: globalState.setting.clockDigital.enabled },
-  { label: 'AnalogClock', componentName: 'clockAnalog', disabled: globalState.setting.clockAnalog.enabled },
-  { label: 'Date', componentName: 'date', disabled: globalState.setting.date.enabled },
-  { label: 'Calendar', componentName: 'calendar', disabled: globalState.setting.calendar.enabled },
-  { label: 'Search', componentName: 'search', disabled: globalState.setting.search.enabled },
-  { label: 'Weather', componentName: 'weather', disabled: globalState.setting.weather.enabled },
+const elementList = computed(() => [
+  {
+    label: window.$t('setting.mainLabel'),
+    componentName: 'settingIcon',
+    iconName: 'ic:baseline-settings',
+    iconSize: 26,
+    disabled: globalState.setting.settingIcon.enabled,
+  },
+  {
+    label: window.$t('setting.bookmark'),
+    componentName: 'bookmark',
+    iconName: 'ic:outline-keyboard-alt',
+    iconSize: 28,
+    disabled: globalState.setting.bookmark.enabled,
+  },
+  {
+    label: window.$t('setting.clockDigital'),
+    componentName: 'clockDigital',
+    iconName: 'mdi:clock-digital',
+    iconSize: 30,
+    disabled: globalState.setting.clockDigital.enabled,
+  },
+  {
+    label: window.$t('setting.clockAnalog'),
+    componentName: 'clockAnalog',
+    iconName: 'grommet-icons:clock',
+    iconSize: 26,
+    disabled: globalState.setting.clockAnalog.enabled,
+  },
+  {
+    label: window.$t('setting.date'),
+    componentName: 'date',
+    iconName: 'system-uicons:calendar-date',
+    iconSize: 26,
+    disabled: globalState.setting.date.enabled,
+  },
+  {
+    label: window.$t('setting.calendar'),
+    componentName: 'calendar',
+    iconName: 'uiw:date',
+    iconSize: 22,
+    disabled: globalState.setting.calendar.enabled,
+  },
+  {
+    label: window.$t('setting.search'),
+    componentName: 'search',
+    iconName: 'teenyicons:search-circle-outline',
+    iconSize: 24,
+    disabled: globalState.setting.search.enabled,
+  },
+  {
+    label: window.$t('setting.weather'),
+    componentName: 'weather',
+    iconName: 'mdi:weather-cloudy',
+    iconSize: 28,
+    disabled: globalState.setting.weather.enabled,
+  },
 ])
 
+// ElementDrawer
 const handleContainerMouseEnter = () => {
   state.isCursorInElementDrawer = true
 }
@@ -56,6 +109,7 @@ const handleContainerMouseLeave = () => {
   state.isCursorInElementDrawer = false
 }
 
+// Element
 let isStartDragTaskRan = false
 const handleElementMouseDown = () => {
   isStartDragTaskRan = false
@@ -63,6 +117,7 @@ const handleElementMouseDown = () => {
 
 const handleElementMouseMove = async(e: MouseEvent) => {
   if (isStartDragTaskRan) {
+    // 确保MouseDownTaskMap只执行一次
     return
   }
   isStartDragTaskRan = true
@@ -74,6 +129,7 @@ const handleElementMouseMove = async(e: MouseEvent) => {
 const handleElementMouseUp = (e: MouseEvent) => {
   moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
   if (!state.isCursorInElementDrawer) {
+    // 保存启用状态
     globalState.setting[moveState.currDragTarget.name].enabled = true
   }
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
@@ -120,7 +176,7 @@ const handlerDeleteMouseUp = () => {
   moveState.isDeleteHover = false
 }
 
-// keyboard
+// keyboard listener
 const keyboardHandler = (e: KeyboardEvent) => {
   if (!isDragMode.value) {
     return
@@ -141,23 +197,29 @@ const keyboardHandler = (e: KeyboardEvent) => {
 const CNAME = 'moveable-tool'
 addKeyboardTask(CNAME, keyboardHandler)
 
-const bgMoveableElementDelete = getStyleConst('bgMoveableElementDelete')
+const themeColorMain = getStyleConst('themeColorMain')
+const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
+const bgMoveableComponentDelete = getStyleConst('bgMoveableComponentDelete')
+const bgMoveableToolDrawer = getStyleConst('bgMoveableToolDrawer')
+const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
 </script>
 
 <style>
-.moveable-tool {
+#moveable-tool {
   z-index: 11;
   position: relative;
   top: 0;
-  left: -250px;
-  width: 250px;
+  left: -230px;
+  width: 230px;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  background-color: v-bind(bgMoveableToolDrawer);
   transition: all 0.3s ease;
   .tool__drawer {
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
     .drawer__switch {
       position: absolute;
       top: 50vh;
@@ -168,7 +230,7 @@ const bgMoveableElementDelete = getStyleConst('bgMoveableElementDelete')
       width: 20px;
       height: 80px;
       transform: translate(0, -50%);
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: v-bind(bgMoveableToolDrawer);
       border-top-right-radius: 5px;
       border-bottom-right-radius: 5px;
       cursor: pointer;
@@ -181,10 +243,18 @@ const bgMoveableElementDelete = getStyleConst('bgMoveableElementDelete')
         transform: rotate(180deg);
       }
     }
+    .drawer__switch:hover {
+      color: v-bind(themeColorMain);
+    }
     .drawer__header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 10px;
+      width: 100%;
+      border-bottom: 1px solid v-bind(borderMoveableToolItem);
       .header__icon {
-        font-size: 16px;
+        font-size: 22px;
       }
     }
     .drawer__content {
@@ -192,34 +262,63 @@ const bgMoveableElementDelete = getStyleConst('bgMoveableElementDelete')
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      padding-top: 10px;
       width: 100%;
       .content__item {
-        width: 100%;
-        margin: 0 10px;
-        padding: 10px;
-        text-align: center;
-        cursor: pointer;
+        flex-shrink: 1;
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+        width: 75%;
+        height: 45px;
+        font-size: 16px;
+        /* text-align: center; */
+        border: 1px solid v-bind(borderMoveableToolItem);
+        border-radius: 3px;
+        cursor: move;
         user-select: none;
+        .item__icon {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 50px;
+          height: 45px;
+        }
+        .item__text {
+          flex: 1;
+          height: 45px;
+          line-height: 45px;
+          text-align: center;
+          border-left: 1px solid v-bind(borderMoveableToolItem);
+        }
+      }
+      .content__item:hover {
+        background-color: v-bind(bgMoveableComponentMain);
       }
     }
   }
   .tool__delete {
-    z-index: 11;
+    z-index: 20;
     position: fixed;
-    top: 8vh;
-    right: 10vw;
+    top: -45px;
+    right: -45px;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 45px;
     height: 45px;
-    border: 1px solid v-bind(bgMoveableElementDelete);
     border-radius: 2px;
     cursor: pointer;
+    transition: all 0.3s ease;
     .delete__icon {
-      font-size: 30px;
-      color: v-bind(bgMoveableElementDelete);
+      font-size: 36px;
+      color: v-bind(bgMoveableComponentDelete);
     }
+  }
+  .tool__delete--active {
+    top: 8vh;
+    right: 10vw;
   }
 }
 .moveable-tool--active {

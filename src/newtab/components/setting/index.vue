@@ -1,7 +1,7 @@
 <template>
   <div id="setting">
     <!-- settingIcon -->
-    <MoveableElement componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
+    <MoveableComponent componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
       <div v-if="isRender" data-target-type="1" data-target-name="settingIcon">
         <div class="settingIcon__container" :style="containerStyle">
           <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
@@ -9,7 +9,7 @@
           </NButton>
         </div>
       </div>
-    </MoveableElement>
+    </MoveableComponent>
     <!-- Drawer -->
     <NDrawer
       v-model:show="isSettingDrawerVisible"
@@ -67,55 +67,43 @@ import { URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDra
 const CNAME = 'settingIcon'
 const isRender = getIsComponentRender(CNAME)
 
-const tabPaneList: any = shallowRef([])
-
-const initEnumData = () => {
-  tabPaneList.value = [
-    {
-      name: 'general',
-      label: window.$t('setting.general'),
-      component: GeneralSetting,
-    },
-    {
-      name: 'bookmark',
-      label: window.$t('setting.bookmark'),
-      component: BookmarkSetting,
-    },
-    {
-      name: 'clock',
-      label: window.$t('setting.clock'),
-      component: ClockSetting,
-    },
-    {
-      name: 'date',
-      label: window.$t('setting.date'),
-      component: DateSetting,
-    },
-    {
-      name: 'calendar',
-      label: window.$t('setting.calendar'),
-      component: CalendarSetting,
-    },
-    {
-      name: 'search',
-      label: window.$t('setting.search'),
-      component: SearchSetting,
-    },
-    {
-      name: 'weather',
-      label: window.$t('setting.weather'),
-      component: WeatherSetting,
-    },
-  ]
-}
-
-watch(
-  () => globalState.setting.general.lang,
-  () => {
-    initEnumData()
+const tabPaneList = computed(() => ([
+  {
+    name: 'general',
+    label: window.$t('setting.general'),
+    component: GeneralSetting,
   },
-  { immediate: true },
-)
+  {
+    name: 'bookmark',
+    label: window.$t('setting.bookmark'),
+    component: BookmarkSetting,
+  },
+  {
+    name: 'clock',
+    label: window.$t('setting.clock'),
+    component: ClockSetting,
+  },
+  {
+    name: 'date',
+    label: window.$t('setting.date'),
+    component: DateSetting,
+  },
+  {
+    name: 'calendar',
+    label: window.$t('setting.calendar'),
+    component: CalendarSetting,
+  },
+  {
+    name: 'search',
+    label: window.$t('setting.search'),
+    component: SearchSetting,
+  },
+  {
+    name: 'weather',
+    label: window.$t('setting.weather'),
+    component: WeatherSetting,
+  },
+]))
 
 const onTabsChange = (tabName: string) => {
   currSettingTabValue.value = tabName
@@ -125,24 +113,25 @@ const openSettingModal = () => {
   if (isDragMode.value) {
     return
   }
-  toggleIsSettingDrawerVisible()
+  toggleIsSettingDrawerVisible(true)
   gaEvent('setting-button', 'click', 'open')
 }
 
 const openDragMode = () => {
-  if (isDragMode.value) {
-    return
-  }
-  toggleIsSettingDrawerVisible()
-  toggleIsDragMode()
+  toggleIsSettingDrawerVisible(false)
+  toggleIsDragMode(true)
 }
 
 const drawerOpacity = ref(1)
 const handlerPreviewEnter = () => {
   drawerOpacity.value = 0
+  const mask = document.querySelector('.n-drawer-mask') as HTMLElement
+  mask.setAttribute('style', 'transition: all 0.3s ease;background-color: transparent;')
 }
 const handlerPreviewLeave = () => {
   drawerOpacity.value = 1
+  const mask = document.querySelector('.n-drawer-mask') as HTMLElement
+  mask.style.backgroundColor = ''
 }
 
 const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
@@ -155,7 +144,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   z-index: 10;
   position: absolute;
   .item__icon {
-    font-size: 26px;
+    font-size: 28px;
   }
 }
 
@@ -164,8 +153,8 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 }
 
 .n-tabs-nav {
-  /* 抽屉的z-index为2000，这里设置入口图标层级低于抽屉 */
-  z-index: 1999;
+  /* 抽屉的z-index为2000 */
+  z-index: 2000;
   position: absolute;
   top: 0;
   left: 0;
@@ -214,8 +203,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
         margin-right: 10px;
       }
     }
-    .bottom__version {
-    }
+    .bottom__version {}
     .bottom__right {
       display: flex;
       justify-content: center;

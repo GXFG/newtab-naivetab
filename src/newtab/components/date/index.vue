@@ -1,5 +1,5 @@
 <template>
-  <MoveableElement componentName="date" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponent componentName="date" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
@@ -7,7 +7,7 @@
         </p>
       </div>
     </div>
-  </MoveableElement>
+  </MoveableComponent>
 </template>
 
 <script setup lang="ts">
@@ -26,14 +26,14 @@ const updateDate = () => {
 }
 
 watch(
-  () => globalState.setting.date.enabled,
+  isRender,
   (value) => {
-    if (value) {
-      updateDate()
-      addTimerTask(CNAME, updateDate)
-    } else {
+    if (!value) {
       removeTimerTask(CNAME)
+      return
     }
+    updateDate()
+    addTimerTask(CNAME, updateDate)
   },
   { immediate: true },
 )

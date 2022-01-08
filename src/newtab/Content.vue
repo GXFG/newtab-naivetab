@@ -3,11 +3,10 @@
   <BackgroundImg />
   <RightClickMenu />
   <MoveableTool />
-  <MoveableAuxiliaryLine />
+  <MoveableLine />
   <HelpModal />
   <WhatsNew />
   <!-- element -->
-  <Setting />
   <KeyboardBookmark />
   <DigitalClock />
   <AnalogClock />
@@ -15,6 +14,7 @@
   <Calendar />
   <Search />
   <Weather />
+  <Setting />
 </template>
 
 <script setup lang="ts">

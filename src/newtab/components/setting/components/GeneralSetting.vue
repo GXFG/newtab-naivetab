@@ -4,13 +4,13 @@
       <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
     </NFormItem>
     <NFormItem :label="$t('common.theme')">
-      <NSelect v-model:value="globalState.setting.general.theme" :options="state.themeList" />
+      <NSelect v-model:value="globalState.setting.general.theme" :options="themeList" />
     </NFormItem>
     <NFormItem :label="$t('general.language')">
       <NSelect v-model:value="proxy.$i18n.locale" :options="state.i18nList" @update:value="onChangeLocale" />
     </NFormItem>
     <NFormItem :label="$t('common.drawerSite')">
-      <NSelect v-model:value="globalState.setting.general.drawerPlacement" :options="state.drawerPlacementList" />
+      <NSelect v-model:value="globalState.setting.general.drawerPlacement" :options="drawerPlacementList" />
     </NFormItem>
     <NFormItem :label="$t('general.setttingIcon')">
       <NSwitch v-model:value="globalState.setting.settingIcon.enabled" />
@@ -24,7 +24,7 @@
       <NSwitch v-model:value="globalState.style.general.isBackgroundImageEnabled" />
     </NFormItem>
     <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
-      <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="state.backgroundImageSourceList" style="width: 110px" />
+      <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 110px" />
       <template v-if="globalState.style.general.backgroundImageSource === 0">
         <NButton class="setting__row-element" @click="onSelectBackgroundImage">
           <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
@@ -118,40 +118,29 @@ import i18n from '@/lib/i18n'
 const { proxy }: any = getCurrentInstance()
 
 const state = reactive({
-  themeList: [] as TSelectItem[],
-  drawerPlacementList: [] as TSelectItem[],
-  backgroundImageSourceList: [] as TEnum[],
   i18nList: i18n.global.availableLocales.map((locale: string) => ({
     label: locale,
     value: locale,
   })),
 })
 
-const initEnumData = () => {
-  state.themeList = [
-    { label: window.$t('common.auto'), value: 'auto' },
-    { label: window.$t('common.light'), value: 'light' },
-    { label: window.$t('common.dark'), value: 'dark' },
-  ]
-  state.drawerPlacementList = [
-    { label: window.$t('common.left'), value: 'left' },
-    { label: window.$t('common.right'), value: 'right' },
-    { label: window.$t('common.top'), value: 'top' },
-    { label: window.$t('common.bottom'), value: 'bottom' },
-  ]
-  state.backgroundImageSourceList = [
-    { label: window.$t('common.bing'), value: 1 },
-    { label: window.$t('common.local'), value: 0 },
-  ]
-}
+const themeList = computed(() => ([
+  { label: window.$t('common.auto'), value: 'auto' },
+  { label: window.$t('common.light'), value: 'light' },
+  { label: window.$t('common.dark'), value: 'dark' },
+]))
 
-watch(
-  () => globalState.setting.general.lang,
-  () => {
-    initEnumData()
-  },
-  { immediate: true },
-)
+const drawerPlacementList = computed(() => ([
+  { label: window.$t('common.left'), value: 'left' },
+  { label: window.$t('common.right'), value: 'right' },
+  { label: window.$t('common.top'), value: 'top' },
+  { label: window.$t('common.bottom'), value: 'bottom' },
+]))
+
+const backgroundImageSourceList = computed(() => ([
+  { label: window.$t('common.bing'), value: 1 },
+  { label: window.$t('common.local'), value: 0 },
+]))
 
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
@@ -159,7 +148,7 @@ const onChangeLocale = (locale: string) => {
   gaEvent('setting-locale', 'click', 'change')
 }
 
-const isCurrSelectedImage = item => item.urlbase === globalState.style.general.backgroundImageId
+const isCurrSelectedImage = (item: TImageItem) => item.urlbase === globalState.style.general.backgroundImageId
 
 const bgImageFileInputEl = ref()
 const onSelectBackgroundImage = () => {
@@ -222,7 +211,7 @@ const onResetSetting = () => {
   gaEvent('setting-reset', 'click', 'open')
 }
 
-const borderColorMain = getStyleConst('borderColorMain')
+const themeColorMain = getStyleConst('themeColorMain')
 </script>
 
 <style scoped>
@@ -245,6 +234,6 @@ const borderColorMain = getStyleConst('borderColorMain')
   }
 }
 .image__item--active {
-  outline: 3px solid v-bind(borderColorMain);
+  outline: 3px solid v-bind(themeColorMain);
 }
 </style>

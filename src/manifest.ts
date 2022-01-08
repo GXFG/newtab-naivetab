@@ -25,8 +25,9 @@ export async function getManifest() {
     permissions: [
       'storage',
       'chrome://favicon/',
-      'https://cn.bing.com/',
-      'https://api.weatherapi.com/',
+      'https://cn.bing.com/', // image
+      'https://api.weatherapi.com/', // weather
+      'https://www.baidu.com/', // search
     ],
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',

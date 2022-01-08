@@ -8,17 +8,19 @@ import './main.css'
  */
 export const styleConst = ref({
   // common
-  borderColorMain: ['#18A058', ''],
+  themeColorMain: ['#63e2b7', ''],
   // setting
   bgBottomBar: ['#eceff1', '#424247'],
   // moveable
   auxiliaryLineMain: ['#40a9ff', ''],
   auxiliaryLineBound: ['#ff7875', ''],
   auxiliaryLineElement: ['#69c0ff', ''],
-  deleteBtnColor: ['#ffa39e', ''],
-  bgMoveableElementMain: ['rgba(100,181,246, 0.5)', ''],
-  bgMoveableElementActive: ['rgba(100,181,246, 0.5)', ''],
-  bgMoveableElementDelete: ['rgba(250,82,82, 0.7)', ''],
+  bgMoveableComponentMain: ['rgba(100,181,246, 0.5)', ''],
+  bgMoveableComponentActive: ['rgba(100,181,246, 0.7)', ''],
+  bgMoveableComponentDelete: ['rgba(250,82,82, 0.7)', ''],
+  moveableToolDeleteBtnColor: ['#ffa39e', ''],
+  borderMoveableToolItem: ['#63e2b7', ''],
+  bgMoveableToolDrawer: ['rgba(0, 0, 0, 0.6)', ''],
   // calendar
   textColorRed: ['#fa5252', ''],
   bgCalendarRest: ['rgba(255, 110, 110, 0.4)', ''],

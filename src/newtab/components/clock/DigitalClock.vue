@@ -1,5 +1,5 @@
 <template>
-  <MoveableElement componentName="clockDigital" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponent componentName="clockDigital" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
       <div class="clockDigital__container" :style="containerStyle" :class="{ 'clockDigital__container--shadow': globalState.style.clockDigital.isShadowEnabled }">
         <div class="clock__time">
@@ -10,7 +10,7 @@
         </div>
       </div>
     </div>
-  </MoveableElement>
+  </MoveableComponent>
 </template>
 
 <script setup lang="ts">
@@ -31,14 +31,14 @@ const updateTime = () => {
 }
 
 watch(
-  () => globalState.setting.clockDigital.enabled,
+  isRender,
   (value) => {
-    if (value) {
-      updateTime()
-      addTimerTask(CNAME, updateTime)
-    } else {
+    if (!value) {
       removeTimerTask(CNAME)
+      return
     }
+    updateTime()
+    addTimerTask(CNAME, updateTime)
   },
   { immediate: true },
 )

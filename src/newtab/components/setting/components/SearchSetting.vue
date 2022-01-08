@@ -12,7 +12,7 @@
 import { NFormItem, NSelect } from 'naive-ui'
 import { SEARCH_ENGINE_LIST, globalState } from '@/logic'
 
-const onChangeSearch = (value, option: TSelectItem) => {
+const onChangeSearch = (value, option: TSelectStringItem) => {
   globalState.setting.search.urlName = option.label
 }
 </script>

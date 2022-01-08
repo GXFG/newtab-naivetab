@@ -1,4 +1,4 @@
-import { isSettingDrawerVisible, toggleIsSettingDrawerVisible } from '@/logic'
+import { globalState, isSettingDrawerVisible, toggleIsSettingDrawerVisible } from '@/logic'
 
 const tasks = new Map()
 
@@ -12,9 +12,10 @@ export const removeKeyboardTask = (key: string) => {
 
 export const startKeyboard = () => {
   document.onkeydown = (e: KeyboardEvent) => {
-    if (isSettingDrawerVisible.value) {
+    // 在'搜索框'与'设置抽屉内'忽略按键事件
+    if (isSettingDrawerVisible.value || globalState.state.isSearchFocused) {
       if (e.key === 'Escape') {
-        toggleIsSettingDrawerVisible()
+        toggleIsSettingDrawerVisible(false)
       }
       return
     }

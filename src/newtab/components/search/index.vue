@@ -1,58 +1,128 @@
 <template>
-  <MoveableElement componentName="search" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponent componentName="search" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
-      <div
-        class="search__container"
-        :style="containerStyle"
-        :class="{
-          'search__container--focus': globalState.style.search.isBorderEnabled && state.isFocused,
-          'search__container--border': globalState.style.search.isBorderEnabled,
-          'search__container--shadow': globalState.style.search.isShadowEnabled,
-        }"
-      >
-        <input
-          v-model="state.searchValue"
-          class="input__main"
-          :class="{ 'input__main--move': isDragMode }"
-          :placeholder="placeholder"
-          :disabled="isDragMode"
-          @focus="onSearchFocus()"
-          @blur="onSearchBlur"
-          @keyup.enter="onSearch()"
-        />
-        <il:search class="input__icon" :class="{ 'input__icon--move': isDragMode }" @click="onSearch()" />
-      </div>
+      <NDropdown :show="state.isSuggestVisible" :options="state.suggestList" :placement="state.placementValue" :show-arrow="true" @select="handleSelectSuggest">
+        <div
+          class="search__container"
+          :style="containerStyle"
+          :class="{
+            'search__container--focus': globalState.style.search.isBorderEnabled && globalState.state.isSearchFocused,
+            'search__container--border': globalState.style.search.isBorderEnabled,
+            'search__container--shadow': globalState.style.search.isShadowEnabled,
+          }"
+        >
+          <input
+            v-model="state.searchValue"
+            class="input__main"
+            :class="{ 'input__main--move': isDragMode }"
+            :placeholder="placeholder"
+            :disabled="isDragMode"
+            @focus="onSearchFocus()"
+            @blur="onSearchBlur"
+            @input="onSearchInput"
+            @keyup.enter="onSearch()"
+          />
+          <div class="input__clear" :class="{ 'input__clear--move': isDragMode }">
+            <icon-park-outline:close-one v-show="isClearVisible" @click="onClearValue()" />
+          </div>
+          <il:search class="input__search" :class="{ 'input__search--move': isDragMode }" @click="onSearch()" />
+        </div>
+      </NDropdown>
     </div>
-  </MoveableElement>
+  </MoveableComponent>
 </template>
 
 <script setup lang="ts">
+import { NDropdown } from 'naive-ui'
+import { useDebounceFn } from '@vueuse/core'
 import { globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, openNewPage } from '@/logic'
+import http from '@/lib/http'
 
 const CNAME = 'search'
 const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
-  isFocused: false,
   searchValue: '',
+  isSuggestVisible: false,
+  placementValue: 'bottom',
+  suggestList: [],
 })
 
 const placeholder = computed(() => `${globalState.setting.search.urlName}`)
+const isClearVisible = computed(() => state.searchValue.length !== 0)
 
 const onSearchFocus = () => {
-  state.isFocused = true
+  globalState.state.isSearchFocused = true
+  state.isSuggestVisible = true
 }
+
 const onSearchBlur = () => {
-  state.isFocused = false
+  globalState.state.isSearchFocused = false
+}
+
+const onSearchInput = () => {
+  if (state.searchValue.length === 0 || state.isSuggestVisible) {
+    return
+  }
+  state.isSuggestVisible = true
+}
+
+const onClearValue = () => {
+  state.searchValue = ''
+  state.suggestList = []
 }
 
 const onSearch = () => {
-  if (state.searchValue.length === 0) {
+  if (state.searchValue.length === 0 || state.isSuggestVisible) {
     return
   }
   const url = globalState.setting.search.urlValue.replace('{query}', state.searchValue)
+  state.isSuggestVisible = false
   openNewPage(url)
   state.searchValue = ''
+}
+
+const getBaiduSuggest = async() => {
+  if (state.searchValue.length === 0) {
+    return
+  }
+  const data: any = await http({
+    url: 'https://www.baidu.com/sugrec',
+    params: {
+      prod: 'pc',
+      wd: state.searchValue,
+    },
+  })
+  if (data && data.g && data.g.length !== 0) {
+    state.suggestList = data.g.map((item: { q: string[] }) => ({
+      label: item.q,
+      key: item.q,
+    }))
+  } else {
+    state.suggestList = []
+  }
+}
+
+const getBaiduSuggestHandler = useDebounceFn(getBaiduSuggest, 300)
+
+watch(
+  () => state.searchValue,
+  () => {
+    if (state.searchValue.length === 0) {
+      onClearValue()
+      return
+    }
+    getBaiduSuggestHandler()
+  },
+)
+watch(isDragMode, () => {
+  onClearValue()
+})
+
+const handleSelectSuggest = (key: string) => {
+  state.searchValue = key
+  state.isSuggestVisible = false
+  onSearch()
 }
 
 const containerStyle = ref(getLayoutStyle(CNAME))
@@ -87,11 +157,22 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     .input__main--move {
       cursor: move !important;
     }
-    .input__icon {
-      margin: 3px 0 0 10px;
+    .input__clear {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 50px;
+      font-size: 16px;
       cursor: pointer;
     }
-    .input__icon--move {
+    .input__clear--move {
+      cursor: move !important;
+    }
+    .input__search {
+      margin: 3px 0 0 0;
+      cursor: pointer;
+    }
+    .input__search--move {
       cursor: move !important;
     }
   }

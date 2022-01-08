@@ -1,5 +1,5 @@
-export const URL_CHANGELOG = 'https://github.com/cmd-cv/newtab-puzzletab/blob/main/CHANGELOG.md'
-export const URL_GITHUB = 'https://github.com/cmd-cv/newtab-puzzletab'
+export const URL_CHANGELOG = 'https://github.com/GXFG/newtab-puzzletab/blob/main/CHANGELOG.md'
+export const URL_GITHUB = 'https://github.com/GXFG/newtab-puzzletab'
 export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
 
 export const KEYBOARD_KEY = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']

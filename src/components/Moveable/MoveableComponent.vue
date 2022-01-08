@@ -234,6 +234,7 @@ watch(isCurrent, async(value) => {
     return
   }
   modifyMoveableWrapClass(value, 'element-active')
+  modifyMoveableWrapClass(!value, 'element-bg-hover') // 当前选中的Component无hover样式
 })
 
 watch(() => moveState.isDeleteHover, async(value) => {
@@ -244,9 +245,9 @@ watch(() => moveState.isDeleteHover, async(value) => {
 })
 
 const auxiliaryLineElement = getStyleConst('auxiliaryLineElement')
-const bgMoveableElementMain = getStyleConst('bgMoveableElementMain')
-const bgMoveableElementActive = getStyleConst('bgMoveableElementActive')
-const deleteBtnColor = getStyleConst('deleteBtnColor')
+const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
+const bgMoveableComponentActive = getStyleConst('bgMoveableComponentActive')
+const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
 
 </script>
 
@@ -256,13 +257,14 @@ const deleteBtnColor = getStyleConst('deleteBtnColor')
 }
 
 .element-bg-hover:hover {
-  background-color: v-bind(bgMoveableElementMain) !important;
+  background-color: v-bind(bgMoveableComponentMain) !important;
 }
 
 .element-active {
-  background-color: v-bind(bgMoveableElementActive) !important;
+  background-color: v-bind(bgMoveableComponentActive) !important;
 }
+
 .element-delete {
-  background-color: v-bind(deleteBtnColor) !important;
+  background-color: v-bind(moveableToolDeleteBtnColor) !important;
 }
 </style>

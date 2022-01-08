@@ -5,14 +5,15 @@ interface Window {
   $notification: any
 }
 
-type TComponents = 'element' | 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'search' | 'calendar' | 'weather'
+type TTargetType = 1 | 2
+type TComponents = 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'search' | 'calendar' | 'weather'
 
-type TEnum = {
+type TSelectNumberItem = {
   label: string
   value: number
 }
 
-type TSelectItem = {
+type TSelectStringItem = {
   label: string
   value: string
 }

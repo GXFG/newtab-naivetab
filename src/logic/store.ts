@@ -12,6 +12,7 @@ export const currSettingTabValue = ref('general')
 export const globalState = reactive({
   state: {
     isWhatsNewModalVisible: false,
+    isSearchFocused: false,
   },
   localState: useStorageLocal('local-state', {
     currThemeCode: 0, // 0:light | 1:dark

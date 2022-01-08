@@ -1,5 +1,5 @@
 <template>
-  <MoveableElement componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponent componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
       <div class="bookmark__container" :style="containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
@@ -36,7 +36,7 @@
         </div>
       </div>
     </div>
-  </MoveableElement>
+  </MoveableComponent>
 </template>
 
 <script setup lang="ts">
@@ -87,8 +87,8 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
   for (const key of KEYBOARD_KEY) {
     const item = globalState.setting.bookmark.keymap[key]
     const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
-    // 重置没有配置信息的按键
     if (!(item && (item.url || item.name))) {
+      // 重置没有配置信息的按键数据
       localBookmarkList.value[index] = {
         key,
         url: '',
@@ -128,7 +128,7 @@ const onPressItem = (url: string) => {
   state.currSelectKey = ''
 }
 
-// 监听键盘按键
+// keyboard listener
 let timer = null as any
 const keyboardTask = (e: KeyboardEvent) => {
   const { key } = e
@@ -189,6 +189,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
   .bookmark__container {
     z-index: 10;
     position: absolute;
+    overflow: hidden;
     .bookmark__row {
       display: flex;
       justify-content: center;
