@@ -10,9 +10,12 @@ export const imageState = ref(useStorageLocal('data-images', {
   localBackgroundBase64: '',
 }))
 
-// size: UHD, 1920x1080, 1366x768
+/**
+ * @param size: UHD, 1920x1080, 1366x768
+ */
 export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http://cn.bing.com/${url}_${size}.jpg`
 
+export const isImageLoading = ref(false)
 export const isImageListLoading = ref(false)
 
 const getBingImages = async() => {
@@ -37,6 +40,7 @@ const getBingImages = async() => {
 
 const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
   await nextTick()
+  isImageLoading.value = true
   const backgroundEl: any = document.querySelector('#background')
   if (clearStyle) {
     backgroundEl.style = ''
@@ -47,6 +51,7 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
     currUrl = imageState.value.localBackgroundBase64
   } else {
     if (initPage && globalState.style.general.backgroundImageUrl.length !== 0) {
+      // 初始化页面时且本地有图片缓存时，读取上一次的设置
       currUrl = globalState.style.general.backgroundImageUrl
     } else {
       let index = imageState.value.imageList.findIndex((item: TImageItem) => item.urlbase === globalState.style.general.backgroundImageId)
@@ -57,11 +62,20 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
       currUrl = httpUrl
     }
   }
-  let style = `background-image: url(${currUrl});`
-  style += 'background-size: cover;background-repeat: no-repeat;'
-  style += `opacity: ${globalState.style.general.bgOpacity};`
-  style += `filter: blur(${globalState.style.general.bgBlur}px);`
-  backgroundEl.style = style
+  const imgEle = new Image()
+  imgEle.src = currUrl
+  // 图片加载完成后再切换背景图
+  imgEle.onload = () => {
+    let style = `background-image: url(${currUrl});`
+    style += 'background-size: cover;background-repeat: no-repeat;'
+    style += `opacity: ${globalState.style.general.bgOpacity};`
+    style += `filter: blur(${globalState.style.general.bgBlur}px);`
+    backgroundEl.style = style
+    isImageLoading.value = false
+  }
+  imgEle.onerror = () => {
+    isImageLoading.value = false
+  }
 }
 
 watch([

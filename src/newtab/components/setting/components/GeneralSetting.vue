@@ -51,10 +51,15 @@
     </NFormItem>
     <NFormItem v-else-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 1" label=" ">
       <div class="setting__image-wrap">
-        <div v-for="item in imageState.imageList" :key="item.url" class="image__item" :class="{ 'image__item--active': globalState.style.general.backgroundImageId === item.urlbase }" @click="onSelectImage(item)">
+        <div v-for="item in imageState.imageList" :key="item.url" class="image__item" :class="{ 'image__item--active': isCurrSelectedImage(item) }" @click="onSelectImage(item)">
           <NTooltip triger="hover">
             <template #trigger>
-              <img :src="getImageUrlFromBing(item.url, '1366x768')" alt="" />
+              <div>
+                <p v-show="isCurrSelectedImage(item) && isImageLoading" class="item__loading">
+                  loading...
+                </p>
+                <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="" />
+              </div>
             </template>
             <p>{{ item.copyright }}</p>
           </NTooltip>
@@ -107,7 +112,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { NDivider, NFormItem, NButton, NSelect, NInput, NInputNumber, NSlider, NSwitch, NPopconfirm, NTooltip } from 'naive-ui'
-import { gaEvent, importSetting, exportSetting, resetSetting, getStyleConst, globalState, imageState, getImageUrlFromBing, isImageListLoading, onRefreshImageList } from '@/logic'
+import { gaEvent, importSetting, exportSetting, resetSetting, getStyleConst, globalState, imageState, getImageUrlFromBing, isImageLoading, isImageListLoading, onRefreshImageList } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -153,6 +158,8 @@ const onChangeLocale = (locale: string) => {
   globalState.setting.general.lang = locale
   gaEvent('setting-locale', 'click', 'change')
 }
+
+const isCurrSelectedImage = item => item.urlbase === globalState.style.general.backgroundImageId
 
 const bgImageFileInputEl = ref()
 const onSelectBackgroundImage = () => {
@@ -223,10 +230,18 @@ const borderColorMain = getStyleConst('borderColorMain')
   display: flex;
   flex-wrap: wrap;
   .image__item {
+    position: relative;
     margin: 0 3% 2% 0;
     width: 30%;
     border-radius: 2px;
     cursor: pointer;
+    .item__loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 .image__item--active {
