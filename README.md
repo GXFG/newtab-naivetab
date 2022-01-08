@@ -2,7 +2,7 @@
   <img src="https://user-images.githubusercontent.com/20944987/147905855-2a1eaebf-d7af-45d1-9aa2-2f96806d79c9.png" />
   <h1 align="center">PuzzleTab</h1>
   <p align="center">一款简洁的浏览器新标签页扩展</p>
-  <p align="center">中文 | <a href="https://github.com/cmd-cv/newtab-puzzletab/blob/main/README.en-US.md">English</a></p>
+  <p align="center">中文 | <a href="https://github.com/GXFG/newtab-puzzletab/blob/main/README.en-US.md">English</a></p>
 </div
 
 ## 🌟特性
@@ -34,7 +34,7 @@
 
 ## 📜更新日志
 
-[查看 CHANGELOG.md](https://github.com/cmd-cv/newtab-puzzletab/blob/main/CHANGELOG.md)
+[查看 CHANGELOG.md](https://github.com/GXFG/newtab-puzzletab/blob/main/CHANGELOG.md)
 
 ## 🏗开发
 
