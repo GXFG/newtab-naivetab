@@ -44,7 +44,7 @@ const isRender = getIsComponentRender(CNAME)
 const state = reactive({
   searchValue: '',
   isSuggestVisible: false,
-  placementValue: 'bottom',
+  placementValue: 'bottom' as any,
   suggestList: [],
 })
 
