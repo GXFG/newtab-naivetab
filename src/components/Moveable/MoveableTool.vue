@@ -206,7 +206,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
 
 <style>
 #moveable-tool {
-  z-index: 11;
+  z-index: 20;
   position: relative;
   top: 0;
   left: -230px;
