@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { NDrawer, NDrawerContent, NButton, NTabs, NTabPane } from 'naive-ui'
+import { NButton, NDrawer, NDrawerContent, NTabPane, NTabs } from 'naive-ui'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
@@ -62,7 +62,7 @@ import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_GITHUB, gaEvent, currSettingTabValue, isSettingDrawerVisible, isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, globalState, getIsComponentRender, getStyleConst, getLayoutStyle, openNewPage, openWhatsNewModal } from '@/logic'
+import { URL_GITHUB, currSettingTabValue, gaEvent, getIsComponentRender, getLayoutStyle, getStyleConst, globalState, isDragMode, isSettingDrawerVisible, openNewPage, openWhatsNewModal, toggleIsDragMode, toggleIsSettingDrawerVisible } from '@/logic'
 
 const CNAME = 'settingIcon'
 const isRender = getIsComponentRender(CNAME)

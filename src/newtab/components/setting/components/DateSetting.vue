@@ -2,7 +2,7 @@
   <BaseComponentSetting field="date">
     <template #header>
       <NFormItem :label="$t('common.format')">
-        <NInput v-model:value="globalState.setting.date.format"></NInput>
+        <NInput v-model:value="globalState.setting.date.format" />
         <Tips link :content="URL_DAYJS_FORMAT" />
       </NFormItem>
     </template>

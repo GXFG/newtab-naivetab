@@ -9,9 +9,10 @@
 </template>
 
 <script setup lang="ts">
-import { NConfigProvider, useOsTheme, darkTheme, GlobalThemeOverrides, zhCN, enUS, NMessageProvider, NNotificationProvider } from 'naive-ui'
+import type { GlobalThemeOverrides } from 'naive-ui'
+import { NConfigProvider, NMessageProvider, NNotificationProvider, darkTheme, enUS, useOsTheme, zhCN } from 'naive-ui'
 import Content from './Content.vue'
-import { gaEvent, THEME_TO_CODE_MAP, globalState, openWhatsNewModal, loadSyncSetting, startTimer, stopTimer, startKeyboard, getStyleField } from '@/logic'
+import { THEME_TO_CODE_MAP, gaEvent, getStyleField, globalState, loadSyncSetting, openWhatsNewModal, startKeyboard, startTimer, stopTimer } from '@/logic'
 
 openWhatsNewModal()
 loadSyncSetting()

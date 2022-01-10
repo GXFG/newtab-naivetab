@@ -5,7 +5,7 @@
   <BaseComponentSetting field="clockAnalog">
     <template #header>
       <NFormItem :label="$t('common.theme')">
-        <NSelect v-model:value="globalState.setting.clockAnalog.theme" :options="ANALOG_CLOCK_THEME"></NSelect>
+        <NSelect v-model:value="globalState.setting.clockAnalog.theme" :options="ANALOG_CLOCK_THEME" />
       </NFormItem>
     </template>
   </BaseComponentSetting>
@@ -16,7 +16,7 @@
   <BaseComponentSetting field="clockDigital">
     <template #header>
       <NFormItem :label="$t('common.format')">
-        <NInput v-model:value="globalState.setting.clockDigital.format"></NInput>
+        <NInput v-model:value="globalState.setting.clockDigital.format" />
         <Tips link :content="URL_DAYJS_FORMAT" />
       </NFormItem>
       <NFormItem :label="$t('clock.apMark')">
@@ -29,6 +29,6 @@
 </template>
 
 <script setup lang="ts">
-import { NDivider, NFormItem, NSelect, NInput, NInputNumber, NSwitch, NSlider } from 'naive-ui'
+import { NDivider, NFormItem, NInput, NInputNumber, NSelect, NSlider, NSwitch } from 'naive-ui'
 import { ANALOG_CLOCK_THEME, URL_DAYJS_FORMAT, globalState } from '@/logic'
 </script>

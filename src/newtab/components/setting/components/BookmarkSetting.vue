@@ -13,7 +13,9 @@
           <div v-if="globalState.setting.bookmark.isDblclickOpen" class="setting__input_item">
             <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
             <NInputNumber v-model:value="globalState.setting.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
-              <template #suffix> ms </template>
+              <template #suffix>
+                ms
+              </template>
             </NInputNumber>
             <Tips :content="$t('bookmark.intervalTimeTips')" />
           </div>
@@ -53,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { NDivider, NSpace, NFormItem, NButton, NInputGroup, NInputGroupLabel, NInput, NInputNumber, NSwitch } from 'naive-ui'
+import { NButton, NDivider, NFormItem, NInput, NInputGroup, NInputGroupLabel, NInputNumber, NSpace, NSwitch } from 'naive-ui'
 import { KEYBOARD_KEY, globalState } from '@/logic'
 
 const onAddKey = (key: string) => {
@@ -79,7 +81,6 @@ const onDeleteKey = (key: string) => {
       opacity: 0.6;
       text-align: center;
       &:nth-of-type(1) {
-        /* margin-left: 14%; */
         width: 40px;
       }
       &:nth-of-type(2) {

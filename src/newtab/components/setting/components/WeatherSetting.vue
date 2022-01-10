@@ -11,28 +11,28 @@
       </NFormItem>
       <NFormItem :label="$t('weather.city')">
         <NInputGroup>
-          <NAutoComplete v-model:value="state.cityLabel" :loading="state.isSearchLoading" :options="state.cityList" @update:value="onUpdateCity" @select="onSelectCity"></NAutoComplete>
+          <NAutoComplete v-model:value="state.cityLabel" :loading="state.isSearchLoading" :options="state.cityList" @update:value="onUpdateCity" @select="onSelectCity" />
           <!-- <NButton @click="onSearch()">
             <bx:bx-search class="item__icon" />
           </NButton> -->
         </NInputGroup>
       </NFormItem>
       <NFormItem label="AQI">
-        <NSelect v-model:value="globalState.setting.weather.aqi" :options="aqiOptions"></NSelect>
+        <NSelect v-model:value="globalState.setting.weather.aqi" :options="aqiOptions" />
       </NFormItem>
       <NFormItem :label="$t('weather.temperatureUnit')">
-        <NSelect v-model:value="globalState.setting.weather.temperatureUnit" :options="temperatureUnitOptions"></NSelect>
+        <NSelect v-model:value="globalState.setting.weather.temperatureUnit" :options="temperatureUnitOptions" />
       </NFormItem>
       <NFormItem :label="$t('weather.speedUnit')">
-        <NSelect v-model:value="globalState.setting.weather.speedUnit" :options="speedUnitOptions"></NSelect>
+        <NSelect v-model:value="globalState.setting.weather.speedUnit" :options="speedUnitOptions" />
       </NFormItem>
       <NFormItem label="API Key">
-        <NInput v-model:value="globalState.setting.weather.apiKey"></NInput>
+        <NInput v-model:value="globalState.setting.weather.apiKey" />
         <NTooltip trigger="hover" placement="top-end">
           <template #trigger>
             <div style="margin-left: 10px; padding: 0 10px; background-color: #fff; border-radius: 2px">
               <a href="https://www.weatherapi.com/" title="Free Weather API">
-                <img :src="'/assets/img/weatherapi.png'" alt="Weather data by WeatherAPI.com" border="0" />
+                <img :src="'/assets/img/weatherapi.png'" alt="Weather data by WeatherAPI.com" border="0">
               </a>
             </div>
           </template>
@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { NFormItem, NInputGroup, NAutoComplete, NInput, NSelect, NSwitch, NTooltip, NSlider, NInputNumber } from 'naive-ui'
+import { NAutoComplete, NFormItem, NInput, NInputGroup, NInputNumber, NSelect, NSlider, NSwitch, NTooltip } from 'naive-ui'
 import { useDebounceFn } from '@vueuse/core'
 import { WEATHER_LANG_MAP, globalState } from '@/logic'
 import http from '@/lib/http'
@@ -110,7 +110,8 @@ const getSearch = async() => {
         value: item.url,
       }),
     )
-  } catch (e) {
+  }
+  catch (e) {
     state.isSearchLoading = false
   }
 }

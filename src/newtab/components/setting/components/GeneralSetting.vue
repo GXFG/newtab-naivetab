@@ -27,11 +27,15 @@
       <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
         <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 110px" />
         <template v-if="globalState.style.general.backgroundImageSource === 0">
-          <NButton class="setting__row-element" @click="onSelectBackgroundImage"> <uil:import />&nbsp;{{ $t('general.importSettingsValue') }} </NButton>
+          <NButton class="setting__row-element" @click="onSelectBackgroundImage">
+            <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
+          </NButton>
           <Tips :content="$t('general.localBackgroundTips')" />
         </template>
         <template v-else-if="globalState.style.general.backgroundImageSource === 1">
-          <NButton class="setting__row-element" @click="onSaveImage()"> <ion:save-outline />&nbsp;{{ $t('general.saveCurrendImage') }} </NButton>
+          <NButton class="setting__row-element" @click="onSaveImage()">
+            <ion:save-outline />&nbsp;{{ $t('general.saveCurrendImage') }}
+          </NButton>
           <NButton class="setting__row-element" :loading="isImageListLoading" @click="onRefreshImageList()">
             <template #icon>
               <div class="icon__wrap">
@@ -41,7 +45,7 @@
             {{ $t('common.refresh') }}
           </NButton>
         </template>
-        <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange" />
+        <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
       </NFormItem>
       <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 0" :label="$t('general.filename')">
         <p>{{ imageState.localBackgroundFileName }}</p>
@@ -52,8 +56,10 @@
             <NTooltip triger="hover">
               <template #trigger>
                 <div>
-                  <p v-show="isCurrSelectedImage(item) && isImageLoading" class="item__loading">loading...</p>
-                  <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="" />
+                  <p v-show="isCurrSelectedImage(item) && isImageLoading" class="item__loading">
+                    loading...
+                  </p>
+                  <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="">
                 </div>
               </template>
               <p>{{ item.copyright }}</p>
@@ -79,18 +85,24 @@
         <Tips :content="$t('general.syncTimeTips')" />
       </NFormItem>
       <NFormItem :label="$t('general.importSettingsLabel')">
-        <NButton @click="onImportSetting"> <uil:import />&nbsp;{{ $t('general.importSettingsValue') }} </NButton>
-        <input ref="settingFileInputEl" style="display: none" type="file" @change="onImportFileChange" />
+        <NButton @click="onImportSetting">
+          <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
+        </NButton>
+        <input ref="settingFileInputEl" style="display: none" type="file" @change="onImportFileChange">
         <Tips :content="$t('general.importSettingsTips')" />
       </NFormItem>
       <NFormItem :label="$t('general.exportSettingLabel')">
-        <NButton @click="onExportSetting()"> <uil:export />&nbsp;{{ $t('general.exportSettingValue') }} </NButton>
+        <NButton @click="onExportSetting()">
+          <uil:export />&nbsp;{{ $t('general.exportSettingValue') }}
+        </NButton>
         <Tips :content="$t('general.exportSettingTips')" />
       </NFormItem>
       <NFormItem :label="$t('general.resetSettingLabel')">
         <NPopconfirm @positive-click="onResetSetting()">
           <template #trigger>
-            <NButton dashed type="error"> <ic:round-reset-tv />&nbsp;{{ $t('general.resetSettingValue') }} </NButton>
+            <NButton dashed type="error">
+              <ic:round-reset-tv />&nbsp;{{ $t('general.resetSettingValue') }}
+            </NButton>
           </template>
           {{ $t('common.confirm') }}?
         </NPopconfirm>
@@ -101,8 +113,8 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { NDivider, NFormItem, NButton, NSelect, NInput, NInputNumber, NSlider, NSwitch, NPopconfirm, NTooltip } from 'naive-ui'
-import { gaEvent, importSetting, exportSetting, resetSetting, getStyleConst, globalState, imageState, getImageUrlFromBing, isImageLoading, isImageListLoading, onRefreshImageList } from '@/logic'
+import { NButton, NDivider, NFormItem, NInput, NInputNumber, NPopconfirm, NSelect, NSlider, NSwitch, NTooltip } from 'naive-ui'
+import { exportSetting, gaEvent, getImageUrlFromBing, getStyleConst, globalState, imageState, importSetting, isImageListLoading, isImageLoading, onRefreshImageList, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -142,7 +154,7 @@ const isCurrSelectedImage = (item: TImageItem) => item.urlbase === globalState.s
 
 const bgImageFileInputEl = ref()
 const onSelectBackgroundImage = () => {
-  ;(bgImageFileInputEl as any).value.value = null
+  (bgImageFileInputEl as any).value.value = null
   bgImageFileInputEl.value.click()
   gaEvent('setting-background-image', 'click', 'open')
 }
@@ -174,7 +186,7 @@ const syncTime = computed(() => {
 
 const settingFileInputEl = ref()
 const onImportSetting = () => {
-  ;(settingFileInputEl as any).value.value = null
+  (settingFileInputEl as any).value.value = null
   settingFileInputEl.value.click()
   gaEvent('setting-import', 'click', 'open')
 }

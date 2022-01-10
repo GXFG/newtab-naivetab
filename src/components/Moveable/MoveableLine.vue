@@ -1,10 +1,10 @@
 <template>
-  <div v-show="moveState.isXAxisCenterVisible" class="axis xaxis__center"></div>
-  <div v-show="moveState.isYAxisCenterVisible" class="axis yaxis__center"></div>
-  <div v-show="moveState.isTopVisible" class="bound bound__top"></div>
-  <div v-show="moveState.isBottomVisible" class="bound bound__bottom"></div>
-  <div v-show="moveState.isLeftVisible" class="bound bound__left"></div>
-  <div v-show="moveState.isRightVisible" class="bound bound__right"></div>
+  <div v-show="moveState.isXAxisCenterVisible" class="axis xaxis__center" />
+  <div v-show="moveState.isYAxisCenterVisible" class="axis yaxis__center" />
+  <div v-show="moveState.isTopVisible" class="bound bound__top" />
+  <div v-show="moveState.isBottomVisible" class="bound bound__bottom" />
+  <div v-show="moveState.isLeftVisible" class="bound bound__left" />
+  <div v-show="moveState.isRightVisible" class="bound bound__right" />
 </template>
 
 <script setup lang="ts">

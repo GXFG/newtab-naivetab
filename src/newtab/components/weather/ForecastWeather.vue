@@ -1,5 +1,5 @@
 <template>
-  <div v-if="globalState.setting.weather.forecastEnabled" id="forecast" ref="chartDom"></div>
+  <div v-if="globalState.setting.weather.forecastEnabled" id="forecast" ref="chartDom" />
 </template>
 
 <script setup lang="ts">

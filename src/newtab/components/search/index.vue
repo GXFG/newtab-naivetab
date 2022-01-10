@@ -21,7 +21,7 @@
             @blur="onSearchBlur"
             @input="onSearchInput"
             @keyup.enter="onSearch()"
-          />
+          >
           <div class="input__clear" :class="{ 'input__clear--move': isDragMode }">
             <icon-park-outline:close-one v-show="isClearVisible" @click="onClearValue()" />
           </div>
@@ -98,7 +98,8 @@ const getBaiduSuggest = async() => {
       label: item.q,
       key: item.q,
     }))
-  } else {
+  }
+  else {
     state.suggestList = []
   }
 }

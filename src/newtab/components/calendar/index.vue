@@ -11,7 +11,7 @@
               :options="state.yearList"
               :disabled="isDragMode"
               @update:value="onDateChange()"
-            ></NSelect>
+            />
           </div>
           <div class="options__item">
             <NButton class="item__btn" text :disabled="isDragMode" @click="onPrevMonth()">
@@ -24,7 +24,7 @@
               :options="monthsList"
               :disabled="isDragMode"
               @update:value="onDateChange()"
-            ></NSelect>
+            />
             <NButton class="item__btn" text :disabled="isDragMode" @click="onNextMonth()">
               <fa-solid:angle-right />
             </NButton>
@@ -157,7 +157,8 @@ const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
   }
   if (type === 1) {
     state.dateList.unshift(param)
-  } else {
+  }
+  else {
     state.dateList.push(param)
   }
 }
@@ -211,7 +212,8 @@ const onPrevMonth = () => {
   if (state.currMonth === 1) {
     state.currYear -= 1
     state.currMonth = 12
-  } else {
+  }
+  else {
     state.currMonth -= 1
   }
   onRender()
@@ -222,7 +224,8 @@ const onNextMonth = () => {
   if (state.currMonth === 12) {
     state.currYear += 1
     state.currMonth = 1
-  } else {
+  }
+  else {
     state.currMonth += 1
   }
   onRender()

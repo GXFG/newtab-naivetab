@@ -1,6 +1,6 @@
 <template>
   <NForm ref="formRef" class="form__layout" label-placement="left" :label-width="100">
-    <slot name="header"></slot>
+    <slot name="header" />
 
     <NDivider title-placement="left">
       {{ `${dividerName ? dividerName : $t('common.style')}` }}
@@ -16,7 +16,7 @@
       <NInputNumber v-model:value="globalState.style[props.field].width" class="setting__input-number" :step="1" :min="1" :max="500" />
     </NFormItem>
     <NFormItem v-if="'fontFamily' in globalState.style[props.field]" :label="$t('common.font')">
-      <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" " @blur="onFontBlur"></NInput>
+      <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" " @blur="onFontBlur" />
     </NFormItem>
     <NFormItem v-if="globalState.style[props.field].fontSize" :label="$t('common.fontSize')">
       <NSlider v-model:value="globalState.style[props.field].fontSize" :step="1" :min="12" :max="200" />
@@ -46,12 +46,12 @@
       <NColorPicker v-if="globalState.style[props.field].isShadowEnabled" v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]" class="setting__row-element" show-preview :swatches="swatches" />
     </NFormItem>
 
-    <slot name="footer"></slot>
+    <slot name="footer" />
   </NForm>
 </template>
 
 <script setup lang="ts">
-import { NDivider, NForm, NFormItem, NInput, NInputNumber, NSwitch, NSlider, NColorPicker } from 'naive-ui'
+import { NColorPicker, NDivider, NForm, NFormItem, NInput, NInputNumber, NSlider, NSwitch } from 'naive-ui'
 import { gaEvent, globalState } from '@/logic'
 
 const props = defineProps({

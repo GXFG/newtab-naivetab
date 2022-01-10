@@ -1,5 +1,5 @@
 <template>
-  <div id="background"></div>
+  <div id="background" />
 </template>
 <style>
 #background {

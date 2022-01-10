@@ -24,14 +24,14 @@
             </p>
             <div class="item__img">
               <div class="img__wrap">
-                <img v-if="item.url" class="img__main" :src="`chrome://favicon/size/16@2x/${item.url}`" :ondragstart="() => false" />
+                <img v-if="item.url" class="img__main" :src="`chrome://favicon/size/16@2x/${item.url}`" :ondragstart="() => false">
               </div>
             </div>
             <p class="item__name">
               {{ item.name }}
             </p>
             <!-- 按键定位标志F & J -->
-            <div v-if="['f', 'j'].includes(item.key)" class="item__cursor"></div>
+            <div v-if="['f', 'j'].includes(item.key)" class="item__cursor" />
           </div>
         </div>
       </div>
@@ -146,7 +146,8 @@ const keyboardTask = (e: KeyboardEvent) => {
   }
   if (key === state.currSelectKey) {
     openNewPage(url)
-  } else {
+  }
+  else {
     state.currSelectKey = key
     clearTimeout(timer)
     timer = setTimeout(() => {
