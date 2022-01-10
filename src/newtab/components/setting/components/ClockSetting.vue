@@ -1,7 +1,7 @@
 <template>
   <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['clockAnalog', 'clockDigital']">
     <!-- clockAnalog -->
-    <NCollapseItem :title="$t('clock.clockAnalog')" name="clockAnalog">
+    <NCollapseItem :title="$t('setting.clockAnalog')" name="clockAnalog">
       <BaseComponentSetting field="clockAnalog">
         <template #header>
           <NFormItem :label="$t('common.theme')">
@@ -11,7 +11,7 @@
       </BaseComponentSetting>
     </NCollapseItem>
     <!-- clockDigital -->
-    <NCollapseItem :title="$t('clock.clockDigital')" name="clockDigital">
+    <NCollapseItem :title="$t('setting.clockDigital')" name="clockDigital">
       <BaseComponentSetting field="clockDigital">
         <template #header>
           <NFormItem :label="$t('common.format')">

@@ -6,17 +6,14 @@
           <div
             v-for="item in rowData"
             :key="item.key"
-            :title="item.url"
             class="row__item"
             :class="{
               'row__item--move': isDragMode,
-              'row__item--active': item.key === state.currSelectKey,
+              'row__item--hover': !isDragMode,
               'row__item--border': globalState.style.bookmark.isBorderEnabled,
               'row__item--shadow': globalState.style.bookmark.isShadowEnabled,
             }"
-            :data-key="item.key"
-            @mouseenter="handleContainerEnter"
-            @mouseleave="handleContainerLeave"
+            :title="item.url"
             @click="onPressItem(item.url)"
           >
             <p class="item__key">
@@ -158,18 +155,6 @@ const keyboardTask = (e: KeyboardEvent) => {
 
 addKeyboardTask(CNAME, keyboardTask)
 
-// 处理hover状态
-const handleContainerEnter = (e: MouseEvent) => {
-  if (isDragMode.value) {
-    return
-  }
-  const el = e.target as HTMLInputElement
-  state.currSelectKey = el.getAttribute('data-key') || ''
-}
-const handleContainerLeave = () => {
-  state.currSelectKey = ''
-}
-
 const containerStyle = ref(getLayoutStyle(CNAME))
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
@@ -207,32 +192,40 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       .row__item--border {
         outline: 1px solid v-bind(customBorderColor);
       }
-      .row__item--active {
-        background-color: v-bind(customActiveColor) !important;
-      }
       .row__item--shadow {
         box-shadow: v-bind(customShadowColor) 0px 2px 1px, v-bind(customShadowColor) 0px 4px 2px, v-bind(customShadowColor) 0px 8px 4px, v-bind(customShadowColor) 0px 16px 8px;
       }
+      .row__item--hover:hover {
+        background-color: v-bind(customActiveColor) !important;
+      }
       .row__item {
         flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
         position: relative;
         margin: v-bind(customMargin);
-        padding: 0.8%;
+        padding: 0.5%;
         width: v-bind(customWidth);
         height: v-bind(customWidth);
         text-align: center;
-        border-radius: 4px;
         color: v-bind(customFontColor);
         background-color: v-bind(customBackgroundColor);
+        border-radius: 4px;
         cursor: pointer;
         transition: all 0.3s ease;
+        box-sizing: border-box;
         .item__key {
+          flex: 0 0 auto;
+          font-weight: 500;
         }
         .item__img {
+          flex: 1;
           display: flex;
           justify-content: center;
           align-items: center;
-          margin-top: 4%;
+          width: 100%;
           .img__wrap {
             width: 39%;
             .img__main {
@@ -242,7 +235,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
           }
         }
         .item__name {
-          margin-top: 5%;
+          flex: 0 0 auto;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;

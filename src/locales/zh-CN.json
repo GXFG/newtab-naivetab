@@ -77,7 +77,10 @@
     "general": "通用",
     "mainLabel": "设置",
     "bookmark": "书签",
+    "bookmarkKeyboard": "键盘书签",
     "clock": "时钟",
+    "clockDigital": "数字时钟",
+    "clockAnalog": "模拟时钟",
     "date": "日期",
     "search": "搜索",
     "calendar": "日历",
@@ -106,12 +109,9 @@
     "localBackgroundTips": "本地图片不会进行同步"
   },
   "clock": {
-    "clockDigital": "数字时钟",
-    "clockAnalog": "模拟时钟",
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "bookmarkKeyboard": "键盘书签",
     "dblclickKeyToOpen": "双击按键打开",
     "dblclickKeyToOpenTips": "双击键盘按键以打开书签",
     "intervalTime": "间隔时间",

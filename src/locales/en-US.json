@@ -77,7 +77,10 @@
     "general": "General",
     "mainLabel": "Setting",
     "bookmark": "Bookmark",
+    "bookmarkKeyboard": "KeyboardBookmark",
     "clock": "Clock",
+    "clockDigital": "DigitalClock",
+    "clockAnalog": "AnalogClock",
     "date": "Date",
     "search": "Search",
     "calendar": "Calendar",
@@ -106,12 +109,9 @@
     "localBackgroundTips": "Local file will not be synchronized"
   },
   "clock": {
-    "clockDigital": "DigitalClock",
-    "clockAnalog": "AnalogClock",
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "bookmarkKeyboard": "KeyboardBookmark",
     "dblclickKeyToOpen": "Dblclick open",
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",

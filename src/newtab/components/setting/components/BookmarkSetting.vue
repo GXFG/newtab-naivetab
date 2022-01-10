@@ -1,7 +1,7 @@
 <template>
   <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['bookmarkKeyboard']">
     <!-- bookmarkKeyboard -->
-    <NCollapseItem :title="$t('bookmark.bookmarkKeyboard')" name="bookmarkKeyboard">
+    <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
       <BaseComponentSetting field="bookmark">
         <template #header>
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">

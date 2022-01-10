@@ -25,9 +25,9 @@ export const DAYJS_LANG_MAP = {
 }
 
 export const SEARCH_ENGINE_LIST = [
-  { label: 'google', value: 'https://www.google.com/search?q={query}' },
   { label: 'bing', value: 'https://cn.bing.com/search?q={query}' },
   { label: 'baidu', value: 'https://www.baidu.com/s?word={query}' },
+  { label: 'google', value: 'https://www.google.com/search?q={query}' },
   { label: 'github', value: 'https://github.com/search?q={query}' },
 ]
 
