@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponent componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="bookmark" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
       <div class="bookmark__container" :style="containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
@@ -36,7 +36,7 @@
         </div>
       </div>
     </div>
-  </MoveableComponent>
+  </MoveableComponentWrap>
 </template>
 
 <script setup lang="ts">

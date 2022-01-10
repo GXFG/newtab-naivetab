@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponent componentName="search" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="search" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
       <NDropdown :show="state.isSuggestVisible" :options="state.suggestList" :placement="state.placementValue" :show-arrow="true" @select="handleSelectSuggest">
         <div
@@ -29,7 +29,7 @@
         </div>
       </NDropdown>
     </div>
-  </MoveableComponent>
+  </MoveableComponentWrap>
 </template>
 
 <script setup lang="ts">

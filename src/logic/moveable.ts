@@ -144,10 +144,6 @@ const onHandleListener = (isInit: boolean) => {
   for (const eventName of Object.keys(mouseTaskMap)) {
     listenerFunc(eventName, mouseTaskMap[eventName])
   }
-  bodyEle.addEventListener('mousedown', handleMousedown)
-  bodyEle.addEventListener('mousemove', handleMousemove)
-  bodyEle.addEventListener('mouseup', handleMouseup)
-  bodyEle.addEventListener('mouseleave', handleMouseup)
 }
 
 watch(isDragMode, (value) => {

@@ -228,7 +228,7 @@ export const globalState = reactive({
     }),
     clockAnalog: useStorageLocal('setting-clock-analog', {
       enabled: false,
-      theme: 0, // theme list 索引
+      theme: 0, // themeList的索引
     }),
     date: useStorageLocal('setting-date', {
       enabled: false,

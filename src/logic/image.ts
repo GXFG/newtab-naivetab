@@ -41,7 +41,7 @@ const getBingImages = async() => {
 const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
   await nextTick()
   isImageLoading.value = true
-  const backgroundEl: any = document.querySelector('#background')
+  const backgroundEl: any = document.querySelector('#background__container')
   if (clearStyle) {
     backgroundEl.style = ''
     return

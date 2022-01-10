@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponent componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="clockAnalog" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
       <div class="clockAnalog__container" :style="containerStyle">
         <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
@@ -10,7 +10,7 @@
         </article>
       </div>
     </div>
-  </MoveableComponent>
+  </MoveableComponentWrap>
 </template>
 
 <script setup lang="ts">

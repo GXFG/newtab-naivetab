@@ -1,8 +1,8 @@
 <template>
-  <div id="background" />
+  <div id="background__container" />
 </template>
 <style>
-#background {
+#background__container {
   position: absolute;
   top: 0;
   left: 0;

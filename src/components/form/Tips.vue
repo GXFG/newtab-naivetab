@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import { NButton, NTooltip } from 'naive-ui'
+import { openNewPage } from '@/logic'
 
 const props = defineProps({
   content: {
@@ -29,7 +30,7 @@ const onClick = () => {
   if (!props.link) {
     return
   }
-  window.open(props.content)
+  openNewPage(props.content)
 }
 </script>
 

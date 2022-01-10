@@ -4,8 +4,8 @@
   <RightClickMenu />
   <HelpModal />
   <WhatsNewModal />
-  <MoveableTool />
-  <MoveableLine />
+  <MoveableGuideLine />
+  <MoveableElementDrawer />
   <!-- element -->
   <KeyboardBookmark />
   <DigitalClock />

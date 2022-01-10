@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { NModal, NCard, NButton } from 'naive-ui'
-import Currentlog from '../../CURRENTLOG.md'
+import Currentlog from '../../../CURRENTLOG.md'
 import { URL_CHANGELOG, globalState, openNewPage, closeWhatsNewModal } from '@/logic'
 
 const isDisableCloseBtn = ref(true)

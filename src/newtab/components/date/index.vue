@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponent componentName="date" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="date" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
       <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
         <p class="date__text">
@@ -7,7 +7,7 @@
         </p>
       </div>
     </div>
-  </MoveableComponent>
+  </MoveableComponentWrap>
 </template>
 
 <script setup lang="ts">

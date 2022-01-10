@@ -5,7 +5,6 @@
     <NDivider title-placement="left">
       {{ `${dividerName ? dividerName : $t('common.style')}` }}
     </NDivider>
-
     <!-- size -->
     <NFormItem v-if="globalState.style[props.field].margin" :label="$t('common.margin')">
       <NSlider v-model:value="globalState.style[props.field].margin" :step="1" :min="1" :max="100" />
@@ -26,7 +25,6 @@
       <NSlider v-model:value="globalState.style[props.field].letterSpacing" :step="1" :max="200" />
       <NInputNumber v-model:value="globalState.style[props.field].letterSpacing" class="setting__input-number" :step="1" />
     </NFormItem>
-
     <!-- color -->
     <NFormItem v-if="globalState.style[props.field].fontColor" :label="$t('common.fontColor')">
       <NColorPicker v-model:value="globalState.style[props.field].fontColor[globalState.localState.currThemeCode]" show-preview :swatches="swatches" />
@@ -39,11 +37,23 @@
     </NFormItem>
     <NFormItem v-if="globalState.style[props.field].borderColor" :label="$t('common.borderColor')">
       <NSwitch v-model:value="globalState.style[props.field].isBorderEnabled" />
-      <NColorPicker v-if="globalState.style[props.field].isBorderEnabled" v-model:value="globalState.style[props.field].borderColor[globalState.localState.currThemeCode]" class="setting__row-element" show-preview :swatches="swatches" />
+      <NColorPicker
+        v-if="globalState.style[props.field].isBorderEnabled"
+        v-model:value="globalState.style[props.field].borderColor[globalState.localState.currThemeCode]"
+        class="setting__row-element"
+        show-preview
+        :swatches="swatches"
+      />
     </NFormItem>
     <NFormItem v-if="globalState.style[props.field].shadowColor" :label="$t('common.shadowColor')">
       <NSwitch v-model:value="globalState.style[props.field].isShadowEnabled" />
-      <NColorPicker v-if="globalState.style[props.field].isShadowEnabled" v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]" class="setting__row-element" show-preview :swatches="swatches" />
+      <NColorPicker
+        v-if="globalState.style[props.field].isShadowEnabled"
+        v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]"
+        class="setting__row-element"
+        show-preview
+        :swatches="swatches"
+      />
     </NFormItem>
 
     <slot name="footer" />

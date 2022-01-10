@@ -1,7 +1,7 @@
 <template>
   <div id="setting">
     <!-- settingIcon -->
-    <MoveableComponent componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
+    <MoveableComponentWrap componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
       <div v-if="isRender" data-target-type="1" data-target-name="settingIcon">
         <div class="settingIcon__container" :style="containerStyle">
           <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
@@ -9,7 +9,7 @@
           </NButton>
         </div>
       </div>
-    </MoveableComponent>
+    </MoveableComponentWrap>
     <!-- Drawer -->
     <NDrawer
       v-model:show="isSettingDrawerVisible"

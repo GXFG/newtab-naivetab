@@ -1,12 +1,12 @@
 <template>
-  <MoveableComponent componentName="weather" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="weather" @onDrag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
       <div class="weather__container" :style="containerStyle">
         <CurrentWeather />
         <ForecastWeather />
       </div>
     </div>
-  </MoveableComponent>
+  </MoveableComponentWrap>
 </template>
 
 <script setup lang="ts">
