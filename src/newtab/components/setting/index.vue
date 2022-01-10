@@ -186,6 +186,14 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 
 .drawer-wrap {
   transition: all 0.3s ease;
+  .setting__content {
+    padding-top: 20px;
+    /* collapse title */
+    .n-collapse-item__header-main {
+      font-size: 16px;
+      font-weight: 500 !important;
+    }
+  }
   .drawer__bottom {
     position: absolute;
     left: 0px;
