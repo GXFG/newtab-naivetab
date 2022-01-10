@@ -78,8 +78,6 @@
     "mainLabel": "Setting",
     "bookmark": "Bookmark",
     "clock": "Clock",
-    "clockDigital": "DigitalClock",
-    "clockAnalog": "AnalogClock",
     "date": "Date",
     "search": "Search",
     "calendar": "Calendar",
@@ -108,14 +106,17 @@
     "localBackgroundTips": "Local file will not be synchronized"
   },
   "clock": {
+    "clockDigital": "DigitalClock",
+    "clockAnalog": "AnalogClock",
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "bookmarkLabel": "Bookmark",
+    "bookmarkKeyboard": "KeyboardBookmark",
     "dblclickKeyToOpen": "Dblclick open",
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",
     "intervalTimeTips": "The effective interval for double-clicking",
+    "keyLabel": "Key",
     "urlLabel": "Url",
     "urlPlaceholder": "",
     "nameLabel": "Name",

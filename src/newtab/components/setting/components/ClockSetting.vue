@@ -1,39 +1,31 @@
 <template>
-  <NDivider style="margin-bottom:0;">
-    {{ $t('setting.clockAnalog') }}
+  <NDivider style="margin-bottom: 0">
+    {{ $t('clock.clockAnalog') }}
   </NDivider>
+  <BaseComponentSetting field="clockAnalog">
+    <template #header>
+      <NFormItem :label="$t('common.theme')">
+        <NSelect v-model:value="globalState.setting.clockAnalog.theme" :options="ANALOG_CLOCK_THEME"></NSelect>
+      </NFormItem>
+    </template>
+  </BaseComponentSetting>
 
-  <ElementLayout field="clockAnalog">
-    <NFormItem :label="$t('common.theme')">
-      <NSelect v-model:value="globalState.setting.clockAnalog.theme" :options="ANALOG_CLOCK_THEME"></NSelect>
-    </NFormItem>
-  </ElementLayout>
-  <ElementConfig field="clockAnalog" />
-
-  <NDivider style="margin-bottom:0;">
-    {{ $t('setting.clockDigital') }}
+  <NDivider style="margin-bottom: 0">
+    {{ $t('clock.clockDigital') }}
   </NDivider>
-
-  <ElementLayout field="clockDigital">
-    <NFormItem :label="$t('common.format')">
-      <NInput v-model:value="globalState.setting.clockDigital.format"></NInput>
-      <Tips link :content="URL_DAYJS_FORMAT" />
-    </NFormItem>
-    <NFormItem :label="$t('clock.apMark')">
-      <NSwitch v-model:value="globalState.setting.clockDigital.unitEnabled" />
-      <NSlider
-        v-if="globalState.setting.clockDigital.unitEnabled"
-        v-model:value="globalState.style.clockDigital.unit.fontSize"
-        class="setting__row-element"
-        :step="1"
-        :min="12"
-        :max="200"
-      />
-      <NInputNumber v-if="globalState.setting.clockDigital.unitEnabled" v-model:value="globalState.style.clockDigital.unit.fontSize" class="setting__input-number" :min="12" :step="1" />
-    </NFormItem>
-  </ElementLayout>
-
-  <ElementConfig field="clockDigital" />
+  <BaseComponentSetting field="clockDigital">
+    <template #header>
+      <NFormItem :label="$t('common.format')">
+        <NInput v-model:value="globalState.setting.clockDigital.format"></NInput>
+        <Tips link :content="URL_DAYJS_FORMAT" />
+      </NFormItem>
+      <NFormItem :label="$t('clock.apMark')">
+        <NSwitch v-model:value="globalState.setting.clockDigital.unitEnabled" />
+        <NSlider v-if="globalState.setting.clockDigital.unitEnabled" v-model:value="globalState.style.clockDigital.unit.fontSize" class="setting__row-element" :step="1" :min="12" :max="200" />
+        <NInputNumber v-if="globalState.setting.clockDigital.unitEnabled" v-model:value="globalState.style.clockDigital.unit.fontSize" class="setting__input-number" :min="12" :step="1" />
+      </NFormItem>
+    </template>
+  </BaseComponentSetting>
 </template>
 
 <script setup lang="ts">

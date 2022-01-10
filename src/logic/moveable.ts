@@ -16,7 +16,7 @@ export const moveState = reactive({
   isBottomVisible: false,
   isLeftVisible: false,
   isRightVisible: false,
-  dragTempEnabledMap: {
+  dragTempEnabledMap: { // 临时开启组件，只有鼠标放下时才进行真正的开启
     settingIcon: false,
     bookmark: false,
     clockDigital: false,
@@ -26,7 +26,7 @@ export const moveState = reactive({
     search: false,
     weather: false,
   },
-  isDragingMap: {
+  isDragingMap: { // 是否正在拖动中
     settingIcon: false,
     bookmark: false,
     clockDigital: false,

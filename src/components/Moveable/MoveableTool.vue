@@ -58,14 +58,14 @@ const elementList = computed(() => [
     disabled: globalState.setting.bookmark.enabled,
   },
   {
-    label: window.$t('setting.clockDigital'),
+    label: window.$t('clock.clockDigital'),
     componentName: 'clockDigital',
     iconName: 'mdi:clock-digital',
     iconSize: 30,
     disabled: globalState.setting.clockDigital.enabled,
   },
   {
-    label: window.$t('setting.clockAnalog'),
+    label: window.$t('clock.clockAnalog'),
     componentName: 'clockAnalog',
     iconName: 'grommet-icons:clock',
     iconSize: 26,

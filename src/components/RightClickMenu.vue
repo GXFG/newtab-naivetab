@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { isDragMode, toggleIsDragMode, toggleIsSettingDrawerVisible, currSettingTabValue, getTargetDataFromEvent } from '@/logic'
+import { isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, currSettingTabValue, getTargetDataFromEvent } from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -66,6 +66,9 @@ const onCloseMenu = () => {
 
 const handleContextMenu = async(e: MouseEvent) => {
   e.preventDefault()
+  if (isSettingDrawerVisible.value) {
+    return
+  }
   state.isMenuVisible = false
   state.posX = e.clientX
   state.posY = e.clientY

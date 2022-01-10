@@ -1,4 +1,3 @@
 <template>
-  <ElementLayout field="calendar" />
-  <ElementConfig field="calendar" />
+  <BaseComponentSetting field="calendar" />
 </template>

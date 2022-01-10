@@ -2,10 +2,10 @@
   <!-- component -->
   <BackgroundImg />
   <RightClickMenu />
+  <HelpModal />
+  <WhatsNewModal />
   <MoveableTool />
   <MoveableLine />
-  <HelpModal />
-  <WhatsNew />
   <!-- element -->
   <KeyboardBookmark />
   <DigitalClock />
