@@ -109,8 +109,7 @@ const getSearch = async() => {
         value: item.url,
       }),
     )
-  }
-  catch (e) {
+  } catch (e) {
     state.isSearchLoading = false
   }
 }

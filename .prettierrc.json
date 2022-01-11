@@ -1,7 +1,9 @@
 {
-  "printWidth": 300,
+  "printWidth": 230,
   "prettier.tabWidth": 2,
   "semi": false,
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "proseWrap": "always",
+  "bracketSameLine": true
 }

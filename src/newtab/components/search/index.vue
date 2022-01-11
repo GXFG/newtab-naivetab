@@ -97,8 +97,7 @@ const getBaiduSuggest = async() => {
       label: item.q,
       key: item.q,
     }))
-  }
-  else {
+  } else {
     state.suggestList = []
   }
 }

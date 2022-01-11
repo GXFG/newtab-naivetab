@@ -11,14 +11,7 @@
       </div>
     </MoveableComponentWrap>
     <!-- Drawer -->
-    <NDrawer
-      v-model:show="isSettingDrawerVisible"
-      class="drawer-wrap"
-      :style="drawerStyle"
-      display-directive="show"
-      :width="600"
-      :placement="globalState.setting.general.drawerPlacement"
-    >
+    <NDrawer v-model:show="isSettingDrawerVisible" class="drawer-wrap" :style="drawerStyle" display-directive="show" :width="600" :placement="globalState.setting.general.drawerPlacement">
       <NDrawerContent>
         <NTabs type="line" :value="currSettingTabValue" @update:value="onTabsChange">
           <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
@@ -61,12 +54,26 @@ import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
-import { URL_GITHUB, currSettingTabValue, gaEvent, getIsComponentRender, getLayoutStyle, getStyleConst, globalState, isDragMode, isSettingDrawerVisible, openNewPage, openWhatsNewModal, toggleIsDragMode, toggleIsSettingDrawerVisible } from '@/logic'
+import {
+  URL_GITHUB,
+  currSettingTabValue,
+  gaEvent,
+  getIsComponentRender,
+  getLayoutStyle,
+  getStyleConst,
+  globalState,
+  isDragMode,
+  isSettingDrawerVisible,
+  openNewPage,
+  openWhatsNewModal,
+  toggleIsDragMode,
+  toggleIsSettingDrawerVisible,
+} from '@/logic'
 
 const CNAME = 'settingIcon'
 const isRender = getIsComponentRender(CNAME)
 
-const tabPaneList = computed(() => ([
+const tabPaneList = computed(() => [
   {
     name: 'general',
     label: window.$t('setting.general'),
@@ -102,7 +109,7 @@ const tabPaneList = computed(() => ([
     label: window.$t('setting.weather'),
     component: WeatherSetting,
   },
-]))
+])
 
 const onTabsChange = (tabName: string) => {
   currSettingTabValue.value = tabName
@@ -210,7 +217,8 @@ const bgBottomBar = getStyleConst('bgBottomBar')
         margin-right: 10px;
       }
     }
-    .bottom__version {}
+    .bottom__version {
+    }
     .bottom__right {
       display: flex;
       justify-content: center;

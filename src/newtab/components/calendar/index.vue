@@ -4,27 +4,13 @@
       <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
         <div class="calendar__options">
           <div class="options__item">
-            <NSelect
-              v-model:value="state.currYear"
-              class="item__select_year"
-              size="small"
-              :options="state.yearList"
-              :disabled="isDragMode"
-              @update:value="onDateChange()"
-            />
+            <NSelect v-model:value="state.currYear" class="item__select_year" size="small" :options="state.yearList" :disabled="isDragMode" @update:value="onDateChange()" />
           </div>
           <div class="options__item">
             <NButton class="item__btn" text :disabled="isDragMode" @click="onPrevMonth()">
               <fa-solid:angle-left />
             </NButton>
-            <NSelect
-              v-model:value="state.currMonth"
-              class="item__select_month"
-              size="small"
-              :options="monthsList"
-              :disabled="isDragMode"
-              @update:value="onDateChange()"
-            />
+            <NSelect v-model:value="state.currMonth" class="item__select_month" size="small" :options="monthsList" :disabled="isDragMode" @update:value="onDateChange()" />
             <NButton class="item__btn" text :disabled="isDragMode" @click="onNextMonth()">
               <fa-solid:angle-right />
             </NButton>
@@ -97,7 +83,7 @@ const state = reactive({
   }[],
 })
 
-const monthsList = computed(() => ([
+const monthsList = computed(() => [
   { label: window.$t('calendar.january'), value: 1 },
   { label: window.$t('calendar.february'), value: 2 },
   { label: window.$t('calendar.march'), value: 3 },
@@ -110,9 +96,9 @@ const monthsList = computed(() => ([
   { label: window.$t('calendar.october'), value: 10 },
   { label: window.$t('calendar.november'), value: 11 },
   { label: window.$t('calendar.december'), value: 12 },
-]))
+])
 
-const weekList = computed(() => ([
+const weekList = computed(() => [
   { label: window.$t('calendar.monday'), value: 1 },
   { label: window.$t('calendar.tuesday'), value: 2 },
   { label: window.$t('calendar.wednesday'), value: 3 },
@@ -120,7 +106,7 @@ const weekList = computed(() => ([
   { label: window.$t('calendar.friday'), value: 5 },
   { label: window.$t('calendar.saturday'), value: 6 },
   { label: window.$t('calendar.sunday'), value: 7 },
-]))
+])
 
 const holidayTypeToDesc = computed(() => ({
   1: window.$t('calendar.rest'),
@@ -155,8 +141,7 @@ const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
   }
   if (type === 1) {
     state.dateList.unshift(param)
-  }
-  else {
+  } else {
     state.dateList.push(param)
   }
 }
@@ -210,8 +195,7 @@ const onPrevMonth = () => {
   if (state.currMonth === 1) {
     state.currYear -= 1
     state.currMonth = 12
-  }
-  else {
+  } else {
     state.currMonth -= 1
   }
   onRender()
@@ -222,8 +206,7 @@ const onNextMonth = () => {
   if (state.currMonth === 12) {
     state.currYear += 1
     state.currMonth = 1
-  }
-  else {
+  } else {
     state.currMonth += 1
   }
   onRender()
@@ -335,7 +318,8 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         &:hover {
           border: 1px solid v-bind(customItemActiveColor);
         }
-        .item__day {}
+        .item__day {
+        }
         .item__desc {
           color: v-bind(customFontColor);
           font-size: 12px;

@@ -143,8 +143,7 @@ const keyboardTask = (e: KeyboardEvent) => {
   }
   if (key === state.currSelectKey) {
     openNewPage(url)
-  }
-  else {
+  } else {
     state.currSelectKey = key
     clearTimeout(timer)
     timer = setTimeout(() => {
