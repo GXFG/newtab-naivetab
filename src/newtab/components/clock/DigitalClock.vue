@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="clockDigital" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="clockDigital" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
       <div class="clockDigital__container" :style="containerStyle" :class="{ 'clockDigital__container--shadow': globalState.style.clockDigital.isShadowEnabled }">
         <div class="clock__time">
@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
 import { globalState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockDigital'

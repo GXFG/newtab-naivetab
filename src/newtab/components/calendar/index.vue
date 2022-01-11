@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="calendar" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="calendar" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
       <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
         <div class="calendar__options">
@@ -73,8 +73,6 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import { NButton, NSelect } from 'naive-ui'
 import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, globalState, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 import { calendar } from '@/lib/calendar'
 

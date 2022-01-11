@@ -61,7 +61,6 @@
 </template>
 
 <script setup lang="ts">
-import { NColorPicker, NDivider, NForm, NFormItem, NInput, NInputNumber, NSlider, NSwitch } from 'naive-ui'
 import { gaEvent, globalState } from '@/logic'
 
 const props = defineProps({

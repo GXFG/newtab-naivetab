@@ -1,7 +1,7 @@
 <template>
   <div id="setting">
     <!-- settingIcon -->
-    <MoveableComponentWrap componentName="settingIcon" @onDrag="(style) => (containerStyle = style)">
+    <MoveableComponentWrap componentName="settingIcon" @drag="(style) => (containerStyle = style)">
       <div v-if="isRender" data-target-type="1" data-target-name="settingIcon">
         <div class="settingIcon__container" :style="containerStyle">
           <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
@@ -53,7 +53,6 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NDrawer, NDrawerContent, NTabPane, NTabs } from 'naive-ui'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'

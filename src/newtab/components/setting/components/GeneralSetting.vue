@@ -112,8 +112,6 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import { NButton, NDivider, NFormItem, NInput, NInputNumber, NPopconfirm, NSelect, NSlider, NSwitch, NTooltip } from 'naive-ui'
 import { exportSetting, gaEvent, getImageUrlFromBing, getStyleConst, globalState, imageState, importSetting, isImageListLoading, isImageLoading, onRefreshImageList, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 

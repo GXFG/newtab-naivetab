@@ -1,5 +1,4 @@
 import { useToggle } from '@vueuse/core'
-import { changeElementEnabledStatus } from '@/logic'
 
 export const [isDragMode, toggleIsDragMode] = useToggle(false)
 export const [isElementDrawerVisible, toggleIsElementDrawerVisible] = useToggle(true)

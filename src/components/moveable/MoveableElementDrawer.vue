@@ -34,9 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import { NButton } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, addKeyboardTask, getStyleConst, moveState, globalState, changeElementEnabledStatus } from '@/logic'
+import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, addKeyboardTask, getStyleConst, moveState, globalState } from '@/logic'
 
 const state = reactive({
   isCursorInElementDrawer: false,
@@ -116,20 +115,18 @@ const handleElementMouseDown = () => {
 }
 
 const handleElementMouseMove = async(e: MouseEvent) => {
-  if (isStartDragTaskRan) {
-    // 确保MouseDownTaskMap只执行一次
+  if (isStartDragTaskRan) { // 确保MouseDownTaskMap只执行一次
     return
   }
   isStartDragTaskRan = true
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = true
-  await nextTick() // 开启component后等待dom刷新才可进行移动组件
+  await nextTick()
   moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true)
 }
 
 const handleElementMouseUp = (e: MouseEvent) => {
   moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
-  if (!state.isCursorInElementDrawer) {
-    // 保存启用状态
+  if (!state.isCursorInElementDrawer) { // 保存启用状态
     globalState.setting[moveState.currDragTarget.name].enabled = true
   }
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
@@ -190,7 +187,7 @@ const keyboardHandler = (e: KeyboardEvent) => {
     if (moveState.currDragTarget.name.length === 0) {
       return
     }
-    changeElementEnabledStatus(moveState.currDragTarget.name as TComponents, false)
+    globalState.setting[moveState.currDragTarget.name].enabled = false
   }
 }
 

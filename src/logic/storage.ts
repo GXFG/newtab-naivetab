@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { useDebounceFn } from '@vueuse/core'
 import { globalState } from './store'
 import { MERGE_SETTING_DELAY } from './const'

@@ -25,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import { NModal, NCard, NButton } from 'naive-ui'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isDragMode, addKeyboardTask } from '@/logic'
 

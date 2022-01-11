@@ -30,6 +30,5 @@
 </template>
 
 <script setup lang="ts">
-import { NCollapse, NCollapseItem, NFormItem, NInput, NInputNumber, NSelect, NSlider, NSwitch } from 'naive-ui'
 import { ANALOG_CLOCK_THEME, URL_DAYJS_FORMAT, globalState } from '@/logic'
 </script>

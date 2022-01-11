@@ -276,10 +276,6 @@ export const closeWhatsNewModal = () => {
   globalState.state.isWhatsNewModalVisible = false
 }
 
-export const changeElementEnabledStatus = (componentName: TComponents, status: boolean) => {
-  globalState.setting[componentName].enabled = status
-}
-
 export const openNewPage = (url: string) => {
   if (url.length === 0) {
     return

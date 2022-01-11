@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { NFormItem, NSelect } from 'naive-ui'
 import { SEARCH_ENGINE_LIST, globalState } from '@/logic'
 
 const onChangeSearch = (value, option: TSelectStringItem) => {

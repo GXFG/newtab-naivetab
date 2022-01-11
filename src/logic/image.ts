@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { globalState } from './store'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import http from '@/lib/http'

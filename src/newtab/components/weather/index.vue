@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="weather" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="weather" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
       <div class="weather__container" :style="containerStyle">
         <CurrentWeather />
@@ -10,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
 import CurrentWeather from './CurrentWeather.vue'
 import ForecastWeather from './ForecastWeather.vue'
 import { WEATHER_LANG_MAP, log, globalState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'

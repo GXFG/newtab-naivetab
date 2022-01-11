@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { NCollapse, NCollapseItem, NButton, NFormItem, NInput, NInputGroup, NInputGroupLabel, NInputNumber, NSpace, NSwitch } from 'naive-ui'
 import { KEYBOARD_KEY, globalState } from '@/logic'
 
 const onAddKey = (key: string) => {

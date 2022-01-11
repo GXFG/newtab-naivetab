@@ -3,10 +3,10 @@
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { storage } from 'webextension-polyfill'
+import type { StorageLikeAsync } from '@vueuse/core'
 import {
   useLocalStorage,
   useStorageAsync,
-  StorageLikeAsync,
   MaybeRef,
   StorageAsyncOptions,
   RemovableRef,

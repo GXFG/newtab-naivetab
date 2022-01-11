@@ -17,7 +17,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['onDrag'])
+const emit = defineEmits(['drag'])
 
 const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move !important;' : ''))
 
@@ -171,7 +171,7 @@ const onDrag = (e: MouseEvent) => {
   }
 
   const style = `${offsetData.xOffsetKey}:${offsetData.xOffsetValue}vw; ${offsetData.yOffsetKey}:${offsetData.yOffsetValue}vh; transform:translate(${offsetData.xTranslateValue}%, ${offsetData.yTranslateValue}%)`
-  emit('onDrag', style)
+  emit('drag', style)
 }
 
 const initMouseTask = () => {

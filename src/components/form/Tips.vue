@@ -12,7 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NTooltip } from 'naive-ui'
 import { openNewPage } from '@/logic'
 
 const props = defineProps({

@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="search" @onDrag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="search" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
       <NDropdown :show="state.isSuggestVisible" :options="state.suggestList" :placement="state.placementValue" :show-arrow="true" @select="handleSelectSuggest">
         <div
@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import { NDropdown } from 'naive-ui'
 import { useDebounceFn } from '@vueuse/core'
 import { globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, openNewPage } from '@/logic'
 import http from '@/lib/http'

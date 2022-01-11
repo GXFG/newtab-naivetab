@@ -1,5 +1,6 @@
 import { dirname, relative, resolve } from 'path'
-import { defineConfig, UserConfig } from 'vite'
+import type { UserConfig } from 'vite'
+import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import vueI18n from '@intlify/vite-plugin-vue-i18n'
 import Icons from 'unplugin-icons/vite'
@@ -37,11 +38,8 @@ export const sharedConfig: UserConfig = {
     AutoImport({
       imports: [
         'vue',
-        {
-          'webextension-polyfill': [
-            ['default', 'browser'],
-          ],
-        },
+        { 'webextension-polyfill': [['default', 'browser']] },
+        { dayjs: [['default', 'dayjs']] },
       ],
       dts: r('src/auto-imports.d.ts'),
     }),
@@ -51,11 +49,13 @@ export const sharedConfig: UserConfig = {
       dirs: [r('src/components')],
       // generate `components.d.ts` for ts support with Volar
       dts: true,
+      deep: true,
       resolvers: [
         // auto import icons
         IconsResolver({
           componentPrefix: '',
         }),
+        NaiveUiResolver(),
       ],
     }),
 
@@ -71,11 +71,6 @@ export const sharedConfig: UserConfig = {
         return html.replace(/"\/assets\//g, `"${relative(dirname(path), '/assets')}/`)
       },
     },
-    Components({
-      resolvers: [
-        NaiveUiResolver(),
-      ],
-    }),
   ],
   optimizeDeps: {
     include: [

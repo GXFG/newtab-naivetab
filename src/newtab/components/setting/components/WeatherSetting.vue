@@ -55,7 +55,6 @@
 </template>
 
 <script setup lang="ts">
-import { NAutoComplete, NFormItem, NInput, NInputGroup, NInputNumber, NSelect, NSlider, NSwitch, NTooltip } from 'naive-ui'
 import { useDebounceFn } from '@vueuse/core'
 import { WEATHER_LANG_MAP, globalState } from '@/logic'
 import http from '@/lib/http'

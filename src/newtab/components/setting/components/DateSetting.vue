@@ -10,6 +10,5 @@
 </template>
 
 <script setup lang="ts">
-import { NFormItem, NInput } from 'naive-ui'
 import { URL_DAYJS_FORMAT, globalState } from '@/logic'
 </script>
