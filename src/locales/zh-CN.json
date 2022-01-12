@@ -90,8 +90,6 @@
     "globalStyle": "全局样式",
     "generalLabel": "通用",
     "pageTitle": "页面标题",
-    "setttingIcon": "设置图标",
-    "setttingIconTips": "是否展示设置图标，关闭后可通过鼠标右键打开设置抽屉",
     "settingDividerSetting": "设置",
     "syncTime": "同步时间",
     "syncTimeTips": "多设备同步设置，仅在登录浏览器账号后生效",

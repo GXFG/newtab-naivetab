@@ -235,6 +235,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         }
         .item__name {
           flex: 0 0 auto;
+          width: 100%;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;

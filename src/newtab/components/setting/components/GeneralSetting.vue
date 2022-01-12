@@ -4,18 +4,17 @@
       <NFormItem :label="$t('general.pageTitle')">
         <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
       </NFormItem>
-      <NFormItem :label="$t('common.theme')">
-        <NSelect v-model:value="globalState.setting.general.theme" :options="themeList" />
-      </NFormItem>
       <NFormItem :label="$t('general.language')">
         <NSelect v-model:value="proxy.$i18n.locale" :options="state.i18nList" @update:value="onChangeLocale" />
       </NFormItem>
       <NFormItem :label="$t('common.drawerSite')">
         <NSelect v-model:value="globalState.setting.general.drawerPlacement" :options="drawerPlacementList" />
       </NFormItem>
-      <NFormItem :label="$t('general.setttingIcon')">
-        <NSwitch v-model:value="globalState.setting.settingIcon.enabled" />
-        <Tips :content="$t('general.setttingIconTips')" />
+    </template>
+
+    <template #style>
+      <NFormItem :label="$t('common.theme')">
+        <NSelect v-model:value="globalState.setting.general.theme" :options="themeList" />
       </NFormItem>
     </template>
 

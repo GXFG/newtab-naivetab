@@ -27,3 +27,5 @@ export const styleConst = ref({
   bgCalendarWork: ['rgba(122, 122, 122, 0.5)', ''],
   bgCalendarLabelWork: ['rgba(122, 122, 122, 0.6)', ''],
 })
+
+export const swatcheColors = ['rgba(255, 255, 255, 1)', 'rgba(209, 213, 219, 1)', 'rgba(71,85,105, 1)', 'rgba(44, 62, 80, 1)', 'rgba(113, 113, 113, 1)', 'rgba(53, 54, 58, 1)', 'rgba(15, 23, 42, 1)']

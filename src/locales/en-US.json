@@ -90,8 +90,6 @@
     "globalStyle": "Global style",
     "generalLabel": "General",
     "pageTitle": "Page title",
-    "setttingIcon": "SetttingIcon",
-    "setttingIconTips": "Whether to display the setting icon, after closing, you can open the setting drawer with the right-click menu",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",
