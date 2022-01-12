@@ -1,7 +1,7 @@
 <template>
   <MoveableComponentWrap componentName="search" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
-      <NDropdown :show="state.isSuggestVisible" :options="state.suggestList" :placement="state.placementValue" :show-arrow="true" @select="handleSelectSuggest">
+      <NDropdown :show="state.isSuggestVisible" :options="state.suggestList" :placement="state.placementValue" :show-arrow="true" @select="handleSelectSuggest" @clickoutside="handleSelectOutside">
         <div
           class="search__container"
           :style="containerStyle"
@@ -20,12 +20,12 @@
             @focus="onSearchFocus()"
             @blur="onSearchBlur"
             @input="onSearchInput"
-            @keyup.enter="onSearch()"
+            @keyup.enter="handleSearch()"
           >
           <div class="input__clear" :class="{ 'input__clear--move': isDragMode }">
             <icon-park-outline:close-one v-show="isClearVisible" @click="onClearValue()" />
           </div>
-          <il:search class="input__search" :class="{ 'input__search--move': isDragMode }" @click="onSearch()" />
+          <il:search class="input__search" :class="{ 'input__search--move': isDragMode }" @click="handleSearch()" />
         </div>
       </NDropdown>
     </div>
@@ -72,7 +72,7 @@ const onClearValue = () => {
 }
 
 const onSearch = () => {
-  if (state.searchValue.length === 0 || state.isSuggestVisible) {
+  if (state.searchValue.length === 0) {
     return
   }
   const url = globalState.setting.search.urlValue.replace('{query}', state.searchValue)
@@ -80,6 +80,8 @@ const onSearch = () => {
   openNewPage(url)
   state.searchValue = ''
 }
+
+const handleSearch = useDebounceFn(onSearch, 200)
 
 const getBaiduSuggest = async() => {
   if (state.searchValue.length === 0) {
@@ -114,6 +116,7 @@ watch(
     getBaiduSuggestHandler()
   },
 )
+
 watch(isDragMode, () => {
   onClearValue()
 })
@@ -121,7 +124,11 @@ watch(isDragMode, () => {
 const handleSelectSuggest = (key: string) => {
   state.searchValue = key
   state.isSuggestVisible = false
-  onSearch()
+  handleSearch()
+}
+
+const handleSelectOutside = () => {
+  state.isSuggestVisible = false
 }
 
 const containerStyle = ref(getLayoutStyle(CNAME))
