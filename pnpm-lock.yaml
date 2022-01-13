@@ -23,7 +23,7 @@ specifiers:
   esno: ^0.10.0
   fs-extra: ^10.0.0
   kolorist: ^1.5.0
-  naive-ui: ^2.23.2
+  naive-ui: ^2.24.1
   npm-run-all: ^4.1.5
   rimraf: ^3.0.2
   typescript: ^4.5.4
@@ -65,7 +65,7 @@ devDependencies:
   esno: registry.npmmirror.com/esno/0.10.1
   fs-extra: registry.nlark.com/fs-extra/10.0.0
   kolorist: registry.npmmirror.com/kolorist/1.5.0
-  naive-ui: registry.npmmirror.com/naive-ui/2.23.2_vue@3.2.26
+  naive-ui: registry.npmmirror.com/naive-ui/2.24.1_vue@3.2.26
   npm-run-all: registry.npmmirror.com/npm-run-all/4.1.5
   rimraf: registry.nlark.com/rimraf/3.0.2
   typescript: registry.npmmirror.com/typescript/4.5.4
@@ -3358,8 +3358,8 @@ packages:
       vue-i18n:
         optional: true
     dependencies:
-      '@intlify/message-compiler': registry.npmmirror.com/@intlify/message-compiler/9.2.0-beta.26
-      '@intlify/shared': registry.npmmirror.com/@intlify/shared/9.2.0-beta.26
+      '@intlify/message-compiler': registry.npmmirror.com/@intlify/message-compiler/9.2.0-beta.28
+      '@intlify/shared': registry.npmmirror.com/@intlify/shared/9.2.0-beta.28
       jsonc-eslint-parser: registry.npmmirror.com/jsonc-eslint-parser/1.4.1
       source-map: registry.nlark.com/source-map/0.6.1
       vue-i18n: registry.npmmirror.com/vue-i18n/9.2.0-beta.26_vue@3.2.26
@@ -3397,10 +3397,27 @@ packages:
       source-map: registry.nlark.com/source-map/0.6.1
     dev: true
 
+  registry.npmmirror.com/@intlify/message-compiler/9.2.0-beta.28:
+    resolution: {integrity: sha512-NBH9fZyitN2cijGt8bmU1W7ZPdhKbgW01L1RxJKFJW0cRaCmknJq63Aif1Q6xcxKt9ZhPbvIKHgPGzg1nWMfeA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@intlify/message-compiler/download/@intlify/message-compiler-9.2.0-beta.28.tgz}
+    name: '@intlify/message-compiler'
+    version: 9.2.0-beta.28
+    engines: {node: '>= 12'}
+    dependencies:
+      '@intlify/shared': registry.npmmirror.com/@intlify/shared/9.2.0-beta.28
+      source-map: registry.nlark.com/source-map/0.6.1
+    dev: true
+
   registry.npmmirror.com/@intlify/shared/9.2.0-beta.26:
     resolution: {integrity: sha512-MjUlkjNThqkqy8yXUcFKBiW/hIfqAn5cP3Vd0b4wdOHS8rPCEbvSbAnF08uiZDkVv8gTcsLyymX21GaU6oYyyQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@intlify/shared/download/@intlify/shared-9.2.0-beta.26.tgz}
     name: '@intlify/shared'
     version: 9.2.0-beta.26
+    engines: {node: '>= 12'}
+    dev: true
+
+  registry.npmmirror.com/@intlify/shared/9.2.0-beta.28:
+    resolution: {integrity: sha512-JBMcoj1D4kSAma7Vb0+d8z6lPLIn7hIdZJPxbU8bgeMMniwKLoIS/jGlEfrZihsB5+otckPeQp203z8skwVS0w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@intlify/shared/download/@intlify/shared-9.2.0-beta.28.tgz}
+    name: '@intlify/shared'
+    version: 9.2.0-beta.28
     engines: {node: '>= 12'}
     dev: true
 
@@ -3421,7 +3438,7 @@ packages:
         optional: true
     dependencies:
       '@intlify/bundle-utils': registry.npmmirror.com/@intlify/bundle-utils/2.2.0_vue-i18n@9.2.0-beta.26
-      '@intlify/shared': registry.npmmirror.com/@intlify/shared/9.2.0-beta.26
+      '@intlify/shared': registry.npmmirror.com/@intlify/shared/9.2.0-beta.28
       '@rollup/pluginutils': registry.nlark.com/@rollup/pluginutils/4.1.1
       debug: registry.npmmirror.com/debug/4.3.2
       fast-glob: registry.nlark.com/fast-glob/3.2.7
@@ -4037,7 +4054,7 @@ packages:
     dev: true
 
   registry.npmmirror.com/acorn/7.4.1:
-    resolution: {integrity: sha1-/q7SVZc9LndVW4PbwIhRpsY1IPo=, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/acorn/download/acorn-7.4.1.tgz}
+    resolution: {integrity: sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/acorn/download/acorn-7.4.1.tgz}
     name: acorn
     version: 7.4.1
     engines: {node: '>=0.4.0'}
@@ -6423,11 +6440,11 @@ packages:
       thenify-all: registry.npmmirror.com/thenify-all/1.6.0
     dev: true
 
-  registry.npmmirror.com/naive-ui/2.23.2_vue@3.2.26:
-    resolution: {integrity: sha512-x5XtoJrfMcBGqkryJ6RPg3hB7xDqbO+5TfDB1UGIaVsj2fsidn9S9a6yK/jXqKbw+h5h97NqOu+Lf5EH8tAIog==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/naive-ui/download/naive-ui-2.23.2.tgz}
-    id: registry.npmmirror.com/naive-ui/2.23.2
+  registry.npmmirror.com/naive-ui/2.24.1_vue@3.2.26:
+    resolution: {integrity: sha512-nwU4L7P5rIutkRjoBB3wvtn19GYBI/vbz+DeyhbkG9MB4VZe2xZLA5fgq0dD4MsY2KYYcffKz4wDcQOJBy5zGg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/naive-ui/download/naive-ui-2.24.1.tgz}
+    id: registry.npmmirror.com/naive-ui/2.24.1
     name: naive-ui
-    version: 2.23.2
+    version: 2.24.1
     peerDependencies:
       vue: ^3.0.0
     dependencies:
@@ -6446,10 +6463,10 @@ packages:
       seemly: registry.npmmirror.com/seemly/0.3.3
       treemate: registry.npmmirror.com/treemate/0.3.9
       vdirs: registry.npmmirror.com/vdirs/0.1.7_vue@3.2.26
-      vfonts: registry.npmmirror.com/vfonts/0.1.0
+      vfonts: registry.npmmirror.com/vfonts/0.0.3
       vooks: registry.npmmirror.com/vooks/0.2.12_vue@3.2.26
       vue: registry.npmmirror.com/vue/3.2.26
-      vueuc: registry.npmmirror.com/vueuc/0.4.19_7fea039e05dc0d0bb67319189a00d1ad
+      vueuc: registry.npmmirror.com/vueuc/0.4.22_7fea039e05dc0d0bb67319189a00d1ad
     dev: true
 
   registry.npmmirror.com/nanoevents/6.0.2:
@@ -7556,10 +7573,10 @@ packages:
       extsprintf: registry.npmmirror.com/extsprintf/1.3.0
     dev: true
 
-  registry.npmmirror.com/vfonts/0.1.0:
-    resolution: {integrity: sha1-wWrzfKBEsnJa5VVTBJKA775iIqk=, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vfonts/download/vfonts-0.1.0.tgz}
+  registry.npmmirror.com/vfonts/0.0.3:
+    resolution: {integrity: sha512-nguyw8L6Un8eelg1vQ31vIU2ESxqid7EYmy8V+MDeMaHBqaRSkg3dTBToC1PR00D89UzS/SLkfYPnx0Wf23IQQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vfonts/download/vfonts-0.0.3.tgz}
     name: vfonts
-    version: 0.1.0
+    version: 0.0.3
     dev: true
 
   registry.npmmirror.com/vite-plugin-md/0.11.7_vite@2.7.10:
@@ -7700,11 +7717,11 @@ packages:
       '@vue/shared': registry.npmmirror.com/@vue/shared/3.2.26
     dev: true
 
-  registry.npmmirror.com/vueuc/0.4.19_7fea039e05dc0d0bb67319189a00d1ad:
-    resolution: {integrity: sha512-mzhYwv60cldElLolvG5sMsDFNMP1+vQbxPnbWzT2BdIG6XfF0hzCxq0KMoYpg4cAekKijty2txRgNkySIjTWLA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vueuc/download/vueuc-0.4.19.tgz}
-    id: registry.npmmirror.com/vueuc/0.4.19
+  registry.npmmirror.com/vueuc/0.4.22_7fea039e05dc0d0bb67319189a00d1ad:
+    resolution: {integrity: sha512-NqyBnS46+Fiuk9nEVqNocchRZ4PjVIzREA7lFOn/RrzpAjaX/3Srlee8BmIkNGhVcvrd7oCOgOl/vv12ls1C+Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vueuc/download/vueuc-0.4.22.tgz}
+    id: registry.npmmirror.com/vueuc/0.4.22
     name: vueuc
-    version: 0.4.19
+    version: 0.4.22
     peerDependencies:
       '@css-render/vue3-ssr': ^0.15.7
       vue: ^3.0.11
