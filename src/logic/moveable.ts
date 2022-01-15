@@ -103,7 +103,7 @@ const handleMousedown = (e: MouseEvent) => {
 }
 
 const handleMousemove = (e: MouseEvent) => {
-  if (!isDragMode.value || moveState.currDragTarget.type === -1) {
+  if (!isDragMode.value || e.buttons === 0 || moveState.currDragTarget.type === -1) {
     return
   }
   for (const task of moveState.MouseMoveTaskMap.values()) {
