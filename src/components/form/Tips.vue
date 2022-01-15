@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { openNewPage } from '@/logic'
+import { createTab } from '@/logic'
 
 const props = defineProps({
   content: {
@@ -29,7 +29,7 @@ const onClick = () => {
   if (!props.link) {
     return
   }
-  openNewPage(props.content)
+  createTab(props.content)
 }
 </script>
 

@@ -19,7 +19,7 @@
           </template>
           {{ $t('common.close') }}
         </NButton>
-        <NButton class="footer__btn" type="primary" ghost size="small" @click="openNewPage(URL_CHANGELOG)">
+        <NButton class="footer__btn" type="primary" ghost size="small" @click="createTab(URL_CHANGELOG)">
           <template #icon>
             <div class="icon__wrap">
               <gg:more-o class="btn__icon" />
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import Currentlog from '../../../CURRENTLOG.md'
-import { URL_CHANGELOG, globalState, openNewPage, closeWhatsNewModal } from '@/logic'
+import { URL_CHANGELOG, globalState, createTab, closeWhatsNewModal } from '@/logic'
 
 const isDisableCloseBtn = ref(true)
 

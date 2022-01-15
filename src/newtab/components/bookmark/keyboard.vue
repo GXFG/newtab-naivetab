@@ -14,7 +14,8 @@
               'row__item--shadow': globalState.style.bookmark.isShadowEnabled,
             }"
             :title="item.url"
-            @click="onPressItem(item.url)"
+            @click="onClickItem(item.url)"
+            @mousedown="onItemMouseDown($event, item.url)"
           >
             <p class="item__key">
               {{ `${item.key.toUpperCase()}` }}
@@ -39,7 +40,7 @@
 <script setup lang="ts">
 import { useThrottleFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, globalState, getIsComponentRender, getLayoutStyle, getStyleField, addKeyboardTask, sleep, log, openNewPage } from '@/logic'
+import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, moveState, globalState, getIsComponentRender, getLayoutStyle, getStyleField, addKeyboardTask, sleep, log, createTab } from '@/logic'
 
 const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
@@ -117,12 +118,22 @@ watch(
   { deep: true },
 )
 
-const onPressItem = (url: string) => {
+const onClickItem = (url: string) => {
   if (isDragMode.value) {
     return
   }
-  openNewPage(url)
+  createTab(url)
   state.currSelectKey = ''
+}
+
+const onItemMouseDown = (e: MouseEvent, url: string) => {
+  if (e.button !== 1) {
+    return
+  }
+  if (isDragMode.value) {
+    return
+  }
+  createTab(url, false)
 }
 
 // keyboard listener
@@ -138,11 +149,11 @@ const keyboardTask = (e: KeyboardEvent) => {
     return
   }
   if (!globalState.setting.bookmark.isDblclickOpen) {
-    openNewPage(url)
+    createTab(url)
     return
   }
   if (key === state.currSelectKey) {
-    openNewPage(url)
+    createTab(url)
   } else {
     state.currSelectKey = key
     clearTimeout(timer)

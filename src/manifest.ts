@@ -23,6 +23,7 @@ export async function getManifest() {
       128: './assets/img/icon/icon-128.png',
     },
     permissions: [
+      'tabs',
       'storage',
       'chrome://favicon/',
       'https://cn.bing.com/', // image

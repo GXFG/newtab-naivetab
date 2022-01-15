@@ -276,11 +276,11 @@ export const closeWhatsNewModal = () => {
   globalState.state.isWhatsNewModalVisible = false
 }
 
-export const openNewPage = (url: string) => {
+export const createTab = (url: string, active = true) => {
   if (url.length === 0) {
     return
   }
-  window.open(url)
+  chrome.tabs.create({ url, active })
 }
 
 export const getIsComponentRender = (componentName: TComponents) => computed(() => globalState.setting[componentName].enabled || moveState.dragTempEnabledMap[componentName])

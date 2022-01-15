@@ -78,7 +78,7 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
   return { type, name }
 }
 
-const getMouseTaskKeyList = () => {
+const getMouseTaskKey = () => {
   let taskKey = ''
   if (moveState.currDragTarget.type === 1) {
     taskKey = moveState.currDragTarget.name
@@ -89,7 +89,7 @@ const getMouseTaskKeyList = () => {
 }
 
 const handleMousedown = (e: MouseEvent) => {
-  if (!isDragMode.value) {
+  if (!isDragMode.value || e.button !== 0) {
     return
   }
   const targetData = getTargetDataFromEvent(e)
@@ -98,12 +98,12 @@ const handleMousedown = (e: MouseEvent) => {
   if (moveState.currDragTarget.type === -1) {
     return
   }
-  const mouseTask = getMouseTaskKeyList()
+  const mouseTask = getMouseTaskKey()
   moveState.MouseDownTaskMap.get(mouseTask)(e)
 }
 
 const handleMousemove = (e: MouseEvent) => {
-  if (!isDragMode.value || e.buttons === 0 || moveState.currDragTarget.type === -1) {
+  if (!isDragMode.value || moveState.currDragTarget.type === -1) {
     return
   }
   for (const task of moveState.MouseMoveTaskMap.values()) {
@@ -122,7 +122,7 @@ const handleMouseup = (e: MouseEvent) => {
   if (!isDragMode.value || moveState.currDragTarget.type === -1) {
     return
   }
-  const mouseTask = getMouseTaskKeyList()
+  const mouseTask = getMouseTaskKey()
   moveState.MouseUpTaskMap.get(mouseTask)(e)
   if (lastIsElementDrawerVisible) {
     toggleIsElementDrawerVisible(true)

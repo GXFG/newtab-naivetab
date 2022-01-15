@@ -36,7 +36,7 @@
           <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal(true)">
             <ic:round-new-releases />
           </NButton>
-          <NButton text class="right__icon" title="Github" @click="openNewPage(URL_GITHUB)">
+          <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
             <carbon:logo-github />
           </NButton>
         </div>
@@ -64,7 +64,7 @@ import {
   globalState,
   isDragMode,
   isSettingDrawerVisible,
-  openNewPage,
+  createTab,
   openWhatsNewModal,
   toggleIsDragMode,
   toggleIsSettingDrawerVisible,

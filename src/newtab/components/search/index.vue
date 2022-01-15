@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, openNewPage } from '@/logic'
+import { globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab } from '@/logic'
 import http from '@/lib/http'
 
 const CNAME = 'search'
@@ -77,7 +77,7 @@ const onSearch = () => {
   }
   const url = globalState.setting.search.urlValue.replace('{query}', state.searchValue)
   state.isSuggestVisible = false
-  openNewPage(url)
+  createTab(url)
   state.searchValue = ''
 }
 
