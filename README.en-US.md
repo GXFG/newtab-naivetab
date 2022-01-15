@@ -20,12 +20,10 @@
 
 | Description | Preview |
 | ---- | ---- |
-| Overview | <img width="1280" alt="iShot2021-12-31 21 44 21" src="https://user-images.githubusercontent.com/20944987/147826447-76b01988-c5ad-4952-b449-26cb05df832f.png"> |
-| Click on the gear icon on the right, or right-click menu to expand the detailed settings drawer, which contains specific configuration items for 'General' and 'Each Components' | <img width="1280" alt="iShot2021-12-31 21 44 27" src="https://user-images.githubusercontent.com/20944987/147826477-f3c115d1-c511-4af3-854f-01411d4dff7a.png"> |
-| Each component contains configuration items for 'Style', You can modify the font, color... | <img width="1280" alt="iShot2021-12-31 21 44 53" src="https://user-images.githubusercontent.com/20944987/147826497-f3ff5b35-051b-440c-b736-807fc4c8e82d.png"> |
-| Each component can be placed anywhere on the screen via dragMode | <img width="1280" alt="iShot2022-01-02 17 12 22" src="https://user-images.githubusercontent.com/20944987/147871496-fe73f5a7-5b8f-46a6-a8d2-50528f784b0c.png"> |
-| Support Bing, local pictures for background image settings | <img width="1280" alt="iShot2022-01-02 17 09 56" src="https://user-images.githubusercontent.com/20944987/147871442-9d9f5b8b-78ce-4be0-a5f3-86fb42603486.png"> |
-| Supports automatic /manual theme mode switching | <img width="1280" alt="iShot2021-12-31 21 45 09" src="https://user-images.githubusercontent.com/20944987/147826515-422299e3-74c0-452b-8656-30f49eee985d.png"> |
+| Overview | <img width="1280" alt="1" src="https://user-images.githubusercontent.com/20944987/149626030-fa635451-f289-45d1-b97c-222384964801.png"> |
+| Each component can be placed anywhere on the screen via dragMode | <img width="1280" alt="2" src="https://user-images.githubusercontent.com/20944987/149626121-7228eb4a-d9ed-4b9c-b3dc-2e0e79c50e85.png"> |
+| Click on the gear icon, or right-click menu to expand the detailed settings drawer, which contains specific configuration items for 'General' and 'Each Components' | <img width="1280" alt="3" src="https://user-images.githubusercontent.com/20944987/149626127-032dc992-9c88-4b6a-b0cc-bc855773dfdd.png"> |
+| Support Bing, local pictures for background image settings;Supports automatic /manual theme mode switching | <img width="1280" alt="4" src="https://user-images.githubusercontent.com/20944987/149626140-5308555c-7032-4f45-9c44-8a0ba027e0ba.png"> |
 
 ## 🛠️Install
 
