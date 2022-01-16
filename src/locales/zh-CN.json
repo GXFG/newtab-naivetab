@@ -121,7 +121,8 @@
     "namePlaceholder": "可选"
   },
   "search": {
-    "searchEngine": "搜索引擎"
+    "searchEngine": "搜索引擎",
+    "placeholder": "占位文本"
   },
   "calendar": {
     "january": "一月",

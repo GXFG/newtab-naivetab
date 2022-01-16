@@ -121,7 +121,8 @@
     "namePlaceholder": "optional"
   },
   "search": {
-    "searchEngine": "Search engine"
+    "searchEngine": "Search engine",
+    "placeholder": "Placeholder"
   },
   "calendar": {
     "january": "January",

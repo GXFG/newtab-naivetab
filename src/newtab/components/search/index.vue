@@ -15,7 +15,7 @@
             v-model="state.searchValue"
             class="input__main"
             :class="{ 'input__main--move': isDragMode }"
-            :placeholder="placeholder"
+            :placeholder="globalState.setting.search.placeholder"
             :disabled="isDragMode"
             @focus="onSearchFocus()"
             @blur="onSearchBlur"
@@ -47,7 +47,6 @@ const state = reactive({
   suggestList: [],
 })
 
-const placeholder = computed(() => `${globalState.setting.search.urlName}`)
 const isClearVisible = computed(() => state.searchValue.length !== 0)
 
 const onSearchFocus = () => {

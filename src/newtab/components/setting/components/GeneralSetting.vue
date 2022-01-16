@@ -100,7 +100,7 @@
         <NPopconfirm @positive-click="onResetSetting()">
           <template #trigger>
             <NButton dashed type="error">
-              <ic:round-reset-tv />&nbsp;{{ $t('general.resetSettingValue') }}
+              <ic:baseline-settings-backup-restore />&nbsp;{{ $t('general.resetSettingValue') }}
             </NButton>
           </template>
           {{ $t('common.confirm') }}?

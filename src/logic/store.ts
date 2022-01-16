@@ -239,6 +239,7 @@ export const globalState = reactive({
     }),
     search: useStorageLocal('setting-search', {
       enabled: true,
+      placeholder: 'search',
       urlName: 'baidu',
       urlValue: 'https://www.baidu.com/s?word={query}',
     }),

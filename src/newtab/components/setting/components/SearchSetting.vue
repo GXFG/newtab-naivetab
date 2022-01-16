@@ -4,6 +4,9 @@
       <NFormItem :label="$t('search.searchEngine')">
         <NSelect v-model:value="globalState.setting.search.urlValue" :options="SEARCH_ENGINE_LIST" @update:value="onChangeSearch" />
       </NFormItem>
+      <NFormItem :label="$t('search.placeholder')">
+        <NInput v-model:value="globalState.setting.search.placeholder" type="text" placeholder=" " />
+      </NFormItem>
     </template>
   </BaseComponentSetting>
 </template>
