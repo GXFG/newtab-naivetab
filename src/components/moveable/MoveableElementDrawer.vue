@@ -187,7 +187,7 @@ const keyboardHandler = (e: KeyboardEvent) => {
     if (moveState.currDragTarget.name.length === 0) {
       return
     }
-    globalState.setting[moveState.currDragTarget.name].enabled = false
+    onDeleteComponent()
   }
 }
 

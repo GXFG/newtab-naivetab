@@ -15,8 +15,8 @@
               <fa-solid:angle-right />
             </NButton>
           </div>
-          <div class="options__item">
-            <NButton class="item__btn" text :disabled="isDragMode" @click="onReset()">
+          <div class="options__item options__reset">
+            <NButton v-show="isResetBtnVisible" class="item__btn" text :disabled="isDragMode" @click="onReset()">
               <si-glyph:arrow-backward />
             </NButton>
           </div>
@@ -217,6 +217,8 @@ const onDateChange = () => {
   onRender()
 }
 
+const isResetBtnVisible = computed(() => state.currYear !== dayjs().get('year') || state.currMonth !== dayjs().get('month') + 1)
+
 const onReset = () => {
   state.currYear = dayjs().get('year')
   state.currMonth = dayjs().get('month') + 1
@@ -278,6 +280,10 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           flex: 0 0 auto;
           width: 110px;
         }
+      }
+      .options__reset {
+        flex: 0 0 auto;
+        width: 30px;
       }
     }
     .calendar__header {
