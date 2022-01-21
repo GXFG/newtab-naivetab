@@ -1,5 +1,5 @@
 <template>
-  <BaseComponentSetting field="weather">
+  <BaseComponentSetting cname="weather">
     <template #header>
       <NFormItem :label="$t('weather.forecastEnabled')">
         <NTooltip trigger="hover">

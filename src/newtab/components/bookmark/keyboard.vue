@@ -100,7 +100,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
     if (domain && !domain.includes(':')) {
       // 非端口地址
       const tempSplitList = domain.split('.')
-      name = tempSplitList[tempSplitList.length - 2] // 默认name为主域名去掉后缀
+      name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0]
     }
     localBookmarkList.value[index] = {
       key,

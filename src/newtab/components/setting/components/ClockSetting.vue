@@ -2,7 +2,7 @@
   <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['clockAnalog', 'clockDigital']">
     <!-- clockAnalog -->
     <NCollapseItem :title="$t('setting.clockAnalog')" name="clockAnalog">
-      <BaseComponentSetting field="clockAnalog">
+      <BaseComponentSetting cname="clockAnalog">
         <template #header>
           <NFormItem :label="$t('common.theme')">
             <NSelect v-model:value="globalState.setting.clockAnalog.theme" :options="ANALOG_CLOCK_THEME" />
@@ -12,7 +12,7 @@
     </NCollapseItem>
     <!-- clockDigital -->
     <NCollapseItem :title="$t('setting.clockDigital')" name="clockDigital">
-      <BaseComponentSetting field="clockDigital">
+      <BaseComponentSetting cname="clockDigital">
         <template #header>
           <NFormItem :label="$t('common.format')">
             <NInput v-model:value="globalState.setting.clockDigital.format" />

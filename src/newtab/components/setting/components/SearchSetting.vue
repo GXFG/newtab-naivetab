@@ -1,5 +1,5 @@
 <template>
-  <BaseComponentSetting field="search">
+  <BaseComponentSetting cname="search">
     <template #header>
       <NFormItem :label="$t('search.searchEngine')">
         <NSelect v-model:value="globalState.setting.search.urlValue" :options="SEARCH_ENGINE_LIST" @update:value="onChangeSearch" />

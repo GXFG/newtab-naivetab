@@ -2,7 +2,7 @@
   <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['bookmarkKeyboard']">
     <!-- bookmarkKeyboard -->
     <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
-      <BaseComponentSetting field="bookmark">
+      <BaseComponentSetting cname="bookmark">
         <template #header>
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
             <div class="setting__input-wrap">

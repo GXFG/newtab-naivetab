@@ -1,5 +1,5 @@
 <template>
-  <BaseComponentSetting field="date">
+  <BaseComponentSetting cname="date">
     <template #header>
       <NFormItem :label="$t('common.format')">
         <NInput v-model:value="globalState.setting.date.format" />

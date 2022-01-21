@@ -1,5 +1,5 @@
 <template>
-  <BaseComponentSetting field="general" :divider-name="$t('general.globalStyle')">
+  <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
     <template #header>
       <NFormItem :label="$t('general.pageTitle')">
         <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />

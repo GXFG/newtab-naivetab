@@ -8,50 +8,50 @@
     <slot name="style" />
 
     <!-- size -->
-    <NFormItem v-if="globalState.style[props.field].margin" :label="$t('common.margin')">
-      <NSlider v-model:value="globalState.style[props.field].margin" :step="1" :min="1" :max="100" />
-      <NInputNumber v-model:value="globalState.style[props.field].margin" class="setting__input-number" :step="1" :min="1" :max="100" />
+    <NFormItem v-if="isFieldRender('margin')" :label="$t('common.margin')">
+      <NSlider v-model:value="globalState.style[props.cname].margin" :step="1" :min="1" :max="100" />
+      <NInputNumber v-model:value="globalState.style[props.cname].margin" class="setting__input-number" :step="1" :min="1" :max="100" />
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].width" :label="$t('common.width')">
-      <NSlider v-model:value="globalState.style[props.field].width" :step="1" :min="1" :max="500" />
-      <NInputNumber v-model:value="globalState.style[props.field].width" class="setting__input-number" :step="1" :min="1" :max="500" />
+    <NFormItem v-if="isFieldRender('width')" :label="$t('common.width')">
+      <NSlider v-model:value="globalState.style[props.cname].width" :step="1" :min="1" :max="500" />
+      <NInputNumber v-model:value="globalState.style[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="500" />
     </NFormItem>
-    <NFormItem v-if="'fontFamily' in globalState.style[props.field]" :label="$t('common.font')">
-      <NInput v-model:value="globalState.style[props.field].fontFamily" placeholder=" " @blur="onFontBlur" />
+    <NFormItem v-if="'fontFamily' in globalState.style[props.cname]" :label="$t('common.font')">
+      <NInput v-model:value="globalState.style[props.cname].fontFamily" placeholder=" " @blur="onFontBlur" />
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].fontSize" :label="$t('common.fontSize')">
-      <NSlider v-model:value="globalState.style[props.field].fontSize" :step="1" :min="12" :max="200" />
-      <NInputNumber v-model:value="globalState.style[props.field].fontSize" class="setting__input-number" :min="12" :step="1" />
+    <NFormItem v-if="isFieldRender('fontSize')" :label="$t('common.fontSize')">
+      <NSlider v-model:value="globalState.style[props.cname].fontSize" :step="1" :min="12" :max="200" />
+      <NInputNumber v-model:value="globalState.style[props.cname].fontSize" class="setting__input-number" :step="1" :min="12" :max="200" />
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].letterSpacing" :label="$t('common.letterSpacing')">
-      <NSlider v-model:value="globalState.style[props.field].letterSpacing" :step="1" :max="200" />
-      <NInputNumber v-model:value="globalState.style[props.field].letterSpacing" class="setting__input-number" :step="1" />
+    <NFormItem v-if="isFieldRender('letterSpacing')" :label="$t('common.letterSpacing')">
+      <NSlider v-model:value="globalState.style[props.cname].letterSpacing" :step="1" :min="0" :max="20" />
+      <NInputNumber v-model:value="globalState.style[props.cname].letterSpacing" class="setting__input-number" :step="1" :min="0" :max="20" />
     </NFormItem>
     <!-- color -->
-    <NFormItem v-if="globalState.style[props.field].fontColor" :label="$t('common.fontColor')">
-      <NColorPicker v-model:value="globalState.style[props.field].fontColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
+    <NFormItem v-if="isFieldRender('fontColor')" :label="$t('common.fontColor')">
+      <NColorPicker v-model:value="globalState.style[props.cname].fontColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].backgroundColor" :label="$t('common.backgroundColor')">
-      <NColorPicker v-model:value="globalState.style[props.field].backgroundColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
+    <NFormItem v-if="isFieldRender('backgroundColor')" :label="$t('common.backgroundColor')">
+      <NColorPicker v-model:value="globalState.style[props.cname].backgroundColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].activeColor" :label="$t('common.activeColor')">
-      <NColorPicker v-model:value="globalState.style[props.field].activeColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
+    <NFormItem v-if="isFieldRender('activeColor')" :label="$t('common.activeColor')">
+      <NColorPicker v-model:value="globalState.style[props.cname].activeColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].borderColor" :label="$t('common.borderColor')">
-      <NSwitch v-model:value="globalState.style[props.field].isBorderEnabled" />
+    <NFormItem v-if="isFieldRender('borderColor')" :label="$t('common.borderColor')">
+      <NSwitch v-model:value="globalState.style[props.cname].isBorderEnabled" />
       <NColorPicker
-        v-if="globalState.style[props.field].isBorderEnabled"
-        v-model:value="globalState.style[props.field].borderColor[globalState.localState.currThemeCode]"
+        v-if="isFieldRender('isBorderEnabled')"
+        v-model:value="globalState.style[props.cname].borderColor[globalState.localState.currThemeCode]"
         class="setting__row-element"
         show-preview
         :swatches="swatcheColors"
       />
     </NFormItem>
-    <NFormItem v-if="globalState.style[props.field].shadowColor" :label="$t('common.shadowColor')">
-      <NSwitch v-model:value="globalState.style[props.field].isShadowEnabled" />
+    <NFormItem v-if="isFieldRender('shadowColor')" :label="$t('common.shadowColor')">
+      <NSwitch v-model:value="globalState.style[props.cname].isShadowEnabled" />
       <NColorPicker
-        v-if="globalState.style[props.field].isShadowEnabled"
-        v-model:value="globalState.style[props.field].shadowColor[globalState.localState.currThemeCode]"
+        v-if="isFieldRender('isShadowEnabled')"
+        v-model:value="globalState.style[props.cname].shadowColor[globalState.localState.currThemeCode]"
         class="setting__row-element"
         show-preview
         :swatches="swatcheColors"
@@ -67,7 +67,7 @@ import { gaEvent, globalState } from '@/logic'
 import { swatcheColors } from '@/styles/index'
 
 const props = defineProps({
-  field: {
+  cname: {
     type: String,
     required: true,
   },
@@ -76,8 +76,12 @@ const props = defineProps({
   },
 })
 
+const isFieldRender = (field: string) => {
+  return field in globalState.style[props.cname]
+}
+
 const onFontBlur = (value: any) => {
-  gaEvent(`${props.field}-font`, 'blur', `${value.target.value}`)
+  gaEvent(`${props.cname}-font`, 'blur', `${value.target.value}`)
 }
 </script>
 

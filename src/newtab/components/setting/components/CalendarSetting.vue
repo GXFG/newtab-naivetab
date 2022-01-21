@@ -1,3 +1,3 @@
 <template>
-  <BaseComponentSetting field="calendar" />
+  <BaseComponentSetting cname="calendar" />
 </template>
