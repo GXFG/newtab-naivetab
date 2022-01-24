@@ -33,7 +33,7 @@
         </template>
         <template v-else-if="globalState.style.general.backgroundImageSource === 1">
           <NButton class="setting__row-element" @click="onSaveImage()">
-            <ion:save-outline />&nbsp;{{ $t('general.saveCurrendImage') }}
+            <tabler:world-download />&nbsp;{{ $t('general.saveCurrendImage') }}
           </NButton>
           <NButton class="setting__row-element" :loading="isImageListLoading" @click="onRefreshImageList()">
             <template #icon>
@@ -111,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { exportSetting, gaEvent, getImageUrlFromBing, getStyleConst, globalState, imageState, importSetting, isImageListLoading, isImageLoading, onRefreshImageList, resetSetting } from '@/logic'
+import { exportSetting, gaEvent, getImageUrlFromBing, getStyleConst, globalState, imageState, downloadImageByUrl, importSetting, isImageListLoading, isImageLoading, onRefreshImageList, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -170,8 +170,8 @@ const onBackgroundImageFileChange = (e: any) => {
   }
   gaEvent('setting-background-image', 'click', 'select-file')
 }
-const onSaveImage = () => {
-  window.open(globalState.style.general.backgroundImageUrl)
+const onSaveImage = async() => {
+  downloadImageByUrl(globalState.style.general.backgroundImageUrl)
 }
 const onSelectImage = (item: TImageItem) => {
   globalState.style.general.backgroundImageId = item.urlbase
