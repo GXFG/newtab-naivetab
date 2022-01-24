@@ -5,13 +5,7 @@
         {{ $t('help.content') }}
       </p>
       <div class="card__footer">
-        <NButton
-          class="footer__btn"
-          type="primary"
-          ghost
-          size="small"
-          @click="onCloseModal()"
-        >
+        <NButton class="footer__btn" type="primary" ghost size="small" @click="onCloseModal()">
           <template #icon>
             <div class="icon__wrap">
               <line-md:confirm-circle />
@@ -35,9 +29,6 @@ const state = reactive({
 })
 
 const keyboardHandler = (e: KeyboardEvent) => {
-  if (!isDragMode.value) {
-    return
-  }
   const { key } = e
   if (['?', '/'].includes(key)) {
     state.isHelpVisible = true
@@ -59,7 +50,7 @@ watch(isDragMode, (value) => {
   }
   state.isHelpVisible = true
   isOpenHelpVisible.value = false
-})
+}, { immediate: true })
 </script>
 
 <style scoped>

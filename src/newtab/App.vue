@@ -12,8 +12,9 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { NConfigProvider, NMessageProvider, NNotificationProvider, darkTheme, enUS, useOsTheme, zhCN } from 'naive-ui'
 import Content from './Content.vue'
-import { THEME_TO_CODE_MAP, gaEvent, getStyleField, globalState, loadSyncSetting, openWhatsNewModal, startKeyboard, startTimer, stopTimer } from '@/logic'
+import { THEME_TO_CODE_MAP, gaEvent, getStyleField, globalState, loadSyncSetting, initFirstOpen, openWhatsNewModal, startKeyboard, startTimer, stopTimer } from '@/logic'
 
+initFirstOpen ()
 openWhatsNewModal()
 loadSyncSetting()
 startTimer()

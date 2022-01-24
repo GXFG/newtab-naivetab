@@ -2,7 +2,7 @@ import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, moveState } from '@/logic'
+import { DAYJS_LANG_MAP, isDragMode, toggleIsDragMode, moveState } from '@/logic'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
@@ -260,6 +260,16 @@ export const globalState = reactive({
 })
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
+
+// 第一次打开扩展时，打开画布模式&帮助弹窗
+const isFirstOpen = ref(useStorageLocal('data-first', true))
+export const initFirstOpen = () => {
+  if (!isFirstOpen.value) {
+    return
+  }
+  toggleIsDragMode(true)
+  isFirstOpen.value = false
+}
 
 export const openWhatsNewModal = (forceOpen = false) => {
   if (forceOpen) {
