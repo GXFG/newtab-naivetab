@@ -122,7 +122,8 @@
   },
   "search": {
     "searchEngine": "Search engine",
-    "placeholder": "Placeholder"
+    "placeholder": "Placeholder",
+    "icon": "Icon"
   },
   "calendar": {
     "january": "January",

@@ -32,7 +32,9 @@
           <div class="input__clear" :class="{ 'input__clear--move': isDragMode }">
             <icon-park-outline:close-one v-show="isClearVisible" @click="onClearValue()" />
           </div>
-          <il:search class="input__search" :class="{ 'input__search--move': isDragMode }" @click="handleSearch()" />
+          <div v-if="globalState.setting.search.iconEnabled">
+            <il:search class="input__search" :class="{ 'input__search--move': isDragMode }" @click="handleSearch()" />
+          </div>
         </div>
       </NDropdown>
     </div>

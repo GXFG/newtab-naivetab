@@ -122,7 +122,8 @@
   },
   "search": {
     "searchEngine": "搜索引擎",
-    "placeholder": "占位文本"
+    "placeholder": "占位文本",
+    "icon": "搜索图标"
   },
   "calendar": {
     "january": "一月",

@@ -238,6 +238,7 @@ export const globalState = reactive({
     }),
     search: useStorageLocal('setting-search', {
       enabled: true,
+      iconEnabled: true,
       placeholder: 'baidu',
       urlName: 'baidu',
       urlValue: 'https://www.baidu.com/s?word={query}',

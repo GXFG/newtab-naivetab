@@ -7,6 +7,9 @@
       <NFormItem :label="$t('search.placeholder')">
         <NInput v-model:value="globalState.setting.search.placeholder" type="text" placeholder=" " />
       </NFormItem>
+      <NFormItem :label="$t('search.icon')">
+        <NSwitch v-model:value="globalState.setting.search.iconEnabled" />
+      </NFormItem>
     </template>
   </BaseComponentSetting>
 </template>
