@@ -29,13 +29,25 @@
     </NFormItem>
     <!-- color -->
     <NFormItem v-if="isFieldRender('fontColor')" :label="$t('common.fontColor')">
-      <NColorPicker v-model:value="globalState.style[props.cname].fontColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
+      <NColorPicker
+        v-model:value="globalState.style[props.cname].fontColor[globalState.localState.currThemeCode]"
+        show-preview
+        :swatches="swatcheColors"
+      />
     </NFormItem>
     <NFormItem v-if="isFieldRender('backgroundColor')" :label="$t('common.backgroundColor')">
-      <NColorPicker v-model:value="globalState.style[props.cname].backgroundColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
+      <NColorPicker
+        v-model:value="globalState.style[props.cname].backgroundColor[globalState.localState.currThemeCode]"
+        show-preview
+        :swatches="swatcheColors"
+      />
     </NFormItem>
     <NFormItem v-if="isFieldRender('activeColor')" :label="$t('common.activeColor')">
-      <NColorPicker v-model:value="globalState.style[props.cname].activeColor[globalState.localState.currThemeCode]" show-preview :swatches="swatcheColors" />
+      <NColorPicker
+        v-model:value="globalState.style[props.cname].activeColor[globalState.localState.currThemeCode]"
+        show-preview
+        :swatches="swatcheColors"
+      />
     </NFormItem>
     <NFormItem v-if="isFieldRender('borderColor')" :label="$t('common.borderColor')">
       <NSwitch v-model:value="globalState.style[props.cname].isBorderEnabled" />

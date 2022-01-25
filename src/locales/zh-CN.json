@@ -44,10 +44,10 @@
     "backgroundImage": "背景图",
     "source": "来源",
     "blur": "模糊度",
+    "opacity": "透明度",
     "activeColor": "激活颜色",
     "shadowColor": "阴影颜色",
     "borderColor": "边框颜色",
-    "opacity": "透明度",
     "drawerSite": "抽屉位置",
     "local": "本地",
     "bing": "Bing",
@@ -71,7 +71,7 @@
   },
   "help": {
     "title": "帮助",
-    "content": "1. 按下“?”键可再次打开此帮助\n 2. 通过右键菜单进入“设置抽屉”以及“画布模式”\n 3. “画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成布局\n 4. 选中组件后可拖动至垃圾桶，或按delete、backspace键以移除\n 5. 按Esc键退出\n"
+    "content": "1. 按下“?”键可再次打开此帮助\n 2. 通过鼠标右键进入“设置抽屉”、“画布模式”\n 3. “画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成布局\n 4. 选中组件后可拖动至垃圾桶，或按delete、backspace键以移除\n 5. 可按Esc键退出\n"
   },
   "setting": {
     "general": "通用",

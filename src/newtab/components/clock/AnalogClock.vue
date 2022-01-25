@@ -2,11 +2,20 @@
   <MoveableComponentWrap componentName="clockAnalog" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
       <div class="clockAnalog__container" :style="containerStyle">
-        <article class="clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
-          <div class="base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
-          <div class="base hour" :style="`transform: rotateZ(${state.hourDeg}deg);background-image: url(/assets/img/clock/${currTheme}/hour.png)`" />
-          <div class="base minute" :style="`transform: rotateZ(${state.minuteDeg}deg);background-image: url(/assets/img/clock/${currTheme}/minute.png)`" />
-          <div class="base second" :style="`transform: rotateZ(${state.secondDeg}deg);background-image: url(/assets/img/clock/${currTheme}/second.png)`" />
+        <article class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
+          <div class="clock__base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
+          <div
+            class="clock__base hour"
+            :style="`transform: rotateZ(${state.hourDeg}deg);background-image: url(/assets/img/clock/${currTheme}/hour.png)`"
+          />
+          <div
+            class="clock__base minute"
+            :style="`transform: rotateZ(${state.minuteDeg}deg);background-image: url(/assets/img/clock/${currTheme}/minute.png)`"
+          />
+          <div
+            class="clock__base second"
+            :style="`transform: rotateZ(${state.secondDeg}deg);background-image: url(/assets/img/clock/${currTheme}/second.png)`"
+          />
         </article>
       </div>
     </div>
@@ -71,23 +80,22 @@ const customWidth = getStyleField(CNAME, 'width', 'px')
     z-index: 10;
     position: absolute;
     text-align: center;
-    .clock {
+    .container__clock {
       position: relative;
       height: v-bind(customWidth);
       width: v-bind(customWidth);
       border-radius: 20%;
       background-size: 100%;
-    }
-
-    .base {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: v-bind(customWidth);
-      width: v-bind(customWidth);
-      border-radius: 50%;
-      background-size: 100%;
-      transition: transform 0.3s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+      .clock__base {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: v-bind(customWidth);
+        width: v-bind(customWidth);
+        border-radius: 50%;
+        background-size: 100%;
+        transition: transform 0.3s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+      }
     }
   }
 }

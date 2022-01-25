@@ -12,7 +12,12 @@
               </div>
               <div v-if="globalState.setting.bookmark.isDblclickOpen" class="setting__input_item">
                 <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
-                <NInputNumber v-model:value="globalState.setting.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
+                <NInputNumber
+                  v-model:value="globalState.setting.bookmark.dblclickIntervalTime"
+                  class="setting__input-number--unit"
+                  :min="0"
+                  :step="1"
+                >
                   <template #suffix>
                     ms
                   </template>
@@ -39,7 +44,15 @@
                   {{ `${key.toUpperCase()}` }}
                 </NInputGroupLabel>
                 <template v-if="globalState.setting.bookmark.keymap[key]">
-                  <NInput v-for="field of ['url', 'name']" :key="field" v-model:value="globalState.setting.bookmark.keymap[key][field as 'url' | 'name']" class="input__main" type="text" clearable :placeholder="$t(`bookmark.${field}Placeholder`)" />
+                  <NInput
+                    v-for="field of ['url', 'name']"
+                    :key="field"
+                    v-model:value="globalState.setting.bookmark.keymap[key][field as 'url' | 'name']"
+                    class="input__main"
+                    type="text"
+                    clearable
+                    :placeholder="$t(`bookmark.${field}Placeholder`)"
+                  />
                   <NButton @click="onDeleteKey(key)">
                     <ri:delete-bin-6-line class="item__icon" />
                   </NButton>

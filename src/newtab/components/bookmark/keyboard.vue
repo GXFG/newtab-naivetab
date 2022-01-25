@@ -40,7 +40,20 @@
 <script setup lang="ts">
 import { useThrottleFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY, KEY_OF_INDEX, MERGE_SETTING_DELAY, isDragMode, moveState, globalState, getIsComponentRender, getLayoutStyle, getStyleField, addKeyboardTask, sleep, log, createTab } from '@/logic'
+import {
+  KEYBOARD_KEY,
+  KEY_OF_INDEX,
+  MERGE_SETTING_DELAY,
+  isDragMode,
+  globalState,
+  getIsComponentRender,
+  getLayoutStyle,
+  getStyleField,
+  addKeyboardTask,
+  sleep,
+  log,
+  createTab,
+} from '@/logic'
 
 const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
@@ -128,6 +141,7 @@ const onClickItem = (url: string) => {
 
 const onItemMouseDown = (e: MouseEvent, url: string) => {
   if (e.button !== 1) {
+    // 按下鼠标中键
     return
   }
   if (isDragMode.value) {
@@ -203,7 +217,8 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         outline: 1px solid v-bind(customBorderColor);
       }
       .row__item--shadow {
-        box-shadow: v-bind(customShadowColor) 0px 2px 1px, v-bind(customShadowColor) 0px 4px 2px, v-bind(customShadowColor) 0px 8px 4px, v-bind(customShadowColor) 0px 16px 8px;
+        box-shadow: v-bind(customShadowColor) 0px 2px 1px, v-bind(customShadowColor) 0px 4px 2px, v-bind(customShadowColor) 0px 8px 4px,
+          v-bind(customShadowColor) 0px 16px 8px;
       }
       .row__item--hover:hover {
         background-color: v-bind(customActiveColor) !important;

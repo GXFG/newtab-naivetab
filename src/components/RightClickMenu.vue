@@ -12,7 +12,14 @@
 </template>
 
 <script setup lang="ts">
-import { isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, currSettingTabValue, getTargetDataFromEvent } from '@/logic'
+import {
+  isDragMode,
+  toggleIsDragMode,
+  isSettingDrawerVisible,
+  toggleIsSettingDrawerVisible,
+  currSettingTabValue,
+  getTargetDataFromEvent,
+} from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -21,7 +28,7 @@ const state = reactive({
   currComponentName: '',
 })
 
-const menuList = computed(() => ([
+const menuList = computed(() => [
   {
     label: (state.currComponentName.length === 0 ? '' : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
     key: 'setting',
@@ -35,7 +42,7 @@ const menuList = computed(() => ([
     label: window.$t('common.dragMode'),
     key: 'dragMode',
   },
-]))
+])
 
 const menuActionMap = {
   setting: () => {

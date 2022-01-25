@@ -41,16 +41,20 @@ const onCloseModal = () => {
   state.isHelpVisible = false
 }
 
-watch(isDragMode, (value) => {
-  if (!value) {
-    return
-  }
-  if (!isOpenHelpVisible.value) {
-    return
-  }
-  state.isHelpVisible = true
-  isOpenHelpVisible.value = false
-}, { immediate: true })
+watch(
+  isDragMode,
+  (value) => {
+    if (!value) {
+      return
+    }
+    if (!isOpenHelpVisible.value) {
+      return
+    }
+    state.isHelpVisible = true
+    isOpenHelpVisible.value = false
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

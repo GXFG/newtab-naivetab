@@ -213,13 +213,17 @@ const modifyMoveableWrapBorder = async(isAdd: boolean) => {
   }
 }
 
-watch(isDragMode, (value) => {
-  if (!isEnabled.value) {
-    return
-  }
-  initTargetEle()
-  modifyMoveableWrapBorder(value)
-}, { immediate: true })
+watch(
+  isDragMode,
+  (value) => {
+    if (!isEnabled.value) {
+      return
+    }
+    initTargetEle()
+    modifyMoveableWrapBorder(value)
+  },
+  { immediate: true },
+)
 
 watch(isEnabled, (value: boolean) => {
   if (!isDragMode.value || !value) {
@@ -237,18 +241,20 @@ watch(isCurrent, async(value) => {
   modifyMoveableWrapClass(!value, 'element-bg-hover') // 当前选中的Component无hover样式
 })
 
-watch(() => moveState.isDeleteHover, async(value) => {
-  if (!isCurrent.value) {
-    return
-  }
-  modifyMoveableWrapClass(value, 'element-delete')
-})
+watch(
+  () => moveState.isDeleteHover,
+  async(value) => {
+    if (!isCurrent.value) {
+      return
+    }
+    modifyMoveableWrapClass(value, 'element-delete')
+  },
+)
 
 const auxiliaryLineElement = getStyleConst('auxiliaryLineElement')
 const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 const bgMoveableComponentActive = getStyleConst('bgMoveableComponentActive')
 const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
-
 </script>
 
 <style>

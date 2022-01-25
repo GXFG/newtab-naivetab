@@ -1,7 +1,14 @@
 <template>
   <MoveableComponentWrap componentName="search" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
-      <NDropdown :show="state.isSuggestVisible" :options="state.suggestList" :placement="state.placementValue" :show-arrow="true" @select="handleSelectSuggest" @clickoutside="handleSelectOutside">
+      <NDropdown
+        :show="state.isSuggestVisible"
+        :options="state.suggestList"
+        :placement="state.placementValue"
+        :show-arrow="true"
+        @select="handleSelectSuggest"
+        @clickoutside="handleSelectOutside"
+      >
         <div
           class="search__container"
           :style="containerStyle"

@@ -1,5 +1,10 @@
 <template>
-  <div id="moveable-tool" :class="{ 'moveable-tool--active': isDragMode && isElementDrawerVisible }" @mouseenter="handleContainerMouseEnter" @mouseleave="handleContainerMouseLeave">
+  <div
+    id="moveable-tool"
+    :class="{ 'moveable-tool--active': isDragMode && isElementDrawerVisible }"
+    @mouseenter="handleContainerMouseEnter"
+    @mouseleave="handleContainerMouseLeave"
+  >
     <!-- drawer -->
     <div class="tool__drawer">
       <div v-if="isDragMode" class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
@@ -27,7 +32,13 @@
       </div>
     </div>
     <!-- delete -->
-    <div class="tool__delete" :class="{ 'tool__delete--active': isDeleteBtnVisible }" @mouseenter="handlerDeleteMouseEnter" @mouseleave="handlerDeleteMouseLeave" @mouseup="handlerDeleteMouseUp">
+    <div
+      class="tool__delete"
+      :class="{ 'tool__delete--active': isDeleteBtnVisible }"
+      @mouseenter="handlerDeleteMouseEnter"
+      @mouseleave="handlerDeleteMouseLeave"
+      @mouseup="handlerDeleteMouseUp"
+    >
       <ri:delete-bin-6-line class="delete__icon" />
     </div>
   </div>
@@ -35,7 +46,16 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, addKeyboardTask, getStyleConst, moveState, globalState } from '@/logic'
+import {
+  isDragMode,
+  toggleIsDragMode,
+  isElementDrawerVisible,
+  handleToggleIsElementDrawerVisible,
+  addKeyboardTask,
+  getStyleConst,
+  moveState,
+  globalState,
+} from '@/logic'
 
 const state = reactive({
   isCursorInElementDrawer: false,
@@ -115,7 +135,8 @@ const handleElementMouseDown = () => {
 }
 
 const handleElementMouseMove = async(e: MouseEvent) => {
-  if (isStartDragTaskRan) { // 确保MouseDownTaskMap只执行一次
+  if (isStartDragTaskRan) {
+    // 确保MouseDownTaskMap只执行一次
     return
   }
   isStartDragTaskRan = true
@@ -126,7 +147,8 @@ const handleElementMouseMove = async(e: MouseEvent) => {
 
 const handleElementMouseUp = (e: MouseEvent) => {
   moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
-  if (!state.isCursorInElementDrawer) { // 保存启用状态
+  if (!state.isCursorInElementDrawer) {
+    // 保存启用状态
     globalState.setting[moveState.currDragTarget.name].enabled = true
   }
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false

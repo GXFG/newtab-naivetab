@@ -17,7 +17,14 @@
             <raphael:temp />
           </div>
           <div class="item__value">
-            <span class="value__text value__text--large">{{ `${globalState.setting.weather.temperatureUnit === 'c' ? globalState.localState.weather.current.temp_c : globalState.localState.weather.current.temp_f}` }} </span>
+            <span class="value__text value__text--large">{{
+              `${
+                globalState.setting.weather.temperatureUnit === 'c'
+                  ? globalState.localState.weather.current.temp_c
+                  : globalState.localState.weather.current.temp_f
+              }`
+            }}
+            </span>
             <span class="value__unit">{{ temperatureUnit }}</span>
           </div>
         </div>
@@ -26,7 +33,14 @@
             <carbon:temperature-feels-like />
           </div>
           <div class="item__value">
-            <span class="value__text value__text--large">{{ `${globalState.setting.weather.temperatureUnit === 'c' ? globalState.localState.weather.current.feelslike_c : globalState.localState.weather.current.feelslike_f}` }} </span>
+            <span class="value__text value__text--large">{{
+              `${
+                globalState.setting.weather.temperatureUnit === 'c'
+                  ? globalState.localState.weather.current.feelslike_c
+                  : globalState.localState.weather.current.feelslike_f
+              }`
+            }}
+            </span>
             <span class="value__unit">{{ temperatureUnit }}</span>
           </div>
         </div>
@@ -37,7 +51,14 @@
             <ri:windy-fill />
           </div>
           <div class="item__value">
-            <span class="value__text">{{ `${globalState.localState.weather.current.wind_dir} / ${globalState.setting.weather.speedUnit === 'kph' ? globalState.localState.weather.current.wind_kph : globalState.localState.weather.current.wind_mph}` }} </span>
+            <span class="value__text">{{
+              `${globalState.localState.weather.current.wind_dir} / ${
+                globalState.setting.weather.speedUnit === 'kph'
+                  ? globalState.localState.weather.current.wind_kph
+                  : globalState.localState.weather.current.wind_mph
+              }`
+            }}
+            </span>
             <span class="value__unit">{{ speedUnit }}</span>
           </div>
         </div>

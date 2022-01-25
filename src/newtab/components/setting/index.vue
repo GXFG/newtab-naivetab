@@ -4,14 +4,27 @@
     <MoveableComponentWrap componentName="settingIcon" @drag="(style) => (containerStyle = style)">
       <div v-if="isRender" data-target-type="1" data-target-name="settingIcon">
         <div class="settingIcon__container" :style="containerStyle">
-          <NButton text :title="`${$t('setting.mainLabel')}`" :style="isDragMode ? 'cursor: move;' : ''" :disabled="isDragMode" @click="openSettingModal()">
+          <NButton
+            text
+            :title="`${$t('setting.mainLabel')}`"
+            :style="isDragMode ? 'cursor: move;' : ''"
+            :disabled="isDragMode"
+            @click="openSettingModal()"
+          >
             <ic:baseline-settings class="item__icon" />
           </NButton>
         </div>
       </div>
     </MoveableComponentWrap>
     <!-- Drawer -->
-    <NDrawer v-model:show="isSettingDrawerVisible" class="drawer-wrap" :style="drawerStyle" display-directive="show" :width="600" :placement="globalState.setting.general.drawerPlacement">
+    <NDrawer
+      v-model:show="isSettingDrawerVisible"
+      class="drawer-wrap"
+      :style="drawerStyle"
+      display-directive="show"
+      :width="600"
+      :placement="globalState.setting.general.drawerPlacement"
+    >
       <NDrawerContent>
         <NTabs type="line" :value="currSettingTabValue" @update:value="onTabsChange">
           <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">

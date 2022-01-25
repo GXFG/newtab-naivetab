@@ -2,7 +2,7 @@ import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, isDragMode, toggleIsDragMode, moveState } from '@/logic'
+import { DAYJS_LANG_MAP, toggleIsDragMode, moveState } from '@/logic'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
@@ -174,8 +174,8 @@ export const globalState = reactive({
         xOffsetKey: 'left',
         xOffsetValue: 50,
         xTranslateValue: -50,
-        yOffsetKey: 'top',
-        yOffsetValue: 70,
+        yOffsetKey: 'bottom',
+        yOffsetValue: 40,
         yTranslateValue: 0,
       },
       width: 350,
@@ -184,7 +184,7 @@ export const globalState = reactive({
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isBorderEnabled: true,
       borderWidth: 2,
-      borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
+      borderColor: ['rgba(167, 176, 188, 1)', 'rgba(167, 176, 188, 1)'],
       activeColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
@@ -239,7 +239,7 @@ export const globalState = reactive({
     }),
     search: useStorageLocal('setting-search', {
       enabled: true,
-      placeholder: 'search',
+      placeholder: 'baidu',
       urlName: 'baidu',
       urlValue: 'https://www.baidu.com/s?word={query}',
     }),
@@ -283,6 +283,7 @@ export const openWhatsNewModal = (forceOpen = false) => {
   globalState.setting.general.version = pkg.version
   globalState.state.isWhatsNewModalVisible = true
 }
+
 export const closeWhatsNewModal = () => {
   globalState.state.isWhatsNewModalVisible = false
 }
@@ -309,7 +310,9 @@ export const getStyleConst = (field: string) => {
   })
 }
 
-// e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
+/**
+ * e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
+ */
 export const getStyleField = (component: 'general' | TComponents, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
     let style = field.split('.').reduce((r: any, c: string) => r[c], globalState.style[component])
@@ -334,8 +337,8 @@ watch([
   () => globalState.style.general,
   () => globalState.localState.currThemeCode,
 ], () => {
-  document.body.style.setProperty('--text-color-main', getStyleField('general', 'fontColor').value)
   document.body.style.setProperty('--bg-main', getStyleField('general', 'backgroundColor').value)
+  document.body.style.setProperty('--text-color-main', getStyleField('general', 'fontColor').value)
 }, {
   immediate: true,
   deep: true,

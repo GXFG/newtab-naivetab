@@ -1,7 +1,11 @@
 <template>
   <MoveableComponentWrap componentName="clockDigital" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
-      <div class="clockDigital__container" :style="containerStyle" :class="{ 'clockDigital__container--shadow': globalState.style.clockDigital.isShadowEnabled }">
+      <div
+        class="clockDigital__container"
+        :style="containerStyle"
+        :class="{ 'clockDigital__container--shadow': globalState.style.clockDigital.isShadowEnabled }"
+      >
         <div class="clock__time">
           <p class="time__text">
             {{ state.time }}

@@ -20,8 +20,21 @@
           </NFormItem>
           <NFormItem :label="$t('clock.apMark')">
             <NSwitch v-model:value="globalState.setting.clockDigital.unitEnabled" />
-            <NSlider v-if="globalState.setting.clockDigital.unitEnabled" v-model:value="globalState.style.clockDigital.unit.fontSize" class="setting__row-element" :step="1" :min="12" :max="200" />
-            <NInputNumber v-if="globalState.setting.clockDigital.unitEnabled" v-model:value="globalState.style.clockDigital.unit.fontSize" class="setting__input-number" :min="12" :step="1" />
+            <NSlider
+              v-if="globalState.setting.clockDigital.unitEnabled"
+              v-model:value="globalState.style.clockDigital.unit.fontSize"
+              class="setting__row-element"
+              :step="1"
+              :min="12"
+              :max="200"
+            />
+            <NInputNumber
+              v-if="globalState.setting.clockDigital.unitEnabled"
+              v-model:value="globalState.style.clockDigital.unit.fontSize"
+              class="setting__input-number"
+              :min="12"
+              :step="1"
+            />
           </NFormItem>
         </template>
       </BaseComponentSetting>

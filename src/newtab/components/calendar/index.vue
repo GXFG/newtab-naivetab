@@ -1,16 +1,34 @@
 <template>
   <MoveableComponentWrap componentName="calendar" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
-      <div class="calendar__container" :style="containerStyle" :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }">
+      <div
+        class="calendar__container"
+        :style="containerStyle"
+        :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }"
+      >
         <div class="calendar__options">
           <div class="options__item">
-            <NSelect v-model:value="state.currYear" class="item__select_year" size="small" :options="state.yearList" :disabled="isDragMode" @update:value="onDateChange()" />
+            <NSelect
+              v-model:value="state.currYear"
+              class="item__select_year"
+              size="small"
+              :options="state.yearList"
+              :disabled="isDragMode"
+              @update:value="onDateChange()"
+            />
           </div>
           <div class="options__item">
             <NButton class="item__btn" text :disabled="isDragMode" @click="onPrevMonth()">
               <fa-solid:angle-left />
             </NButton>
-            <NSelect v-model:value="state.currMonth" class="item__select_month" size="small" :options="monthsList" :disabled="isDragMode" @update:value="onDateChange()" />
+            <NSelect
+              v-model:value="state.currMonth"
+              class="item__select_month"
+              size="small"
+              :options="monthsList"
+              :disabled="isDragMode"
+              @update:value="onDateChange()"
+            />
             <NButton class="item__btn" text :disabled="isDragMode" @click="onNextMonth()">
               <fa-solid:angle-right />
             </NButton>

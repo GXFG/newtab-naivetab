@@ -11,7 +11,13 @@
       </NFormItem>
       <NFormItem :label="$t('weather.city')">
         <NInputGroup>
-          <NAutoComplete v-model:value="state.cityLabel" :loading="state.isSearchLoading" :options="state.cityList" @update:value="onUpdateCity" @select="onSelectCity" />
+          <NAutoComplete
+            v-model:value="state.cityLabel"
+            :loading="state.isSearchLoading"
+            :options="state.cityList"
+            @update:value="onUpdateCity"
+            @select="onSelectCity"
+          />
           <!-- <NButton @click="onSearch()">
             <bx:bx-search class="item__icon" />
           </NButton> -->

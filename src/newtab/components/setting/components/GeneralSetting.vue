@@ -25,12 +25,14 @@
       </NFormItem>
       <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
         <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 110px" />
+        <!-- local -->
         <template v-if="globalState.style.general.backgroundImageSource === 0">
           <NButton class="setting__row-element" @click="onSelectBackgroundImage">
             <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
           </NButton>
           <Tips :content="$t('general.localBackgroundTips')" />
         </template>
+        <!-- bing -->
         <template v-else-if="globalState.style.general.backgroundImageSource === 1">
           <NButton class="setting__row-element" @click="onSaveImage()">
             <tabler:world-download />&nbsp;{{ $t('general.saveCurrendImage') }}
@@ -46,20 +48,28 @@
         </template>
         <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
       </NFormItem>
-      <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 0" :label="$t('general.filename')">
+      <!-- local -->
+      <NFormItem
+        v-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 0"
+        :label="$t('general.filename')"
+      >
         <p>{{ imageState.localBackgroundFileName }}</p>
       </NFormItem>
+      <!-- bing -->
       <NFormItem v-else-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 1" label=" ">
         <div class="setting__image-wrap">
-          <div v-for="item in imageState.imageList" :key="item.url" class="image__item" :class="{ 'image__item--active': isCurrSelectedImage(item) }" @click="onSelectImage(item)">
+          <div
+            v-for="item in imageState.imageList"
+            :key="item.url"
+            class="image__item"
+            :class="{ 'image__item--active': isCurrSelectedImage(item) }"
+            @click="onSelectImage(item)"
+          >
             <NTooltip triger="hover">
               <template #trigger>
-                <div>
-                  <p v-show="isCurrSelectedImage(item) && isImageLoading" class="item__loading">
-                    loading...
-                  </p>
+                <NSpin :show="isCurrSelectedImage(item) && isImageLoading">
                   <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="">
-                </div>
+                </NSpin>
               </template>
               <p>{{ item.copyright }}</p>
             </NTooltip>
@@ -111,7 +121,20 @@
 </template>
 
 <script setup lang="ts">
-import { exportSetting, gaEvent, getImageUrlFromBing, getStyleConst, globalState, imageState, downloadImageByUrl, importSetting, isImageListLoading, isImageLoading, onRefreshImageList, resetSetting } from '@/logic'
+import {
+  exportSetting,
+  gaEvent,
+  getImageUrlFromBing,
+  getStyleConst,
+  globalState,
+  imageState,
+  downloadImageByUrl,
+  importSetting,
+  isImageListLoading,
+  isImageLoading,
+  onRefreshImageList,
+  resetSetting,
+} from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -218,18 +241,10 @@ const themeColorMain = getStyleConst('themeColorMain')
   display: flex;
   flex-wrap: wrap;
   .image__item {
-    position: relative;
     margin: 0 3% 2% 0;
     width: 30%;
     border-radius: 2px;
     cursor: pointer;
-    .item__loading {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      text-align: center;
-    }
   }
 }
 .image__item--active {
