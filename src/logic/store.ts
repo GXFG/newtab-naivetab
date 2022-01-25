@@ -120,7 +120,6 @@ export const globalState = reactive({
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
       unit: {
         fontSize: 30,
-        fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       },
     }),
     clockAnalog: useStorageLocal('style-clock-analog', {

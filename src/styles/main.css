@@ -18,6 +18,6 @@ body {
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   font-size: 14px;
-  color: var(--text-color-main);
-  background-color: var(--bg-main);
+  color: var(--text-color-main) !important;
+  background-color: var(--bg-main) !important;
 }

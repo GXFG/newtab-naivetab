@@ -38,8 +38,8 @@ const getBingImages = async() => {
 }
 
 const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
-  await nextTick()
   isImageLoading.value = true
+  await nextTick()
   const backgroundEl: any = document.querySelector('#background__container')
   if (clearStyle) {
     backgroundEl.style = ''
@@ -64,12 +64,10 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
   const imgEle = new Image()
   imgEle.src = currUrl
   // 图片加载完成后再切换背景图
-  imgEle.onload = () => {
-    let style = `background-image: url(${currUrl});`
-    style += 'background-size: cover;background-repeat: no-repeat;'
-    style += `opacity: ${globalState.style.general.bgOpacity};`
-    style += `filter: blur(${globalState.style.general.bgBlur}px);`
-    backgroundEl.style = style
+  imgEle.onload = async() => {
+    const bgImg = `background-image: url(${currUrl});`
+    backgroundEl.style = bgImg
+    await nextTick()
     isImageLoading.value = false
   }
   imgEle.onerror = () => {
@@ -82,8 +80,6 @@ watch([
   () => globalState.style.general.backgroundImageId,
   () => imageState.value.localBackgroundBase64,
   () => globalState.style.general.backgroundImageUrl,
-  () => globalState.style.general.bgOpacity,
-  () => globalState.style.general.bgBlur,
 ], () => {
   if (!globalState.style.general.isBackgroundImageEnabled) {
     return

@@ -3,19 +3,10 @@
     <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
       <div class="clockAnalog__container" :style="containerStyle">
         <article class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
-          <div class="clock__base marker" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
-          <div
-            class="clock__base hour"
-            :style="`transform: rotateZ(${state.hourDeg}deg);background-image: url(/assets/img/clock/${currTheme}/hour.png)`"
-          />
-          <div
-            class="clock__base minute"
-            :style="`transform: rotateZ(${state.minuteDeg}deg);background-image: url(/assets/img/clock/${currTheme}/minute.png)`"
-          />
-          <div
-            class="clock__base second"
-            :style="`transform: rotateZ(${state.secondDeg}deg);background-image: url(/assets/img/clock/${currTheme}/second.png)`"
-          />
+          <div class="clock__base" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
+          <div class="clock__base clock__hour" :style="`background-image: url(/assets/img/clock/${currTheme}/hour.png);`" />
+          <div class="clock__base clock__minute" :style="`);background-image: url(/assets/img/clock/${currTheme}/minute.png);`" />
+          <div class="clock__base clock__second" :style="`background-image: url(/assets/img/clock/${currTheme}/second.png);`" />
         </article>
       </div>
     </div>
@@ -70,6 +61,9 @@ const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === 
 
 const containerStyle = ref(getLayoutStyle(CNAME))
 const customWidth = getStyleField(CNAME, 'width', 'px')
+const hourDeg = computed(() => `${state.hourDeg}deg`)
+const minuteDeg = computed(() => `${state.minuteDeg}deg`)
+const secondDeg = computed(() => `${state.secondDeg}deg`)
 </script>
 
 <style scoped>
@@ -95,6 +89,15 @@ const customWidth = getStyleField(CNAME, 'width', 'px')
         border-radius: 50%;
         background-size: 100%;
         transition: transform 0.3s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+      }
+      .clock__hour {
+        transform: rotateZ(v-bind(hourDeg));
+      }
+      .clock__minute {
+        transform: rotateZ(v-bind(minuteDeg));
+      }
+      .clock__second {
+        transform: rotateZ(v-bind(secondDeg));
       }
     }
   }

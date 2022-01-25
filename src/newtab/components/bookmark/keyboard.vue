@@ -10,6 +10,7 @@
             :class="{
               'row__item--move': isDragMode,
               'row__item--hover': !isDragMode,
+              'row__item--active': state.currSelectKey === item.key,
               'row__item--border': globalState.style.bookmark.isBorderEnabled,
               'row__item--shadow': globalState.style.bookmark.isShadowEnabled,
             }"
@@ -215,6 +216,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       }
       .row__item--border {
         outline: 1px solid v-bind(customBorderColor);
+      }
+      .row__item--active {
+        background-color: v-bind(customActiveColor) !important;
       }
       .row__item--shadow {
         box-shadow: v-bind(customShadowColor) 0px 2px 1px, v-bind(customShadowColor) 0px 4px 2px, v-bind(customShadowColor) 0px 8px 4px,
