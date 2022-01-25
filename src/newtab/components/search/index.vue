@@ -2,7 +2,7 @@
   <MoveableComponentWrap componentName="search" @drag="(style) => (containerStyle = style)">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
       <NDropdown
-        :show="state.isSuggestVisible"
+        :show="globalState.setting.search.suggestionEnabled && state.isSuggestVisible"
         :options="state.suggestList"
         :placement="state.placementValue"
         :show-arrow="true"
@@ -117,6 +117,9 @@ const getBaiduSuggestHandler = useDebounceFn(getBaiduSuggest, 300)
 watch(
   () => state.searchValue,
   () => {
+    if (!globalState.setting.search.suggestionEnabled) {
+      return
+    }
     if (state.searchValue.length === 0) {
       onClearValue()
       return

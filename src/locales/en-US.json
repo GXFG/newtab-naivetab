@@ -118,12 +118,13 @@
     "urlLabel": "Url",
     "urlPlaceholder": "",
     "nameLabel": "Name",
-    "namePlaceholder": "optional"
+    "namePlaceholder": "Optional"
   },
   "search": {
     "searchEngine": "Search engine",
     "placeholder": "Placeholder",
-    "icon": "Icon"
+    "icon": "Icon",
+    "suggestion": "Suggestion"
   },
   "calendar": {
     "january": "January",

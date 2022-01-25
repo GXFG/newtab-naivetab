@@ -10,6 +10,9 @@
       <NFormItem :label="$t('search.icon')">
         <NSwitch v-model:value="globalState.setting.search.iconEnabled" />
       </NFormItem>
+      <NFormItem :label="$t('search.suggestion')">
+        <NSwitch v-model:value="globalState.setting.search.suggestionEnabled" />
+      </NFormItem>
     </template>
   </BaseComponentSetting>
 </template>
