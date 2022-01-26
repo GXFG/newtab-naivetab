@@ -177,7 +177,7 @@ export const globalState = reactive({
         yOffsetValue: 40,
         yTranslateValue: 0,
       },
-      width: 350,
+      width: 300,
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 24,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],

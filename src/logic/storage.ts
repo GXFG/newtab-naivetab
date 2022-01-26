@@ -26,6 +26,9 @@ watch([
   deep: true,
 })
 
+/**
+ * 只合并当前配置内存在的字段
+ */
 const mergeSetting = (state: any, acceptState: any) => {
   const filterState = {} as any
   const fieldList = Object.keys(acceptState)
@@ -60,6 +63,9 @@ const updateSetting = (data: any) => {
   if (data.style.calendar) {
     globalState.style.calendar = mergeSetting(globalState.style.calendar, data.style.calendar)
   }
+  if (data.style.search) {
+    globalState.style.search = mergeSetting(globalState.style.search, data.style.search)
+  }
   if (data.style.weather) {
     globalState.style.weather = mergeSetting(globalState.style.weather, data.style.weather)
   }
@@ -84,6 +90,9 @@ const updateSetting = (data: any) => {
   }
   if (data.setting.calendar) {
     globalState.setting.calendar = mergeSetting(globalState.setting.calendar, data.setting.calendar)
+  }
+  if (data.setting.search) {
+    globalState.setting.search = mergeSetting(globalState.setting.search, data.setting.search)
   }
   if (data.setting.weather) {
     globalState.setting.weather = mergeSetting(globalState.setting.weather, data.setting.weather)

@@ -12,29 +12,39 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { NConfigProvider, NMessageProvider, NNotificationProvider, darkTheme, enUS, useOsTheme, zhCN } from 'naive-ui'
 import Content from './Content.vue'
-import { THEME_TO_CODE_MAP, gaEvent, getStyleField, globalState, loadSyncSetting, initFirstOpen, openWhatsNewModal, startKeyboard, startTimer, stopTimer } from '@/logic'
+import {
+  THEME_TO_CODE_MAP,
+  gaEvent,
+  getStyleField,
+  globalState,
+  loadSyncSetting,
+  initFirstOpen,
+  openWhatsNewModal,
+  startKeyboard,
+  startTimer,
+  stopTimer,
+} from '@/logic'
 
-initFirstOpen ()
-openWhatsNewModal()
-loadSyncSetting()
-startTimer()
-startKeyboard()
+onMounted(async() => {
+  loadSyncSetting()
+  startTimer()
+  startKeyboard()
+  await nextTick()
+  initFirstOpen()
+  openWhatsNewModal()
+  gaEvent('page-home', 'view', 'view')
+})
 
 onUnmounted(() => {
   stopTimer()
 })
-
-gaEvent('page-home', 'view', 'view')
 
 // theme
 const osTheme = useOsTheme() // light | dark | null
 const currTheme = ref()
 
 watch(
-  [
-    () => osTheme.value,
-    () => globalState.setting.general.theme,
-  ],
+  [() => osTheme.value, () => globalState.setting.general.theme],
   () => {
     if (globalState.setting.general.theme === 'auto') {
       globalState.localState.currThemeCode = THEME_TO_CODE_MAP[osTheme.value as any]

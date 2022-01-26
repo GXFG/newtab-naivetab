@@ -24,7 +24,7 @@
         <NSwitch v-model:value="globalState.style.general.isBackgroundImageEnabled" />
       </NFormItem>
       <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
-        <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 110px" />
+        <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 30%;" />
         <!-- local -->
         <template v-if="globalState.style.general.backgroundImageSource === 0">
           <NButton class="setting__row-element" @click="onSelectBackgroundImage">
