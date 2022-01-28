@@ -53,6 +53,7 @@
     "bing": "Bing",
     "margin": "Margin",
     "width": "Width",
+    "height": "Height",
     "icon": "Icon",
     "config": "Config",
     "format": "Format",
@@ -84,7 +85,8 @@
     "date": "Date",
     "search": "Search",
     "calendar": "Calendar",
-    "weather": "Weather"
+    "weather": "Weather",
+    "memo": "Memo"
   },
   "general": {
     "globalStyle": "Global style",
@@ -153,6 +155,10 @@
     "city": "City",
     "temperatureUnit": "TEMP unit",
     "speedUnit": "Speed unit",
-    "forecastEnabled": "Forecast"
+    "forecastEnabled": "Forecast",
+    "icon": "Weather icon"
+  },
+  "memo": {
+    "wordCount": "Word count"
   }
 }

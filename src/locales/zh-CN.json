@@ -53,6 +53,7 @@
     "bing": "Bing",
     "margin": "边距",
     "width": "宽度",
+    "height": "高度",
     "icon": "图标",
     "config": "配置",
     "format": "格式",
@@ -84,7 +85,8 @@
     "date": "日期",
     "search": "搜索",
     "calendar": "日历",
-    "weather": "天气"
+    "weather": "天气",
+    "memo": "备忘录"
   },
   "general": {
     "globalStyle": "全局样式",
@@ -153,6 +155,10 @@
     "city": "城市",
     "temperatureUnit": "温度单位",
     "speedUnit": "速度单位",
-    "forecastEnabled": "预报"
+    "forecastEnabled": "预报",
+    "icon": "天气图标"
+  },
+  "memo": {
+    "wordCount": "字数统计"
   }
 }

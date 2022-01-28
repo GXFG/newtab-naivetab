@@ -67,6 +67,7 @@ import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
+import MemoSetting from './components/MemoSetting.vue'
 import {
   URL_GITHUB,
   currSettingTabValue,
@@ -121,6 +122,11 @@ const tabPaneList = computed(() => [
     name: 'weather',
     label: window.$t('setting.weather'),
     component: WeatherSetting,
+  },
+  {
+    name: 'memo',
+    label: window.$t('setting.memo'),
+    component: MemoSetting,
   },
 ])
 

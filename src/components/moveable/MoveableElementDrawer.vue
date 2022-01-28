@@ -118,6 +118,13 @@ const elementList = computed(() => [
     iconSize: 28,
     disabled: globalState.setting.weather.enabled,
   },
+  {
+    label: window.$t('setting.memo'),
+    componentName: 'memo',
+    iconName: 'fluent:notepad-edit-16-regular',
+    iconSize: 24,
+    disabled: globalState.setting.memo.enabled,
+  },
 ])
 
 // ElementDrawer

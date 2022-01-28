@@ -24,6 +24,7 @@ export const moveState = reactive({
     calendar: false,
     search: false,
     weather: false,
+    memo: false,
   },
   isDragingMap: { // 是否正在拖动中
     settingIcon: false,
@@ -34,6 +35,7 @@ export const moveState = reactive({
     calendar: false,
     search: false,
     weather: false,
+    memo: false,
   },
   currDragTarget: {
     type: -1 as TargetType | -1,

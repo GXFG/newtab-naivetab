@@ -16,6 +16,10 @@
       <NSlider v-model:value="globalState.style[props.cname].width" :step="1" :min="1" :max="500" />
       <NInputNumber v-model:value="globalState.style[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="500" />
     </NFormItem>
+    <NFormItem v-if="isFieldRender('height')" :label="$t('common.height')">
+      <NSlider v-model:value="globalState.style[props.cname].height" :step="1" :min="1" :max="500" />
+      <NInputNumber v-model:value="globalState.style[props.cname].height" class="setting__input-number" :step="1" :min="1" :max="500" />
+    </NFormItem>
     <NFormItem v-if="isFieldRender('fontFamily')" :label="$t('common.font')">
       <NSelect v-model:value="globalState.style[props.cname].fontFamily" :options="availableFontOptions" :render-label="selectRenderLabel" />
     </NFormItem>
@@ -121,7 +125,7 @@ const selectRenderLabel = (option: SelectStringItem) => {
               fontFamily: option.label,
             },
           },
-          'abcd-ABCD-0123',
+          'abc ABC 0123',
         ),
       ],
     ),

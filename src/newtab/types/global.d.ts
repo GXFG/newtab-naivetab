@@ -6,7 +6,7 @@ interface Window {
 }
 
 type TargetType = 1 | 2 // 1:component 2:element
-type Components = 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather'
+type Components = 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo'
 
 interface SelectStringItem {
   label: string

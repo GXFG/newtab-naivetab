@@ -13,6 +13,7 @@ export const globalState = reactive({
   state: {
     isWhatsNewModalVisible: false,
     isSearchFocused: false,
+    isMemoFocused: false,
   },
   localState: useStorageLocal('local-state', {
     currThemeCode: 0, // 0:light | 1:dark
@@ -94,7 +95,7 @@ export const globalState = reactive({
       },
       margin: 3,
       width: 50,
-      fontFamily: '',
+      fontFamily: 'Arial',
       fontSize: 12,
       fontColor: ['rgba(15, 23, 42, 1)', 'rgba(15, 23, 42, 1)'],
       backgroundColor: ['rgba(209, 213, 219, 1)', 'rgba(212, 212, 216, 1)'],
@@ -159,7 +160,7 @@ export const globalState = reactive({
         yTranslateValue: 0,
       },
       width: 45,
-      fontFamily: '',
+      fontFamily: 'Arial',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
       backgroundColor: ['rgba(209, 213, 219, 0.75)', 'rgba(58, 58, 58, 0.75)'],
@@ -179,7 +180,7 @@ export const globalState = reactive({
         yTranslateValue: 0,
       },
       width: 300,
-      fontFamily: '',
+      fontFamily: 'Arial',
       fontSize: 24,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isBorderEnabled: true,
@@ -212,7 +213,9 @@ export const globalState = reactive({
         yOffsetValue: 0,
         yTranslateValue: 0,
       },
-      fontFamily: '',
+      width: 200,
+      height: 200,
+      fontFamily: 'Arial',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isShadowEnabled: true,
@@ -275,6 +278,8 @@ export const globalState = reactive({
     }),
     memo: useStorageLocal('setting-memo', {
       enabled: false,
+      countEnabled: true,
+      content: '',
     }),
   },
 })

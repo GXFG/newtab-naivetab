@@ -12,8 +12,8 @@ export const removeKeyboardTask = (key: string) => {
 
 export const startKeyboard = () => {
   document.onkeydown = (e: KeyboardEvent) => {
-    // 在'搜索框'与'设置抽屉内'忽略按键事件
-    if (isSettingDrawerVisible.value || globalState.state.isSearchFocused) {
+    // 在'搜索框'、'备忘录'、'设置抽屉'内时忽略按键事件
+    if (isSettingDrawerVisible.value || globalState.state.isSearchFocused || globalState.state.isMemoFocused) {
       if (e.key === 'Escape') {
         toggleIsSettingDrawerVisible(false)
       }
