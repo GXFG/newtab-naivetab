@@ -36,8 +36,8 @@ export const moveState = reactive({
     weather: false,
   },
   currDragTarget: {
-    type: -1 as TTargetType | -1,
-    name: '' as TComponents | '',
+    type: -1 as TargetType | -1,
+    name: '' as Components | '',
   },
 })
 
@@ -59,7 +59,7 @@ export const handleToggleIsElementDrawerVisible = () => {
  */
 export const getTargetDataFromEvent = (e: MouseEvent): {
   type: -1 | 1 | 2
-  name: '' | TComponents
+  name: '' | Components
 } => {
   let target: any = e.target
   try {
@@ -74,7 +74,7 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
     }
   }
   const type = (+target.getAttribute('data-target-type') as 1 | 2) || -1
-  const name: TComponents = target.getAttribute('data-target-name') || ''
+  const name: Components = target.getAttribute('data-target-name') || ''
   return { type, name }
 }
 

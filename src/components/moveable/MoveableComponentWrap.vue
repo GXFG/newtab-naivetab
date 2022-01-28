@@ -66,8 +66,8 @@ const startDrag = async(e: MouseEvent, resite = false) => {
     // 默认光标位置为component的中心
     const _top = e.clientY - height / 2
     const _left = e.clientX - width / 2
-    globalState.style[props.componentName as TComponents].layout.xOffsetValue = getPercentageInWidth(_left)
-    globalState.style[props.componentName as TComponents].layout.yOffsetValue = getPercentageInHeight(_top)
+    globalState.style[props.componentName as Components].layout.xOffsetValue = getPercentageInWidth(_left)
+    globalState.style[props.componentName as Components].layout.yOffsetValue = getPercentageInHeight(_top)
     state.startState.top = _top
     state.startState.left = _left
   }
@@ -84,12 +84,12 @@ const stopDrag = () => {
   moveState.isBottomVisible = false
   moveState.isLeftVisible = false
   moveState.isRightVisible = false
-  if (offsetData.xOffsetKey.length !== 0) globalState.style[props.componentName as TComponents].layout.xOffsetKey = offsetData.xOffsetKey
-  if (offsetData.xOffsetValue !== -1) globalState.style[props.componentName as TComponents].layout.xOffsetValue = offsetData.xOffsetValue
-  if (offsetData.xTranslateValue !== -1) globalState.style[props.componentName as TComponents].layout.xTranslateValue = offsetData.xTranslateValue
-  if (offsetData.yOffsetKey.length !== 0) globalState.style[props.componentName as TComponents].layout.yOffsetKey = offsetData.yOffsetKey
-  if (offsetData.yOffsetValue !== -1) globalState.style[props.componentName as TComponents].layout.yOffsetValue = offsetData.yOffsetValue
-  if (offsetData.yTranslateValue !== -1) globalState.style[props.componentName as TComponents].layout.yTranslateValue = offsetData.yTranslateValue
+  if (offsetData.xOffsetKey.length !== 0) globalState.style[props.componentName as Components].layout.xOffsetKey = offsetData.xOffsetKey
+  if (offsetData.xOffsetValue !== -1) globalState.style[props.componentName as Components].layout.xOffsetValue = offsetData.xOffsetValue
+  if (offsetData.xTranslateValue !== -1) globalState.style[props.componentName as Components].layout.xTranslateValue = offsetData.xTranslateValue
+  if (offsetData.yOffsetKey.length !== 0) globalState.style[props.componentName as Components].layout.yOffsetKey = offsetData.yOffsetKey
+  if (offsetData.yOffsetValue !== -1) globalState.style[props.componentName as Components].layout.yOffsetValue = offsetData.yOffsetValue
+  if (offsetData.yTranslateValue !== -1) globalState.style[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
 }
 
 const onDrag = (e: MouseEvent) => {

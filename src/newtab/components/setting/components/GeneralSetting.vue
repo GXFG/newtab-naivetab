@@ -170,7 +170,7 @@ const onChangeLocale = (locale: string) => {
   gaEvent('setting-locale', 'click', 'change')
 }
 
-const isCurrSelectedImage = (item: TImageItem) => item.urlbase === globalState.style.general.backgroundImageId
+const isCurrSelectedImage = (item: ImageItem) => item.urlbase === globalState.style.general.backgroundImageId
 
 const bgImageFileInputEl = ref()
 const onSelectBackgroundImage = () => {
@@ -196,7 +196,7 @@ const onBackgroundImageFileChange = (e: any) => {
 const onSaveImage = async() => {
   downloadImageByUrl(globalState.style.general.backgroundImageUrl)
 }
-const onSelectImage = (item: TImageItem) => {
+const onSelectImage = (item: ImageItem) => {
   globalState.style.general.backgroundImageId = item.urlbase
 }
 

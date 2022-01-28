@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { SEARCH_ENGINE_LIST, globalState } from '@/logic'
 
-const onChangeSearch = (value, option: TSelectStringItem) => {
+const onChangeSearch = (value, option: SelectStringItem) => {
   globalState.setting.search.urlName = option.label
 }
 </script>

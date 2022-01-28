@@ -47,7 +47,7 @@ export const globalState = reactive({
         gust_mph: '', // 2.2
         gust_kph: '', // 3.6
       },
-      forecastday: [] as TWeatherForecastdayItem[],
+      forecastday: [] as WeatherForecastdayItem[],
     },
   }),
   syncTime: useStorageLocal('setting-sync-time', 0),
@@ -178,7 +178,7 @@ export const globalState = reactive({
         yTranslateValue: 0,
       },
       width: 300,
-      fontFamily: 'Arial Rounded MT Bold',
+      fontFamily: '',
       fontSize: 24,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isBorderEnabled: true,
@@ -296,7 +296,7 @@ export const createTab = (url: string, active = true) => {
   chrome.tabs.create({ url, active })
 }
 
-export const getIsComponentRender = (componentName: TComponents) => computed(() => globalState.setting[componentName].enabled || moveState.dragTempEnabledMap[componentName])
+export const getIsComponentRender = (componentName: Components) => computed(() => globalState.setting[componentName].enabled || moveState.dragTempEnabledMap[componentName])
 
 export const getLayoutStyle = (name: string) => {
   let style = `${globalState.style[name].layout.xOffsetKey}:${globalState.style[name].layout.xOffsetValue}vw;`
@@ -314,7 +314,7 @@ export const getStyleConst = (field: string) => {
 /**
  * e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
  */
-export const getStyleField = (component: 'general' | TComponents, field: string, unit?: string, ratio?: number) => {
+export const getStyleField = (component: 'general' | Components, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
     let style = field.split('.').reduce((r: any, c: string) => r[c], globalState.style[component])
     if (style instanceof Array) {

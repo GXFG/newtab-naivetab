@@ -3,7 +3,7 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import http from '@/lib/http'
 
 export const imageState = ref(useStorageLocal('data-images', {
-  imageList: [] as TImageItem[],
+  imageList: [] as ImageItem[],
   syncDate: '',
   localBackgroundFileName: '',
   localBackgroundBase64: '',
@@ -53,7 +53,7 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
       // 初始化页面时且本地有图片缓存时，读取上一次的设置
       currUrl = globalState.style.general.backgroundImageUrl
     } else {
-      let index = imageState.value.imageList.findIndex((item: TImageItem) => item.urlbase === globalState.style.general.backgroundImageId)
+      let index = imageState.value.imageList.findIndex((item: ImageItem) => item.urlbase === globalState.style.general.backgroundImageId)
       index = index === -1 ? 0 : index
       const urlbase = imageState.value.imageList[index].urlbase
       const httpUrl = getImageUrlFromBing(urlbase)

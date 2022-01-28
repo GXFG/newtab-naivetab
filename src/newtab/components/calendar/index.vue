@@ -138,7 +138,7 @@ const holidayTypeToDesc = computed(() => ({
 const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
   const formatDate = dateEl.format('YYYY-MM-DD')
   const shortDate = dateEl.format('MMDD')
-  const lunar: TCalendar = calendar.solar2lunar(...formatDate.split('-'))
+  const lunar: Calendar = calendar.solar2lunar(...formatDate.split('-'))
   const { cYear, cDay, nWeek, isToday, festival, lunarFestival, Term, IMonthCn, IDayCn, lDay } = lunar
   // desc优先级：阳历节日，阴历节日，节气，阴历月份，阴历日期
   let isFestival = true

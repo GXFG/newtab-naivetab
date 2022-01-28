@@ -5,20 +5,15 @@ interface Window {
   $notification: any
 }
 
-type TTargetType = 1 | 2
-type TComponents = 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'search' | 'calendar' | 'weather'
+type TargetType = 1 | 2 // 1:component 2:element
+type Components = 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather'
 
-type TSelectNumberItem = {
-  label: string
-  value: number
-}
-
-type TSelectStringItem = {
+interface SelectStringItem {
   label: string
   value: string
 }
 
-type TCalendar = {
+interface Calendar {
   Animal: string // "牛"
   IDayCn: string // "廿九"
   IMonthCn: string // "冬月"
@@ -44,7 +39,7 @@ type TCalendar = {
   ncWeek: string // "星期六"
 }
 
-type TImageItem = {
+interface ImageItem {
   bot: number
   copyright: string //  "汉密尔顿山顶的利克天文台，美国加利福尼亚州 (© Jeffrey Lewis/Tandem Stills + Motion)"
   copyrightlink: string // "https://www.bing.com/search?q=%E5%88%A9%E5%85%8B%E5%A4%A9%E6%96%87%E5%8F%B0&form=hpcapt&mkt=zh-cn"
@@ -62,7 +57,7 @@ type TImageItem = {
   wp: boolean
 }
 
-type TWeatherCurrentItem = {
+interface WeatherCurrentItemd {
   time_epoch: number // 1638460800,
   time: string // "2021-12-03 00:00",
   temp_c: number // 6.4,
@@ -102,7 +97,7 @@ type TWeatherCurrentItem = {
   uv: number // 1.0
 }
 
-type TWeatherForecastdayItem = {
+interface WeatherForecastdayItem {
   date: string
   date_epoch: string
   day: {

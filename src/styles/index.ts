@@ -4,7 +4,7 @@ import './main.css'
 
 /**
  * key: ['lightColor', 'darkColor']
- * 默认 darkColor = lightColor
+ * 其中默认 darkColor = lightColor
  */
 export const styleConst = ref({
   // common

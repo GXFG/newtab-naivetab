@@ -45,7 +45,7 @@
           Weather data by WeatherAPI.com
         </NTooltip>
       </NFormItem>
-      <NFormItem :label="$t('common.icon')">
+      <NFormItem :label="$t('weather.icon')">
         <div class="setting__input-wrap">
           <div class="setting__input_item">
             <NSwitch v-model:value="globalState.setting.weather.iconEnabled" />
@@ -83,7 +83,7 @@ const speedUnitOptions = [
 const state = reactive({
   isSearchLoading: false,
   cityLabel: globalState.setting.weather.city.label,
-  cityList: [] as TSelectStringItem[],
+  cityList: [] as SelectStringItem[],
 })
 
 const getSearch = async() => {
