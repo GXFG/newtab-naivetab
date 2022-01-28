@@ -4,7 +4,6 @@ import { MERGE_SETTING_DELAY } from './const'
 import { log, downloadJsonByTagA } from './util'
 
 const uploadFn = () => {
-  log('Start syncing settings')
   globalState.syncTime = Date.now()
   const localData = JSON.stringify({
     syncTime: globalState.syncTime,
@@ -41,61 +40,15 @@ const mergeSetting = (state: any, acceptState: any) => {
 }
 
 const updateSetting = (data: any) => {
-  // style
-  if (data.style.general) {
-    globalState.style.general = mergeSetting(globalState.style.general, data.style.general)
+  for (const field of Object.keys(globalState.style)) {
+    if (Object.prototype.hasOwnProperty.call(data.style, field)) {
+      globalState.style[field] = mergeSetting(globalState.style[field], data.style[field])
+    }
   }
-  if (data.style.settingIcon) {
-    globalState.style.settingIcon = mergeSetting(globalState.style.settingIcon, data.style.settingIcon)
-  }
-  if (data.style.bookmark) {
-    globalState.style.bookmark = mergeSetting(globalState.style.bookmark, data.style.bookmark)
-  }
-  if (data.style.clockDigital) {
-    globalState.style.clockDigital = mergeSetting(globalState.style.clockDigital, data.style.clockDigital)
-  }
-  if (data.style.clockAnalog) {
-    globalState.style.clockAnalog = mergeSetting(globalState.style.clockAnalog, data.style.clockAnalog)
-  }
-  if (data.style.date) {
-    globalState.style.date = mergeSetting(globalState.style.date, data.style.date)
-  }
-  if (data.style.calendar) {
-    globalState.style.calendar = mergeSetting(globalState.style.calendar, data.style.calendar)
-  }
-  if (data.style.search) {
-    globalState.style.search = mergeSetting(globalState.style.search, data.style.search)
-  }
-  if (data.style.weather) {
-    globalState.style.weather = mergeSetting(globalState.style.weather, data.style.weather)
-  }
-  // setting
-  if (data.setting.general) {
-    globalState.setting.general = mergeSetting(globalState.setting.general, data.setting.general)
-  }
-  if (data.setting.settingIcon) {
-    globalState.setting.settingIcon = mergeSetting(globalState.setting.settingIcon, data.setting.settingIcon)
-  }
-  if (data.setting.bookmark) {
-    globalState.setting.bookmark = mergeSetting(globalState.setting.bookmark, data.setting.bookmark)
-  }
-  if (data.setting.clockDigital) {
-    globalState.setting.clockDigital = mergeSetting(globalState.setting.clockDigital, data.setting.clockDigital)
-  }
-  if (data.setting.clockAnalog) {
-    globalState.setting.clockAnalog = mergeSetting(globalState.setting.clockAnalog, data.setting.clockAnalog)
-  }
-  if (data.setting.date) {
-    globalState.setting.date = mergeSetting(globalState.setting.date, data.setting.date)
-  }
-  if (data.setting.calendar) {
-    globalState.setting.calendar = mergeSetting(globalState.setting.calendar, data.setting.calendar)
-  }
-  if (data.setting.search) {
-    globalState.setting.search = mergeSetting(globalState.setting.search, data.setting.search)
-  }
-  if (data.setting.weather) {
-    globalState.setting.weather = mergeSetting(globalState.setting.weather, data.setting.weather)
+  for (const field of Object.keys(globalState.setting)) {
+    if (Object.prototype.hasOwnProperty.call(data.setting, field)) {
+      globalState.setting[field] = mergeSetting(globalState.setting[field], data.setting[field])
+    }
   }
 }
 

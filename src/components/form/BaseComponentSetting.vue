@@ -129,11 +129,12 @@ const selectRenderLabel = (option: SelectStringItem) => {
 }
 </script>
 
-<style scoped>
+<style>
 .form__layout {
   padding-top: 20px;
 }
-..n-base-select-menu .n-base-select-option .n-base-select-option__content {
-  width: 100%;
+
+.n-base-select-option__content {
+  width: 100% !important;
 }
 </style>

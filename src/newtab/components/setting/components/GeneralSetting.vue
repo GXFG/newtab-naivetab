@@ -65,7 +65,7 @@
             :class="{ 'image__item--active': isCurrSelectedImage(item) }"
             @click="onSelectImage(item)"
           >
-            <NTooltip triger="hover">
+            <NTooltip trigger="hover">
               <template #trigger>
                 <NSpin :show="isCurrSelectedImage(item) && isImageLoading">
                   <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="">
