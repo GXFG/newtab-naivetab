@@ -2,7 +2,7 @@ import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, toggleIsDragMode, moveState } from '@/logic'
+import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState } from '@/logic'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
@@ -16,6 +16,7 @@ export const globalState = reactive({
   },
   localState: useStorageLocal('local-state', {
     currThemeCode: 0, // 0:light | 1:dark
+    availableFontList: [] as any[],
     weather: {
       syncTime: 0,
       current: {
@@ -61,7 +62,7 @@ export const globalState = reactive({
         yOffsetValue: 50,
         yTranslateValue: -50,
       },
-      fontFamily: 'PingFang SC, Microsoft YaHei',
+      fontFamily: 'Arial',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
       backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
@@ -202,6 +203,21 @@ export const globalState = reactive({
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
     }),
+    memo: useStorageLocal('style-memo', {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 0,
+        xTranslateValue: 0,
+        yOffsetKey: 'top',
+        yOffsetValue: 0,
+        yTranslateValue: 0,
+      },
+      fontFamily: '',
+      fontSize: 14,
+      fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
+      isShadowEnabled: true,
+      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
+    }),
   },
   setting: {
     general: useStorageLocal('setting-general', {
@@ -257,10 +273,25 @@ export const globalState = reactive({
       speedUnit: 'kph', // 'kph' | 'mph'
       iconEnabled: true,
     }),
+    memo: useStorageLocal('setting-memo', {
+      enabled: false,
+    }),
   },
 })
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
+
+export const initAvailableFontList = async() => {
+  const fontCheck = new Set(FONT_LIST.sort())
+  await document.fonts.ready
+  const availableList = new Set()
+  for (const font of fontCheck.values()) {
+    if (document.fonts.check(`12px "${font}"`)) {
+      availableList.add(font)
+    }
+  }
+  globalState.localState.availableFontList = [...availableList.values()]
+}
 
 // 第一次打开扩展时，打开画布模式&帮助弹窗
 const isFirstOpen = ref(useStorageLocal('data-first', true))

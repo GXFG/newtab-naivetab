@@ -20,6 +20,7 @@ import {
   loadSyncSetting,
   initFirstOpen,
   openWhatsNewModal,
+  initAvailableFontList,
   startKeyboard,
   startTimer,
   stopTimer,
@@ -32,6 +33,7 @@ onMounted(async() => {
   await nextTick()
   initFirstOpen()
   openWhatsNewModal()
+  initAvailableFontList()
   gaEvent('page-home', 'view', 'view')
 })
 

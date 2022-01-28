@@ -16,8 +16,8 @@
       <NSlider v-model:value="globalState.style[props.cname].width" :step="1" :min="1" :max="500" />
       <NInputNumber v-model:value="globalState.style[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="500" />
     </NFormItem>
-    <NFormItem v-if="'fontFamily' in globalState.style[props.cname]" :label="$t('common.font')">
-      <NInput v-model:value="globalState.style[props.cname].fontFamily" placeholder=" " @blur="onFontBlur" />
+    <NFormItem v-if="isFieldRender('fontFamily')" :label="$t('common.font')">
+      <NSelect v-model:value="globalState.style[props.cname].fontFamily" :options="availableFontOptions" :render-label="selectRenderLabel" />
     </NFormItem>
     <NFormItem v-if="isFieldRender('fontSize')" :label="$t('common.fontSize')">
       <NSlider v-model:value="globalState.style[props.cname].fontSize" :step="1" :min="12" :max="200" />
@@ -27,6 +27,7 @@
       <NSlider v-model:value="globalState.style[props.cname].letterSpacing" :step="1" :min="0" :max="20" />
       <NInputNumber v-model:value="globalState.style[props.cname].letterSpacing" class="setting__input-number" :step="1" :min="0" :max="20" />
     </NFormItem>
+
     <!-- color -->
     <NFormItem v-if="isFieldRender('fontColor')" :label="$t('common.fontColor')">
       <NColorPicker
@@ -75,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { gaEvent, globalState } from '@/logic'
+import { globalState } from '@/logic'
 import { swatcheColors } from '@/styles/index'
 
 const props = defineProps({
@@ -92,13 +93,47 @@ const isFieldRender = (field: string) => {
   return field in globalState.style[props.cname]
 }
 
-const onFontBlur = (value: any) => {
-  gaEvent(`${props.cname}-font`, 'blur', `${value.target.value}`)
+const availableFontOptions = computed(() =>
+  globalState.localState.availableFontList.map((font: string) => ({
+    label: font,
+    value: font,
+  })),
+)
+
+const selectRenderLabel = (option: SelectStringItem) => {
+  return [
+    h(
+      'div',
+      {
+        style: {
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+      },
+      [
+        h('span', {}, option.label),
+        h(
+          'span',
+          {
+            style: {
+              fontFamily: option.label,
+            },
+          },
+          'abcd-ABCD-0123',
+        ),
+      ],
+    ),
+  ]
 }
 </script>
 
 <style scoped>
 .form__layout {
   padding-top: 20px;
+}
+..n-base-select-menu .n-base-select-option .n-base-select-option__content {
+  width: 100%;
 }
 </style>
