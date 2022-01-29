@@ -40,16 +40,19 @@ const mergeSetting = (state: any, acceptState: any) => {
 }
 
 const updateSetting = (data: any) => {
-  for (const field of Object.keys(globalState.style)) {
-    if (Object.prototype.hasOwnProperty.call(data.style, field)) {
-      globalState.style[field] = mergeSetting(globalState.style[field], data.style[field])
+  return new Promise((resolve) => {
+    for (const field of Object.keys(globalState.style)) {
+      if (Object.prototype.hasOwnProperty.call(data.style, field)) {
+        globalState.style[field] = mergeSetting(globalState.style[field], data.style[field])
+      }
     }
-  }
-  for (const field of Object.keys(globalState.setting)) {
-    if (Object.prototype.hasOwnProperty.call(data.setting, field)) {
-      globalState.setting[field] = mergeSetting(globalState.setting[field], data.setting[field])
+    for (const field of Object.keys(globalState.setting)) {
+      if (Object.prototype.hasOwnProperty.call(data.setting, field)) {
+        globalState.setting[field] = mergeSetting(globalState.setting[field], data.setting[field])
+      }
     }
-  }
+    resolve(true)
+  })
 }
 
 export const loadSyncSetting = () => {
@@ -72,7 +75,7 @@ export const loadSyncSetting = () => {
   })
 }
 
-export const importSetting = (text: string) => {
+export const importSetting = async(text: string) => {
   if (!text) {
     return
   }
@@ -81,13 +84,14 @@ export const importSetting = (text: string) => {
     fileContent = JSON.parse(text)
   } catch (e) {
     log('Parse error', e)
-    window.$message.error(window.$t('common.fail'))
+    window.$message.error(`${window.$t('common.import')}${window.$t('common.fail')}`)
   }
   if (Object.keys(fileContent).length === 0) {
     return
   }
   log('FileContent', fileContent)
-  updateSetting(fileContent)
+  await updateSetting(fileContent)
+  location.reload()
 }
 
 export const exportSetting = () => {
@@ -96,7 +100,7 @@ export const exportSetting = () => {
     style: globalState.style,
     setting: globalState.setting,
   }, filename)
-  window.$message.success(window.$t('common.success'))
+  window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
 }
 
 export const resetSetting = () => {
