@@ -251,6 +251,7 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
+const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customItemWidth = getStyleField(CNAME, 'width', 'px')
@@ -386,7 +387,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         opacity: 0.4;
       }
     }
-    outline: 1px solid v-bind(customBorderColor);
+    outline: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .calendar__container-border {
   }

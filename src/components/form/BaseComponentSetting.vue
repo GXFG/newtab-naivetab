@@ -22,9 +22,6 @@
     </NFormItem>
     <NFormItem v-if="isFieldRender('fontFamily')" :label="$t('common.font')">
       <NSelect v-model:value="globalState.style[props.cname].fontFamily" :options="availableFontOptions" :render-label="selectRenderLabel" />
-    </NFormItem>
-    <NFormItem v-if="isFieldRender('fontSize')" :label="$t('common.fontSize')">
-      <NSlider v-model:value="globalState.style[props.cname].fontSize" :step="1" :min="12" :max="200" />
       <NInputNumber v-model:value="globalState.style[props.cname].fontSize" class="setting__input-number" :step="1" :min="12" :max="200" />
     </NFormItem>
     <NFormItem v-if="isFieldRender('letterSpacing')" :label="$t('common.letterSpacing')">
@@ -54,7 +51,7 @@
         :swatches="swatcheColors"
       />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('borderColor')" :label="$t('common.borderColor')">
+    <NFormItem v-if="isFieldRender('borderColor')" :label="$t('common.border')">
       <NSwitch v-model:value="globalState.style[props.cname].isBorderEnabled" />
       <NColorPicker
         v-if="isFieldRender('isBorderEnabled')"
@@ -63,8 +60,16 @@
         show-preview
         :swatches="swatcheColors"
       />
+      <NInputNumber
+        v-if="isFieldRender('borderWidth')"
+        v-model:value="globalState.style[props.cname].borderWidth"
+        class="setting__input-number"
+        :step="1"
+        :min="1"
+        :max="10"
+      />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('shadowColor')" :label="$t('common.shadowColor')">
+    <NFormItem v-if="isFieldRender('shadowColor')" :label="$t('common.shadow')">
       <NSwitch v-model:value="globalState.style[props.cname].isShadowEnabled" />
       <NColorPicker
         v-if="isFieldRender('isShadowEnabled')"

@@ -52,7 +52,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     position: absolute;
     .memo_wrap {
       .memo__input {
-        padding: 5px;
+        padding: 0 8px;
         width: v-bind(customWidth);
         height: v-bind(customHeight);
         font-size: v-bind(customFontSize);
@@ -65,10 +65,6 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
   /* fix left space */
   .n-input__textarea-el {
     left: 2px !important;
-  }
-  /* dragMode */
-  .n-input.n-input--disabled .n-input__input-el, .n-input.n-input--disabled .n-input__textarea-el {
-    cursor: move;
   }
 }
 </style>

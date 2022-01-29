@@ -126,4 +126,9 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
   margin-left: 10px;
   width: 150px;
 }
+
+/* dragMode input */
+.n-input.n-input--disabled .n-input__input-el, .n-input.n-input--disabled .n-input__textarea-el {
+  cursor: move;
+}
 </style>

@@ -187,6 +187,7 @@ const customMargin = getStyleField(CNAME, 'margin', 'px')
 const customWidth = getStyleField(CNAME, 'width', 'px')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
+const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customActiveColor = getStyleField(CNAME, 'activeColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
@@ -215,7 +216,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         cursor: move !important;
       }
       .row__item--border {
-        outline: 1px solid v-bind(customBorderColor);
+        outline: v-bind(customBorderWidth) solid v-bind(customBorderColor);
       }
       .row__item--active {
         background-color: v-bind(customActiveColor) !important;
