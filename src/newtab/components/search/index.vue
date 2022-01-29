@@ -18,23 +18,32 @@
             'search__container--shadow': globalState.style.search.isShadowEnabled,
           }"
         >
-          <input
-            v-model="state.searchValue"
-            class="input__main"
-            :class="{ 'input__main--move': isDragMode }"
-            :placeholder="globalState.setting.search.placeholder"
-            :disabled="isDragMode"
-            @focus="onSearchFocus()"
-            @blur="onSearchBlur"
-            @input="onSearchInput"
-            @keyup.enter="handleSearch()"
-          >
-          <div class="input__clear" :class="{ 'input__clear--move': isDragMode }">
-            <icon-park-outline:close-one v-show="isClearVisible" @click="onClearValue()" />
-          </div>
-          <div v-if="globalState.setting.search.iconEnabled">
-            <il:search class="input__search" :class="{ 'input__search--move': isDragMode }" @click="handleSearch()" />
-          </div>
+          <NInputGroup>
+            <NInput
+              v-model:value="state.searchValue"
+              type="text"
+              size="large"
+              class="input__main"
+              :class="{ 'input__main--move': isDragMode }"
+              :placeholder="globalState.setting.search.placeholder"
+              :disabled="isDragMode"
+              clearable
+              @focus="onSearchFocus()"
+              @blur="onSearchBlur"
+              @input="onSearchInput"
+              @keyup.enter="handleSearch()"
+            />
+            <NButton
+              v-if="globalState.setting.search.iconEnabled"
+              size="large"
+              text
+              class="input__search"
+              :class="{ 'input__search--move': isDragMode }"
+              @click="handleSearch()"
+            >
+              <il:search />
+            </NButton>
+          </NInputGroup>
         </div>
       </NDropdown>
     </div>
@@ -148,7 +157,6 @@ const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customWidth = getStyleField(CNAME, 'width', 'px')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
-const customActiveColor = getStyleField(CNAME, 'activeColor')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
@@ -157,7 +165,6 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 #search {
   font-family: v-bind(customFontFamily);
   color: v-bind(customFontColor);
-  font-size: v-bind(customFontSize);
   user-select: none;
   .search__container {
     z-index: 10;
@@ -165,42 +172,29 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px 10px;
+    border-radius: 3px;
     .input__main {
       flex: 1;
       width: v-bind(customWidth);
+      font-size: v-bind(customFontSize);
       background-color: transparent;
     }
     .input__main--move {
       cursor: move !important;
     }
-    .input__clear {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 50px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .input__clear--move {
-      cursor: move !important;
-    }
     .input__search {
-      margin: 3px 0 0 0;
+      width: 50px;
       cursor: pointer;
     }
     .input__search--move {
       cursor: move !important;
     }
   }
-  .search__container--focus {
-    border-bottom: v-bind(customBorderWidth) solid v-bind(customActiveColor) !important;
-  }
   .search__container--border {
-    border-bottom: v-bind(customBorderWidth) solid v-bind(customBorderColor);
+    border: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .search__container--shadow {
-    text-shadow: 2px 8px 6px v-bind(customShadowColor);
+    box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;
   }
 }
 </style>
