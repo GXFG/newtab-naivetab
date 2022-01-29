@@ -1,21 +1,13 @@
 <template>
   <BaseComponentSetting cname="weather">
     <template #header>
-      <NFormItem :label="$t('weather.forecastEnabled')">
-        <NTooltip trigger="hover">
-          <template #trigger>
-            <NSwitch v-model:value="globalState.setting.weather.forecastEnabled" :disabled="true" />
-          </template>
-          In development, Stay tuned.
-        </NTooltip>
-      </NFormItem>
       <NFormItem :label="$t('weather.city')">
         <NInputGroup>
           <NAutoComplete
-            v-model:value="state.cityLabel"
-            :loading="state.isSearchLoading"
+            v-model:value="state.keyword"
             :options="state.cityList"
-            @update:value="onUpdateCity"
+            :loading="state.isSearchLoading"
+            @update:value="onChangeCity"
             @select="onSelectCity"
           />
           <!-- <NButton @click="onSearch()">
@@ -23,38 +15,36 @@
           </NButton> -->
         </NInputGroup>
       </NFormItem>
-      <NFormItem label="AQI">
-        <NSelect v-model:value="globalState.setting.weather.aqi" :options="aqiOptions" />
+      <NFormItem label="API Key">
+        <NInput v-model:value="globalState.setting.weather.apiKey" />
+        <Tips link :content="URL_QWEATHER_START" />
       </NFormItem>
-      <NFormItem :label="$t('weather.temperatureUnit')">
+
+      <!-- <NFormItem :label="$t('weather.temperatureUnit')">
         <NSelect v-model:value="globalState.setting.weather.temperatureUnit" :options="temperatureUnitOptions" />
       </NFormItem>
       <NFormItem :label="$t('weather.speedUnit')">
         <NSelect v-model:value="globalState.setting.weather.speedUnit" :options="speedUnitOptions" />
-      </NFormItem>
-      <NFormItem label="API Key">
-        <NInput v-model:value="globalState.setting.weather.apiKey" />
-        <NTooltip trigger="hover" placement="top-end">
-          <template #trigger>
-            <div style="margin-left: 10px; padding: 0 10px; background-color: #fff; border-radius: 2px">
-              <a href="https://www.weatherapi.com/" title="Free Weather API">
-                <img :src="'/assets/img/weatherapi.png'" alt="Weather data by WeatherAPI.com" border="0">
-              </a>
-            </div>
-          </template>
-          Weather data by WeatherAPI.com
-        </NTooltip>
-      </NFormItem>
+      </NFormItem> -->
+
       <NFormItem :label="$t('weather.icon')">
         <div class="setting__input-wrap">
           <div class="setting__input_item">
             <NSwitch v-model:value="globalState.setting.weather.iconEnabled" />
           </div>
           <div v-if="globalState.setting.weather.iconEnabled" class="setting__input_item">
-            <NSlider v-model:value="globalState.style.weather.iconWidth" class="item__grow" :step="1" :min="30" :max="200" />
-            <NInputNumber v-model:value="globalState.style.weather.iconWidth" class="setting__input-number" :step="1" :min="30" :max="200" />
+            <NSlider v-model:value="globalState.style.weather.iconSize" class="item__grow" :step="1" :min="30" :max="200" />
+            <NInputNumber v-model:value="globalState.style.weather.iconSize" class="setting__input-number" :step="1" :min="30" :max="200" />
           </div>
         </div>
+      </NFormItem>
+      <NFormItem :label="$t('weather.forecast')">
+        <NTooltip trigger="hover">
+          <template #trigger>
+            <NSwitch v-model:value="globalState.setting.weather.forecastEnabled" :disabled="true" />
+          </template>
+          In development...
+        </NTooltip>
       </NFormItem>
     </template>
   </BaseComponentSetting>
@@ -62,13 +52,8 @@
 
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { WEATHER_LANG_MAP, globalState } from '@/logic'
-import http from '@/lib/http'
-
-const aqiOptions = [
-  { label: 'yes', value: 'yes' },
-  { label: 'no', value: 'no' },
-]
+import { URL_QWEATHER_START, globalState } from '@/logic'
+import { getCityLookup } from '@/api'
 
 const temperatureUnitOptions = [
   { label: '℃', value: 'c' },
@@ -82,56 +67,42 @@ const speedUnitOptions = [
 
 const state = reactive({
   isSearchLoading: false,
-  cityLabel: globalState.setting.weather.city.label,
+  keyword: globalState.setting.weather.city.name,
   cityList: [] as SelectStringItem[],
 })
 
-const getSearch = async() => {
-  if (state.isSearchLoading || globalState.setting.weather.city.label.length === 0) {
+const getLocation = async() => {
+  if (state.isSearchLoading || state.keyword.length === 0) {
     return
   }
   state.isSearchLoading = true
   try {
-    const data: any = await http({
-      url: 'https://api.weatherapi.com/v1/search.json',
-      params: {
-        key: globalState.setting.weather.apiKey,
-        q: globalState.setting.weather.city.label,
-        lang: WEATHER_LANG_MAP[globalState.setting.general.lang],
-      },
-    })
+    const data = await getCityLookup(state.keyword)
     state.isSearchLoading = false
-    state.cityList = data.map(
-      (item: {
-        country: string // "China"
-        id: number // 386793
-        lat: number // 39.93
-        lon: number // 116.39
-        name: string // "Beijing Shi, Beijing, China"
-        region: string // "Beijing"
-        url: string // "beijing-shi-beijing-china"
-      }) => ({
-        label: item.name,
-        value: item.url,
-      }),
-    )
+    if (data.code !== '200') {
+      state.cityList = []
+      return
+    }
+    state.cityList = data.location.map((item: CityItem) => ({
+      label: `${item.country}-${item.adm1}-${item.adm2}-${item.name}`,
+      value: item.id,
+    }))
   } catch (e) {
     state.isSearchLoading = false
   }
 }
 
 const onSearch = useDebounceFn(() => {
-  globalState.setting.weather.city.label = state.cityLabel
-  getSearch()
-}, 2500)
+  getLocation()
+}, 500)
 
-const onUpdateCity = (label: any) => {
-  state.cityLabel = label.replace(/[^A-Za-z0-9, ]/g, '')
+const onChangeCity = (label: string) => {
+  state.keyword = label
   onSearch()
 }
 
 const onSelectCity = (value: any) => {
-  globalState.setting.weather.city.label = state.cityLabel
-  globalState.setting.weather.city.value = value
+  globalState.setting.weather.city.name = state.keyword
+  globalState.setting.weather.city.id = value
 }
 </script>

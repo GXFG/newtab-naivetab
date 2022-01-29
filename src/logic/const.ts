@@ -1,6 +1,8 @@
 export const URL_CHANGELOG = 'https://github.com/GXFG/newtab-puzzletab/blob/main/CHANGELOG.md'
 export const URL_GITHUB = 'https://github.com/GXFG/newtab-puzzletab'
 export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
+export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'
+export const URL_QWEATHER_HOME = 'https://www.qweather.com/'
 
 export const FONT_LIST = [
   // common
@@ -18,7 +20,7 @@ export const MERGE_SETTING_DELAY = 2000
 
 export const DRAG_TRIGGER_DISTANCE = 10
 
-export const THEME_TO_CODE_MAP = {
+export const APPEARANCE_TO_CODE_MAP = {
   light: 0,
   dark: 1,
 }
@@ -42,12 +44,14 @@ export const SEARCH_ENGINE_LIST = [
 
 export const WEATHER_LANG_MAP = {
   'zh-CN': 'zh',
-  'en-US': '',
+  'en-US': 'en',
 }
+
 export const WEATHER_TEMPERATURE_UNIT_MAP = {
   c: '℃',
   f: '℉',
 }
+
 export const WEATHER_SPEED_UNIT_MAP = {
   mph: 'mph',
   kph: 'km/h',

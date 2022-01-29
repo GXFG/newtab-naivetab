@@ -32,21 +32,21 @@
     <!-- color -->
     <NFormItem v-if="isFieldRender('fontColor')" :label="$t('common.fontColor')">
       <NColorPicker
-        v-model:value="globalState.style[props.cname].fontColor[globalState.localState.currThemeCode]"
+        v-model:value="globalState.style[props.cname].fontColor[globalState.localState.currAppearanceCode]"
         show-preview
         :swatches="swatcheColors"
       />
     </NFormItem>
     <NFormItem v-if="isFieldRender('backgroundColor')" :label="$t('common.backgroundColor')">
       <NColorPicker
-        v-model:value="globalState.style[props.cname].backgroundColor[globalState.localState.currThemeCode]"
+        v-model:value="globalState.style[props.cname].backgroundColor[globalState.localState.currAppearanceCode]"
         show-preview
         :swatches="swatcheColors"
       />
     </NFormItem>
     <NFormItem v-if="isFieldRender('activeColor')" :label="$t('common.activeColor')">
       <NColorPicker
-        v-model:value="globalState.style[props.cname].activeColor[globalState.localState.currThemeCode]"
+        v-model:value="globalState.style[props.cname].activeColor[globalState.localState.currAppearanceCode]"
         show-preview
         :swatches="swatcheColors"
       />
@@ -55,7 +55,7 @@
       <NSwitch v-model:value="globalState.style[props.cname].isBorderEnabled" />
       <NColorPicker
         v-if="isFieldRender('isBorderEnabled')"
-        v-model:value="globalState.style[props.cname].borderColor[globalState.localState.currThemeCode]"
+        v-model:value="globalState.style[props.cname].borderColor[globalState.localState.currAppearanceCode]"
         class="setting__row-element"
         show-preview
         :swatches="swatcheColors"
@@ -73,7 +73,7 @@
       <NSwitch v-model:value="globalState.style[props.cname].isShadowEnabled" />
       <NColorPicker
         v-if="isFieldRender('isShadowEnabled')"
-        v-model:value="globalState.style[props.cname].shadowColor[globalState.localState.currThemeCode]"
+        v-model:value="globalState.style[props.cname].shadowColor[globalState.localState.currAppearanceCode]"
         class="setting__row-element"
         show-preview
         :swatches="swatcheColors"

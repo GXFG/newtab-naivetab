@@ -1,7 +1,7 @@
 {
   "name": "newtab-puzzletab",
   "displayName": "PuzzleTab - New Tab",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "一款简洁的浏览器新标签页扩展",
   "private": true,
   "scripts": {

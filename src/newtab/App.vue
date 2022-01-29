@@ -13,7 +13,7 @@ import type { GlobalThemeOverrides } from 'naive-ui'
 import { NConfigProvider, NMessageProvider, NNotificationProvider, darkTheme, enUS, useOsTheme, zhCN } from 'naive-ui'
 import Content from './Content.vue'
 import {
-  THEME_TO_CODE_MAP,
+  APPEARANCE_TO_CODE_MAP,
   gaEvent,
   getStyleField,
   globalState,
@@ -46,15 +46,15 @@ const osTheme = useOsTheme() // light | dark | null
 const currTheme = ref()
 
 watch(
-  [() => osTheme.value, () => globalState.setting.general.theme],
+  [() => osTheme.value, () => globalState.setting.general.appearance],
   () => {
-    if (globalState.setting.general.theme === 'auto') {
-      globalState.localState.currThemeCode = THEME_TO_CODE_MAP[osTheme.value as any]
+    if (globalState.setting.general.appearance === 'auto') {
+      globalState.localState.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
       currTheme.value = osTheme.value === 'dark' ? darkTheme : null
       return
     }
-    globalState.localState.currThemeCode = THEME_TO_CODE_MAP[globalState.setting.general.theme]
-    currTheme.value = globalState.setting.general.theme === 'dark' ? darkTheme : null
+    globalState.localState.currAppearanceCode = APPEARANCE_TO_CODE_MAP[globalState.setting.general.appearance]
+    currTheme.value = globalState.setting.general.appearance === 'dark' ? darkTheme : null
   },
   { immediate: true },
 )

@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab } from '@/logic'
-import http from '@/lib/http'
+import { getBaiduSugrec } from '@/api'
 
 const CNAME = 'search'
 const isRender = getIsComponentRender(CNAME)
@@ -64,8 +64,6 @@ const state = reactive({
   placementValue: 'bottom' as any,
   suggestList: [],
 })
-
-const isClearVisible = computed(() => state.searchValue.length !== 0)
 
 const onSearchFocus = () => {
   globalState.state.isSearchFocused = true
@@ -104,13 +102,7 @@ const getBaiduSuggest = async() => {
   if (state.searchValue.length === 0) {
     return
   }
-  const data: any = await http({
-    url: 'https://www.baidu.com/sugrec',
-    params: {
-      prod: 'pc',
-      wd: state.searchValue,
-    },
-  })
+  const data: any = await getBaiduSugrec(state.searchValue)
   if (data && data.g && data.g.length !== 0) {
     state.suggestList = data.g.map((item: { q: string[] }) => ({
       label: item.q,

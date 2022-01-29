@@ -1,6 +1,6 @@
 import { globalState } from './store'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import http from '@/lib/http'
+import { getBingImages } from '@/api'
 
 export const imageState = ref(useStorageLocal('data-images', {
   imageList: [] as ImageItem[],
@@ -17,18 +17,10 @@ export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http:
 export const isImageLoading = ref(false)
 export const isImageListLoading = ref(false)
 
-const getBingImages = async() => {
+const getImages = async() => {
   try {
     isImageListLoading.value = true
-    const data: any = await http({
-      method: 'get',
-      url: 'https://cn.bing.com/HPImageArchive.aspx',
-      params: {
-        format: 'js',
-        idx: 0, // idx=0 表示是显示当天的时间，1表示昨天...，支持查看历史 15 天以内的图片
-        n: 8, // 1-8 返回请求数量，目前最多一次获取8张
-      },
-    })
+    const data: any = await getBingImages()
     isImageListLoading.value = false
     imageState.value.syncDate = dayjs().format('YYYY-MM-DD')
     imageState.value.imageList = data.images
@@ -89,11 +81,11 @@ watch([
 
 watch(() => globalState.style.general.isBackgroundImageEnabled, async(isEnabled) => {
   if (imageState.value.imageList.length === 0) {
-    await getBingImages()
+    await getImages()
   }
   renderBackgroundImage(true, !isEnabled)
 }, { immediate: true })
 
 export const onRefreshImageList = () => {
-  getBingImages()
+  getImages()
 }

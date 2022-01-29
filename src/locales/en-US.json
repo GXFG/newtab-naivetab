@@ -34,6 +34,7 @@
     "yOffset": "YOffset",
     "yOffsetTips": "The element relative to the Y-axis of the screen",
     "style": "Style",
+    "appearance": "Appearance",
     "theme": "Theme",
     "auto": "Auto",
     "light": "Light",
@@ -159,7 +160,7 @@
     "city": "City",
     "temperatureUnit": "TEMP unit",
     "speedUnit": "Speed unit",
-    "forecastEnabled": "Forecast",
+    "forecast": "Forecast",
     "icon": "Weather icon"
   },
   "memo": {

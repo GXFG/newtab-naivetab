@@ -13,8 +13,8 @@
     </template>
 
     <template #style>
-      <NFormItem :label="$t('common.theme')">
-        <NSelect v-model:value="globalState.setting.general.theme" :options="themeList" />
+      <NFormItem :label="$t('common.appearance')">
+        <NSelect v-model:value="globalState.setting.general.appearance" :options="themeList" />
       </NFormItem>
     </template>
 
@@ -24,7 +24,7 @@
         <NSwitch v-model:value="globalState.style.general.isBackgroundImageEnabled" />
       </NFormItem>
       <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
-        <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 30%;" />
+        <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 30%" />
         <!-- local -->
         <template v-if="globalState.style.general.backgroundImageSource === 0">
           <NButton class="setting__row-element" @click="onSelectBackgroundImage">
@@ -50,7 +50,11 @@
       </NFormItem>
       <!-- local -->
       <NFormItem
-        v-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 0"
+        v-if="
+          globalState.style.general.isBackgroundImageEnabled &&
+            globalState.style.general.backgroundImageSource === 0 &&
+            imageState.localBackgroundFileName.length !== 0
+        "
         :label="$t('general.filename')"
       >
         <p>{{ imageState.localBackgroundFileName }}</p>
@@ -178,6 +182,7 @@ const onSelectBackgroundImage = () => {
   bgImageFileInputEl.value.click()
   gaEvent('setting-background-image', 'click', 'open')
 }
+
 const onBackgroundImageFileChange = (e: any) => {
   const file = e.target.files[0]
   if (file.size > 4 * 1024 * 1024) {
@@ -193,9 +198,11 @@ const onBackgroundImageFileChange = (e: any) => {
   }
   gaEvent('setting-background-image', 'click', 'select-file')
 }
+
 const onSaveImage = async() => {
   downloadImageByUrl(globalState.style.general.backgroundImageUrl)
 }
+
 const onSelectImage = (item: ImageItem) => {
   globalState.style.general.backgroundImageId = item.urlbase
 }
@@ -210,6 +217,7 @@ const onImportSetting = () => {
   settingFileInputEl.value.click()
   gaEvent('setting-import', 'click', 'open')
 }
+
 const onImportFileChange = (e: any) => {
   const file = e.target.files[0]
   if (!file.name.includes('.json')) {
@@ -223,6 +231,7 @@ const onImportFileChange = (e: any) => {
   }
   gaEvent('setting-import', 'click', 'select-file')
 }
+
 const onExportSetting = () => {
   exportSetting()
   gaEvent('setting-export', 'click', 'open')

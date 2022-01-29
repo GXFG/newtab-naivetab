@@ -34,6 +34,7 @@
     "yOffset": "Y轴偏移",
     "yOffsetTips": "元素相对屏幕Y轴的偏移值",
     "style": "样式",
+    "appearance": "外观",
     "theme": "主题",
     "auto": "自动",
     "light": "浅色",
@@ -159,7 +160,7 @@
     "city": "城市",
     "temperatureUnit": "温度单位",
     "speedUnit": "速度单位",
-    "forecastEnabled": "预报",
+    "forecast": "未来预报",
     "icon": "天气图标"
   },
   "memo": {

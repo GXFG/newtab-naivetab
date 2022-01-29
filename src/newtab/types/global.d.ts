@@ -57,81 +57,41 @@ interface ImageItem {
   wp: boolean
 }
 
-interface WeatherCurrentItemd {
-  time_epoch: number // 1638460800,
-  time: string // "2021-12-03 00:00",
-  temp_c: number // 6.4,
-  temp_f: number // 43.5,
-  is_day: number // 0,
-  condition: {
-    text: string // "Clear",
-    icon: string // "//cdn.weatherapi.com/weather/64x64/night/113.png",
-    code: number // 1000
-  }
-  wind_mph: number // 9.8,
-  wind_kph: number // 15.8,
-  wind_degree: number // 321,
-  wind_dir: string // "NW",
-  pressure_mb: number // 1021.0,
-  pressure_in: number // 30.15,
-  precip_mm: number // 0.0,
-  precip_in: number // 0.0,
-  humidity: number // 27,
-  cloud: number // 4,
-  feelslike_c: number // 3.4,
-  feelslike_f: number // 38.1,
-  windchill_c: number // 3.4,
-  windchill_f: number // 38.1,
-  heatindex_c: number // 6.4,
-  heatindex_f: number // 43.5,
-  dewpoint_c: number // -11.2,
-  dewpoint_f: number // 11.8,
-  will_it_rain: number // 0,
-  chance_of_rain: number // 0,
-  will_it_snow: number // 0,
-  chance_of_snow: number // 0,
-  vis_km: number // 10.0,
-  vis_miles: number // 6.0,
-  gust_mph: number // 15.9,
-  gust_kph: number // 25.6,
-  uv: number // 1.0
+interface CityItem {
+  adm1: string // "北京市"
+  adm2: string // "北京"
+  country: string // "中国"
+  fxLink: string // "http://hfx.link/2ax1"
+  id: string // "101010100"
+  isDst: string // "0"
+  lat: string // "39.90498"
+  lon: string // "116.40528"
+  name: string // "北京"
+  rank: string // "10"
+  type: string // "city"
+  tz: string // "Asia/Shanghai"
+  utcOffset: string // "+08:00"
+}
+interface IndicesItem {
+  category: string // "较不宜"
+  date: string // "2022-01-29"
+  level: string // "3"
+  name: string // "运动指数"
+  text: string // "天气较好，但考虑天气寒冷，推荐您进行室内运动，户外运动时请注意保暖并做好准备活动。"
+  type: string // "1"
 }
 
-interface WeatherForecastdayItem {
-  date: string
-  date_epoch: string
-  day: {
-    maxtemp_c: number // 13.4,
-    maxtemp_f: number // 56.1,
-    mintemp_c: number // 4.8,
-    mintemp_f: number // 40.6,
-    avgtemp_c: number // 7.9,
-    avgtemp_f: number // 46.2,
-    maxwind_mph: number // 9.8,
-    maxwind_kph: number // 15.8,
-    totalprecip_mm: number // 0.0,
-    totalprecip_in: number // 0.0,
-    avgvis_km: number // 10.0,
-    avgvis_miles: number // 6.0,
-    avghumidity: number // 26.0,
-    daily_will_it_rain: number // 0,
-    daily_chance_of_rain: number // 0,
-    daily_will_it_snow: number // 0,
-    daily_chance_of_snow: number // 0,
-    condition: {
-      text: string // "Sunny",
-      icon: string // "//cdn.weatherapi.com/weather/64x64/day/113.png",
-      code: number // 1000
-    }
-    uv: number
-  }
-  astro: {
-    sunrise: string // "07:19 AM",
-    sunset: string // "04:50 PM",
-    moonrise: string // "05:42 AM",
-    moonset: string // "03:58 PM",
-    moon_phase: string // "Waxing Crescent",
-    moon_illumination: string // "0"
-  }
-  hour: TWeatherCurrentItem[]
+interface WarningItem {
+  id: string // "10101010020211009154607668935939",
+  sender: string // "北京市气象局",
+  pubTime: string // "2021-10-09T15:46+08:00",
+  title: string // "北京市气象台2021年10月09日15时40分发布大风蓝色预警信号",
+  startTime: string // "2021-10-09T15:40+08:00",
+  endTime: string // "2021-10-10T15:40+08:00",
+  status: string // "active",
+  level: string // "蓝色",
+  type: string // "11B06",
+  typeName: string // "大风",
+  text: string // "市气象台2021年10月9日15时40分发布大风蓝色预警信号：预计，9日22时至10日19时，本市大部分地区有4级左右偏北风，阵风6、7级，山区阵风可达8级左右，请注意防范。",
+  related: string // ""
 }

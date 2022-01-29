@@ -16,40 +16,53 @@ export const globalState = reactive({
     isMemoFocused: false,
   },
   localState: useStorageLocal('local-state', {
-    currThemeCode: 0, // 0:light | 1:dark
+    currAppearanceCode: 0, // 0:light | 1:dark
     availableFontList: [] as any[],
     weather: {
-      syncTime: 0,
-      current: {
-        last_updated_epoch: 0, // 1638929700
-        last_updated: '', // "2021-12-08 10:15"
-        temp_c: '', // 1.0
-        temp_f: '', // 33.8
-        is_day: '', // 1
-        condition: {
-          text: '', // "Sunny"
-          icon: '', // "//cdn.weatherapi.com/weather/64x64/day/113.png"
-          code: '', // 1000
-        },
-        wind_mph: '', // 0.0
-        wind_kph: '', // 0.0
-        wind_degree: '', // 49
-        wind_dir: '', // "NE"
-        pressure_mb: '', // 1033.0
-        pressure_in: '', // 30.5
-        precip_mm: '', // 0.0
-        precip_in: '', // 0.0
-        humidity: '', // 69
-        cloud: '', // 0
-        feelslike_c: '', // 1.0
-        feelslike_f: '', // 33.8
-        vis_km: '', // 10.0
-        vis_miles: '', // 6.0
-        uv: '', // 1.0
-        gust_mph: '', // 2.2
-        gust_kph: '', // 3.6
+      now: {
+        syncTime: 0,
+        cloud: '', // "0"
+        dew: '', // "-20"
+        feelsLike: '', // "-2"
+        humidity: '', // "22"
+        icon: '', // "100"
+        obsTime: '', // "2022-01-29T11:13+08:00"
+        precip: '', // "0.0"
+        pressure: '', // "1024"
+        temp: '', // "2"
+        text: '', // "晴"
+        vis: '', // "30"
+        wind360: '', // "0"
+        windDir: '', // "北风"
+        windScale: '', // "2"
+        windSpeed: '', // "7"
       },
-      forecastday: [] as WeatherForecastdayItem[],
+      air: {
+        syncTime: 0,
+        aqi: '', // "31"
+        category: '', // "优"
+        co: '', // "0.3"
+        level: '', // "1"
+        no2: '', // "15"
+        o3: '', // "64"
+        pm2p5: '', // "20"
+        pm10: '', // "31"
+        primary: '', // "NA"
+        pubTime: '', // "2022-01-29T15:00+08:00"
+        so2: '', // "1"
+      },
+      indices: {
+        syncTime: 0,
+        list: [] as IndicesItem[],
+      },
+      warning: {
+        syncTime: 0,
+        list: [] as WarningItem[],
+      },
+      forecast: {
+        syncTime: 0,
+        list: [],
+      },
     },
   }),
   syncTime: useStorageLocal('setting-sync-time', 0),
@@ -71,7 +84,7 @@ export const globalState = reactive({
       backgroundImageSource: 1, // 0:localFile, 1:bing
       backgroundImageUrl: '',
       backgroundImageId: '', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
-      bgOpacity: 0.8,
+      bgOpacity: 0.7,
       bgBlur: 10,
     }),
     settingIcon: useStorageLocal('style-setting-icon', {
@@ -200,10 +213,10 @@ export const globalState = reactive({
         yOffsetValue: 0,
         yTranslateValue: 0,
       },
-      iconWidth: 70,
       fontFamily: 'Arial Rounded MT Bold',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+      iconSize: 50,
     }),
     memo: useStorageLocal('style-memo', {
       layout: {
@@ -226,7 +239,7 @@ export const globalState = reactive({
   setting: {
     general: useStorageLocal('setting-general', {
       version: pkg.version,
-      theme: 'auto', // light | dark | auto
+      appearance: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
       lang: defaultLang,
       drawerPlacement: 'right' as any,
@@ -266,16 +279,15 @@ export const globalState = reactive({
     }),
     weather: useStorageLocal('setting-weather', {
       enabled: false,
-      forecastEnabled: false,
-      apiKey: 'bc9a224f841945f0bb2104157212811',
+      apiKey: '72db57326f9f494ab04d1d431bc127e9',
       city: {
-        label: 'Beijing, Beijing, China',
-        value: 'beijing-shi-beijing-china',
+        id: '101010300', // 101010300
+        name: '中国-北京市-北京-朝阳', // "中国-北京市-北京-朝阳"
       },
-      aqi: 'no',
       temperatureUnit: 'c', // 'c' | 'f'
       speedUnit: 'kph', // 'kph' | 'mph'
       iconEnabled: true,
+      forecastEnabled: false,
     }),
     memo: useStorageLocal('setting-memo', {
       enabled: false,
@@ -344,7 +356,7 @@ export const getLayoutStyle = (name: string) => {
 
 export const getStyleConst = (field: string) => {
   return computed(() => {
-    return styleConst.value[field][globalState.localState.currThemeCode] || styleConst.value[field][0]
+    return styleConst.value[field][globalState.localState.currAppearanceCode] || styleConst.value[field][0]
   })
 }
 
@@ -355,7 +367,7 @@ export const getStyleField = (component: 'general' | Components, field: string, 
   return computed(() => {
     let style = field.split('.').reduce((r: any, c: string) => r[c], globalState.style[component])
     if (style instanceof Array) {
-      return style[globalState.localState.currThemeCode]
+      return style[globalState.localState.currAppearanceCode]
     }
     if (ratio) {
       style = style * ratio
@@ -373,7 +385,7 @@ watch(() => globalState.setting.general.pageTitle, () => {
 
 watch([
   () => globalState.style.general,
-  () => globalState.localState.currThemeCode,
+  () => globalState.localState.currAppearanceCode,
 ], () => {
   document.body.style.setProperty('--bg-main', getStyleField('general', 'backgroundColor').value)
   document.body.style.setProperty('--text-color-main', getStyleField('general', 'fontColor').value)
