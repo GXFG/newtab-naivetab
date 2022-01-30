@@ -213,6 +213,7 @@ const modifyMoveableWrapBorder = async(isAdd: boolean) => {
   }
 }
 
+// 开启或关闭DragMode时为所有当前启用的组件添加或移除对应class
 watch(
   isDragMode,
   (value) => {
@@ -225,6 +226,7 @@ watch(
   { immediate: true },
 )
 
+// 当为DragMode且组件启用时添加对应class
 watch(isEnabled, (value: boolean) => {
   if (!isDragMode.value || !value) {
     return
@@ -233,8 +235,9 @@ watch(isEnabled, (value: boolean) => {
   modifyMoveableWrapBorder(true)
 })
 
+// 为当前选中的组件增加对应class
 watch(isCurrent, async(value) => {
-  if (!isEnabled.value) {
+  if (!isDragMode.value || !isEnabled.value) {
     return
   }
   modifyMoveableWrapClass(value, 'element-active')
