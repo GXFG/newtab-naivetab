@@ -1,7 +1,7 @@
 <template>
-  <MoveableComponentWrap componentName="bookmark" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="bookmark" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
-      <div class="bookmark__container" :style="containerStyle">
+      <div class="bookmark__container" :style="dragStyle || containerStyle">
         <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
           <div
             v-for="item in rowData"
@@ -11,8 +11,8 @@
               'row__item--move': isDragMode,
               'row__item--hover': !isDragMode,
               'row__item--active': state.currSelectKey === item.key,
-              'row__item--border': globalState.style.bookmark.isBorderEnabled,
-              'row__item--shadow': globalState.style.bookmark.isShadowEnabled,
+              'row__item--border': localState.style.bookmark.isBorderEnabled,
+              'row__item--shadow': localState.style.bookmark.isShadowEnabled,
             }"
             :title="item.url"
             @click="onClickItem(item.url)"
@@ -46,7 +46,7 @@ import {
   KEY_OF_INDEX,
   MERGE_SETTING_DELAY,
   isDragMode,
-  globalState,
+  localState,
   getIsComponentRender,
   getLayoutStyle,
   getStyleField,
@@ -97,7 +97,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
     await sleep(200)
   }
   for (const key of KEYBOARD_KEY) {
-    const item = globalState.setting.bookmark.keymap[key]
+    const item = localState.setting.bookmark.keymap[key]
     const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
     if (!(item && (item.url || item.name))) {
       // 重置没有配置信息的按键数据
@@ -125,7 +125,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
 }, MERGE_SETTING_DELAY)
 
 watch(
-  () => globalState.setting.bookmark.keymap,
+  () => localState.setting.bookmark.keymap,
   () => {
     mergeBookmarkSetting()
   },
@@ -163,7 +163,7 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (url.length === 0) {
     return
   }
-  if (!globalState.setting.bookmark.isDblclickOpen) {
+  if (!localState.setting.bookmark.isDblclickOpen) {
     createTab(url)
     return
   }
@@ -174,13 +174,14 @@ const keyboardTask = (e: KeyboardEvent) => {
     clearTimeout(timer)
     timer = setTimeout(() => {
       state.currSelectKey = ''
-    }, globalState.setting.bookmark.dblclickIntervalTime)
+    }, localState.setting.bookmark.dblclickIntervalTime)
   }
 }
 
 addKeyboardTask(CNAME, keyboardTask)
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customMargin = getStyleField(CNAME, 'margin', 'px')

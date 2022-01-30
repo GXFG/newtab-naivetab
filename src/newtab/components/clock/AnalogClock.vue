@@ -1,7 +1,7 @@
 <template>
-  <MoveableComponentWrap componentName="clockAnalog" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="clockAnalog" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
-      <div class="clockAnalog__container" :style="containerStyle">
+      <div class="clockAnalog__container" :style="dragStyle || containerStyle">
         <article class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
           <div class="clock__base" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
           <div class="clock__base clock__hour" :style="`background-image: url(/assets/img/clock/${currTheme}/hour.png);`" />
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, globalState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockAnalog'
 const isRender = getIsComponentRender(CNAME)
@@ -57,9 +57,10 @@ watch(
   { immediate: true },
 )
 
-const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === globalState.setting.clockAnalog.theme)?.label || 'light')
+const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === localState.setting.clockAnalog.theme)?.label || 'light')
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customWidth = getStyleField(CNAME, 'width', 'px')
 const hourDeg = computed(() => `${state.hourDeg}deg`)
 const minuteDeg = computed(() => `${state.minuteDeg}deg`)

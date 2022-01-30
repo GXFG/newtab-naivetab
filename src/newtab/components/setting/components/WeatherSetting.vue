@@ -16,32 +16,32 @@
         </NInputGroup>
       </NFormItem>
       <NFormItem label="API Key">
-        <NInput v-model:value="globalState.setting.weather.apiKey" />
+        <NInput v-model:value="localState.setting.weather.apiKey" />
         <Tips link :content="URL_QWEATHER_START" />
       </NFormItem>
 
       <!-- <NFormItem :label="$t('weather.temperatureUnit')">
-        <NSelect v-model:value="globalState.setting.weather.temperatureUnit" :options="temperatureUnitOptions" />
+        <NSelect v-model:value="localState.setting.weather.temperatureUnit" :options="temperatureUnitOptions" />
       </NFormItem>
       <NFormItem :label="$t('weather.speedUnit')">
-        <NSelect v-model:value="globalState.setting.weather.speedUnit" :options="speedUnitOptions" />
+        <NSelect v-model:value="localState.setting.weather.speedUnit" :options="speedUnitOptions" />
       </NFormItem> -->
 
       <NFormItem :label="$t('weather.icon')">
         <div class="setting__input-wrap">
           <div class="setting__input_item">
-            <NSwitch v-model:value="globalState.setting.weather.iconEnabled" />
+            <NSwitch v-model:value="localState.setting.weather.iconEnabled" />
           </div>
-          <div v-if="globalState.setting.weather.iconEnabled" class="setting__input_item">
-            <NSlider v-model:value="globalState.style.weather.iconSize" class="item__grow" :step="1" :min="30" :max="200" />
-            <NInputNumber v-model:value="globalState.style.weather.iconSize" class="setting__input-number" :step="1" :min="30" :max="200" />
+          <div v-if="localState.setting.weather.iconEnabled" class="setting__input_item">
+            <NSlider v-model:value="localState.style.weather.iconSize" class="item__grow" :step="1" :min="30" :max="200" />
+            <NInputNumber v-model:value="localState.style.weather.iconSize" class="setting__input-number" :step="1" :min="30" :max="200" />
           </div>
         </div>
       </NFormItem>
       <NFormItem :label="$t('weather.forecast')">
         <NTooltip trigger="hover">
           <template #trigger>
-            <NSwitch v-model:value="globalState.setting.weather.forecastEnabled" :disabled="true" />
+            <NSwitch v-model:value="localState.setting.weather.forecastEnabled" :disabled="true" />
           </template>
           In development...
         </NTooltip>
@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { URL_QWEATHER_START, globalState } from '@/logic'
+import { URL_QWEATHER_START, localState } from '@/logic'
 import { getCityLookup } from '@/api'
 
 const temperatureUnitOptions = [
@@ -67,7 +67,7 @@ const speedUnitOptions = [
 
 const state = reactive({
   isSearchLoading: false,
-  keyword: globalState.setting.weather.city.name,
+  keyword: localState.setting.weather.city.name,
   cityList: [] as SelectStringItem[],
 })
 
@@ -102,7 +102,7 @@ const onChangeCity = (label: string) => {
 }
 
 const onSelectCity = (value: any) => {
-  globalState.setting.weather.city.name = state.keyword
-  globalState.setting.weather.city.id = value
+  localState.setting.weather.city.name = state.keyword
+  localState.setting.weather.city.id = value
 }
 </script>

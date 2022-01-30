@@ -1,7 +1,7 @@
 <template>
   <div id="now">
     <div class="now__icon">
-      <div v-if="globalState.setting.weather.iconEnabled" class="icon__wrap">
+      <div v-if="localState.setting.weather.iconEnabled" class="icon__wrap">
         <i :class="`qi-${weatherState.now.icon}`" />
       </div>
     </div>
@@ -107,7 +107,7 @@ import {
   WEATHER_SPEED_UNIT_MAP,
   isDragMode,
   weatherState,
-  globalState,
+  localState,
   getStyleField,
   createTab,
 } from '@/logic'
@@ -158,8 +158,8 @@ const onOpenWeather = () => {
   createTab(URL_QWEATHER_HOME)
 }
 
-const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[globalState.setting.weather.temperatureUnit])
-const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[globalState.setting.weather.speedUnit])
+const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[localState.setting.weather.temperatureUnit])
+const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[localState.setting.weather.speedUnit])
 
 const customIconSize = getStyleField(CNAME, 'iconSize', 'px')
 const customLabelSize = getStyleField(CNAME, 'fontSize', 'px', 1.4)

@@ -2,38 +2,38 @@
   <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
     <template #header>
       <NFormItem :label="$t('general.pageTitle')">
-        <NInput v-model:value="globalState.setting.general.pageTitle" type="text" placeholder=" " />
+        <NInput v-model:value="localState.setting.general.pageTitle" type="text" placeholder=" " />
       </NFormItem>
       <NFormItem :label="$t('general.language')">
         <NSelect v-model:value="proxy.$i18n.locale" :options="state.i18nList" @update:value="onChangeLocale" />
       </NFormItem>
       <NFormItem :label="$t('common.drawerSite')">
-        <NSelect v-model:value="globalState.setting.general.drawerPlacement" :options="drawerPlacementList" />
+        <NSelect v-model:value="localState.setting.general.drawerPlacement" :options="drawerPlacementList" />
       </NFormItem>
     </template>
 
     <template #style>
       <NFormItem :label="$t('common.appearance')">
-        <NSelect v-model:value="globalState.setting.general.appearance" :options="themeList" />
+        <NSelect v-model:value="localState.setting.general.appearance" :options="themeList" />
       </NFormItem>
     </template>
 
     <template #footer>
       <!-- backgroundImage -->
       <NFormItem :label="$t('common.backgroundImage')">
-        <NSwitch v-model:value="globalState.style.general.isBackgroundImageEnabled" />
+        <NSwitch v-model:value="localState.style.general.isBackgroundImageEnabled" />
       </NFormItem>
-      <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
-        <NSelect v-model:value="globalState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 30%" />
+      <NFormItem v-if="localState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
+        <NSelect v-model:value="localState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 30%" />
         <!-- local -->
-        <template v-if="globalState.style.general.backgroundImageSource === 0">
+        <template v-if="localState.style.general.backgroundImageSource === 0">
           <NButton class="setting__row-element" @click="onSelectBackgroundImage">
             <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
           </NButton>
           <Tips :content="$t('general.localBackgroundTips')" />
         </template>
         <!-- bing -->
-        <template v-else-if="globalState.style.general.backgroundImageSource === 1">
+        <template v-else-if="localState.style.general.backgroundImageSource === 1">
           <NButton class="setting__row-element" @click="onSaveImage()">
             <tabler:world-download />&nbsp;{{ $t('general.saveCurrendImage') }}
           </NButton>
@@ -51,8 +51,8 @@
       <!-- local -->
       <NFormItem
         v-if="
-          globalState.style.general.isBackgroundImageEnabled &&
-            globalState.style.general.backgroundImageSource === 0 &&
+          localState.style.general.isBackgroundImageEnabled &&
+            localState.style.general.backgroundImageSource === 0 &&
             imageState.localBackgroundFileName.length !== 0
         "
         :label="$t('general.filename')"
@@ -60,7 +60,7 @@
         <p>{{ imageState.localBackgroundFileName }}</p>
       </NFormItem>
       <!-- bing -->
-      <NFormItem v-else-if="globalState.style.general.isBackgroundImageEnabled && globalState.style.general.backgroundImageSource === 1" label=" ">
+      <NFormItem v-else-if="localState.style.general.isBackgroundImageEnabled && localState.style.general.backgroundImageSource === 1" label=" ">
         <div class="setting__image-wrap">
           <div
             v-for="item in imageState.imageList"
@@ -80,13 +80,13 @@
           </div>
         </div>
       </NFormItem>
-      <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.blur')">
-        <NSlider v-model:value="globalState.style.general.bgBlur" :step="0.1" :min="0" :max="200" />
-        <NInputNumber v-model:value="globalState.style.general.bgBlur" class="setting__input-number" :step="0.1" :min="0" :max="200" />
+      <NFormItem v-if="localState.style.general.isBackgroundImageEnabled" :label="$t('common.blur')">
+        <NSlider v-model:value="localState.style.general.bgBlur" :step="0.1" :min="0" :max="200" />
+        <NInputNumber v-model:value="localState.style.general.bgBlur" class="setting__input-number" :step="0.1" :min="0" :max="200" />
       </NFormItem>
-      <NFormItem v-if="globalState.style.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
-        <NSlider v-model:value="globalState.style.general.bgOpacity" :step="0.01" :min="0" :max="1" />
-        <NInputNumber v-model:value="globalState.style.general.bgOpacity" class="setting__input-number" :step="0.01" :min="0" :max="1" />
+      <NFormItem v-if="localState.style.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
+        <NSlider v-model:value="localState.style.general.bgOpacity" :step="0.01" :min="0" :max="1" />
+        <NInputNumber v-model:value="localState.style.general.bgOpacity" class="setting__input-number" :step="0.01" :min="0" :max="1" />
       </NFormItem>
 
       <!-- setting -->
@@ -110,6 +110,12 @@
         </NButton>
         <Tips :content="$t('general.exportSettingTips')" />
       </NFormItem>
+      <NFormItem :label="$t('general.resetStorageLabel')">
+        <NButton @click="resetStorage()">
+          <ant-design:clear-outlined />&nbsp;{{ $t('general.resetStorageValue') }}
+        </NButton>
+        <Tips :content="$t('general.resetStorageTips')" />
+      </NFormItem>
       <NFormItem :label="$t('general.resetSettingLabel')">
         <NPopconfirm @positive-click="onResetSetting()">
           <template #trigger>
@@ -130,13 +136,14 @@ import {
   gaEvent,
   getImageUrlFromBing,
   getStyleConst,
-  globalState,
+  localState,
   imageState,
   downloadImageByUrl,
   importSetting,
   isImageListLoading,
   isImageLoading,
   onRefreshImageList,
+  resetStorage,
   resetSetting,
 } from '@/logic'
 import i18n from '@/lib/i18n'
@@ -170,11 +177,11 @@ const backgroundImageSourceList = computed(() => [
 
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
-  globalState.setting.general.lang = locale
+  localState.setting.general.lang = locale
   gaEvent('setting-locale', 'click', 'change')
 }
 
-const isCurrSelectedImage = (item: ImageItem) => item.urlbase === globalState.style.general.backgroundImageId
+const isCurrSelectedImage = (item: ImageItem) => item.urlbase === localState.style.general.backgroundImageId
 
 const bgImageFileInputEl = ref()
 const onSelectBackgroundImage = () => {
@@ -200,15 +207,15 @@ const onBackgroundImageFileChange = (e: any) => {
 }
 
 const onSaveImage = async() => {
-  downloadImageByUrl(globalState.style.general.backgroundImageUrl)
+  downloadImageByUrl(localState.style.general.backgroundImageUrl)
 }
 
 const onSelectImage = (item: ImageItem) => {
-  globalState.style.general.backgroundImageId = item.urlbase
+  localState.style.general.backgroundImageId = item.urlbase
 }
 
 const syncTime = computed(() => {
-  return dayjs(globalState.syncTime).format('YYYY-MM-DD HH:mm:ss')
+  return dayjs(localState.common.syncTime).format('YYYY-MM-DD HH:mm:ss')
 })
 
 const settingFileInputEl = ref()

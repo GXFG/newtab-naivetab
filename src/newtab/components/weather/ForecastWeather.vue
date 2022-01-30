@@ -1,7 +1,7 @@
 <template>
-  <div v-if="globalState.setting.weather.forecastEnabled" id="forecast" ref="chartDom" />
+  <div v-if="localState.setting.weather.forecastEnabled" id="forecast" ref="chartDom" />
 </template>
 
 <script setup lang="ts">
-import { globalState } from '@/logic'
+import { localState } from '@/logic'
 </script>

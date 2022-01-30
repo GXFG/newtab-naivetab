@@ -7,13 +7,13 @@
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
             <div class="setting__input-wrap">
               <div class="setting__input_item">
-                <NSwitch v-model:value="globalState.setting.bookmark.isDblclickOpen" />
+                <NSwitch v-model:value="localState.setting.bookmark.isDblclickOpen" />
                 <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
               </div>
-              <div v-if="globalState.setting.bookmark.isDblclickOpen" class="setting__input_item">
+              <div v-if="localState.setting.bookmark.isDblclickOpen" class="setting__input_item">
                 <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
                 <NInputNumber
-                  v-model:value="globalState.setting.bookmark.dblclickIntervalTime"
+                  v-model:value="localState.setting.bookmark.dblclickIntervalTime"
                   class="setting__input-number--unit"
                   :min="0"
                   :step="1"
@@ -43,11 +43,11 @@
                 <NInputGroupLabel class="item__key">
                   {{ `${key.toUpperCase()}` }}
                 </NInputGroupLabel>
-                <template v-if="globalState.setting.bookmark.keymap[key]">
+                <template v-if="localState.setting.bookmark.keymap[key]">
                   <NInput
                     v-for="field of ['url', 'name']"
                     :key="field"
-                    v-model:value="globalState.setting.bookmark.keymap[key][field as 'url' | 'name']"
+                    v-model:value="localState.setting.bookmark.keymap[key][field as 'url' | 'name']"
                     class="input__main"
                     type="text"
                     clearable
@@ -70,17 +70,17 @@
 </template>
 
 <script setup lang="ts">
-import { KEYBOARD_KEY, globalState } from '@/logic'
+import { KEYBOARD_KEY, localState } from '@/logic'
 
 const onAddKey = (key: string) => {
-  globalState.setting.bookmark.keymap[key] = {
+  localState.setting.bookmark.keymap[key] = {
     url: '',
     name: '',
   }
 }
 
 const onDeleteKey = (key: string) => {
-  delete globalState.setting.bookmark.keymap[key]
+  delete localState.setting.bookmark.keymap[key]
 }
 </script>
 

@@ -34,3 +34,27 @@ export const downloadJsonByTagA = (result: any, filename = 'file') => {
   link.setAttribute('download', filename)
   link.click()
 }
+
+/**
+ * 只合并当前配置内存在的字段
+ */
+export const mergeState = (currState: {}, acceptState: {}) => {
+  if (acceptState === undefined || acceptState === null) {
+    return currState
+  }
+  if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
+    return acceptState
+  }
+  // 只处理对象类型，其余均返回currState，如Array
+  if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
+    return currState
+  }
+  const filterState = {} as any
+  const fieldList = Object.keys(acceptState)
+  for (const field of fieldList) {
+    if (Object.prototype.hasOwnProperty.call(currState, field)) {
+      filterState[field] = acceptState[field]
+    }
+  }
+  return { ...currState, ...filterState }
+}

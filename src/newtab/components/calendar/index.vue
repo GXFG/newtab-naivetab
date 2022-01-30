@@ -1,10 +1,10 @@
 <template>
-  <MoveableComponentWrap componentName="calendar" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="calendar" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
       <div
         class="calendar__container"
-        :style="containerStyle"
-        :class="{ 'calendar__container-shadow': globalState.style.calendar.isShadowEnabled, border: globalState.style.calendar.isBorderEnabled }"
+        :style="dragStyle || containerStyle"
+        :class="{ 'calendar__container-shadow': localState.style.calendar.isShadowEnabled, border: localState.style.calendar.isBorderEnabled }"
       >
         <div class="calendar__options">
           <div class="options__item">
@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, globalState, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
+import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, localState, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
 const CNAME = 'calendar'
@@ -245,7 +245,8 @@ const onReset = () => {
   gaEvent('calendar-reset', 'click', '')
 }
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customContainerWidth = getStyleField(CNAME, 'width', 'px', 7.4)
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')

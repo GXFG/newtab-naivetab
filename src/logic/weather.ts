@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getWeatherNow, getWeatherForecast, getWeatherIndices, getWeatherAirNow, getWeatherWarning } from '@/api'
-import { globalState, log } from '@/logic'
+import { localState, log } from '@/logic'
 
 export const weatherState = ref(useStorageLocal('data-weather', {
   now: {
@@ -100,7 +100,7 @@ const getWarningData = async() => {
 }
 
 export const updateWeather = () => {
-  if (!globalState.setting.weather.enabled) {
+  if (!localState.setting.weather.enabled) {
     return
   }
   const currTS = dayjs().valueOf()
@@ -121,7 +121,7 @@ export const updateWeather = () => {
     getWarningData()
   }
   // 未来预报最小刷新间隔为2小时
-  if (globalState.setting.weather.forecastEnabled && currTS - weatherState.value.forecast.syncTime >= 3600000 * 2) {
+  if (localState.setting.weather.forecastEnabled && currTS - weatherState.value.forecast.syncTime >= 3600000 * 2) {
     getForecastData()
   }
 }
@@ -131,19 +131,19 @@ export const refreshWeather = () => {
   getAirData()
   getIndicesData()
   getWarningData()
-  if (globalState.setting.weather.forecastEnabled) {
+  if (localState.setting.weather.forecastEnabled) {
     getForecastData()
   }
 }
 
 // 修改城市、切换语言 立即更新数据
-watch([() => globalState.setting.weather.city.id, () => globalState.setting.general.lang], () => {
+watch([() => localState.setting.weather.city.id, () => localState.setting.general.lang], () => {
   refreshWeather()
 })
 
 // 开启“未来预报”后立即更新数据
 watch(
-  () => globalState.setting.weather.forecastEnabled,
+  () => localState.setting.weather.forecastEnabled,
   (value) => {
     if (!value) {
       return

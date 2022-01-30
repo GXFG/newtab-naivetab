@@ -2,26 +2,22 @@ import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState } from '@/logic'
+import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, mergeState, log } from '@/logic'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const [isSettingDrawerVisible, toggleIsSettingDrawerVisible] = useToggle(false)
 export const currSettingTabValue = ref('general')
 
-export const globalState = reactive({
-  state: {
-    isWhatsNewModalVisible: false,
-    isSearchFocused: false,
-    isMemoFocused: false,
-  },
-  localState: useStorageLocal('local-state', {
+const defaultState = {
+  common: {
+    syncTime: 0,
+    isFirstOpen: true,
     currAppearanceCode: 0, // 0:light | 1:dark
     availableFontList: [] as any[],
-  }),
-  syncTime: useStorageLocal('setting-sync-time', 0),
+  },
   style: {
-    general: useStorageLocal('style-general', {
+    general: {
       layout: {
         xOffsetKey: 'right',
         xOffsetValue: 1,
@@ -40,8 +36,8 @@ export const globalState = reactive({
       backgroundImageId: '', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
       bgOpacity: 0.7,
       bgBlur: 10,
-    }),
-    settingIcon: useStorageLocal('style-setting-icon', {
+    },
+    settingIcon: {
       layout: {
         xOffsetKey: 'right',
         xOffsetValue: 1,
@@ -50,8 +46,8 @@ export const globalState = reactive({
         yOffsetValue: 50,
         yTranslateValue: -50,
       },
-    }),
-    bookmark: useStorageLocal('style-bookmark', {
+    },
+    bookmark: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -72,8 +68,8 @@ export const globalState = reactive({
       borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
-    }),
-    clockDigital: useStorageLocal('style-clock-digital', {
+    },
+    clockDigital: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -91,8 +87,8 @@ export const globalState = reactive({
       unit: {
         fontSize: 30,
       },
-    }),
-    clockAnalog: useStorageLocal('style-clock-analog', {
+    },
+    clockAnalog: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -102,8 +98,8 @@ export const globalState = reactive({
         yTranslateValue: 0,
       },
       width: 150,
-    }),
-    date: useStorageLocal('style-date', {
+    },
+    date: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -117,8 +113,8 @@ export const globalState = reactive({
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 1)'],
-    }),
-    calendar: useStorageLocal('style-calendar', {
+    },
+    calendar: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 0,
@@ -138,8 +134,8 @@ export const globalState = reactive({
       borderColor: ['rgba(71,85,105, 1)', 'rgba(82, 82, 82, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-    }),
-    search: useStorageLocal('style-search', {
+    },
+    search: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -157,8 +153,8 @@ export const globalState = reactive({
       borderColor: ['rgba(167, 176, 188, 1)', 'rgba(167, 176, 188, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
-    }),
-    weather: useStorageLocal('style-weather', {
+    },
+    weather: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 50,
@@ -171,8 +167,8 @@ export const globalState = reactive({
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
       iconSize: 50,
-    }),
-    memo: useStorageLocal('style-memo', {
+    },
+    memo: {
       layout: {
         xOffsetKey: 'left',
         xOffsetValue: 0,
@@ -188,50 +184,50 @@ export const globalState = reactive({
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 0.5)'],
-    }),
+    },
   },
   setting: {
-    general: useStorageLocal('setting-general', {
+    general: {
       version: pkg.version,
       appearance: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
       lang: defaultLang,
       drawerPlacement: 'right' as any,
-    }),
-    settingIcon: useStorageLocal('setting-icon', {
+    },
+    settingIcon: {
       enabled: false,
-    }),
-    bookmark: useStorageLocal('setting-bookmark', {
+    },
+    bookmark: {
       enabled: false,
       keymap: {},
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
-    }),
-    clockDigital: useStorageLocal('setting-clock-digital', {
+    },
+    clockDigital: {
       enabled: true,
       format: 'hh:mm:ss',
       unitEnabled: true,
-    }),
-    clockAnalog: useStorageLocal('setting-clock-analog', {
+    },
+    clockAnalog: {
       enabled: false,
       theme: 0, // themeList的索引
-    }),
-    date: useStorageLocal('setting-date', {
+    },
+    date: {
       enabled: false,
       format: 'YYYY-MM-DD dddd',
-    }),
-    calendar: useStorageLocal('setting-calendar', {
+    },
+    calendar: {
       enabled: false,
-    }),
-    search: useStorageLocal('setting-search', {
+    },
+    search: {
       enabled: true,
       iconEnabled: true,
       suggestionEnabled: true,
       placeholder: 'baidu',
       urlName: 'baidu',
       urlValue: 'https://www.baidu.com/s?word={query}',
-    }),
-    weather: useStorageLocal('setting-weather', {
+    },
+    weather: {
       enabled: false,
       apiKey: '72db57326f9f494ab04d1d431bc127e9',
       city: {
@@ -242,16 +238,50 @@ export const globalState = reactive({
       speedUnit: 'kph', // 'kph' | 'mph'
       iconEnabled: true,
       forecastEnabled: false,
-    }),
-    memo: useStorageLocal('setting-memo', {
+    },
+    memo: {
       enabled: false,
       countEnabled: true,
       content: '',
-    }),
+    },
+  },
+}
+
+export const localState = reactive({
+  common: useStorageLocal('local-state', defaultState.common),
+  style: {
+    general: useStorageLocal('style-general', defaultState.style.general),
+    settingIcon: useStorageLocal('style-setting-icon', defaultState.style.settingIcon),
+    bookmark: useStorageLocal('style-bookmark', defaultState.style.bookmark),
+    clockDigital: useStorageLocal('style-clock-digital', defaultState.style.clockDigital),
+    clockAnalog: useStorageLocal('style-clock-analog', defaultState.style.clockAnalog),
+    date: useStorageLocal('style-date', defaultState.style.date),
+    calendar: useStorageLocal('style-calendar', defaultState.style.calendar),
+    search: useStorageLocal('style-search', defaultState.style.search),
+    weather: useStorageLocal('style-weather', defaultState.style.weather),
+    memo: useStorageLocal('style-memo', defaultState.style.memo),
+  },
+  setting: {
+    general: useStorageLocal('setting-general', defaultState.setting.general),
+    settingIcon: useStorageLocal('setting-icon', defaultState.setting.settingIcon),
+    bookmark: useStorageLocal('setting-bookmark', defaultState.setting.bookmark),
+    clockDigital: useStorageLocal('setting-clock-digital', defaultState.setting.clockDigital),
+    clockAnalog: useStorageLocal('setting-clock-analog', defaultState.setting.clockAnalog),
+    date: useStorageLocal('setting-date', defaultState.setting.date),
+    calendar: useStorageLocal('setting-calendar', defaultState.setting.calendar),
+    search: useStorageLocal('setting-search', defaultState.setting.search),
+    weather: useStorageLocal('setting-weather', defaultState.setting.weather),
+    memo: useStorageLocal('setting-memo', defaultState.setting.memo),
   },
 })
 
-export const currDayjsLang = computed(() => DAYJS_LANG_MAP[globalState.setting.general.lang] || 'en')
+export const globalState = ref({
+  isWhatsNewModalVisible: false,
+  isSearchFocused: false,
+  isMemoFocused: false,
+})
+
+export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localState.setting.general.lang] || 'en')
 
 export const initAvailableFontList = async() => {
   const fontCheck = new Set(FONT_LIST.sort())
@@ -262,10 +292,10 @@ export const initAvailableFontList = async() => {
       availableList.add(font)
     }
   }
-  globalState.localState.availableFontList = [...availableList.values()]
+  localState.common.availableFontList = [...availableList.values()]
 }
 
-// 第一次打开扩展时，打开画布模式&帮助弹窗
+// 首次打开扩展时，打开画布模式&帮助弹窗
 const isFirstOpen = ref(useStorageLocal('data-first', true))
 export const initFirstOpen = () => {
   if (!isFirstOpen.value) {
@@ -275,21 +305,34 @@ export const initFirstOpen = () => {
   isFirstOpen.value = false
 }
 
-export const openWhatsNewModal = (forceOpen = false) => {
-  if (forceOpen) {
-    globalState.state.isWhatsNewModalVisible = true
-  }
-  const currSettingVersion = +globalState.setting.general.version.split('.').join('')
+export const closeWhatsNewModal = () => {
+  globalState.value.isWhatsNewModalVisible = false
+}
+
+export const openWhatsNewModal = () => {
+  globalState.value.isWhatsNewModalVisible = true
+}
+
+export const checkUpdate = () => {
+  const currSettingVersion = +localState.setting.general.version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
   if (currSettingVersion >= currPkgVersion) {
     return
   }
-  globalState.setting.general.version = pkg.version
-  globalState.state.isWhatsNewModalVisible = true
-}
-
-export const closeWhatsNewModal = () => {
-  globalState.state.isWhatsNewModalVisible = false
+  log('checkUpdate get new version')
+  // 展示更新内容
+  openWhatsNewModal()
+  // 处理新增配置，删除无用旧配置
+  try {
+    for (const rootField of Object.keys(defaultState)) {
+      for (const field of Object.keys(defaultState[rootField])) {
+        localState[rootField][field] = mergeState(defaultState[rootField][field], localState[rootField][field])
+      }
+    }
+    localState.setting.general.version = pkg.version
+  } catch (e) {
+    log('checkUpdate mergeState error', e)
+  }
 }
 
 export const createTab = (url: string, active = true) => {
@@ -299,18 +342,20 @@ export const createTab = (url: string, active = true) => {
   chrome.tabs.create({ url, active })
 }
 
-export const getIsComponentRender = (componentName: Components) => computed(() => globalState.setting[componentName].enabled || moveState.dragTempEnabledMap[componentName])
+export const getIsComponentRender = (componentName: Components) => computed(() => localState.setting[componentName].enabled || moveState.dragTempEnabledMap[componentName])
 
 export const getLayoutStyle = (name: string) => {
-  let style = `${globalState.style[name].layout.xOffsetKey}:${globalState.style[name].layout.xOffsetValue}vw;`
-  style += `${globalState.style[name].layout.yOffsetKey}:${globalState.style[name].layout.yOffsetValue}vh;`
-  style += `transform:translate(${globalState.style[name].layout.xTranslateValue}%, ${globalState.style[name].layout.yTranslateValue}%);`
-  return style
+  return computed(() => {
+    let style = `${localState.style[name].layout.xOffsetKey}:${localState.style[name].layout.xOffsetValue}vw;`
+    style += `${localState.style[name].layout.yOffsetKey}:${localState.style[name].layout.yOffsetValue}vh;`
+    style += `transform:translate(${localState.style[name].layout.xTranslateValue}%, ${localState.style[name].layout.yTranslateValue}%);`
+    return style
+  })
 }
 
 export const getStyleConst = (field: string) => {
   return computed(() => {
-    return styleConst.value[field][globalState.localState.currAppearanceCode] || styleConst.value[field][0]
+    return styleConst.value[field][localState.common.currAppearanceCode] || styleConst.value[field][0]
   })
 }
 
@@ -319,9 +364,9 @@ export const getStyleConst = (field: string) => {
  */
 export const getStyleField = (component: 'general' | Components, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
-    let style = field.split('.').reduce((r: any, c: string) => r[c], globalState.style[component])
+    let style = field.split('.').reduce((r: any, c: string) => r[c], localState.style[component])
     if (style instanceof Array) {
-      return style[globalState.localState.currAppearanceCode]
+      return style[localState.common.currAppearanceCode]
     }
     if (ratio) {
       style = style * ratio
@@ -333,13 +378,13 @@ export const getStyleField = (component: 'general' | Components, field: string, 
   })
 }
 
-watch(() => globalState.setting.general.pageTitle, () => {
-  document.title = globalState.setting.general.pageTitle
+watch(() => localState.setting.general.pageTitle, () => {
+  document.title = localState.setting.general.pageTitle
 }, { immediate: true })
 
 watch([
-  () => globalState.style.general,
-  () => globalState.localState.currAppearanceCode,
+  () => localState.style.general,
+  () => localState.common.currAppearanceCode,
 ], () => {
   document.body.style.setProperty('--bg-main', getStyleField('general', 'backgroundColor').value)
   document.body.style.setProperty('--text-color-main', getStyleField('general', 'fontColor').value)

@@ -1,5 +1,5 @@
 import { createI18n } from 'vue-i18n'
-import { globalState } from '@/logic/store'
+import { localState } from '@/logic/store'
 
 const modules = import.meta.globEager('../locales/*')
 
@@ -28,7 +28,7 @@ function getLangAll(): any {
 
 const i18n: any = createI18n({
   legacy: false,
-  locale: globalState.setting.general.lang,
+  locale: localState.setting.general.lang,
   fallbackLocale: 'en-US',
   globalInjection: true,
   messages: getLangAll(),

@@ -1,14 +1,14 @@
 import { useDebounceFn } from '@vueuse/core'
-import { globalState } from './store'
+import { log, downloadJsonByTagA, mergeState } from './util'
 import { MERGE_SETTING_DELAY } from './const'
-import { log, downloadJsonByTagA } from './util'
+import { localState } from './store'
 
 const uploadFn = () => {
-  globalState.syncTime = Date.now()
+  localState.common.syncTime = Date.now()
   const localData = JSON.stringify({
-    syncTime: globalState.syncTime,
-    style: globalState.style,
-    setting: globalState.setting,
+    syncTime: localState.common.syncTime,
+    style: localState.style,
+    setting: localState.setting,
   })
   chrome.storage.sync.set({ PuzzleTabSetting: localData }, () => {
     log('Sync settings complete')
@@ -17,38 +17,23 @@ const uploadFn = () => {
 const uploadSetting = useDebounceFn(uploadFn, MERGE_SETTING_DELAY)
 
 watch([
-  () => globalState.style,
-  () => globalState.setting,
+  () => localState.style,
+  () => localState.setting,
 ], () => {
+  log('uploadSetting')
   uploadSetting()
 }, {
   deep: true,
 })
 
-/**
- * 只合并当前配置内存在的字段
- */
-const mergeSetting = (state: any, acceptState: any) => {
-  const filterState = {} as any
-  const fieldList = Object.keys(acceptState)
-  for (const field of fieldList) {
-    if (field in state) {
-      filterState[field] = acceptState[field]
-    }
-  }
-  return { ...state, ...filterState }
-}
-
 const updateSetting = (data: any) => {
   return new Promise((resolve) => {
-    for (const field of Object.keys(globalState.style)) {
-      if (Object.prototype.hasOwnProperty.call(data.style, field)) {
-        globalState.style[field] = mergeSetting(globalState.style[field], data.style[field])
-      }
-    }
-    for (const field of Object.keys(globalState.setting)) {
-      if (Object.prototype.hasOwnProperty.call(data.setting, field)) {
-        globalState.setting[field] = mergeSetting(globalState.setting[field], data.setting[field])
+    for (const rootField of ['style', 'setting']) {
+      for (const field of Object.keys(localState[rootField])) {
+        // 忽略掉本地不存在的配置
+        if (Object.prototype.hasOwnProperty.call(data[rootField], field)) {
+          localState[rootField][field] = mergeState(localState[rootField][field], data[rootField][field])
+        }
       }
     }
     resolve(true)
@@ -64,13 +49,13 @@ export const loadSyncSetting = () => {
     }
 
     const cloudSetting = JSON.parse(PuzzleTabSetting)
-    if (cloudSetting.syncTime === globalState.syncTime) {
+    if (cloudSetting.syncTime === localState.common.syncTime) {
       log('None modification settings')
       return
     }
 
     log('Load settings', cloudSetting)
-    globalState.syncTime = cloudSetting.syncTime
+    localState.common.syncTime = cloudSetting.syncTime
     updateSetting(cloudSetting)
   })
 }
@@ -97,10 +82,15 @@ export const importSetting = async(text: string) => {
 export const exportSetting = () => {
   const filename = `puzzletab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadJsonByTagA({
-    style: globalState.style,
-    setting: globalState.setting,
+    style: localState.style,
+    setting: localState.setting,
   }, filename)
   window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
+}
+
+export const resetStorage = () => {
+  localStorage.clear()
+  location.reload()
 }
 
 export const resetSetting = () => {

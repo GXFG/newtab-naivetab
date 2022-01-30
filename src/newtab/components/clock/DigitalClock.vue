@@ -1,16 +1,16 @@
 <template>
-  <MoveableComponentWrap componentName="clockDigital" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="clockDigital" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
       <div
         class="clockDigital__container"
-        :style="containerStyle"
-        :class="{ 'clockDigital__container--shadow': globalState.style.clockDigital.isShadowEnabled }"
+        :style="dragStyle || containerStyle"
+        :class="{ 'clockDigital__container--shadow': localState.style.clockDigital.isShadowEnabled }"
       >
         <div class="clock__time">
           <p class="time__text">
             {{ state.time }}
           </p>
-          <span v-if="globalState.setting.clockDigital.unitEnabled" class="time__unit">{{ state.unit }}</span>
+          <span v-if="localState.setting.clockDigital.unitEnabled" class="time__unit">{{ state.unit }}</span>
         </div>
       </div>
     </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { globalState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { localState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockDigital'
 const isRender = getIsComponentRender(CNAME)
@@ -29,7 +29,7 @@ const state = reactive({
 })
 
 const updateTime = () => {
-  state.time = dayjs().format(globalState.setting.clockDigital.format)
+  state.time = dayjs().format(localState.setting.clockDigital.format)
   state.unit = dayjs().format('a')
 }
 
@@ -46,7 +46,8 @@ watch(
   { immediate: true },
 )
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')

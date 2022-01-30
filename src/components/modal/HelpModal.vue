@@ -19,10 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStorageLocal } from '@/composables/useStorageLocal'
-import { isDragMode, addKeyboardTask } from '@/logic'
-
-const isOpenHelpVisible = ref(useStorageLocal('data-help-modal', true))
+import { localState, isDragMode, addKeyboardTask } from '@/logic'
 
 const state = reactive({
   isHelpVisible: false,
@@ -47,11 +44,11 @@ watch(
     if (!value) {
       return
     }
-    if (!isOpenHelpVisible.value) {
+    if (!localState.common.isFirstOpen) {
       return
     }
     state.isHelpVisible = true
-    isOpenHelpVisible.value = false
+    localState.common.isFirstOpen = false
   },
   { immediate: true },
 )

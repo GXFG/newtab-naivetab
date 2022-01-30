@@ -1,9 +1,9 @@
 <template>
   <div id="setting">
     <!-- settingIcon -->
-    <MoveableComponentWrap componentName="settingIcon" @drag="(style) => (containerStyle = style)">
+    <MoveableComponentWrap componentName="settingIcon" @drag="(style) => (dragStyle = style)">
       <div v-if="isRender" data-target-type="1" data-target-name="settingIcon">
-        <div class="settingIcon__container" :style="containerStyle">
+        <div class="settingIcon__container" :style="dragStyle || containerStyle">
           <NButton
             text
             :title="`${$t('setting.mainLabel')}`"
@@ -23,7 +23,7 @@
       :style="drawerStyle"
       display-directive="show"
       :width="600"
-      :placement="globalState.setting.general.drawerPlacement"
+      :placement="localState.setting.general.drawerPlacement"
     >
       <NDrawerContent>
         <NTabs type="line" :value="currSettingTabValue" @update:value="onTabsChange">
@@ -46,7 +46,7 @@
           Ver.{{ `${pkg.version}` }}
         </p>
         <div class="bottom__right">
-          <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal(true)">
+          <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal()">
             <ic:round-new-releases />
           </NButton>
           <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
@@ -75,7 +75,7 @@ import {
   getIsComponentRender,
   getLayoutStyle,
   getStyleConst,
-  globalState,
+  localState,
   isDragMode,
   isSettingDrawerVisible,
   createTab,
@@ -160,7 +160,8 @@ const handlerPreviewLeave = () => {
 }
 
 const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const bgBottomBar = getStyleConst('bgBottomBar')
 </script>
 

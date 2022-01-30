@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
-import { globalState } from '@/logic'
+import { localState } from '@/logic'
 
 export const imageState = ref(useStorageLocal('data-images', {
   imageList: [] as ImageItem[],
@@ -38,18 +38,18 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
     return
   }
   let currUrl = ''
-  if (globalState.style.general.backgroundImageSource === 0) {
+  if (localState.style.general.backgroundImageSource === 0) {
     currUrl = imageState.value.localBackgroundBase64
   } else {
-    if (initPage && globalState.style.general.backgroundImageUrl.length !== 0) {
+    if (initPage && localState.style.general.backgroundImageUrl.length !== 0) {
       // 初始化页面时且本地有图片缓存时，读取上一次的设置
-      currUrl = globalState.style.general.backgroundImageUrl
+      currUrl = localState.style.general.backgroundImageUrl
     } else {
-      let index = imageState.value.imageList.findIndex((item: ImageItem) => item.urlbase === globalState.style.general.backgroundImageId)
+      let index = imageState.value.imageList.findIndex((item: ImageItem) => item.urlbase === localState.style.general.backgroundImageId)
       index = index === -1 ? 0 : index
       const urlbase = imageState.value.imageList[index].urlbase
       const httpUrl = getImageUrlFromBing(urlbase)
-      globalState.style.general.backgroundImageUrl = httpUrl
+      localState.style.general.backgroundImageUrl = httpUrl
       currUrl = httpUrl
     }
   }
@@ -68,18 +68,18 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
 }
 
 watch([
-  () => globalState.style.general.backgroundImageSource,
-  () => globalState.style.general.backgroundImageId,
+  () => localState.style.general.backgroundImageSource,
+  () => localState.style.general.backgroundImageId,
   () => imageState.value.localBackgroundBase64,
-  () => globalState.style.general.backgroundImageUrl,
+  () => localState.style.general.backgroundImageUrl,
 ], () => {
-  if (!globalState.style.general.isBackgroundImageEnabled) {
+  if (!localState.style.general.isBackgroundImageEnabled || imageState.value.imageList.length === 0) {
     return
   }
   renderBackgroundImage(false)
 })
 
-watch(() => globalState.style.general.isBackgroundImageEnabled, async(isEnabled) => {
+watch(() => localState.style.general.isBackgroundImageEnabled, async(isEnabled) => {
   if (imageState.value.imageList.length === 0) {
     await getImages()
   }

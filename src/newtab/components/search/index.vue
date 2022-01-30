@@ -1,8 +1,8 @@
 <template>
-  <MoveableComponentWrap componentName="search" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="search" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
       <NDropdown
-        :show="globalState.setting.search.suggestionEnabled && state.isSuggestVisible"
+        :show="localState.setting.search.suggestionEnabled && state.isSuggestVisible"
         :options="state.suggestList"
         :placement="state.placementValue"
         :show-arrow="true"
@@ -11,11 +11,11 @@
       >
         <div
           class="search__container"
-          :style="containerStyle"
+          :style="dragStyle || containerStyle"
           :class="{
-            'search__container--focus': globalState.style.search.isBorderEnabled && globalState.state.isSearchFocused,
-            'search__container--border': globalState.style.search.isBorderEnabled,
-            'search__container--shadow': globalState.style.search.isShadowEnabled,
+            'search__container--focus': localState.style.search.isBorderEnabled && globalState.isSearchFocused,
+            'search__container--border': localState.style.search.isBorderEnabled,
+            'search__container--shadow': localState.style.search.isShadowEnabled,
           }"
         >
           <NInputGroup>
@@ -25,7 +25,7 @@
               size="large"
               class="input__main"
               :class="{ 'input__main--move': isDragMode }"
-              :placeholder="globalState.setting.search.placeholder"
+              :placeholder="localState.setting.search.placeholder"
               :disabled="isDragMode"
               clearable
               @focus="onSearchFocus()"
@@ -34,7 +34,7 @@
               @keyup.enter="handleSearch()"
             />
             <NButton
-              v-if="globalState.setting.search.iconEnabled"
+              v-if="localState.setting.search.iconEnabled"
               size="large"
               text
               class="input__search"
@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab } from '@/logic'
+import { localState, globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab } from '@/logic'
 import { getBaiduSugrec } from '@/api'
 
 const CNAME = 'search'
@@ -66,12 +66,12 @@ const state = reactive({
 })
 
 const onSearchFocus = () => {
-  globalState.state.isSearchFocused = true
+  globalState.value.isSearchFocused = true
   state.isSuggestVisible = true
 }
 
 const onSearchBlur = () => {
-  globalState.state.isSearchFocused = false
+  globalState.value.isSearchFocused = false
 }
 
 const onSearchInput = () => {
@@ -90,7 +90,7 @@ const onSearch = () => {
   if (state.searchValue.length === 0) {
     return
   }
-  const url = globalState.setting.search.urlValue.replace('{query}', state.searchValue)
+  const url = localState.setting.search.urlValue.replace('{query}', state.searchValue)
   state.isSuggestVisible = false
   createTab(url)
   state.searchValue = ''
@@ -118,7 +118,7 @@ const getBaiduSuggestHandler = useDebounceFn(getBaiduSuggest, 300)
 watch(
   () => state.searchValue,
   () => {
-    if (!globalState.setting.search.suggestionEnabled) {
+    if (!localState.setting.search.suggestionEnabled) {
       return
     }
     if (state.searchValue.length === 0) {
@@ -143,7 +143,8 @@ const handleSelectOutside = () => {
   state.isSuggestVisible = false
 }
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')

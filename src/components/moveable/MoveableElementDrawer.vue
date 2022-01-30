@@ -54,7 +54,7 @@ import {
   addKeyboardTask,
   getStyleConst,
   moveState,
-  globalState,
+  localState,
 } from '@/logic'
 
 const state = reactive({
@@ -67,63 +67,63 @@ const elementList = computed(() => [
     componentName: 'settingIcon',
     iconName: 'ic:baseline-settings',
     iconSize: 26,
-    disabled: globalState.setting.settingIcon.enabled,
+    disabled: localState.setting.settingIcon.enabled,
   },
   {
     label: window.$t('setting.bookmark'),
     componentName: 'bookmark',
     iconName: 'ic:outline-keyboard-alt',
     iconSize: 28,
-    disabled: globalState.setting.bookmark.enabled,
+    disabled: localState.setting.bookmark.enabled,
   },
   {
     label: window.$t('setting.clockDigital'),
     componentName: 'clockDigital',
     iconName: 'mdi:clock-digital',
     iconSize: 30,
-    disabled: globalState.setting.clockDigital.enabled,
+    disabled: localState.setting.clockDigital.enabled,
   },
   {
     label: window.$t('setting.clockAnalog'),
     componentName: 'clockAnalog',
     iconName: 'grommet-icons:clock',
     iconSize: 26,
-    disabled: globalState.setting.clockAnalog.enabled,
+    disabled: localState.setting.clockAnalog.enabled,
   },
   {
     label: window.$t('setting.date'),
     componentName: 'date',
     iconName: 'system-uicons:calendar-date',
     iconSize: 26,
-    disabled: globalState.setting.date.enabled,
+    disabled: localState.setting.date.enabled,
   },
   {
     label: window.$t('setting.calendar'),
     componentName: 'calendar',
     iconName: 'uiw:date',
     iconSize: 22,
-    disabled: globalState.setting.calendar.enabled,
+    disabled: localState.setting.calendar.enabled,
   },
   {
     label: window.$t('setting.search'),
     componentName: 'search',
     iconName: 'teenyicons:search-circle-outline',
     iconSize: 24,
-    disabled: globalState.setting.search.enabled,
+    disabled: localState.setting.search.enabled,
   },
   {
     label: window.$t('setting.weather'),
     componentName: 'weather',
     iconName: 'mdi:weather-cloudy',
     iconSize: 28,
-    disabled: globalState.setting.weather.enabled,
+    disabled: localState.setting.weather.enabled,
   },
   {
     label: window.$t('setting.memo'),
     componentName: 'memo',
     iconName: 'fluent:notepad-edit-16-regular',
     iconSize: 24,
-    disabled: globalState.setting.memo.enabled,
+    disabled: localState.setting.memo.enabled,
   },
 ])
 
@@ -156,7 +156,7 @@ const handleElementMouseUp = (e: MouseEvent) => {
   moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
   if (!state.isCursorInElementDrawer) {
     // 保存启用状态
-    globalState.setting[moveState.currDragTarget.name].enabled = true
+    localState.setting[moveState.currDragTarget.name].enabled = true
   }
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
   isStartDragTaskRan = false
@@ -176,7 +176,7 @@ onMounted(() => {
 const isDeleteBtnVisible = computed(() => isDragMode.value && moveState.isComponentDraging)
 
 const onDeleteComponent = () => {
-  globalState.setting[moveState.currDragTarget.name].enabled = false
+  localState.setting[moveState.currDragTarget.name].enabled = false
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
 }
 

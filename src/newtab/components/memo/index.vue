@@ -1,16 +1,16 @@
 <template>
-  <MoveableComponentWrap componentName="memo" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="memo" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="memo" data-target-type="1" data-target-name="memo">
-      <div class="memo__container" :style="containerStyle" :class="{ 'memo__container--shadow': globalState.style.memo.isShadowEnabled }">
+      <div class="memo__container" :style="dragStyle || containerStyle" :class="{ 'memo__container--shadow': localState.style.memo.isShadowEnabled }">
         <div class="memo_wrap">
           <NInput
-            v-model:value="globalState.setting.memo.content"
+            v-model:value="localState.setting.memo.content"
             class="memo__input"
             type="textarea"
             placeholder=" "
             autosize
             :disabled="isDragMode"
-            :show-count="globalState.setting.memo.countEnabled"
+            :show-count="localState.setting.memo.countEnabled"
             @focus="onFocus"
             @blur="onBlur"
           />
@@ -21,20 +21,21 @@
 </template>
 
 <script setup lang="ts">
-import { isDragMode, globalState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { isDragMode, globalState, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'memo'
 const isRender = getIsComponentRender(CNAME)
 
 const onFocus = () => {
-  globalState.state.isMemoFocused = true
+  globalState.value.isMemoFocused = true
 }
 
 const onBlur = () => {
-  globalState.state.isMemoFocused = false
+  globalState.value.isMemoFocused = false
 }
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customWidth = getStyleField(CNAME, 'width', 'px')
 const customHeight = getStyleField(CNAME, 'height', 'px')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')

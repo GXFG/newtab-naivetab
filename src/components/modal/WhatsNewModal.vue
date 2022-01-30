@@ -1,5 +1,5 @@
 <template>
-  <NModal :show="globalState.state.isWhatsNewModalVisible" :mask-closable="false">
+  <NModal :show="globalState.isWhatsNewModalVisible" :mask-closable="false">
     <NCard class="card__wrap" :title="`🌟 ${$t('common.whatsNew')}`">
       <Currentlog />
       <div class="card__footer">

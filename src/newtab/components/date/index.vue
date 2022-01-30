@@ -1,7 +1,7 @@
 <template>
-  <MoveableComponentWrap componentName="date" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="date" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
-      <div class="date__container" :style="containerStyle" :class="{ 'date__container--shadow': globalState.style.date.isShadowEnabled }">
+      <div class="date__container" :style="dragStyle || containerStyle" :class="{ 'date__container--shadow': localState.style.date.isShadowEnabled }">
         <p class="date__text">
           {{ state.date }}
         </p>
@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { currDayjsLang, globalState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { currDayjsLang, localState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'date'
 const isRender = getIsComponentRender(CNAME)
@@ -21,7 +21,7 @@ const state = reactive({
 })
 
 const updateDate = () => {
-  state.date = dayjs().locale(currDayjsLang.value).format(globalState.setting.date.format)
+  state.date = dayjs().locale(currDayjsLang.value).format(localState.setting.date.format)
 }
 
 watch(
@@ -37,7 +37,8 @@ watch(
   { immediate: true },
 )
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')

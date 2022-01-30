@@ -1,7 +1,7 @@
 <template>
-  <MoveableComponentWrap componentName="weather" @drag="(style) => (containerStyle = style)">
+  <MoveableComponentWrap componentName="weather" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
-      <div class="weather__container" :style="containerStyle">
+      <div class="weather__container" :style="dragStyle || containerStyle">
         <NowWeather />
         <ForecastWeather />
       </div>
@@ -29,7 +29,8 @@ watch(isRender, (value) => {
   refreshWeather()
 })
 
-const containerStyle = ref(getLayoutStyle(CNAME))
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')

@@ -16,10 +16,10 @@ import {
   APPEARANCE_TO_CODE_MAP,
   gaEvent,
   getStyleField,
-  globalState,
+  localState,
   loadSyncSetting,
   initFirstOpen,
-  openWhatsNewModal,
+  checkUpdate,
   initAvailableFontList,
   startKeyboard,
   startTimer,
@@ -32,7 +32,7 @@ onMounted(async() => {
   startKeyboard()
   await nextTick()
   initFirstOpen()
-  openWhatsNewModal()
+  checkUpdate()
   initAvailableFontList()
   gaEvent('page-home', 'view', 'view')
 })
@@ -46,15 +46,15 @@ const osTheme = useOsTheme() // light | dark | null
 const currTheme = ref()
 
 watch(
-  [() => osTheme.value, () => globalState.setting.general.appearance],
+  [() => osTheme.value, () => localState.setting.general.appearance],
   () => {
-    if (globalState.setting.general.appearance === 'auto') {
-      globalState.localState.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
+    if (localState.setting.general.appearance === 'auto') {
+      localState.common.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
       currTheme.value = osTheme.value === 'dark' ? darkTheme : null
       return
     }
-    globalState.localState.currAppearanceCode = APPEARANCE_TO_CODE_MAP[globalState.setting.general.appearance]
-    currTheme.value = globalState.setting.general.appearance === 'dark' ? darkTheme : null
+    localState.common.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localState.setting.general.appearance]
+    currTheme.value = localState.setting.general.appearance === 'dark' ? darkTheme : null
   },
   { immediate: true },
 )
@@ -72,9 +72,9 @@ const NATIVE_UI_LOCALE_MAP = {
 const nativeUILang = ref(enUS)
 
 watch(
-  () => globalState.setting.general.lang,
+  () => localState.setting.general.lang,
   () => {
-    nativeUILang.value = NATIVE_UI_LOCALE_MAP[globalState.setting.general.lang] || enUS
+    nativeUILang.value = NATIVE_UI_LOCALE_MAP[localState.setting.general.lang] || enUS
   },
   { immediate: true },
 )
@@ -128,7 +128,8 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 }
 
 /* dragMode input */
-.n-input.n-input--disabled .n-input__input-el, .n-input.n-input--disabled .n-input__textarea-el {
+.n-input.n-input--disabled .n-input__input-el,
+.n-input.n-input--disabled .n-input__textarea-el {
   cursor: move;
 }
 </style>

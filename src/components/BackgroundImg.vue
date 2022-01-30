@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { globalState } from '@/logic'
+import { localState } from '@/logic'
 </script>
 
 <style>
@@ -19,8 +19,8 @@ import { globalState } from '@/logic'
     height: 100vh;
     background-size: cover;
     background-repeat: no-repeat;
-    filter: blur(v-bind(globalState.style.general.bgBlur + 'px'));
-    opacity: v-bind(globalState.style.general.bgOpacity);
+    filter: blur(v-bind(localState.style.general.bgBlur + 'px'));
+    opacity: v-bind(localState.style.general.bgOpacity);
   }
 }
 </style>
