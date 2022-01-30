@@ -1,6 +1,6 @@
-import { globalState } from './store'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
+import { globalState } from '@/logic'
 
 export const imageState = ref(useStorageLocal('data-images', {
   imageList: [] as ImageItem[],

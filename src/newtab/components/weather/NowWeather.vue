@@ -2,7 +2,7 @@
   <div id="now">
     <div class="now__icon">
       <div v-if="globalState.setting.weather.iconEnabled" class="icon__wrap">
-        <i :class="`qi-${globalState.localState.weather.now.icon}`" />
+        <i :class="`qi-${weatherState.now.icon}`" />
       </div>
     </div>
     <div class="now__info">
@@ -45,7 +45,7 @@
             </NTooltip>
           </div>
           <div class="item__value">
-            <span class="value__text value__text--l">{{ globalState.localState.weather.now.text }}</span>
+            <span class="value__text value__text--l">{{ weatherState.now.text }}</span>
           </div>
         </div>
         <div class="info__item">
@@ -53,7 +53,7 @@
             <raphael:temp />
           </div>
           <div class="item__value">
-            <span class="value__text value__text--xl">{{ globalState.localState.weather.now.temp }}</span>
+            <span class="value__text value__text--xl">{{ weatherState.now.temp }}</span>
             <span class="value__unit">{{ temperatureUnit }}</span>
           </div>
         </div>
@@ -62,7 +62,7 @@
             <carbon:temperature-feels-like />
           </div>
           <div class="item__value">
-            <span class="value__text value__text--xl">{{ globalState.localState.weather.now.feelsLike }} </span>
+            <span class="value__text value__text--xl">{{ weatherState.now.feelsLike }} </span>
             <span class="value__unit">{{ temperatureUnit }}</span>
           </div>
         </div>
@@ -74,7 +74,7 @@
             <entypo:air />
           </div>
           <div class="item__value">
-            <span class="value__text">{{ `${globalState.localState.weather.air.category} / ${globalState.localState.weather.air.aqi}` }}</span>
+            <span class="value__text">{{ `${weatherState.air.category} / ${weatherState.air.aqi}` }}</span>
           </div>
         </div>
         <div class="info__item">
@@ -82,7 +82,7 @@
             <carbon:humidity />
           </div>
           <div class="item__value">
-            <span class="value__text">{{ globalState.localState.weather.now.humidity }}</span>
+            <span class="value__text">{{ weatherState.now.humidity }}</span>
             <span class="value__unit">%</span>
           </div>
         </div>
@@ -91,10 +91,7 @@
             <ri:windy-fill />
           </div>
           <div class="item__value">
-            <span class="value__text">{{
-              `${globalState.localState.weather.now.windDir} / ${globalState.localState.weather.now.windScale} / ${globalState.localState.weather.now.windSpeed}`
-            }}
-            </span>
+            <span class="value__text">{{ `${weatherState.now.windDir} / ${weatherState.now.windScale} / ${weatherState.now.windSpeed}` }} </span>
             <span class="value__unit">{{ speedUnit }}</span>
           </div>
         </div>
@@ -104,7 +101,16 @@
 </template>
 
 <script setup lang="ts">
-import { URL_QWEATHER_HOME, WEATHER_TEMPERATURE_UNIT_MAP, WEATHER_SPEED_UNIT_MAP, isDragMode, globalState, getStyleField, createTab } from '@/logic'
+import {
+  URL_QWEATHER_HOME,
+  WEATHER_TEMPERATURE_UNIT_MAP,
+  WEATHER_SPEED_UNIT_MAP,
+  isDragMode,
+  weatherState,
+  globalState,
+  getStyleField,
+  createTab,
+} from '@/logic'
 
 const CNAME = 'weather'
 
@@ -113,15 +119,15 @@ const state = reactive({
   isIndicesVisible: false,
 })
 
-const isWarningVisible = computed(() => globalState.localState.weather.warning.list.length > 0)
+const isWarningVisible = computed(() => weatherState.value.warning.list.length > 0)
 
 const indicesInfo = computed(() => {
-  const indicesList = globalState.localState.weather.indices.list.map((item: IndicesItem) => `${item.name}: [${item.category}] ${item.text}`)
+  const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}: [${item.category}] ${item.text}`)
   return indicesList.join('\n')
 })
 
 const warningInfo = computed(() => {
-  const warningList = globalState.localState.weather.warning.list.map((item: WarningItem) => `${item.title} \n ${item.text}`)
+  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `${item.title} \n ${item.text}`)
   return warningList.join('\n')
 })
 

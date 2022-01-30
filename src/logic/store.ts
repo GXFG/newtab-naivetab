@@ -18,52 +18,6 @@ export const globalState = reactive({
   localState: useStorageLocal('local-state', {
     currAppearanceCode: 0, // 0:light | 1:dark
     availableFontList: [] as any[],
-    weather: {
-      now: {
-        syncTime: 0,
-        cloud: '', // "0"
-        dew: '', // "-20"
-        feelsLike: '', // "-2"
-        humidity: '', // "22"
-        icon: '', // "100"
-        obsTime: '', // "2022-01-29T11:13+08:00"
-        precip: '', // "0.0"
-        pressure: '', // "1024"
-        temp: '', // "2"
-        text: '', // "晴"
-        vis: '', // "30"
-        wind360: '', // "0"
-        windDir: '', // "北风"
-        windScale: '', // "2"
-        windSpeed: '', // "7"
-      },
-      air: {
-        syncTime: 0,
-        aqi: '', // "31"
-        category: '', // "优"
-        co: '', // "0.3"
-        level: '', // "1"
-        no2: '', // "15"
-        o3: '', // "64"
-        pm2p5: '', // "20"
-        pm10: '', // "31"
-        primary: '', // "NA"
-        pubTime: '', // "2022-01-29T15:00+08:00"
-        so2: '', // "1"
-      },
-      indices: {
-        syncTime: 0,
-        list: [] as IndicesItem[],
-      },
-      warning: {
-        syncTime: 0,
-        list: [] as WarningItem[],
-      },
-      forecast: {
-        syncTime: 0,
-        list: [],
-      },
-    },
   }),
   syncTime: useStorageLocal('setting-sync-time', 0),
   style: {
