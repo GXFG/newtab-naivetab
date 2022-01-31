@@ -1,7 +1,9 @@
 <template>
   <NModal :show="globalState.isWhatsNewModalVisible" :mask-closable="false">
-    <NCard class="card__wrap" :title="`🌟 ${$t('common.whatsNew')}`">
-      <Currentlog />
+    <NCard class="card__wrap" :title="`${$t('common.whatsNew')}`">
+      <div class="card__content">
+        <Currentlog />
+      </div>
       <div class="card__footer">
         <NButton
           class="footer__btn"
@@ -33,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import Currentlog from '../../../CURRENTLOG.md'
+import Currentlog from '../../../CHANGELOG.md'
 import { URL_CHANGELOG, globalState, createTab, closeWhatsNewModal } from '@/logic'
 
 const isDisableCloseBtn = ref(true)
@@ -46,6 +48,10 @@ setTimeout(() => {
 <style scoped>
 .card__wrap {
   width: 500px;
+}
+.card__content {
+  height: 30vh;
+  overflow: scroll;
 }
 .card__footer {
   display: flex;
