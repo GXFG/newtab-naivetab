@@ -1,7 +1,7 @@
 <template>
   <div id="now">
     <div class="now__icon">
-      <div v-if="localState.setting.weather.iconEnabled" class="icon__wrap">
+      <div v-if="localState.setting.weather.iconEnabled" class="icon__wrap" @click="onOpenWeather()">
         <i :class="`qi-${weatherState.now.icon}`" />
       </div>
     </div>
@@ -9,24 +9,30 @@
       <!-- row 1 -->
       <div class="info__row">
         <div class="info__item">
-          <div class="item__label">
-            <div v-if="isWarningVisible">
-              <NTooltip :show="state.isWarningVisible" trigger="manual">
-                <template #trigger>
-                  <div
-                    class="label__info"
-                    :class="{ 'label__info--move': isDragMode }"
-                    @mouseenter="handleWarningMouseEnter()"
-                    @mouseleave="handleWarningMouseLeave()"
-                  >
-                    <emojione:warning />
-                  </div>
-                </template>
-                <p class="weather__indices">
-                  {{ warningInfo }}
-                </p>
-              </NTooltip>
+          <div class="info__item">
+            <div class="item__label">
+              <div v-if="isWarningVisible">
+                <NTooltip :show="state.isWarningVisible" trigger="manual">
+                  <template #trigger>
+                    <div
+                      class="label__info"
+                      :class="{ 'label__info--move': isDragMode }"
+                      @mouseenter="handleWarningMouseEnter()"
+                      @mouseleave="handleWarningMouseLeave()"
+                    >
+                      <vaadin:warning />
+                    </div>
+                  </template>
+                  <p class="weather__indices">
+                    {{ warningInfo }}
+                  </p>
+                </NTooltip>
+              </div>
             </div>
+          </div>
+        </div>
+        <div class="info__item">
+          <div class="item__label">
             <NTooltip :show="state.isIndicesVisible" trigger="manual">
               <template #trigger>
                 <div
@@ -34,7 +40,6 @@
                   :class="{ 'label__info--move': isDragMode }"
                   @mouseenter="handleIndicesMouseEnter()"
                   @mouseleave="handleIndicesMouseLeave()"
-                  @click="onOpenWeather()"
                 >
                   <heroicons-outline:information-circle />
                 </div>
@@ -127,7 +132,7 @@ const indicesInfo = computed(() => {
 })
 
 const warningInfo = computed(() => {
-  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `${item.title} \n ${item.text}`)
+  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `${item.text}`)
   return warningList.join('\n')
 })
 
@@ -180,6 +185,7 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 2)
   .now__icon {
     .icon__wrap {
       font-size: v-bind(customIconSize);
+      cursor: pointer;
     }
   }
   .now__info {

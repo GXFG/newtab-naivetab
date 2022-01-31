@@ -45,7 +45,7 @@ export const getWeatherIndices = () => {
       lang: WEATHER_LANG_MAP[localState.setting.general.lang],
       key: localState.setting.weather.apiKey,
       location: localState.setting.weather.city.id,
-      type: '1,3,7,8,9,10',
+      type: '1,3,7,8,10',
     },
   })
 }
