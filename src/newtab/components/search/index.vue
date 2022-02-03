@@ -151,6 +151,7 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customWidth = getStyleField(CNAME, 'width', 'px')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
+const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
@@ -166,11 +167,12 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     justify-content: center;
     align-items: center;
     border-radius: 3px;
+    background-color: v-bind(customBackgroundColor);
     .input__main {
       flex: 1;
       width: v-bind(customWidth);
       font-size: v-bind(customFontSize);
-      background-color: transparent;
+      background-color: v-bind(customBackgroundColor);
     }
     .input__main--move {
       cursor: move !important;

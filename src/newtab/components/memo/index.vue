@@ -41,6 +41,7 @@ const customHeight = getStyleField(CNAME, 'height', 'px')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
@@ -57,6 +58,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         width: v-bind(customWidth);
         height: v-bind(customHeight);
         font-size: v-bind(customFontSize);
+        background-color: v-bind(customBackgroundColor);
       }
     }
   }
