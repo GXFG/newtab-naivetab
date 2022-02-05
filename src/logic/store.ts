@@ -185,7 +185,7 @@ const defaultState = {
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(228, 228, 231, 1)'],
       backgroundColor: ['rgba(0, 0, 0, 0.1)', 'rgba(0, 0, 0, 0.1)'],
       isShadowEnabled: true,
-      shadowColor: ['rgba(181, 181, 181, 1)', 'rgba(33, 33, 33, 0.5)'],
+      shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
     },
   },
   setting: {

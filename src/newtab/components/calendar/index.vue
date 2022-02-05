@@ -67,6 +67,10 @@
                 'item__label--work': item.type === 2,
               }"
             >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
+            <span
+              v-if="item.isToday"
+              class="item__today"
+            >{{ $t('calendar.today') }}</span>
             <span class="item__day">{{ item.day }}</span>
             <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
           </li>
@@ -337,7 +341,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         width: v-bind(customItemWidth);
         height: v-bind(customItemWidth);
         text-align: center;
-        border-radius: 5px;
+        border-radius: 4px;
         border: 1px solid rgba(0, 0, 0, 0);
         transition: all 0.3s ease;
         overflow: hidden;
@@ -353,6 +357,15 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         }
         .item__desc--highlight {
           color: v-bind(textColorRed);
+        }
+        .item__today {
+          position: absolute;
+          top: -7%;
+          right: -7%;
+          padding: 7%;
+          color: v-bind(customFontColor);
+          font-size: 13px;
+          transform: scale(0.7);
         }
         .item__label {
           position: absolute;

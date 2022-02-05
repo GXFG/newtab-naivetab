@@ -156,6 +156,7 @@
     "friday": "Fri",
     "saturday": "Sat",
     "sunday": "Sun",
+    "today": "N",
     "work": "W",
     "rest": "R"
   },

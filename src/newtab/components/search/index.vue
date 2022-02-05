@@ -166,7 +166,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 3px;
+    border-radius: 4px;
     background-color: v-bind(customBackgroundColor);
     .input__main {
       flex: 1;
