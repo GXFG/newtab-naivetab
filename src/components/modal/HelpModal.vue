@@ -1,5 +1,5 @@
 <template>
-  <NModal :show="state.isHelpVisible" :mask-closable="false">
+  <NModal :show="globalState.isHelpModalVisible" :mask-closable="false">
     <NCard class="card__wrap" :title="`📝 ${$t('help.title')}`">
       <p class="card__content">
         {{ $t('help.content') }}
@@ -19,23 +19,19 @@
 </template>
 
 <script setup lang="ts">
-import { localState, isDragMode, addKeyboardTask } from '@/logic'
-
-const state = reactive({
-  isHelpVisible: false,
-})
+import { localState, globalState, isDragMode, addKeyboardTask } from '@/logic'
 
 const keyboardHandler = (e: KeyboardEvent) => {
   const { key } = e
-  if (['?', '/'].includes(key)) {
-    state.isHelpVisible = true
+  if (['?'].includes(key)) {
+    globalState.value.isHelpModalVisible = true
   }
 }
 
 addKeyboardTask('help-modal', keyboardHandler)
 
 const onCloseModal = () => {
-  state.isHelpVisible = false
+  globalState.value.isHelpModalVisible = false
 }
 
 watch(
@@ -47,7 +43,7 @@ watch(
     if (!localState.common.isFirstOpen) {
       return
     }
-    state.isHelpVisible = true
+    globalState.value.isHelpModalVisible = true
     localState.common.isFirstOpen = false
   },
   { immediate: true },

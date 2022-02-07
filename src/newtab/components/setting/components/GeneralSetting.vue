@@ -69,10 +69,13 @@
             :class="{ 'image__item--active': isCurrSelectedImage(item) }"
             @click="onSelectImage(item)"
           >
+            <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="">
             <NTooltip trigger="hover">
               <template #trigger>
                 <NSpin :show="isCurrSelectedImage(item) && isImageLoading">
-                  <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="">
+                  <div class="item__info">
+                    <ic:outline-info />
+                  </div>
                 </NSpin>
               </template>
               <p>{{ item.copyright }}</p>
@@ -110,11 +113,11 @@
         </NButton>
         <Tips :content="$t('general.exportSettingTips')" />
       </NFormItem>
-      <NFormItem :label="$t('general.resetStorageLabel')">
-        <NButton @click="resetStorage()">
-          <ant-design:clear-outlined />&nbsp;{{ $t('general.resetStorageValue') }}
+      <NFormItem :label="$t('general.clearStorageLabel')">
+        <NButton @click="clearStorage()">
+          <ant-design:clear-outlined />&nbsp;{{ $t('general.clearStorageValue') }}
         </NButton>
-        <Tips :content="$t('general.resetStorageTips')" />
+        <Tips :content="$t('general.clearStorageTips')" />
       </NFormItem>
       <NFormItem :label="$t('general.resetSettingLabel')">
         <NPopconfirm @positive-click="onResetSetting()">
@@ -143,7 +146,7 @@ import {
   isImageListLoading,
   isImageLoading,
   onRefreshImageList,
-  resetStorage,
+  clearStorage,
   resetSetting,
 } from '@/logic'
 import i18n from '@/lib/i18n'
@@ -257,10 +260,19 @@ const themeColorMain = getStyleConst('themeColorMain')
   display: flex;
   flex-wrap: wrap;
   .image__item {
+    position: relative;
     margin: 0 3% 2% 0;
     width: 30%;
     border-radius: 2px;
     cursor: pointer;
+    .item__info {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }
 .image__item--active {
