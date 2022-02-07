@@ -106,9 +106,9 @@
     "exportSettingLabel": "Export setting",
     "exportSettingValue": "Export",
     "exportSettingTips": "It is recommended that you export your app settings regularly to prevent the loss of important data",
-    "resetStorageLabel": "Reset cache",
-    "resetStorageValue": "Reset",
-    "resetStorageTips": "If there is an exception locally, you can try to reset the local cache, this operation will not lose the synced settings",
+    "clearStorageLabel": "Clear cache",
+    "clearStorageValue": "Clear",
+    "clearStorageTips": "If there is an exception locally, you can try to clear the local cache, this operation will not lose the synced settings",
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
     "language": "Language",
@@ -120,6 +120,8 @@
     "apMark": "a.p./p.m."
   },
   "bookmark": {
+    "showNumberKey": "Show Number Key",
+    "showSymbolKey": "Show Symbol Key",
     "dblclickKeyToOpen": "Dblclick open",
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",

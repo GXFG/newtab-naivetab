@@ -4,7 +4,7 @@
       <div
         class="calendar__container"
         :style="dragStyle || containerStyle"
-        :class="{ 'calendar__container-shadow': localState.style.calendar.isShadowEnabled, border: localState.style.calendar.isBorderEnabled }"
+        :class="{ 'calendar__container-shadow': localState.style.calendar.isShadowEnabled, 'calendar__container-border': localState.style.calendar.isBorderEnabled }"
       >
         <div class="calendar__options">
           <div class="options__item">
@@ -67,10 +67,7 @@
                 'item__label--work': item.type === 2,
               }"
             >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
-            <span
-              v-if="item.isToday"
-              class="item__today"
-            >{{ $t('calendar.today') }}</span>
+            <span v-if="item.isToday" class="item__today">{{ $t('calendar.today') }}</span>
             <span class="item__day">{{ item.day }}</span>
             <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
           </li>
@@ -275,11 +272,11 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
   .calendar__container {
     z-index: 10;
     position: absolute;
-    background-color: v-bind(customBackgroundColor);
     width: v-bind(customContainerWidth);
     text-align: center;
+    border-radius: 4px;
+    background-color: v-bind(customBackgroundColor);
     user-select: none;
-    border-radius: 5px;
     overflow: hidden;
     .calendar__options {
       padding: 1.5%;
@@ -401,9 +398,9 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         opacity: 0.4;
       }
     }
-    outline: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .calendar__container-border {
+    outline: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .calendar__container-shadow {
     box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;

@@ -46,6 +46,9 @@
           Ver.{{ `${pkg.version}` }}
         </p>
         <div class="bottom__right">
+          <NButton text class="right__icon" title="help" @click="openHelpModal()">
+            <bx:bxs-help-circle />
+          </NButton>
           <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal()">
             <ic:round-new-releases />
           </NButton>
@@ -79,6 +82,7 @@ import {
   isDragMode,
   isSettingDrawerVisible,
   createTab,
+  openHelpModal,
   openWhatsNewModal,
   toggleIsDragMode,
   toggleIsSettingDrawerVisible,

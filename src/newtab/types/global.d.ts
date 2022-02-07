@@ -13,6 +13,12 @@ interface SelectStringItem {
   value: string
 }
 
+interface BookmarkItem {
+  key: string
+  url: string
+  name?: string
+}
+
 interface Calendar {
   Animal: string // "牛"
   IDayCn: string // "廿九"

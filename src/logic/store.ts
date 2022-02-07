@@ -201,9 +201,11 @@ const defaultState = {
     },
     bookmark: {
       enabled: false,
-      keymap: {},
+      isSymbolEnabled: false,
+      isNumberEnabled: false,
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
+      keymap: {},
     },
     clockDigital: {
       enabled: true,
@@ -278,6 +280,7 @@ export const localState = reactive({
 })
 
 export const globalState = ref({
+  isHelpModalVisible: false,
   isWhatsNewModalVisible: false,
   isSearchFocused: false,
   isMemoFocused: false,
@@ -310,9 +313,12 @@ export const initFirstOpen = () => {
 export const closeWhatsNewModal = () => {
   globalState.value.isWhatsNewModalVisible = false
 }
-
 export const openWhatsNewModal = () => {
   globalState.value.isWhatsNewModalVisible = true
+}
+
+export const openHelpModal = () => {
+  globalState.value.isHelpModalVisible = true
 }
 
 export const checkUpdate = () => {
@@ -342,6 +348,26 @@ export const createTab = (url: string, active = true) => {
     return
   }
   chrome.tabs.create({ url, active })
+}
+
+export const getDefaultBookmarkName = (url: string) => {
+  if (!url) {
+    return ''
+  }
+  const padUrl = url.includes('//') ? url : `https://${url}`
+  const domain = padUrl.split('/')[2]
+  if (!domain) {
+    return ''
+  }
+  let name = ''
+  if (domain.includes(':')) {
+    // 端口地址
+    name = `:${domain.split(':')[1]}`
+  } else {
+    const tempSplitList = domain.split('.')
+    name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0]
+  }
+  return name
 }
 
 export const getIsComponentRender = (componentName: Components) => computed(() => localState.setting[componentName].enabled || moveState.dragTempEnabledMap[componentName])

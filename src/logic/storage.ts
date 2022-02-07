@@ -4,6 +4,7 @@ import { MERGE_SETTING_DELAY } from './const'
 import { localState } from './store'
 
 const uploadFn = () => {
+  log('uploadSetting')
   localState.common.syncTime = Date.now()
   const localData = JSON.stringify({
     syncTime: localState.common.syncTime,
@@ -20,7 +21,6 @@ watch([
   () => localState.style,
   () => localState.setting,
 ], () => {
-  log('uploadSetting')
   uploadSetting()
 }, {
   deep: true,
@@ -88,7 +88,7 @@ export const exportSetting = () => {
   window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
 }
 
-export const resetStorage = () => {
+export const clearStorage = () => {
   localStorage.clear()
   location.reload()
 }

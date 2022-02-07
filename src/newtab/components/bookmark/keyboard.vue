@@ -2,7 +2,7 @@
   <MoveableComponentWrap componentName="bookmark" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
       <div class="bookmark__container" :style="dragStyle || containerStyle">
-        <div v-for="(rowData, rowIndex) in keyBoardRowList" :key="rowIndex" class="bookmark__row">
+        <div v-for="(rowData, rowIndex) in keyboardRowList" :key="rowIndex" class="bookmark__row">
           <div
             v-for="item in rowData"
             :key="item.key"
@@ -15,8 +15,8 @@
               'row__item--shadow': localState.style.bookmark.isShadowEnabled,
             }"
             :title="item.url"
-            @click="onClickItem(item.url)"
-            @mousedown="onItemMouseDown($event, item.url)"
+            @click="onClickKey(item.url)"
+            @mousedown="onMouseDownKey($event, item.url)"
           >
             <p class="item__key">
               {{ `${item.key.toUpperCase()}` }}
@@ -39,100 +39,33 @@
 </template>
 
 <script setup lang="ts">
-import { useThrottleFn } from '@vueuse/core'
-import { useStorageLocal } from '@/composables/useStorageLocal'
 import {
-  KEYBOARD_KEY,
-  KEY_OF_INDEX,
-  MERGE_SETTING_DELAY,
+  KEYBOARD_KEY_LIST,
+  KEYBOARD_CODE_TO_LABEL_MAP,
   isDragMode,
   localState,
   getIsComponentRender,
   getLayoutStyle,
   getStyleField,
   addKeyboardTask,
-  sleep,
-  log,
   createTab,
+  localBookmarkList,
+  keyboardRowList,
+  initBookmarkListData,
 } from '@/logic'
 
 const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
 
-interface bookmarkList {
-  key: string
-  url: string
-  name?: string
-}
-
 const state = reactive({
   currSelectKey: '',
 })
 
-const isInitialized = useStorageLocal('data-bookmark-initialized', false)
-const localBookmarkList = useStorageLocal('data-bookmark', [] as bookmarkList[])
-
-const initBookmarkListData = () => {
-  if (isInitialized.value) {
-    return
-  }
-  KEYBOARD_KEY.forEach((key: string) => {
-    localBookmarkList.value.push({
-      key,
-      url: '',
-      name: '',
-    })
-  })
-  isInitialized.value = true
-}
-initBookmarkListData()
-
-const keyBoardRowList = computed(() => {
-  return [localBookmarkList.value.slice(0, 10), localBookmarkList.value.slice(10, 19), localBookmarkList.value.slice(19)]
+onMounted(() => {
+  initBookmarkListData()
 })
 
-const mergeBookmarkSetting = useThrottleFn(async() => {
-  log('Merge BookmarkSetting')
-  if (!isInitialized) {
-    await sleep(200)
-  }
-  for (const key of KEYBOARD_KEY) {
-    const item = localState.setting.bookmark.keymap[key]
-    const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
-    if (!(item && (item.url || item.name))) {
-      // 重置没有配置信息的按键数据
-      localBookmarkList.value[index] = {
-        key,
-        url: '',
-        name: '',
-      }
-      continue
-    }
-    const url = item.url.includes('//') ? item.url : `https://${item.url}`
-    const domain = url.split('/')[2]
-    let name = ''
-    if (domain && !domain.includes(':')) {
-      // 非端口地址
-      const tempSplitList = domain.split('.')
-      name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0]
-    }
-    localBookmarkList.value[index] = {
-      key,
-      url,
-      name: item.name ? item.name : name,
-    }
-  }
-}, MERGE_SETTING_DELAY)
-
-watch(
-  () => localState.setting.bookmark.keymap,
-  () => {
-    mergeBookmarkSetting()
-  },
-  { deep: true },
-)
-
-const onClickItem = (url: string) => {
+const onClickKey = (url: string) => {
   if (isDragMode.value) {
     return
   }
@@ -140,11 +73,11 @@ const onClickItem = (url: string) => {
   state.currSelectKey = ''
 }
 
-const onItemMouseDown = (e: MouseEvent, url: string) => {
+const onMouseDownKey = (e: MouseEvent, url: string) => {
   if (e.button !== 1) {
-    // 按下鼠标中键
     return
   }
+  // 按下鼠标中键
   if (isDragMode.value) {
     return
   }
@@ -155,10 +88,11 @@ const onItemMouseDown = (e: MouseEvent, url: string) => {
 let timer = null as any
 const keyboardTask = (e: KeyboardEvent) => {
   const { key } = e
-  if (!(key in KEY_OF_INDEX)) {
+  const translateKey = KEYBOARD_CODE_TO_LABEL_MAP[key] || key
+  const index = KEYBOARD_KEY_LIST.indexOf(translateKey)
+  if (index === -1) {
     return
   }
-  const index = KEY_OF_INDEX[key as keyof typeof KEY_OF_INDEX]
   const url = localBookmarkList.value[index].url
   if (url.length === 0) {
     return
@@ -167,10 +101,10 @@ const keyboardTask = (e: KeyboardEvent) => {
     createTab(url)
     return
   }
-  if (key === state.currSelectKey) {
+  if (translateKey === state.currSelectKey) {
     createTab(url)
   } else {
-    state.currSelectKey = key
+    state.currSelectKey = translateKey
     clearTimeout(timer)
     timer = setTimeout(() => {
       state.currSelectKey = ''
@@ -185,7 +119,9 @@ const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customMargin = getStyleField(CNAME, 'margin', 'px')
+const customHalfWidth = getStyleField(CNAME, 'width', 'px', 0.5)
 const customWidth = getStyleField(CNAME, 'width', 'px')
+const customTrebleHalfWidth = getStyleField(CNAME, 'width', 'px', 1.5)
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
@@ -205,13 +141,15 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     overflow: hidden;
     .bookmark__row {
       display: flex;
-      justify-content: center;
       align-items: center;
       &:nth-child(2) {
-        margin-left: -5%;
+        margin-left: v-bind(customHalfWidth);
       }
       &:nth-child(3) {
-        margin-left: -16%;
+        margin-left: v-bind(customWidth);
+      }
+      &:nth-child(4) {
+        margin-left: v-bind(customTrebleHalfWidth);
       }
       .row__item--move {
         cursor: move !important;

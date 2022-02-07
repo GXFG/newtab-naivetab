@@ -77,7 +77,7 @@
   },
   "help": {
     "title": "帮助",
-    "content": "1. 按下“?”键可再次打开此帮助\n 2. 通过鼠标右键进入“设置抽屉”、“画布模式”\n 3. “画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成布局\n 4. 选中组件后可拖动至垃圾桶，或按delete、backspace键以移除\n 5. 可按Esc键退出\n"
+    "content": "1. 按下“?”键可再次打开此帮助\n 2. 通过鼠标右键进入“设置抽屉”、“画布模式”\n 3. “画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成布局\n 4. 选中组件后可拖动至垃圾桶，或按delete、backspace键以移除\n 5. 可按Esc键退出当前模式、关闭抽屉\n"
   },
   "setting": {
     "general": "通用",
@@ -106,9 +106,9 @@
     "exportSettingLabel": "导出设置",
     "exportSettingValue": "导出",
     "exportSettingTips": "建议定期导出应用设置，防止丢失重要数据",
-    "resetStorageLabel": "重置缓存",
-    "resetStorageValue": "重置",
-    "resetStorageTips": "如果本地出现异常可尝试重置本地缓存，此操作不会重置已同步的设置",
+    "clearStorageLabel": "清除缓存",
+    "clearStorageValue": "清除",
+    "clearStorageTips": "如果本地出现异常可尝试清除本地缓存，此操作不会清除已同步的设置",
     "resetSettingLabel": "重置设置",
     "resetSettingValue": "重置",
     "language": "语言",
@@ -120,6 +120,8 @@
     "apMark": "a.p./p.m."
   },
   "bookmark": {
+    "showNumberKey": "展示数字按键",
+    "showSymbolKey": "展示字符按键",
     "dblclickKeyToOpen": "双击按键打开",
     "dblclickKeyToOpenTips": "双击键盘按键以打开书签",
     "intervalTime": "间隔时间",

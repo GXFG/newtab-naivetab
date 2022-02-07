@@ -4,6 +4,12 @@
     <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
       <BaseComponentSetting cname="bookmark">
         <template #header>
+          <NFormItem :label="$t('bookmark.showNumberKey')">
+            <NSwitch v-model:value="localState.setting.bookmark.isNumberEnabled" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.showSymbolKey')">
+            <NSwitch v-model:value="localState.setting.bookmark.isSymbolEnabled" />
+          </NFormItem>
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
             <div class="setting__input-wrap">
               <div class="setting__input_item">
@@ -12,12 +18,7 @@
               </div>
               <div v-if="localState.setting.bookmark.isDblclickOpen" class="setting__input_item">
                 <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
-                <NInputNumber
-                  v-model:value="localState.setting.bookmark.dblclickIntervalTime"
-                  class="setting__input-number--unit"
-                  :min="0"
-                  :step="1"
-                >
+                <NInputNumber v-model:value="localState.setting.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
                   <template #suffix>
                     ms
                   </template>
@@ -27,31 +28,38 @@
             </div>
           </NFormItem>
           <div class="modal__bookmark">
-            <NSpace vertical>
-              <NInputGroup class="bookmark__label">
-                <p class="label__text">
-                  {{ $t('bookmark.keyLabel') }}
-                </p>
-                <p class="label__text">
-                  {{ $t('bookmark.urlLabel') }}
-                </p>
-                <p class="label__text">
-                  {{ $t('bookmark.nameLabel') }}
-                </p>
-              </NInputGroup>
-              <NInputGroup v-for="key of KEYBOARD_KEY" :key="key" class="bookmark__item">
+            <NInputGroup class="bookmark__label">
+              <p class="label__text">
+                {{ $t('bookmark.keyLabel') }}
+              </p>
+              <p class="label__text">
+                {{ $t('bookmark.urlLabel') }}
+              </p>
+              <p class="label__text">
+                {{ $t('bookmark.nameLabel') }}
+              </p>
+            </NInputGroup>
+            <div v-for="rowData of keyboardSettingRowList" :key="rowData" class="bookmark__row">
+              <NInputGroup v-for="key of rowData" :key="key" class="bookmark__item">
                 <NInputGroupLabel class="item__key">
                   {{ `${key.toUpperCase()}` }}
                 </NInputGroupLabel>
                 <template v-if="localState.setting.bookmark.keymap[key]">
                   <NInput
-                    v-for="field of ['url', 'name']"
-                    :key="field"
-                    v-model:value="localState.setting.bookmark.keymap[key][field as 'url' | 'name']"
+                    key="url"
+                    v-model:value="localState.setting.bookmark.keymap[key].url"
                     class="input__main"
                     type="text"
                     clearable
-                    :placeholder="$t(`bookmark.${field}Placeholder`)"
+                    :placeholder="$t('bookmark.urlPlaceholder')"
+                  />
+                  <NInput
+                    key="name"
+                    v-model:value="localState.setting.bookmark.keymap[key].name"
+                    class="input__main"
+                    type="text"
+                    clearable
+                    :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
                   />
                   <NButton @click="onDeleteKey(key)">
                     <ri:delete-bin-6-line class="item__icon" />
@@ -61,7 +69,7 @@
                   <zondicons:add-solid class="item__icon" />
                 </NButton>
               </NInputGroup>
-            </NSpace>
+            </div>
           </div>
         </template>
       </BaseComponentSetting>
@@ -70,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { KEYBOARD_KEY, localState } from '@/logic'
+import { localState, keyboardSettingRowList, getDefaultBookmarkName } from '@/logic'
 
 const onAddKey = (key: string) => {
   localState.setting.bookmark.keymap[key] = {
@@ -105,24 +113,27 @@ const onDeleteKey = (key: string) => {
       }
     }
   }
-  .bookmark__item {
-    padding: 0 0 0 15px;
-    .item__key {
-      flex: 0 0 auto;
-      display: flex;
-      justify-content: center;
-      width: 40px;
-    }
-    .input__main {
-      &:nth-of-type(2) {
+  .bookmark__row {
+    margin-bottom: 10px;
+    .bookmark__item {
+      padding: 3px 0 3px 15px;
+      .item__key {
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: center;
+        width: 40px;
+      }
+      .input__main {
+        &:nth-of-type(2) {
+          flex: 1;
+        }
+        &:nth-of-type(3) {
+          width: 25%;
+        }
+      }
+      .item__add {
         flex: 1;
       }
-      &:nth-of-type(3) {
-        width: 25%;
-      }
-    }
-    .item__add {
-      flex: 1;
     }
   }
 }
