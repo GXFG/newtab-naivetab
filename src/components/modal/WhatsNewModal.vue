@@ -51,7 +51,7 @@ setTimeout(() => {
 }
 .card__content {
   height: 30vh;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 .card__footer {
   display: flex;
