@@ -10,9 +10,7 @@
           type="warning"
           ghost
           size="small"
-          :disabled="isDisableCloseBtn"
-          :loading="isDisableCloseBtn"
-          @click="closeWhatsNewModal()"
+          @click="onClose()"
         >
           <template #icon>
             <div class="icon__wrap">
@@ -21,14 +19,6 @@
           </template>
           {{ $t('common.close') }}
         </NButton>
-        <NButton class="footer__btn" type="primary" ghost size="small" @click="createTab(URL_CHANGELOG)">
-          <template #icon>
-            <div class="icon__wrap">
-              <gg:more-o class="btn__icon" />
-            </div>
-          </template>
-          {{ $t('common.more') }}
-        </NButton>
       </div>
     </NCard>
   </NModal>
@@ -36,13 +26,12 @@
 
 <script setup lang="ts">
 import Currentlog from '../../../CHANGELOG.md'
-import { URL_CHANGELOG, globalState, createTab, closeWhatsNewModal } from '@/logic'
+import { globalState, closeWhatsNewModal, clearStorage } from '@/logic'
 
-const isDisableCloseBtn = ref(true)
-
-setTimeout(() => {
-  isDisableCloseBtn.value = false
-}, 3000)
+const onClose = () => {
+  clearStorage()
+  closeWhatsNewModal()
+}
 </script>
 
 <style scoped>
@@ -52,6 +41,19 @@ setTimeout(() => {
 .card__content {
   height: 30vh;
   overflow-y: scroll;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  &::-webkit-scrollbar-track {
+    background: #ccc;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
 }
 .card__footer {
   display: flex;

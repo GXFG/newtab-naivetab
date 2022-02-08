@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { localState, globalState, isDragMode, addKeyboardTask } from '@/logic'
+import { globalState, isFirstOpen, isDragMode, addKeyboardTask } from '@/logic'
 
 const keyboardHandler = (e: KeyboardEvent) => {
   const { key } = e
@@ -40,11 +40,10 @@ watch(
     if (!value) {
       return
     }
-    if (!localState.common.isFirstOpen) {
+    if (!isFirstOpen.value) {
       return
     }
     globalState.value.isHelpModalVisible = true
-    localState.common.isFirstOpen = false
   },
   { immediate: true },
 )

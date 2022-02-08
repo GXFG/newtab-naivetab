@@ -12,7 +12,6 @@ export const currSettingTabValue = ref('general')
 const defaultState = {
   common: {
     syncTime: 0,
-    isFirstOpen: true,
     currAppearanceCode: 0, // 0:light | 1:dark
     availableFontList: [] as any[],
   },
@@ -300,12 +299,13 @@ export const initAvailableFontList = async() => {
   localState.common.availableFontList = [...availableList.values()]
 }
 
-// 首次打开扩展时，打开画布模式&帮助弹窗
-const isFirstOpen = ref(useStorageLocal('data-first', true))
+export const isFirstOpen = ref(useStorageLocal('data-first', true))
+
 export const initFirstOpen = () => {
   if (!isFirstOpen.value) {
     return
   }
+  // 首次打开扩展时，打开画布模式 & 帮助弹窗
   toggleIsDragMode(true)
   isFirstOpen.value = false
 }

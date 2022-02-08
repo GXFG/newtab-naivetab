@@ -47,17 +47,21 @@ export const loadSyncSetting = () => {
       uploadFn() // 初始化默认设置数据到云端
       return
     }
-
     const cloudSetting = JSON.parse(PuzzleTabSetting)
     if (cloudSetting.syncTime === localState.common.syncTime) {
       log('None modification settings')
       return
     }
-
     log('Load settings', cloudSetting)
     localState.common.syncTime = cloudSetting.syncTime
     updateSetting(cloudSetting)
   })
+}
+
+export const clearStorage = () => {
+  localStorage.clear()
+  localStorage.setItem('data-first', 'false') // 避免打开help弹窗
+  location.reload()
 }
 
 export const importSetting = async(text: string) => {
@@ -76,7 +80,7 @@ export const importSetting = async(text: string) => {
   }
   log('FileContent', fileContent)
   await updateSetting(fileContent)
-  location.reload()
+  clearStorage()
 }
 
 export const exportSetting = () => {
@@ -88,13 +92,7 @@ export const exportSetting = () => {
   window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
 }
 
-export const clearStorage = () => {
-  localStorage.clear()
-  location.reload()
-}
-
 export const resetSetting = () => {
   chrome.storage.sync.clear()
-  localStorage.clear()
-  location.reload()
+  clearStorage()
 }
