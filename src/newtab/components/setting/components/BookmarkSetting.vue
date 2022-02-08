@@ -61,6 +61,12 @@
                     clearable
                     :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
                   />
+                  <NButton @click="onMoveKey(key, 'up')">
+                    <jam:chevron-up class="item__icon" />
+                  </NButton>
+                  <NButton @click="onMoveKey(key, 'down')">
+                    <jam:chevron-down class="item__icon" />
+                  </NButton>
                   <NButton @click="onDeleteKey(key)">
                     <ri:delete-bin-6-line class="item__icon" />
                   </NButton>
@@ -89,6 +95,24 @@ const onAddKey = (key: string) => {
 
 const onDeleteKey = (key: string) => {
   delete localState.setting.bookmark.keymap[key]
+}
+
+const currKeyboardList = computed(() => keyboardSettingRowList.value.flat())
+
+const onMoveKey = (key: string, type: 'up' | 'down') => {
+  const currIndex = currKeyboardList.value.indexOf(key)
+  const listLen = currKeyboardList.value.length
+  if (type === 'up' && currIndex <= 0) {
+    return
+  } else if (type === 'down' && currIndex >= listLen - 1) {
+    return
+  }
+  const targetIndex = type === 'up' ? currIndex - 1 : currIndex + 1
+  const targetKey = currKeyboardList.value[targetIndex]
+  const targetData = localState.setting.bookmark.keymap[targetKey]
+  const currData: any = localState.setting.bookmark.keymap[key]
+  localState.setting.bookmark.keymap[key] = targetData
+  localState.setting.bookmark.keymap[targetKey] = currData
 }
 </script>
 

@@ -1,6 +1,6 @@
 import { useThrottleFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_SETTING_DELAY, localState, sleep, log, getDefaultBookmarkName } from '@/logic'
+import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localState, sleep, log, getDefaultBookmarkName } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
@@ -82,7 +82,7 @@ const mergeBookmarkSetting = useThrottleFn(async() => {
       name: item.name || getDefaultBookmarkName(item.url),
     }
   }
-}, MERGE_SETTING_DELAY)
+}, MERGE_BOOKMARK_DELAY)
 
 watch(
   () => localState.setting.bookmark.keymap,

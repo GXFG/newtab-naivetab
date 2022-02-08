@@ -30,7 +30,8 @@ export const KEYBOARD_CODE_TO_LABEL_MAP = {
   '/': '?',
 }
 
-export const MERGE_SETTING_DELAY = 2000
+export const MERGE_SETTING_DELAY = 1000
+export const MERGE_BOOKMARK_DELAY = 500
 
 export const DRAG_TRIGGER_DISTANCE = 10
 
