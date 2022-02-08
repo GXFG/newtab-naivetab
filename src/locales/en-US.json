@@ -120,8 +120,8 @@
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "showNumberKey": "Show Number Key",
-    "showSymbolKey": "Show Symbol Key",
+    "showNumberKey": "Number Key",
+    "showSymbolKey": "Symbol Key",
     "dblclickKeyToOpen": "Dblclick open",
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",
