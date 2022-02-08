@@ -1,7 +1,7 @@
 {
   "name": "newtab-puzzletab",
   "displayName": "PuzzleTab - New Tab",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "一款简洁的浏览器新标签页扩展",
   "private": true,
   "scripts": {
@@ -33,7 +33,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/node": "^16.11.22",
     "@types/webextension-polyfill": "^0.8.2",
-    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/eslint-plugin": "^5.11.0",
     "@vitejs/plugin-vue": "^2.1.0",
     "@vue/compiler-sfc": "^3.2.30",
     "@vueuse/core": "^7.5.5",
@@ -53,7 +53,7 @@
     "unplugin-vue-components": "^0.15.6",
     "vite": "^2.7.13",
     "vite-plugin-md": "^0.11.7",
-    "vite-plugin-windicss": "^1.6.3",
+    "vite-plugin-windicss": "^1.7.0",
     "vue": "^3.2.30",
     "vue-demi": "^0.11.4",
     "vue-i18n": "^9.2.0-beta.30",
