@@ -23,7 +23,7 @@
             </p>
             <div class="item__img">
               <div class="img__wrap">
-                <img v-if="item.url" class="img__main" :src="`chrome://favicon/size/16@2x/${item.url}`" :ondragstart="() => false">
+                <img v-if="item.url" class="img__main" :src="getDomainIcon(item.url)" :ondragstart="() => false">
               </div>
             </div>
             <p class="item__name">
@@ -53,6 +53,7 @@ import {
   keyboardRowList,
   initBookmarkListData,
 } from '@/logic'
+import { isNotChrome } from '@/env'
 
 const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
@@ -64,6 +65,13 @@ const state = reactive({
 onMounted(() => {
   initBookmarkListData()
 })
+
+const getDomainIcon = (url: string) => {
+  if (isNotChrome) {
+    return `${url}/favicon.ico`
+  }
+  return `chrome://favicon/size/16@2x/${url}`
+}
 
 const onClickKey = (url: string) => {
   if (isDragMode.value) {
