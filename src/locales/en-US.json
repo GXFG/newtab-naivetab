@@ -6,6 +6,7 @@
     "close": "Close",
     "exit": "Exit",
     "add": "Add",
+    "edit": "Edit",
     "delete": "Delete",
     "success": "Success",
     "fail": "Fail",
@@ -158,7 +159,7 @@
     "friday": "Fri",
     "saturday": "Sat",
     "sunday": "Sun",
-    "today": "N",
+    "today": "T",
     "work": "W",
     "rest": "R"
   },

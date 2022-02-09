@@ -1,32 +1,40 @@
 <template>
+  <!-- CityPicker -->
+  <NModal
+    v-model:show="state.isCityPickerModalVisible"
+    style="width: 450px; height: 450px"
+    preset="card"
+    :title="`${$t('common.edit')}${$t('weather.city')}`"
+    :mask-closable="true"
+  >
+    <NAutoComplete
+      v-model:value="state.keyword"
+      :options="state.cityList"
+      :loading="state.isSearchLoading"
+      @update:value="onChangeCity"
+      @select="onSelectCity"
+    />
+  </NModal>
   <BaseComponentSetting cname="weather">
     <template #header>
       <NFormItem :label="$t('weather.city')">
         <NInputGroup>
-          <NAutoComplete
-            v-model:value="state.keyword"
-            :options="state.cityList"
-            :loading="state.isSearchLoading"
-            @update:value="onChangeCity"
-            @select="onSelectCity"
-          />
-          <!-- <NButton @click="onSearch()">
-            <bx:bx-search class="item__icon" />
-          </NButton> -->
+          <NInput v-model:value="localState.setting.weather.city.name" :disabled="true" />
+          <NButton @click="onOpenCityPicker()">
+            <clarity:note-edit-line class="item__icon" />
+          </NButton>
         </NInputGroup>
       </NFormItem>
       <NFormItem label="API Key">
         <NInput v-model:value="localState.setting.weather.apiKey" />
         <Tips link :content="URL_QWEATHER_START" />
       </NFormItem>
-
       <!-- <NFormItem :label="$t('weather.temperatureUnit')">
         <NSelect v-model:value="localState.setting.weather.temperatureUnit" :options="temperatureUnitOptions" />
       </NFormItem>
       <NFormItem :label="$t('weather.speedUnit')">
         <NSelect v-model:value="localState.setting.weather.speedUnit" :options="speedUnitOptions" />
       </NFormItem> -->
-
       <NFormItem :label="$t('weather.icon')">
         <div class="setting__input-wrap">
           <div class="setting__input_item">
@@ -66,8 +74,9 @@ const speedUnitOptions = [
 ]
 
 const state = reactive({
+  isCityPickerModalVisible: false,
   isSearchLoading: false,
-  keyword: localState.setting.weather.city.name,
+  keyword: '',
   cityList: [] as SelectStringItem[],
 })
 
@@ -77,13 +86,13 @@ const getLocation = async() => {
   }
   state.isSearchLoading = true
   try {
-    const data = await getCityLookup(state.keyword)
+    const res = await getCityLookup(state.keyword)
     state.isSearchLoading = false
-    if (data.code !== '200') {
+    if (res.code !== '200') {
       state.cityList = []
       return
     }
-    state.cityList = data.location.map((item: CityItem) => ({
+    state.cityList = res.location.map((item: CityItem) => ({
       label: `${item.country}-${item.adm1}-${item.adm2}-${item.name}`,
       value: item.id,
     }))
@@ -104,5 +113,11 @@ const onChangeCity = (label: string) => {
 const onSelectCity = (value: any) => {
   localState.setting.weather.city.name = state.keyword
   localState.setting.weather.city.id = value
+}
+
+const onOpenCityPicker = () => {
+  state.keyword = ''
+  state.cityList = []
+  state.isCityPickerModalVisible = true
 }
 </script>
