@@ -2,14 +2,14 @@ import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, mergeState, log } from '@/logic'
+import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, log } from '@/logic'
 
 const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
 
 export const [isSettingDrawerVisible, toggleIsSettingDrawerVisible] = useToggle(false)
 export const currSettingTabValue = ref('general')
 
-const defaultState = {
+export const defaultState = {
   common: {
     syncTime: 0,
     currAppearanceCode: 0, // 0:light | 1:dark
@@ -283,6 +283,7 @@ export const globalState = ref({
   isWhatsNewModalVisible: false,
   isSearchFocused: false,
   isMemoFocused: false,
+  isClearStorageLoading: false,
 })
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localState.setting.general.lang] || 'en')
@@ -328,15 +329,9 @@ export const checkUpdate = () => {
     return
   }
   log('checkUpdate get new version')
-  // 展示更新内容
-  openWhatsNewModal()
-  // 处理新增配置，删除无用旧配置
+  openWhatsNewModal() // 展示更新内容
   try {
-    for (const rootField of Object.keys(defaultState)) {
-      for (const field of Object.keys(defaultState[rootField])) {
-        localState[rootField][field] = mergeState(defaultState[rootField][field], localState[rootField][field])
-      }
-    }
+    updateSetting() // 刷新配置设置
     localState.setting.general.version = pkg.version
   } catch (e) {
     log('checkUpdate mergeState error', e)

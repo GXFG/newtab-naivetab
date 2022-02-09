@@ -1,7 +1,7 @@
 import { useDebounceFn } from '@vueuse/core'
 import { log, downloadJsonByTagA, mergeState } from './util'
 import { MERGE_SETTING_DELAY } from './const'
-import { localState } from './store'
+import { defaultState, localState, globalState } from './store'
 
 const uploadFn = () => {
   log('uploadSetting')
@@ -26,14 +26,20 @@ watch([
   deep: true,
 })
 
-const updateSetting = (data: any) => {
+/**
+ * 处理新增配置，删除无用旧配置
+ * 默认刷新配置结构
+ * 以defaultState为模板与acceptState进行去重合并
+ */
+export const updateSetting = (acceptState = localState) => {
   return new Promise((resolve) => {
-    for (const rootField of ['style', 'setting']) {
-      for (const field of Object.keys(localState[rootField])) {
-        // 忽略掉本地不存在的配置
-        if (Object.prototype.hasOwnProperty.call(data[rootField], field)) {
-          localState[rootField][field] = mergeState(localState[rootField][field], data[rootField][field])
-        }
+    for (const rootField of Object.keys(defaultState)) {
+      if (!Object.prototype.hasOwnProperty.call(acceptState, rootField)) {
+        continue
+      }
+      // 只遍历acceptState内存在的rootField
+      for (const subField of Object.keys(acceptState[rootField])) {
+        localState[rootField][subField] = mergeState(defaultState[rootField][subField], acceptState[rootField][subField])
       }
     }
     resolve(true)
@@ -44,7 +50,7 @@ export const loadSyncSetting = () => {
   chrome.storage.sync.get(null, ({ PuzzleTabSetting }) => {
     if (!PuzzleTabSetting) {
       log('Notfound settings')
-      uploadFn() // 初始化默认设置数据到云端
+      uploadFn() // 初始化设置到云端
       return
     }
     const cloudSetting = JSON.parse(PuzzleTabSetting)
@@ -58,10 +64,20 @@ export const loadSyncSetting = () => {
   })
 }
 
-export const clearStorage = () => {
+const clearStorage = () => {
   localStorage.clear()
   localStorage.setItem('data-first', 'false') // 避免打开help弹窗
   location.reload()
+}
+
+export const refreshSettingAndClearStorage = async() => {
+  globalState.value.isClearStorageLoading = true
+  await updateSetting()
+  // 等待setting同步完成后再进行后续操作
+  setTimeout(() => {
+    clearStorage()
+    globalState.value.isClearStorageLoading = false
+  }, 2000)
 }
 
 export const importSetting = async(text: string) => {

@@ -10,6 +10,7 @@
           type="warning"
           ghost
           size="small"
+          :loading="globalState.isClearStorageLoading"
           @click="onClose()"
         >
           <template #icon>
@@ -26,11 +27,11 @@
 
 <script setup lang="ts">
 import Currentlog from '../../../CHANGELOG.md'
-import { globalState, closeWhatsNewModal, clearStorage } from '@/logic'
+import { globalState, closeWhatsNewModal, refreshSettingAndClearStorage } from '@/logic'
 
 const onClose = () => {
-  clearStorage()
-  closeWhatsNewModal()
+  refreshSettingAndClearStorage()
+  // closeWhatsNewModal()
 }
 </script>
 

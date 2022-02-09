@@ -26,7 +26,7 @@ export const downloadImageByUrl = async(url: string, filename = `${Date.now()}`)
 }
 
 export const downloadJsonByTagA = (result: any, filename = 'file') => {
-  const content = JSON.stringify(result, null, 4)
+  const content = JSON.stringify(result, null, 2)
   const blob = new Blob([content], { type: 'text/json' })
   const url = window.URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -36,25 +36,34 @@ export const downloadJsonByTagA = (result: any, filename = 'file') => {
 }
 
 /**
- * 只合并当前配置内存在的字段
+ * 以state为模板与acceptState进行递归去重合并
  */
-export const mergeState = (currState: {}, acceptState: {}) => {
+export const mergeState = (state: any, acceptState: any) => {
   if (acceptState === undefined || acceptState === null) {
-    return currState
+    return state
+  }
+  // 二者类型不同时，直接返回state，为处理新增state的情况
+  if (Object.prototype.toString.call(state) !== Object.prototype.toString.call(acceptState)) {
+    return state
   }
   if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
     return acceptState
   }
-  // 只处理对象类型，其余均返回currState，如Array
+  // 只处理Object类型，其余如Array等对象类型均直接返回state，
   if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
-    return currState
+    return state
+  }
+  // 二者均为Object、且state为空Object时，返回acceptState，如setting中的keymap数据
+  if (Object.keys(state).length === 0) {
+    return acceptState
   }
   const filterState = {} as any
   const fieldList = Object.keys(acceptState)
   for (const field of fieldList) {
-    if (Object.prototype.hasOwnProperty.call(currState, field)) {
-      filterState[field] = acceptState[field]
+    // 递归合并，只合并state内存在的字段
+    if (Object.prototype.hasOwnProperty.call(state, field)) {
+      filterState[field] = mergeState(state[field], acceptState[field])
     }
   }
-  return { ...currState, ...filterState }
+  return { ...state, ...filterState }
 }
