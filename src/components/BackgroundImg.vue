@@ -1,4 +1,5 @@
 <template>
+  <!-- save css var -->
   <div id="background">
     <div id="background__container" />
   </div>

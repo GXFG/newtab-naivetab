@@ -21,26 +21,23 @@
     <template #footer>
       <!-- backgroundImage -->
       <NFormItem :label="$t('common.backgroundImage')">
-        <NSwitch v-model:value="localState.style.general.isBackgroundImageEnabled" />
+        <NSwitch v-model:value="localState.setting.general.isBackgroundImageEnabled" />
       </NFormItem>
-      <NFormItem v-if="localState.style.general.isBackgroundImageEnabled" :label="$t('common.source')">
-        <NSelect v-model:value="localState.style.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 30%" />
+      <NFormItem v-if="localState.setting.general.isBackgroundImageEnabled" :label="$t('common.source')">
+        <NSelect v-model:value="localState.setting.general.backgroundImageSource" :options="backgroundImageSourceList" style="width: 30%" />
         <!-- local -->
-        <template v-if="localState.style.general.backgroundImageSource === 0">
+        <template v-if="localState.setting.general.backgroundImageSource === 0">
           <NButton class="setting__row-element" @click="onSelectBackgroundImage">
             <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
           </NButton>
           <Tips :content="$t('general.localBackgroundTips')" />
         </template>
         <!-- bing -->
-        <template v-else-if="localState.style.general.backgroundImageSource === 1">
-          <NButton class="setting__row-element" @click="onSaveImage()">
-            <tabler:world-download />&nbsp;{{ $t('general.saveCurrendImage') }}
-          </NButton>
+        <template v-else-if="localState.setting.general.backgroundImageSource === 1">
           <NButton class="setting__row-element" :loading="isImageListLoading" @click="onRefreshImageList()">
             <template #icon>
               <div class="icon__wrap">
-                <fontisto:spinner-refresh style="font-size: 14px" />
+                <topcoat:refresh style="font-size: 14px" />
               </div>
             </template>
             {{ $t('common.refresh') }}
@@ -51,43 +48,66 @@
       <!-- local -->
       <NFormItem
         v-if="
-          localState.style.general.isBackgroundImageEnabled &&
-            localState.style.general.backgroundImageSource === 0 &&
+          localState.setting.general.isBackgroundImageEnabled &&
+            localState.setting.general.backgroundImageSource === 0 &&
             imageState.localBackgroundFileName.length !== 0
         "
         :label="$t('general.filename')"
       >
         <p>{{ imageState.localBackgroundFileName }}</p>
       </NFormItem>
-      <!-- bing -->
-      <NFormItem v-else-if="localState.style.general.isBackgroundImageEnabled && localState.style.general.backgroundImageSource === 1" label=" ">
-        <div class="setting__image-wrap">
+      <!-- bing & favorite -->
+      <NFormItem v-else-if="localState.setting.general.isBackgroundImageEnabled && localState.setting.general.backgroundImageSource !== 0" label=" ">
+        <div class="setting__images">
           <div
-            v-for="item in imageState.imageList"
+            v-for="item in currPreviewImageList"
             :key="item.url"
             class="image__item"
-            :class="{ 'image__item--active': isCurrSelectedImage(item) }"
-            @click="onSelectImage(item)"
+            :class="{ 'image__item--active': getIsCurrSelectedImage(item.id) }"
           >
-            <NSpin :show="isCurrSelectedImage(item) && isImageLoading">
-              <img :src="getImageUrlFromBing(item.urlbase, '1366x768')" alt="">
+            <NSpin :show="getIsCurrSelectedImage(item.id) && isImageLoading">
+              <img :src="item.url" alt="" @click="onSelectImage(item.id)">
             </NSpin>
-            <NTooltip trigger="hover">
-              <template #trigger>
-                <div class="item__info">
-                  <ic:outline-info />
-                </div>
-              </template>
-              <p>{{ item.copyright }}</p>
-            </NTooltip>
+            <div v-if="getIsCurrSelectedImage(item.id)" class="item__current">
+              <line-md:confirm-circle />
+            </div>
+            <div class="item__toolbar">
+              <NTooltip trigger="hover">
+                <template #trigger>
+                  <div class="toolbar__icon">
+                    <ic:outline-info />
+                  </div>
+                </template>
+                <p>{{ item.desc }}</p>
+              </NTooltip>
+              <div class="toolbar__icon" @click="onViewImage(item.url)">
+                <mdi:eye-circle-outline />
+              </div>
+              <div class="toolbar__icon" @click="onSaveImage(item.url)">
+                <charm:download />
+              </div>
+              <div v-if="isFavoriteIconVisible(item.id)" class="toolbar__icon" @click="onFavoriteImage(item)">
+                <mi:favorite />
+              </div>
+              <!-- delete -->
+              <NPopconfirm v-if="localState.setting.general.backgroundImageSource === 9" @positive-click="onUnFavoriteImage(item.id)">
+                <template #trigger>
+                  <div class="toolbar__icon">
+                    <ri:delete-bin-6-line />
+                  </div>
+                </template>
+                {{ $t('common.confirm') }}?
+              </NPopconfirm>
+            </div>
           </div>
         </div>
       </NFormItem>
-      <NFormItem v-if="localState.style.general.isBackgroundImageEnabled" :label="$t('common.blur')">
+
+      <NFormItem v-if="localState.setting.general.isBackgroundImageEnabled" :label="$t('common.blur')">
         <NSlider v-model:value="localState.style.general.bgBlur" :step="0.1" :min="0" :max="200" />
         <NInputNumber v-model:value="localState.style.general.bgBlur" class="setting__input-number" :step="0.1" :min="0" :max="200" />
       </NFormItem>
-      <NFormItem v-if="localState.style.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
+      <NFormItem v-if="localState.setting.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
         <NSlider v-model:value="localState.style.general.bgOpacity" :step="0.01" :min="0" :max="1" />
         <NInputNumber v-model:value="localState.style.general.bgOpacity" class="setting__input-number" :step="0.01" :min="0" :max="1" />
       </NFormItem>
@@ -101,7 +121,7 @@
         <Tips :content="$t('general.syncTimeTips')" />
       </NFormItem>
       <NFormItem :label="$t('general.importSettingsLabel')">
-        <NButton @click="onImportSetting">
+        <NButton :loading="globalState.isImportSettingLoading" @click="onImportSetting">
           <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
         </NButton>
         <input ref="settingFileInputEl" style="display: none" type="file" @change="onImportFileChange">
@@ -123,7 +143,7 @@
         <NPopconfirm @positive-click="onResetSetting()">
           <template #trigger>
             <NButton dashed type="error">
-              <ic:baseline-settings-backup-restore />&nbsp;{{ $t('general.resetSettingValue') }}
+              <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}
             </NButton>
           </template>
           {{ $t('common.confirm') }}?
@@ -137,8 +157,10 @@
 import {
   exportSetting,
   gaEvent,
-  getImageUrlFromBing,
+  currPreviewImageList,
   getStyleConst,
+  createTab,
+  getImageUrlFromBing,
   localState,
   globalState,
   imageState,
@@ -175,8 +197,9 @@ const drawerPlacementList = computed(() => [
 ])
 
 const backgroundImageSourceList = computed(() => [
-  { label: window.$t('common.bing'), value: 1 },
   { label: window.$t('common.local'), value: 0 },
+  { label: window.$t('common.favorite'), value: 9 },
+  { label: window.$t('common.bing'), value: 1 },
 ])
 
 const onChangeLocale = (locale: string) => {
@@ -185,7 +208,7 @@ const onChangeLocale = (locale: string) => {
   gaEvent('setting-locale', 'click', 'change')
 }
 
-const isCurrSelectedImage = (item: ImageItem) => item.urlbase === localState.style.general.backgroundImageId
+const getIsCurrSelectedImage = (id: string) => id === localState.setting.general.backgroundImageId
 
 const bgImageFileInputEl = ref()
 const onSelectBackgroundImage = () => {
@@ -210,17 +233,35 @@ const onBackgroundImageFileChange = (e: any) => {
   gaEvent('setting-background-image', 'click', 'select-file')
 }
 
-const onSaveImage = async() => {
-  downloadImageByUrl(localState.style.general.backgroundImageUrl)
+const onSelectImage = (id: string) => {
+  localState.setting.general.backgroundImageId = id
 }
 
-const onSelectImage = (item: ImageItem) => {
-  localState.style.general.backgroundImageId = item.urlbase
+const onViewImage = (url: string) => {
+  createTab(url)
 }
 
-const syncTime = computed(() => {
-  return dayjs(localState.common.syncTime).format('YYYY-MM-DD HH:mm:ss')
-})
+const onSaveImage = (url: string) => {
+  downloadImageByUrl(url)
+}
+
+const favoriteBackgroundIdList = computed(() => localState.setting.general.favoriteBackgroundList.map((item: ImageListItem) => item.id))
+const isFavoriteIconVisible = (id: string) => !favoriteBackgroundIdList.value.includes(id)
+
+const onFavoriteImage = (item: ImageListItem) => {
+  localState.setting.general.favoriteBackgroundList.push({
+    id: item.id,
+    url: item.url,
+    desc: item.desc,
+  })
+}
+
+const onUnFavoriteImage = (id: string) => {
+  const index = localState.setting.general.favoriteBackgroundList.findIndex((item: ImageListItem) => item.id === id)
+  localState.setting.general.favoriteBackgroundList.splice(index, 1)
+}
+
+const syncTime = computed(() => dayjs(localState.common.syncTime).format('YYYY-MM-DD HH:mm:ss'))
 
 const settingFileInputEl = ref()
 const onImportSetting = () => {
@@ -257,26 +298,57 @@ const themeColorMain = getStyleConst('themeColorMain')
 </script>
 
 <style scoped>
-.setting__image-wrap {
+.setting__images {
   display: flex;
   flex-wrap: wrap;
   .image__item {
+    flex: 0 0 auto;
     position: relative;
     margin: 0 3% 2% 0;
     width: 30%;
     border-radius: 2px;
     cursor: pointer;
-    .item__info {
+    overflow: hidden;
+    &:hover {
+      .item__toolbar {
+        bottom: 0 !important;
+      }
+    }
+    .item__toolbar {
+      z-index: 2;
       position: absolute;
-      bottom: 0;
-      right: 0;
+      bottom: -20px;
+      left: 0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      width: 100%;
+      height: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+      .toolbar__icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    .item__current {
+      z-index: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
       display: flex;
       justify-content: center;
       align-items: center;
+      width: 100%;
+      height: 100%;
+      font-size: 26px;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: v-bind(themeColorMain);
     }
   }
-}
-.image__item--active {
-  outline: 3px solid v-bind(themeColorMain);
+  .image__item--active {
+    outline: 2px solid v-bind(themeColorMain);
+  }
 }
 </style>

@@ -14,6 +14,17 @@ export const imageState = ref(useStorageLocal('data-images', {
  */
 export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http://cn.bing.com/${url}_${size}.jpg`
 
+export const currPreviewImageList = computed(() => {
+  if (localState.setting.general.backgroundImageSource === 1) {
+    return imageState.value.imageList.map((item: ImageItem) => ({
+      id: item.urlbase,
+      url: getImageUrlFromBing(item.urlbase),
+      desc: item.copyright,
+    }))
+  }
+  return localState.setting.general.favoriteBackgroundList
+})
+
 export const isImageLoading = ref(false)
 export const isImageListLoading = ref(false)
 
@@ -38,18 +49,18 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
     return
   }
   let currUrl = ''
-  if (localState.style.general.backgroundImageSource === 0) {
+  if (localState.setting.general.backgroundImageSource === 0) {
     currUrl = imageState.value.localBackgroundBase64
   } else {
-    if (initPage && localState.style.general.backgroundImageUrl.length !== 0) {
+    if (initPage && localState.setting.general.backgroundImageUrl.length !== 0) {
       // 初始化页面时且本地有图片缓存时，读取上一次的设置
-      currUrl = localState.style.general.backgroundImageUrl
+      currUrl = localState.setting.general.backgroundImageUrl
     } else {
-      let index = imageState.value.imageList.findIndex((item: ImageItem) => item.urlbase === localState.style.general.backgroundImageId)
+      let index = imageState.value.imageList.findIndex((item: ImageItem) => item.urlbase === localState.setting.general.backgroundImageId)
       index = index === -1 ? 0 : index
       const urlbase = imageState.value.imageList[index].urlbase
       const httpUrl = getImageUrlFromBing(urlbase)
-      localState.style.general.backgroundImageUrl = httpUrl
+      localState.setting.general.backgroundImageUrl = httpUrl
       currUrl = httpUrl
     }
   }
@@ -68,18 +79,18 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
 }
 
 watch([
-  () => localState.style.general.backgroundImageSource,
-  () => localState.style.general.backgroundImageId,
   () => imageState.value.localBackgroundBase64,
-  () => localState.style.general.backgroundImageUrl,
+  () => localState.setting.general.backgroundImageSource,
+  () => localState.setting.general.backgroundImageId,
+  () => localState.setting.general.backgroundImageUrl,
 ], () => {
-  if (!localState.style.general.isBackgroundImageEnabled || imageState.value.imageList.length === 0) {
+  if (!localState.setting.general.isBackgroundImageEnabled || imageState.value.imageList.length === 0) {
     return
   }
   renderBackgroundImage(false)
 })
 
-watch(() => localState.style.general.isBackgroundImageEnabled, async(isEnabled) => {
+watch(() => localState.setting.general.isBackgroundImageEnabled, async(isEnabled) => {
   if (imageState.value.imageList.length === 0) {
     await getImages()
   }

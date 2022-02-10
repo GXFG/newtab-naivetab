@@ -4,10 +4,7 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
 import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, log } from '@/logic'
 
-const defaultLang = chrome.i18n.getUILanguage() || 'en-US'
-
 export const [isSettingDrawerVisible, toggleIsSettingDrawerVisible] = useToggle(false)
-export const currSettingTabValue = ref('general')
 
 export const defaultState = {
   common: {
@@ -29,10 +26,6 @@ export const defaultState = {
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
       backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
-      isBackgroundImageEnabled: true,
-      backgroundImageSource: 1, // 0:localFile, 1:bing
-      backgroundImageUrl: '',
-      backgroundImageId: '', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
       bgOpacity: 0.7,
       bgBlur: 10,
     },
@@ -192,8 +185,19 @@ export const defaultState = {
       version: pkg.version,
       appearance: 'auto', // light | dark | auto
       pageTitle: 'NewTab',
-      lang: defaultLang,
+      lang: chrome.i18n.getUILanguage() || 'en-US',
       drawerPlacement: 'right' as any,
+      isBackgroundImageEnabled: true,
+      backgroundImageSource: 9, // 0:localFile, 9:favorite, 1:bing
+      backgroundImageId: '/th?id=OHR.Oymyakon_ZH-CN7758768574', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
+      backgroundImageUrl: 'http://cn.bing.com//th?id=OHR.Oymyakon_ZH-CN7758768574_UHD.jpg',
+      favoriteBackgroundList: [
+        {
+          id: '/th?id=OHR.Oymyakon_ZH-CN7758768574',
+          url: 'http://cn.bing.com//th?id=OHR.Oymyakon_ZH-CN7758768574_UHD.jpg',
+          desc: '奥伊米亚康的冬天，俄罗斯 (© Alexandr Berdicevschi/Getty Images)',
+        },
+      ],
     },
     settingIcon: {
       enabled: false,
@@ -280,11 +284,14 @@ export const localState = reactive({
 
 export const globalState = ref({
   isUploadSettingLoading: false,
+  isImportSettingLoading: false,
   isClearStorageLoading: false,
   isHelpModalVisible: false,
   isWhatsNewModalVisible: false,
+  isWhatsNewModalCloseToRefresh: false,
   isSearchFocused: false,
   isMemoFocused: false,
+  currSettingTabValue: 'general',
 })
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localState.setting.general.lang] || 'en')
@@ -312,11 +319,13 @@ export const initFirstOpen = () => {
   isFirstOpen.value = false
 }
 
+export const openWhatsNewModal = (closeToRefresh = false) => {
+  globalState.value.isWhatsNewModalVisible = true
+  globalState.value.isWhatsNewModalCloseToRefresh = closeToRefresh
+}
 export const closeWhatsNewModal = () => {
   globalState.value.isWhatsNewModalVisible = false
-}
-export const openWhatsNewModal = () => {
-  globalState.value.isWhatsNewModalVisible = true
+  globalState.value.isWhatsNewModalCloseToRefresh = false
 }
 
 export const openHelpModal = () => {
@@ -331,7 +340,7 @@ export const checkUpdate = () => {
   }
   log('checkUpdate get new version')
   localState.setting.general.version = pkg.version
-  openWhatsNewModal() // 展示更新内容
+  openWhatsNewModal(true) // 展示更新内容
   updateSetting() // 刷新配置设置
 }
 

@@ -17,8 +17,8 @@ import {
   toggleIsDragMode,
   isSettingDrawerVisible,
   toggleIsSettingDrawerVisible,
-  currSettingTabValue,
   getTargetDataFromEvent,
+  globalState,
 } from '@/logic'
 
 const state = reactive({
@@ -51,7 +51,7 @@ const menuActionMap = {
       tabName = 'clock'
     }
     if (tabName.length !== 0) {
-      currSettingTabValue.value = tabName
+      globalState.value.currSettingTabValue = tabName
     }
     toggleIsSettingDrawerVisible()
   },

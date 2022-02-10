@@ -26,7 +26,7 @@
       :placement="localState.setting.general.drawerPlacement"
     >
       <NDrawerContent>
-        <NTabs type="line" :value="currSettingTabValue" @update:value="onTabsChange">
+        <NTabs type="line" :value="globalState.currSettingTabValue" @update:value="onTabsChange">
           <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
             <component :is="item.component" />
           </NTabPane>
@@ -36,7 +36,7 @@
       <div class="drawer__bottom" :style="`background-color: ${bgBottomBar};`">
         <div class="bottom__left">
           <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
-            <ic:round-preview />&nbsp;{{ $t('common.preview') }}
+            <mdi:eye-circle-outline />&nbsp;{{ $t('common.preview') }}
           </NButton>
           <NButton class="left__item" size="small" title="DragMode" @click="openDragMode()">
             <tabler:drag-drop />&nbsp;{{ $t('common.dragMode') }}
@@ -73,12 +73,12 @@ import WeatherSetting from './components/WeatherSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
 import {
   URL_GITHUB,
-  currSettingTabValue,
   gaEvent,
   getIsComponentRender,
   getLayoutStyle,
   getStyleConst,
   localState,
+  globalState,
   isDragMode,
   isSettingDrawerVisible,
   createTab,
@@ -135,7 +135,7 @@ const tabPaneList = computed(() => [
 ])
 
 const onTabsChange = (tabName: string) => {
-  currSettingTabValue.value = tabName
+  globalState.value.currSettingTabValue = tabName
 }
 
 const openSettingModal = () => {

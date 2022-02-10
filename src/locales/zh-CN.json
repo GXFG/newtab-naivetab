@@ -57,6 +57,7 @@
     "drawerSite": "抽屉位置",
     "local": "本地",
     "bing": "Bing",
+    "favorite": "收藏",
     "margin": "边距",
     "width": "宽度",
     "height": "高度",
@@ -113,9 +114,9 @@
     "resetSettingLabel": "重置设置",
     "resetSettingValue": "重置",
     "language": "语言",
-    "saveCurrendImage": "保存当前图片",
+    "saveCurrendImage": "保存当前背景",
     "filename": "文件名",
-    "localBackgroundTips": "本地图片不会进行同步"
+    "localBackgroundTips": "本地背景图不会进行云同步，仅在当前设备生效"
   },
   "clock": {
     "apMark": "a.p./p.m."

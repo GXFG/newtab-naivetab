@@ -45,6 +45,12 @@ interface Calendar {
   ncWeek: string // "星期六"
 }
 
+interface ImageListItem {
+  id: string
+  url: string
+  desc: string
+}
+
 interface ImageItem {
   bot: number
   copyright: string //  "汉密尔顿山顶的利克天文台，美国加利福尼亚州 (© Jeffrey Lewis/Tandem Stills + Motion)"
