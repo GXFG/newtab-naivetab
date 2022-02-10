@@ -59,17 +59,12 @@ watch(
   { immediate: true },
 )
 
-const themeOverrides: GlobalThemeOverrides = {
-  common: {},
-}
-
+// UI language
+const nativeUILang = ref(enUS)
 const NATIVE_UI_LOCALE_MAP = {
   'zh-CN': zhCN,
   'en-US': enUS,
 }
-
-// UI language
-const nativeUILang = ref(enUS)
 
 watch(
   () => localState.setting.general.lang,
@@ -78,6 +73,11 @@ watch(
   },
   { immediate: true },
 )
+
+// custom theme
+const themeOverrides: GlobalThemeOverrides = {
+  common: {},
+}
 
 const CNAME = 'general'
 const customFontFamily = getStyleField(CNAME, 'fontFamily')

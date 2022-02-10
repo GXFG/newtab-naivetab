@@ -279,11 +279,12 @@ export const localState = reactive({
 })
 
 export const globalState = ref({
+  isUploadSettingLoading: false,
+  isClearStorageLoading: false,
   isHelpModalVisible: false,
   isWhatsNewModalVisible: false,
   isSearchFocused: false,
   isMemoFocused: false,
-  isClearStorageLoading: false,
 })
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localState.setting.general.lang] || 'en')
@@ -329,13 +330,9 @@ export const checkUpdate = () => {
     return
   }
   log('checkUpdate get new version')
+  localState.setting.general.version = pkg.version
   openWhatsNewModal() // 展示更新内容
-  try {
-    updateSetting() // 刷新配置设置
-    localState.setting.general.version = pkg.version
-  } catch (e) {
-    log('checkUpdate mergeState error', e)
-  }
+  updateSetting() // 刷新配置设置
 }
 
 export const createTab = (url: string, active = true) => {
@@ -360,7 +357,7 @@ export const getDefaultBookmarkName = (url: string) => {
     name = `:${domain.split(':')[1]}`
   } else {
     const tempSplitList = domain.split('.')
-    name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0]
+    name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0] // 设置默认name
   }
   return name
 }
@@ -406,12 +403,13 @@ watch(() => localState.setting.general.pageTitle, () => {
 }, { immediate: true })
 
 watch([
-  () => localState.style.general,
+  () => localState.style.general.backgroundColor,
+  () => localState.style.general.fontColor,
   () => localState.common.currAppearanceCode,
 ], () => {
   document.body.style.setProperty('--bg-main', getStyleField('general', 'backgroundColor').value)
   document.body.style.setProperty('--text-color-main', getStyleField('general', 'fontColor').value)
 }, {
   immediate: true,
-  deep: true,
+  deep: true, // color is array
 })

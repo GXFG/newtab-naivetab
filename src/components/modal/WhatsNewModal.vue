@@ -27,11 +27,14 @@
 
 <script setup lang="ts">
 import Currentlog from '../../../CHANGELOG.md'
-import { globalState, closeWhatsNewModal, refreshSettingAndClearStorage } from '@/logic'
+import { globalState, closeWhatsNewModal, refreshSetting } from '@/logic'
 
 const onClose = () => {
-  refreshSettingAndClearStorage()
-  // closeWhatsNewModal()
+  if (globalState.value.isWhatsNewModalCloseToRefresh) {
+    refreshSetting()
+    return
+  }
+  closeWhatsNewModal()
 }
 </script>
 

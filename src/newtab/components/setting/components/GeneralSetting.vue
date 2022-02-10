@@ -114,7 +114,7 @@
         <Tips :content="$t('general.exportSettingTips')" />
       </NFormItem>
       <NFormItem :label="$t('general.clearStorageLabel')">
-        <NButton :loading="globalState.isClearStorageLoading" @click="refreshSettingAndClearStorage()">
+        <NButton :loading="globalState.isClearStorageLoading" @click="refreshSetting()">
           <ant-design:clear-outlined />&nbsp;{{ $t('general.clearStorageValue') }}
         </NButton>
         <Tips :content="$t('general.clearStorageTips')" />
@@ -147,7 +147,7 @@ import {
   isImageListLoading,
   isImageLoading,
   onRefreshImageList,
-  refreshSettingAndClearStorage,
+  refreshSetting,
   resetSetting,
 } from '@/logic'
 import i18n from '@/lib/i18n'
