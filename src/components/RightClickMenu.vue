@@ -39,7 +39,7 @@ const menuList = computed(() => [
     key: 'd1',
   },
   {
-    label: window.$t('common.dragMode'),
+    label: isDragMode.value ? `${window.$t('common.close')}${window.$t('common.dragMode')}` : window.$t('common.dragMode'),
     key: 'dragMode',
   },
 ])
