@@ -16,8 +16,70 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  font-family: arial, sans-serif;
   font-size: 14px;
   color: var(--text-color-main) !important;
   background-color: var(--bg-main) !important;
+}
+
+/* button icon */
+.icon__wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* setting */
+.setting__row-element {
+  margin-left: 10px;
+}
+.setting__input-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  .setting__input_item {
+    display: flex;
+    align-items: center;
+    &:nth-of-type(2) {
+      flex: 1;
+      justify-content: flex-end;
+      margin-left: 10px;
+    }
+  }
+}
+.setting__input-number {
+  flex: 0 0 auto;
+  margin-left: 10px;
+  width: 110px;
+}
+.setting__input-number--unit {
+  flex: 0 0 auto;
+  margin-left: 10px;
+  width: 150px;
+}
+
+/* dragMode input */
+.n-input.n-input--disabled .n-input__input-el,
+.n-input.n-input--disabled .n-input__textarea-el {
+  cursor: move;
+}
+
+/* modal scroll */
+.modal__content {
+  height: 30vh;
+  white-space: pre-line;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  &::-webkit-scrollbar-track {
+    background: #ccc;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
 }

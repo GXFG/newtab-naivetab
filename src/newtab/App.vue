@@ -89,47 +89,4 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
   font-size: v-bind(customFontSize);
   font-family: v-bind(customFontFamily);
 }
-
-.icon__wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.setting__row-element {
-  margin-left: 10px;
-}
-
-.setting__input-wrap {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  .setting__input_item {
-    display: flex;
-    align-items: center;
-    &:nth-of-type(2) {
-      flex: 1;
-      justify-content: flex-end;
-      margin-left: 10px;
-    }
-  }
-}
-
-.setting__input-number {
-  flex: 0 0 auto;
-  margin-left: 10px;
-  width: 110px;
-}
-
-.setting__input-number--unit {
-  flex: 0 0 auto;
-  margin-left: 10px;
-  width: 150px;
-}
-
-/* dragMode input */
-.n-input.n-input--disabled .n-input__input-el,
-.n-input.n-input--disabled .n-input__textarea-el {
-  cursor: move;
-}
 </style>
