@@ -15,15 +15,14 @@
       @select="onSelectCity"
     />
   </NModal>
-  <BaseComponentSetting cname="weather">
+  <!-- main -->
+  <BaseComponentSetting id="weather__setting" cname="weather">
     <template #header>
       <NFormItem :label="$t('weather.city')">
-        <NInputGroup>
-          <NInput v-model:value="localState.setting.weather.city.name" :disabled="true" />
-          <NButton @click="onOpenCityPicker()">
-            <clarity:note-edit-line class="item__icon" />
-          </NButton>
-        </NInputGroup>
+        <NInput v-model:value="localState.setting.weather.city.name" :disabled="true" />
+        <NButton class="setting__row-element" @click="onOpenCityPicker()">
+          <clarity:note-edit-line class="item__icon" />
+        </NButton>
       </NFormItem>
       <NFormItem label="API Key">
         <NInput v-model:value="localState.setting.weather.apiKey" />
@@ -46,14 +45,14 @@
           </div>
         </div>
       </NFormItem>
-      <NFormItem :label="$t('weather.forecast')">
+      <!-- <NFormItem :label="$t('weather.forecast')">
         <NTooltip trigger="hover">
           <template #trigger>
             <NSwitch v-model:value="localState.setting.weather.forecastEnabled" :disabled="true" />
           </template>
           In development...
         </NTooltip>
-      </NFormItem>
+      </NFormItem> -->
     </template>
   </BaseComponentSetting>
 </template>
@@ -121,3 +120,12 @@ const onOpenCityPicker = () => {
   state.isCityPickerModalVisible = true
 }
 </script>
+
+<style>
+#weather__setting {
+  .n-input.n-input--disabled .n-input__input-el,
+  .n-input.n-input--disabled .n-input__textarea-el {
+    cursor: not-allowed;
+  }
+}
+</style>

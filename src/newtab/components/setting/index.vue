@@ -63,9 +63,9 @@
 
 <script setup lang="ts">
 import pkg from '../../../../package.json'
-import GeneralSetting from './components/GeneralSetting.vue'
+import GeneralSetting from './components/GeneralSetting/index.vue'
+import ClockSetting from './components/ClockSetting/index.vue'
 import BookmarkSetting from './components/BookmarkSetting.vue'
-import ClockSetting from './components/ClockSetting.vue'
 import DateSetting from './components/DateSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
