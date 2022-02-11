@@ -1,7 +1,7 @@
 <template>
   <NModal :show="globalState.isHelpModalVisible" :mask-closable="false">
     <NCard class="card__wrap" :title="`📝 ${$t('help.title')}`">
-      <p class="card__content">
+      <p class="modal__content">
         {{ $t('help.content') }}
       </p>
       <div class="card__footer">
@@ -53,9 +53,7 @@ watch(
 .card__wrap {
   width: 500px;
 }
-.card__content {
-  white-space: pre-line;
-}
+
 .card__footer {
   display: flex;
   justify-content: flex-end;

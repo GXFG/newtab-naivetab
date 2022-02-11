@@ -3,14 +3,8 @@
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { storage } from 'webextension-polyfill'
-import type { StorageLikeAsync } from '@vueuse/core'
-import {
-  useLocalStorage,
-  useStorageAsync,
-  MaybeRef,
-  StorageAsyncOptions,
-  RemovableRef,
-} from '@vueuse/core'
+import type { StorageLikeAsync, MaybeRef, StorageAsyncOptions, RemovableRef } from '@vueuse/core'
+import { useLocalStorage, useStorageAsync } from '@vueuse/core'
 
 const storageLocal: StorageLikeAsync = {
   removeItem(key: string) {
@@ -26,7 +20,7 @@ const storageLocal: StorageLikeAsync = {
   },
 }
 
-// Todo 每次载入页面均会触发watch，暂时关闭
+// Todo 不能持久化
 // export const useStorageLocal = <T>(
 //   key: string,
 //   initialValue: MaybeRef<T>,

@@ -51,7 +51,7 @@ interface ImageListItem {
   desc: string
 }
 
-interface ImageItem {
+interface BingImageItem {
   bot: number
   copyright: string //  "汉密尔顿山顶的利克天文台，美国加利福尼亚州 (© Jeffrey Lewis/Tandem Stills + Motion)"
   copyrightlink: string // "https://www.bing.com/search?q=%E5%88%A9%E5%85%8B%E5%A4%A9%E6%96%87%E5%8F%B0&form=hpcapt&mkt=zh-cn"
@@ -84,6 +84,7 @@ interface CityItem {
   tz: string // "Asia/Shanghai"
   utcOffset: string // "+08:00"
 }
+
 interface IndicesItem {
   category: string // "较不宜"
   date: string // "2022-01-29"

@@ -63,13 +63,6 @@ const state = reactive({
 
 const elementList = computed(() => [
   {
-    label: window.$t('setting.mainLabel'),
-    componentName: 'settingIcon',
-    iconName: 'ic:baseline-settings',
-    iconSize: 26,
-    disabled: localState.setting.settingIcon.enabled,
-  },
-  {
     label: window.$t('setting.bookmark'),
     componentName: 'bookmark',
     iconName: 'ic:outline-keyboard-alt',
@@ -124,6 +117,13 @@ const elementList = computed(() => [
     iconName: 'fluent:notepad-edit-16-regular',
     iconSize: 24,
     disabled: localState.setting.memo.enabled,
+  },
+  {
+    label: window.$t('setting.mainLabel'),
+    componentName: 'settingIcon',
+    iconName: 'ic:baseline-settings',
+    iconSize: 26,
+    disabled: localState.setting.settingIcon.enabled,
   },
 ])
 

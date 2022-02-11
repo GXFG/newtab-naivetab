@@ -188,7 +188,7 @@ export const defaultState = {
       lang: chrome.i18n.getUILanguage() || 'en-US',
       drawerPlacement: 'right' as any,
       isBackgroundImageEnabled: true,
-      backgroundImageSource: 9, // 0:localFile, 9:favorite, 1:bing
+      backgroundImageSource: 1, // 0:localFile, 1:network
       backgroundImageId: '/th?id=OHR.Oymyakon_ZH-CN7758768574', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
       backgroundImageUrl: 'http://cn.bing.com//th?id=OHR.Oymyakon_ZH-CN7758768574_UHD.jpg',
       favoriteBackgroundList: [

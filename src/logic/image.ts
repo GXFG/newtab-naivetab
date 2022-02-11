@@ -3,8 +3,7 @@ import { getBingImages } from '@/api'
 import { localState } from '@/logic'
 
 export const imageState = ref(useStorageLocal('data-images', {
-  imageList: [] as ImageItem[],
-  syncDate: '',
+  imageList: [] as BingImageItem[],
   localBackgroundFileName: '',
   localBackgroundBase64: '',
 }))
@@ -14,16 +13,14 @@ export const imageState = ref(useStorageLocal('data-images', {
  */
 export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http://cn.bing.com/${url}_${size}.jpg`
 
-export const currPreviewImageList = computed(() => {
-  if (localState.setting.general.backgroundImageSource === 1) {
-    return imageState.value.imageList.map((item: ImageItem) => ({
-      id: item.urlbase,
-      url: getImageUrlFromBing(item.urlbase),
-      desc: item.copyright,
-    }))
-  }
-  return localState.setting.general.favoriteBackgroundList
-})
+export const currPreviewImageListMap = computed(() => ({
+  favorite: localState.setting.general.favoriteBackgroundList,
+  bing: imageState.value.imageList.map((item: BingImageItem) => ({
+    id: item.urlbase,
+    url: getImageUrlFromBing(item.urlbase),
+    desc: item.copyright,
+  })),
+}))
 
 export const isImageLoading = ref(false)
 export const isImageListLoading = ref(false)
@@ -33,7 +30,6 @@ const getImages = async() => {
     isImageListLoading.value = true
     const data: any = await getBingImages()
     isImageListLoading.value = false
-    imageState.value.syncDate = dayjs().format('YYYY-MM-DD')
     imageState.value.imageList = data.images
   } catch (e) {
     isImageListLoading.value = false
@@ -53,10 +49,10 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
     currUrl = imageState.value.localBackgroundBase64
   } else {
     if (initPage && localState.setting.general.backgroundImageUrl.length !== 0) {
-      // 初始化页面时且本地有图片缓存时，读取上一次的设置
+      // 初始化页面且本地有图片缓存时，读取上一次的设置
       currUrl = localState.setting.general.backgroundImageUrl
     } else {
-      let index = imageState.value.imageList.findIndex((item: ImageItem) => item.urlbase === localState.setting.general.backgroundImageId)
+      let index = imageState.value.imageList.findIndex((item: BingImageItem) => item.urlbase === localState.setting.general.backgroundImageId)
       index = index === -1 ? 0 : index
       const urlbase = imageState.value.imageList[index].urlbase
       const httpUrl = getImageUrlFromBing(urlbase)

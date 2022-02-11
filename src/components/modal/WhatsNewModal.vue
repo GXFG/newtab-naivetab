@@ -1,7 +1,7 @@
 <template>
   <NModal :show="globalState.isWhatsNewModalVisible" :mask-closable="false">
-    <NCard class="card__wrap" :title="`${$t('common.whatsNew')}`">
-      <div class="card__content">
+    <NCard class="card__wrap" :title="`✨${$t('common.whatsNew')}✨`">
+      <div class="modal__content">
         <Currentlog />
       </div>
       <div class="card__footer">
@@ -42,23 +42,7 @@ const onClose = () => {
 .card__wrap {
   width: 500px;
 }
-.card__content {
-  height: 30vh;
-  overflow-y: scroll;
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #808080;
-    border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  }
-  &::-webkit-scrollbar-track {
-    background: #ccc;
-    border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  }
-}
+
 .card__footer {
   display: flex;
   justify-content: flex-end;
