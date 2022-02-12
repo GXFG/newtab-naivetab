@@ -25,7 +25,7 @@
               size="large"
               class="input__main"
               :class="{ 'input__main--move': isDragMode }"
-              :placeholder="localState.setting.search.placeholder"
+              :placeholder="localState.setting.search.placeholder || localState.setting.search.urlName"
               :disabled="isDragMode"
               clearable
               @focus="onSearchFocus()"

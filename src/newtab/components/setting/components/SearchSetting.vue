@@ -5,7 +5,7 @@
         <NSelect v-model:value="localState.setting.search.urlValue" :options="SEARCH_ENGINE_LIST" @update:value="onChangeSearch" />
       </NFormItem>
       <NFormItem :label="$t('search.placeholder')">
-        <NInput v-model:value="localState.setting.search.placeholder" type="text" placeholder=" " />
+        <NInput v-model:value="localState.setting.search.placeholder" type="text" :placeholder="localState.setting.search.urlName" />
       </NFormItem>
       <NFormItem :label="$t('search.icon')">
         <NSwitch v-model:value="localState.setting.search.iconEnabled" />
