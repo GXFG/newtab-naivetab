@@ -12,7 +12,7 @@
       </div>
       <div class="drawer__header">
         <NButton ghost type="warning" @click="toggleIsDragMode()">
-          <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}` }}
+          <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}${$t('common.dragMode')}` }}
         </NButton>
       </div>
       <div class="drawer__content">

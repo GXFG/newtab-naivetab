@@ -25,7 +25,7 @@
         </div>
       </div>
       <NSpin :show="isImageListLoading">
-        <NCollapse default-expanded-names="favorite" accordion>
+        <NCollapse accordion>
           <NCollapseItem v-for="origin of Object.keys(currPreviewImageListMap)" :key="origin" :title="$t(`common.${origin}`)" :name="origin">
             <div class="picker__images">
               <div v-for="item in currPreviewImageListMap[origin]" :key="item.url" class="image__item">
@@ -57,7 +57,7 @@ const onCloseModal = () => {
 
 <style scoped>
 .modal__content {
-  height: 50vh;
+  height: 70vh;
   .picker__label {
     opacity: 0.6;
   }

@@ -87,7 +87,7 @@
       <NFormItem :label="$t('general.resetSettingLabel')">
         <NPopconfirm @positive-click="onResetSetting()">
           <template #trigger>
-            <NButton dashed type="error">
+            <NButton ghost type="error">
               <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}
             </NButton>
           </template>

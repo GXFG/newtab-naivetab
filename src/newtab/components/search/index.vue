@@ -155,10 +155,9 @@ const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
-<style scoped>
+<style>
 #search {
   font-family: v-bind(customFontFamily);
-  color: v-bind(customFontColor);
   user-select: none;
   .search__container {
     z-index: 10;
@@ -168,11 +167,26 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     align-items: center;
     border-radius: 4px;
     background-color: v-bind(customBackgroundColor);
+    .n-input__border {
+      border: 0 !important;
+    }
     .input__main {
       flex: 1;
       width: v-bind(customWidth);
       font-size: v-bind(customFontSize);
       background-color: v-bind(customBackgroundColor);
+      .n-input__input-el {
+        color: v-bind(customFontColor) !important;
+      }
+      .n-input__input-el::input-placeholder {
+        color: v-bind(customFontColor) !important;
+      }
+      .n-input__input-el::-webkit-input-placeholder {
+        color: v-bind(customFontColor) !important;
+      }
+      .n-input__input-el::-moz-placeholder {
+        color: v-bind(customFontColor) !important;
+      }
     }
     .input__main--move {
       cursor: move !important;

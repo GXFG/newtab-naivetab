@@ -41,6 +41,6 @@
 ## 🌼感谢
 
 - [Vitesse-webext](https://github.com/antfu/vitesse-webext)
-- [Naiveui](https://www.naiveui.com/zh-CN/os-theme)
 - [VueUse](https://vueuse.org/guide/index.html)
+- [Naiveui](https://www.naiveui.com/zh-CN/os-theme)
 - [icones](https://icones.js.org)
