@@ -191,6 +191,7 @@ export const defaultState = {
       backgroundImageSource: 1, // 0:localFile, 1:network
       backgroundImageId: '/th?id=OHR.Oymyakon_ZH-CN7758768574', // images[0].urlbase e.g.: '/th?id=OHR.SnowyPrague_ZH-CN9794475183'
       backgroundImageUrl: 'http://cn.bing.com//th?id=OHR.Oymyakon_ZH-CN7758768574_UHD.jpg',
+      backgroundImageDesc: '奥伊米亚康的冬天，俄罗斯 (© Alexandr Berdicevschi/Getty Images)',
       favoriteBackgroundList: [
         {
           id: '/th?id=OHR.Oymyakon_ZH-CN7758768574',

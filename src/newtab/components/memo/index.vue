@@ -48,7 +48,6 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 <style>
 #memo {
   font-family: v-bind(customFontFamily);
-  color: v-bind(customFontColor);
   .memo__container {
     z-index: 10;
     position: absolute;
@@ -59,6 +58,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         height: v-bind(customHeight);
         font-size: v-bind(customFontSize);
         background-color: v-bind(customBackgroundColor);
+        .n-input__textarea-el {
+          color: v-bind(customFontColor);
+        }
       }
     }
   }

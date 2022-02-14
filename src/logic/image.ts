@@ -36,7 +36,7 @@ const getImages = async() => {
   }
 }
 
-const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
+const renderBackgroundImage = async(clearStyle = false) => {
   isImageLoading.value = true
   await nextTick()
   const backgroundEl: any = document.querySelector('#background__container')
@@ -44,26 +44,13 @@ const renderBackgroundImage = async(initPage: boolean, clearStyle = false) => {
     backgroundEl.style = ''
     return
   }
-  let currUrl = ''
-  if (localState.setting.general.backgroundImageSource === 0) {
-    currUrl = imageState.value.localBackgroundBase64
-  } else {
-    if (initPage && localState.setting.general.backgroundImageUrl.length !== 0) {
-      // 初始化页面且本地有图片缓存时，读取上一次的设置
-      currUrl = localState.setting.general.backgroundImageUrl
-    } else {
-      let index = imageState.value.imageList.findIndex((item: BingImageItem) => item.urlbase === localState.setting.general.backgroundImageId)
-      index = index === -1 ? 0 : index
-      const urlbase = imageState.value.imageList[index].urlbase
-      const httpUrl = getImageUrlFromBing(urlbase)
-      localState.setting.general.backgroundImageUrl = httpUrl
-      currUrl = httpUrl
-    }
-  }
+  const currUrl = localState.setting.general.backgroundImageSource === 0
+    ? imageState.value.localBackgroundBase64
+    : localState.setting.general.backgroundImageUrl
   const imgEle = new Image()
   imgEle.src = currUrl
-  // 图片加载完成后再切换背景图
   imgEle.onload = async() => {
+    // 图片加载完成后再切换背景图
     const bgImg = `background-image: url(${currUrl});`
     backgroundEl.style = bgImg
     await nextTick()
@@ -83,14 +70,14 @@ watch([
   if (!localState.setting.general.isBackgroundImageEnabled || imageState.value.imageList.length === 0) {
     return
   }
-  renderBackgroundImage(false)
+  renderBackgroundImage()
 })
 
 watch(() => localState.setting.general.isBackgroundImageEnabled, async(isEnabled) => {
   if (imageState.value.imageList.length === 0) {
     await getImages()
   }
-  renderBackgroundImage(true, !isEnabled)
+  renderBackgroundImage(!isEnabled)
 }, { immediate: true })
 
 export const onRefreshImageList = () => {

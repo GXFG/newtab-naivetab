@@ -1,6 +1,7 @@
 <template>
   <div class="image-wrap" :class="{ 'image-wrap--active': isCurrSelectedImage }">
     <NSpin :show="isCurrSelectedImage && isImageLoading">
+      <!-- 懒加载的img不支持reactive变量 -->
       <img v-if="lazy" v-lazy="props.data.url" alt="" @click="onSelectImage()">
       <img v-else :src="props.data.url" alt="" @click="onSelectImage()">
     </NSpin>
@@ -72,6 +73,8 @@ const onSelectImage = () => {
     return
   }
   localState.setting.general.backgroundImageId = props.data.id
+  localState.setting.general.backgroundImageUrl = props.data.url
+  localState.setting.general.backgroundImageDesc = props.data.desc
 }
 
 const onViewImage = () => {
@@ -128,6 +131,7 @@ const themeColorMain = getStyleConst('themeColorMain')
       display: flex;
       justify-content: center;
       align-items: center;
+      color: #fff;
     }
   }
   .image__current-mask {

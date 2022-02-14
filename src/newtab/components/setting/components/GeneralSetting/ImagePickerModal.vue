@@ -19,7 +19,7 @@
             :data="{
               id: localState.setting.general.backgroundImageId,
               url: localState.setting.general.backgroundImageUrl,
-              desc: '',
+              desc: localState.setting.general.backgroundImageDesc,
             }"
           />
         </div>
@@ -67,6 +67,7 @@ const props = defineProps({
     flex: 0 0 auto;
     margin: 1.5%;
     width: 30%;
+    height: 110px;
   }
 }
 </style>
