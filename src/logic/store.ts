@@ -210,12 +210,7 @@ export const defaultState = {
       isNumberEnabled: false,
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
-      keymap: {
-        q: {
-          url: 'www.baidu.com',
-          name: '',
-        },
-      },
+      keymap: {},
     },
     clockDigital: {
       enabled: true,

@@ -1,5 +1,5 @@
-export const URL_CHANGELOG = 'https://github.com/GXFG/newtab-puzzletab/blob/main/CHANGELOG.md'
-export const URL_GITHUB = 'https://github.com/GXFG/newtab-puzzletab'
+export const URL_CHANGELOG = 'https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md'
+export const URL_GITHUB = 'https://github.com/GXFG/newtab-naivetab'
 export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
 export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'
 export const URL_QWEATHER_HOME = 'https://www.qweather.com/'

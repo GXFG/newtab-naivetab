@@ -36,7 +36,7 @@ const uploadFn = () => {
     style: localState.style,
     setting: localState.setting,
   })
-  chrome.storage.sync.set({ PuzzleTabSetting: localData }, () => {
+  chrome.storage.sync.set({ NaiveTabSetting: localData }, () => {
     log('Sync settings complete')
     globalState.value.isUploadSettingLoading = false
   })
@@ -110,13 +110,13 @@ export const updateSetting = (acceptState = localState) => {
 }
 
 export const loadSyncSetting = () => {
-  chrome.storage.sync.get(null, ({ PuzzleTabSetting }) => {
-    if (!PuzzleTabSetting) {
+  chrome.storage.sync.get(null, ({ NaiveTabSetting }) => {
+    if (!NaiveTabSetting) {
       log('Notfound settings')
       uploadFn() // 初始化设置到云端
       return
     }
-    const cloudSetting = JSON.parse(PuzzleTabSetting)
+    const cloudSetting = JSON.parse(NaiveTabSetting)
     if (cloudSetting.syncTime === localState.common.syncTime) {
       log('None modification settings')
       return
@@ -179,7 +179,7 @@ export const importSetting = async(text: string) => {
 }
 
 export const exportSetting = () => {
-  const filename = `puzzletab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
+  const filename = `naivetab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadJsonByTagA({
     style: localState.style,
     setting: localState.setting,

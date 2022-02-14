@@ -1,8 +1,8 @@
 <div align="center">
   <img src="https://user-images.githubusercontent.com/20944987/147905855-2a1eaebf-d7af-45d1-9aa2-2f96806d79c9.png" />
-  <h1 align="center">PuzzleTab</h1>
+  <h1 align="center">NaiveTab</h1>
   <p align="center">A clean browser with newtab page extensions</p>
-  <p align="center">English | <a href="https://github.com/GXFG/newtab-puzzletab/blob/main/README.md">中文</a></p>
+  <p align="center">English | <a href="https://github.com/GXFG/newtab-naivetab/blob/main/README.md">中文</a></p>
 </div>
 
 ## 🌟Feature
@@ -27,12 +27,12 @@
 
 ## 🛠️Install
 
-- **Chrome** url: [PuzzleTab](https://chrome.google.com/webstore/detail/puzzletab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem/related)
+- **Chrome** url: [NaiveTab](https://chrome.google.com/webstore/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem/related)
 - **Edge**: Install via the address above.
 
 ## 📜Changelog
 
-[View Changelog](https://github.com/GXFG/newtab-puzzletab/blob/main/CHANGELOG.md)
+[View Changelog](https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md)
 
 ## 🏗Contribute
 
