@@ -3,6 +3,30 @@ import { log, downloadJsonByTagA } from './util'
 import { MERGE_SETTING_DELAY } from './const'
 import { defaultState, localState, globalState } from './store'
 
+export const checkPermission = (field: OptionsPermission) => {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.permissions.contains({ permissions: [field] }, (granted) => {
+        resolve(granted)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export const requestPermission = (field: OptionsPermission) => {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.permissions.request({ permissions: [field] }, (granted) => {
+        resolve(granted)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 const uploadFn = () => {
   globalState.value.isUploadSettingLoading = true
   log('uploadSetting')

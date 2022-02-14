@@ -27,8 +27,10 @@ export async function getManifest() {
       'chrome://favicon/',
       'https://cn.bing.com/', // image
       'https://www.baidu.com/', // search
-      'https://devapi.qweather.com/', // weather
-      'https://geoapi.qweather.com/', // weather
+      'https://*.qweather.com/', // weather
+    ],
+    optional_permissions: [
+      'bookmarks',
     ],
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',

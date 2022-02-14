@@ -1,5 +1,6 @@
 import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
+import { isNotChrome } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
 import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, log } from '@/logic'
@@ -205,11 +206,16 @@ export const defaultState = {
     },
     bookmark: {
       enabled: false,
-      isSymbolEnabled: false,
+      isSymbolEnabled: true,
       isNumberEnabled: false,
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
-      keymap: {},
+      keymap: {
+        q: {
+          url: 'www.baidu.com',
+          name: '',
+        },
+      },
     },
     clockDigital: {
       enabled: true,
@@ -350,6 +356,13 @@ export const createTab = (url: string, active = true) => {
     return
   }
   chrome.tabs.create({ url, active })
+}
+
+export const getDomainIcon = (url: string) => {
+  if (isNotChrome) {
+    return `${url}/favicon.ico`
+  }
+  return `chrome://favicon/size/16@2x/${url}`
 }
 
 export const getDefaultBookmarkName = (url: string) => {

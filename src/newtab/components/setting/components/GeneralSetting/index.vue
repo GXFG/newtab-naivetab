@@ -1,5 +1,6 @@
 <template>
-  <ImagePickerModal :show="state.isImageListVisible" :change="toggleIsImageListVisible" />
+  <ImagePickerModal :show="state.isImageListVisible" @close="toggleIsImageListVisible" />
+
   <!-- main -->
   <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
     <template #header>

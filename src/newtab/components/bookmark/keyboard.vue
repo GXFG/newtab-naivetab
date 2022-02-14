@@ -49,11 +49,11 @@ import {
   getStyleField,
   addKeyboardTask,
   createTab,
+  getDomainIcon,
   localBookmarkList,
   keyboardRowList,
   initBookmarkListData,
 } from '@/logic'
-import { isNotChrome } from '@/env'
 
 const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
@@ -65,13 +65,6 @@ const state = reactive({
 onMounted(() => {
   initBookmarkListData()
 })
-
-const getDomainIcon = (url: string) => {
-  if (isNotChrome) {
-    return `${url}/favicon.ico`
-  }
-  return `chrome://favicon/size/16@2x/${url}`
-}
 
 const onClickKey = (url: string) => {
   if (isDragMode.value) {

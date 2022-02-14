@@ -6,7 +6,7 @@
     preset="card"
     :title="`${$t('common.edit')}${$t('common.backgroundImage')}`"
     :mask-closable="true"
-    @update:show="props.change()"
+    @update:show="onCloseModal()"
   >
     <div class="modal__content">
       <div>
@@ -46,11 +46,13 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  change: {
-    type: Function,
-    required: true,
-  },
 })
+
+const emit = defineEmits(['close'])
+
+const onCloseModal = () => {
+  emit('close')
+}
 </script>
 
 <style scoped>

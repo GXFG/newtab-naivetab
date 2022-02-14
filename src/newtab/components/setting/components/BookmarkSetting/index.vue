@@ -1,4 +1,6 @@
 <template>
+  <BookmarkPickerModal :show="state.isBookmarkModalVisible" @close="toggleIsBookmarkPickerVisible" @select="onSelectBookmark" />
+
   <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['bookmarkKeyboard']">
     <!-- bookmarkKeyboard -->
     <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
@@ -27,6 +29,7 @@
               </div>
             </div>
           </NFormItem>
+
           <div class="modal__bookmark">
             <NInputGroup class="bookmark__label">
               <p class="label__text">
@@ -61,18 +64,28 @@
                     clearable
                     :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
                   />
-                  <NButton @click="onMoveKey(key, 'up')">
-                    <jam:chevron-up class="item__icon" />
+                  <NButton @click="onImportBookmark(key)">
+                    <bi:bookmark-plus />
                   </NButton>
-                  <NButton @click="onMoveKey(key, 'down')">
-                    <jam:chevron-down class="item__icon" />
-                  </NButton>
-                  <NButton @click="onDeleteKey(key)">
-                    <ri:delete-bin-6-line class="item__icon" />
-                  </NButton>
+                  <div class="item__move">
+                    <NButton class="move__btn" @click="onMoveKey(key, 'up')">
+                      <jam:chevron-up />
+                    </NButton>
+                    <NButton class="move__btn" @click="onMoveKey(key, 'down')">
+                      <jam:chevron-down />
+                    </NButton>
+                  </div>
+                  <NPopconfirm @positive-click="onDeleteKey(key)">
+                    <template #trigger>
+                      <NButton>
+                        <ri:delete-bin-6-line />
+                      </NButton>
+                    </template>
+                    {{ $t('common.confirm') }}?
+                  </NPopconfirm>
                 </template>
                 <NButton v-else class="item__add" @click="onAddKey(key)">
-                  <zondicons:add-solid class="item__icon" />
+                  <zondicons:add-solid />
                 </NButton>
               </NInputGroup>
             </div>
@@ -84,7 +97,17 @@
 </template>
 
 <script setup lang="ts">
-import { localState, keyboardSettingRowList, getDefaultBookmarkName } from '@/logic'
+import BookmarkPickerModal from './BookmarkPickerModal.vue'
+import { localState, keyboardSettingRowList, getDefaultBookmarkName, requestPermission } from '@/logic'
+
+const state = reactive({
+  isBookmarkModalVisible: false,
+  currKey: '',
+})
+
+const toggleIsBookmarkPickerVisible = () => {
+  state.isBookmarkModalVisible = !state.isBookmarkModalVisible
+}
 
 const onAddKey = (key: string) => {
   localState.setting.bookmark.keymap[key] = {
@@ -113,6 +136,23 @@ const onMoveKey = (key: string, type: 'up' | 'down') => {
   const currData: any = localState.setting.bookmark.keymap[key]
   localState.setting.bookmark.keymap[key] = targetData
   localState.setting.bookmark.keymap[targetKey] = currData
+}
+
+const onImportBookmark = async(key: string) => {
+  const granted = await requestPermission('bookmarks')
+  if (!granted) {
+    return
+  }
+  state.currKey = key
+  toggleIsBookmarkPickerVisible()
+}
+
+const onSelectBookmark = (payload: ChromeBookmarkItem) => {
+  const key = state.currKey
+  localState.setting.bookmark.keymap[key] = {
+    url: payload.url,
+    name: payload.title,
+  }
 }
 </script>
 
@@ -157,6 +197,13 @@ const onMoveKey = (key: string, type: 'up' | 'down') => {
       }
       .item__add {
         flex: 1;
+      }
+      .item__move {
+        display: flex;
+        flex-direction: column;
+        .move__btn {
+          height: 17px;
+        }
       }
     }
   }
