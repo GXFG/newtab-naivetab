@@ -26,10 +26,11 @@
 
 | Description | Preview |
 | ---- | ---- |
-| Overview | <img width="1280" alt="1" src="https://user-images.githubusercontent.com/20944987/149626030-fa635451-f289-45d1-b97c-222384964801.png"> |
-| Each component can be placed anywhere on the screen via dragMode | <img width="1280" alt="2" src="https://user-images.githubusercontent.com/20944987/149626121-7228eb4a-d9ed-4b9c-b3dc-2e0e79c50e85.png"> |
-| Click on the gear icon, or right-click menu to expand the detailed settings drawer, which contains specific configuration items for 'General' and 'Each Components' | <img width="1280" alt="3" src="https://user-images.githubusercontent.com/20944987/149626127-032dc992-9c88-4b6a-b0cc-bc855773dfdd.png"> |
-| Support Bing, local pictures for background image settings;Supports automatic /manual theme mode switching | <img width="1280" alt="4" src="https://user-images.githubusercontent.com/20944987/149626140-5308555c-7032-4f45-9c44-8a0ba027e0ba.png"> |
+| Simple, efficient, highly customizable new tabs | <img width="1280" alt="0" src="https://user-images.githubusercontent.com/20944987/154078631-8ee7fe8d-d2e2-4643-8608-c8b0825bb419.png"> |
+| Support automatic/manual switching of light and dark modes |  <img width="1280" alt="1" src="https://user-images.githubusercontent.com/20944987/154078950-69c6fc2b-a8b7-4fd4-bb98-59d2826224a8.png"> |
+| Components can be dragged and dropped anywhere for full customization | <img width="1280" alt="2" src="https://user-images.githubusercontent.com/20944987/154079047-1bb6dcd5-0b1a-4bbf-99fd-ea726e6d0c15.png"> |
+| Components support rich custom styles | <img width="1280" alt="3" src="https://user-images.githubusercontent.com/20944987/154079176-258da34f-f2e8-4303-9054-2e6996e0aefa.png"> |
+| Contains bookmarks, clocks, dates, weather, perpetual calendars, and more | <img width="1280" alt="4" src="https://user-images.githubusercontent.com/20944987/154079205-a0b3a0e1-7984-4e2d-9bbf-adfbb005ee25.png"> |
 
 ## 🛠️Install
 
