@@ -62,6 +62,7 @@
     "margin": "Margin",
     "width": "Width",
     "height": "Height",
+    "borderRadius": "Radius",
     "icon": "Icon",
     "config": "Config",
     "format": "Format",

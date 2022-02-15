@@ -123,6 +123,7 @@ const customMargin = getStyleField(CNAME, 'margin', 'px')
 const customHalfWidth = getStyleField(CNAME, 'width', 'px', 0.5)
 const customWidth = getStyleField(CNAME, 'width', 'px')
 const customTrebleHalfWidth = getStyleField(CNAME, 'width', 'px', 1.5)
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
@@ -182,7 +183,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         text-align: center;
         color: v-bind(customFontColor);
         background-color: v-bind(customBackgroundColor);
-        border-radius: 4px;
+        border-radius: v-bind(customBorderRadius);
         cursor: pointer;
         transition: all 0.3s ease;
         box-sizing: border-box;

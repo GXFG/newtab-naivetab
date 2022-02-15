@@ -62,7 +62,9 @@
         {{ $t('general.settingDividerSetting') }}
       </NDivider>
       <NFormItem :label="$t('general.syncTime')">
-        <p>{{ syncTime }}</p>
+        <NSpin :show="globalState.isUploadSettingLoading" size="small">
+          <p>{{ syncTime }}</p>
+        </NSpin>
         <Tips :content="$t('general.syncTimeTips')" />
       </NFormItem>
       <NFormItem :label="$t('general.importSettingsLabel')">

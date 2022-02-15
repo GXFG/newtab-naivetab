@@ -43,6 +43,7 @@ const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
+const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'px')
 </script>
 
 <style scoped>
@@ -55,6 +56,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     position: absolute;
     .date__text {
       font-size: v-bind(customFontSize);
+      letter-spacing: v-bind(customLetterSpacing);
     }
   }
   .date__container--shadow {

@@ -257,6 +257,7 @@ const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customItemWidth = getStyleField(CNAME, 'width', 'px')
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
 const customItemActiveColor = getStyleField(CNAME, 'activeColor')
 const textColorRed = getStyleConst('textColorRed')
 const bgCalendarRest = getStyleConst('bgCalendarRest')
@@ -274,7 +275,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
     position: absolute;
     width: v-bind(customContainerWidth);
     text-align: center;
-    border-radius: 4px;
+    border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
     user-select: none;
     overflow: hidden;
@@ -338,7 +339,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         width: v-bind(customItemWidth);
         height: v-bind(customItemWidth);
         text-align: center;
-        border-radius: 4px;
+        border-radius: v-bind(customBorderRadius);
         border: 1px solid rgba(0, 0, 0, 0);
         transition: all 0.3s ease;
         overflow: hidden;

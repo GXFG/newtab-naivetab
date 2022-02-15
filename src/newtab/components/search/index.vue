@@ -149,6 +149,7 @@ const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customWidth = getStyleField(CNAME, 'width', 'px')
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
@@ -165,10 +166,13 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 4px;
+    border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
     .n-input__border {
       border: 0 !important;
+    }
+    .n-input, .n-input--focus {
+      border-radius: v-bind(customBorderRadius);
     }
     .input__main {
       flex: 1;

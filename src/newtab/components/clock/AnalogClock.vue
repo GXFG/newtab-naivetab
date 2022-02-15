@@ -79,7 +79,6 @@ const secondDeg = computed(() => `${state.secondDeg}deg`)
       position: relative;
       height: v-bind(customWidth);
       width: v-bind(customWidth);
-      border-radius: 20%;
       background-size: 100%;
       .clock__base {
         position: absolute;

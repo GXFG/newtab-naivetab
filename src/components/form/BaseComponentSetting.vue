@@ -8,60 +8,64 @@
     <slot name="style" />
 
     <!-- size -->
-    <NFormItem v-if="isFieldRender('margin')" :label="$t('common.margin')">
+    <NFormItem v-if="isRenderField('margin')" :label="$t('common.margin')">
       <NSlider v-model:value="localState.style[props.cname].margin" :step="1" :min="1" :max="100" />
       <NInputNumber v-model:value="localState.style[props.cname].margin" class="setting__input-number" :step="1" :min="1" :max="100" />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('width')" :label="$t('common.width')">
+    <NFormItem v-if="isRenderField('width')" :label="$t('common.width')">
       <NSlider v-model:value="localState.style[props.cname].width" :step="1" :min="1" :max="500" />
       <NInputNumber v-model:value="localState.style[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="500" />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('height')" :label="$t('common.height')">
+    <NFormItem v-if="isRenderField('height')" :label="$t('common.height')">
       <NSlider v-model:value="localState.style[props.cname].height" :step="1" :min="1" :max="500" />
       <NInputNumber v-model:value="localState.style[props.cname].height" class="setting__input-number" :step="1" :min="1" :max="500" />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('fontFamily')" :label="$t('common.font')">
-      <NSelect v-model:value="localState.style[props.cname].fontFamily" :options="availableFontOptions" :render-label="selectRenderLabel" />
+    <NFormItem v-if="isRenderField('borderRadius')" :label="$t('common.borderRadius')">
+      <NSlider v-model:value="localState.style[props.cname].borderRadius" :step="1" :min="0" :max="200" />
+      <NInputNumber v-model:value="localState.style[props.cname].borderRadius" class="setting__input-number" :step="1" :min="0" :max="200" />
+    </NFormItem>
+    <NFormItem v-if="isRenderField('fontFamily')" :label="$t('common.font')">
+      <NSelect v-model:value="localState.style[props.cname].fontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
       <NInputNumber v-model:value="localState.style[props.cname].fontSize" class="setting__input-number" :step="1" :min="12" :max="200" />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('letterSpacing')" :label="$t('common.letterSpacing')">
+    <NFormItem v-if="isRenderField('letterSpacing')" :label="$t('common.letterSpacing')">
       <NSlider v-model:value="localState.style[props.cname].letterSpacing" :step="1" :min="0" :max="20" />
       <NInputNumber v-model:value="localState.style[props.cname].letterSpacing" class="setting__input-number" :step="1" :min="0" :max="20" />
     </NFormItem>
 
     <!-- color -->
-    <NFormItem v-if="isFieldRender('fontColor')" :label="$t('common.fontColor')">
+    <NFormItem v-if="isRenderField('fontColor')" :label="$t('common.fontColor')">
       <NColorPicker
         v-model:value="localState.style[props.cname].fontColor[localState.common.currAppearanceCode]"
         show-preview
         :swatches="swatcheColors"
       />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('backgroundColor')" :label="$t('common.backgroundColor')">
+    <NFormItem v-if="isRenderField('backgroundColor')" :label="$t('common.backgroundColor')">
       <NColorPicker
         v-model:value="localState.style[props.cname].backgroundColor[localState.common.currAppearanceCode]"
         show-preview
         :swatches="swatcheColors"
       />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('activeColor')" :label="$t('common.activeColor')">
+    <NFormItem v-if="isRenderField('activeColor')" :label="$t('common.activeColor')">
       <NColorPicker
         v-model:value="localState.style[props.cname].activeColor[localState.common.currAppearanceCode]"
         show-preview
         :swatches="swatcheColors"
       />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('borderColor')" :label="$t('common.border')">
+    <NFormItem v-if="isRenderField('borderColor')" :label="$t('common.border')">
       <NSwitch v-model:value="localState.style[props.cname].isBorderEnabled" />
       <NColorPicker
-        v-if="isFieldRender('isBorderEnabled')"
+        v-if="isRenderField('isBorderEnabled')"
         v-model:value="localState.style[props.cname].borderColor[localState.common.currAppearanceCode]"
         class="setting__row-element"
         show-preview
         :swatches="swatcheColors"
       />
       <NInputNumber
-        v-if="isFieldRender('borderWidth')"
+        v-if="isRenderField('borderWidth')"
         v-model:value="localState.style[props.cname].borderWidth"
         class="setting__input-number"
         :step="1"
@@ -69,10 +73,10 @@
         :max="10"
       />
     </NFormItem>
-    <NFormItem v-if="isFieldRender('shadowColor')" :label="$t('common.shadow')">
+    <NFormItem v-if="isRenderField('shadowColor')" :label="$t('common.shadow')">
       <NSwitch v-model:value="localState.style[props.cname].isShadowEnabled" />
       <NColorPicker
-        v-if="isFieldRender('isShadowEnabled')"
+        v-if="isRenderField('isShadowEnabled')"
         v-model:value="localState.style[props.cname].shadowColor[localState.common.currAppearanceCode]"
         class="setting__row-element"
         show-preview
@@ -98,7 +102,7 @@ const props = defineProps({
   },
 })
 
-const isFieldRender = (field: string) => {
+const isRenderField = (field: string) => {
   return field in localState.style[props.cname]
 }
 
@@ -109,7 +113,7 @@ const availableFontOptions = computed(() =>
   })),
 )
 
-const selectRenderLabel = (option: SelectStringItem) => {
+const fontSelectRenderLabel = (option: SelectStringItem) => {
   return [
     h(
       'div',

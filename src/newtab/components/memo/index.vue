@@ -1,7 +1,14 @@
 <template>
   <MoveableComponentWrap componentName="memo" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="memo" data-target-type="1" data-target-name="memo">
-      <div class="memo__container" :style="dragStyle || containerStyle" :class="{ 'memo__container--shadow': localState.style.memo.isShadowEnabled }">
+      <div
+        class="memo__container"
+        :style="dragStyle || containerStyle"
+        :class="{
+          'memo__container--border': localState.style.memo.isBorderEnabled,
+          'memo__container--shadow': localState.style.memo.isShadowEnabled
+        }"
+      >
         <div class="memo_wrap">
           <NInput
             v-model:value="localState.setting.memo.content"
@@ -41,6 +48,9 @@ const customHeight = getStyleField(CNAME, 'height', 'px')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
+const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
@@ -51,18 +61,31 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
   .memo__container {
     z-index: 10;
     position: absolute;
+    border-radius: v-bind(customBorderRadius);
+    background-color: v-bind(customBackgroundColor);
+    .n-input__border {
+      border: 0 !important;
+    }
+    .n-input, .n-input--focus {
+      border-radius: v-bind(customBorderRadius);
+    }
     .memo_wrap {
+      .n-input--textarea {
+        background-color: transparent !important;
+      }
       .memo__input {
         padding: 0 8px;
         width: v-bind(customWidth);
         height: v-bind(customHeight);
         font-size: v-bind(customFontSize);
-        background-color: v-bind(customBackgroundColor);
         .n-input__textarea-el {
           color: v-bind(customFontColor);
         }
       }
     }
+  }
+  .memo__container--border {
+    border: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .memo__container--shadow {
     box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;

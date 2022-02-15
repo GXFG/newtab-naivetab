@@ -1,31 +1,7 @@
 import { useDebounceFn } from '@vueuse/core'
-import { log, downloadJsonByTagA } from './util'
+import { log, downloadJsonByTagA, sleep } from './util'
 import { MERGE_SETTING_DELAY } from './const'
 import { defaultState, localState, globalState } from './store'
-
-export const checkPermission = (field: OptionsPermission) => {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.permissions.contains({ permissions: [field] }, (granted) => {
-        resolve(granted)
-      })
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-export const requestPermission = (field: OptionsPermission) => {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.permissions.request({ permissions: [field] }, (granted) => {
-        resolve(granted)
-      })
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
 
 const uploadFn = () => {
   globalState.value.isUploadSettingLoading = true
@@ -100,6 +76,7 @@ export const updateSetting = (acceptState = localState) => {
         // 只遍历acceptState内存在的rootField
         for (const subField of Object.keys(acceptState[rootField])) {
           localState[rootField][subField] = mergeState(defaultState[rootField][subField], acceptState[rootField][subField])
+          // console.log(localState[rootField][subField], defaultState[rootField][subField], acceptState[rootField][subField])
         }
       }
       resolve(true)
@@ -127,9 +104,11 @@ export const loadSyncSetting = () => {
   })
 }
 
-const clearStorage = () => {
+const clearStorage = (clearAll = false) => {
   localStorage.clear()
-  localStorage.setItem('data-first', 'false') // 避免打开help弹窗
+  if (!clearAll) {
+    localStorage.setItem('data-first', 'false') // 避免打开help弹窗
+  }
   location.reload()
 }
 
@@ -142,7 +121,7 @@ export const refreshSetting = async() => {
       return
     }
     stopWatch()
-    await nextTick()
+    await sleep(300) // 确保localStorage写入完成
     clearStorage()
     globalState.value.isClearStorageLoading = false
   })
@@ -172,7 +151,7 @@ export const importSetting = async(text: string) => {
       return
     }
     stopWatch()
-    await nextTick()
+    await sleep(300) // 确保localStorage写入完成
     clearStorage()
     globalState.value.isImportSettingLoading = false
   })
@@ -189,5 +168,29 @@ export const exportSetting = () => {
 
 export const resetSetting = () => {
   chrome.storage.sync.clear()
-  clearStorage()
+  clearStorage(true)
+}
+
+export const checkPermission = (field: OptionsPermission) => {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.permissions.contains({ permissions: [field] }, (granted) => {
+        resolve(granted)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export const requestPermission = (field: OptionsPermission) => {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.permissions.request({ permissions: [field] }, (granted) => {
+        resolve(granted)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
