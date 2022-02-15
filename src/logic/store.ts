@@ -131,6 +131,20 @@ export const defaultState = {
       isShadowEnabled: true,
       shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
     },
+    weather: {
+      layout: {
+        xOffsetKey: 'left',
+        xOffsetValue: 50,
+        xTranslateValue: -50,
+        yOffsetKey: 'bottom',
+        yOffsetValue: 5,
+        yTranslateValue: 0,
+      },
+      fontFamily: 'Arial Rounded MT Bold',
+      fontSize: 14,
+      fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+      iconSize: 50,
+    },
     search: {
       layout: {
         xOffsetKey: 'left',
@@ -151,20 +165,6 @@ export const defaultState = {
       backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(74, 74, 74, 0.1)'],
       isShadowEnabled: true,
       shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
-    },
-    weather: {
-      layout: {
-        xOffsetKey: 'left',
-        xOffsetValue: 50,
-        xTranslateValue: -50,
-        yOffsetKey: 'bottom',
-        yOffsetValue: 5,
-        yTranslateValue: 0,
-      },
-      fontFamily: 'Arial Rounded MT Bold',
-      fontSize: 14,
-      fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-      iconSize: 50,
     },
     memo: {
       layout: {
@@ -261,14 +261,6 @@ export const defaultState = {
     calendar: {
       enabled: true,
     },
-    search: {
-      enabled: true,
-      iconEnabled: false,
-      suggestionEnabled: true,
-      placeholder: '',
-      urlName: 'baidu',
-      urlValue: 'https://www.baidu.com/s?word={query}',
-    },
     weather: {
       enabled: false,
       apiKey: '72db57326f9f494ab04d1d431bc127e9',
@@ -280,6 +272,14 @@ export const defaultState = {
       speedUnit: 'kph', // 'kph' | 'mph'
       iconEnabled: true,
       forecastEnabled: false,
+    },
+    search: {
+      enabled: true,
+      iconEnabled: false,
+      suggestionEnabled: true,
+      placeholder: '',
+      urlName: 'baidu',
+      urlValue: 'https://www.baidu.com/s?word={query}',
     },
     memo: {
       enabled: false,

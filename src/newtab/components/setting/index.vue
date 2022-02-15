@@ -118,14 +118,14 @@ const tabPaneList = computed(() => [
     component: CalendarSetting,
   },
   {
-    name: 'search',
-    label: window.$t('setting.search'),
-    component: SearchSetting,
-  },
-  {
     name: 'weather',
     label: window.$t('setting.weather'),
     component: WeatherSetting,
+  },
+  {
+    name: 'search',
+    label: window.$t('setting.search'),
+    component: SearchSetting,
   },
   {
     name: 'memo',

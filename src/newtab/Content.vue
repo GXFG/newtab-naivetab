@@ -12,8 +12,8 @@
   <AnalogClock />
   <Date />
   <Calendar />
-  <Search />
   <Weather />
+  <Search />
   <Memo />
   <Setting />
 </template>
@@ -26,8 +26,8 @@ import DigitalClock from '@/newtab/components/clock/DigitalClock.vue'
 import AnalogClock from '@/newtab/components/clock/AnalogClock.vue'
 import Date from '@/newtab/components/date/index.vue'
 import Calendar from '@/newtab/components/calendar/index.vue'
-import Search from '@/newtab/components/search/index.vue'
 import Weather from '@/newtab/components/weather/index.vue'
+import Search from '@/newtab/components/search/index.vue'
 import Memo from '@/newtab/components/memo/index.vue'
 
 window.$message = useMessage()

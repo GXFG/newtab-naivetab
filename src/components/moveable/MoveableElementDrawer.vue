@@ -98,18 +98,18 @@ const elementList = computed(() => [
     disabled: localState.setting.calendar.enabled,
   },
   {
-    label: window.$t('setting.search'),
-    componentName: 'search',
-    iconName: 'teenyicons:search-circle-outline',
-    iconSize: 24,
-    disabled: localState.setting.search.enabled,
-  },
-  {
     label: window.$t('setting.weather'),
     componentName: 'weather',
     iconName: 'mdi:weather-cloudy',
     iconSize: 28,
     disabled: localState.setting.weather.enabled,
+  },
+  {
+    label: window.$t('setting.search'),
+    componentName: 'search',
+    iconName: 'teenyicons:search-circle-outline',
+    iconSize: 24,
+    disabled: localState.setting.search.enabled,
   },
   {
     label: window.$t('setting.memo'),
