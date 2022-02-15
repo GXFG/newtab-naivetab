@@ -197,6 +197,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     }
     .input__search {
       width: 50px;
+      color: v-bind(customFontColor) !important;
       cursor: pointer;
     }
     .input__search--move {

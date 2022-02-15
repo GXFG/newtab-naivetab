@@ -158,7 +158,7 @@ export const defaultState = {
       borderRadius: 4,
       fontFamily: 'Arial',
       fontSize: 18,
-      fontColor: ['rgba(15, 23, 42, 1)', 'rgba(228, 228, 231, 1)'],
+      fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
       isBorderEnabled: true,
       borderWidth: 1,
       borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
