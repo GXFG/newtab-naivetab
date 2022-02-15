@@ -265,7 +265,7 @@ const bgCalendarWork = getStyleConst('bgCalendarWork')
 const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
 </script>
 
-<style scoped>
+<style>
 #calendar {
   color: v-bind(customFontColor);
   font-size: v-bind(customFontSize);
@@ -284,6 +284,9 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
       display: flex;
       justify-content: space-around;
       align-items: center;
+      .n-base-selection-label {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+      }
       .options__item {
         display: flex;
         justify-content: center;
