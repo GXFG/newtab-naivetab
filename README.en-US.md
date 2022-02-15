@@ -20,7 +20,7 @@
 5. Support automatic switching of appearance according to the appearance of the system (light mode, dark mode)
 6. Sync your settings on multiple devices (requires a browser personal account)
 7. Set up support export json file backup
-8. Language support (en-CN, en-US)
+8. Language support (zh-CN, en-US)
 
 ## 📷Preview
 
