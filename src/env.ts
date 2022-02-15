@@ -12,4 +12,5 @@ export function isForbiddenUrl(url: string): boolean {
 }
 
 export const isFirefox = navigator.userAgent.includes('Firefox')
-export const isNotChrome = !navigator.userAgent.includes('Chrome')
+export const isChrome = navigator.userAgent.includes('Chrome')
+export const isEdge = navigator.userAgent.includes('Edge')

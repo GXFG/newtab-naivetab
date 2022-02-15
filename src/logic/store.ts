@@ -1,6 +1,6 @@
 import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
-import { isNotChrome } from '@/env'
+import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
 import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, log } from '@/logic'
@@ -379,10 +379,12 @@ export const createTab = (url: string, active = true) => {
 }
 
 export const getDomainIcon = (url: string) => {
-  if (isNotChrome) {
-    return `${url}/favicon.ico`
+  if (isEdge) {
+    return `edge://favicon/size/16@2x/${url}`
+  } else if (isChrome) {
+    return `chrome://favicon/size/16@2x/${url}`
   }
-  return `chrome://favicon/size/16@2x/${url}`
+  return `${url}/favicon.ico`
 }
 
 export const getDefaultBookmarkName = (url: string) => {
