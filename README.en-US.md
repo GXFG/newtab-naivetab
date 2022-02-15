@@ -1,20 +1,26 @@
 <div align="center">
   <img src="https://user-images.githubusercontent.com/20944987/147905855-2a1eaebf-d7af-45d1-9aa2-2f96806d79c9.png" />
   <h1 align="center">NaiveTab</h1>
-  <p align="center">A clean browser with newtab page extensions</p>
+  <p align="center">A naive newtab page extensions</p>
   <p align="center">English | <a href="https://github.com/GXFG/newtab-naivetab/blob/main/README.md">中文</a></p>
 </div>
 
 ## 🌟Feature
 
-- Includes digital clock, analog clock, date, bookmark, perpetual calendar, weather and more
-- Components can be placed anywhere (drag mode)
-- Components can customize most styles (fonts, colors, size, and more)
-- Supports automatic theme switching based on system appearance (light, dark)
-- Support custom background image (Bing, local image)
-- Sync your data across multiple devices (requires login to account)
-- Supports data export for self-backup
-- Language support (zh-CN, en-US)
+1. Inclusions:
+   1. Digital clock, analog clock, date
+   2. Bookmarks: Displayed in keyboard form, you can quickly access the corresponding links
+   3. Perpetual calendar: including lunar calendar, holidays, and holidays, it is convenient to view the working day and arrange the personal schedule reasonably
+   4. Search bar: Custom search engine available
+   5. Weather: You can view information such as temperature, wind, humidity, alarm, daily index, etc
+   6. Notes: Editable notes, or to-dos
+2. The above components can be dragged and dropped anywhere on the screen, fully customizable (via canvas mode)
+3. Components can be customized with most styles (font, color, size, border, shadow, etc.)
+4. Support custom background image (Bing daily image, local picture)
+5. Support automatic switching of appearance according to the appearance of the system (light mode, dark mode)
+6. Sync your settings on multiple devices (requires a browser personal account)
+7. Set up support export json file backup
+8. Language support (en-CN, en-US)
 
 ## 📷Preview
 
