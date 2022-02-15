@@ -30,7 +30,7 @@ const state = reactive({
 
 const menuList = computed(() => [
   {
-    label: (state.currComponentName.length === 0 ? '' : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
+    label: (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
     key: 'setting',
     disabled: isDragMode.value,
   },
@@ -50,9 +50,7 @@ const menuActionMap = {
     if (tabName.includes('clock')) {
       tabName = 'clock'
     }
-    if (tabName.length !== 0) {
-      globalState.value.currSettingTabValue = tabName
-    }
+    globalState.value.currSettingTabValue = tabName.length === 0 ? 'general' : tabName
     toggleIsSettingDrawerVisible()
   },
   dragMode: () => {
