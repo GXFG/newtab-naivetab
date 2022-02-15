@@ -42,52 +42,65 @@
                 {{ $t('bookmark.nameLabel') }}
               </p>
             </NInputGroup>
-            <div v-for="rowData of keyboardSettingRowList" :key="rowData" class="bookmark__row">
-              <NInputGroup v-for="key of rowData" :key="key" class="bookmark__item">
-                <NInputGroupLabel class="item__key">
-                  {{ `${key.toUpperCase()}` }}
-                </NInputGroupLabel>
-                <template v-if="localState.setting.bookmark.keymap[key]">
-                  <NInput
-                    key="url"
-                    v-model:value="localState.setting.bookmark.keymap[key].url"
-                    class="input__main"
-                    type="text"
-                    clearable
-                    :placeholder="$t('bookmark.urlPlaceholder')"
-                  />
-                  <NInput
-                    key="name"
-                    v-model:value="localState.setting.bookmark.keymap[key].name"
-                    class="input__main"
-                    type="text"
-                    clearable
-                    :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
-                  />
-                  <NButton @click="onImportBookmark(key)">
-                    <bi:bookmark-plus />
-                  </NButton>
-                  <div class="item__move">
-                    <NButton class="move__btn" @click="onMoveKey(key, 'up')">
-                      <jam:chevron-up />
-                    </NButton>
-                    <NButton class="move__btn" @click="onMoveKey(key, 'down')">
-                      <jam:chevron-down />
-                    </NButton>
-                  </div>
-                  <NPopconfirm @positive-click="onDeleteKey(key)">
-                    <template #trigger>
-                      <NButton>
-                        <ri:delete-bin-6-line />
+            <div class="bookmark__content">
+              <!-- left: keyList -->
+              <div class="content__key">
+                <div v-for="rowData of keyboardSettingRowList" :key="rowData" class="bookmark__group">
+                  <NInputGroupLabel v-for="key of rowData" :key="key" class="bookmark__key">
+                    {{ `${key.toUpperCase()}` }}
+                  </NInputGroupLabel>
+                </div>
+              </div>
+              <!-- right: config -->
+              <div class="content__config">
+                <transition-group v-for="rowData of keyboardSettingRowList" :key="rowData" name="flip-list" tag="div" class="bookmark__group">
+                  <NInputGroup
+                    v-for="key of rowData"
+                    :key="key"
+                    class="bookmark__item"
+                    :draggable="true"
+                    @dragstart="handleDragStart(key)"
+                    @dragenter="handleDragEnter($event, key)"
+                    @dragover="handleDragOver($event)"
+                  >
+                    <template v-if="localState.setting.bookmark.keymap[key]">
+                      <NInput
+                        key="url"
+                        v-model:value="localState.setting.bookmark.keymap[key].url"
+                        class="input__main"
+                        type="text"
+                        clearable
+                        :placeholder="$t('bookmark.urlPlaceholder')"
+                      />
+                      <NInput
+                        key="name"
+                        v-model:value="localState.setting.bookmark.keymap[key].name"
+                        class="input__main"
+                        type="text"
+                        clearable
+                        :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
+                      />
+                      <NInputGroupLabel class="item__move">
+                        <ri:drag-move-fill />
+                      </NInputGroupLabel>
+                      <NButton @click="onImportBookmark(key)">
+                        <lucide:bookmark-plus />
                       </NButton>
+                      <NPopconfirm @positive-click="onDeleteKey(key)">
+                        <template #trigger>
+                          <NButton>
+                            <ri:delete-bin-6-line />
+                          </NButton>
+                        </template>
+                        {{ $t('common.confirm') }}?
+                      </NPopconfirm>
                     </template>
-                    {{ $t('common.confirm') }}?
-                  </NPopconfirm>
-                </template>
-                <NButton v-else class="item__add" @click="onAddKey(key)">
-                  <zondicons:add-solid />
-                </NButton>
-              </NInputGroup>
+                    <NButton v-else class="item__create" @click="onCreateKey(key)">
+                      <zondicons:add-solid />
+                    </NButton>
+                  </NInputGroup>
+                </transition-group>
+              </div>
             </div>
           </div>
         </template>
@@ -102,14 +115,15 @@ import { localState, keyboardSettingRowList, getDefaultBookmarkName, requestPerm
 
 const state = reactive({
   isBookmarkModalVisible: false,
-  currKey: '',
+  currDragKey: '',
+  currImporKey: '',
 })
 
 const toggleIsBookmarkPickerVisible = () => {
   state.isBookmarkModalVisible = !state.isBookmarkModalVisible
 }
 
-const onAddKey = (key: string) => {
+const onCreateKey = (key: string) => {
   localState.setting.bookmark.keymap[key] = {
     url: '',
     name: '',
@@ -120,22 +134,23 @@ const onDeleteKey = (key: string) => {
   delete localState.setting.bookmark.keymap[key]
 }
 
-const currKeyboardList = computed(() => keyboardSettingRowList.value.flat())
+const handleDragStart = (key: string) => {
+  state.currDragKey = key
+}
 
-const onMoveKey = (key: string, type: 'up' | 'down') => {
-  const currIndex = currKeyboardList.value.indexOf(key)
-  const listLen = currKeyboardList.value.length
-  if (type === 'up' && currIndex <= 0) {
-    return
-  } else if (type === 'down' && currIndex >= listLen - 1) {
+const handleDragEnter = (e: any, targetKey: string) => {
+  e.preventDefault()
+  if (state.currDragKey === targetKey) {
     return
   }
-  const targetIndex = type === 'up' ? currIndex - 1 : currIndex + 1
-  const targetKey = currKeyboardList.value[targetIndex]
   const targetData = localState.setting.bookmark.keymap[targetKey]
-  const currData: any = localState.setting.bookmark.keymap[key]
-  localState.setting.bookmark.keymap[key] = targetData
-  localState.setting.bookmark.keymap[targetKey] = currData
+  localState.setting.bookmark.keymap[targetKey] = localState.setting.bookmark.keymap[state.currDragKey]
+  localState.setting.bookmark.keymap[state.currDragKey] = targetData
+  state.currDragKey = targetKey
+}
+
+const handleDragOver = (e: any) => {
+  e.preventDefault() // 阻止松开按键后的返回动画
 }
 
 const onImportBookmark = async(key: string) => {
@@ -143,13 +158,12 @@ const onImportBookmark = async(key: string) => {
   if (!granted) {
     return
   }
-  state.currKey = key
+  state.currImporKey = key
   toggleIsBookmarkPickerVisible()
 }
 
 const onSelectBookmark = (payload: ChromeBookmarkItem) => {
-  const key = state.currKey
-  localState.setting.bookmark.keymap[key] = {
+  localState.setting.bookmark.keymap[state.currImporKey] = {
     url: payload.url,
     name: payload.title,
   }
@@ -157,52 +171,63 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
 </script>
 
 <style>
+.flip-list-move {
+  transition: transform 0.8s ease;
+}
+
 .modal__bookmark {
   .bookmark__label {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0 0 15px;
     .label__text {
       opacity: 0.6;
-      text-align: center;
       &:nth-of-type(1) {
-        width: 40px;
+        width: 43px;
+        text-align: center;
       }
       &:nth-of-type(2) {
-        flex: 1;
+        width: 50%;
+        text-align: center;
       }
       &:nth-of-type(3) {
-        width: 33%;
+        width: 50%;
+        padding-left: 7%;
       }
     }
   }
-  .bookmark__row {
-    margin-bottom: 10px;
-    .bookmark__item {
-      padding: 3px 0 3px 15px;
-      .item__key {
-        flex: 0 0 auto;
-        display: flex;
-        justify-content: center;
-        width: 40px;
-      }
-      .input__main {
-        &:nth-of-type(2) {
+  .bookmark__content {
+    display: flex;
+    .content__key {
+    }
+    .content__config {
+    }
+    .bookmark__key {
+      display: flex;
+      justify-content: center;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    .bookmark__group {
+      padding-bottom: 10px;
+      .bookmark__item {
+        margin-bottom: 5px;
+        .input__main {
+          &:nth-of-type(1) {
+            flex: 1;
+          }
+          &:nth-of-type(2) {
+            width: 25%;
+          }
+        }
+        .item__create {
           flex: 1;
         }
-        &:nth-of-type(3) {
-          width: 25%;
-        }
-      }
-      .item__add {
-        flex: 1;
-      }
-      .item__move {
-        display: flex;
-        flex-direction: column;
-        .move__btn {
-          height: 17px;
+        .item__move {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: move;
         }
       }
     }
