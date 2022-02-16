@@ -193,7 +193,7 @@ export const defaultState = {
       backgroundImageSource: 1, // 0:localFile, 1:network
       backgroundImageName: 'YurisNight_ZH-CN5738817931',
       backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
-      favoriteBackgroundList: [
+      favoriteImageList: [
         {
           name: 'ChurchillBears_ZH-CN1430090934',
           desc: '好奇地看着相机的北极熊，加拿大丘吉尔镇 (© Matthias Breiter/Minden Pictures)',

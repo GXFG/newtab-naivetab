@@ -87,24 +87,24 @@ const onSaveImage = () => {
 }
 
 const isFavoriteIconVisible = computed(() => {
-  const favoriteBackgroundNameList = localState.setting.general.favoriteBackgroundList.map((item: FavoriteImageListItem) => item.name)
+  const favoriteBackgroundNameList = localState.setting.general.favoriteImageList.map((item: FavoriteImageListItem) => item.name)
   return !favoriteBackgroundNameList.includes(props.data.name)
 })
 
 const onFavoriteImage = () => {
-  if (localState.setting.general.favoriteBackgroundList.length >= FAVORITE_MAX_COUNT) {
+  if (localState.setting.general.favoriteImageList.length >= FAVORITE_MAX_COUNT) {
     window.$message.error(window.$t('prompts.favoriteLimt'))
     return
   }
-  localState.setting.general.favoriteBackgroundList.push({
+  localState.setting.general.favoriteImageList.push({
     name: props.data.name,
     desc: props.data.desc,
   })
 }
 
 const onUnFavoriteImage = () => {
-  const index = localState.setting.general.favoriteBackgroundList.findIndex((item: FavoriteImageListItem) => item.name === props.data.name)
-  localState.setting.general.favoriteBackgroundList.splice(index, 1)
+  const index = localState.setting.general.favoriteImageList.findIndex((item: FavoriteImageListItem) => item.name === props.data.name)
+  localState.setting.general.favoriteImageList.splice(index, 1)
 }
 
 const themeColorMain = getStyleConst('themeColorMain')

@@ -56,7 +56,7 @@ const onCloseModal = () => {
 
 <style scoped>
 .modal__content {
-  height: 70vh;
+  height: 75vh;
   .picker__label {
     opacity: 0.6;
   }

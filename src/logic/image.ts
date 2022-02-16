@@ -15,7 +15,7 @@ export const imageState = ref(useStorageLocal('data-images', {
 export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `http://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
 
 export const previewImageListMap = computed(() => ({
-  favorite: localState.setting.general.favoriteBackgroundList,
+  favorite: localState.setting.general.favoriteImageList,
   bing: imageState.value.imageList.map((item: BingImageItem) => {
     const name = item.urlbase.split('OHR.')[1]
     return {
@@ -76,9 +76,6 @@ watch([
 })
 
 watch(() => localState.setting.general.isBackgroundImageEnabled, async(isEnabled) => {
-  if (imageState.value.imageList.length === 0) {
-    await getImages()
-  }
   renderBackgroundImage(!isEnabled)
 }, { immediate: true })
 
