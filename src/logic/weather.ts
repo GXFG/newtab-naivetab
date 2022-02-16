@@ -56,7 +56,7 @@ const getNowData = async() => {
   }
   weatherState.value.now = data.now
   weatherState.value.now.syncTime = dayjs().valueOf()
-  log('Update now weather')
+  log('Weather update now')
 }
 
 const getForecastData = async() => {
@@ -66,7 +66,7 @@ const getForecastData = async() => {
   }
   weatherState.value.forecast.list = data.daily
   weatherState.value.forecast.syncTime = dayjs().valueOf()
-  log('Update forecast weather')
+  log('Weather update forecast')
 }
 
 const getIndicesData = async() => {
@@ -76,7 +76,7 @@ const getIndicesData = async() => {
   }
   weatherState.value.indices.list = data.daily
   weatherState.value.indices.syncTime = dayjs().valueOf()
-  log('Update indices weather')
+  log('Weather update indices')
 }
 
 const getAirData = async() => {
@@ -86,7 +86,7 @@ const getAirData = async() => {
   }
   weatherState.value.air = data.now
   weatherState.value.air.syncTime = dayjs().valueOf()
-  log('Update air weather')
+  log('Weather update air')
 }
 
 const getWarningData = async() => {
@@ -96,7 +96,7 @@ const getWarningData = async() => {
   }
   weatherState.value.warning.list = data.warning
   weatherState.value.warning.syncTime = dayjs().valueOf()
-  log('Update warning weather')
+  log('Weather update warning')
 }
 
 export const updateWeather = () => {

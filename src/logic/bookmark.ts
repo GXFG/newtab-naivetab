@@ -1,4 +1,4 @@
-import { useThrottleFn } from '@vueuse/core'
+import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localState, sleep, log, getDefaultBookmarkName } from '@/logic'
 
@@ -47,7 +47,7 @@ export const initBookmarkListData = () => {
   if (isInitialized.value) {
     return
   }
-  log('initBookmarkListData')
+  log('Bookmark initBookmarkListData')
   localBookmarkList.value = []
   KEYBOARD_KEY_LIST.forEach((key: string) => {
     localBookmarkList.value.push({
@@ -59,16 +59,16 @@ export const initBookmarkListData = () => {
   isInitialized.value = true
 }
 
-const mergeBookmarkSetting = useThrottleFn(async() => {
-  log('Merge BookmarkSetting')
+const mergeBookmarkSetting = useDebounceFn(async() => {
+  log('Bookmark merge setting')
   if (!isInitialized) {
     await sleep(300)
   }
   for (const key of KEYBOARD_KEY_LIST) {
     const index = KEYBOARD_KEY_LIST.indexOf(key)
     const item = localState.setting.bookmark.keymap[key]
-    // 初始化无设置数据的按键
     if (!item) {
+      // 初始化无设置数据的按键
       localBookmarkList.value[index] = {
         key,
         url: '',
