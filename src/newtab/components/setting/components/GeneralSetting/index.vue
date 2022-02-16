@@ -62,7 +62,7 @@
         {{ $t('general.settingDividerSetting') }}
       </NDivider>
       <NFormItem :label="$t('general.syncTime')">
-        <NSpin :show="globalState.isUploadSettingLoading" size="small">
+        <NSpin :show="globalState.isUploadConfigLoadingMap.style || globalState.isUploadConfigLoadingMap.setting" size="small">
           <p>{{ syncTime }}</p>
         </NSpin>
         <Tips :content="$t('general.syncTimeTips')" />
@@ -177,7 +177,10 @@ const toggleIsImageListVisible = () => {
   }
 }
 
-const syncTime = computed(() => dayjs(localState.common.syncTime).format('YYYY-MM-DD HH:mm:ss'))
+const syncTime = computed(() => {
+  const maxDate = Math.max(localState.common.syncTimeMap.style, localState.common.syncTimeMap.setting)
+  return dayjs(maxDate).format('YYYY-MM-DD HH:mm:ss')
+})
 
 const importSettingInputEl = ref()
 const onImportSetting = () => {

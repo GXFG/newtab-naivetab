@@ -1,29 +1,46 @@
 import { useDebounceFn } from '@vueuse/core'
 import { log, downloadJsonByTagA, sleep } from './util'
-import { MERGE_SETTING_DELAY } from './const'
+import { MERGE_CONFIG_DELAY } from './const'
 import { defaultState, localState, globalState } from './store'
 
-const uploadFn = () => {
-  globalState.value.isUploadSettingLoading = true
-  log('uploadSetting')
-  localState.common.syncTime = Date.now()
-  const localData = JSON.stringify({
-    syncTime: localState.common.syncTime,
-    style: localState.style,
-    setting: localState.setting,
-  })
-  chrome.storage.sync.set({ NaiveTabSetting: localData }, () => {
-    log('Sync settings complete')
-    globalState.value.isUploadSettingLoading = false
+/**
+ * https://developer.chrome.com/docs/extensions/reference/storage/
+ * chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192  单个配置不可超过8k
+ */
+const uploadConfigFn = (field: ConfigField) => {
+  globalState.value.isUploadConfigLoadingMap[field] = true
+  log(`Upload config-${field}`)
+  localState.common.syncTimeMap[field] = Date.now()
+  const syncTime = localState.common.syncTimeMap[field]
+  const payload = {
+    [`naive-tab-${field}`]: JSON.stringify({
+      syncTime,
+      data: localState[field],
+    }),
+  }
+  chrome.storage.sync.set(payload, () => {
+    const error = chrome.runtime.lastError
+    if (error) {
+      log(`Upload config-${field} error`, error)
+      window.$message.error(`${window.$t('common.upload')}${window.$t('common.setting')}${window.$t('common.fail')}`)
+    } else {
+      log(`Upload config-${field} complete`, syncTime)
+    }
+    globalState.value.isUploadConfigLoadingMap[field] = false
   })
 }
-const uploadSetting = useDebounceFn(uploadFn, MERGE_SETTING_DELAY)
 
-watch([
-  () => localState.style,
-  () => localState.setting,
-], () => {
-  uploadSetting()
+const uploadConfigStyle = useDebounceFn(() => { uploadConfigFn('style') }, MERGE_CONFIG_DELAY)
+const uploadConfigSetting = useDebounceFn(() => { uploadConfigFn('setting') }, MERGE_CONFIG_DELAY)
+
+watch(() => localState.style, () => {
+  uploadConfigStyle()
+}, {
+  deep: true,
+})
+
+watch(() => localState.setting, () => {
+  uploadConfigSetting()
 }, {
   deep: true,
 })
@@ -86,25 +103,52 @@ export const updateSetting = (acceptState = localState) => {
   })
 }
 
-export const loadSyncSetting = () => {
-  chrome.storage.sync.get(null, ({ NaiveTabSetting }) => {
-    if (!NaiveTabSetting) {
-      log('Notfound settings')
-      uploadFn() // 初始化设置到云端
+/**
+ * {
+ *   `naive-tab-${field}`: '{
+ *      syncTime: number
+ *      data: {}
+ *   }'
+ * }
+ */
+export const downloadConfig = () => {
+  chrome.storage.sync.get(null, (data) => {
+    const error = chrome.runtime.lastError
+    if (error) {
+      log('Load config error', error)
       return
     }
-    const cloudSetting = JSON.parse(NaiveTabSetting)
-    if (cloudSetting.syncTime === localState.common.syncTime) {
-      log('None modification settings')
+    const pendingConfig = {} as any
+    const configFieldList = ['style', 'setting'] as ConfigField[]
+    for (const field of configFieldList) {
+      if (!Object.prototype.hasOwnProperty.call(data, `naive-tab-${field}`)) {
+        log(`Config-${field} initialize`)
+        uploadConfigFn(field)
+      } else {
+        const targetConfig = JSON.parse(data[`naive-tab-${field}`])
+        if (targetConfig.syncTime === localState.common.syncTimeMap[field]) {
+          log(`Config-${field} not update`)
+          continue
+        }
+        if (targetConfig.syncTime < localState.common.syncTimeMap[field]) {
+          log(`Config-${field} is overdue, reupload`)
+          uploadConfigFn(field)
+          continue
+        }
+        localState.common.syncTimeMap[field] = targetConfig.syncTime
+        pendingConfig[field] = targetConfig.data
+      }
+    }
+    if (Object.keys(pendingConfig).length === 0) {
       return
     }
-    log('Load settings', cloudSetting)
-    localState.common.syncTime = cloudSetting.syncTime
-    updateSetting(cloudSetting)
+    log('Load config', pendingConfig)
+    updateSetting(pendingConfig)
   })
 }
 
 const clearStorage = (clearAll = false) => {
+  log('Clear localStorage')
   localStorage.clear()
   if (!clearAll) {
     localStorage.setItem('data-first', 'false') // 避免打开help弹窗
@@ -115,16 +159,9 @@ const clearStorage = (clearAll = false) => {
 export const refreshSetting = async() => {
   globalState.value.isClearStorageLoading = true
   await updateSetting()
-  // 等待setting同步完成后再进行后续操作
-  const stopWatch = watch(() => globalState.value.isUploadSettingLoading, async(value) => {
-    if (value) {
-      return
-    }
-    stopWatch()
-    await sleep(300) // 确保localStorage写入完成
-    clearStorage()
-    globalState.value.isClearStorageLoading = false
-  })
+  await sleep(5000) // 等待config同步完成、localStorage写入完成后再进行后续操作
+  clearStorage()
+  globalState.value.isClearStorageLoading = false
 }
 
 export const importSetting = async(text: string) => {
@@ -146,15 +183,9 @@ export const importSetting = async(text: string) => {
   }
   log('FileContent', fileContent)
   await updateSetting(fileContent)
-  const stopWatch = watch(() => globalState.value.isUploadSettingLoading, async(value) => {
-    if (value) {
-      return
-    }
-    stopWatch()
-    await sleep(300) // 确保localStorage写入完成
-    clearStorage()
-    globalState.value.isImportSettingLoading = false
-  })
+  await sleep(5000) // 等待config同步完成、localStorage写入完成后再进行后续操作
+  clearStorage()
+  globalState.value.isImportSettingLoading = false
 }
 
 export const exportSetting = () => {

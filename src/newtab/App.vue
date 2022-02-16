@@ -17,7 +17,7 @@ import {
   gaEvent,
   getStyleField,
   localState,
-  loadSyncSetting,
+  downloadConfig,
   initFirstOpen,
   checkUpdate,
   initAvailableFontList,
@@ -27,7 +27,7 @@ import {
 } from '@/logic'
 
 onMounted(async() => {
-  loadSyncSetting()
+  downloadConfig()
   startTimer()
   startKeyboard()
   await nextTick()

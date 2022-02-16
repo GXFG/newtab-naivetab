@@ -1,23 +1,13 @@
 const logStyles = [
-  'padding: 3px 8px',
-  'background: #1475B2',
+  'padding: 4px 8px',
   'color: #fff',
   'border-radius: 3px',
+  'background:',
 ].join(';')
 
 export const log = (msg: string, ...args: any[]) => {
-  console.log(`%c${msg}`, logStyles, ...args)
-}
-
-const logWarnStyles = [
-  'padding: 3px 8px',
-  'background: #ff4757',
-  'color: #fff',
-  'border-radius: 3px',
-].join(';')
-
-export const logWarn = (msg: string, ...args: any[]) => {
-  console.log(`%c${msg}`, logWarnStyles, ...args)
+  const style = `${logStyles}${msg.includes('error') ? '#ff4757' : '#1475B2'}`
+  console.log(`%c${msg}`, style, ...args)
 }
 
 export const sleep = (time: number) => {

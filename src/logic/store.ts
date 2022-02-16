@@ -9,9 +9,12 @@ export const [isSettingDrawerVisible, toggleIsSettingDrawerVisible] = useToggle(
 
 export const defaultState = {
   common: {
-    syncTime: 0,
     currAppearanceCode: 0, // 0:light | 1:dark
     availableFontList: [] as any[],
+    syncTimeMap: {
+      style: 0,
+      setting: 0,
+    },
   },
   style: {
     general: {
@@ -188,38 +191,31 @@ export const defaultState = {
       drawerPlacement: 'right' as any,
       isBackgroundImageEnabled: true,
       backgroundImageSource: 1, // 0:localFile, 1:network
-      backgroundImageId: '/th?id=OHR.YurisNight_ZH-CN5738817931',
-      backgroundImageUrl: 'http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg',
+      backgroundImageName: 'YurisNight_ZH-CN5738817931',
       backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
       favoriteBackgroundList: [
         {
-          id: '/th?id=OHR.ChurchillBears_ZH-CN1430090934',
-          url: 'http://cn.bing.com//th?id=OHR.ChurchillBears_ZH-CN1430090934_UHD.jpg',
+          name: 'ChurchillBears_ZH-CN1430090934',
           desc: '好奇地看着相机的北极熊，加拿大丘吉尔镇 (© Matthias Breiter/Minden Pictures)',
         },
         {
-          id: '/th?id=OHR.DarwinsArch_ZH-CN9740478501',
-          url: 'http://cn.bing.com//th?id=OHR.DarwinsArch_ZH-CN9740478501_UHD.jpg',
+          name: 'DarwinsArch_ZH-CN9740478501',
           desc: '达尔文岛的达尔文拱门，厄瓜多尔加拉帕戈斯 (© miralex/Getty Images)',
         },
         {
-          id: '/th?id=OHR.WinterHalo_ZH-CN0666553211',
-          url: 'http://cn.bing.com//th?id=OHR.WinterHalo_ZH-CN0666553211_UHD.jpg',
+          name: 'WinterHalo_ZH-CN0666553211',
           desc: '厄尔士山脉上的光晕，德国萨克森州 (© Martin Ruegner/Getty Images)',
         },
         {
-          id: '/th?id=OHR.PoetrysCave_ZH-CN3196193909',
-          url: 'http://cn.bing.com//th?id=OHR.PoetrysCave_ZH-CN3196193909_UHD.jpg',
+          name: 'PoetrysCave_ZH-CN3196193909',
           desc: '鸟瞰罗卡附近的Grotta della Poesia，意大利莱切 (© Amazing Aerial Agency/Offset by Shutterstock)',
         },
         {
-          id: '/th?id=OHR.PrathameshJaju_ZH-CN2207606082',
-          url: 'http://cn.bing.com//th?id=OHR.PrathameshJaju_ZH-CN2207606082_UHD.jpg',
+          name: 'PrathameshJaju_ZH-CN2207606082',
           desc: '月球的高清合成影像 (© Prathamesh Jaju)',
         },
         {
-          id: '/th?id=OHR.YurisNight_ZH-CN5738817931',
-          url: 'http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg',
+          name: 'YurisNight_ZH-CN5738817931',
           desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
         },
       ],
@@ -303,6 +299,10 @@ export const localState = reactive({
 })
 
 export const globalState = ref({
+  isUploadConfigLoadingMap: {
+    style: false,
+    setting: false,
+  },
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
