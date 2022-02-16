@@ -1,5 +1,5 @@
-export const URL_CHANGELOG = 'https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md'
 export const URL_GITHUB = 'https://github.com/GXFG/newtab-naivetab'
+export const URL_CHANGELOG = 'https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md'
 export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
 export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'
 export const URL_QWEATHER_HOME = 'https://www.qweather.com/'
@@ -30,10 +30,14 @@ export const KEYBOARD_CODE_TO_LABEL_MAP = {
   '/': '?',
 }
 
-export const MERGE_SETTING_DELAY = 1000
+// MAX_WRITE_OPERATIONS_PER_HOUR = 1800, https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
+export const MERGE_CONFIG_DELAY = 2000
+
 export const MERGE_BOOKMARK_DELAY = 500
 
 export const DRAG_TRIGGER_DISTANCE = 10
+
+export const FAVORITE_MAX_COUNT = 12
 
 export const APPEARANCE_TO_CODE_MAP = {
   light: 0,

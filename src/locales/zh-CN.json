@@ -79,7 +79,8 @@
     "dragMode": "画布模式"
   },
   "prompts": {
-    "imageTooLarge": "图片体积过大"
+    "imageTooLarge": "图片体积过大",
+    "favoriteLimt": "已达到收藏最大数"
   },
   "help": {
     "title": "帮助",

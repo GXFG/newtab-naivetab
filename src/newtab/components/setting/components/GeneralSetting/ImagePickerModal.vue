@@ -17,8 +17,7 @@
           <BackgroundImageElement
             :lazy="false"
             :data="{
-              id: localState.setting.general.backgroundImageId,
-              url: localState.setting.general.backgroundImageUrl,
+              name: localState.setting.general.backgroundImageName,
               desc: localState.setting.general.backgroundImageDesc,
             }"
           />
@@ -26,9 +25,9 @@
       </div>
       <NSpin :show="isImageListLoading">
         <NCollapse accordion>
-          <NCollapseItem v-for="origin of Object.keys(currPreviewImageListMap)" :key="origin" :title="$t(`common.${origin}`)" :name="origin">
+          <NCollapseItem v-for="origin of Object.keys(previewImageListMap)" :key="origin" :title="$t(`common.${origin}`)" :name="origin">
             <div class="picker__images">
-              <div v-for="item in currPreviewImageListMap[origin]" :key="item.url" class="image__item">
+              <div v-for="item in previewImageListMap[origin]" :key="item.name" class="image__item">
                 <BackgroundImageElement :data="item" select :delete="origin === 'favorite'" />
               </div>
             </div>
@@ -39,7 +38,7 @@
   </NModal>
 </template>
 <script setup lang="ts">
-import { currPreviewImageListMap, localState, isImageListLoading } from '@/logic'
+import { previewImageListMap, localState, isImageListLoading } from '@/logic'
 
 const props = defineProps({
   show: {

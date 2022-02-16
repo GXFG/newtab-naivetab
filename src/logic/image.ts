@@ -9,17 +9,20 @@ export const imageState = ref(useStorageLocal('data-images', {
 }))
 
 /**
- * @param size: UHD, 1920x1080, 1366x768
+ * e.g.: http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
+ * @param size: 1366x768, 1920x1080, UHD
  */
-export const getImageUrlFromBing = (url: string, size = 'UHD'): string => `http://cn.bing.com/${url}_${size}.jpg`
+export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `http://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
 
-export const currPreviewImageListMap = computed(() => ({
+export const previewImageListMap = computed(() => ({
   favorite: localState.setting.general.favoriteBackgroundList,
-  bing: imageState.value.imageList.map((item: BingImageItem) => ({
-    id: item.urlbase,
-    url: getImageUrlFromBing(item.urlbase),
-    desc: item.copyright,
-  })),
+  bing: imageState.value.imageList.map((item: BingImageItem) => {
+    const name = item.urlbase.split('OHR.')[1]
+    return {
+      name,
+      desc: item.copyright,
+    }
+  }),
 }))
 
 export const isImageLoading = ref(false)
@@ -46,7 +49,7 @@ const renderBackgroundImage = async(clearStyle = false) => {
   }
   const currUrl = localState.setting.general.backgroundImageSource === 0
     ? imageState.value.localBackgroundBase64
-    : localState.setting.general.backgroundImageUrl
+    : getBingImageUrlFromName(localState.setting.general.backgroundImageName, 'UHD')
   const imgEle = new Image()
   imgEle.src = currUrl
   imgEle.onload = async() => {
@@ -64,8 +67,7 @@ const renderBackgroundImage = async(clearStyle = false) => {
 watch([
   () => imageState.value.localBackgroundBase64,
   () => localState.setting.general.backgroundImageSource,
-  () => localState.setting.general.backgroundImageId,
-  () => localState.setting.general.backgroundImageUrl,
+  () => localState.setting.general.backgroundImageName,
 ], () => {
   if (!localState.setting.general.isBackgroundImageEnabled || imageState.value.imageList.length === 0) {
     return

@@ -79,7 +79,8 @@
     "dragMode": "DragMode"
   },
   "prompts": {
-    "imageTooLarge": "Image too large"
+    "imageTooLarge": "Image too large",
+    "favoriteLimt": "The maximum number of favorites has been reached"
   },
   "help": {
     "title": "Help",

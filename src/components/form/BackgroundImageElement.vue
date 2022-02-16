@@ -2,8 +2,8 @@
   <div class="image-wrap" :class="{ 'image-wrap--active': isCurrSelectedImage }">
     <NSpin :show="isCurrSelectedImage && isImageLoading">
       <!-- 懒加载的img不支持reactive变量 -->
-      <img v-if="lazy" v-lazy="props.data.url" alt="" @click="onSelectImage()">
-      <img v-else :src="props.data.url" alt="" @click="onSelectImage()">
+      <img v-if="lazy" v-lazy="getBingImageUrlFromName(props.data.name)" alt="" @click="onSelectImage()">
+      <img v-else :src="getBingImageUrlFromName(props.data.name)" alt="" @click="onSelectImage()">
     </NSpin>
     <div v-if="isCurrSelectedImage" class="image__current-mask">
       <line-md:confirm-circle />
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { getStyleConst, createTab, localState, downloadImageByUrl, isImageLoading } from '@/logic'
+import { FAVORITE_MAX_COUNT, getStyleConst, createTab, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
 
 const props = defineProps({
   data: {
@@ -65,42 +65,48 @@ const isCurrSelectedImage = computed(() => {
   if (!props.select) {
     return false
   }
-  return props.data.id === localState.setting.general.backgroundImageId
+  return props.data.name === localState.setting.general.backgroundImageName
 })
 
 const onSelectImage = () => {
   if (!props.select) {
     return
   }
-  localState.setting.general.backgroundImageId = props.data.id
-  localState.setting.general.backgroundImageUrl = props.data.url
+  localState.setting.general.backgroundImageName = props.data.name
   localState.setting.general.backgroundImageDesc = props.data.desc
 }
 
 const onViewImage = () => {
-  createTab(props.data.url)
+  const url = getBingImageUrlFromName(props.data.name, 'UHD')
+  createTab(url)
 }
 
 const onSaveImage = () => {
-  downloadImageByUrl(props.data.url)
+  const url = getBingImageUrlFromName(props.data.name, 'UHD')
+  downloadImageByUrl(url, props.data.name)
 }
+
 const isFavoriteIconVisible = computed(() => {
-  const favoriteBackgroundIdList = localState.setting.general.favoriteBackgroundList.map((item: ImageListItem) => item.id)
-  return !favoriteBackgroundIdList.includes(props.data.id)
+  const favoriteBackgroundNameList = localState.setting.general.favoriteBackgroundList.map((item: FavoriteImageListItem) => item.name)
+  return !favoriteBackgroundNameList.includes(props.data.name)
 })
 
 const onFavoriteImage = () => {
+  if (localState.setting.general.favoriteBackgroundList.length >= FAVORITE_MAX_COUNT) {
+    window.$message.error(window.$t('prompts.favoriteLimt'))
+    return
+  }
   localState.setting.general.favoriteBackgroundList.push({
-    id: props.data.id,
-    url: props.data.url,
+    name: props.data.name,
     desc: props.data.desc,
   })
 }
 
 const onUnFavoriteImage = () => {
-  const index = localState.setting.general.favoriteBackgroundList.findIndex((item: ImageListItem) => item.id === props.data.id)
+  const index = localState.setting.general.favoriteBackgroundList.findIndex((item: FavoriteImageListItem) => item.name === props.data.name)
   localState.setting.general.favoriteBackgroundList.splice(index, 1)
 }
+
 const themeColorMain = getStyleConst('themeColorMain')
 </script>
 
