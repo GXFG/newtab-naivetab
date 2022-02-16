@@ -30,16 +30,6 @@ export const defaultState = {
       bgOpacity: 1,
       bgBlur: 0,
     },
-    settingIcon: {
-      layout: {
-        xOffsetKey: 'right',
-        xOffsetValue: 1,
-        xTranslateValue: 0,
-        yOffsetKey: 'top',
-        yOffsetValue: 50,
-        yTranslateValue: -50,
-      },
-    },
     bookmark: {
       layout: {
         xOffsetKey: 'left',
@@ -234,9 +224,6 @@ export const defaultState = {
         },
       ],
     },
-    settingIcon: {
-      enabled: false,
-    },
     bookmark: {
       enabled: false,
       isSymbolEnabled: true,
@@ -293,7 +280,6 @@ export const localState = reactive({
   common: useStorageLocal('local-state', defaultState.common),
   style: {
     general: useStorageLocal('style-general', defaultState.style.general),
-    settingIcon: useStorageLocal('style-setting-icon', defaultState.style.settingIcon),
     bookmark: useStorageLocal('style-bookmark', defaultState.style.bookmark),
     clockDigital: useStorageLocal('style-clock-digital', defaultState.style.clockDigital),
     clockAnalog: useStorageLocal('style-clock-analog', defaultState.style.clockAnalog),
@@ -305,7 +291,6 @@ export const localState = reactive({
   },
   setting: {
     general: useStorageLocal('setting-general', defaultState.setting.general),
-    settingIcon: useStorageLocal('setting-icon', defaultState.setting.settingIcon),
     bookmark: useStorageLocal('setting-bookmark', defaultState.setting.bookmark),
     clockDigital: useStorageLocal('setting-clock-digital', defaultState.setting.clockDigital),
     clockAnalog: useStorageLocal('setting-clock-analog', defaultState.setting.clockAnalog),

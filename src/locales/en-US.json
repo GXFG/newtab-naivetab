@@ -73,6 +73,8 @@
     "refresh": "Refresh",
     "save": "Save",
     "current": "Current",
+    "sync": "Sync",
+    "upload": "Upload",
     "setting": "Setting",
     "dragMode": "DragMode"
   },

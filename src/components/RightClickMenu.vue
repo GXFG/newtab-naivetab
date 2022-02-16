@@ -1,5 +1,5 @@
 <template>
-  <n-dropdown
+  <NDropdown
     placement="bottom-start"
     trigger="manual"
     :x="state.posX"
@@ -12,14 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  isDragMode,
-  toggleIsDragMode,
-  isSettingDrawerVisible,
-  toggleIsSettingDrawerVisible,
-  getTargetDataFromEvent,
-  globalState,
-} from '@/logic'
+import { Icon } from '@iconify/vue'
+import { isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, getTargetDataFromEvent, globalState } from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -32,6 +26,7 @@ const menuList = computed(() => [
   {
     label: (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
     key: 'setting',
+    icon: () => h(Icon, { icon: 'ion:settings-outline' }),
     disabled: isDragMode.value,
   },
   {
@@ -41,6 +36,7 @@ const menuList = computed(() => [
   {
     label: isDragMode.value ? `${window.$t('common.exit')}${window.$t('common.dragMode')}` : window.$t('common.dragMode'),
     key: 'dragMode',
+    icon: () => h(Icon, { icon: 'tabler:drag-drop' }),
   },
 ])
 
@@ -78,7 +74,7 @@ const handleContextMenu = async(e: MouseEvent) => {
   state.posX = e.clientX
   state.posY = e.clientY
   const targetData = getTargetDataFromEvent(e)
-  state.currComponentName = targetData.name === 'settingIcon' ? '' : targetData.name
+  state.currComponentName = targetData.name
   await nextTick()
   state.isMenuVisible = true
 }

@@ -1,21 +1,5 @@
 <template>
   <div id="setting">
-    <!-- settingIcon -->
-    <MoveableComponentWrap componentName="settingIcon" @drag="(style) => (dragStyle = style)">
-      <div v-if="isRender" data-target-type="1" data-target-name="settingIcon">
-        <div class="settingIcon__container" :style="dragStyle || containerStyle">
-          <NButton
-            text
-            :title="`${$t('setting.mainLabel')}`"
-            :style="isDragMode ? 'cursor: move;' : ''"
-            :disabled="isDragMode"
-            @click="openSettingModal()"
-          >
-            <ic:baseline-settings class="item__icon" />
-          </NButton>
-        </div>
-      </div>
-    </MoveableComponentWrap>
     <!-- Drawer -->
     <NDrawer
       v-model:show="isSettingDrawerVisible"
@@ -37,9 +21,6 @@
         <div class="bottom__left">
           <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
             <mdi:eye-circle-outline />&nbsp;{{ $t('common.preview') }}
-          </NButton>
-          <NButton class="left__item" size="small" title="DragMode" @click="openDragMode()">
-            <tabler:drag-drop />&nbsp;{{ $t('common.dragMode') }}
           </NButton>
         </div>
         <p class="bottom__version">
@@ -73,13 +54,9 @@ import WeatherSetting from './components/WeatherSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
 import {
   URL_GITHUB,
-  gaEvent,
-  getIsComponentRender,
-  getLayoutStyle,
   getStyleConst,
   localState,
   globalState,
-  isDragMode,
   isSettingDrawerVisible,
   createTab,
   openHelpModal,
@@ -87,9 +64,6 @@ import {
   toggleIsDragMode,
   toggleIsSettingDrawerVisible,
 } from '@/logic'
-
-const CNAME = 'settingIcon'
-const isRender = getIsComponentRender(CNAME)
 
 const tabPaneList = computed(() => [
   {
@@ -138,19 +112,6 @@ const onTabsChange = (tabName: string) => {
   globalState.value.currSettingTabValue = tabName
 }
 
-const openSettingModal = () => {
-  if (isDragMode.value) {
-    return
-  }
-  toggleIsSettingDrawerVisible(true)
-  gaEvent('setting-button', 'click', 'open')
-}
-
-const openDragMode = () => {
-  toggleIsSettingDrawerVisible(false)
-  toggleIsDragMode(true)
-}
-
 const drawerOpacity = ref(1)
 const handlerPreviewEnter = () => {
   drawerOpacity.value = 0
@@ -164,20 +125,10 @@ const handlerPreviewLeave = () => {
 }
 
 const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(CNAME)
 const bgBottomBar = getStyleConst('bgBottomBar')
 </script>
 
 <style>
-.settingIcon__container {
-  z-index: 10;
-  position: absolute;
-  .item__icon {
-    font-size: 28px;
-  }
-}
-
 .n-tabs-tab__label {
   user-select: none;
 }

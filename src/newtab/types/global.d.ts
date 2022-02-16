@@ -6,7 +6,7 @@ interface Window {
 }
 
 type TargetType = 1 | 2 // 1:component 2:element
-type Components = 'settingIcon' | 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo'
+type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo'
 
 type OptionsPermission = 'bookmarks'
 

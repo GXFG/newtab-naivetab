@@ -9,6 +9,17 @@ export const log = (msg: string, ...args: any[]) => {
   console.log(`%c${msg}`, logStyles, ...args)
 }
 
+const logWarnStyles = [
+  'padding: 3px 8px',
+  'background: #ff4757',
+  'color: #fff',
+  'border-radius: 3px',
+].join(';')
+
+export const logWarn = (msg: string, ...args: any[]) => {
+  console.log(`%c${msg}`, logWarnStyles, ...args)
+}
+
 export const sleep = (time: number) => {
   return new Promise((resolve) => {
     setTimeout(() => { resolve(null) }, time)

@@ -118,13 +118,6 @@ const elementList = computed(() => [
     iconSize: 24,
     disabled: localState.setting.memo.enabled,
   },
-  {
-    label: window.$t('setting.mainLabel'),
-    componentName: 'settingIcon',
-    iconName: 'ic:baseline-settings',
-    iconSize: 26,
-    disabled: localState.setting.settingIcon.enabled,
-  },
 ])
 
 // ElementDrawer
