@@ -75,7 +75,7 @@ watch([
   renderBackgroundImage()
 })
 
-watch(() => localState.setting.general.isBackgroundImageEnabled, async(isEnabled) => {
+watch(() => localState.setting.general.isBackgroundImageEnabled, (isEnabled) => {
   renderBackgroundImage(!isEnabled)
 }, { immediate: true })
 
