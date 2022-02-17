@@ -1,5 +1,11 @@
 <template>
-  <NConfigProvider id="container" :locale="nativeUILang" :theme="currTheme" :theme-overrides="themeOverrides">
+  <NConfigProvider
+    id="container"
+    :class="{ 'animation--zoom-in': localState.setting.general.isLoadPageAnimationEnabled }"
+    :locale="nativeUILang"
+    :theme="currTheme"
+    :theme-overrides="themeOverrides"
+  >
     <NNotificationProvider>
       <NMessageProvider>
         <Content />

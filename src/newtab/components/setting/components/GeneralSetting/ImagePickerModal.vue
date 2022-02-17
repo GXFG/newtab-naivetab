@@ -24,7 +24,7 @@
         </div>
       </div>
       <NSpin :show="isImageListLoading">
-        <NCollapse accordion>
+        <NCollapse default-expanded-names="bing" accordion>
           <NCollapseItem v-for="origin of Object.keys(previewImageListMap)" :key="origin" :title="$t(`common.${origin}`)" :name="origin">
             <div class="picker__images">
               <div v-for="item in previewImageListMap[origin]" :key="item.name" class="image__item">

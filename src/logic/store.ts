@@ -190,6 +190,7 @@ export const defaultState = {
       lang: chrome.i18n.getUILanguage() || 'en-US',
       drawerPlacement: 'right' as any,
       isBackgroundImageEnabled: true,
+      isLoadPageAnimationEnabled: true,
       backgroundImageSource: 1, // 0:localFile, 1:network
       backgroundImageName: 'YurisNight_ZH-CN5738817931',
       backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',

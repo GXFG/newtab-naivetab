@@ -13,6 +13,9 @@
       <NFormItem :label="$t('common.drawerSite')">
         <NSelect v-model:value="localState.setting.general.drawerPlacement" :options="drawerPlacementList" />
       </NFormItem>
+      <NFormItem :label="$t('general.loadPageAnimation')">
+        <NSwitch v-model:value="localState.setting.general.isLoadPageAnimationEnabled" />
+      </NFormItem>
     </template>
 
     <template #style>

@@ -224,6 +224,10 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
 </script>
 
 <style>
+.moveable-tool--active {
+  left: 0 !important;
+}
+
 #moveable-tool {
   z-index: 20;
   position: relative;
@@ -339,8 +343,5 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
     top: 8vh;
     right: 10vw;
   }
-}
-.moveable-tool--active {
-  left: 0 !important;
 }
 </style>

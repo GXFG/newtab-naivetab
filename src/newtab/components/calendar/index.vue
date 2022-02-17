@@ -89,7 +89,7 @@ const state = reactive({
   currYear: dayjs().get('year'),
   currMonth: dayjs().get('month') + 1,
   currDay: dayjs().get('date'),
-  yearList: Array.from(Array(51), (v, i) => ({ label: `${2000 + i}`, value: 2000 + i })),
+  yearList: Array.from(Array(101), (v, i) => ({ label: `${2000 + i}`, value: 2000 + i })),
   dateList: [] as {
     date: string // YYYY-MM-DD
     day: number // D

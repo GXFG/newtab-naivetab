@@ -1,6 +1,7 @@
 import 'virtual:windi.css'
 import './reset.css'
 import './main.css'
+import './animation.css'
 import './qweather-icons.css'
 
 /**

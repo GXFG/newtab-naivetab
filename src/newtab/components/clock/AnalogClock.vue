@@ -2,12 +2,12 @@
   <MoveableComponentWrap componentName="clockAnalog" @drag="(style) => (dragStyle = style)">
     <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
       <div class="clockAnalog__container" :style="dragStyle || containerStyle">
-        <article class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
+        <div v-show="state.isClockVisible" class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
           <div class="clock__base" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
           <div class="clock__base clock__hour" :style="`background-image: url(/assets/img/clock/${currTheme}/hour.png);`" />
-          <div class="clock__base clock__minute" :style="`);background-image: url(/assets/img/clock/${currTheme}/minute.png);`" />
+          <div class="clock__base clock__minute" :style="`background-image: url(/assets/img/clock/${currTheme}/minute.png);`" />
           <div class="clock__base clock__second" :style="`background-image: url(/assets/img/clock/${currTheme}/second.png);`" />
-        </article>
+        </div>
       </div>
     </div>
   </MoveableComponentWrap>
@@ -19,11 +19,39 @@ import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, localState, getIsCom
 const CNAME = 'clockAnalog'
 const isRender = getIsComponentRender(CNAME)
 
+const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === localState.setting.clockAnalog.theme)?.label || 'light')
+
 const state = reactive({
+  isClockVisible: false,
   hourDeg: 0,
   minuteDeg: 0,
   secondDeg: 0,
 })
+
+const imageLoadComplete = (url: string) => {
+  return new Promise((resolve) => {
+    const imgEle = new Image()
+    imgEle.src = url
+    imgEle.onload = () => {
+      resolve(true)
+    }
+    imgEle.onerror = () => {
+      resolve(true)
+    }
+  })
+}
+
+const getClockImageUrl = (type: 'background' | 'marker' | 'hour' | 'minute' | 'second') => {
+  return `/assets/img/clock/${currTheme.value}/${type}.png`
+}
+
+const initClockImage = async() => {
+  const url = getClockImageUrl('background')
+  await imageLoadComplete(url)
+  state.isClockVisible = true
+}
+
+initClockImage()
 
 const initTime = () => {
   const h = dayjs().hour()
@@ -35,7 +63,8 @@ const initTime = () => {
 }
 
 const updateTime = () => {
-  const s = dayjs().second()
+  // const s = dayjs().second() // 0.01416015625 ms
+  const s = new Date().getSeconds() // 0.0087890625 ms
   state.secondDeg += 6
   if (s !== 0) {
     return
@@ -56,8 +85,6 @@ watch(
   },
   { immediate: true },
 )
-
-const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === localState.setting.clockAnalog.theme)?.label || 'light')
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)

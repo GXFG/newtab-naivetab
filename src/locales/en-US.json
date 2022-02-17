@@ -104,6 +104,7 @@
     "globalStyle": "Global style",
     "generalLabel": "General",
     "pageTitle": "Page title",
+    "loadPageAnimation": "Load animation",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",

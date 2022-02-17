@@ -1,0 +1,12 @@
+@keyframes zoom-in {
+  0% {
+    transform:scale(1.05);
+  }
+  100% {
+    transform:scale(1);
+  }
+}
+
+.animation--zoom-in {
+  animation: zoom-in 600ms ease 50ms;
+}

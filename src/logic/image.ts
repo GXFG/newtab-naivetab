@@ -39,7 +39,9 @@ const getImages = async() => {
   }
 }
 
+const tempLoadImageEle = new Image()
 const renderBackgroundImage = async(clearStyle = false) => {
+  tempLoadImageEle.src = '' // 取消上一个图片的加载，为确保严格按加载顺序生效
   isImageLoading.value = true
   await nextTick()
   const backgroundEl: any = document.querySelector('#background__container')
@@ -50,16 +52,15 @@ const renderBackgroundImage = async(clearStyle = false) => {
   const currUrl = localState.setting.general.backgroundImageSource === 0
     ? imageState.value.localBackgroundBase64
     : getBingImageUrlFromName(localState.setting.general.backgroundImageName, 'UHD')
-  const imgEle = new Image()
-  imgEle.src = currUrl
-  imgEle.onload = async() => {
+  tempLoadImageEle.src = currUrl
+  tempLoadImageEle.onload = async() => {
     // 图片加载完成后再切换背景图
     const bgImg = `background-image: url(${currUrl});`
     backgroundEl.style = bgImg
     await nextTick()
     isImageLoading.value = false
   }
-  imgEle.onerror = () => {
+  tempLoadImageEle.onerror = () => {
     isImageLoading.value = false
   }
 }
@@ -69,7 +70,7 @@ watch([
   () => localState.setting.general.backgroundImageSource,
   () => localState.setting.general.backgroundImageName,
 ], () => {
-  if (!localState.setting.general.isBackgroundImageEnabled || imageState.value.imageList.length === 0) {
+  if (!localState.setting.general.isBackgroundImageEnabled) {
     return
   }
   renderBackgroundImage()

@@ -159,7 +159,7 @@ const clearStorage = (clearAll = false) => {
 export const refreshSetting = async() => {
   globalState.value.isClearStorageLoading = true
   await updateSetting()
-  await sleep(5000) // 等待config同步完成、localStorage写入完成后再进行后续操作
+  await sleep(3000) // 等待config同步完成、localStorage写入完成后再进行后续操作
   clearStorage()
   globalState.value.isClearStorageLoading = false
 }
@@ -183,7 +183,7 @@ export const importSetting = async(text: string) => {
   }
   log('FileContent', fileContent)
   await updateSetting(fileContent)
-  await sleep(5000) // 等待config同步完成、localStorage写入完成后再进行后续操作
+  await sleep(3000) // 等待config同步完成、localStorage写入完成后再进行后续操作
   clearStorage()
   globalState.value.isImportSettingLoading = false
 }
