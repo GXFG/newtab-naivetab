@@ -18,9 +18,9 @@ export async function getManifest() {
       default_icon: './assets/img/icon/icon.png',
     },
     icons: {
-      16: './assets/img/icon/icon-16.png',
-      48: './assets/img/icon/icon-48.png',
-      128: './assets/img/icon/icon-128.png',
+      16: './assets/img/icon/icon-16x16.png',
+      48: './assets/img/icon/icon-48x48.png',
+      128: './assets/img/icon/icon-128x128.png',
     },
     permissions: [
       'storage',
