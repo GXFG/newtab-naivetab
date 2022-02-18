@@ -2,8 +2,8 @@
   <div class="image-wrap" :class="{ 'image-wrap--active': isCurrSelectedImage }">
     <NSpin :show="isCurrSelectedImage && isImageLoading">
       <!-- 懒加载的img不支持reactive变量 -->
-      <img v-if="lazy" v-lazy="getBingImageUrlFromName(props.data.name)" alt="" @click="onSelectImage()">
-      <img v-else :src="getBingImageUrlFromName(props.data.name)" alt="" @click="onSelectImage()">
+      <img v-if="lazy" v-lazy="currImageUrl" alt="" @click="onSelectImage()">
+      <img v-else :src="currImageUrl" alt="" @click="onSelectImage()">
     </NSpin>
     <div v-if="isCurrSelectedImage" class="image__current-mask">
       <line-md:confirm-circle />
@@ -59,6 +59,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+})
+
+const currImageUrl = computed(() => {
+  if (props.data.url && props.data.url.length !== 0) {
+    return props.data.url
+  }
+  return getBingImageUrlFromName(props.data.name)
 })
 
 const isCurrSelectedImage = computed(() => {

@@ -1,5 +1,5 @@
 <template>
-  <ImagePickerModal :show="state.isImageListVisible" @close="toggleIsImageListVisible" />
+  <ImagePickerModal :show="state.isImageModalVisible" @close="toggleIsImageModalVisible" />
 
   <!-- main -->
   <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
@@ -28,28 +28,9 @@
       <!-- backgroundImage -->
       <NFormItem :label="$t('common.backgroundImage')">
         <NSwitch v-model:value="localState.setting.general.isBackgroundImageEnabled" />
-        <template v-if="localState.setting.general.isBackgroundImageEnabled">
-          <NSelect
-            v-model:value="localState.setting.general.backgroundImageSource"
-            :options="backgroundImageSourceList"
-            class="setting__row-element"
-          />
-          <!-- local -->
-          <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
-          <template v-if="localState.setting.general.backgroundImageSource === 0">
-            <NButton class="setting__row-element" @click="onSelectBackgroundImage">
-              <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
-            </NButton>
-            <Tips :content="$t('general.localBackgroundTips')" />
-          </template>
-          <!-- bing & favorite -->
-          <NButton v-else class="setting__row-element" @click="toggleIsImageListVisible()">
-            <feather:edit />
-          </NButton>
-        </template>
-      </NFormItem>
-      <NFormItem v-if="isLocalFilenameVisible" :label="$t('general.filename')">
-        <p>{{ imageState.localBackgroundFileName }}</p>
+        <NButton class="setting__row-element" @click="toggleIsImageModalVisible()">
+          <feather:edit />&nbsp;{{ $t('common.edit') }}
+        </NButton>
       </NFormItem>
       <NFormItem v-if="localState.setting.general.isBackgroundImageEnabled" :label="$t('common.blur')">
         <NSlider v-model:value="localState.style.general.bgBlur" :step="0.1" :min="0" :max="200" />
@@ -105,7 +86,7 @@
 
 <script setup lang="ts">
 import ImagePickerModal from './ImagePickerModal.vue'
-import { exportSetting, gaEvent, localState, globalState, imageState, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
+import { exportSetting, gaEvent, localState, globalState, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -115,7 +96,7 @@ const state = reactive({
     label: locale,
     value: locale,
   })),
-  isImageListVisible: false,
+  isImageModalVisible: false,
 })
 
 const themeList = computed(() => [
@@ -131,51 +112,15 @@ const drawerPlacementList = computed(() => [
   { label: window.$t('common.bottom'), value: 'bottom' },
 ])
 
-const backgroundImageSourceList = computed(() => [
-  { label: window.$t('common.local'), value: 0 },
-  { label: window.$t('common.network'), value: 1 },
-])
-
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
   localState.setting.general.lang = locale
   gaEvent('setting-locale', 'click', 'change')
 }
 
-const isLocalFilenameVisible = computed(() => {
-  return (
-    localState.setting.general.isBackgroundImageEnabled
-    && localState.setting.general.backgroundImageSource === 0
-    && imageState.value.localBackgroundFileName.length !== 0
-  )
-})
-
-const bgImageFileInputEl = ref()
-const onSelectBackgroundImage = () => {
-  (bgImageFileInputEl as any).value.value = null
-  bgImageFileInputEl.value.click()
-  gaEvent('setting-background-image', 'click', 'open')
-}
-
-const onBackgroundImageFileChange = (e: any) => {
-  const file = e.target.files[0]
-  if (file.size > 4 * 1024 * 1024) {
-    window.$message.error(window.$t('prompts.imageTooLarge'))
-    return
-  }
-  const reader = new FileReader()
-  reader.readAsDataURL(file)
-  reader.onload = () => {
-    const res: any = reader.result // base64
-    imageState.value.localBackgroundBase64 = res
-    imageState.value.localBackgroundFileName = file.name
-  }
-  gaEvent('setting-background-image', 'click', 'select-file')
-}
-
-const toggleIsImageListVisible = () => {
-  state.isImageListVisible = !state.isImageListVisible
-  if (state.isImageListVisible) {
+const toggleIsImageModalVisible = () => {
+  state.isImageModalVisible = !state.isImageModalVisible
+  if (state.isImageModalVisible) {
     onRefreshImageList()
   }
 }
