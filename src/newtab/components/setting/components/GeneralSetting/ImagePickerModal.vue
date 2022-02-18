@@ -88,13 +88,15 @@ const backgroundImageSourceList = computed(() => [
 ])
 
 const currImageData = computed(() => {
-  const data: any = {
+  let data: any = {
     name: localState.setting.general.backgroundImageName,
     desc: localState.setting.general.backgroundImageDesc,
   }
   if (!(localState.setting.general.backgroundImageSource === 1 && !localState.setting.general.isBackgroundImageCustomUrlEnabled)) {
     // not from bing
-    data.url = currBackgroundImageUrl.value
+    data = {
+      url: currBackgroundImageUrl.value,
+    }
   }
   return data
 })
