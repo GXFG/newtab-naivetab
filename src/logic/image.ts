@@ -2,17 +2,24 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
 import { localState } from '@/logic'
 
+/**
+ * e.g.: http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
+ * @param size: 1366x768, 1920x1080, UHD
+ */
+export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `http://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
+
 export const imageState = ref(useStorageLocal('data-images', {
   imageList: [] as BingImageItem[],
   localBackgroundFileName: '',
   localBackgroundBase64: '',
 }))
 
-/**
- * e.g.: http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
- * @param size: 1366x768, 1920x1080, UHD
- */
-export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `http://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
+export const currBackgroundImageUrl = computed(() => {
+  if (localState.setting.general.backgroundImageSource === 0) {
+    return imageState.value.localBackgroundBase64
+  }
+  return getBingImageUrlFromName(localState.setting.general.backgroundImageName, 'UHD')
+})
 
 export const previewImageListMap = computed(() => ({
   favorite: localState.setting.general.favoriteImageList,
@@ -25,7 +32,6 @@ export const previewImageListMap = computed(() => ({
   }),
 }))
 
-export const isImageLoading = ref(false)
 export const isImageListLoading = ref(false)
 
 const getImages = async() => {
@@ -39,30 +45,22 @@ const getImages = async() => {
   }
 }
 
-const tempLoadImageEle = new Image()
-const renderBackgroundImage = async(clearStyle = false) => {
-  tempLoadImageEle.src = '' // 取消上一个图片的加载，为确保严格按加载顺序生效
+export const isImageLoading = ref(true)
+
+const loadImageEle = new Image()
+loadImageEle.onload = () => {
+  console.timeEnd('backgroundImage')
+  isImageLoading.value = false
+}
+loadImageEle.onerror = () => {
+  isImageLoading.value = false
+}
+
+const renderBackgroundImage = () => {
+  console.time('backgroundImage')
+  loadImageEle.src = '' // 取消上一个图片的加载，为确保严格按加载顺序生效
   isImageLoading.value = true
-  await nextTick()
-  const backgroundEl: any = document.querySelector('#background__container')
-  if (clearStyle) {
-    backgroundEl.style = ''
-    return
-  }
-  const currUrl = localState.setting.general.backgroundImageSource === 0
-    ? imageState.value.localBackgroundBase64
-    : getBingImageUrlFromName(localState.setting.general.backgroundImageName, 'UHD')
-  tempLoadImageEle.src = currUrl
-  tempLoadImageEle.onload = async() => {
-    // 图片加载完成后再切换背景图
-    const bgImg = `background-image: url(${currUrl});`
-    backgroundEl.style = bgImg
-    await nextTick()
-    isImageLoading.value = false
-  }
-  tempLoadImageEle.onerror = () => {
-    isImageLoading.value = false
-  }
+  loadImageEle.src = currBackgroundImageUrl.value
 }
 
 watch([
@@ -74,10 +72,6 @@ watch([
     return
   }
   renderBackgroundImage()
-})
-
-watch(() => localState.setting.general.isBackgroundImageEnabled, (isEnabled) => {
-  renderBackgroundImage(!isEnabled)
 }, { immediate: true })
 
 export const onRefreshImageList = () => {

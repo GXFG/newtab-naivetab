@@ -1,5 +1,5 @@
+<!-- 最外层div的style会被用来存放v-bind的变量，不能再进行:style操作 -->
 <template>
-  <!-- 最外层div的style会被用来存放v-bind的变量，不能再进行:style操作 -->
   <div>
     <div ref="moveableWrapEl" :style="moveableWrapStyle" class="moveable-wrap">
       <slot />
