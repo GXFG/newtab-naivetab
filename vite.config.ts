@@ -10,6 +10,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Markdown from 'vite-plugin-md'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import WindiCSS from 'vite-plugin-windicss'
+// import visualizer from 'rollup-plugin-visualizer'
 import windiConfig from './windi.config'
 import { r, port, isDev } from './scripts/utils'
 
@@ -71,6 +72,8 @@ export const sharedConfig: UserConfig = {
         return html.replace(/"\/assets\//g, `"${relative(dirname(path), '/assets')}/`)
       },
     },
+
+    // visualizer(),
   ],
   optimizeDeps: {
     include: [
