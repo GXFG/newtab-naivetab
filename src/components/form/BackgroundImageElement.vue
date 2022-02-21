@@ -120,6 +120,8 @@ const themeColorMain = getStyleConst('themeColorMain')
 <style scoped>
 .image-wrap {
   position: relative;
+  width: 100%;
+  height: 100%;
   border-radius: 2px;
   cursor: pointer;
   overflow: hidden;

@@ -1,6 +1,6 @@
 <template>
-  <NModal :show="props.show" style="width: 700px" preset="card" :title="$t('setting.bookmark')" :mask-closable="true" @update:show="onCloseModal()">
-    <div class="modal__content">
+  <NDrawer :show="props.show" :width="550" @update:show="onCloseModal()">
+    <NDrawerContent :title="$t('setting.bookmark')" closable>
       <NTree
         block-line
         :data="state.bookmarks"
@@ -10,8 +10,8 @@
         :default-expanded-keys="state.defaultExpandedKeys"
         :node-props="state.nodeProps"
       />
-    </div>
-  </NModal>
+    </NDrawerContent>
+  </NDrawer>
 </template>
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
@@ -95,7 +95,4 @@ watch(
 </script>
 
 <style scoped>
-.modal__content {
-  height: 60vh;
-}
 </style>

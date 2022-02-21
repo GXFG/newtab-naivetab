@@ -1,5 +1,5 @@
 <template>
-  <ImagePickerModal :show="state.isImageModalVisible" @close="toggleIsImageModalVisible" />
+  <ImagePicker :show="state.isImageModalVisible" @close="toggleIsImageModalVisible" />
 
   <!-- main -->
   <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
@@ -29,7 +29,7 @@
       <NFormItem :label="$t('common.backgroundImage')">
         <NSwitch v-model:value="localState.setting.general.isBackgroundImageEnabled" />
         <NButton class="setting__row-element" @click="toggleIsImageModalVisible()">
-          <feather:edit />&nbsp;{{ $t('common.edit') }}
+          <tabler:edit />&nbsp;{{ $t('common.edit') }}
         </NButton>
       </NFormItem>
       <NFormItem v-if="localState.setting.general.isBackgroundImageEnabled" :label="$t('common.blur')">
@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import ImagePickerModal from './ImagePickerModal.vue'
+import ImagePicker from './ImagePicker.vue'
 import { exportSetting, gaEvent, localState, globalState, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 

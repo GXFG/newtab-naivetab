@@ -1,5 +1,5 @@
 <template>
-  <BookmarkPickerModal :show="state.isBookmarkModalVisible" @close="toggleIsBookmarkPickerVisible" @select="onSelectBookmark" />
+  <BookmarkPicker :show="state.isBookmarkModalVisible" @close="toggleIsBookmarkPickerVisible" @select="onSelectBookmark" />
 
   <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['bookmarkKeyboard']">
     <!-- bookmarkKeyboard -->
@@ -11,6 +11,9 @@
           </NFormItem>
           <NFormItem :label="$t('bookmark.showSymbolKey')">
             <NSwitch v-model:value="localState.setting.bookmark.isSymbolEnabled" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.newTabOpen')">
+            <NSwitch v-model:value="localState.setting.bookmark.isNewTabOpen" />
           </NFormItem>
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
             <div class="setting__input-wrap">
@@ -110,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import BookmarkPickerModal from './BookmarkPickerModal.vue'
+import BookmarkPicker from './BookmarkPicker.vue'
 import { localState, keyboardSettingRowList, getDefaultBookmarkName, requestPermission } from '@/logic'
 
 const state = reactive({

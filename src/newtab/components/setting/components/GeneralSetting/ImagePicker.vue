@@ -1,23 +1,10 @@
 <template>
   <!-- ImagePicker: bing & favorite -->
-  <NModal
-    :show="props.show"
-    style="width: 700px"
-    preset="card"
-    :title="`${$t('common.edit')}${$t('common.backgroundImage')}`"
-    :mask-closable="true"
-    @update:show="onCloseModal()"
-  >
-    <div class="modal__content">
-      <!-- current -->
-      <div>
-        <p class="current__label">
-          {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
-        </p>
-        <div class="current__content">
-          <div class="image__item">
-            <BackgroundImageElement :lazy="false" :data="currImageData" />
-          </div>
+  <NDrawer :show="props.show" :width="550" @update:show="onCloseModal()">
+    <NDrawerContent :title="`${$t('common.edit')}${$t('common.backgroundImage')}`" closable>
+      <div class="modal__content">
+        <!-- current -->
+        <div>
           <NForm class="content__config" label-placement="left" :label-width="60">
             <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
             <NFormItem :label="$t('common.origin')">
@@ -43,28 +30,34 @@
               <NInput
                 v-if="localState.setting.general.isBackgroundImageCustomUrlEnabled"
                 v-model:value="localState.setting.general.backgroundImageCustomUrl"
-                class="setting__row-element custom__input"
+                class="setting__row-element"
                 type="text"
                 placeholder="https://"
               />
             </NFormItem>
           </NForm>
+          <p class="current__label">
+            {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
+          </p>
+          <div class="current__image image__item">
+            <BackgroundImageElement :lazy="false" :data="currImageData" />
+          </div>
         </div>
-      </div>
-      <!-- list -->
-      <NSpin :show="isImageListLoading">
-        <NCollapse default-expanded-names="bing" accordion>
-          <NCollapseItem v-for="origin of Object.keys(previewImageListMap)" :key="origin" :title="$t(`common.${origin}`)" :name="origin">
-            <div class="picker__images">
-              <div v-for="item in previewImageListMap[origin]" :key="item.name" class="image__item">
-                <BackgroundImageElement :data="item" select :delete="origin === 'favorite'" />
+        <!-- list -->
+        <NSpin :show="isImageListLoading">
+          <NCollapse default-expanded-names="bing" accordion>
+            <NCollapseItem v-for="origin of Object.keys(previewImageListMap)" :key="origin" :title="$t(`common.${origin}`)" :name="origin">
+              <div class="picker__images">
+                <div v-for="item in previewImageListMap[origin]" :key="item.name" class="image__item">
+                  <BackgroundImageElement :data="item" select :delete="origin === 'favorite'" />
+                </div>
               </div>
-            </div>
-          </NCollapseItem>
-        </NCollapse>
-      </NSpin>
-    </div>
-  </NModal>
+            </NCollapseItem>
+          </NCollapse>
+        </NSpin>
+      </div>
+    </NDrawerContent>
+  </NDrawer>
 </template>
 <script setup lang="ts">
 import { gaEvent, previewImageListMap, localState, imageState, isImageListLoading, currBackgroundImageUrl } from '@/logic'
@@ -135,20 +128,16 @@ const isLocalFilenameVisible = computed(() => {
 
 <style scoped>
 .modal__content {
-  height: 75vh;
+  height: 88vh;
+  .content__config {
+    margin-right: 18px;
+    flex: 1;
+  }
   .current__label {
     opacity: 0.6;
   }
-  .current__content {
-    display: flex;
-    .content__config {
-      margin-top: 10px;
-      margin-right: 18px;
-      flex: 1;
-      .custom__input {
-        width: 300px;
-      }
-    }
+  .current__image {
+    height: 125px;
   }
   .picker__images {
     display: flex;
@@ -156,9 +145,9 @@ const isLocalFilenameVisible = computed(() => {
   }
   .image__item {
     flex: 0 0 auto;
-    margin: 1.5%;
-    width: 30%;
-    min-height: 110px;
+    margin: 2.3%;
+    width: 45%;
+    min-height: 125px;
   }
 }
 </style>

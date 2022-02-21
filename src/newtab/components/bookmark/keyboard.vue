@@ -70,7 +70,11 @@ const onClickKey = (url: string) => {
   if (isDragMode.value) {
     return
   }
-  createTab(url)
+  if (localState.setting.bookmark.isNewTabOpen) {
+    createTab(url)
+  } else {
+    window.location.href = url
+  }
   state.currSelectKey = ''
 }
 

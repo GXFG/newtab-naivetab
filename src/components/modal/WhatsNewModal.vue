@@ -7,7 +7,7 @@
       <div class="card__footer">
         <NButton
           class="footer__btn"
-          type="warning"
+          type="primary"
           ghost
           size="small"
           :loading="globalState.isClearStorageLoading"

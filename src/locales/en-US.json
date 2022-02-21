@@ -118,6 +118,7 @@
   "bookmark": {
     "showNumberKey": "Number Key",
     "showSymbolKey": "Symbol Key",
+    "newTabOpen": "Open in newtab",
     "dblclickKeyToOpen": "Dblclick open",
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",

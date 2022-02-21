@@ -1,27 +1,23 @@
 <template>
   <!-- CityPicker -->
-  <NModal
-    v-model:show="state.isCityPickerModalVisible"
-    style="width: 450px; height: 450px"
-    preset="card"
-    :title="`${$t('common.edit')}${$t('weather.city')}`"
-    :mask-closable="true"
-  >
-    <NAutoComplete
-      v-model:value="state.keyword"
-      :options="state.cityList"
-      :loading="state.isSearchLoading"
-      @update:value="onChangeCity"
-      @select="onSelectCity"
-    />
-  </NModal>
+  <NDrawer v-model:show="state.isCityPickerVisible" :width="550">
+    <NDrawerContent :title="`${$t('common.edit')}${$t('weather.city')}`" closable>
+      <NAutoComplete
+        v-model:value="state.keyword"
+        :options="state.cityList"
+        :loading="state.isSearchLoading"
+        @update:value="onChangeCity"
+        @select="onSelectCity"
+      />
+    </NDrawerContent>
+  </NDrawer>
   <!-- main -->
   <BaseComponentSetting id="weather__setting" cname="weather">
     <template #header>
       <NFormItem :label="$t('weather.city')">
         <NInput v-model:value="localState.setting.weather.city.name" :disabled="true" />
         <NButton class="setting__row-element" @click="onOpenCityPicker()">
-          <clarity:note-edit-line class="item__icon" />
+          <tabler:edit class="item__icon" />
         </NButton>
       </NFormItem>
       <NFormItem label="API Key">
@@ -73,7 +69,7 @@ const speedUnitOptions = [
 ]
 
 const state = reactive({
-  isCityPickerModalVisible: false,
+  isCityPickerVisible: false,
   isSearchLoading: false,
   keyword: '',
   cityList: [] as SelectStringItem[],
@@ -117,7 +113,7 @@ const onSelectCity = (value: any) => {
 const onOpenCityPicker = () => {
   state.keyword = ''
   state.cityList = []
-  state.isCityPickerModalVisible = true
+  state.isCityPickerVisible = true
 }
 </script>
 

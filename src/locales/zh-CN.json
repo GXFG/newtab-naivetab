@@ -118,6 +118,7 @@
   "bookmark": {
     "showNumberKey": "展示数字按键",
     "showSymbolKey": "展示字符按键",
+    "newTabOpen": "以新标签页打开",
     "dblclickKeyToOpen": "双击按键打开",
     "dblclickKeyToOpenTips": "双击键盘按键以打开书签",
     "intervalTime": "间隔时间",

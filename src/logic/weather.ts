@@ -49,6 +49,16 @@ export const weatherState = ref(useStorageLocal('data-weather', {
   },
 }))
 
+export const weatherIndicesInfo = computed(() => {
+  const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}: [${item.category}] ${item.text}`)
+  return indicesList.join('\n')
+})
+
+export const weatherWarningInfo = computed(() => {
+  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `${item.text}`)
+  return warningList.join('\n')
+})
+
 const getNowData = async() => {
   const data = await getWeatherNow()
   if (data.code !== '200') {
@@ -97,6 +107,13 @@ const getWarningData = async() => {
   weatherState.value.warning.list = data.warning
   weatherState.value.warning.syncTime = dayjs().valueOf()
   log('Weather update warning')
+  await nextTick()
+  if (data.warning.length > 0) {
+    window.$notification.warning({
+      title: 'Warning',
+      content: weatherWarningInfo,
+    })
+  }
 }
 
 export const updateWeather = () => {

@@ -227,6 +227,7 @@ export const defaultState = {
       enabled: false,
       isSymbolEnabled: true,
       isNumberEnabled: false,
+      isNewTabOpen: true,
       isDblclickOpen: true,
       dblclickIntervalTime: 200, // ms
       keymap: {},
@@ -376,7 +377,7 @@ export const createTab = (url: string, active = true) => {
 
 export const getDomainIcon = (url: string) => {
   if (isChrome) {
-    return `chrome://favicon/size/16@2x/${url}`
+    return `chrome://favicon/size/32@2x/${url}`
   }
   return `${url}/favicon.ico`
 }

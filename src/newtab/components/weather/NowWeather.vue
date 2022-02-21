@@ -24,7 +24,7 @@
                     </div>
                   </template>
                   <p class="weather__indices">
-                    {{ warningInfo }}
+                    {{ weatherWarningInfo }}
                   </p>
                 </NTooltip>
               </div>
@@ -45,7 +45,7 @@
                 </div>
               </template>
               <p class="weather__indices">
-                {{ indicesInfo }}
+                {{ weatherIndicesInfo }}
               </p>
             </NTooltip>
           </div>
@@ -112,6 +112,8 @@ import {
   WEATHER_SPEED_UNIT_MAP,
   isDragMode,
   weatherState,
+  weatherIndicesInfo,
+  weatherWarningInfo,
   localState,
   getStyleField,
   createTab,
@@ -125,16 +127,6 @@ const state = reactive({
 })
 
 const isWarningVisible = computed(() => weatherState.value.warning.list.length > 0)
-
-const indicesInfo = computed(() => {
-  const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}: [${item.category}] ${item.text}`)
-  return indicesList.join('\n')
-})
-
-const warningInfo = computed(() => {
-  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `${item.text}`)
-  return warningList.join('\n')
-})
 
 const handleWarningMouseEnter = () => {
   if (isDragMode.value) {

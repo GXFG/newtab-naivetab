@@ -5,7 +5,7 @@
       v-model:show="isSettingDrawerVisible"
       class="drawer-wrap"
       :style="drawerStyle"
-      display-directive="show"
+      display-directive="if"
       :width="600"
       :placement="localState.setting.general.drawerPlacement"
     >
@@ -33,9 +33,9 @@
           <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal()">
             <ic:round-new-releases />
           </NButton>
-          <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
+          <!-- <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
             <carbon:logo-github />
-          </NButton>
+          </NButton> -->
         </div>
       </div>
     </NDrawer>
@@ -52,18 +52,7 @@ import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
-import {
-  URL_GITHUB,
-  getStyleConst,
-  localState,
-  globalState,
-  isSettingDrawerVisible,
-  createTab,
-  openHelpModal,
-  openWhatsNewModal,
-  toggleIsDragMode,
-  toggleIsSettingDrawerVisible,
-} from '@/logic'
+import { URL_GITHUB, getStyleConst, localState, globalState, isSettingDrawerVisible, createTab, openHelpModal, openWhatsNewModal } from '@/logic'
 
 const tabPaneList = computed(() => [
   {
