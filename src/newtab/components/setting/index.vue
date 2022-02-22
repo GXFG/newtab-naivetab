@@ -33,9 +33,9 @@
           <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal()">
             <ic:round-new-releases />
           </NButton>
-          <!-- <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
+          <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
             <carbon:logo-github />
-          </NButton> -->
+          </NButton>
         </div>
       </div>
     </NDrawer>

@@ -80,14 +80,19 @@ watch(
   { immediate: true },
 )
 
-// custom theme
-const themeOverrides: GlobalThemeOverrides = {
-  common: {},
-}
-
 const CNAME = 'general'
+const customPrimaryColor = getStyleField(CNAME, 'primaryColor')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+
+const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: customPrimaryColor.value,
+    primaryColorPressed: '#57606f',
+    primaryColorHover: '#7f8c8d',
+    primaryColorSuppl: '#747d8c',
+  },
+}
 </script>
 
 <style>

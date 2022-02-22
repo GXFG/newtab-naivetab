@@ -46,7 +46,7 @@
         {{ $t('general.settingDividerSetting') }}
       </NDivider>
       <NFormItem :label="$t('general.syncTime')">
-        <NSpin :show="globalState.isUploadConfigLoadingMap.style || globalState.isUploadConfigLoadingMap.setting" size="small">
+        <NSpin :show="isUploadConfigLoading" size="small">
           <p>{{ syncTime }}</p>
         </NSpin>
         <Tips :content="$t('general.syncTimeTips')" />
@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import ImagePicker from './ImagePicker.vue'
-import { exportSetting, gaEvent, localState, globalState, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
+import { exportSetting, gaEvent, localState, globalState, isUploadConfigLoading, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()

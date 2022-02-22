@@ -53,6 +53,7 @@ import {
   handleToggleIsElementDrawerVisible,
   addKeyboardTask,
   getStyleConst,
+  getStyleField,
   moveState,
   localState,
 } from '@/logic'
@@ -216,7 +217,7 @@ const keyboardHandler = (e: KeyboardEvent) => {
 const CNAME = 'moveable-tool'
 addKeyboardTask(CNAME, keyboardHandler)
 
-const themeColorMain = getStyleConst('themeColorMain')
+const customPrimaryColor = getStyleField('general', 'primaryColor')
 const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 const bgMoveableComponentDelete = getStyleConst('bgMoveableComponentDelete')
 const bgMoveableToolDrawer = getStyleConst('bgMoveableToolDrawer')
@@ -267,7 +268,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
       }
     }
     .drawer__switch:hover {
-      color: v-bind(themeColorMain);
+      color: v-bind(customPrimaryColor);
     }
     .drawer__header {
       display: flex;

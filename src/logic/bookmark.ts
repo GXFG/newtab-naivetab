@@ -47,7 +47,7 @@ export const initBookmarkListData = () => {
   if (isInitialized.value) {
     return
   }
-  log('Bookmark initBookmarkListData')
+  log('Bookmark initLocalList')
   localBookmarkList.value = []
   KEYBOARD_KEY_LIST.forEach((key: string) => {
     localBookmarkList.value.push({

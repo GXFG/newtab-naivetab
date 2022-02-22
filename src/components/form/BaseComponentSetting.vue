@@ -34,6 +34,14 @@
     </NFormItem>
 
     <!-- color -->
+    <NFormItem v-if="isRenderField('primaryColor')" :label="$t('common.primaryColor')">
+      <NColorPicker
+        v-model:value="localState.style[props.cname].primaryColor[localState.common.currAppearanceCode]"
+        show-preview
+        :swatches="swatcheColors"
+      />
+      <Tips :content="$t('general.primaryColorTips')" />
+    </NFormItem>
     <NFormItem v-if="isRenderField('fontColor')" :label="$t('common.fontColor')">
       <NColorPicker
         v-model:value="localState.style[props.cname].fontColor[localState.common.currAppearanceCode]"

@@ -6,7 +6,7 @@
     "close": "关闭",
     "exit": "退出",
     "add": "添加",
-    "edit": "编辑",
+    "edit": "修改",
     "delete": "删除",
     "success": "成功",
     "fail": "失败",
@@ -30,6 +30,7 @@
     "font": "字体",
     "fontSize": "字体大小",
     "letterSpacing": "字体间距",
+    "primaryColor": "主题颜色",
     "fontColor": "字体颜色",
     "backgroundColor": "背景颜色",
     "backgroundImage": "背景图",
@@ -93,6 +94,7 @@
     "generalLabel": "通用",
     "pageTitle": "页面标题",
     "loadPageAnimation": "载入动画",
+    "primaryColorTips": "刷新后生效",
     "settingDividerSetting": "设置",
     "syncTime": "同步时间",
     "syncTimeTips": "多设备同步设置，仅在登录浏览器账号后生效",
@@ -109,20 +111,20 @@
     "resetSettingValue": "重置",
     "language": "语言",
     "saveCurrendImage": "保存当前背景",
-    "filename": "文件名",
     "localBackgroundTips": "本地背景图不会进行云同步，仅在当前设备生效"
   },
   "clock": {
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "showNumberKey": "展示数字按键",
-    "showSymbolKey": "展示字符按键",
     "newTabOpen": "以新标签页打开",
     "dblclickKeyToOpen": "双击按键打开",
     "dblclickKeyToOpenTips": "双击键盘按键以打开书签",
     "intervalTime": "间隔时间",
     "intervalTimeTips": "识别在多长时间内的双击操作",
+    "showNumberKey": "展示数字按键",
+    "showSymbolKey": "展示字符按键",
+    "showName": "展示链接名称",
     "keyLabel": "按键",
     "urlLabel": "地址",
     "urlPlaceholder": "",
@@ -160,6 +162,7 @@
     "rest": "休"
   },
   "weather": {
+    "warning": "天气预警",
     "city": "城市",
     "temperatureUnit": "温度单位",
     "speedUnit": "速度单位",

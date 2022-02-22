@@ -29,6 +29,7 @@ export const defaultState = {
       fontFamily: 'Arial',
       fontSize: 14,
       fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+      primaryColor: ['rgba(24,160,88, 1)', 'rgba(24,160,88, 1)'],
       backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
       bgOpacity: 1,
       bgBlur: 0,
@@ -229,6 +230,7 @@ export const defaultState = {
       isNumberEnabled: false,
       isNewTabOpen: true,
       isDblclickOpen: true,
+      isNameVisible: false,
       dblclickIntervalTime: 200, // ms
       keymap: {},
     },

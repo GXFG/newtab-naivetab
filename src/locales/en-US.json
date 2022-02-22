@@ -30,6 +30,7 @@
     "font": "Font",
     "fontSize": "Font size",
     "letterSpacing": "Letter spacing",
+    "primaryColor": "Primary color",
     "fontColor": "Font color",
     "backgroundColor": "BG color",
     "backgroundImage": "BG image",
@@ -93,6 +94,7 @@
     "generalLabel": "General",
     "pageTitle": "Page title",
     "loadPageAnimation": "Load animation",
+    "primaryColorTips": "Takes effect after refresh",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",
@@ -109,20 +111,20 @@
     "resetSettingValue": "Reset",
     "language": "Language",
     "saveCurrendImage": "Download",
-    "filename": "Filename",
     "localBackgroundTips": "Local file will not be synchronized"
   },
   "clock": {
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "showNumberKey": "Number Key",
-    "showSymbolKey": "Symbol Key",
     "newTabOpen": "Open in newtab",
     "dblclickKeyToOpen": "Dblclick open",
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",
     "intervalTimeTips": "The effective interval for double-clicking",
+    "showNumberKey": "Number Key",
+    "showSymbolKey": "Symbol Key",
+    "showName": "Hide name",
     "keyLabel": "Key",
     "urlLabel": "Url",
     "urlPlaceholder": "",
@@ -160,6 +162,7 @@
     "rest": "R"
   },
   "weather": {
+    "warning": "Warning",
     "city": "City",
     "temperatureUnit": "TEMP unit",
     "speedUnit": "Speed unit",

@@ -6,15 +6,6 @@
     <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
       <BaseComponentSetting cname="bookmark">
         <template #header>
-          <NFormItem :label="$t('bookmark.showNumberKey')">
-            <NSwitch v-model:value="localState.setting.bookmark.isNumberEnabled" />
-          </NFormItem>
-          <NFormItem :label="$t('bookmark.showSymbolKey')">
-            <NSwitch v-model:value="localState.setting.bookmark.isSymbolEnabled" />
-          </NFormItem>
-          <NFormItem :label="$t('bookmark.newTabOpen')">
-            <NSwitch v-model:value="localState.setting.bookmark.isNewTabOpen" />
-          </NFormItem>
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
             <div class="setting__input-wrap">
               <div class="setting__input_item">
@@ -31,6 +22,18 @@
                 <Tips :content="$t('bookmark.intervalTimeTips')" />
               </div>
             </div>
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.newTabOpen')">
+            <NSwitch v-model:value="localState.setting.bookmark.isNewTabOpen" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.showNumberKey')">
+            <NSwitch v-model:value="localState.setting.bookmark.isNumberEnabled" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.showSymbolKey')">
+            <NSwitch v-model:value="localState.setting.bookmark.isSymbolEnabled" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.showName')">
+            <NSwitch v-model:value="localState.setting.bookmark.isNameVisible" />
           </NFormItem>
 
           <div class="modal__bookmark">

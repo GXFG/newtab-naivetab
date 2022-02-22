@@ -26,7 +26,7 @@
                 <img v-if="item.url" class="img__main" :src="getDomainIcon(item.url)" :ondragstart="() => false">
               </div>
             </div>
-            <p class="item__name">
+            <p v-if="localState.setting.bookmark.isNameVisible" class="item__name">
               {{ item.name }}
             </p>
             <!-- 按键定位标志F & J -->

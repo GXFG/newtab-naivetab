@@ -29,10 +29,9 @@
 import Currentlog from '../../../CHANGELOG.md'
 import { globalState, closeWhatsNewModal, refreshSetting } from '@/logic'
 
-const onClose = () => {
+const onClose = async() => {
   if (globalState.value.isWhatsNewModalCloseToRefresh) {
-    refreshSetting()
-    return
+    await refreshSetting()
   }
   closeWhatsNewModal()
 }

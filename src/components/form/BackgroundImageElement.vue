@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { FAVORITE_MAX_COUNT, getStyleConst, createTab, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
+import { FAVORITE_MAX_COUNT, getStyleField, createTab, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
 
 const props = defineProps({
   data: {
@@ -114,7 +114,8 @@ const onUnFavoriteImage = () => {
   localState.setting.general.favoriteImageList.splice(index, 1)
 }
 
-const themeColorMain = getStyleConst('themeColorMain')
+const customPrimaryColor = getStyleField('general', 'primaryColor')
+
 </script>
 
 <style scoped>
@@ -161,10 +162,10 @@ const themeColorMain = getStyleConst('themeColorMain')
     height: 100%;
     font-size: 26px;
     background-color: rgba(0, 0, 0, 0.3);
-    color: v-bind(themeColorMain);
+    color: v-bind(customPrimaryColor);
   }
 }
 .image-wrap--active {
-  outline: 2px solid v-bind(themeColorMain);
+  outline: 2px solid v-bind(customPrimaryColor);
 }
 </style>

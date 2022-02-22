@@ -9,8 +9,6 @@ import './qweather-icons.css'
  * 其中默认 darkColor = lightColor
  */
 export const styleConst = ref({
-  // common
-  themeColorMain: ['#63e2b7', ''],
   // setting
   bgBottomBar: ['#eceff1', '#424247'],
   // moveable
@@ -21,7 +19,7 @@ export const styleConst = ref({
   bgMoveableComponentActive: ['rgba(100,181,246, 0.7)', ''],
   bgMoveableComponentDelete: ['rgba(250,82,82, 0.7)', ''],
   moveableToolDeleteBtnColor: ['#ffa39e', ''],
-  borderMoveableToolItem: ['#63e2b7', ''],
+  borderMoveableToolItem: ['#95a5a6', ''],
   bgMoveableToolDrawer: ['rgba(0, 0, 0, 0.6)', ''],
   // calendar
   textColorRed: ['#fa5252', ''],
