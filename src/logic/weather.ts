@@ -110,7 +110,7 @@ const getWarningData = async() => {
   await nextTick()
   if (data.warning.length > 0) {
     window.$notification.warning({
-      title: 'Warning',
+      title: window.$t('weather.warning'),
       content: weatherWarningInfo,
     })
   }
