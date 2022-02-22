@@ -3,9 +3,11 @@ import { log, downloadJsonByTagA, sleep } from './util'
 import { MERGE_CONFIG_DELAY } from './const'
 import { defaultState, localState, globalState } from './store'
 
+export const isUploadConfigLoading = computed(() => globalState.value.isUploadConfigLoadingMap.style || globalState.value.isUploadConfigLoadingMap.setting)
+
 /**
  * https://developer.chrome.com/docs/extensions/reference/storage/
- * chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192  单个配置不可超过8k
+ * chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192  注意单个配置不可超过8k
  */
 const uploadConfigFn = (field: ConfigField) => {
   globalState.value.isUploadConfigLoadingMap[field] = true
@@ -18,7 +20,7 @@ const uploadConfigFn = (field: ConfigField) => {
       data: localState[field],
     }),
   }
-  chrome.storage.sync.set(payload, () => {
+  chrome.storage.sync.set(payload, async() => {
     const error = chrome.runtime.lastError
     if (error) {
       log(`Upload config-${field} error`, error)
@@ -26,7 +28,10 @@ const uploadConfigFn = (field: ConfigField) => {
     } else {
       log(`Upload config-${field} complete`, syncTime)
     }
-    globalState.value.isUploadConfigLoadingMap[field] = false
+    setTimeout(() => {
+      // 确保isUploadConfigLoading的值不会抖动，消除style 与 setting排队同步时中间出现的短暂二者值均为false的间隙
+      globalState.value.isUploadConfigLoadingMap[field] = false
+    }, 100)
   })
 }
 
@@ -148,19 +153,29 @@ export const downloadConfig = () => {
 }
 
 const clearStorage = (clearAll = false) => {
-  log('Clear localStorage')
-  localStorage.clear()
-  if (!clearAll) {
-    localStorage.setItem('data-first', 'false') // 避免打开help弹窗
-  }
-  location.reload()
+  return new Promise((resolve) => {
+    const cancelListenerSync = watch(isUploadConfigLoading, async(value) => {
+      if (value) {
+        log('Clear localStorage wait') // 等待config同步完成、localStorage写入完成后再进行后续操作
+        return
+      }
+      await sleep(1000) // 严格确保同步完成后再执行清除动作
+      log('Clear localStorage execute')
+      cancelListenerSync()
+      localStorage.clear()
+      if (!clearAll) {
+        localStorage.setItem('data-first', 'false') // 避免打开help弹窗
+      }
+      resolve(true)
+      location.reload()
+    })
+  })
 }
 
 export const refreshSetting = async() => {
   globalState.value.isClearStorageLoading = true
   await updateSetting()
-  await sleep(3000) // 等待config同步完成、localStorage写入完成后再进行后续操作
-  clearStorage()
+  await clearStorage()
   globalState.value.isClearStorageLoading = false
 }
 
@@ -183,8 +198,7 @@ export const importSetting = async(text: string) => {
   }
   log('FileContent', fileContent)
   await updateSetting(fileContent)
-  await sleep(3000) // 等待config同步完成、localStorage写入完成后再进行后续操作
-  clearStorage()
+  await clearStorage()
   globalState.value.isImportSettingLoading = false
 }
 
