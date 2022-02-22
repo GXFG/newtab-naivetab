@@ -33,7 +33,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/node": "^16.11.25",
     "@types/webextension-polyfill": "^0.8.2",
-    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@vitejs/plugin-vue": "^2.2.2",
     "@vue/compiler-sfc": "^3.2.31",
     "@vueuse/core": "^7.6.2",
