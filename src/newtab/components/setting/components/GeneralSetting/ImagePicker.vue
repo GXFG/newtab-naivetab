@@ -17,12 +17,12 @@
             <!-- local -->
             <NFormItem v-if="localState.setting.general.backgroundImageSource === 0" :label="$t('common.select')">
               <NButton class="setting__row-element" @click="onSelectBackgroundImage">
-                <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
+                <uil:import />&nbsp;{{ $t('common.import') }}
               </NButton>
+              <p class="setting__row-element">
+                {{ imageState.localBackgroundFileName }}
+              </p>
               <Tips :content="$t('general.localBackgroundTips')" />
-            </NFormItem>
-            <NFormItem v-if="isLocalFilenameVisible" :label="$t('general.filename')">
-              <p>{{ imageState.localBackgroundFileName }}</p>
             </NFormItem>
             <!-- network -->
             <NFormItem v-else-if="localState.setting.general.backgroundImageSource === 1" :label="$t('common.custom')">
@@ -117,13 +117,6 @@ const onBackgroundImageFileChange = (e: any) => {
   gaEvent('setting-background-image', 'click', 'select-file')
 }
 
-const isLocalFilenameVisible = computed(() => {
-  return (
-    localState.setting.general.isBackgroundImageEnabled
-    && localState.setting.general.backgroundImageSource === 0
-    && imageState.value.localBackgroundFileName.length !== 0
-  )
-})
 </script>
 
 <style scoped>
