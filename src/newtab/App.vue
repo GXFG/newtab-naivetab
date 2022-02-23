@@ -88,9 +88,9 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const themeOverrides: GlobalThemeOverrides = {
   common: {
     primaryColor: customPrimaryColor.value,
-    primaryColorPressed: '#57606f',
+    primaryColorSuppl: customPrimaryColor.value,
     primaryColorHover: '#7f8c8d',
-    primaryColorSuppl: '#747d8c',
+    primaryColorPressed: '#57606f',
   },
 }
 </script>

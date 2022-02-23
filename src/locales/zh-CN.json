@@ -94,7 +94,7 @@
     "generalLabel": "通用",
     "pageTitle": "页面标题",
     "loadPageAnimation": "载入动画",
-    "primaryColorTips": "刷新后生效",
+    "primaryColorTips": "修改后需刷新页面才可生效",
     "settingDividerSetting": "设置",
     "syncTime": "同步时间",
     "syncTimeTips": "多设备同步设置，仅在登录浏览器账号后生效",

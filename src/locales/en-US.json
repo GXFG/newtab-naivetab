@@ -94,7 +94,7 @@
     "generalLabel": "General",
     "pageTitle": "Page title",
     "loadPageAnimation": "Load animation",
-    "primaryColorTips": "Takes effect after refresh",
+    "primaryColorTips": "Takes effect after refresh page",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",

@@ -64,9 +64,9 @@ const mergeState = (state: any, acceptState: any) => {
   if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
     return acceptState
   }
-  // 只处理Object类型，其余如Array等对象类型均直接返回state，
+  // 只处理Object类型，其余如Array等对象类型均直接返回acceptState，
   if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
-    return state
+    return acceptState
   }
   // 二者均为Object、且state为空Object时，返回acceptState，如setting中的keymap数据
   if (Object.keys(state).length === 0) {
@@ -213,7 +213,8 @@ export const exportSetting = () => {
 
 export const resetSetting = () => {
   chrome.storage.sync.clear()
-  clearStorage(true)
+  localStorage.clear()
+  location.reload()
 }
 
 export const checkPermission = (field: OptionsPermission) => {
