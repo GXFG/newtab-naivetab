@@ -40,7 +40,6 @@ watch(
       removeTimerTask(CNAME)
       return
     }
-    updateTime()
     addTimerTask(CNAME, updateTime)
   },
   { immediate: true },

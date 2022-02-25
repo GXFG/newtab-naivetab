@@ -20,7 +20,6 @@ const storageLocal: StorageLikeAsync = {
   },
 }
 
-// Todo 不能持久化
 // export const useStorageLocal = <T>(
 //   key: string,
 //   initialValue: MaybeRef<T>,

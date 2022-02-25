@@ -45,7 +45,8 @@
     "unplugin",
     "vitejs",
     "Vitesse",
-    "vueuse"
+    "vueuse",
+    "windicss"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "volar.tsPlugin": true,

@@ -2,6 +2,7 @@ let timer = null as any
 const tasks = new Map()
 
 export const addTimerTask = (key: string, task: () => void) => {
+  task()
   tasks.set(key, task)
 }
 

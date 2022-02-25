@@ -8,7 +8,7 @@ specifiers:
   '@intlify/vite-plugin-vue-i18n': ^3.3.0
   '@types/chrome': ^0.0.162
   '@types/fs-extra': ^9.0.13
-  '@types/node': ^16.11.25
+  '@types/node': ^16.11.26
   '@types/webextension-polyfill': ^0.8.2
   '@typescript-eslint/eslint-plugin': ^5.12.1
   '@vitejs/plugin-vue': ^2.2.2
@@ -26,7 +26,7 @@ specifiers:
   naive-ui: ^2.25.5
   npm-run-all: ^4.1.5
   rimraf: ^3.0.2
-  rollup-plugin-visualizer: ^5.5.4
+  rollup-plugin-visualizer: ^5.6.0
   typescript: ^4.5.5
   unplugin-auto-import: ^0.5.11
   unplugin-icons: ^0.11.4
@@ -53,7 +53,7 @@ devDependencies:
   '@intlify/vite-plugin-vue-i18n': 3.3.0_ce828d16c4e80881af0d3b7928628a00
   '@types/chrome': 0.0.162
   '@types/fs-extra': 9.0.13
-  '@types/node': 16.11.25
+  '@types/node': 16.11.26
   '@types/webextension-polyfill': 0.8.2
   '@typescript-eslint/eslint-plugin': 5.12.1_eslint@8.9.0+typescript@4.5.5
   '@vitejs/plugin-vue': 2.2.2_vite@2.8.4+vue@3.2.31
@@ -69,7 +69,7 @@ devDependencies:
   naive-ui: 2.25.5_vue@3.2.31
   npm-run-all: 4.1.5
   rimraf: 3.0.2
-  rollup-plugin-visualizer: 5.5.4
+  rollup-plugin-visualizer: 5.6.0
   typescript: 4.5.5
   unplugin-auto-import: 0.5.11_@vueuse+core@7.6.2+vite@2.8.4
   unplugin-icons: 0.11.4_6e15ba1a75aa500ec3ba1149feeba2e4
@@ -114,7 +114,7 @@ packages:
     dependencies:
       '@antfu/eslint-config-ts': 0.15.0_eslint@8.9.0+typescript@4.5.5
       eslint: 8.9.0
-      eslint-plugin-react: 7.28.0_eslint@8.9.0
+      eslint-plugin-react: 7.29.0_eslint@8.9.0
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -482,7 +482,7 @@ packages:
   /@types/fs-extra/9.0.13:
     resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
     dependencies:
-      '@types/node': 16.11.25
+      '@types/node': 16.11.26
     dev: true
 
   /@types/har-format/1.2.8:
@@ -537,8 +537,8 @@ packages:
     resolution: {integrity: sha512-DssMqTV9UnnoxDWu959sDLZzfvqCF0qDNRjaWeYSui9xkFe61kKo4l1TWNTQONpuXEm+gLMRvdlzvNHBamzmEw==}
     dev: true
 
-  /@types/node/16.11.25:
-    resolution: {integrity: sha512-NrTwfD7L1RTc2qrHQD4RTTy4p0CO2LatKBEKEds3CaVuhoM/+DJzmWZl5f+ikR8cm8F5mfJxK+9rQq07gRiSjQ==}
+  /@types/node/16.11.26:
+    resolution: {integrity: sha512-GZ7bu5A6+4DtG7q9GsoHXy3ALcgeIHP4NnL0Vv2wu0uUB/yQex26v0tf6/na1mm0+bS9Uw+0DFex7aaKr2qawQ==}
     dev: true
 
   /@types/normalize-package-data/2.4.1:
@@ -560,7 +560,7 @@ packages:
   /@types/yauzl/2.9.2:
     resolution: {integrity: sha1-xI5dVq/xREQJ45+hZLC01FUqe3o=, tarball: '@types/yauzl/download/@types/yauzl-2.9.2.tgz'}
     dependencies:
-      '@types/node': 16.11.25
+      '@types/node': 16.11.26
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.12.1_aa3af6382115a42a71cc388b7b2c30b3:
@@ -753,7 +753,7 @@ packages:
       '@vue/shared': 3.2.31
       estree-walker: 2.0.2
       magic-string: 0.25.7
-      postcss: 8.4.6
+      postcss: 8.4.7
       source-map: 0.6.1
     dev: true
 
@@ -1368,7 +1368,7 @@ packages:
     engines: {node: '>=12.13.0'}
     hasBin: true
     dependencies:
-      '@types/node': 16.11.25
+      '@types/node': 16.11.26
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 1.3.0
@@ -2432,8 +2432,8 @@ packages:
       eslint: 8.9.0
     dev: true
 
-  /eslint-plugin-react/7.28.0_eslint@8.9.0:
-    resolution: {integrity: sha512-IOlFIRHzWfEQQKcAD4iyYDndHwTQiCMcJVJjxempf203jnNLUnW34AXLrV33+nEXoifJE2ZEGmcjKPL8957eSw==}
+  /eslint-plugin-react/7.29.0_eslint@8.9.0:
+    resolution: {integrity: sha512-lwbGCO4cEotwl+Wo0zkkjzbhxEzFcG6lv4mpWXfxKzXNZMF5wDEQqykPetB4mi3uTLGVSXxmgVlBMzHTHue6cA==}
     engines: {node: '>=4'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
@@ -4579,6 +4579,15 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
+  /postcss/8.4.7:
+    resolution: {integrity: sha512-L9Ye3r6hkkCeOETQX6iOaWZgjp3LL6Lpqm6EtgbKrgqGGteRMNb9vzBfRL96YOSu8o7x3MfIH9Mo5cPJFGrW6A==}
+    engines: {node: ^10 || ^12 || >=14}
+    dependencies:
+      nanoid: 3.3.1
+      picocolors: 1.0.0
+      source-map-js: 1.0.2
+    dev: true
+
   /prelude-ls/1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
@@ -4878,8 +4887,8 @@ packages:
       glob: 7.2.0
     dev: true
 
-  /rollup-plugin-visualizer/5.5.4:
-    resolution: {integrity: sha512-CJQFUuZ75S1daGEkk62UH7lL6UFCoP86Sn/iz4gXBdamdwFeD5nPGCHHXfXCrly/wNgQOYTH7cdcxk4+OG3Xjw==}
+  /rollup-plugin-visualizer/5.6.0:
+    resolution: {integrity: sha512-CKcc8GTUZjC+LsMytU8ocRr/cGZIfMR7+mdy4YnlyetlmIl/dM8BMnOEpD4JPIGt+ZVW7Db9ZtSsbgyeBH3uTA==}
     engines: {node: '>=12'}
     hasBin: true
     peerDependencies:
@@ -5758,7 +5767,7 @@ packages:
         optional: true
     dependencies:
       esbuild: 0.14.23
-      postcss: 8.4.6
+      postcss: 8.4.7
       resolve: 1.22.0
       rollup: 2.68.0
     optionalDependencies:
