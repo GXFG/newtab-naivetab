@@ -102,6 +102,7 @@ const updateTime = () => {
 
   if (m !== 0) {
     state.minuteDeg = m * 6
+    state.hourDeg = h * 30 + m * 0.5
     return
   }
   state.minuteDeg = 360
@@ -114,7 +115,7 @@ const updateTime = () => {
   }, OPEN_ANIMATION_DELAY_TIME)
 
   if (h !== 0) {
-    state.hourDeg = h * 30 + m * 0.5
+    state.hourDeg = h * 30
     return
   }
   state.hourDeg = 360
