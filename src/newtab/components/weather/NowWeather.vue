@@ -11,8 +11,8 @@
         <div class="info__item">
           <div class="info__item">
             <div class="item__label">
-              <div v-if="isWarningVisible">
-                <NTooltip :show="state.isWarningVisible" trigger="manual">
+              <div v-if="isWeatherWarning">
+                <NPopover :style="{ width: '500px' }" :show="state.isWarningVisible || weatherState.state.isWarningVisible" trigger="manual">
                   <template #trigger>
                     <div
                       class="label__info"
@@ -23,17 +23,22 @@
                       <vaadin:warning />
                     </div>
                   </template>
-                  <p class="weather__indices">
-                    {{ weatherWarningInfo }}
-                  </p>
-                </NTooltip>
+                  <div class="weather__indices_wrap">
+                    <p class="weather__indices">
+                      {{ weatherWarningInfo }}
+                    </p>
+                    <div v-if="weatherState.state.isWarningVisible" class="icon__wrap" @click="onCloseWarning()">
+                      <ri:close-circle-line />
+                    </div>
+                  </div>
+                </NPopover>
               </div>
             </div>
           </div>
         </div>
         <div class="info__item">
           <div class="item__label">
-            <NTooltip :show="state.isIndicesVisible" trigger="manual">
+            <NPopover :show="state.isIndicesVisible" trigger="manual">
               <template #trigger>
                 <div
                   class="label__info"
@@ -47,7 +52,7 @@
               <p class="weather__indices">
                 {{ weatherIndicesInfo }}
               </p>
-            </NTooltip>
+            </NPopover>
           </div>
           <div class="item__value">
             <span class="value__text value__text--l">{{ weatherState.now.text }}</span>
@@ -126,7 +131,7 @@ const state = reactive({
   isIndicesVisible: false,
 })
 
-const isWarningVisible = computed(() => weatherState.value.warning.list.length > 0)
+const isWeatherWarning = computed(() => weatherState.value.warning.list.length > 0)
 
 const handleWarningMouseEnter = () => {
   if (isDragMode.value) {
@@ -136,6 +141,10 @@ const handleWarningMouseEnter = () => {
 }
 const handleWarningMouseLeave = () => {
   state.isWarningVisible = false
+}
+
+const onCloseWarning = () => {
+  weatherState.value.state.isWarningVisible = false
 }
 
 const handleIndicesMouseEnter = () => {
@@ -166,6 +175,12 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 2)
 </script>
 
 <style>
+.weather__indices_wrap {
+  display: flex;
+  .icon__wrap {
+    cursor: pointer;
+  }
+}
 .weather__indices {
   white-space: pre-line;
   line-height: 1.5;

@@ -1,5 +1,5 @@
 <template>
-  <NTooltip trigger="hover">
+  <NPopover trigger="hover">
     <template #trigger>
       <NButton text class="tips__btn" @click="onClick()">
         <ph:question-bold class="btn__icon" />
@@ -8,7 +8,7 @@
     <p class="tips-content">
       {{ `${link ? $t('common.linkTips') + '\n ' : ''}${props.content}` }}
     </p>
-  </NTooltip>
+  </NPopover>
 </template>
 
 <script setup lang="ts">

@@ -3,6 +3,9 @@ import { getWeatherNow, getWeatherForecast, getWeatherIndices, getWeatherAirNow,
 import { localState, log } from '@/logic'
 
 export const weatherState = ref(useStorageLocal('data-weather', {
+  state: {
+    isWarningVisible: false,
+  },
   now: {
     syncTime: 0,
     cloud: '', // "0"
@@ -108,12 +111,17 @@ const getWarningData = async() => {
   weatherState.value.warning.syncTime = dayjs().valueOf()
   log('Weather update warning')
   await nextTick()
-  if (data.warning.length > 0) {
-    window.$notification.warning({
-      title: window.$t('weather.warning'),
-      content: weatherWarningInfo,
-    })
+  if (data.warning.length === 0) {
+    weatherState.value.state.isWarningVisible = false
+    return
   }
+  window.$notification.warning({
+    title: window.$t('weather.warning'),
+    content: weatherWarningInfo,
+    duration: 3000,
+    closable: false,
+  })
+  weatherState.value.state.isWarningVisible = true
 }
 
 export const updateWeather = () => {
