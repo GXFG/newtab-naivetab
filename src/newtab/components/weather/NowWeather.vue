@@ -76,6 +76,16 @@
             <span class="value__unit">{{ temperatureUnit }}</span>
           </div>
         </div>
+        <div class="info__item">
+          <div class="item__label">
+            <ph:plus-minus-bold />
+          </div>
+          <div class="item__value">
+            <span class="value__text">{{ weatherState.forecast.list[0] && `${weatherState.forecast.list[0].tempMax} / ${weatherState.forecast.list[0].tempMin}` }}
+            </span>
+            <span class="value__unit">{{ temperatureUnit }}</span>
+          </div>
+        </div>
       </div>
       <!-- row 2 -->
       <div class="info__row">

@@ -87,7 +87,7 @@
                         :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
                       />
                       <NInputGroupLabel class="item__move">
-                        <ri:drag-move-fill />
+                        <cil:resize-height />
                       </NInputGroupLabel>
                       <NButton @click="onImportBookmark(key)">
                         <lucide:bookmark-plus />
@@ -233,7 +233,7 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
           display: flex;
           justify-content: center;
           align-items: center;
-          cursor: move;
+          cursor: row-resize;
         }
       }
     }

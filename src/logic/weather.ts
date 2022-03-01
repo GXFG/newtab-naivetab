@@ -48,7 +48,7 @@ export const weatherState = ref(useStorageLocal('data-weather', {
   },
   forecast: {
     syncTime: 0,
-    list: [],
+    list: [] as ForecastItem[],
   },
 }))
 
@@ -110,18 +110,7 @@ const getWarningData = async() => {
   weatherState.value.warning.list = data.warning
   weatherState.value.warning.syncTime = dayjs().valueOf()
   log('Weather update warning')
-  await nextTick()
-  if (data.warning.length === 0) {
-    weatherState.value.state.isWarningVisible = false
-    return
-  }
-  window.$notification.warning({
-    title: window.$t('weather.warning'),
-    content: weatherWarningInfo,
-    duration: 3000,
-    closable: false,
-  })
-  weatherState.value.state.isWarningVisible = true
+  weatherState.value.state.isWarningVisible = data.warning.length !== 0
 }
 
 export const updateWeather = () => {
@@ -129,8 +118,8 @@ export const updateWeather = () => {
     return
   }
   const currTS = dayjs().valueOf()
-  // 实时天气最小刷新间隔为2分钟
-  if (currTS - weatherState.value.now.syncTime >= 60000 * 2) {
+  // 实时天气最小刷新间隔为10分钟
+  if (currTS - weatherState.value.now.syncTime >= 60000 * 10) {
     getNowData()
   }
   // 空气质量最小刷新间隔为2小时
@@ -141,12 +130,12 @@ export const updateWeather = () => {
   if (currTS - weatherState.value.indices.syncTime >= 3600000 * 4) {
     getIndicesData()
   }
-  // 预警最小刷新间隔为3小时
-  if (currTS - weatherState.value.warning.syncTime >= 3600000 * 2) {
+  // 预警最小刷新间隔为1小时
+  if (currTS - weatherState.value.warning.syncTime >= 3600000 * 1) {
     getWarningData()
   }
-  // 未来预报最小刷新间隔为2小时
-  if (localState.setting.weather.forecastEnabled && currTS - weatherState.value.forecast.syncTime >= 3600000 * 2) {
+  // 未来预报最小刷新间隔为4小时
+  if (currTS - weatherState.value.forecast.syncTime >= 3600000 * 4) {
     getForecastData()
   }
 }
@@ -156,23 +145,10 @@ export const refreshWeather = () => {
   getAirData()
   getIndicesData()
   getWarningData()
-  if (localState.setting.weather.forecastEnabled) {
-    getForecastData()
-  }
+  getForecastData()
 }
 
 // 修改城市、切换语言 立即更新数据
 watch([() => localState.setting.weather.city.id, () => localState.setting.general.lang], () => {
   refreshWeather()
 })
-
-// 开启“未来预报”后立即更新数据
-watch(
-  () => localState.setting.weather.forecastEnabled,
-  (value) => {
-    if (!value) {
-      return
-    }
-    getForecastData()
-  },
-)

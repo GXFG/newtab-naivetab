@@ -42,12 +42,7 @@
         </div>
       </NFormItem>
       <!-- <NFormItem :label="$t('weather.forecast')">
-        <NTooltip trigger="hover">
-          <template #trigger>
-            <NSwitch v-model:value="localState.setting.weather.forecastEnabled" :disabled="true" />
-          </template>
-          In development...
-        </NTooltip>
+        <NSwitch v-model:value="localState.setting.weather.forecastEnabled" />
       </NFormItem> -->
     </template>
   </BaseComponentSetting>
