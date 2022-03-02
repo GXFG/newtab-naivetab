@@ -9,14 +9,14 @@
       <line-md:confirm-circle />
     </div>
     <div class="image__toolbar">
-      <NTooltip v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">
+      <NPopover v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">
         <template #trigger>
           <div class="toolbar__icon">
             <ic:outline-info />
           </div>
         </template>
         <p>{{ props.data.desc }}</p>
-      </NTooltip>
+      </NPopover>
       <div class="toolbar__icon" @click="onViewImage()">
         <mdi:eye-circle-outline />
       </div>
