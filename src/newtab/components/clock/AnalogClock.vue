@@ -69,18 +69,8 @@ const initClockImage = async() => {
 
 initClockImage()
 
-const initDefaultTime = () => {
-  const date = new Date()
-  const h = date.getHours()
-  const m = date.getMinutes()
-  const s = date.getSeconds()
-  state.hourDeg = h * 30 + m * 0.5
-  state.minuteDeg = m * 6
-  state.secondDeg = s * 6
-}
-
-const CLOSE_ANIMATION_DELAY_TIME = 350 // 需要大于动画执行时间300ms
-const OPEN_ANIMATION_DELAY_TIME = 500
+const DISABLE_ANIMATION_DELAY_TIME = 350 // 需要大于动画执行时间300ms
+const ENABLE_ANIMATION_DELAY_TIME = 500
 
 const updateTime = () => {
   const date = new Date()
@@ -89,30 +79,31 @@ const updateTime = () => {
   const s = date.getSeconds()
   if (s !== 0) {
     state.secondDeg = s * 6
+    state.minuteDeg = m * 6
+    state.hourDeg = h * 30 + m * 0.5
     return
   }
   state.secondDeg = 360
   setTimeout(() => {
     state.isSecondAnimationEnable = false
     state.secondDeg = 0
-  }, CLOSE_ANIMATION_DELAY_TIME)
+  }, DISABLE_ANIMATION_DELAY_TIME)
   setTimeout(() => {
     state.isSecondAnimationEnable = true
-  }, OPEN_ANIMATION_DELAY_TIME)
+  }, ENABLE_ANIMATION_DELAY_TIME)
 
   if (m !== 0) {
     state.minuteDeg = m * 6
-    state.hourDeg = h * 30 + m * 0.5
     return
   }
   state.minuteDeg = 360
   setTimeout(() => {
     state.isMinuteAnimationEnable = false
     state.minuteDeg = 0
-  }, CLOSE_ANIMATION_DELAY_TIME)
+  }, DISABLE_ANIMATION_DELAY_TIME)
   setTimeout(() => {
     state.isMinuteAnimationEnable = true
-  }, OPEN_ANIMATION_DELAY_TIME)
+  }, ENABLE_ANIMATION_DELAY_TIME)
 
   if (h !== 0) {
     state.hourDeg = h * 30
@@ -122,10 +113,10 @@ const updateTime = () => {
   setTimeout(() => {
     state.isHourAnimationEnable = false
     state.hourDeg = 0
-  }, CLOSE_ANIMATION_DELAY_TIME)
+  }, DISABLE_ANIMATION_DELAY_TIME)
   setTimeout(() => {
     state.isHourAnimationEnable = true
-  }, OPEN_ANIMATION_DELAY_TIME)
+  }, ENABLE_ANIMATION_DELAY_TIME)
 }
 
 watch(
@@ -135,7 +126,6 @@ watch(
       removeTimerTask(CNAME)
       return
     }
-    initDefaultTime()
     addTimerTask(CNAME, updateTime)
   },
   { immediate: true },
@@ -146,9 +136,9 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     state.isAnimationEnable = false
   } else {
-    nextTick(() => {
+    setTimeout(() => {
       state.isAnimationEnable = true
-    })
+    }, ENABLE_ANIMATION_DELAY_TIME)
   }
 })
 
