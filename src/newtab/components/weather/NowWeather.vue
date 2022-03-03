@@ -12,7 +12,7 @@
           <div class="info__item">
             <div class="item__label">
               <div v-if="isWeatherWarning">
-                <NPopover :style="{ width: '500px' }" :show="state.isWarningVisible || weatherState.state.isWarningVisible" trigger="manual">
+                <NPopover :style="{ width: '500px' }" :show="warningVisible" trigger="manual">
                   <template #trigger>
                     <div
                       class="label__info"
@@ -143,12 +143,20 @@ const state = reactive({
 
 const isWeatherWarning = computed(() => weatherState.value.warning.list.length > 0)
 
+const warningVisible = computed(() => {
+  if (isDragMode.value) {
+    return false
+  }
+  return state.isWarningVisible || weatherState.value.state.isWarningVisible
+})
+
 const handleWarningMouseEnter = () => {
   if (isDragMode.value) {
     return
   }
   state.isWarningVisible = true
 }
+
 const handleWarningMouseLeave = () => {
   state.isWarningVisible = false
 }
