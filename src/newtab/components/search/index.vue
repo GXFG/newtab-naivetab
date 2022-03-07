@@ -66,12 +66,12 @@ const state = reactive({
 })
 
 const onSearchFocus = () => {
-  globalState.value.isSearchFocused = true
+  globalState.isSearchFocused = true
   state.isSuggestVisible = true
 }
 
 const onSearchBlur = () => {
-  globalState.value.isSearchFocused = false
+  globalState.isSearchFocused = false
 }
 
 const onSearchInput = () => {

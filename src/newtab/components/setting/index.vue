@@ -98,7 +98,7 @@ const tabPaneList = computed(() => [
 ])
 
 const onTabsChange = (tabName: string) => {
-  globalState.value.currSettingTabValue = tabName
+  globalState.currSettingTabValue = tabName
 }
 
 const drawerOpacity = ref(1)

@@ -8,11 +8,11 @@ import { localState } from '@/logic'
  */
 export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `http://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
 
-export const imageState = ref(useStorageLocal('data-images', {
+export const imageState = useStorageLocal('data-images', {
   imageList: [] as BingImageItem[],
   localBackgroundFileName: '',
   localBackgroundBase64: '',
-}))
+})
 
 export const currBackgroundImageUrl = computed(() => {
   let url = ''

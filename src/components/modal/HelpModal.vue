@@ -24,14 +24,14 @@ import { globalState, isFirstOpen, isDragMode, addKeyboardTask } from '@/logic'
 const keyboardHandler = (e: KeyboardEvent) => {
   const { key } = e
   if (['?'].includes(key)) {
-    globalState.value.isHelpModalVisible = true
+    globalState.isHelpModalVisible = true
   }
 }
 
 addKeyboardTask('help-modal', keyboardHandler)
 
 const onCloseModal = () => {
-  globalState.value.isHelpModalVisible = false
+  globalState.isHelpModalVisible = false
 }
 
 watch(
@@ -43,7 +43,7 @@ watch(
     if (!isFirstOpen.value) {
       return
     }
-    globalState.value.isHelpModalVisible = true
+    globalState.isHelpModalVisible = true
   },
   { immediate: true },
 )

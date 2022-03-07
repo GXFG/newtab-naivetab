@@ -46,7 +46,7 @@ const menuActionMap = {
     if (tabName.includes('clock')) {
       tabName = 'clock'
     }
-    globalState.value.currSettingTabValue = tabName.length === 0 ? 'general' : tabName
+    globalState.currSettingTabValue = tabName.length === 0 ? 'general' : tabName
     toggleIsSettingDrawerVisible()
   },
   dragMode: () => {

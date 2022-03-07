@@ -3,14 +3,14 @@ import { log, downloadJsonByTagA, sleep } from './util'
 import { MERGE_CONFIG_DELAY } from './const'
 import { defaultState, localState, globalState } from './store'
 
-export const isUploadConfigLoading = computed(() => globalState.value.isUploadConfigLoadingMap.style || globalState.value.isUploadConfigLoadingMap.setting)
+export const isUploadConfigLoading = computed(() => globalState.isUploadConfigLoadingMap.style || globalState.isUploadConfigLoadingMap.setting)
 
 /**
  * https://developer.chrome.com/docs/extensions/reference/storage/
  * chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192  注意单个配置不可超过8k
  */
 const uploadConfigFn = (field: ConfigField) => {
-  globalState.value.isUploadConfigLoadingMap[field] = true
+  globalState.isUploadConfigLoadingMap[field] = true
   log(`Upload config-${field}`)
   localState.common.syncTimeMap[field] = Date.now()
   const syncTime = localState.common.syncTimeMap[field]
@@ -30,7 +30,7 @@ const uploadConfigFn = (field: ConfigField) => {
     }
     setTimeout(() => {
       // 确保isUploadConfigLoading的值不会抖动，消除style 与 setting排队同步时中间出现的短暂二者值均为false的间隙
-      globalState.value.isUploadConfigLoadingMap[field] = false
+      globalState.isUploadConfigLoadingMap[field] = false
     }, 100)
   })
 }
@@ -173,33 +173,33 @@ const clearStorage = (clearAll = false) => {
 }
 
 export const refreshSetting = async() => {
-  globalState.value.isClearStorageLoading = true
+  globalState.isClearStorageLoading = true
   await updateSetting()
   await clearStorage()
-  globalState.value.isClearStorageLoading = false
+  globalState.isClearStorageLoading = false
 }
 
 export const importSetting = async(text: string) => {
   if (!text) {
     return
   }
-  globalState.value.isImportSettingLoading = true
+  globalState.isImportSettingLoading = true
   let fileContent = {} as any
   try {
     fileContent = JSON.parse(text)
   } catch (e) {
     log('Parse error', e)
     window.$message.error(`${window.$t('common.import')}${window.$t('common.fail')}`)
-    globalState.value.isImportSettingLoading = false
+    globalState.isImportSettingLoading = false
   }
   if (Object.keys(fileContent).length === 0) {
-    globalState.value.isImportSettingLoading = false
+    globalState.isImportSettingLoading = false
     return
   }
   log('FileContent', fileContent)
   await updateSetting(fileContent)
   await clearStorage()
-  globalState.value.isImportSettingLoading = false
+  globalState.isImportSettingLoading = false
 }
 
 export const exportSetting = () => {

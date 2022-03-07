@@ -34,11 +34,11 @@ const CNAME = 'memo'
 const isRender = getIsComponentRender(CNAME)
 
 const onFocus = () => {
-  globalState.value.isMemoFocused = true
+  globalState.isMemoFocused = true
 }
 
 const onBlur = () => {
-  globalState.value.isMemoFocused = false
+  globalState.isMemoFocused = false
 }
 
 const dragStyle = ref('')

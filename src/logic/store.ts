@@ -304,7 +304,7 @@ export const localState = reactive({
   },
 })
 
-export const globalState = ref({
+export const globalState = reactive({
   isUploadConfigLoadingMap: {
     style: false,
     setting: false,
@@ -334,7 +334,7 @@ export const initAvailableFontList = async() => {
   localState.common.availableFontList = [...availableList.values()]
 }
 
-export const isFirstOpen = ref(useStorageLocal('data-first', true))
+export const isFirstOpen = useStorageLocal('data-first', true)
 
 export const initFirstOpen = () => {
   if (!isFirstOpen.value) {
@@ -346,16 +346,16 @@ export const initFirstOpen = () => {
 }
 
 export const openWhatsNewModal = (closeToRefresh = false) => {
-  globalState.value.isWhatsNewModalVisible = true
-  globalState.value.isWhatsNewModalCloseToRefresh = closeToRefresh
+  globalState.isWhatsNewModalVisible = true
+  globalState.isWhatsNewModalCloseToRefresh = closeToRefresh
 }
 export const closeWhatsNewModal = () => {
-  globalState.value.isWhatsNewModalVisible = false
-  globalState.value.isWhatsNewModalCloseToRefresh = false
+  globalState.isWhatsNewModalVisible = false
+  globalState.isWhatsNewModalCloseToRefresh = false
 }
 
 export const openHelpModal = () => {
-  globalState.value.isHelpModalVisible = true
+  globalState.isHelpModalVisible = true
 }
 
 export const checkUpdate = () => {
