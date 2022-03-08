@@ -66,8 +66,9 @@ onMounted(() => {
   initBookmarkListData()
 })
 
-const onClickKey = (url: string) => {
-  if (isDragMode.value) {
+const openPage = (url: string, active = true) => {
+  if (!active) {
+    createTab(url, false)
     return
   }
   if (localState.setting.bookmark.isNewTabOpen) {
@@ -75,6 +76,13 @@ const onClickKey = (url: string) => {
   } else {
     window.location.href = url
   }
+}
+
+const onClickKey = (url: string) => {
+  if (isDragMode.value) {
+    return
+  }
+  openPage(url)
   state.currSelectKey = ''
 }
 
@@ -92,8 +100,9 @@ const onMouseDownKey = (e: MouseEvent, url: string) => {
 // keyboard listener
 let timer = null as any
 const keyboardTask = (e: KeyboardEvent) => {
-  const { key } = e
-  const translateKey = KEYBOARD_CODE_TO_LABEL_MAP[key] || key
+  const { key, shiftKey } = e
+  const lowerCaseKey = key.toLowerCase()
+  const translateKey = KEYBOARD_CODE_TO_LABEL_MAP[lowerCaseKey] || lowerCaseKey
   const index = KEYBOARD_KEY_LIST.indexOf(translateKey)
   if (index === -1) {
     return
@@ -103,11 +112,11 @@ const keyboardTask = (e: KeyboardEvent) => {
     return
   }
   if (!localState.setting.bookmark.isDblclickOpen) {
-    createTab(url)
+    openPage(url, !shiftKey)
     return
   }
   if (translateKey === state.currSelectKey) {
-    createTab(url)
+    openPage(url, !shiftKey)
   } else {
     state.currSelectKey = translateKey
     clearTimeout(timer)
@@ -189,7 +198,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         background-color: v-bind(customBackgroundColor);
         border-radius: v-bind(customBorderRadius);
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 200ms ease;
         box-sizing: border-box;
         .item__key {
           flex: 0 0 auto;

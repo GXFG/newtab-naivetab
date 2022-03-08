@@ -1,7 +1,7 @@
 {
   "name": "newtab-naivetab",
   "displayName": "NaiveTab - New Tab",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "一款简洁的浏览器新标签页扩展",
   "private": true,
   "scripts": {
@@ -33,7 +33,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/node": "^16.11.26",
     "@types/webextension-polyfill": "^0.8.2",
-    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@vitejs/plugin-vue": "^2.2.4",
     "@vue/compiler-sfc": "^3.2.31",
     "@vueuse/core": "^7.7.1",

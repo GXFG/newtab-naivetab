@@ -73,7 +73,7 @@
   },
   "help": {
     "title": "Help",
-    "content": "1. Press? key to open this note again\n 2. Select the left component with the mouse, press the left button and drag to the screen to complete the layout\n 3. After selecting a component, you can press delete or backspace to delete\n 4. Press Esc to exit\n"
+    "content": "1. Press? key to open this note again\n 2. Enter SettingsDrawer, DragMode by right mouse button 3. Select the left component with the mouse, press the left button and drag to the screen to complete the layout\n 4. After selecting a component, you can press delete or backspace to delete\n 5. Press Esc to exit\n 6. Bookmarks or Shift + keys can be clicked with the middle mouse button to open bookmarks when done\n"
   },
   "setting": {
     "general": "General",

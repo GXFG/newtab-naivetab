@@ -94,7 +94,7 @@
             <entypo:air />
           </div>
           <div class="item__value">
-            <span class="value__text">{{ `${weatherState.air.category} / ${weatherState.air.aqi}` }}</span>
+            <span class="value__text">{{ `${weatherState.air.category} / AQI ${weatherState.air.aqi}` }}</span>
           </div>
         </div>
         <div class="info__item">

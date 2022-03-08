@@ -64,10 +64,11 @@
                     v-for="key of rowData"
                     :key="key"
                     class="bookmark__item"
-                    :draggable="true"
+                    :draggable="state.isBookmarkDragEnabled"
                     @dragstart="handleDragStart(key)"
                     @dragenter="handleDragEnter($event, key)"
                     @dragover="handleDragOver($event)"
+                    @dragend="handleDragEnd()"
                   >
                     <template v-if="localState.setting.bookmark.keymap[key]">
                       <NInput
@@ -86,7 +87,7 @@
                         clearable
                         :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
                       />
-                      <NInputGroupLabel class="item__move">
+                      <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
                         <cil:resize-height />
                       </NInputGroupLabel>
                       <NButton @click="onImportBookmark(key)">
@@ -121,6 +122,7 @@ import { localState, keyboardSettingRowList, getDefaultBookmarkName, requestPerm
 
 const state = reactive({
   isBookmarkModalVisible: false,
+  isBookmarkDragEnabled: false,
   currDragKey: '',
   currImporKey: '',
 })
@@ -140,6 +142,14 @@ const onDeleteKey = (key: string) => {
   delete localState.setting.bookmark.keymap[key]
 }
 
+const onBookmarkStartDrag = () => {
+  state.isBookmarkDragEnabled = true
+}
+
+const onBookmarkStopDrag = () => {
+  state.isBookmarkDragEnabled = false
+}
+
 const handleDragStart = (key: string) => {
   state.currDragKey = key
 }
@@ -157,6 +167,10 @@ const handleDragEnter = (e: any, targetKey: string) => {
 
 const handleDragOver = (e: any) => {
   e.preventDefault() // 阻止松开按键后的返回动画
+}
+
+const handleDragEnd = () => {
+  onBookmarkStopDrag()
 }
 
 const onImportBookmark = async(key: string) => {
