@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { useMessage, useNotification } from 'naive-ui'
+import { useMessage, useNotification, useLoadingBar } from 'naive-ui'
 import Setting from './components/setting/index.vue'
 import KeyboardBookmark from '@/newtab/components/bookmark/keyboard.vue'
 import DigitalClock from '@/newtab/components/clock/DigitalClock.vue'
@@ -32,4 +32,5 @@ import Memo from '@/newtab/components/memo/index.vue'
 
 window.$message = useMessage()
 window.$notification = useNotification()
+window.$loadingBar = useLoadingBar()
 </script>

@@ -15,9 +15,12 @@
               'row__item--shadow': localState.style.bookmark.isShadowEnabled,
             }"
             :title="item.url"
-            @click="onClickKey(item.url)"
+            @click="onClickKey(item.key, item.url)"
             @mousedown="onMouseDownKey($event, item.url)"
           >
+            <div v-if="state.currSelectKey === item.key && state.isLoadPageLoading" class="item__loading">
+              <eos-icons:loading />
+            </div>
             <p class="item__key">
               {{ `${item.key.toUpperCase()}` }}
             </p>
@@ -60,6 +63,7 @@ const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
   currSelectKey: '',
+  isLoadPageLoading: false,
 })
 
 onMounted(() => {
@@ -68,22 +72,26 @@ onMounted(() => {
 
 const openPage = (url: string, active = true) => {
   if (!active) {
+    // 后台打开
     createTab(url, false)
     return
   }
   if (localState.setting.bookmark.isNewTabOpen) {
-    createTab(url)
+    createTab(url) // 以新标签页打开
   } else {
+    // 当前新标签页打开
+    state.isLoadPageLoading = true
+    window.$loadingBar.start()
     window.location.href = url
   }
 }
 
-const onClickKey = (url: string) => {
+const onClickKey = (key: string, url: string) => {
   if (isDragMode.value) {
     return
   }
+  state.currSelectKey = KEYBOARD_CODE_TO_LABEL_MAP[key] || key
   openPage(url)
-  state.currSelectKey = ''
 }
 
 const onMouseDownKey = (e: MouseEvent, url: string) => {
@@ -112,14 +120,15 @@ const keyboardTask = (e: KeyboardEvent) => {
     return
   }
   if (!localState.setting.bookmark.isDblclickOpen) {
+    state.currSelectKey = translateKey
     openPage(url, !shiftKey)
     return
   }
+  clearTimeout(timer)
   if (translateKey === state.currSelectKey) {
     openPage(url, !shiftKey)
   } else {
     state.currSelectKey = translateKey
-    clearTimeout(timer)
     timer = setTimeout(() => {
       state.currSelectKey = ''
     }, localState.setting.bookmark.dblclickIntervalTime)
@@ -129,6 +138,7 @@ const keyboardTask = (e: KeyboardEvent) => {
 addKeyboardTask(CNAME, keyboardTask)
 
 const dragStyle = ref('')
+const customPrimaryColor = getStyleField('general', 'primaryColor')
 const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
@@ -200,6 +210,20 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         cursor: pointer;
         transition: all 200ms ease;
         box-sizing: border-box;
+        .item__loading {
+          z-index: 1;
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: v-bind(customWidth);
+          height: v-bind(customWidth);
+          font-size: 220%;
+          color: v-bind(customPrimaryColor);
+          background-color: rgba(0, 0, 0, 0.1)
+        }
         .item__key {
           flex: 0 0 auto;
           font-weight: 500;

@@ -3,6 +3,7 @@ interface Window {
   $t: any // vue-i18n
   $message: any
   $notification: any
+  $loadingBar: any
 }
 
 type OptionsPermission = 'bookmarks'

@@ -8,7 +8,9 @@
   >
     <NNotificationProvider>
       <NMessageProvider>
-        <Content />
+        <NLoadingBarProvider>
+          <Content />
+        </NLoadingBarProvider>
       </NMessageProvider>
     </NNotificationProvider>
   </NConfigProvider>
@@ -16,7 +18,7 @@
 
 <script setup lang="ts">
 import type { GlobalThemeOverrides } from 'naive-ui'
-import { NConfigProvider, NMessageProvider, NNotificationProvider, darkTheme, enUS, useOsTheme, zhCN } from 'naive-ui'
+import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider, darkTheme, enUS, useOsTheme, zhCN } from 'naive-ui'
 import Content from './Content.vue'
 import {
   APPEARANCE_TO_CODE_MAP,
