@@ -15,15 +15,14 @@ export const imageState = useStorageLocal('data-images', {
 })
 
 export const currBackgroundImageUrl = computed(() => {
-  let url = ''
   if (localState.setting.general.backgroundImageSource === 0) {
-    url = imageState.value.localBackgroundBase64
-  } else if (localState.setting.general.backgroundImageSource === 1) {
-    url = localState.setting.general.isBackgroundImageCustomUrlEnabled
-      ? localState.setting.general.backgroundImageCustomUrl
-      : getBingImageUrlFromName(localState.setting.general.backgroundImageName, 'UHD')
+    return imageState.value.localBackgroundBase64
   }
-  return url
+  if (localState.setting.general.isBackgroundImageCustomUrlEnabled) {
+    return localState.setting.general.backgroundImageCustomUrl
+  }
+  const quality = localState.setting.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
+  return getBingImageUrlFromName(localState.setting.general.backgroundImageName, quality)
 })
 
 export const previewImageListMap = computed(() => ({

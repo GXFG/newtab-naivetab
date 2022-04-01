@@ -25,16 +25,18 @@
               <Tips :content="$t('general.localBackgroundTips')" />
             </NFormItem>
             <!-- network -->
-            <NFormItem v-else-if="localState.setting.general.backgroundImageSource === 1" :label="$t('common.custom')">
-              <NSwitch v-model:value="localState.setting.general.isBackgroundImageCustomUrlEnabled" />
-              <NInput
-                v-if="localState.setting.general.isBackgroundImageCustomUrlEnabled"
-                v-model:value="localState.setting.general.backgroundImageCustomUrl"
-                class="setting__row-element"
-                type="text"
-                placeholder="https://"
-              />
-            </NFormItem>
+            <template v-else-if="localState.setting.general.backgroundImageSource === 1">
+              <NFormItem :label="$t('common.custom')">
+                <NSwitch v-model:value="localState.setting.general.isBackgroundImageCustomUrlEnabled" />
+                <NInput
+                  v-if="localState.setting.general.isBackgroundImageCustomUrlEnabled"
+                  v-model:value="localState.setting.general.backgroundImageCustomUrl"
+                  class="setting__row-element"
+                  type="text"
+                  placeholder="https://"
+                />
+              </NFormItem>
+            </template>
           </NForm>
           <p class="current__label">
             {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
@@ -42,6 +44,11 @@
           <div class="current__image image__item">
             <BackgroundImageElement :lazy="false" :data="currImageData" />
           </div>
+          <NForm class="content__config" label-placement="left" :label-width="60">
+            <NFormItem v-if="!localState.setting.general.isBackgroundImageCustomUrlEnabled" :label="$t('common.4k')">
+              <NSwitch v-model:value="localState.setting.general.backgroundImageHighQuality" />
+            </NFormItem>
+          </NForm>
         </div>
         <!-- list -->
         <NSpin :show="isImageListLoading">
