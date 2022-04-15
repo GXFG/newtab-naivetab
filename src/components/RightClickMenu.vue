@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, getTargetDataFromEvent, globalState } from '@/logic'
+import { URL_GITHUB_ISSUSE, isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, getTargetDataFromEvent, globalState, createTab } from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -38,6 +38,15 @@ const menuList = computed(() => [
     key: 'dragMode',
     icon: () => h(Icon, { icon: 'tabler:drag-drop' }),
   },
+  {
+    type: 'divider',
+    key: 'd1',
+  },
+  {
+    label: window.$t('common.feedback'),
+    key: 'feedback',
+    icon: () => h(Icon, { icon: 'bx:message-rounded-dots' }),
+  },
 ])
 
 const menuActionMap = {
@@ -52,6 +61,9 @@ const menuActionMap = {
   dragMode: () => {
     toggleIsSettingDrawerVisible(false)
     toggleIsDragMode()
+  },
+  feedback: () => {
+    createTab(URL_GITHUB_ISSUSE)
   },
 }
 

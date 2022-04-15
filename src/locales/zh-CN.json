@@ -66,7 +66,8 @@
     "sync": "同步",
     "upload": "上传",
     "setting": "设置",
-    "dragMode": "画布模式"
+    "dragMode": "画布模式",
+    "feedback": "反馈建议"
   },
   "prompts": {
     "imageTooLarge": "图片体积过大",
