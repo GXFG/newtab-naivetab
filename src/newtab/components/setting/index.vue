@@ -27,12 +27,6 @@
           Ver.{{ `${pkg.version}` }}
         </p>
         <div class="bottom__right">
-          <NButton text class="right__icon" title="help" @click="openHelpModal()">
-            <bx:bxs-help-circle />
-          </NButton>
-          <NButton text class="right__icon" title="ChangeLog" @click="openWhatsNewModal()">
-            <ic:round-new-releases />
-          </NButton>
           <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
             <carbon:logo-github />
           </NButton>
@@ -52,7 +46,7 @@ import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
-import { URL_GITHUB, getStyleConst, localState, globalState, isSettingDrawerVisible, createTab, openHelpModal, openWhatsNewModal } from '@/logic'
+import { URL_GITHUB, getStyleConst, localState, globalState, isSettingDrawerVisible, createTab } from '@/logic'
 
 const tabPaneList = computed(() => [
   {

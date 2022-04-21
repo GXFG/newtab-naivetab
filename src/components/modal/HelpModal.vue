@@ -19,16 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { globalState, isFirstOpen, isDragMode, addKeyboardTask } from '@/logic'
-
-const keyboardHandler = (e: KeyboardEvent) => {
-  const { key } = e
-  if (['?'].includes(key)) {
-    globalState.isHelpModalVisible = true
-  }
-}
-
-addKeyboardTask('help-modal', keyboardHandler)
+import { globalState, isFirstOpen, isDragMode } from '@/logic'
 
 const onCloseModal = () => {
   globalState.isHelpModalVisible = false

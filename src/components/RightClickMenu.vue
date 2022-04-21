@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { URL_GITHUB_ISSUSE, isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, getTargetDataFromEvent, globalState, createTab } from '@/logic'
+import { URL_GITHUB_ISSUSE, isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, getTargetDataFromEvent, globalState, createTab, openHelpModal, openWhatsNewModal } from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -30,10 +30,6 @@ const menuList = computed(() => [
     disabled: isDragMode.value,
   },
   {
-    type: 'divider',
-    key: 'd1',
-  },
-  {
     label: isDragMode.value ? `${window.$t('common.exit')}${window.$t('common.dragMode')}` : window.$t('common.dragMode'),
     key: 'dragMode',
     icon: () => h(Icon, { icon: 'tabler:drag-drop' }),
@@ -43,9 +39,38 @@ const menuList = computed(() => [
     key: 'd1',
   },
   {
+    label: window.$t('common.other'),
+    key: 'other',
+    icon: () => h(Icon, { icon: 'ph:info-bold' }),
+    children: [
+      {
+        label: window.$t('common.usingHelp'),
+        key: 'help',
+        icon: () => h(Icon, { icon: 'ic:baseline-help-outline' }),
+      },
+      {
+        label: window.$t('common.whatsNew'),
+        key: 'whatsNew',
+        icon: () => h(Icon, { icon: 'ic:outline-new-releases' }),
+      },
+    ],
+  },
+  {
     label: window.$t('common.feedback'),
     key: 'feedback',
     icon: () => h(Icon, { icon: 'bx:message-rounded-dots' }),
+    children: [
+      {
+        label: 'Github',
+        key: 'feedbackGithub',
+        icon: () => h(Icon, { icon: 'carbon:logo-github' }),
+      },
+      {
+        label: 'Email',
+        key: 'feedbackEmail',
+        icon: () => h(Icon, { icon: 'mdi:email-outline' }),
+      },
+    ],
   },
 ])
 
@@ -62,8 +87,19 @@ const menuActionMap = {
     toggleIsSettingDrawerVisible(false)
     toggleIsDragMode()
   },
-  feedback: () => {
+  help: () => {
+    openHelpModal()
+  },
+  whatsNew: () => {
+    openWhatsNewModal()
+  },
+  feedbackGithub: () => {
     createTab(URL_GITHUB_ISSUSE)
+  },
+  feedbackEmail: () => {
+    const a = document.createElement('a')
+    a.href = 'mailto:gxfgim@outlook.com?subject=NaiveTab Feedback'
+    a.click()
   },
 }
 

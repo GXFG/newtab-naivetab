@@ -70,14 +70,22 @@ onMounted(() => {
   initBookmarkListData()
 })
 
+const delayResetPressKey = () => {
+  setTimeout(() => {
+    state.currSelectKey = ''
+  }, 200)
+}
+
 const openPage = (url: string, active = true) => {
   if (!active) {
     // 后台打开
     createTab(url, false)
+    delayResetPressKey()
     return
   }
   if (localState.setting.bookmark.isNewTabOpen) {
     createTab(url) // 以新标签页打开
+    delayResetPressKey()
   } else {
     // 当前新标签页打开
     state.isLoadPageLoading = true
@@ -122,16 +130,16 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (!localState.setting.bookmark.isDblclickOpen) {
     state.currSelectKey = translateKey
     openPage(url, !shiftKey)
-    return
-  }
-  clearTimeout(timer)
-  if (translateKey === state.currSelectKey) {
-    openPage(url, !shiftKey)
   } else {
-    state.currSelectKey = translateKey
-    timer = setTimeout(() => {
-      state.currSelectKey = ''
-    }, localState.setting.bookmark.dblclickIntervalTime)
+    clearTimeout(timer)
+    if (translateKey === state.currSelectKey) {
+      openPage(url, !shiftKey)
+    } else {
+      state.currSelectKey = translateKey
+      timer = setTimeout(() => {
+        state.currSelectKey = ''
+      }, localState.setting.bookmark.dblclickIntervalTime)
+    }
   }
 }
 
