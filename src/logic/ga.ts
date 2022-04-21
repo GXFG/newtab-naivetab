@@ -14,8 +14,12 @@ export const gaEvent = (category: string, action: string, opt_label: string, opt
   }
   const param: any = ['_trackEvent', category, action, opt_label]
 
-  if (opt_value !== undefined) param.push(opt_value)
-  if (opt_noninteraction !== undefined) param.push(opt_noninteraction)
+  if (opt_value !== undefined) {
+    param.push(opt_value)
+  }
+  if (opt_noninteraction !== undefined) {
+    param.push(opt_noninteraction)
+  }
   log('ga', param.slice(1).join(','))
   window._gaq.push(param)
 }

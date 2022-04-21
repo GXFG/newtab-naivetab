@@ -84,12 +84,24 @@ const stopDrag = () => {
   moveState.isBottomVisible = false
   moveState.isLeftVisible = false
   moveState.isRightVisible = false
-  if (offsetData.xOffsetKey.length !== 0) localState.style[props.componentName as Components].layout.xOffsetKey = offsetData.xOffsetKey
-  if (offsetData.xOffsetValue !== -1) localState.style[props.componentName as Components].layout.xOffsetValue = offsetData.xOffsetValue
-  if (offsetData.xTranslateValue !== -1) localState.style[props.componentName as Components].layout.xTranslateValue = offsetData.xTranslateValue
-  if (offsetData.yOffsetKey.length !== 0) localState.style[props.componentName as Components].layout.yOffsetKey = offsetData.yOffsetKey
-  if (offsetData.yOffsetValue !== -1) localState.style[props.componentName as Components].layout.yOffsetValue = offsetData.yOffsetValue
-  if (offsetData.yTranslateValue !== -1) localState.style[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
+  if (offsetData.xOffsetKey.length !== 0) {
+    localState.style[props.componentName as Components].layout.xOffsetKey = offsetData.xOffsetKey
+  }
+  if (offsetData.xOffsetValue !== -1) {
+    localState.style[props.componentName as Components].layout.xOffsetValue = offsetData.xOffsetValue
+  }
+  if (offsetData.xTranslateValue !== -1) {
+    localState.style[props.componentName as Components].layout.xTranslateValue = offsetData.xTranslateValue
+  }
+  if (offsetData.yOffsetKey.length !== 0) {
+    localState.style[props.componentName as Components].layout.yOffsetKey = offsetData.yOffsetKey
+  }
+  if (offsetData.yOffsetValue !== -1) {
+    localState.style[props.componentName as Components].layout.yOffsetValue = offsetData.yOffsetValue
+  }
+  if (offsetData.yTranslateValue !== -1) {
+    localState.style[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
+  }
 }
 
 const onDrag = (e: MouseEvent) => {

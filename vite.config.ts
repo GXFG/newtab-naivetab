@@ -49,7 +49,7 @@ export const sharedConfig: UserConfig = {
     Components({
       dirs: [r('src/components')],
       // generate `components.d.ts` for ts support with Volar
-      dts: true,
+      dts: r('src/components.d.ts'),
       deep: true,
       resolvers: [
         // auto import icons
@@ -120,4 +120,8 @@ export default defineConfig(({ command }) => ({
       config: windiConfig,
     }),
   ],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
 }))
