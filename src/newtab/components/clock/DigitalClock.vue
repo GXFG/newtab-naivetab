@@ -4,13 +4,13 @@
       <div
         class="clockDigital__container"
         :style="dragStyle || containerStyle"
-        :class="{ 'clockDigital__container--shadow': localState.style.clockDigital.isShadowEnabled }"
+        :class="{ 'clockDigital__container--shadow': localConfig.clockDigital.isShadowEnabled }"
       >
         <div class="clock__time">
           <p class="time__text">
             {{ state.time }}
           </p>
-          <span v-if="localState.setting.clockDigital.unitEnabled" class="time__unit">{{ state.unit }}</span>
+          <span v-if="localConfig.clockDigital.unitEnabled" class="time__unit">{{ state.unit }}</span>
         </div>
       </div>
     </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { localState, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { localConfig, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockDigital'
 const isRender = getIsComponentRender(CNAME)
@@ -29,7 +29,7 @@ const state = reactive({
 })
 
 const updateTime = () => {
-  state.time = dayjs().format(localState.setting.clockDigital.format)
+  state.time = dayjs().format(localConfig.clockDigital.format)
   state.unit = dayjs().format('a')
 }
 

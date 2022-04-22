@@ -1,7 +1,7 @@
 <template>
   <NConfigProvider
     id="container"
-    :class="{ 'animation--zoom-in': localState.setting.general.isLoadPageAnimationEnabled }"
+    :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }"
     :locale="nativeUILang"
     :theme="currTheme"
     :theme-overrides="themeOverrides"
@@ -24,11 +24,11 @@ import {
   APPEARANCE_TO_CODE_MAP,
   gaEvent,
   getStyleField,
+  localConfig,
   localState,
   downloadConfig,
   initFirstOpen,
   checkUpdate,
-  initAvailableFontList,
   startKeyboard,
   startTimer,
   stopTimer,
@@ -41,7 +41,6 @@ onMounted(async() => {
   await nextTick()
   initFirstOpen()
   checkUpdate()
-  initAvailableFontList()
   gaEvent('page-home', 'view', 'view')
 })
 
@@ -54,15 +53,15 @@ const osTheme = useOsTheme() // light | dark | null
 const currTheme = ref()
 
 watch(
-  [() => osTheme.value, () => localState.setting.general.appearance],
+  [() => osTheme.value, () => localConfig.general.appearance],
   () => {
-    if (localState.setting.general.appearance === 'auto') {
-      localState.common.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
+    if (localConfig.general.appearance === 'auto') {
+      localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
       currTheme.value = osTheme.value === 'dark' ? darkTheme : null
       return
     }
-    localState.common.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localState.setting.general.appearance]
-    currTheme.value = localState.setting.general.appearance === 'dark' ? darkTheme : null
+    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance]
+    currTheme.value = localConfig.general.appearance === 'dark' ? darkTheme : null
   },
   { immediate: true },
 )
@@ -75,9 +74,9 @@ const NATIVE_UI_LOCALE_MAP = {
 }
 
 watch(
-  () => localState.setting.general.lang,
+  () => localConfig.general.lang,
   () => {
-    nativeUILang.value = NATIVE_UI_LOCALE_MAP[localState.setting.general.lang] || enUS
+    nativeUILang.value = NATIVE_UI_LOCALE_MAP[localConfig.general.lang] || enUS
   },
   { immediate: true },
 )

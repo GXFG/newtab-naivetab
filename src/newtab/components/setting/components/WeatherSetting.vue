@@ -15,34 +15,34 @@
   <BaseComponentSetting id="weather__setting" cname="weather">
     <template #header>
       <NFormItem :label="$t('weather.city')">
-        <NInput v-model:value="localState.setting.weather.city.name" :disabled="true" />
+        <NInput v-model:value="localConfig.weather.city.name" :disabled="true" />
         <NButton class="setting__row-element" @click="onOpenCityPicker()">
           <tabler:edit class="item__icon" />
         </NButton>
       </NFormItem>
       <NFormItem label="API Key">
-        <NInput v-model:value="localState.setting.weather.apiKey" />
+        <NInput v-model:value="localConfig.weather.apiKey" />
         <Tips link :content="URL_QWEATHER_START" />
       </NFormItem>
       <!-- <NFormItem :label="$t('weather.temperatureUnit')">
-        <NSelect v-model:value="localState.setting.weather.temperatureUnit" :options="temperatureUnitOptions" />
+        <NSelect v-model:value="localConfig.weather.temperatureUnit" :options="temperatureUnitOptions" />
       </NFormItem>
       <NFormItem :label="$t('weather.speedUnit')">
-        <NSelect v-model:value="localState.setting.weather.speedUnit" :options="speedUnitOptions" />
+        <NSelect v-model:value="localConfig.weather.speedUnit" :options="speedUnitOptions" />
       </NFormItem> -->
       <NFormItem :label="$t('weather.icon')">
         <div class="setting__input-wrap">
           <div class="setting__input_item">
-            <NSwitch v-model:value="localState.setting.weather.iconEnabled" />
+            <NSwitch v-model:value="localConfig.weather.iconEnabled" />
           </div>
-          <div v-if="localState.setting.weather.iconEnabled" class="setting__input_item">
-            <NSlider v-model:value="localState.style.weather.iconSize" class="item__grow" :step="1" :min="30" :max="200" />
-            <NInputNumber v-model:value="localState.style.weather.iconSize" class="setting__input-number" :step="1" :min="30" :max="200" />
+          <div v-if="localConfig.weather.iconEnabled" class="setting__input_item">
+            <NSlider v-model:value="localConfig.weather.iconSize" class="item__grow" :step="1" :min="30" :max="200" />
+            <NInputNumber v-model:value="localConfig.weather.iconSize" class="setting__input-number" :step="1" :min="30" :max="200" />
           </div>
         </div>
       </NFormItem>
       <!-- <NFormItem :label="$t('weather.forecast')">
-        <NSwitch v-model:value="localState.setting.weather.forecastEnabled" />
+        <NSwitch v-model:value="localConfig.weather.forecastEnabled" />
       </NFormItem> -->
     </template>
   </BaseComponentSetting>
@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { URL_QWEATHER_START, localState } from '@/logic'
+import { URL_QWEATHER_START, localConfig } from '@/logic'
 import { getCityLookup } from '@/api'
 
 const temperatureUnitOptions = [
@@ -101,8 +101,8 @@ const onChangeCity = (label: string) => {
 }
 
 const onSelectCity = (value: any) => {
-  localState.setting.weather.city.name = state.keyword
-  localState.setting.weather.city.id = value
+  localConfig.weather.city.name = state.keyword
+  localConfig.weather.city.id = value
 }
 
 const onOpenCityPicker = () => {

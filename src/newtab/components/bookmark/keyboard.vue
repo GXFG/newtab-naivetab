@@ -11,8 +11,8 @@
               'row__item--move': isDragMode,
               'row__item--hover': !isDragMode,
               'row__item--active': state.currSelectKey === item.key,
-              'row__item--border': localState.style.bookmark.isBorderEnabled,
-              'row__item--shadow': localState.style.bookmark.isShadowEnabled,
+              'row__item--border': localConfig.bookmark.isBorderEnabled,
+              'row__item--shadow': localConfig.bookmark.isShadowEnabled,
             }"
             :title="item.url"
             @click="onClickKey(item.key, item.url)"
@@ -29,7 +29,7 @@
                 <img v-if="item.url" class="img__main" :src="getDomainIcon(item.url)" :ondragstart="() => false">
               </div>
             </div>
-            <p v-if="localState.setting.bookmark.isNameVisible" class="item__name">
+            <p v-if="localConfig.bookmark.isNameVisible" class="item__name">
               {{ item.name }}
             </p>
             <!-- 按键定位标志F & J -->
@@ -46,7 +46,7 @@ import {
   KEYBOARD_KEY_LIST,
   KEYBOARD_CODE_TO_LABEL_MAP,
   isDragMode,
-  localState,
+  localConfig,
   getIsComponentRender,
   getLayoutStyle,
   getStyleField,
@@ -83,7 +83,7 @@ const openPage = (url: string, active = true) => {
     delayResetPressKey()
     return
   }
-  if (localState.setting.bookmark.isNewTabOpen) {
+  if (localConfig.bookmark.isNewTabOpen) {
     createTab(url) // 以新标签页打开
     delayResetPressKey()
   } else {
@@ -127,7 +127,7 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (url.length === 0) {
     return
   }
-  if (!localState.setting.bookmark.isDblclickOpen) {
+  if (!localConfig.bookmark.isDblclickOpen) {
     state.currSelectKey = translateKey
     openPage(url, !shiftKey)
   } else {
@@ -138,7 +138,7 @@ const keyboardTask = (e: KeyboardEvent) => {
       state.currSelectKey = translateKey
       timer = setTimeout(() => {
         state.currSelectKey = ''
-      }, localState.setting.bookmark.dblclickIntervalTime)
+      }, localConfig.bookmark.dblclickIntervalTime)
     }
   }
 }

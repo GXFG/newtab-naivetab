@@ -5,19 +5,19 @@
         class="memo__container"
         :style="dragStyle || containerStyle"
         :class="{
-          'memo__container--border': localState.style.memo.isBorderEnabled,
-          'memo__container--shadow': localState.style.memo.isShadowEnabled
+          'memo__container--border': localConfig.memo.isBorderEnabled,
+          'memo__container--shadow': localConfig.memo.isShadowEnabled
         }"
       >
         <div class="memo_wrap">
           <NInput
-            v-model:value="localState.setting.memo.content"
+            v-model:value="localConfig.memo.content"
             class="memo__input"
             type="textarea"
             placeholder=" "
             autosize
             :disabled="isDragMode"
-            :show-count="localState.setting.memo.countEnabled"
+            :show-count="localConfig.memo.countEnabled"
             @focus="onFocus"
             @blur="onBlur"
           />
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { isDragMode, globalState, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { isDragMode, globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'memo'
 const isRender = getIsComponentRender(CNAME)

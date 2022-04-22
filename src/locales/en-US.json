@@ -72,6 +72,7 @@
     "other": "Other"
   },
   "prompts": {
+    "pleaseWait": "In progress, Please wait",
     "imageTooLarge": "Image too large",
     "favoriteLimt": "The maximum number of favorites has been reached"
   },

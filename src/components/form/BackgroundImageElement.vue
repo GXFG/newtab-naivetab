@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { FAVORITE_MAX_COUNT, getStyleField, createTab, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
+import { FAVORITE_MAX_COUNT, getStyleField, createTab, localConfig, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
 
 const props = defineProps({
   data: {
@@ -72,15 +72,15 @@ const isCurrSelectedImage = computed(() => {
   if (!props.select) {
     return false
   }
-  return props.data.name === localState.setting.general.backgroundImageName
+  return props.data.name === localConfig.general.backgroundImageName
 })
 
 const onSelectImage = () => {
   if (!props.select) {
     return
   }
-  localState.setting.general.backgroundImageName = props.data.name
-  localState.setting.general.backgroundImageDesc = props.data.desc
+  localConfig.general.backgroundImageName = props.data.name
+  localConfig.general.backgroundImageDesc = props.data.desc
 }
 
 const onViewImage = () => {
@@ -94,24 +94,24 @@ const onSaveImage = () => {
 }
 
 const isFavoriteIconVisible = computed(() => {
-  const favoriteBackgroundNameList = localState.setting.general.favoriteImageList.map((item: FavoriteImageListItem) => item.name)
+  const favoriteBackgroundNameList = localConfig.general.favoriteImageList.map((item: FavoriteImageListItem) => item.name)
   return !favoriteBackgroundNameList.includes(props.data.name)
 })
 
 const onFavoriteImage = () => {
-  if (localState.setting.general.favoriteImageList.length >= FAVORITE_MAX_COUNT) {
+  if (localConfig.general.favoriteImageList.length >= FAVORITE_MAX_COUNT) {
     window.$message.error(window.$t('prompts.favoriteLimt'))
     return
   }
-  localState.setting.general.favoriteImageList.push({
+  localConfig.general.favoriteImageList.push({
     name: props.data.name,
     desc: props.data.desc,
   })
 }
 
 const onUnFavoriteImage = () => {
-  const index = localState.setting.general.favoriteImageList.findIndex((item: FavoriteImageListItem) => item.name === props.data.name)
-  localState.setting.general.favoriteImageList.splice(index, 1)
+  const index = localConfig.general.favoriteImageList.findIndex((item: FavoriteImageListItem) => item.name === props.data.name)
+  localConfig.general.favoriteImageList.splice(index, 1)
 }
 
 const customPrimaryColor = getStyleField('general', 'primaryColor')

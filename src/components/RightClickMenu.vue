@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { URL_GITHUB_ISSUSE, isDragMode, toggleIsDragMode, isSettingDrawerVisible, toggleIsSettingDrawerVisible, getTargetDataFromEvent, globalState, createTab, openHelpModal, openWhatsNewModal } from '@/logic'
+import { URL_GITHUB_ISSUSE, isDragMode, toggleIsDragMode, switchSettingDrawerVisible, getTargetDataFromEvent, globalState, createTab, openHelpModal, openWhatsNewModal } from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -81,10 +81,10 @@ const menuActionMap = {
       tabName = 'clock'
     }
     globalState.currSettingTabValue = tabName.length === 0 ? 'general' : tabName
-    toggleIsSettingDrawerVisible()
+    switchSettingDrawerVisible(true)
   },
   dragMode: () => {
-    toggleIsSettingDrawerVisible(false)
+    switchSettingDrawerVisible(false)
     toggleIsDragMode()
   },
   help: () => {
@@ -115,7 +115,7 @@ const onCloseMenu = () => {
 
 const handleContextMenu = async(e: MouseEvent) => {
   e.preventDefault()
-  if (isSettingDrawerVisible.value) {
+  if (globalState.isSettingDrawerVisible) {
     return
   }
   state.isMenuVisible = false

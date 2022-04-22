@@ -9,13 +9,13 @@
             <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
             <NFormItem :label="$t('common.origin')">
               <NSelect
-                v-model:value="localState.setting.general.backgroundImageSource"
+                v-model:value="localConfig.general.backgroundImageSource"
                 :options="backgroundImageSourceList"
                 class="setting__row-element"
               />
             </NFormItem>
             <!-- local -->
-            <NFormItem v-if="localState.setting.general.backgroundImageSource === 0" :label="$t('common.select')">
+            <NFormItem v-if="localConfig.general.backgroundImageSource === 0" :label="$t('common.select')">
               <NButton class="setting__row-element" @click="onSelectBackgroundImage">
                 <uil:import />&nbsp;{{ $t('common.import') }}
               </NButton>
@@ -25,12 +25,12 @@
               <Tips :content="$t('general.localBackgroundTips')" />
             </NFormItem>
             <!-- network -->
-            <template v-else-if="localState.setting.general.backgroundImageSource === 1">
+            <template v-else-if="localConfig.general.backgroundImageSource === 1">
               <NFormItem :label="$t('common.custom')">
-                <NSwitch v-model:value="localState.setting.general.isBackgroundImageCustomUrlEnabled" />
+                <NSwitch v-model:value="localConfig.general.isBackgroundImageCustomUrlEnabled" />
                 <NInput
-                  v-if="localState.setting.general.isBackgroundImageCustomUrlEnabled"
-                  v-model:value="localState.setting.general.backgroundImageCustomUrl"
+                  v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
+                  v-model:value="localConfig.general.backgroundImageCustomUrl"
                   class="setting__row-element"
                   type="text"
                   placeholder="https://"
@@ -45,8 +45,8 @@
             <BackgroundImageElement :lazy="false" :data="currImageData" />
           </div>
           <NForm class="content__config" label-placement="left" :label-width="60">
-            <NFormItem v-if="!localState.setting.general.isBackgroundImageCustomUrlEnabled" :label="$t('common.4k')">
-              <NSwitch v-model:value="localState.setting.general.backgroundImageHighQuality" />
+            <NFormItem v-if="!localConfig.general.isBackgroundImageCustomUrlEnabled" :label="$t('common.4k')">
+              <NSwitch v-model:value="localConfig.general.backgroundImageHighQuality" />
             </NFormItem>
           </NForm>
         </div>
@@ -67,7 +67,7 @@
   </NDrawer>
 </template>
 <script setup lang="ts">
-import { gaEvent, previewImageListMap, localState, imageState, isImageListLoading, currBackgroundImageUrl } from '@/logic'
+import { gaEvent, previewImageListMap, localConfig, imageState, isImageListLoading, currBackgroundImageUrl } from '@/logic'
 
 const props = defineProps({
   show: {
@@ -89,10 +89,10 @@ const backgroundImageSourceList = computed(() => [
 
 const currImageData = computed(() => {
   let data: any = {
-    name: localState.setting.general.backgroundImageName,
-    desc: localState.setting.general.backgroundImageDesc,
+    name: localConfig.general.backgroundImageName,
+    desc: localConfig.general.backgroundImageDesc,
   }
-  if (!(localState.setting.general.backgroundImageSource === 1 && !localState.setting.general.isBackgroundImageCustomUrlEnabled)) {
+  if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
     // not from bing
     data = {
       url: currBackgroundImageUrl.value,

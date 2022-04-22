@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getWeatherNow, getWeatherForecast, getWeatherIndices, getWeatherAirNow, getWeatherWarning } from '@/api'
-import { localState, log } from '@/logic'
+import { localConfig, log } from '@/logic'
 
 export const weatherState = useStorageLocal('data-weather', {
   state: {
@@ -114,7 +114,7 @@ const getWarningData = async() => {
 }
 
 export const updateWeather = () => {
-  if (!localState.setting.weather.enabled) {
+  if (!localConfig.weather.enabled) {
     return
   }
   const currTS = dayjs().valueOf()
@@ -149,6 +149,6 @@ export const refreshWeather = () => {
 }
 
 // 修改城市、切换语言 立即更新数据
-watch([() => localState.setting.weather.city.id, () => localState.setting.general.lang], () => {
+watch([() => localConfig.weather.city.id, () => localConfig.general.lang], () => {
   refreshWeather()
 })
