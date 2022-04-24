@@ -293,7 +293,6 @@ export const globalState = reactive({
   isClearStorageLoading: false,
   isHelpModalVisible: false,
   isWhatsNewModalVisible: false,
-  isWhatsNewModalCloseToRefresh: false,
   isSearchFocused: false,
   isMemoFocused: false,
   currSettingTabValue: 'general',
@@ -331,13 +330,11 @@ export const initFirstOpen = () => {
   isFirstOpen.value = false
 }
 
-export const openWhatsNewModal = (closeToRefresh = false) => {
+export const openWhatsNewModal = () => {
   globalState.isWhatsNewModalVisible = true
-  globalState.isWhatsNewModalCloseToRefresh = closeToRefresh
 }
 export const closeWhatsNewModal = () => {
   globalState.isWhatsNewModalVisible = false
-  globalState.isWhatsNewModalCloseToRefresh = false
 }
 
 export const openHelpModal = () => {
@@ -345,14 +342,15 @@ export const openHelpModal = () => {
 }
 
 export const checkUpdate = () => {
-  const currSettingVersion = +localConfig.general.version.split('.').join('')
+  log('Version', localConfig.general.version)
+  const localVersion = +localConfig.general.version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
-  if (currSettingVersion >= currPkgVersion) {
+  if (localVersion >= currPkgVersion) {
     return
   }
   log('checkUpdate get new version')
   localConfig.general.version = pkg.version
-  openWhatsNewModal(true) // 展示更新内容
+  openWhatsNewModal() // 展示更新内容
   updateSetting() // 刷新配置设置
 }
 

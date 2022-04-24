@@ -1,6 +1,6 @@
 import { useDebounceFn } from '@vueuse/core'
 import { log, downloadJsonByTagA, sleep } from './util'
-import { COMPONENT_LIST, MERGE_CONFIG_DELAY } from './const'
+import { CONFIG_FIELD_LIST, MERGE_CONFIG_DELAY } from './const'
 import { defaultConfig, localConfig, localState, globalState } from './store'
 
 export const isUploadConfigLoading = computed(() => {
@@ -99,21 +99,34 @@ const mergeState = (state: any, acceptState: any) => {
 
 /**
  * 处理新增配置，删除无用旧配置
- * 默认刷新配置结构
  * 以defaultConfig为模板与acceptState进行去重合并
+ * acceptState不传递时默认刷新配置结构
  */
-export const updateSetting = (acceptState = localConfig) => {
-  // TODO继承<0.9版本的配置
+export const updateSetting = (acceptRawState = localConfig) => {
+  let acceptState = acceptRawState
   return new Promise((resolve) => {
     try {
-      for (const rootField of Object.keys(defaultConfig)) {
-        if (!Object.prototype.hasOwnProperty.call(acceptState, rootField)) {
+      const version = +localConfig.general.version.split('.').join('')
+      if (version < 0.9) {
+        // 继承小于0.9版本的旧配置结构
+        log('Version<0.9')
+        const oldConfig = {} as any
+        for (const configField of CONFIG_FIELD_LIST) {
+          oldConfig[configField] = {
+            ...JSON.parse(localStorage.getItem(`style-${configField}`) || ''),
+            ...JSON.parse(localStorage.getItem(`setting-${configField}`) || ''),
+          }
+        }
+        acceptState = oldConfig
+      }
+      for (const configField of Object.keys(defaultConfig)) {
+        if (!Object.prototype.hasOwnProperty.call(acceptState, configField)) {
           continue
         }
-        // 只遍历acceptState内存在的rootField
-        for (const subField of Object.keys(acceptState[rootField])) {
-          localConfig[rootField][subField] = mergeState(defaultConfig[rootField][subField], acceptState[rootField][subField])
-          // console.log(localConfig[rootField][subField], defaultConfig[rootField][subField], acceptState[rootField][subField])
+        // 只遍历acceptState内存在的configField
+        for (const subField of Object.keys(acceptState[configField])) {
+          localConfig[configField][subField] = mergeState(defaultConfig[configField][subField], acceptState[configField][subField])
+          // console.log(localConfig[configField][subField], defaultConfig[configField][subField], acceptState[configField][subField])
         }
       }
       resolve(true)
@@ -139,7 +152,7 @@ export const downloadConfig = () => {
       return
     }
     const pendingConfig = {} as any
-    for (const field of COMPONENT_LIST) {
+    for (const field of CONFIG_FIELD_LIST) {
       if (!Object.prototype.hasOwnProperty.call(data, `naive-tab-${field}`)) {
         log(`Config-${field} initialize`)
         uploadConfigFn(field)
