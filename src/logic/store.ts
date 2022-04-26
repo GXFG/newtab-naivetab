@@ -341,14 +341,14 @@ export const openHelpModal = () => {
   globalState.isHelpModalVisible = true
 }
 
-export const checkUpdate = () => {
+export const handleUpdate = () => {
   log('Version', localConfig.general.version)
   const localVersion = +localConfig.general.version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
   if (localVersion >= currPkgVersion) {
     return
   }
-  log('checkUpdate get new version')
+  log('get new version')
   localConfig.general.version = pkg.version
   openWhatsNewModal() // 展示更新内容
   updateSetting() // 刷新配置设置

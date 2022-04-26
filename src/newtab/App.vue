@@ -28,7 +28,7 @@ import {
   localState,
   downloadConfig,
   initFirstOpen,
-  checkUpdate,
+  handleUpdate,
   startKeyboard,
   startTimer,
   stopTimer,
@@ -40,7 +40,7 @@ onMounted(async() => {
   startKeyboard()
   await nextTick()
   initFirstOpen()
-  checkUpdate()
+  handleUpdate()
   gaEvent('page-home', 'view', 'view')
 })
 

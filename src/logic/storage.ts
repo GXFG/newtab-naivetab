@@ -98,9 +98,8 @@ const mergeState = (state: any, acceptState: any) => {
 }
 
 /**
- * 处理新增配置，删除无用旧配置
+ * 处理新增配置，删除无用旧配置。默认acceptState不传递时为刷新配置结构
  * 以defaultConfig为模板与acceptState进行去重合并
- * acceptState不传递时默认刷新配置结构
  */
 export const updateSetting = (acceptRawState = localConfig) => {
   let acceptState = acceptRawState
@@ -145,6 +144,7 @@ export const updateSetting = (acceptRawState = localConfig) => {
  * }
  */
 export const downloadConfig = () => {
+  console.time('downloadConfig')
   chrome.storage.sync.get(null, (data) => {
     const error = chrome.runtime.lastError
     if (error) {
@@ -157,8 +157,9 @@ export const downloadConfig = () => {
         log(`Config-${field} initialize`)
         uploadConfigFn(field)
       } else {
-        const targetConfig = JSON.parse(data[`naive-tab-${field}`])
-        const targetSyncTime = targetConfig.syncTime
+        const target = JSON.parse(data[`naive-tab-${field}`])
+        const targetConfig = target.data
+        const targetSyncTime = target.syncTime
         const localSyncTime = localState.value.syncTimeMap[field]
         if (targetSyncTime === localSyncTime) {
           log(`Config-${field} not update`)
@@ -173,6 +174,7 @@ export const downloadConfig = () => {
         localState.value.syncTimeMap[field] = targetSyncTime
       }
     }
+    console.timeEnd('downloadConfig')
     if (Object.keys(pendingConfig).length === 0) {
       return
     }
@@ -200,6 +202,7 @@ const clearStorage = (clearAll = false) => {
         localStorage.setItem('data-first', 'false') // 避免打开help弹窗
       }
       resolve(true)
+      log('Reload page')
       location.reload()
     })
   })
