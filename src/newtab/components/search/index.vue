@@ -26,6 +26,7 @@
               class="input__main"
               :class="{ 'input__main--move': isDragMode }"
               :placeholder="localConfig.search.placeholder || localConfig.search.urlName"
+              :loading="state.isSuggestLoading"
               :disabled="isDragMode"
               clearable
               @focus="onSearchFocus()"
@@ -35,10 +36,10 @@
             />
             <NButton
               v-if="localConfig.search.iconEnabled"
-              size="large"
-              text
               class="input__search"
               :class="{ 'input__search--move': isDragMode }"
+              size="large"
+              text
               @click="handleSearch()"
             >
               <il:search />
@@ -61,6 +62,7 @@ const isRender = getIsComponentRender(CNAME)
 const state = reactive({
   searchValue: '',
   isSuggestVisible: false,
+  isSuggestLoading: false,
   placementValue: 'bottom' as any,
   suggestList: [],
 })
@@ -102,7 +104,9 @@ const getBaiduSuggest = async() => {
   if (state.searchValue.length === 0) {
     return
   }
+  state.isSuggestLoading = true
   const data: any = await getBaiduSugrec(state.searchValue)
+  state.isSuggestLoading = false
   if (data && data.g && data.g.length !== 0) {
     state.suggestList = data.g.map((item: { q: string[] }) => ({
       label: item.q,

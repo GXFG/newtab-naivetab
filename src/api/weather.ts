@@ -16,7 +16,7 @@ export const getCityLookup = (location: string) => {
 // https://dev.qweather.com/docs/api/weather/weather-daily-forecast/
 export const getWeatherForecast = () => {
   return http({
-    url: 'https://devapi.qweather.com/v7/weather/7d',
+    url: 'https://devapi.qweather.com/v7/weather/3d',
     params: {
       lang: WEATHER_LANG_MAP[localConfig.general.lang],
       key: localConfig.weather.apiKey,
