@@ -1,4 +1,5 @@
 import { useDebounceFn } from '@vueuse/core'
+import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
 import { CONFIG_FIELD_LIST, MERGE_CONFIG_DELAY } from './const'
 import { defaultConfig, localConfig, localState, globalState } from './store'
@@ -128,6 +129,7 @@ export const updateSetting = (acceptRawState = localConfig) => {
           // console.log(localConfig[configField][subField], defaultConfig[configField][subField], acceptState[configField][subField])
         }
       }
+      log('LocalConfig', localConfig)
       resolve(true)
     } catch (e) {
       log('updateSetting error', e)
@@ -239,7 +241,7 @@ export const importSetting = async(text: string) => {
 }
 
 export const exportSetting = () => {
-  const filename = `naivetab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
+  const filename = `naivetab-${pkg.version}-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadJsonByTagA(localConfig, filename)
   window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
 }
