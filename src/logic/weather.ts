@@ -58,7 +58,7 @@ export const weatherIndicesInfo = computed(() => {
 })
 
 export const weatherWarningInfo = computed(() => {
-  const warningList = weatherState.value.warning.list.map((item: WarningItem, index: number) => `${index + 1}. ${item.text}`.replace(/\n/, ''))
+  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `☞ ${item.text}`.replace(/\n/, ''))
   return warningList.join('\n')
 })
 
