@@ -106,8 +106,8 @@ export const updateSetting = (acceptRawState = localConfig) => {
   let acceptState = acceptRawState
   return new Promise((resolve) => {
     try {
-      const version = +localConfig.general.version.split('.').join('')
-      if (version < 0.9) {
+      const versionPureNum = +localConfig.general.version.split('.').join('')
+      if (versionPureNum < 90) {
         // 继承小于0.9版本的旧配置结构
         log('Version<0.9')
         const oldConfig = {} as any
@@ -138,6 +138,8 @@ export const updateSetting = (acceptRawState = localConfig) => {
 }
 
 /**
+ * 下载配置信息
+ * chrome.storage 格式示例：
  * {
  *   `naive-tab-${field}`: '{
  *      syncTime: number
@@ -196,7 +198,7 @@ const clearStorage = (clearAll = false) => {
         log('Clear localStorage wait') // 等待config同步完成、localStorage写入完成后再进行后续操作
         return
       }
-      await sleep(1000) // 严格确保同步完成后再执行清除动作
+      await sleep(1000) // 严格确保配置上传完成后再执行清除动作
       log('Clear localStorage execute')
       cancelListenerSync()
       localStorage.clear()
@@ -235,13 +237,32 @@ export const importSetting = async(text: string) => {
     return
   }
   log('FileContent', fileContent)
-  await updateSetting(fileContent)
-  window.$message.success(`${window.$t('common.import')}${window.$t('common.success')}`)
-  globalState.isImportSettingLoading = false
+  try {
+  // 转换小于0.9版本的旧配置结构
+    if (Object.prototype.hasOwnProperty.call(fileContent, 'style')) {
+      log('Version < 0.9')
+      const newConfig = {} as any
+      for (const configField of CONFIG_FIELD_LIST) {
+        newConfig[configField] = {
+          ...fileContent.style[configField] || {},
+          ...fileContent.setting[configField] || {},
+        }
+      }
+      fileContent = newConfig
+      log('FileContentTransform', fileContent)
+    }
+    await updateSetting(fileContent)
+    window.$message.success(`${window.$t('common.import')}${window.$t('common.success')}`)
+    globalState.isImportSettingLoading = false
+  } catch (e) {
+    log('Import error', e)
+    window.$message.error(`${window.$t('common.import')}${window.$t('common.fail')} ${e}`)
+    globalState.isImportSettingLoading = false
+  }
 }
 
 export const exportSetting = () => {
-  const filename = `naivetab-${pkg.version}-${dayjs().format('YYYYMMDD-HHmmss')}.json`
+  const filename = `naivetab-v${pkg.version}-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadJsonByTagA(localConfig, filename)
   window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
 }
