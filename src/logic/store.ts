@@ -1,4 +1,3 @@
-import { useToggle } from '@vueuse/core'
 import pkg from '../../package.json'
 import { isChrome } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
@@ -366,26 +365,6 @@ export const getDomainIcon = (url: string) => {
     return `chrome://favicon/size/32@2x/${url}`
   }
   return `${url}/favicon.ico`
-}
-
-export const getDefaultBookmarkName = (url: string) => {
-  if (!url) {
-    return ''
-  }
-  const padUrl = url.includes('//') ? url : `https://${url}`
-  const domain = padUrl.split('/')[2]
-  if (!domain) {
-    return ''
-  }
-  let name = ''
-  if (domain.includes(':')) {
-    // 端口地址
-    name = `:${domain.split(':')[1]}`
-  } else {
-    const tempSplitList = domain.split('.')
-    name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0] // 设置默认name
-  }
-  return name
 }
 
 export const getIsComponentRender = (componentName: Components) => computed(() => localConfig[componentName].enabled || moveState.dragTempEnabledMap[componentName])

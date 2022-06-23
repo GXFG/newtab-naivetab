@@ -1,6 +1,6 @@
 import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, sleep, log, getDefaultBookmarkName } from '@/logic'
+import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, sleep, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
@@ -57,6 +57,26 @@ export const initBookmarkListData = () => {
     })
   })
   isInitialized.value = true
+}
+
+export const getDefaultBookmarkName = (url: string) => {
+  if (!url) {
+    return ''
+  }
+  const padUrl = url.includes('//') ? url : `https://${url}`
+  const domain = padUrl.split('/')[2]
+  if (!domain) {
+    return ''
+  }
+  let name = ''
+  if (domain.includes(':')) {
+    // 端口地址
+    name = `:${domain.split(':')[1]}`
+  } else {
+    const tempSplitList = domain.split('.')
+    name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0] // 设置默认name
+  }
+  return name
 }
 
 const mergeBookmarkSetting = useDebounceFn(async() => {
