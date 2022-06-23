@@ -53,12 +53,12 @@ export const weatherState = useStorageLocal('data-weather', {
 })
 
 export const weatherIndicesInfo = computed(() => {
-  const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}: [${item.category}] ${item.text}`)
+  const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}:【${item.category}】 ${item.text}`.replace(/\n/, ''))
   return indicesList.join('\n')
 })
 
 export const weatherWarningInfo = computed(() => {
-  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `${item.text}`)
+  const warningList = weatherState.value.warning.list.map((item: WarningItem, index: number) => `${index + 1}. ${item.text}`.replace(/\n/, ''))
   return warningList.join('\n')
 })
 
