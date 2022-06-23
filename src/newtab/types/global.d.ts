@@ -1,4 +1,5 @@
 interface Window {
+  _gaq: any
   dataLayer: any
   $t: any // vue-i18n
   $message: any

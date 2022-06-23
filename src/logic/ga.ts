@@ -12,7 +12,8 @@ export const gaEvent = (category: string, action: string, opt_label: string, opt
   // if (import.meta.env.DEV) {
   //   return
   // }
-  const param: any = ['event', category, action, opt_label]
+  // const param: any = ['event', category, action, opt_label]
+  const param: any = ['_trackEvent', category, action, opt_label]
 
   if (opt_value !== undefined) {
     param.push(opt_value)
@@ -20,6 +21,7 @@ export const gaEvent = (category: string, action: string, opt_label: string, opt
   if (opt_noninteraction !== undefined) {
     param.push(opt_noninteraction)
   }
-  log('ga', param.slice(1).join(','))
-  window.dataLayer.push(param)
+  log('ga', param)
+  // window.dataLayer.push(param)
+  window._gaq.push(param)
 }
