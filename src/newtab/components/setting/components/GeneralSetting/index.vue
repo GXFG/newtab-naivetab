@@ -5,40 +5,40 @@
   <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
     <template #header>
       <NFormItem :label="$t('general.pageTitle')">
-        <NInput v-model:value="localState.setting.general.pageTitle" type="text" placeholder=" " />
+        <NInput v-model:value="localConfig.general.pageTitle" type="text" placeholder=" " />
       </NFormItem>
       <NFormItem :label="$t('general.language')">
         <NSelect v-model:value="proxy.$i18n.locale" :options="state.i18nList" @update:value="onChangeLocale" />
       </NFormItem>
       <NFormItem :label="$t('common.drawerSite')">
-        <NSelect v-model:value="localState.setting.general.drawerPlacement" :options="drawerPlacementList" />
+        <NSelect v-model:value="localConfig.general.drawerPlacement" :options="drawerPlacementList" />
       </NFormItem>
       <NFormItem :label="$t('general.loadPageAnimation')">
-        <NSwitch v-model:value="localState.setting.general.isLoadPageAnimationEnabled" />
+        <NSwitch v-model:value="localConfig.general.isLoadPageAnimationEnabled" />
       </NFormItem>
     </template>
 
     <template #style>
       <NFormItem :label="$t('common.appearance')">
-        <NSelect v-model:value="localState.setting.general.appearance" :options="themeList" />
+        <NSelect v-model:value="localConfig.general.appearance" :options="themeList" />
       </NFormItem>
     </template>
 
     <template #footer>
       <!-- backgroundImage -->
       <NFormItem :label="$t('common.backgroundImage')">
-        <NSwitch v-model:value="localState.setting.general.isBackgroundImageEnabled" />
+        <NSwitch v-model:value="localConfig.general.isBackgroundImageEnabled" />
         <NButton class="setting__row-element" @click="toggleIsImageModalVisible()">
           <tabler:edit />&nbsp;{{ $t('common.edit') }}
         </NButton>
       </NFormItem>
-      <NFormItem v-if="localState.setting.general.isBackgroundImageEnabled" :label="$t('common.blur')">
-        <NSlider v-model:value="localState.style.general.bgBlur" :step="0.1" :min="0" :max="200" />
-        <NInputNumber v-model:value="localState.style.general.bgBlur" class="setting__input-number" :step="0.1" :min="0" :max="200" />
+      <NFormItem v-if="localConfig.general.isBackgroundImageEnabled" :label="$t('common.blur')">
+        <NSlider v-model:value="localConfig.general.bgBlur" :step="0.1" :min="0" :max="200" />
+        <NInputNumber v-model:value="localConfig.general.bgBlur" class="setting__input-number" :step="0.1" :min="0" :max="200" />
       </NFormItem>
-      <NFormItem v-if="localState.setting.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
-        <NSlider v-model:value="localState.style.general.bgOpacity" :step="0.01" :min="0" :max="1" />
-        <NInputNumber v-model:value="localState.style.general.bgOpacity" class="setting__input-number" :step="0.01" :min="0" :max="1" />
+      <NFormItem v-if="localConfig.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
+        <NSlider v-model:value="localConfig.general.bgOpacity" :step="0.01" :min="0" :max="1" />
+        <NInputNumber v-model:value="localConfig.general.bgOpacity" class="setting__input-number" :step="0.01" :min="0" :max="1" />
       </NFormItem>
 
       <!-- setting -->
@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import ImagePicker from './ImagePicker.vue'
-import { exportSetting, gaEvent, localState, globalState, isUploadConfigLoading, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
+import { defaultConfig, exportSetting, gaEvent, localConfig, localState, globalState, isUploadConfigLoading, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -114,7 +114,7 @@ const drawerPlacementList = computed(() => [
 
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
-  localState.setting.general.lang = locale
+  localConfig.general.lang = locale
   gaEvent('setting-locale', 'click', 'change')
 }
 
@@ -126,8 +126,12 @@ const toggleIsImageModalVisible = () => {
 }
 
 const syncTime = computed(() => {
-  const maxDate = Math.max(localState.common.syncTimeMap.style, localState.common.syncTimeMap.setting)
-  return dayjs(maxDate).format('YYYY-MM-DD HH:mm:ss')
+  const syncTimeList = [] as number[]
+  for (const field of Object.keys(defaultConfig) as ConfigField[]) {
+    syncTimeList.push(localState.value.syncTimeMap[field])
+  }
+  const maxSyncTime = Math.max(...syncTimeList)
+  return dayjs(maxSyncTime).format('YYYY-MM-DD HH:mm:ss')
 })
 
 const importSettingInputEl = ref()

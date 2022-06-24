@@ -9,9 +9,10 @@ import { log } from './util'
  * @param opt_noninteraction 为true时，表示将不会在跳出率计算中使用事件命中
  */
 export const gaEvent = (category: string, action: string, opt_label: string, opt_value?: number, opt_noninteraction?: boolean) => {
-  if (import.meta.env.DEV) {
-    return
-  }
+  // if (import.meta.env.DEV) {
+  //   return
+  // }
+  // const param: any = ['event', category, action, opt_label]
   const param: any = ['_trackEvent', category, action, opt_label]
 
   if (opt_value !== undefined) {
@@ -20,6 +21,7 @@ export const gaEvent = (category: string, action: string, opt_label: string, opt
   if (opt_noninteraction !== undefined) {
     param.push(opt_noninteraction)
   }
-  log('ga', param.slice(1).join(','))
+  log('ga', param)
+  // window.dataLayer.push(param)
   window._gaq.push(param)
 }

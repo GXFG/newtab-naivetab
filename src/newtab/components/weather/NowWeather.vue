@@ -1,60 +1,55 @@
 <template>
   <div id="now">
     <div class="now__icon">
-      <div v-if="localState.setting.weather.iconEnabled" class="icon__wrap" @click="onOpenWeather()">
-        <i :class="`qi-${weatherState.now.icon}`" />
+      <div v-if="localConfig.weather.iconEnabled" class="icon__wrap" @click="onOpenWeather()">
+        <NPopover :show="state.isIndicesVisible" trigger="manual">
+          <template #trigger>
+            <div
+              class="label__info"
+              :class="{ 'label__info--move': isDragMode }"
+              @mouseenter="handleIndicesMouseEnter()"
+              @mouseleave="handleIndicesMouseLeave()"
+            >
+              <i :class="`qi-${weatherState.now.icon}`" />
+            </div>
+          </template>
+          <p class="weather__indices">
+            {{ weatherIndicesInfo }}
+          </p>
+        </NPopover>
       </div>
     </div>
     <div class="now__info">
       <!-- row 1 -->
       <div class="info__row">
         <div class="info__item">
-          <div class="info__item">
-            <div class="item__label">
-              <div v-if="isWeatherWarning">
-                <NPopover :style="{ width: '500px' }" :show="warningVisible" trigger="manual">
-                  <template #trigger>
-                    <div
-                      class="label__info"
-                      :class="{ 'label__info--move': isDragMode }"
-                      @mouseenter="handleWarningMouseEnter()"
-                      @mouseleave="handleWarningMouseLeave()"
-                    >
-                      <vaadin:warning />
-                    </div>
-                  </template>
-                  <div class="weather__indices_wrap">
-                    <p class="weather__indices">
-                      {{ weatherWarningInfo }}
-                    </p>
-                    <div v-if="weatherState.state.isWarningVisible" class="icon__wrap" @click="onCloseWarning()">
-                      <ri:close-circle-line />
-                    </div>
+          <div class="item__label">
+            <div v-if="isWeatherWarning">
+              <NPopover :style="{ width: '500px' }" :show="warningVisible" trigger="manual">
+                <template #trigger>
+                  <div
+                    class="label__info"
+                    :class="{ 'label__info--move': isDragMode }"
+                    @mouseenter="handleWarningMouseEnter()"
+                    @mouseleave="handleWarningMouseLeave()"
+                  >
+                    <vaadin:warning />
                   </div>
-                </NPopover>
-              </div>
+                </template>
+                <div class="weather__indices_wrap">
+                  <p class="weather__indices">
+                    {{ weatherWarningInfo }}
+                  </p>
+                  <div v-if="weatherState.state.isWarningVisible" class="icon__wrap" @click="onCloseWarning()">
+                    <ri:close-circle-line />
+                  </div>
+                </div>
+              </NPopover>
             </div>
           </div>
         </div>
         <div class="info__item">
           <div class="item__label">
-            <NPopover :show="state.isIndicesVisible" trigger="manual">
-              <template #trigger>
-                <div
-                  class="label__info"
-                  :class="{ 'label__info--move': isDragMode }"
-                  @mouseenter="handleIndicesMouseEnter()"
-                  @mouseleave="handleIndicesMouseLeave()"
-                >
-                  <heroicons-outline:information-circle />
-                </div>
-              </template>
-              <p class="weather__indices">
-                {{ weatherIndicesInfo }}
-              </p>
-            </NPopover>
-          </div>
-          <div class="item__value">
             <span class="value__text value__text--l">{{ weatherState.now.text }}</span>
           </div>
         </div>
@@ -129,7 +124,7 @@ import {
   weatherState,
   weatherIndicesInfo,
   weatherWarningInfo,
-  localState,
+  localConfig,
   getStyleField,
   createTab,
 } from '@/logic'
@@ -182,8 +177,8 @@ const onOpenWeather = () => {
   createTab(URL_QWEATHER_HOME)
 }
 
-const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[localState.setting.weather.temperatureUnit])
-const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[localState.setting.weather.speedUnit])
+const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[localConfig.weather.temperatureUnit])
+const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[localConfig.weather.speedUnit])
 
 const customIconSize = getStyleField(CNAME, 'iconSize', 'px')
 const customLabelSize = getStyleField(CNAME, 'fontSize', 'px', 1.4)

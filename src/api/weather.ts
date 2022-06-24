@@ -1,13 +1,13 @@
 import http from '@/lib/http'
-import { WEATHER_LANG_MAP, localState } from '@/logic'
+import { WEATHER_LANG_MAP, localConfig } from '@/logic'
 
 // https://dev.qweather.com/docs/api/geo/city-lookup/
 export const getCityLookup = (location: string) => {
   return http({
     url: 'https://geoapi.qweather.com/v2/city/lookup',
     params: {
-      lang: WEATHER_LANG_MAP[localState.setting.general.lang],
-      key: localState.setting.weather.apiKey,
+      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      key: localConfig.weather.apiKey,
       location,
     },
   })
@@ -16,11 +16,11 @@ export const getCityLookup = (location: string) => {
 // https://dev.qweather.com/docs/api/weather/weather-daily-forecast/
 export const getWeatherForecast = () => {
   return http({
-    url: 'https://devapi.qweather.com/v7/weather/7d',
+    url: 'https://devapi.qweather.com/v7/weather/3d',
     params: {
-      lang: WEATHER_LANG_MAP[localState.setting.general.lang],
-      key: localState.setting.weather.apiKey,
-      location: localState.setting.weather.city.id,
+      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      key: localConfig.weather.apiKey,
+      location: localConfig.weather.city.id,
     },
   })
 }
@@ -30,9 +30,9 @@ export const getWeatherNow = () => {
   return http({
     url: 'https://devapi.qweather.com/v7/weather/now',
     params: {
-      lang: WEATHER_LANG_MAP[localState.setting.general.lang],
-      key: localState.setting.weather.apiKey,
-      location: localState.setting.weather.city.id,
+      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      key: localConfig.weather.apiKey,
+      location: localConfig.weather.city.id,
     },
   })
 }
@@ -42,9 +42,9 @@ export const getWeatherIndices = () => {
   return http({
     url: 'https://devapi.qweather.com/v7/indices/1d',
     params: {
-      lang: WEATHER_LANG_MAP[localState.setting.general.lang],
-      key: localState.setting.weather.apiKey,
-      location: localState.setting.weather.city.id,
+      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      key: localConfig.weather.apiKey,
+      location: localConfig.weather.city.id,
       type: '1,3,7,8,10',
     },
   })
@@ -55,9 +55,9 @@ export const getWeatherAirNow = () => {
   return http({
     url: 'https://devapi.qweather.com/v7/air/now',
     params: {
-      lang: WEATHER_LANG_MAP[localState.setting.general.lang],
-      key: localState.setting.weather.apiKey,
-      location: localState.setting.weather.city.id,
+      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      key: localConfig.weather.apiKey,
+      location: localConfig.weather.city.id,
     },
   })
 }
@@ -67,9 +67,9 @@ export const getWeatherWarning = () => {
   return http({
     url: 'https://devapi.qweather.com/v7/warning/now',
     params: {
-      lang: WEATHER_LANG_MAP[localState.setting.general.lang],
-      key: localState.setting.weather.apiKey,
-      location: localState.setting.weather.city.id,
+      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      key: localConfig.weather.apiKey,
+      location: localConfig.weather.city.id,
     },
   })
 }

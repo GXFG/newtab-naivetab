@@ -1,5 +1,6 @@
 interface Window {
   _gaq: any
+  dataLayer: any
   $t: any // vue-i18n
   $message: any
   $notification: any
@@ -8,10 +9,9 @@ interface Window {
 
 type OptionsPermission = 'bookmarks'
 
-type ConfigField = 'style' | 'setting'
-
 type TargetType = 1 | 2 // 1:component 2:element
 type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo'
+type ConfigField = Components | 'general'
 
 interface SelectStringItem {
   label: string

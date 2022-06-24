@@ -6,16 +6,16 @@
 </template>
 
 <script setup lang="ts">
-import { localState, currBackgroundImageUrl, isImageLoading } from '@/logic'
+import { localConfig, currBackgroundImageUrl, isImageLoading } from '@/logic'
 
 const bgStyle = computed(() => {
-  if (localState.setting.general.isBackgroundImageEnabled) {
+  if (localConfig.general.isBackgroundImageEnabled) {
     return `background-image: url(${currBackgroundImageUrl.value});`
   }
   return ''
 })
 
-const customOpacity = computed(() => isImageLoading.value ? 0 : localState.style.general.bgOpacity)
+const customOpacity = computed(() => isImageLoading.value ? 0 : localConfig.general.bgOpacity)
 </script>
 
 <style>
@@ -29,7 +29,7 @@ const customOpacity = computed(() => isImageLoading.value ? 0 : localState.style
     height: 100vh;
     background-size: cover;
     background-repeat: no-repeat;
-    filter: blur(v-bind(localState.style.general.bgBlur + 'px'));
+    filter: blur(v-bind(localConfig.general.bgBlur + 'px'));
     opacity: v-bind(customOpacity);
     transition: all 250ms ease;
     will-change: background-image;

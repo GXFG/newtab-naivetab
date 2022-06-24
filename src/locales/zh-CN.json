@@ -47,7 +47,7 @@
     "network": "网络",
     "4k": "4k资源",
     "bing": "Bing",
-    "favorite": "个人收藏",
+    "favorite": "收藏",
     "margin": "边距",
     "width": "宽度",
     "height": "高度",
@@ -72,6 +72,7 @@
     "other": "其他"
   },
   "prompts": {
+    "pleaseWait": "执行中，请稍等",
     "imageTooLarge": "图片体积过大",
     "favoriteLimt": "已达到收藏最大数"
   },

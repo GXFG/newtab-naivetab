@@ -1,8 +1,8 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getWeatherNow, getWeatherForecast, getWeatherIndices, getWeatherAirNow, getWeatherWarning } from '@/api'
-import { localState, log } from '@/logic'
+import { localConfig, log } from '@/logic'
 
-export const weatherState = useStorageLocal('data-weather', {
+const defaultWeatherState = {
   state: {
     isWarningVisible: false,
   },
@@ -50,15 +50,17 @@ export const weatherState = useStorageLocal('data-weather', {
     syncTime: 0,
     list: [] as ForecastItem[],
   },
-})
+}
+
+export const weatherState = useStorageLocal('data-weather', defaultWeatherState)
 
 export const weatherIndicesInfo = computed(() => {
-  const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}: [${item.category}] ${item.text}`)
+  const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}:【${item.category}】 ${item.text}`.replace(/\n/, ''))
   return indicesList.join('\n')
 })
 
 export const weatherWarningInfo = computed(() => {
-  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `${item.text}`)
+  const warningList = weatherState.value.warning.list.map((item: WarningItem) => `☞ ${item.text}`.replace(/\n/, ''))
   return warningList.join('\n')
 })
 
@@ -114,7 +116,7 @@ const getWarningData = async() => {
 }
 
 export const updateWeather = () => {
-  if (!localState.setting.weather.enabled) {
+  if (!localConfig.weather.enabled) {
     return
   }
   const currTS = dayjs().valueOf()
@@ -149,6 +151,6 @@ export const refreshWeather = () => {
 }
 
 // 修改城市、切换语言 立即更新数据
-watch([() => localState.setting.weather.city.id, () => localState.setting.general.lang], () => {
+watch([() => localConfig.weather.city.id, () => localConfig.general.lang], () => {
   refreshWeather()
 })

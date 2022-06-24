@@ -27,12 +27,9 @@
 
 <script setup lang="ts">
 import Currentlog from '../../../CHANGELOG.md'
-import { globalState, closeWhatsNewModal, refreshSetting } from '@/logic'
+import { globalState, closeWhatsNewModal } from '@/logic'
 
 const onClose = async() => {
-  if (globalState.isWhatsNewModalCloseToRefresh) {
-    await refreshSetting()
-  }
   closeWhatsNewModal()
 }
 </script>

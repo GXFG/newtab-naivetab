@@ -4,7 +4,7 @@
       <div
         class="calendar__container"
         :style="dragStyle || containerStyle"
-        :class="{ 'calendar__container-shadow': localState.style.calendar.isShadowEnabled, 'calendar__container-border': localState.style.calendar.isBorderEnabled }"
+        :class="{ 'calendar__container-shadow': localConfig.calendar.isShadowEnabled, 'calendar__container-border': localConfig.calendar.isBorderEnabled }"
       >
         <div class="calendar__options">
           <div class="options__item">
@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, localState, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
+import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 import { calendar } from '@/lib/calendar'
 
 const CNAME = 'calendar'

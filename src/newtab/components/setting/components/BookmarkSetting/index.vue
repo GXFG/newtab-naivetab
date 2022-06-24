@@ -9,12 +9,12 @@
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
             <div class="setting__input-wrap">
               <div class="setting__input_item">
-                <NSwitch v-model:value="localState.setting.bookmark.isDblclickOpen" />
+                <NSwitch v-model:value="localConfig.bookmark.isDblclickOpen" />
                 <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
               </div>
-              <div v-if="localState.setting.bookmark.isDblclickOpen" class="setting__input_item">
+              <div v-if="localConfig.bookmark.isDblclickOpen" class="setting__input_item">
                 <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
-                <NInputNumber v-model:value="localState.setting.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
+                <NInputNumber v-model:value="localConfig.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
                   <template #suffix>
                     ms
                   </template>
@@ -24,16 +24,16 @@
             </div>
           </NFormItem>
           <NFormItem :label="$t('bookmark.newTabOpen')">
-            <NSwitch v-model:value="localState.setting.bookmark.isNewTabOpen" />
+            <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
           </NFormItem>
           <NFormItem :label="$t('bookmark.showNumberKey')">
-            <NSwitch v-model:value="localState.setting.bookmark.isNumberEnabled" />
+            <NSwitch v-model:value="localConfig.bookmark.isNumberEnabled" />
           </NFormItem>
           <NFormItem :label="$t('bookmark.showSymbolKey')">
-            <NSwitch v-model:value="localState.setting.bookmark.isSymbolEnabled" />
+            <NSwitch v-model:value="localConfig.bookmark.isSymbolEnabled" />
           </NFormItem>
           <NFormItem :label="$t('bookmark.showName')">
-            <NSwitch v-model:value="localState.setting.bookmark.isNameVisible" />
+            <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
           </NFormItem>
 
           <div class="modal__bookmark">
@@ -70,10 +70,10 @@
                     @dragover="handleDragOver($event)"
                     @dragend="handleDragEnd()"
                   >
-                    <template v-if="localState.setting.bookmark.keymap[key]">
+                    <template v-if="localConfig.bookmark.keymap[key]">
                       <NInput
                         key="url"
-                        v-model:value="localState.setting.bookmark.keymap[key].url"
+                        v-model:value="localConfig.bookmark.keymap[key].url"
                         class="input__main"
                         type="text"
                         clearable
@@ -81,11 +81,11 @@
                       />
                       <NInput
                         key="name"
-                        v-model:value="localState.setting.bookmark.keymap[key].name"
+                        v-model:value="localConfig.bookmark.keymap[key].name"
                         class="input__main"
                         type="text"
                         clearable
-                        :placeholder="getDefaultBookmarkName(localState.setting.bookmark.keymap[key].url)"
+                        :placeholder="getDefaultBookmarkName(localConfig.bookmark.keymap[key].url)"
                       />
                       <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
                         <cil:resize-height />
@@ -118,7 +118,7 @@
 
 <script setup lang="ts">
 import BookmarkPicker from './BookmarkPicker.vue'
-import { localState, keyboardSettingRowList, getDefaultBookmarkName, requestPermission } from '@/logic'
+import { localConfig, keyboardSettingRowList, getDefaultBookmarkName, requestPermission } from '@/logic'
 
 const state = reactive({
   isBookmarkModalVisible: false,
@@ -132,14 +132,14 @@ const toggleIsBookmarkPickerVisible = () => {
 }
 
 const onCreateKey = (key: string) => {
-  localState.setting.bookmark.keymap[key] = {
+  localConfig.bookmark.keymap[key] = {
     url: '',
     name: '',
   }
 }
 
 const onDeleteKey = (key: string) => {
-  delete localState.setting.bookmark.keymap[key]
+  delete localConfig.bookmark.keymap[key]
 }
 
 const onBookmarkStartDrag = () => {
@@ -159,9 +159,9 @@ const handleDragEnter = (e: any, targetKey: string) => {
   if (state.currDragKey === targetKey) {
     return
   }
-  const targetData = localState.setting.bookmark.keymap[targetKey]
-  localState.setting.bookmark.keymap[targetKey] = localState.setting.bookmark.keymap[state.currDragKey]
-  localState.setting.bookmark.keymap[state.currDragKey] = targetData
+  const targetData = localConfig.bookmark.keymap[targetKey]
+  localConfig.bookmark.keymap[targetKey] = localConfig.bookmark.keymap[state.currDragKey]
+  localConfig.bookmark.keymap[state.currDragKey] = targetData
   state.currDragKey = targetKey
 }
 
@@ -183,7 +183,7 @@ const onImportBookmark = async(key: string) => {
 }
 
 const onSelectBookmark = (payload: ChromeBookmarkItem) => {
-  localState.setting.bookmark.keymap[state.currImporKey] = {
+  localConfig.bookmark.keymap[state.currImporKey] = {
     url: payload.url,
     name: payload.title,
   }

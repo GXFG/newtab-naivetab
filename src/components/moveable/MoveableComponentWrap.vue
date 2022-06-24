@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { DRAG_TRIGGER_DISTANCE, getStyleConst, localState, moveState, isDragMode } from '@/logic'
+import { DRAG_TRIGGER_DISTANCE, getStyleConst, localConfig, moveState, isDragMode } from '@/logic'
 
 const props = defineProps({
   componentName: {
@@ -66,8 +66,8 @@ const startDrag = async(e: MouseEvent, resite = false) => {
     // 默认光标位置为component的中心
     const _top = e.clientY - height / 2
     const _left = e.clientX - width / 2
-    localState.style[props.componentName as Components].layout.xOffsetValue = getPercentageInWidth(_left)
-    localState.style[props.componentName as Components].layout.yOffsetValue = getPercentageInHeight(_top)
+    localConfig[props.componentName as Components].layout.xOffsetValue = getPercentageInWidth(_left)
+    localConfig[props.componentName as Components].layout.yOffsetValue = getPercentageInHeight(_top)
     state.startState.top = _top
     state.startState.left = _left
   }
@@ -85,22 +85,22 @@ const stopDrag = () => {
   moveState.isLeftVisible = false
   moveState.isRightVisible = false
   if (offsetData.xOffsetKey.length !== 0) {
-    localState.style[props.componentName as Components].layout.xOffsetKey = offsetData.xOffsetKey
+    localConfig[props.componentName as Components].layout.xOffsetKey = offsetData.xOffsetKey
   }
   if (offsetData.xOffsetValue !== -1) {
-    localState.style[props.componentName as Components].layout.xOffsetValue = offsetData.xOffsetValue
+    localConfig[props.componentName as Components].layout.xOffsetValue = offsetData.xOffsetValue
   }
   if (offsetData.xTranslateValue !== -1) {
-    localState.style[props.componentName as Components].layout.xTranslateValue = offsetData.xTranslateValue
+    localConfig[props.componentName as Components].layout.xTranslateValue = offsetData.xTranslateValue
   }
   if (offsetData.yOffsetKey.length !== 0) {
-    localState.style[props.componentName as Components].layout.yOffsetKey = offsetData.yOffsetKey
+    localConfig[props.componentName as Components].layout.yOffsetKey = offsetData.yOffsetKey
   }
   if (offsetData.yOffsetValue !== -1) {
-    localState.style[props.componentName as Components].layout.yOffsetValue = offsetData.yOffsetValue
+    localConfig[props.componentName as Components].layout.yOffsetValue = offsetData.yOffsetValue
   }
   if (offsetData.yTranslateValue !== -1) {
-    localState.style[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
+    localConfig[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
   }
 }
 
@@ -196,7 +196,7 @@ onMounted(() => {
   initMouseTask()
 })
 
-const isEnabled = computed(() => localState.setting[props.componentName].enabled || moveState.dragTempEnabledMap[props.componentName])
+const isEnabled = computed(() => localConfig[props.componentName].enabled || moveState.dragTempEnabledMap[props.componentName])
 const isCurrent = computed(() => props.componentName === moveState.currDragTarget.name)
 
 const initTargetEle = async() => {

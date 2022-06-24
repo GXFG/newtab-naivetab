@@ -1,9 +1,19 @@
 import { useDebounceFn } from '@vueuse/core'
+import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
-import { MERGE_CONFIG_DELAY } from './const'
-import { defaultState, localState, globalState } from './store'
+import { MERGE_CONFIG_DELAY, OLD_CONFIG_FIELD_LIST } from './const'
+import { defaultConfig, localConfig, localState, globalState, getLocalVersion, switchSettingDrawerVisible } from './store'
 
-export const isUploadConfigLoading = computed(() => globalState.isUploadConfigLoadingMap.style || globalState.isUploadConfigLoadingMap.setting)
+export const isUploadConfigLoading = computed(() => {
+  let isLoading = false
+  for (const key of Object.keys(globalState.isUploadConfigLoadingMap)) {
+    if (globalState.isUploadConfigLoadingMap[key]) {
+      isLoading = true
+      break
+    }
+  }
+  return isLoading
+})
 
 /**
  * https://developer.chrome.com/docs/extensions/reference/storage/
@@ -12,12 +22,12 @@ export const isUploadConfigLoading = computed(() => globalState.isUploadConfigLo
 const uploadConfigFn = (field: ConfigField) => {
   globalState.isUploadConfigLoadingMap[field] = true
   log(`Upload config-${field}`)
-  localState.common.syncTimeMap[field] = Date.now()
-  const syncTime = localState.common.syncTimeMap[field]
+  const currTime = Date.now()
+  localState.value.syncTimeMap[field] = currTime
   const payload = {
     [`naive-tab-${field}`]: JSON.stringify({
-      syncTime,
-      data: localState[field],
+      syncTime: currTime,
+      data: localConfig[field],
     }),
   }
   chrome.storage.sync.set(payload, async() => {
@@ -26,29 +36,34 @@ const uploadConfigFn = (field: ConfigField) => {
       log(`Upload config-${field} error`, error)
       window.$message.error(`${window.$t('common.upload')}${window.$t('common.setting')}${window.$t('common.fail')}`)
     } else {
-      log(`Upload config-${field} complete`, syncTime)
+      log(`Upload config-${field} complete`, currTime)
     }
     setTimeout(() => {
-      // 确保isUploadConfigLoading的值不会抖动，消除style 与 setting排队同步时中间出现的短暂二者值均为false的间隙
+      // 确保isUploadConfigLoading的值不会抖动，消除多个配置排队同步时中间出现的短暂值均为false的间隙
       globalState.isUploadConfigLoadingMap[field] = false
     }, 100)
   })
 }
 
-const uploadConfigStyle = useDebounceFn(() => { uploadConfigFn('style') }, MERGE_CONFIG_DELAY)
-const uploadConfigSetting = useDebounceFn(() => { uploadConfigFn('setting') }, MERGE_CONFIG_DELAY)
+const uploadConfigGeneral = useDebounceFn(() => { uploadConfigFn('general') }, MERGE_CONFIG_DELAY)
+const uploadConfigBookmark = useDebounceFn(() => { uploadConfigFn('bookmark') }, MERGE_CONFIG_DELAY)
+const uploadConfigClockDigital = useDebounceFn(() => { uploadConfigFn('clockDigital') }, MERGE_CONFIG_DELAY)
+const uploadConfigClockAnalog = useDebounceFn(() => { uploadConfigFn('clockAnalog') }, MERGE_CONFIG_DELAY)
+const uploadConfigDate = useDebounceFn(() => { uploadConfigFn('date') }, MERGE_CONFIG_DELAY)
+const uploadConfigCalendar = useDebounceFn(() => { uploadConfigFn('calendar') }, MERGE_CONFIG_DELAY)
+const uploadConfigSearch = useDebounceFn(() => { uploadConfigFn('search') }, MERGE_CONFIG_DELAY)
+const uploadConfigWeather = useDebounceFn(() => { uploadConfigFn('weather') }, MERGE_CONFIG_DELAY)
+const uploadConfigMemo = useDebounceFn(() => { uploadConfigFn('memo') }, MERGE_CONFIG_DELAY)
 
-watch(() => localState.style, () => {
-  uploadConfigStyle()
-}, {
-  deep: true,
-})
-
-watch(() => localState.setting, () => {
-  uploadConfigSetting()
-}, {
-  deep: true,
-})
+watch(() => localConfig.general, () => { uploadConfigGeneral() }, { deep: true })
+watch(() => localConfig.bookmark, () => { uploadConfigBookmark() }, { deep: true })
+watch(() => localConfig.clockDigital, () => { uploadConfigClockDigital() }, { deep: true })
+watch(() => localConfig.clockAnalog, () => { uploadConfigClockAnalog() }, { deep: true })
+watch(() => localConfig.date, () => { uploadConfigDate() }, { deep: true })
+watch(() => localConfig.calendar, () => { uploadConfigCalendar() }, { deep: true })
+watch(() => localConfig.search, () => { uploadConfigSearch() }, { deep: true })
+watch(() => localConfig.weather, () => { uploadConfigWeather() }, { deep: true })
+watch(() => localConfig.memo, () => { uploadConfigMemo() }, { deep: true })
 
 /**
  * 以state为模板与acceptState进行递归去重合并
@@ -84,23 +99,43 @@ const mergeState = (state: any, acceptState: any) => {
 }
 
 /**
- * 处理新增配置，删除无用旧配置
- * 默认刷新配置结构
- * 以defaultState为模板与acceptState进行去重合并
+ * 处理新增配置，删除无用旧配置。默认acceptState不传递时为刷新配置结构
+ * 以defaultConfig为模板与acceptState进行去重合并
  */
-export const updateSetting = (acceptState = localState) => {
+export const updateSetting = (acceptRawState = localConfig) => {
+  let acceptState = acceptRawState
   return new Promise((resolve) => {
     try {
-      for (const rootField of Object.keys(defaultState)) {
-        if (!Object.prototype.hasOwnProperty.call(acceptState, rootField)) {
+      const version = getLocalVersion()
+      const versionPureNum = +version.split('.').join('')
+      // handle old version 继承小于0.9版本的旧配置结构
+      if (versionPureNum < 90) {
+        log('Version<0.9')
+        const oldConfig = {} as any
+        for (const oldConfigField of OLD_CONFIG_FIELD_LIST) {
+          oldConfig[oldConfigField] = {
+            ...JSON.parse(localStorage.getItem(`style-${oldConfigField}`) || ''),
+            ...JSON.parse(localStorage.getItem(`setting-${oldConfigField}`) || ''),
+          }
+          // 更新版本号
+          oldConfig.general.version = pkg.version
+          // 删除小于0.9版本的旧数据
+          localStorage.removeItem(`style-${oldConfigField}`)
+          localStorage.removeItem(`setting-${oldConfigField}`)
+        }
+        acceptState = oldConfig
+      }
+      for (const configField of Object.keys(defaultConfig)) {
+        if (!Object.prototype.hasOwnProperty.call(acceptState, configField)) {
           continue
         }
-        // 只遍历acceptState内存在的rootField
-        for (const subField of Object.keys(acceptState[rootField])) {
-          localState[rootField][subField] = mergeState(defaultState[rootField][subField], acceptState[rootField][subField])
-          // console.log(localState[rootField][subField], defaultState[rootField][subField], acceptState[rootField][subField])
+        // 只遍历acceptState内存在的configField
+        for (const subField of Object.keys(acceptState[configField])) {
+          localConfig[configField][subField] = mergeState(defaultConfig[configField][subField], acceptState[configField][subField])
+          // console.log(localConfig[configField][subField], defaultConfig[configField][subField], acceptState[configField][subField])
         }
       }
+      log('LocalConfig', localConfig)
       resolve(true)
     } catch (e) {
       log('updateSetting error', e)
@@ -109,6 +144,8 @@ export const updateSetting = (acceptState = localState) => {
 }
 
 /**
+ * 下载配置信息
+ * chrome.storage 格式示例：
  * {
  *   `naive-tab-${field}`: '{
  *      syncTime: number
@@ -117,6 +154,7 @@ export const updateSetting = (acceptState = localState) => {
  * }
  */
 export const downloadConfig = () => {
+  console.time('downloadConfig')
   chrome.storage.sync.get(null, (data) => {
     const error = chrome.runtime.lastError
     if (error) {
@@ -124,26 +162,29 @@ export const downloadConfig = () => {
       return
     }
     const pendingConfig = {} as any
-    const configFieldList = ['style', 'setting'] as ConfigField[]
-    for (const field of configFieldList) {
+    for (const field of Object.keys(defaultConfig) as ConfigField[]) {
       if (!Object.prototype.hasOwnProperty.call(data, `naive-tab-${field}`)) {
         log(`Config-${field} initialize`)
         uploadConfigFn(field)
       } else {
-        const targetConfig = JSON.parse(data[`naive-tab-${field}`])
-        if (targetConfig.syncTime === localState.common.syncTimeMap[field]) {
+        const target = JSON.parse(data[`naive-tab-${field}`])
+        const targetConfig = target.data
+        const targetSyncTime = target.syncTime
+        const localSyncTime = localState.value.syncTimeMap[field]
+        if (targetSyncTime === localSyncTime) {
           log(`Config-${field} not update`)
           continue
         }
-        if (targetConfig.syncTime < localState.common.syncTimeMap[field]) {
+        if (targetSyncTime < localSyncTime) {
           log(`Config-${field} is overdue, reupload`)
           uploadConfigFn(field)
           continue
         }
-        localState.common.syncTimeMap[field] = targetConfig.syncTime
-        pendingConfig[field] = targetConfig.data
+        pendingConfig[field] = targetConfig
+        localState.value.syncTimeMap[field] = targetSyncTime
       }
     }
+    console.timeEnd('downloadConfig')
     if (Object.keys(pendingConfig).length === 0) {
       return
     }
@@ -153,13 +194,17 @@ export const downloadConfig = () => {
 }
 
 const clearStorage = (clearAll = false) => {
+  window.$notification.info({
+    title: window.$t('general.clearStorageLabel'),
+    content: window.$t('prompts.pleaseWait'),
+  })
   return new Promise((resolve) => {
     const cancelListenerSync = watch(isUploadConfigLoading, async(value) => {
       if (value) {
         log('Clear localStorage wait') // 等待config同步完成、localStorage写入完成后再进行后续操作
         return
       }
-      await sleep(1000) // 严格确保同步完成后再执行清除动作
+      await sleep(1000) // 严格确保配置上传完成后再执行清除动作
       log('Clear localStorage execute')
       cancelListenerSync()
       localStorage.clear()
@@ -167,6 +212,7 @@ const clearStorage = (clearAll = false) => {
         localStorage.setItem('data-first', 'false') // 避免打开help弹窗
       }
       resolve(true)
+      log('Reload page')
       location.reload()
     })
   })
@@ -197,17 +243,36 @@ export const importSetting = async(text: string) => {
     return
   }
   log('FileContent', fileContent)
-  await updateSetting(fileContent)
-  await clearStorage()
-  globalState.isImportSettingLoading = false
+  try {
+  // handle old version 转换<0.9版本的旧配置文件结构
+    if (Object.prototype.hasOwnProperty.call(fileContent, 'style')) {
+      log('Old version config')
+      const newConfig = {} as any
+      for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
+        newConfig[configField] = {
+          ...fileContent.style[configField] || {},
+          ...fileContent.setting[configField] || {},
+        }
+      }
+      // 更新版本号
+      newConfig.general.version = pkg.version
+      fileContent = newConfig
+      log('FileContentTransform', fileContent)
+    }
+    await updateSetting(fileContent)
+    window.$message.success(`${window.$t('common.import')}${window.$t('common.success')}`)
+    globalState.isImportSettingLoading = false
+    switchSettingDrawerVisible(false)
+  } catch (e) {
+    log('Import error', e)
+    window.$message.error(`${window.$t('common.import')}${window.$t('common.fail')} ${e}`)
+    globalState.isImportSettingLoading = false
+  }
 }
 
 export const exportSetting = () => {
-  const filename = `naivetab-${dayjs().format('YYYYMMDD-HHmmss')}.json`
-  downloadJsonByTagA({
-    style: localState.style,
-    setting: localState.setting,
-  }, filename)
+  const filename = `naivetab-v${pkg.version}-${dayjs().format('YYYYMMDD-HHmmss')}.json`
+  downloadJsonByTagA(localConfig, filename)
   window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
 }
 

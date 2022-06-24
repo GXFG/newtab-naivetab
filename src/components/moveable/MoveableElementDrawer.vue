@@ -55,7 +55,7 @@ import {
   getStyleConst,
   getStyleField,
   moveState,
-  localState,
+  localConfig,
 } from '@/logic'
 
 const state = reactive({
@@ -68,56 +68,56 @@ const elementList = computed(() => [
     componentName: 'bookmark',
     iconName: 'ic:outline-keyboard-alt',
     iconSize: 28,
-    disabled: localState.setting.bookmark.enabled,
+    disabled: localConfig.bookmark.enabled,
   },
   {
     label: window.$t('setting.clockDigital'),
     componentName: 'clockDigital',
     iconName: 'mdi:clock-digital',
     iconSize: 30,
-    disabled: localState.setting.clockDigital.enabled,
+    disabled: localConfig.clockDigital.enabled,
   },
   {
     label: window.$t('setting.clockAnalog'),
     componentName: 'clockAnalog',
     iconName: 'grommet-icons:clock',
     iconSize: 26,
-    disabled: localState.setting.clockAnalog.enabled,
+    disabled: localConfig.clockAnalog.enabled,
   },
   {
     label: window.$t('setting.date'),
     componentName: 'date',
     iconName: 'system-uicons:calendar-date',
     iconSize: 26,
-    disabled: localState.setting.date.enabled,
+    disabled: localConfig.date.enabled,
   },
   {
     label: window.$t('setting.calendar'),
     componentName: 'calendar',
     iconName: 'uiw:date',
     iconSize: 22,
-    disabled: localState.setting.calendar.enabled,
+    disabled: localConfig.calendar.enabled,
   },
   {
     label: window.$t('setting.weather'),
     componentName: 'weather',
     iconName: 'mdi:weather-cloudy',
     iconSize: 28,
-    disabled: localState.setting.weather.enabled,
+    disabled: localConfig.weather.enabled,
   },
   {
     label: window.$t('setting.search'),
     componentName: 'search',
     iconName: 'teenyicons:search-circle-outline',
     iconSize: 24,
-    disabled: localState.setting.search.enabled,
+    disabled: localConfig.search.enabled,
   },
   {
     label: window.$t('setting.memo'),
     componentName: 'memo',
     iconName: 'fluent:notepad-edit-16-regular',
     iconSize: 24,
-    disabled: localState.setting.memo.enabled,
+    disabled: localConfig.memo.enabled,
   },
 ])
 
@@ -150,7 +150,7 @@ const handleElementMouseUp = (e: MouseEvent) => {
   moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
   if (!state.isCursorInElementDrawer) {
     // 保存启用状态
-    localState.setting[moveState.currDragTarget.name].enabled = true
+    localConfig[moveState.currDragTarget.name].enabled = true
   }
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
   isStartDragTaskRan = false
@@ -170,7 +170,7 @@ onMounted(() => {
 const isDeleteBtnVisible = computed(() => isDragMode.value && moveState.isComponentDraging)
 
 const onDeleteComponent = () => {
-  localState.setting[moveState.currDragTarget.name].enabled = false
+  localConfig[moveState.currDragTarget.name].enabled = false
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
 }
 

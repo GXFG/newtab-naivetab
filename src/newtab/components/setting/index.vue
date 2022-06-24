@@ -2,12 +2,12 @@
   <div id="setting">
     <!-- Drawer -->
     <NDrawer
-      v-model:show="isSettingDrawerVisible"
+      v-model:show="globalState.isSettingDrawerVisible"
       class="drawer-wrap"
       :style="drawerStyle"
       display-directive="if"
       :width="600"
-      :placement="localState.setting.general.drawerPlacement"
+      :placement="localConfig.general.drawerPlacement"
     >
       <NDrawerContent>
         <NTabs type="line" :value="globalState.currSettingTabValue" @update:value="onTabsChange">
@@ -46,7 +46,7 @@ import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
-import { URL_GITHUB, getStyleConst, localState, globalState, isSettingDrawerVisible, createTab } from '@/logic'
+import { URL_GITHUB, getStyleConst, localConfig, globalState, createTab } from '@/logic'
 
 const tabPaneList = computed(() => [
   {

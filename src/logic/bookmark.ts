@@ -1,16 +1,16 @@
 import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localState, sleep, log, getDefaultBookmarkName } from '@/logic'
+import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, sleep, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
 const keyboardSplitList = computed(() => {
   let splitList: any = [[13, 23], [25, 34], [36, 43]]
-  if (localState.setting.bookmark.isSymbolEnabled && localState.setting.bookmark.isNumberEnabled) {
+  if (localConfig.bookmark.isSymbolEnabled && localConfig.bookmark.isNumberEnabled) {
     splitList = [[0, 13], [13, 25], [25, 36], [36]]
-  } else if (localState.setting.bookmark.isSymbolEnabled) {
+  } else if (localConfig.bookmark.isSymbolEnabled) {
     splitList = [[13, 25], [25, 36], [36]]
-  } else if (localState.setting.bookmark.isNumberEnabled) {
+  } else if (localConfig.bookmark.isNumberEnabled) {
     splitList = [[[0, 10], [12, 13]], [13, 23], [25, 34], [36, 43]]
   }
   return splitList
@@ -59,6 +59,26 @@ export const initBookmarkListData = () => {
   isInitialized.value = true
 }
 
+export const getDefaultBookmarkName = (url: string) => {
+  if (!url) {
+    return ''
+  }
+  const padUrl = url.includes('//') ? url : `https://${url}`
+  const domain = padUrl.split('/')[2]
+  if (!domain) {
+    return ''
+  }
+  let name = ''
+  if (domain.includes(':')) {
+    // 端口地址
+    name = `:${domain.split(':')[1]}`
+  } else {
+    const tempSplitList = domain.split('.')
+    name = tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0] // 设置默认name
+  }
+  return name
+}
+
 const mergeBookmarkSetting = useDebounceFn(async() => {
   log('Bookmark merge setting')
   if (!isInitialized) {
@@ -66,7 +86,7 @@ const mergeBookmarkSetting = useDebounceFn(async() => {
   }
   for (const key of KEYBOARD_KEY_LIST) {
     const index = KEYBOARD_KEY_LIST.indexOf(key)
-    const item = localState.setting.bookmark.keymap[key]
+    const item = localConfig.bookmark.keymap[key]
     if (!item) {
       // 初始化无设置数据的按键
       localBookmarkList.value[index] = {
@@ -85,7 +105,7 @@ const mergeBookmarkSetting = useDebounceFn(async() => {
 }, MERGE_BOOKMARK_DELAY)
 
 watch(
-  () => localState.setting.bookmark.keymap,
+  () => localConfig.bookmark.keymap,
   () => {
     mergeBookmarkSetting()
   },
