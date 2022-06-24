@@ -2,7 +2,7 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getWeatherNow, getWeatherForecast, getWeatherIndices, getWeatherAirNow, getWeatherWarning } from '@/api'
 import { localConfig, log } from '@/logic'
 
-export const weatherState = useStorageLocal('data-weather', {
+const defaultWeatherState = {
   state: {
     isWarningVisible: false,
   },
@@ -50,7 +50,9 @@ export const weatherState = useStorageLocal('data-weather', {
     syncTime: 0,
     list: [] as ForecastItem[],
   },
-})
+}
+
+export const weatherState = useStorageLocal('data-weather', defaultWeatherState)
 
 export const weatherIndicesInfo = computed(() => {
   const indicesList = weatherState.value.indices.list.map((item: IndicesItem) => `${item.name}:【${item.category}】 ${item.text}`.replace(/\n/, ''))

@@ -2,7 +2,7 @@ import { useDebounceFn } from '@vueuse/core'
 import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
 import { MERGE_CONFIG_DELAY, OLD_CONFIG_FIELD_LIST } from './const'
-import { defaultConfig, localConfig, localState, globalState, getLocalVersion } from './store'
+import { defaultConfig, localConfig, localState, globalState, getLocalVersion, switchSettingDrawerVisible } from './store'
 
 export const isUploadConfigLoading = computed(() => {
   let isLoading = false
@@ -262,6 +262,7 @@ export const importSetting = async(text: string) => {
     await updateSetting(fileContent)
     window.$message.success(`${window.$t('common.import')}${window.$t('common.success')}`)
     globalState.isImportSettingLoading = false
+    switchSettingDrawerVisible(false)
   } catch (e) {
     log('Import error', e)
     window.$message.error(`${window.$t('common.import')}${window.$t('common.fail')} ${e}`)

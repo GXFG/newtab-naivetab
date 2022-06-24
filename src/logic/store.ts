@@ -249,8 +249,8 @@ export const defaultConfig = {
 export const localConfig = reactive({
   general: useStorageLocal('c-general', defaultConfig.general),
   bookmark: useStorageLocal('c-bookmark', defaultConfig.bookmark),
-  clockDigital: useStorageLocal('c-clock-digital', defaultConfig.clockDigital),
-  clockAnalog: useStorageLocal('c-clock-analog', defaultConfig.clockAnalog),
+  clockDigital: useStorageLocal('c-clockDigital', defaultConfig.clockDigital),
+  clockAnalog: useStorageLocal('c-clockAnalog', defaultConfig.clockAnalog),
   date: useStorageLocal('c-date', defaultConfig.date),
   calendar: useStorageLocal('c-calendar', defaultConfig.calendar),
   search: useStorageLocal('c-search', defaultConfig.search),
