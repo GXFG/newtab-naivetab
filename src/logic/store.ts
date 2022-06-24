@@ -340,14 +340,25 @@ export const openHelpModal = () => {
   globalState.isHelpModalVisible = true
 }
 
+export const getLocalVersion = () => {
+  let version = localConfig.general.version
+  // handle old version 兼容小于0.9版本的旧数据结构
+  const settingGeneral = localStorage.getItem('setting-general')
+  if (settingGeneral) {
+    version = JSON.parse(settingGeneral).version || 0
+  }
+  return version
+}
+
 export const handleUpdate = () => {
-  log('Version', localConfig.general.version)
-  const localVersion = +localConfig.general.version.split('.').join('')
+  const version = getLocalVersion()
+  log('Version', version)
+  const localVersion = +version.split('.').join('')
   const currPkgVersion = +pkg.version.split('.').join('')
   if (localVersion >= currPkgVersion) {
     return
   }
-  log('get new version')
+  log('Get new version')
   localConfig.general.version = pkg.version
   openWhatsNewModal() // 展示更新内容
   updateSetting() // 刷新配置设置

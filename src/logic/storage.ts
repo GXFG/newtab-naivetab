@@ -1,8 +1,8 @@
 import { useDebounceFn } from '@vueuse/core'
 import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
-import { CONFIG_FIELD_LIST, MERGE_CONFIG_DELAY } from './const'
-import { defaultConfig, localConfig, localState, globalState } from './store'
+import { MERGE_CONFIG_DELAY, OLD_CONFIG_FIELD_LIST } from './const'
+import { defaultConfig, localConfig, localState, globalState, getLocalVersion } from './store'
 
 export const isUploadConfigLoading = computed(() => {
   let isLoading = false
@@ -106,16 +106,22 @@ export const updateSetting = (acceptRawState = localConfig) => {
   let acceptState = acceptRawState
   return new Promise((resolve) => {
     try {
-      const versionPureNum = +localConfig.general.version.split('.').join('')
+      const version = getLocalVersion()
+      const versionPureNum = +version.split('.').join('')
+      // handle old version 继承小于0.9版本的旧配置结构
       if (versionPureNum < 90) {
-        // 继承小于0.9版本的旧配置结构
         log('Version<0.9')
         const oldConfig = {} as any
-        for (const configField of CONFIG_FIELD_LIST) {
-          oldConfig[configField] = {
-            ...JSON.parse(localStorage.getItem(`style-${configField}`) || ''),
-            ...JSON.parse(localStorage.getItem(`setting-${configField}`) || ''),
+        for (const oldConfigField of OLD_CONFIG_FIELD_LIST) {
+          oldConfig[oldConfigField] = {
+            ...JSON.parse(localStorage.getItem(`style-${oldConfigField}`) || ''),
+            ...JSON.parse(localStorage.getItem(`setting-${oldConfigField}`) || ''),
           }
+          // 更新版本号
+          oldConfig.general.version = pkg.version
+          // 删除小于0.9版本的旧数据
+          localStorage.removeItem(`style-${oldConfigField}`)
+          localStorage.removeItem(`setting-${oldConfigField}`)
         }
         acceptState = oldConfig
       }
@@ -156,7 +162,7 @@ export const downloadConfig = () => {
       return
     }
     const pendingConfig = {} as any
-    for (const field of CONFIG_FIELD_LIST) {
+    for (const field of Object.keys(defaultConfig) as ConfigField[]) {
       if (!Object.prototype.hasOwnProperty.call(data, `naive-tab-${field}`)) {
         log(`Config-${field} initialize`)
         uploadConfigFn(field)
@@ -238,16 +244,18 @@ export const importSetting = async(text: string) => {
   }
   log('FileContent', fileContent)
   try {
-  // 转换小于0.9版本的旧配置结构
+  // handle old version 转换<0.9版本的旧配置文件结构
     if (Object.prototype.hasOwnProperty.call(fileContent, 'style')) {
-      log('Version < 0.9')
+      log('Old version config')
       const newConfig = {} as any
-      for (const configField of CONFIG_FIELD_LIST) {
+      for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
         newConfig[configField] = {
           ...fileContent.style[configField] || {},
           ...fileContent.setting[configField] || {},
         }
       }
+      // 更新版本号
+      newConfig.general.version = pkg.version
       fileContent = newConfig
       log('FileContentTransform', fileContent)
     }

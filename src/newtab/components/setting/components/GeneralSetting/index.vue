@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import ImagePicker from './ImagePicker.vue'
-import { CONFIG_FIELD_LIST, exportSetting, gaEvent, localConfig, localState, globalState, isUploadConfigLoading, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
+import { defaultConfig, exportSetting, gaEvent, localConfig, localState, globalState, isUploadConfigLoading, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -127,7 +127,7 @@ const toggleIsImageModalVisible = () => {
 
 const syncTime = computed(() => {
   const syncTimeList = [] as number[]
-  for (const field of CONFIG_FIELD_LIST) {
+  for (const field of Object.keys(defaultConfig) as ConfigField[]) {
     syncTimeList.push(localState.value.syncTimeMap[field])
   }
   const maxSyncTime = Math.max(...syncTimeList)
