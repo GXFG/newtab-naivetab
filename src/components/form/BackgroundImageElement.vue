@@ -21,7 +21,7 @@
         <mdi:eye-circle-outline />
       </div>
       <div class="toolbar__icon" @click="onSaveImage()">
-        <charm:download />
+        <ri:download-2-fill />
       </div>
       <div v-if="isFavoriteIconVisible" class="toolbar__icon" @click="onFavoriteImage()">
         <mi:favorite />
@@ -107,6 +107,7 @@ const onFavoriteImage = () => {
     name: props.data.name,
     desc: props.data.desc,
   })
+  window.$message.success(`${window.$t('common.favorite')}${window.$t('common.success')}`)
 }
 
 const onUnFavoriteImage = () => {
@@ -115,7 +116,6 @@ const onUnFavoriteImage = () => {
 }
 
 const customPrimaryColor = getStyleField('general', 'primaryColor')
-
 </script>
 
 <style scoped>
