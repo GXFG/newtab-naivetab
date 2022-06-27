@@ -31,8 +31,8 @@ const customOpacity = computed(() => isImageLoading.value ? 0 : localConfig.gene
     background-repeat: no-repeat;
     filter: blur(v-bind(localConfig.general.bgBlur + 'px'));
     opacity: v-bind(customOpacity);
-    transition: all 250ms ease;
-    will-change: background-image;
+    /* transition: all 250ms ease; */
+    /* will-change: background-image; */
   }
 }
 </style>

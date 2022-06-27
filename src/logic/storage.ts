@@ -1,7 +1,7 @@
 import { useDebounceFn } from '@vueuse/core'
 import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
-import { MERGE_CONFIG_DELAY, OLD_CONFIG_FIELD_LIST } from './const'
+import { MERGE_CONFIG_DELAY } from './const'
 import { defaultConfig, localConfig, localState, globalState, getLocalVersion, switchSettingDrawerVisible } from './store'
 
 export const isUploadConfigLoading = computed(() => {
@@ -66,7 +66,7 @@ watch(() => localConfig.weather, () => { uploadConfigWeather() }, { deep: true }
 watch(() => localConfig.memo, () => { uploadConfigMemo() }, { deep: true })
 
 /**
- * 以state为模板与acceptState进行递归去重合并
+ * 以 state 为模板与 acceptState 进行递归去重合并
  */
 const mergeState = (state: any, acceptState: any) => {
   if (acceptState === undefined || acceptState === null) {
@@ -79,11 +79,11 @@ const mergeState = (state: any, acceptState: any) => {
   if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
     return acceptState
   }
-  // 只处理Object类型，其余如Array等对象类型均直接返回acceptState，
+  // 只处理纯Object类型，其余如Array等对象类型均直接返回acceptState，
   if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
     return acceptState
   }
-  // 二者均为Object、且state为空Object时，返回acceptState，如setting中的keymap数据
+  // 二者均为Object、且state为空Object时，返回acceptState，对应案例如setting中的keymap数据
   if (Object.keys(state).length === 0) {
     return acceptState
   }
@@ -100,7 +100,7 @@ const mergeState = (state: any, acceptState: any) => {
 
 /**
  * 处理新增配置，删除无用旧配置。默认acceptState不传递时为刷新配置结构
- * 以defaultConfig为模板与acceptState进行去重合并
+ * 以 defaultConfig 为模板与 acceptState 进行去重合并
  */
 export const updateSetting = (acceptRawState = localConfig) => {
   let acceptState = acceptRawState
@@ -108,34 +108,42 @@ export const updateSetting = (acceptRawState = localConfig) => {
     try {
       const version = getLocalVersion()
       const versionPureNum = +version.split('.').join('')
-      // handle old version 继承小于0.9版本的旧配置结构
+      // handle old version 继承<0.9版本的旧配置结构
       if (versionPureNum < 90) {
-        log('Version<0.9')
-        const oldConfig = {} as any
-        for (const oldConfigField of OLD_CONFIG_FIELD_LIST) {
-          oldConfig[oldConfigField] = {
+        const processedOldConfig = {} as any
+        for (const configField of Object.keys(defaultConfig)) {
+          // 映射旧的配置key
+          let oldConfigField = configField
+          if (oldConfigField === 'clockDigital') {
+            oldConfigField = 'clock-digital'
+          } else if (oldConfigField === 'clockAnalog') {
+            oldConfigField = 'clock-analog'
+          }
+          processedOldConfig[configField] = {
             ...JSON.parse(localStorage.getItem(`style-${oldConfigField}`) || ''),
             ...JSON.parse(localStorage.getItem(`setting-${oldConfigField}`) || ''),
           }
-          // 更新版本号
-          oldConfig.general.version = pkg.version
-          // 删除小于0.9版本的旧数据
+          // 删除<0.9版本的旧数据
           localStorage.removeItem(`style-${oldConfigField}`)
           localStorage.removeItem(`setting-${oldConfigField}`)
         }
-        acceptState = oldConfig
+        // 更新版本号
+        processedOldConfig.general.version = pkg.version
+        acceptState = processedOldConfig
+        log('Version < 0.9', processedOldConfig)
       }
-      for (const configField of Object.keys(defaultConfig)) {
+      for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
         if (!Object.prototype.hasOwnProperty.call(acceptState, configField)) {
+          // console.log(`${!configField}`)
           continue
         }
         // 只遍历acceptState内存在的configField
         for (const subField of Object.keys(acceptState[configField])) {
           localConfig[configField][subField] = mergeState(defaultConfig[configField][subField], acceptState[configField][subField])
-          // console.log(localConfig[configField][subField], defaultConfig[configField][subField], acceptState[configField][subField])
+          // console.log(`${configField}-${subField}`, localConfig[configField][subField], defaultConfig[configField][subField], acceptState[configField][subField])
         }
       }
-      log('LocalConfig', localConfig)
+      log('UpdateSetting', localConfig)
       resolve(true)
     } catch (e) {
       log('updateSetting error', e)

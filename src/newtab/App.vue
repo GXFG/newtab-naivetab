@@ -26,6 +26,7 @@ import {
   getStyleField,
   localConfig,
   localState,
+  renderBackgroundImage,
   downloadConfig,
   initFirstOpen,
   handleUpdate,
@@ -35,9 +36,10 @@ import {
 } from '@/logic'
 
 onMounted(async() => {
-  downloadConfig()
+  renderBackgroundImage()
   startTimer()
   startKeyboard()
+  downloadConfig()
   await nextTick()
   initFirstOpen()
   handleUpdate()
@@ -68,6 +70,7 @@ watch(
 
 // UI language
 const nativeUILang = ref(enUS)
+
 const NATIVE_UI_LOCALE_MAP = {
   'zh-CN': zhCN,
   'en-US': enUS,

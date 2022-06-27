@@ -57,7 +57,7 @@ export const defaultConfig = {
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
     primaryColor: ['rgba(24,160,88, 1)', 'rgba(24,160,88, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
+    backgroundColor: ['rgba(53, 54, 58, 1)', 'rgba(53, 54, 58, 1)'],
     bgOpacity: 1,
     bgBlur: 0,
   },
@@ -160,7 +160,7 @@ export const defaultConfig = {
     fontFamily: 'Arial',
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 0.6)', 'rgba(30, 30, 30, 0.3)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(30, 30, 30, 1)'],
     activeColor: ['rgba(209, 213, 219, 1)', 'rgba(113, 113, 113, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
@@ -350,7 +350,7 @@ export const getLocalVersion = () => {
   return version
 }
 
-export const handleUpdate = () => {
+export const handleUpdate = async() => {
   const version = getLocalVersion()
   log('Version', version)
   const localVersion = +version.split('.').join('')
@@ -361,7 +361,7 @@ export const handleUpdate = () => {
   log('Get new version')
   localConfig.general.version = pkg.version
   openWhatsNewModal() // 展示更新内容
-  updateSetting() // 刷新配置设置
+  await updateSetting() // 刷新配置设置
 }
 
 export const createTab = (url: string, active = true) => {

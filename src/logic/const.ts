@@ -4,19 +4,6 @@ export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/forma
 export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'
 export const URL_QWEATHER_HOME = 'https://www.qweather.com/'
 
-// handle old version
-export const OLD_CONFIG_FIELD_LIST = [
-  'general',
-  'bookmark',
-  'clock-digital',
-  'clock-analog',
-  'date',
-  'calendar',
-  'search',
-  'weather',
-  'memo',
-]
-
 export const FONT_LIST = [
   // common
   'Cascadia Code', 'Fira Code',

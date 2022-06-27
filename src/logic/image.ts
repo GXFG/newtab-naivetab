@@ -52,17 +52,19 @@ const getImages = async() => {
 export const isImageLoading = ref(true)
 
 const loadImageEle = new Image()
+
 loadImageEle.onload = () => {
-  console.timeEnd('backgroundImage')
+  console.timeEnd('renderBackgroundImage')
   isImageLoading.value = false
 }
+
 loadImageEle.onerror = () => {
   isImageLoading.value = false
 }
 
-const renderBackgroundImage = () => {
-  console.time('backgroundImage')
-  loadImageEle.src = '' // 取消上一个图片的加载，为确保严格按加载顺序生效
+export const renderBackgroundImage = () => {
+  console.time('renderBackgroundImage')
+  loadImageEle.src = '' // 取消上一张图片的加载，为确保严格按加载顺序生效
   isImageLoading.value = true
   loadImageEle.src = currBackgroundImageUrl.value
 }
@@ -76,7 +78,7 @@ watch([
     return
   }
   renderBackgroundImage()
-}, { immediate: true })
+})
 
 export const onRefreshImageList = () => {
   getImages()
