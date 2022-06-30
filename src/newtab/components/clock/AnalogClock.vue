@@ -131,7 +131,7 @@ watch(
   { immediate: true },
 )
 
-// page切换后台时隐藏动画，避免后续页面可见时指针动画执行过多
+// page切换后台时隐藏动画，避免后续页面切换至前天时指针动画执行过多
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     state.isAnimationEnable = false

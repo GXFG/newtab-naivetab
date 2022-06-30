@@ -15,7 +15,7 @@ const bgStyle = computed(() => {
   return ''
 })
 
-const customOpacity = computed(() => isImageLoading.value ? 0 : localConfig.general.bgOpacity)
+const customOpacity = computed(() => (isImageLoading.value ? 0 : localConfig.general.bgOpacity))
 </script>
 
 <style>

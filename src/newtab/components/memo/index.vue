@@ -6,7 +6,7 @@
         :style="dragStyle || containerStyle"
         :class="{
           'memo__container--border': localConfig.memo.isBorderEnabled,
-          'memo__container--shadow': localConfig.memo.isShadowEnabled
+          'memo__container--shadow': localConfig.memo.isShadowEnabled,
         }"
       >
         <div class="memo_wrap">
@@ -66,7 +66,8 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     .n-input__border {
       border: 0 !important;
     }
-    .n-input, .n-input--focus {
+    .n-input,
+    .n-input--focus {
       border-radius: v-bind(customBorderRadius);
     }
     .memo_wrap {

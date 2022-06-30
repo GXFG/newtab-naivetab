@@ -5,14 +5,7 @@
         <Currentlog />
       </div>
       <div class="card__footer">
-        <NButton
-          class="footer__btn"
-          type="primary"
-          ghost
-          size="small"
-          :loading="globalState.isClearStorageLoading"
-          @click="onClose()"
-        >
+        <NButton class="footer__btn" type="primary" ghost size="small" :loading="globalState.isClearStorageLoading" @click="onClose()">
           <template #icon>
             <div class="icon__wrap">
               <ri:close-circle-line />

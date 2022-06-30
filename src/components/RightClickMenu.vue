@@ -13,7 +13,17 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { URL_GITHUB_ISSUSE, isDragMode, toggleIsDragMode, switchSettingDrawerVisible, getTargetDataFromEvent, globalState, createTab, openHelpModal, openWhatsNewModal } from '@/logic'
+import {
+  URL_GITHUB_ISSUSE,
+  isDragMode,
+  toggleIsDragMode,
+  switchSettingDrawerVisible,
+  getTargetDataFromEvent,
+  globalState,
+  createTab,
+  openHelpModal,
+  openWhatsNewModal,
+} from '@/logic'
 
 const state = reactive({
   isMenuVisible: false,
@@ -24,7 +34,9 @@ const state = reactive({
 
 const menuList = computed(() => [
   {
-    label: (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
+    label:
+      (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`))
+      + window.$t('common.setting'),
     key: 'setting',
     icon: () => h(Icon, { icon: 'ion:settings-outline' }),
     disabled: isDragMode.value,

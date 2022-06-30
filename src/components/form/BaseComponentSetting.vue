@@ -35,33 +35,17 @@
 
     <!-- color -->
     <NFormItem v-if="isRenderField('primaryColor')" :label="$t('common.primaryColor')">
-      <NColorPicker
-        v-model:value="localConfig[props.cname].primaryColor[localState.currAppearanceCode]"
-        show-preview
-        :swatches="swatcheColors"
-      />
+      <NColorPicker v-model:value="localConfig[props.cname].primaryColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
       <Tips :content="$t('general.primaryColorTips')" />
     </NFormItem>
     <NFormItem v-if="isRenderField('fontColor')" :label="$t('common.fontColor')">
-      <NColorPicker
-        v-model:value="localConfig[props.cname].fontColor[localState.currAppearanceCode]"
-        show-preview
-        :swatches="swatcheColors"
-      />
+      <NColorPicker v-model:value="localConfig[props.cname].fontColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
     </NFormItem>
     <NFormItem v-if="isRenderField('backgroundColor')" :label="$t('common.backgroundColor')">
-      <NColorPicker
-        v-model:value="localConfig[props.cname].backgroundColor[localState.currAppearanceCode]"
-        show-preview
-        :swatches="swatcheColors"
-      />
+      <NColorPicker v-model:value="localConfig[props.cname].backgroundColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
     </NFormItem>
     <NFormItem v-if="isRenderField('activeColor')" :label="$t('common.activeColor')">
-      <NColorPicker
-        v-model:value="localConfig[props.cname].activeColor[localState.currAppearanceCode]"
-        show-preview
-        :swatches="swatcheColors"
-      />
+      <NColorPicker v-model:value="localConfig[props.cname].activeColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
     </NFormItem>
     <NFormItem v-if="isRenderField('borderColor')" :label="$t('common.border')">
       <NSwitch v-model:value="localConfig[props.cname].isBorderEnabled" />

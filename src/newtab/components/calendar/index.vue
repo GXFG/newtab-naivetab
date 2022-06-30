@@ -4,7 +4,10 @@
       <div
         class="calendar__container"
         :style="dragStyle || containerStyle"
-        :class="{ 'calendar__container-shadow': localConfig.calendar.isShadowEnabled, 'calendar__container-border': localConfig.calendar.isBorderEnabled }"
+        :class="{
+          'calendar__container-shadow': localConfig.calendar.isShadowEnabled,
+          'calendar__container-border': localConfig.calendar.isBorderEnabled,
+        }"
       >
         <div class="calendar__options">
           <div class="options__item">

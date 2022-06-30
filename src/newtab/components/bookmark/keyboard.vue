@@ -84,7 +84,8 @@ const openPage = (url: string, active = true) => {
     return
   }
   if (localConfig.bookmark.isNewTabOpen) {
-    createTab(url) // 以新标签页打开
+    // 以新标签页打开
+    createTab(url)
     delayResetPressKey()
   } else {
     // 当前新标签页打开
@@ -115,6 +116,7 @@ const onMouseDownKey = (e: MouseEvent, url: string) => {
 
 // keyboard listener
 let timer = null as any
+
 const keyboardTask = (e: KeyboardEvent) => {
   const { key, shiftKey } = e
   const lowerCaseKey = key.toLowerCase()
@@ -230,7 +232,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
           height: v-bind(customWidth);
           font-size: 220%;
           color: v-bind(customPrimaryColor);
-          background-color: rgba(0, 0, 0, 0.1)
+          background-color: rgba(0, 0, 0, 0.1);
         }
         .item__key {
           flex: 0 0 auto;

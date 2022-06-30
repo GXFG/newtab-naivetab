@@ -96,11 +96,13 @@ const onTabsChange = (tabName: string) => {
 }
 
 const drawerOpacity = ref(1)
+
 const handlerPreviewEnter = () => {
   drawerOpacity.value = 0
   const mask = document.querySelector('.n-drawer-mask') as HTMLElement
   mask.setAttribute('style', 'transition: all 0.3s ease;background-color: transparent;')
 }
+
 const handlerPreviewLeave = () => {
   drawerOpacity.value = 1
   const mask = document.querySelector('.n-drawer-mask') as HTMLElement

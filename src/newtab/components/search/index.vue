@@ -175,7 +175,8 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     .n-input__border {
       border: 0 !important;
     }
-    .n-input, .n-input--focus {
+    .n-input,
+    .n-input--focus {
       border-radius: v-bind(customBorderRadius);
     }
     .input__main {
