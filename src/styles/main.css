@@ -20,6 +20,8 @@ body {
   font-size: 14px;
   color: var(--text-color-main) !important;
   background-color: var(--bg-main) !important;
+  /* GPU */
+  transform: translateZ(0);
 }
 
 /* button icon */
