@@ -1,29 +1,31 @@
-/*
- * https://github.com/antfu/vitesse-webext/issues/49
- */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { storage } from 'webextension-polyfill'
-import type { StorageLikeAsync, MaybeRef, StorageAsyncOptions, RemovableRef } from '@vueuse/core'
-import { useLocalStorage, useStorageAsync } from '@vueuse/core'
+// import { useLocalStorage } from '@vueuse/core'
+// export const useStorageLocal = useLocalStorage
 
-const storageLocal: StorageLikeAsync = {
-  removeItem(key: string) {
-    return storage.local.remove(key)
-  },
+import type { Ref, UnwrapRef } from 'vue'
 
-  setItem(key: string, value: string) {
-    return storage.local.set({ [key]: value })
-  },
-
-  async getItem(key: string) {
-    return (await storage.local.get(key))[key]
-  },
+export const useStorageLocal: <T>(key: string, defaultValue: T) => Ref<UnwrapRef<T>> = (key, defaultValue) => {
+  const localItem = localStorage.getItem(key)
+  let value = defaultValue
+  if (localItem) {
+    value = JSON.parse(localItem)
+  } else {
+    localStorage.setItem(key, JSON.stringify(defaultValue))
+  }
+  const target = ref(value)
+  let timer = null as any
+  watch(
+    () => target,
+    (state) => {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        const value = JSON.stringify(state.value)
+        localStorage.setItem(key, value)
+        // console.log(`@set ${key}`, value)
+      }, 500)
+    },
+    {
+      deep: true,
+    },
+  )
+  return target
 }
-
-// export const useStorageLocal = <T>(
-//   key: string,
-//   initialValue: MaybeRef<T>,
-//   options?: StorageAsyncOptions<T>,
-// ): RemovableRef<T> => useStorageAsync(key, initialValue, storageLocal, options)
-
-export const useStorageLocal = useLocalStorage
