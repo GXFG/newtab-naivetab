@@ -26,7 +26,7 @@ export async function getManifest() {
       'storage',
       'chrome://favicon/',
       'https://cn.bing.com/', // image
-      'https://www.baidu.com/', // search
+      'https://*.baidu.com/', // search, news
       'https://*.qweather.com/', // weather
     ],
     optional_permissions: [
