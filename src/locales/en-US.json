@@ -92,7 +92,8 @@
     "search": "Search",
     "calendar": "Calendar",
     "weather": "Weather",
-    "memo": "Memo"
+    "memo": "Memo",
+    "news": "News"
   },
   "general": {
     "globalStyle": "Global style",
@@ -176,5 +177,12 @@
   },
   "memo": {
     "wordCount": "Word count"
+  },
+  "news": {
+    "origin": "News Source",
+    "baidu": "Baidu",
+    "zhihu": "Zhihu",
+    "weibo": "Weibo",
+    "v2ex": "V2EX"
   }
 }

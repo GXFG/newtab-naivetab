@@ -42,10 +42,11 @@ import GeneralSetting from './components/GeneralSetting/index.vue'
 import ClockSetting from './components/ClockSetting/index.vue'
 import BookmarkSetting from './components/BookmarkSetting/index.vue'
 import DateSetting from './components/DateSetting.vue'
-import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
-import WeatherSetting from './components/WeatherSetting.vue'
+import SearchSetting from './components/SearchSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
+import WeatherSetting from './components/WeatherSetting.vue'
+import NewsSetting from './components/NewsSetting.vue'
 import { URL_GITHUB, getStyleConst, localConfig, globalState, createTab } from '@/logic'
 
 const tabPaneList = computed(() => [
@@ -75,11 +76,6 @@ const tabPaneList = computed(() => [
     component: CalendarSetting,
   },
   {
-    name: 'weather',
-    label: window.$t('setting.weather'),
-    component: WeatherSetting,
-  },
-  {
     name: 'search',
     label: window.$t('setting.search'),
     component: SearchSetting,
@@ -88,6 +84,16 @@ const tabPaneList = computed(() => [
     name: 'memo',
     label: window.$t('setting.memo'),
     component: MemoSetting,
+  },
+  {
+    name: 'weather',
+    label: window.$t('setting.weather'),
+    component: WeatherSetting,
+  },
+  {
+    name: 'news',
+    label: window.$t('setting.news'),
+    component: NewsSetting,
   },
 ])
 
@@ -136,17 +142,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   overflow-y: scroll;
   user-select: none;
   &::-webkit-scrollbar {
-    width: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #808080;
-    border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  }
-  &::-webkit-scrollbar-track {
-    background: #ccc;
-    border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    display: none;
   }
 }
 

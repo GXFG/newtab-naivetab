@@ -21,7 +21,7 @@ onMounted(() => {
   updateWeather()
 })
 
-// 开启天气主开关后立即更新数据
+// 开启主开关后立即更新数据
 watch(isRender, (value) => {
   if (!value) {
     return

@@ -15,6 +15,7 @@
   <Weather />
   <Search />
   <Memo />
+  <News />
   <Setting />
 </template>
 
@@ -29,6 +30,7 @@ import Calendar from '@/newtab/components/calendar/index.vue'
 import Weather from '@/newtab/components/weather/index.vue'
 import Search from '@/newtab/components/search/index.vue'
 import Memo from '@/newtab/components/memo/index.vue'
+import News from '@/newtab/components/news/index.vue'
 
 window.$message = useMessage()
 window.$notification = useNotification()

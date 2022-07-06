@@ -99,13 +99,6 @@ const elementList = computed(() => [
     disabled: localConfig.calendar.enabled,
   },
   {
-    label: window.$t('setting.weather'),
-    componentName: 'weather',
-    iconName: 'mdi:weather-cloudy',
-    iconSize: 28,
-    disabled: localConfig.weather.enabled,
-  },
-  {
     label: window.$t('setting.search'),
     componentName: 'search',
     iconName: 'teenyicons:search-circle-outline',
@@ -118,6 +111,20 @@ const elementList = computed(() => [
     iconName: 'fluent:notepad-edit-16-regular',
     iconSize: 24,
     disabled: localConfig.memo.enabled,
+  },
+  {
+    label: window.$t('setting.weather'),
+    componentName: 'weather',
+    iconName: 'mdi:weather-cloudy',
+    iconSize: 28,
+    disabled: localConfig.weather.enabled,
+  },
+  {
+    label: window.$t('setting.news'),
+    componentName: 'news',
+    iconName: 'majesticons:newspaper-line',
+    iconSize: 24,
+    disabled: localConfig.news.enabled,
   },
 ])
 

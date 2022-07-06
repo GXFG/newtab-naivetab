@@ -347,7 +347,6 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         text-align: center;
         border-radius: v-bind(customBorderRadius);
         border: 1px solid rgba(0, 0, 0, 0);
-        transition: all 0.3s ease;
         overflow: hidden;
         &:hover {
           border: 1px solid v-bind(customItemActiveColor);

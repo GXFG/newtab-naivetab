@@ -148,7 +148,7 @@ export const defaultConfig = {
   calendar: {
     enabled: true,
     layout: {
-      xOffsetKey: 'left',
+      xOffsetKey: 'right',
       xOffsetValue: 0,
       xTranslateValue: 0,
       yOffsetKey: 'bottom',
@@ -244,6 +244,32 @@ export const defaultConfig = {
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
   },
+  news: {
+    enabled: false,
+    originList: ['zhihu', 'weibo'],
+    layout: {
+      xOffsetKey: 'left',
+      xOffsetValue: 0,
+      xTranslateValue: 0,
+      yOffsetKey: 'bottom',
+      yOffsetValue: 0,
+      yTranslateValue: 0,
+    },
+    margin: 12,
+    width: 350,
+    height: 310,
+    borderRadius: 4,
+    fontFamily: 'Arial',
+    fontSize: 13,
+    fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(30, 30, 30, 1)'],
+    activeColor: ['rgba(200, 200, 200, 1)', 'rgba(75, 94, 104, 1)'],
+    isBorderEnabled: true,
+    borderWidth: 1,
+    borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
+    isShadowEnabled: true,
+    shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
+  },
 }
 
 export const localConfig = reactive({
@@ -256,6 +282,7 @@ export const localConfig = reactive({
   search: useStorageLocal('c-search', defaultConfig.search),
   weather: useStorageLocal('c-weather', defaultConfig.weather),
   memo: useStorageLocal('c-memo', defaultConfig.memo),
+  news: useStorageLocal('c-news', defaultConfig.news),
 })
 
 export const localState = useStorageLocal('l-state', {
@@ -270,6 +297,7 @@ export const localState = useStorageLocal('l-state', {
     search: 0,
     weather: 0,
     memo: 0,
+    news: 0,
   },
 })
 
@@ -286,6 +314,7 @@ export const globalState = reactive({
     search: false,
     weather: false,
     memo: false,
+    news: false,
   },
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
@@ -295,6 +324,7 @@ export const globalState = reactive({
   isSearchFocused: false,
   isMemoFocused: false,
   currSettingTabValue: 'general',
+  currNewsTabValue: localConfig.news.originList[0] || '',
 })
 
 const initAvailableFontList = async() => {
@@ -358,7 +388,7 @@ export const handleUpdate = async() => {
   if (localVersion >= currPkgVersion) {
     return
   }
-  log('Get new version')
+  log('Get new version', pkg.version)
   localConfig.general.version = pkg.version
   openWhatsNewModal() // 展示更新内容
   await updateSetting() // 刷新配置设置
