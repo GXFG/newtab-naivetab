@@ -218,7 +218,6 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         background-color: v-bind(customBackgroundColor);
         border-radius: v-bind(customBorderRadius);
         cursor: pointer;
-        transition: all 200ms ease;
         box-sizing: border-box;
         .item__loading {
           z-index: 1;

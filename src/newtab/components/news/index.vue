@@ -139,7 +139,6 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         border-bottom: v-bind(customBorderWidth) solid v-bind(customBorderColor) !important;
       }
       .news__content {
-        /* margin: 0 8px; */
         height: v-bind(customHeight);
         color: v-bind(customFontColor);
         font-size: v-bind(customFontSize);
