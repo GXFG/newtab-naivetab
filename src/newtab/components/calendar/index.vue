@@ -261,7 +261,7 @@ const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customItemWidth = getStyleField(CNAME, 'width', 'px')
 const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
-const customItemActiveColor = getStyleField(CNAME, 'activeColor')
+const customItemBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
 const textColorRed = getStyleConst('textColorRed')
 const bgCalendarRest = getStyleConst('bgCalendarRest')
 const bgCalendarWork = getStyleConst('bgCalendarWork')
@@ -347,10 +347,9 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         text-align: center;
         border-radius: v-bind(customBorderRadius);
         border: 1px solid rgba(0, 0, 0, 0);
-        transition: all 0.3s ease;
         overflow: hidden;
         &:hover {
-          border: 1px solid v-bind(customItemActiveColor);
+          border: 1px solid v-bind(customItemBackgroundActiveColor);
         }
         .item__day {
         }
@@ -399,7 +398,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         color: v-bind(textColorRed);
       }
       .body__item--active {
-        background-color: v-bind(customItemActiveColor);
+        background-color: v-bind(customItemBackgroundActiveColor);
       }
       .body__item--blur {
         opacity: 0.4;

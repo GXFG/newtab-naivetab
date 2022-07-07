@@ -38,6 +38,8 @@
     "blur": "Blur",
     "opacity": "Opacity",
     "activeColor": "Active color",
+    "fontActiveColor": "Font Active color",
+    "backgroundActiveColor": "BG Active color",
     "shadow": "Shadow",
     "shadowColor": "Shadow color",
     "border": "Border",
@@ -92,7 +94,8 @@
     "search": "Search",
     "calendar": "Calendar",
     "weather": "Weather",
-    "memo": "Memo"
+    "memo": "Memo",
+    "news": "News"
   },
   "general": {
     "globalStyle": "Global style",
@@ -176,5 +179,12 @@
   },
   "memo": {
     "wordCount": "Word count"
+  },
+  "news": {
+    "source": "News Source",
+    "baidu": "Baidu",
+    "zhihu": "Zhihu",
+    "weibo": "Weibo",
+    "v2ex": "V2EX"
   }
 }

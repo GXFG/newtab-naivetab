@@ -10,7 +10,7 @@ interface Window {
 type OptionsPermission = 'bookmarks'
 
 type TargetType = 1 | 2 // 1:component 2:element
-type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo'
+type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo' | 'news'
 type ConfigField = Components | 'general'
 
 interface SelectStringItem {
@@ -151,4 +151,10 @@ interface ForecastItem {
   windScaleNight: string // "1-2"
   windSpeedDay: string // "3"
   windSpeedNight: string // "3"
+}
+
+interface NewsListItem {
+  url: string
+  desc: string
+  hot: string
 }

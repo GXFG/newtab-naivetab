@@ -54,6 +54,7 @@ const uploadConfigCalendar = useDebounceFn(() => { uploadConfigFn('calendar') },
 const uploadConfigSearch = useDebounceFn(() => { uploadConfigFn('search') }, MERGE_CONFIG_DELAY)
 const uploadConfigWeather = useDebounceFn(() => { uploadConfigFn('weather') }, MERGE_CONFIG_DELAY)
 const uploadConfigMemo = useDebounceFn(() => { uploadConfigFn('memo') }, MERGE_CONFIG_DELAY)
+const uploadConfigNews = useDebounceFn(() => { uploadConfigFn('news') }, MERGE_CONFIG_DELAY)
 
 watch(() => localConfig.general, () => { uploadConfigGeneral() }, { deep: true })
 watch(() => localConfig.bookmark, () => { uploadConfigBookmark() }, { deep: true })
@@ -64,6 +65,7 @@ watch(() => localConfig.calendar, () => { uploadConfigCalendar() }, { deep: true
 watch(() => localConfig.search, () => { uploadConfigSearch() }, { deep: true })
 watch(() => localConfig.weather, () => { uploadConfigWeather() }, { deep: true })
 watch(() => localConfig.memo, () => { uploadConfigMemo() }, { deep: true })
+watch(() => localConfig.news, () => { uploadConfigNews() }, { deep: true })
 
 /**
  * 以 state 为模板与 acceptState 进行递归去重合并
@@ -134,11 +136,11 @@ export const updateSetting = (acceptRawState = localConfig) => {
       }
       for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
         if (!Object.prototype.hasOwnProperty.call(acceptState, configField)) {
-          // console.log(`${!configField}`)
+          // 只遍历 acceptState 内存在的 configField
+          // console.log(`!${configField}`)
           continue
         }
-        // 只遍历acceptState内存在的configField
-        for (const subField of Object.keys(acceptState[configField])) {
+        for (const subField of Object.keys(defaultConfig[configField])) {
           localConfig[configField][subField] = mergeState(defaultConfig[configField][subField], acceptState[configField][subField])
           // console.log(`${configField}-${subField}`, localConfig[configField][subField], defaultConfig[configField][subField], acceptState[configField][subField])
         }

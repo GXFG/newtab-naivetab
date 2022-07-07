@@ -5,16 +5,19 @@
       v-model:show="globalState.isSettingDrawerVisible"
       class="drawer-wrap"
       :style="drawerStyle"
-      display-directive="if"
       :width="600"
       :placement="localConfig.general.drawerPlacement"
     >
       <NDrawerContent>
-        <NTabs type="line" :value="globalState.currSettingTabValue" @update:value="onTabsChange">
-          <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
-            <component :is="item.component" />
-          </NTabPane>
-        </NTabs>
+        <div class="drawer__content">
+          <NTabs type="line" :value="globalState.currSettingTabValue" @update:value="onTabsChange">
+            <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
+              <div class="content__wrap">
+                <component :is="item.component" />
+              </div>
+            </NTabPane>
+          </NTabs>
+        </div>
       </NDrawerContent>
       <!-- bottom -->
       <div class="drawer__bottom" :style="`background-color: ${bgBottomBar};`">
@@ -42,10 +45,11 @@ import GeneralSetting from './components/GeneralSetting/index.vue'
 import ClockSetting from './components/ClockSetting/index.vue'
 import BookmarkSetting from './components/BookmarkSetting/index.vue'
 import DateSetting from './components/DateSetting.vue'
-import SearchSetting from './components/SearchSetting.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
-import WeatherSetting from './components/WeatherSetting.vue'
+import SearchSetting from './components/SearchSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
+import WeatherSetting from './components/WeatherSetting.vue'
+import NewsSetting from './components/NewsSetting.vue'
 import { URL_GITHUB, getStyleConst, localConfig, globalState, createTab } from '@/logic'
 
 const tabPaneList = computed(() => [
@@ -75,11 +79,6 @@ const tabPaneList = computed(() => [
     component: CalendarSetting,
   },
   {
-    name: 'weather',
-    label: window.$t('setting.weather'),
-    component: WeatherSetting,
-  },
-  {
     name: 'search',
     label: window.$t('setting.search'),
     component: SearchSetting,
@@ -88,6 +87,16 @@ const tabPaneList = computed(() => [
     name: 'memo',
     label: window.$t('setting.memo'),
     component: MemoSetting,
+  },
+  {
+    name: 'weather',
+    label: window.$t('setting.weather'),
+    component: WeatherSetting,
+  },
+  {
+    name: 'news',
+    label: window.$t('setting.news'),
+    component: NewsSetting,
   },
 ])
 
@@ -114,50 +123,40 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 </script>
 
 <style>
-.n-tabs-tab__label {
-  user-select: none;
-}
-
-.n-tabs-nav {
-  /* 抽屉的z-index为2000 */
-  z-index: 2000;
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 15px 50px 0 20px;
-  width: 600px;
-  user-select: none;
-  background-color: var(--n-color);
-}
-.n-tab-pane {
-  margin-top: 43px;
-  padding: 0 15px 20px 0 !important;
-  height: 88vh;
-  overflow-y: scroll;
-  user-select: none;
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #808080;
-    border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  }
-  &::-webkit-scrollbar-track {
-    background: #ccc;
-    border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  }
-}
-
 .drawer-wrap {
   transition: all 0.3s ease;
-  .setting__content {
-    padding-top: 20px;
+  .drawer__content {
     /* collapse title */
     .n-collapse-item__header-main {
       font-size: 16px;
       font-weight: 500 !important;
+    }
+    .n-tabs-tab__label {
+      user-select: none;
+    }
+    .n-tabs-nav {
+      /* 抽屉的z-index为2000 */
+      z-index: 2000;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 15px 50px 0 20px;
+      width: 600px;
+      user-select: none;
+      background-color: var(--n-color);
+    }
+    .n-tab-pane {
+      margin-top: 43px;
+      padding: 0 15px 20px 0 !important;
+      height: 88vh;
+      overflow-y: scroll;
+      user-select: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    .content__wrap {
+      padding-top: 20px;
     }
   }
   .drawer__bottom {

@@ -161,7 +161,7 @@ const customFontColor = getStyleField(CNAME, 'fontColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
-const customActiveColor = getStyleField(CNAME, 'activeColor')
+const customBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
@@ -193,14 +193,14 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         outline: v-bind(customBorderWidth) solid v-bind(customBorderColor);
       }
       .row__item--active {
-        background-color: v-bind(customActiveColor) !important;
+        background-color: v-bind(customBackgroundActiveColor) !important;
       }
       .row__item--shadow {
         box-shadow: v-bind(customShadowColor) 0px 2px 1px, v-bind(customShadowColor) 0px 4px 2px, v-bind(customShadowColor) 0px 8px 4px,
           v-bind(customShadowColor) 0px 16px 8px;
       }
       .row__item--hover:hover {
-        background-color: v-bind(customActiveColor) !important;
+        background-color: v-bind(customBackgroundActiveColor) !important;
       }
       .row__item {
         flex: 0 0 auto;
@@ -218,7 +218,6 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         background-color: v-bind(customBackgroundColor);
         border-radius: v-bind(customBorderRadius);
         cursor: pointer;
-        transition: all 200ms ease;
         box-sizing: border-box;
         .item__loading {
           z-index: 1;
