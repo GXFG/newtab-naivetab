@@ -91,7 +91,6 @@ export const getWeiboNews = async() => {
         hot = hotList[1]
       }
       hot = `${type}${Math.floor((+hot / 10000))}w`
-      console.log($(ele), desc)
       newsList.push({ url, desc, hot })
     })
     newsList = newsList.slice(1)
