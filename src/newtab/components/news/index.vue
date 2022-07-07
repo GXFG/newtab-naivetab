@@ -31,6 +31,7 @@
                     }"
                     :title="item.desc"
                     @click="onOpenPage(item.url)"
+                    @mousedown="onMouseDownKey($event, item.url)"
                   >
                     <p class="content__desc">
                       {{ item.desc }}
@@ -82,6 +83,17 @@ const onOpenPage = (url: string) => {
     return
   }
   createTab(url)
+}
+
+const onMouseDownKey = (e: MouseEvent, url: string) => {
+  if (e.button !== 1) {
+    return
+  }
+  // 按下鼠标中键
+  if (isDragMode.value) {
+    return
+  }
+  createTab(url, false)
 }
 
 onMounted(() => {
