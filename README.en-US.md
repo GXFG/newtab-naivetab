@@ -14,6 +14,7 @@
    4. Search bar: Custom search engine available
    5. Weather: You can view information such as temperature, wind, humidity, alarm, daily index, etc
    6. Notes: Editable notes, or to-dos
+   7. News: View popular events from Zhihu, Baidu, Sina Weibo, and V2EX
 2. The above components can be dragged and dropped anywhere on the screen, fully customizable (via canvas mode)
 3. Components can be customized with most styles (font, color, size, border, shadow, etc.)
 4. Support custom background image (Bing daily image, local picture)
