@@ -29,14 +29,14 @@ export const getBaiduNews = async() => {
       return
     }
     const $ = cheerio.load(data)
-    const eleList = $('.title_dIF3B')
     let newsList = [] as NewsListItem[]
-    for (const item of eleList) {
-      newsList.push({
-        url: item.attribs.href || '',
-        desc: (item.children[1] as any).childNodes[0].data || '',
-      })
-    }
+    $('.category-wrap_iQLoo').each((i, ele) => {
+      const url = ($(ele).find('.title_dIF3B').attr('href') || '').trim()
+      const desc = $(ele).find('.c-single-text-ellipsis').text().trim()
+      let hot = $(ele).children('.trend_2RttY').children('.hot-index_1Bl1a').text().trim()
+      hot = `${Math.floor((+hot / 10000))}w`
+      newsList.push({ url, desc, hot })
+    })
     newsList = newsList.slice(1)
     newsState.value.baidu.list = newsList
     newsState.value.baidu.syncTime = dayjs().valueOf()
@@ -53,14 +53,16 @@ export const getZhihuNews = async() => {
       return
     }
     const $ = cheerio.load(data)
-    const eleList = $('.HotItem-content')
     const newsList = [] as NewsListItem[]
-    for (const item of eleList) {
-      newsList.push({
-        url: (item.children[0] as any).attribs.href || '',
-        desc: (item.children[0] as any).attribs.title || '',
-      })
-    }
+    $('.HotItem-content').each((i, ele) => {
+      const url = $(ele).children().eq(0).attr('href') || ''
+      const desc = $(ele).children().eq(0).attr('title') || ''
+      let hot = i === 0
+        ? ($(ele).children('.HotItem-metrics')[0] as any).children[2].data
+        : $(ele).children('.HotItem-metrics').text() || ''
+      hot = `${hot.split(' ')[0]}w`
+      newsList.push({ url, desc, hot })
+    })
     newsState.value.zhihu.list = newsList
     newsState.value.zhihu.syncTime = dayjs().valueOf()
     log('News update zhihu')
@@ -76,16 +78,22 @@ export const getWeiboNews = async() => {
       return
     }
     const $ = cheerio.load(data)
-    const eleContainer = $('#pl_top_realtimehot')
-    let eleList = (eleContainer[0].children[1] as any).children[3].children
-    eleList = eleList.filter((item: any) => item.type === 'tag')
     let newsList = [] as NewsListItem[]
-    for (const item of eleList) {
-      newsList.push({
-        url: (item.children[3] as any).children[1].attribs.href || '',
-        desc: (item.children[3] as any).children[1].children[0].data || '',
-      })
-    }
+    const eleList = $('#pl_top_realtimehot').find('tbody').children().filter('tr')
+    eleList.each((i, ele) => {
+      const url = `https://s.weibo.com${$(ele).children('.td-02').children('a').attr('href')}`
+      const desc = $(ele).children('.td-02').children('a').text().trim()
+      let hot: string | number = $(ele).children('.td-02').children('span').text()
+      let type = ''
+      if (isNaN(parseInt(hot))) { // 处理格式如：AB 123
+        const hotList = hot.split(' ')
+        type = `${hotList[0]} `
+        hot = hotList[1]
+      }
+      hot = `${type}${Math.floor((+hot / 10000))}w`
+      console.log($(ele), desc)
+      newsList.push({ url, desc, hot })
+    })
     newsList = newsList.slice(1)
     newsState.value.weibo.list = newsList
     newsState.value.weibo.syncTime = dayjs().valueOf()
@@ -102,14 +110,13 @@ export const getV2exNews = async() => {
       return
     }
     const $ = cheerio.load(data)
-    const eleList = $('.item_title .topic-link')
     const newsList = [] as NewsListItem[]
-    for (const item of eleList) {
-      newsList.push({
-        url: `https://www.v2ex.com${item.attribs.href || ''}`,
-        desc: (item.children[0] as any).data || '',
-      })
-    }
+    $('#Main .cell.item').each((i, ele) => {
+      const url = `https://www.v2ex.com${$(ele).find('.topic-link').attr('href')}`
+      const desc = $(ele).find('.topic-link').text().trim()
+      const hot = $(ele).find('.count_livid').text()
+      newsList.push({ url, desc, hot })
+    })
     newsState.value.v2ex.list = newsList
     newsState.value.v2ex.syncTime = dayjs().valueOf()
     log('News update v2ex')
@@ -134,16 +141,16 @@ export const updateNews = () => {
   if (currTS - newsState.value.baidu.syncTime <= 60000 * 30) {
     return
   }
-  if (localConfig.news.originList.includes('baidu')) {
+  if (localConfig.news.sourceList.includes('baidu')) {
     getBaiduNews()
   }
-  if (localConfig.news.originList.includes('zhihu')) {
+  if (localConfig.news.sourceList.includes('zhihu')) {
     getZhihuNews()
   }
-  if (localConfig.news.originList.includes('weibo')) {
+  if (localConfig.news.sourceList.includes('weibo')) {
     getWeiboNews()
   }
-  if (localConfig.news.originList.includes('v2ex')) {
+  if (localConfig.news.sourceList.includes('v2ex')) {
     getV2exNews()
   }
 }

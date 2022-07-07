@@ -38,6 +38,8 @@
     "blur": "Blur",
     "opacity": "Opacity",
     "activeColor": "Active color",
+    "fontActiveColor": "Font Active color",
+    "backgroundActiveColor": "BG Active color",
     "shadow": "Shadow",
     "shadowColor": "Shadow color",
     "border": "Border",
@@ -179,7 +181,7 @@
     "wordCount": "Word count"
   },
   "news": {
-    "origin": "News Source",
+    "source": "News Source",
     "baidu": "Baidu",
     "zhihu": "Zhihu",
     "weibo": "Weibo",

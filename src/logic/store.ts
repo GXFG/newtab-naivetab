@@ -85,7 +85,7 @@ export const defaultConfig = {
     fontSize: 12,
     fontColor: ['rgba(15, 23, 42, 1)', 'rgba(15, 23, 42, 1)'],
     backgroundColor: ['rgba(209, 213, 219, 1)', 'rgba(212, 212, 216, 1)'],
-    activeColor: ['rgba(255, 255, 255, 1)', 'rgba(71,85,105, 1)'],
+    backgroundActiveColor: ['rgba(255, 255, 255, 1)', 'rgba(71,85,105, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
     borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
@@ -161,7 +161,7 @@ export const defaultConfig = {
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
     backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(30, 30, 30, 1)'],
-    activeColor: ['rgba(209, 213, 219, 1)', 'rgba(113, 113, 113, 1)'],
+    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(113, 113, 113, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
     borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
@@ -246,7 +246,7 @@ export const defaultConfig = {
   },
   news: {
     enabled: false,
-    originList: ['zhihu', 'weibo'],
+    sourceList: ['zhihu', 'weibo'],
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 0,
@@ -262,11 +262,12 @@ export const defaultConfig = {
     fontFamily: 'Arial',
     fontSize: 13,
     fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
+    fontActiveColor: ['rgba(36, 64, 179, 1)', 'rgba(75, 94, 104, 1)'],
     backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(30, 30, 30, 1)'],
-    activeColor: ['rgba(200, 200, 200, 1)', 'rgba(75, 94, 104, 1)'],
+    backgroundActiveColor: ['rgba(239, 239, 245, 1)', 'rgba(54, 54, 54, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(71,85,105, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
   },
@@ -324,7 +325,7 @@ export const globalState = reactive({
   isSearchFocused: false,
   isMemoFocused: false,
   currSettingTabValue: 'general',
-  currNewsTabValue: localConfig.news.originList[0] || '',
+  currNewsTabValue: localConfig.news.sourceList[0] || '',
 })
 
 const initAvailableFontList = async() => {

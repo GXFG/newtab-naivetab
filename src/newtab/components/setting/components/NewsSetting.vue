@@ -1,11 +1,11 @@
 <template>
   <BaseComponentSetting cname="news">
     <template #header>
-      <NFormItem :label="$t('news.origin')">
+      <NFormItem :label="$t('news.source')">
         <NSelect
-          v-model:value="localConfig.news.originList"
+          v-model:value="localConfig.news.sourceList"
           placeholder=" "
-          :options="newsOriginList"
+          :options="newsSourceList"
           max-tag-count="responsive"
           multiple
           clearable
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { globalState, localConfig } from '@/logic'
 
-const newsOriginList = computed(() => [
+const newsSourceList = computed(() => [
   { label: window.$t('news.weibo'), value: 'weibo' },
   { label: window.$t('news.zhihu'), value: 'zhihu' },
   { label: window.$t('news.baidu'), value: 'baidu' },
@@ -27,6 +27,6 @@ const newsOriginList = computed(() => [
 ])
 
 const handleUpdateValue = () => {
-  globalState.currNewsTabValue = localConfig.news.originList[0] || ''
+  globalState.currNewsTabValue = localConfig.news.sourceList[0] || ''
 }
 </script>

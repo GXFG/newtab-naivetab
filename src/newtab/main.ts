@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import '../styles'
-import '../lib/ga.js'
+import '@/lib/ga'
 import App from './App.vue'
 import i18n from '@/lib/i18n'
 import lazyImage from '@/directive/lazyImage'

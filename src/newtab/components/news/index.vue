@@ -10,47 +10,39 @@
         }"
       >
         <div class="news__wrap">
-          <div class="news__tabs">
-            <p
-              v-for="item in selectNewsOriginList"
-              :key="item.value"
-              class="tabs__item"
-              :class="{
-                'tabs__item--active': item.value === globalState.currNewsTabValue,
-              }"
-              @click="handleChangeCurrTab(item.value)"
-            >
-              {{ item.label }}
-            </p>
-          </div>
-          <div ref="contentEl" class="news__content">
-            <div
-              v-for="(item, index) in newsState[globalState.currNewsTabValue] && newsState[globalState.currNewsTabValue].list"
-              :key="item.desc"
-              class="content__item"
-            >
-              <p
-                class="item__index"
-                :class="{
-                  item__index__1: index === 0,
-                  item__index__2: index === 1,
-                  item__index__3: index === 2,
-                }"
-              >
-                {{ index + 1 }}
-              </p>
-              <p
-                class="item__url"
-                :class="{
-                  'item__url--hover': !isDragMode,
-                }"
-                :title="item.desc"
-                @click="onOpenPage(item.url)"
-              >
-                {{ item.desc }}
-              </p>
-            </div>
-          </div>
+          <NTabs type="segment" animated justify-content="space-evenly" @update:value="handleChangeCurrTab">
+            <NTabPane v-for="source in selectNewsSourceList" :key="source.value" :name="source.value" :tab="source.label">
+              <div class="news__content">
+                <div v-for="(item, index) in newsState[source.value] && newsState[source.value].list" :key="item.desc" class="content__item">
+                  <p
+                    class="row__index"
+                    :class="{
+                      row__index__1: index === 0,
+                      row__index__2: index === 1,
+                      row__index__3: index === 2,
+                    }"
+                  >
+                    {{ index + 1 }}
+                  </p>
+                  <div
+                    class="row__content"
+                    :class="{
+                      'row__content--hover': !isDragMode,
+                    }"
+                    :title="item.desc"
+                    @click="onOpenPage(item.url)"
+                  >
+                    <p class="content__desc">
+                      {{ item.desc }}
+                    </p>
+                    <p class="content__hot">
+                      {{ item.hot }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </NTabPane>
+          </NTabs>
         </div>
       </div>
     </div>
@@ -74,18 +66,15 @@ import {
 const CNAME = 'news'
 const isRender = getIsComponentRender(CNAME)
 
-const selectNewsOriginList = computed(() =>
-  localConfig.news.originList.map((key: string) => ({
+const selectNewsSourceList = computed(() =>
+  localConfig.news.sourceList.map((key: string) => ({
     label: window.$t(`news.${key}`),
     value: key,
   })),
 )
 
-const contentEl = ref()
-
 const handleChangeCurrTab = (value: string) => {
   globalState.currNewsTabValue = value
-  contentEl.value.scrollTo(0, 0)
 }
 
 const onOpenPage = (url: string) => {
@@ -118,12 +107,13 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
-const customItemActiveColor = getStyleField(CNAME, 'activeColor')
+const customFontActiveColor = getStyleField(CNAME, 'fontActiveColor')
+const customBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
-<style scoped>
+<style>
 #news {
   font-family: v-bind(customFontFamily);
   user-select: none;
@@ -133,26 +123,23 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
     .news__wrap {
-      padding: 8px;
       width: v-bind(customWidth);
-      .news__tabs {
-        padding-bottom: 8px;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        .tabs__item {
-          padding: 4px 8px;
-          color: v-bind(customFontColor);
-          font-size: v-bind(customFontSize);
-          font-weight: 500;
-          border-radius: 3px;
-          cursor: pointer;
-        }
-        .tabs__item--active {
-          background-color: v-bind(customItemActiveColor);
+      .n-tabs .n-tab-pane {
+        padding: 0 !important;
+      }
+      // segment
+      .n-tabs .n-tabs-rail {
+        background-color: transparent !important;
+        .n-tabs-tab-wrapper .n-tabs-tab.n-tabs-tab--active {
+          background-color: v-bind(customBackgroundActiveColor) !important;
         }
       }
+      // line bottom border
+      .n-tabs .n-tabs-nav.n-tabs-nav--line-type .n-tabs-nav-scroll-content {
+        border-bottom: v-bind(customBorderWidth) solid v-bind(customBorderColor) !important;
+      }
       .news__content {
+        /* margin: 0 8px; */
         height: v-bind(customHeight);
         color: v-bind(customFontColor);
         font-size: v-bind(customFontSize);
@@ -164,29 +151,42 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
           display: flex;
           align-items: center;
           margin: v-bind(customMargin) 0;
-          .item__index {
-            min-width: 18px;
+          width: 100%;
+          .row__index {
+            width: 8%;
+            flex: 0 0 auto;
             font-weight: 500;
             text-align: center;
           }
-          .item__index__1 {
+          .row__index__1 {
             color: #fe2d46;
           }
-          .item__index__2 {
+          .row__index__2 {
             color: #f60;
           }
-          .item__index__3 {
+          .row__index__3 {
             color: #faa90e;
           }
-          .item__url {
-            margin-left: 8px;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+          .row__content {
+            width: 92%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .content__desc {
+              flex: 1;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+            .content__hot {
+              flex: 0 0 auto;
+              margin: 0 8px;
+              opacity: 0.7;
+            }
           }
-          .item__url--hover:hover {
+          .row__content--hover:hover {
+            color: v-bind(customFontActiveColor);
             cursor: pointer;
-            color: #2440b3;
           }
         }
       }

@@ -156,4 +156,5 @@ interface ForecastItem {
 interface NewsListItem {
   url: string
   desc: string
+  hot: string
 }
