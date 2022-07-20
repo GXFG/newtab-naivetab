@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import http from '@/lib/http'
-import { localConfig, log } from '@/logic'
+import { NEWS_SOURCE_MAP, localConfig, createTab, log } from '@/logic'
 
 export const newsState = useStorageLocal('data-news', {
   baidu: {
@@ -23,7 +23,7 @@ export const newsState = useStorageLocal('data-news', {
 })
 
 export const getBaiduNews = async() => {
-  const data: string = await http.get('https://top.baidu.com/board?tab=realtime')
+  const data: string = await http.get(NEWS_SOURCE_MAP.baidu)
   try {
     if (!data) {
       return
@@ -47,7 +47,7 @@ export const getBaiduNews = async() => {
 }
 
 export const getZhihuNews = async() => {
-  const data: string = await http.get('https://www.zhihu.com/hot')
+  const data: string = await http.get(NEWS_SOURCE_MAP.zhihu)
   try {
     if (!data) {
       return
@@ -72,7 +72,7 @@ export const getZhihuNews = async() => {
 }
 
 export const getWeiboNews = async() => {
-  const data: string = await http.get('https://s.weibo.com/top/summary?cate=realtimehot')
+  const data: string = await http.get(NEWS_SOURCE_MAP.weibo)
   try {
     if (!data) {
       return
@@ -103,7 +103,7 @@ export const getWeiboNews = async() => {
 }
 
 export const getV2exNews = async() => {
-  const data: string = await http.get('https://www.v2ex.com/?tab=hot')
+  const data: string = await http.get(NEWS_SOURCE_MAP.v2ex)
   try {
     if (!data) {
       return
@@ -122,6 +122,21 @@ export const getV2exNews = async() => {
   } catch (e) {
     console.warn(e)
   }
+}
+
+export const onRetryNews = (value: NewsSources) => {
+  createTab(NEWS_SOURCE_MAP[value], false)
+  setTimeout(() => {
+    if (value === 'baidu') {
+      getBaiduNews()
+    } else if (value === 'zhihu') {
+      getZhihuNews()
+    } else if (value === 'weibo') {
+      getWeiboNews()
+    } else if (value === 'v2ex') {
+      getV2exNews()
+    }
+  }, 3000)
 }
 
 export const refreshNews = () => {

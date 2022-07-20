@@ -81,6 +81,13 @@ export const WEATHER_SPEED_UNIT_MAP = {
   kph: 'km/h',
 }
 
+export const NEWS_SOURCE_MAP = {
+  baidu: 'https://top.baidu.com/board?tab=realtime',
+  zhihu: 'https://www.zhihu.com/hot',
+  weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
+  v2ex: 'https://www.v2ex.com/?tab=hot',
+}
+
 /**
  * 1休，2班
  */

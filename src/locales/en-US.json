@@ -71,7 +71,8 @@
     "setting": "Setting",
     "dragMode": "DragMode",
     "feedback": "Feedback",
-    "other": "Other"
+    "other": "Other",
+    "retry": "Retry"
   },
   "prompts": {
     "pleaseWait": "In progress, Please wait",

@@ -9,7 +9,7 @@
             class="row__item"
             :class="{
               'row__item--move': isDragMode,
-              'row__item--hover': !isDragMode,
+              'row__item--hover': !isDragMode && item.url.length !== 0,
               'row__item--active': state.currSelectKey === item.key,
               'row__item--border': localConfig.bookmark.isBorderEnabled,
               'row__item--shadow': localConfig.bookmark.isShadowEnabled,
@@ -96,7 +96,7 @@ const openPage = (url: string, active = true) => {
 }
 
 const onClickKey = (key: string, url: string) => {
-  if (isDragMode.value) {
+  if (isDragMode.value || url.length === 0) {
     return
   }
   state.currSelectKey = KEYBOARD_CODE_TO_LABEL_MAP[key] || key

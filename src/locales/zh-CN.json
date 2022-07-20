@@ -71,7 +71,8 @@
     "setting": "设置",
     "dragMode": "画布模式",
     "feedback": "反馈建议",
-    "other": "其他"
+    "other": "其他",
+    "retry": "重试"
   },
   "prompts": {
     "pleaseWait": "执行中，请稍等",

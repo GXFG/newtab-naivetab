@@ -246,7 +246,7 @@ export const defaultConfig = {
   },
   news: {
     enabled: false,
-    sourceList: ['zhihu', 'weibo'],
+    sourceList: ['zhihu', 'weibo'] as NewsSources[],
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 0,
