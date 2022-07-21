@@ -124,17 +124,20 @@ export const getV2exNews = async() => {
   }
 }
 
+const newsSourceFuncMap = {
+  baidu: getBaiduNews,
+  zhihu: getZhihuNews,
+  weibo: getWeiboNews,
+  v2ex: getV2exNews,
+}
+
 export const onRetryNews = (value: NewsSources) => {
+  // 部分网站需要先打开页面登录后才可访问
   createTab(NEWS_SOURCE_MAP[value], false)
   setTimeout(() => {
-    if (value === 'baidu') {
-      getBaiduNews()
-    } else if (value === 'zhihu') {
-      getZhihuNews()
-    } else if (value === 'weibo') {
-      getWeiboNews()
-    } else if (value === 'v2ex') {
-      getV2exNews()
+    const func = newsSourceFuncMap[value]
+    if (func) {
+      func()
     }
   }, 3000)
 }

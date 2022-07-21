@@ -56,7 +56,7 @@ export const defaultConfig = {
     fontFamily: 'Arial',
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    primaryColor: ['rgba(24,160,88, 1)', 'rgba(24,160,88, 1)'],
+    primaryColor: ['rgba(34, 117, 213, 1)', 'rgba(34, 117, 213, 1)'],
     backgroundColor: ['rgba(53, 54, 58, 1)', 'rgba(53, 54, 58, 1)'],
     bgOpacity: 1,
     bgBlur: 0,
@@ -322,6 +322,7 @@ export const globalState = reactive({
   isClearStorageLoading: false,
   isHelpModalVisible: false,
   isWhatsNewModalVisible: false,
+  isSponsorModalVisible: false,
   isSearchFocused: false,
   isMemoFocused: false,
   currSettingTabValue: 'general',
@@ -371,6 +372,10 @@ export const openHelpModal = () => {
   globalState.isHelpModalVisible = true
 }
 
+export const openSponsorModal = () => {
+  globalState.isSponsorModalVisible = true
+}
+
 export const getLocalVersion = () => {
   let version = localConfig.general.version
   // handle old version 兼容小于0.9版本的旧数据结构
@@ -391,8 +396,14 @@ export const handleUpdate = async() => {
   }
   log('Get new version', pkg.version)
   localConfig.general.version = pkg.version
-  openWhatsNewModal() // 展示更新内容
-  await updateSetting() // 刷新配置设置
+  // 更新成功提示
+  window.$notification.success({
+    title: `${window.$t('common.update')}${window.$t('common.success')}`,
+    content: `${window.$t('common.version')} ${pkg.version}`,
+    duration: 5000,
+  })
+  // 刷新配置设置
+  await updateSetting()
 }
 
 export const createTab = (url: string, active = true) => {

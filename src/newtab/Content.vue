@@ -4,6 +4,7 @@
   <RightClickMenu />
   <HelpModal />
   <WhatsNewModal />
+  <SponsorModal />
   <MoveableGuideLine />
   <MoveableElementDrawer />
   <!-- element -->

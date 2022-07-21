@@ -72,9 +72,10 @@ body {
   white-space: pre-line;
   overflow-y: scroll;
   &::-webkit-scrollbar {
-    width: 10px;
+    display: none;
+    /* width: 10px; */
   }
-  &::-webkit-scrollbar-thumb {
+  /* &::-webkit-scrollbar-thumb {
     background: #808080;
     border-radius: 5px;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
@@ -83,5 +84,5 @@ body {
     background: #ccc;
     border-radius: 5px;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  }
+  } */
 }
