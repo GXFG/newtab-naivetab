@@ -13,33 +13,40 @@
           <NTabs type="segment" animated justify-content="space-evenly" @update:value="handleChangeCurrTab">
             <NTabPane v-for="source in selectNewsSourceList" :key="source.value" :name="source.value" :tab="source.label">
               <div class="news__content">
-                <div v-for="(item, index) in newsState[source.value] && newsState[source.value].list" :key="item.desc" class="content__item">
-                  <p
-                    class="row__index"
-                    :class="{
-                      row__index__1: index === 0,
-                      row__index__2: index === 1,
-                      row__index__3: index === 2,
-                    }"
-                  >
-                    {{ index + 1 }}
-                  </p>
-                  <div
-                    class="row__content"
-                    :class="{
-                      'row__content--hover': !isDragMode,
-                    }"
-                    :title="item.desc"
-                    @click="onOpenPage(item.url)"
-                    @mousedown="onMouseDownKey($event, item.url)"
-                  >
-                    <p class="content__desc">
-                      {{ item.desc }}
+                <div v-if="newsState[source.value] && newsState[source.value].list.length !== 0">
+                  <div v-for="(item, index) in newsState[source.value] && newsState[source.value].list" :key="item.desc" class="content__item">
+                    <p
+                      class="row__index"
+                      :class="{
+                        row__index__1: index === 0,
+                        row__index__2: index === 1,
+                        row__index__3: index === 2,
+                      }"
+                    >
+                      {{ index + 1 }}
                     </p>
-                    <p class="content__hot">
-                      {{ item.hot }}
-                    </p>
+                    <div
+                      class="row__content"
+                      :class="{
+                        'row__content--hover': !isDragMode,
+                      }"
+                      :title="item.desc"
+                      @click="onOpenPage(item.url)"
+                      @mousedown="onMouseDownKey($event, item.url)"
+                    >
+                      <p class="content__desc">
+                        {{ item.desc }}
+                      </p>
+                      <p class="content__hot">
+                        {{ item.hot }}
+                      </p>
+                    </div>
                   </div>
+                </div>
+                <div v-else class="content__empty">
+                  <NButton ghost @click="onRetryNews(source.value)">
+                    {{ $t('common.retry') }}
+                  </NButton>
                 </div>
               </div>
             </NTabPane>
@@ -61,6 +68,7 @@ import {
   getLayoutStyle,
   getStyleField,
   updateNews,
+  onRetryNews,
   refreshNews,
 } from '@/logic'
 
@@ -68,13 +76,13 @@ const CNAME = 'news'
 const isRender = getIsComponentRender(CNAME)
 
 const selectNewsSourceList = computed(() =>
-  localConfig.news.sourceList.map((key: string) => ({
+  localConfig.news.sourceList.map((key: NewsSources) => ({
     label: window.$t(`news.${key}`),
     value: key,
   })),
 )
 
-const handleChangeCurrTab = (value: string) => {
+const handleChangeCurrTab = (value: NewsSources) => {
   globalState.currNewsTabValue = value
 }
 
@@ -199,6 +207,12 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
             color: v-bind(customFontActiveColor);
             cursor: pointer;
           }
+        }
+        .content__empty {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: v-bind(customHeight);
         }
       }
     }

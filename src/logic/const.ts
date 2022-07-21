@@ -1,3 +1,5 @@
+export const URL_CHROME_STORE = 'https://chrome.google.com/webstore/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem?utm_source=chrome-ntp-icon'
+export const URL_EDGE_STORE = 'https://microsoftedge.microsoft.com/addons/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/kejadmppkffccjopodhekdnmkofidmjl'
 export const URL_GITHUB = 'https://github.com/GXFG/newtab-naivetab'
 export const URL_GITHUB_ISSUSE = 'https://github.com/GXFG/newtab-naivetab/issues'
 export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
@@ -79,6 +81,13 @@ export const WEATHER_TEMPERATURE_UNIT_MAP = {
 export const WEATHER_SPEED_UNIT_MAP = {
   mph: 'mph',
   kph: 'km/h',
+}
+
+export const NEWS_SOURCE_MAP = {
+  baidu: 'https://top.baidu.com/board?tab=realtime',
+  zhihu: 'https://www.zhihu.com/hot',
+  weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
+  v2ex: 'https://www.v2ex.com/?tab=hot',
 }
 
 /**

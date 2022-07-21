@@ -298,7 +298,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           display: flex;
           justify-content: center;
           align-items: center;
-          width: 25%;
+          margin: 0 8%;
           cursor: pointer;
         }
         .item__select_year {

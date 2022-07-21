@@ -13,8 +13,11 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import { isEdge } from '@/env'
 import {
   URL_GITHUB_ISSUSE,
+  URL_CHROME_STORE,
+  URL_EDGE_STORE,
   isDragMode,
   toggleIsDragMode,
   switchSettingDrawerVisible,
@@ -23,6 +26,7 @@ import {
   createTab,
   openHelpModal,
   openWhatsNewModal,
+  openSponsorModal,
 } from '@/logic'
 
 const state = reactive({
@@ -32,55 +36,74 @@ const state = reactive({
   currComponentName: '',
 })
 
+const renderIconFunc = (icon: string) => () => h(Icon, { icon })
+
 const menuList = computed(() => [
   {
     label:
       (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`))
       + window.$t('common.setting'),
     key: 'setting',
-    icon: () => h(Icon, { icon: 'ion:settings-outline' }),
+    icon: renderIconFunc('ion:settings-outline'),
     disabled: isDragMode.value,
   },
   {
     label: isDragMode.value ? `${window.$t('common.exit')}${window.$t('common.dragMode')}` : window.$t('common.dragMode'),
     key: 'dragMode',
-    icon: () => h(Icon, { icon: 'tabler:drag-drop' }),
+    icon: renderIconFunc('tabler:drag-drop'),
   },
   {
     type: 'divider',
     key: 'd1',
   },
   {
-    label: window.$t('common.other'),
-    key: 'other',
-    icon: () => h(Icon, { icon: 'ph:info-bold' }),
+    label: window.$t('help.title'),
+    key: 'help',
+    icon: renderIconFunc('ph:info-bold'),
     children: [
       {
         label: window.$t('common.usingHelp'),
-        key: 'help',
-        icon: () => h(Icon, { icon: 'ic:baseline-help-outline' }),
+        key: 'usingHelp',
+        icon: renderIconFunc('ic:baseline-help-outline'),
       },
       {
         label: window.$t('common.whatsNew'),
         key: 'whatsNew',
-        icon: () => h(Icon, { icon: 'ic:outline-new-releases' }),
+        icon: renderIconFunc('ic:outline-new-releases'),
       },
     ],
   },
   {
-    label: window.$t('common.feedback'),
-    key: 'feedback',
-    icon: () => h(Icon, { icon: 'bx:message-rounded-dots' }),
+    label: window.$t('common.other'),
+    key: 'other',
+    icon: renderIconFunc('ph:heart-bold'),
     children: [
       {
-        label: 'Github',
-        key: 'feedbackGithub',
-        icon: () => h(Icon, { icon: 'carbon:logo-github' }),
+        label: window.$t('common.feedback'),
+        key: 'feedback',
+        icon: renderIconFunc('bx:message-rounded-dots'),
+        children: [
+          {
+            label: 'Github',
+            key: 'feedbackGithub',
+            icon: renderIconFunc('carbon:logo-github'),
+          },
+          {
+            label: 'Email',
+            key: 'feedbackEmail',
+            icon: renderIconFunc('mdi:email-outline'),
+          },
+        ],
       },
       {
-        label: 'Email',
-        key: 'feedbackEmail',
-        icon: () => h(Icon, { icon: 'mdi:email-outline' }),
+        label: window.$t('rightMenu.positiveFeedback'),
+        key: 'positiveFeedback',
+        icon: renderIconFunc('ph:thumbs-up-bold'),
+      },
+      {
+        label: window.$t('rightMenu.buyMeACoffee'),
+        key: 'buyMeACoffee',
+        icon: renderIconFunc('ep:coffee'),
       },
     ],
   },
@@ -99,7 +122,7 @@ const menuActionMap = {
     switchSettingDrawerVisible(false)
     toggleIsDragMode()
   },
-  help: () => {
+  usingHelp: () => {
     openHelpModal()
   },
   whatsNew: () => {
@@ -109,9 +132,13 @@ const menuActionMap = {
     createTab(URL_GITHUB_ISSUSE)
   },
   feedbackEmail: () => {
-    const a = document.createElement('a')
-    a.href = 'mailto:gxfgim@outlook.com?subject=NaiveTab Feedback'
-    a.click()
+    createTab('mailto:gxfgim@outlook.com?subject=NaiveTab Feedback')
+  },
+  positiveFeedback: () => {
+    createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)
+  },
+  buyMeACoffee: () => {
+    openSponsorModal()
   },
 }
 
@@ -145,5 +172,8 @@ document.oncontextmenu = handleContextMenu
 <style>
 .n-dropdown-menu {
   user-select: none;
+  .n-dropdown-option-body__prefix {
+    z-index: 2;
+  }
 }
 </style>

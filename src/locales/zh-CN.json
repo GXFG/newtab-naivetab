@@ -67,20 +67,35 @@
     "save": "保存",
     "current": "当前",
     "sync": "同步",
+    "update": "更新",
     "upload": "上传",
     "setting": "设置",
     "dragMode": "画布模式",
     "feedback": "反馈建议",
-    "other": "其他"
+    "other": "其他",
+    "help": "帮助",
+    "retry": "重试"
   },
   "prompts": {
     "pleaseWait": "执行中，请稍等",
     "imageTooLarge": "图片体积过大",
     "favoriteLimt": "已达到收藏最大数"
   },
+  "rightMenu": {
+    "encourage": "鼓励",
+    "positiveFeedback": "给个好评",
+    "buyMeACoffee": "买杯咖啡"
+  },
   "help": {
     "title": "帮助",
-    "content": "1. 通过鼠标右键进入“设置抽屉”、“画布模式”\n 2. “画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成布局\n 3. 选中组件后可拖动至垃圾桶，或按delete、backspace键以移除\n 4. 可按Esc键退出画布模式、关闭抽屉\n 5. 可通过鼠标中键点按书签或Shift + 按键以完成后台打开书签\n"
+    "content": "1. 通过单击鼠标右键进入“设置”、“画布模式”\n 2. “画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成添加和布局\n 3. 选中组件后可拖动至垃圾桶，或按delete/backspace键以移除\n 4. 通过按Esc键退出画布模式、关闭抽屉\n 5. 通过鼠标中键点按书签或Shift + 按键以完成后台打开书签\n"
+  },
+  "sponsor": {
+    "title": "给作者买杯咖啡",
+    "content": "我是一名个人开发者，NaiveTab的成长离不开您的支持和鼓励，如果NaiveTab对您有帮助，可以支持一下。",
+    "confirm": "下次一定",
+    "alipay": "支付宝",
+    "wechat": "微信"
   },
   "setting": {
     "general": "通用",

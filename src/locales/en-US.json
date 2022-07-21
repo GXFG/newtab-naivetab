@@ -67,20 +67,35 @@
     "save": "Save",
     "current": "Current",
     "sync": "Sync",
+    "update": "Update",
     "upload": "Upload",
     "setting": "Setting",
     "dragMode": "DragMode",
     "feedback": "Feedback",
-    "other": "Other"
+    "other": "Other",
+    "help": "Help",
+    "retry": "Retry"
   },
   "prompts": {
     "pleaseWait": "In progress, Please wait",
     "imageTooLarge": "Image too large",
     "favoriteLimt": "The maximum number of favorites has been reached"
   },
+  "rightMenu": {
+    "encourage": "Encourage",
+    "positiveFeedback": "Give a positive feedback",
+    "buyMeACoffee": "Buy me a coffee"
+  },
   "help": {
     "title": "Help",
-    "content": "1. Enter SettingsDrawer, DragMode by right mouse button 2. Select the left component with the mouse, press the left button and drag to the screen to complete the layout\n 3. After selecting a component, you can press delete or backspace to delete\n 4. Press Esc to exit\n 5. Bookmarks or Shift + keys can be clicked with the middle mouse button to open bookmarks when done\n"
+    "content": "1. Enter Settings, DragMode by click right mouse button 2. Select the left component with the mouse, press the left button and drag to the screen to complete the layout\n 3. After selecting a component, you can press delete or backspace to delete\n 4. Press Esc to exit\n 5. Bookmarks or Shift + keys can be clicked with the middle mouse button to open bookmarks when done\n"
+  },
+  "sponsor": {
+    "title": "Sponsor a coffee",
+    "content": "I am a personal developer, NaiveTab can not grow without your support and encouragement, if NaiveTab is helpful to you, you can sponsor it.",
+    "confirm": "Next time for sure",
+    "alipay": "Alipay",
+    "wechat": "Wechat"
   },
   "setting": {
     "general": "General",
