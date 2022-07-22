@@ -20,16 +20,16 @@ export const KEYBOARD_KEY_LIST = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '
  * real key code -> label key
  */
 export const KEYBOARD_CODE_TO_LABEL_MAP = {
-  '-': '-',
-  '=': '+',
-  'Backspace': 'BS',
-  '[': '{',
-  ']': '}',
-  ';': ':',
-  '\'': '"',
-  ',': '<',
-  '.': '>',
-  '/': '?',
+  Minus: '-',
+  Equal: '+',
+  Backspace: 'BS',
+  BracketLeft: '{',
+  BracketRight: '}',
+  Semicolon: ':',
+  Quote: '"',
+  Comma: '<',
+  Period: '>',
+  Slash: '?',
 }
 
 // MAX_WRITE_OPERATIONS_PER_HOUR = 1800, https://developer.chrome.com/docs/extensions/reference/storage/#property-sync

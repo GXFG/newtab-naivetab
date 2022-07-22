@@ -23,7 +23,7 @@ const getKeyboardList = (originList: any[]) => {
       rowList.push(originList.slice(range[0]))
     } else {
       if (Array.isArray(range[0])) {
-        // 处理特殊按键的拼接，如：数字 + BS [[0, 10], [12, 13]]
+        // 处理特殊按键的拼接，如：数字行 + BS [[0, 10], [12, 13]]
         let tempList: any = []
         for (const rangeItem of range) {
           tempList = [...tempList, ...originList.slice(rangeItem[0], rangeItem[1])]

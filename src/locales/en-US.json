@@ -88,7 +88,7 @@
   },
   "help": {
     "title": "Help",
-    "content": "1. Enter Settings, DragMode by click right mouse button 2. Select the left component with the mouse, press the left button and drag to the screen to complete the layout\n 3. After selecting a component, you can press delete or backspace to delete\n 4. Press Esc to exit\n 5. Bookmarks or Shift + keys can be clicked with the middle mouse button to open bookmarks when done\n"
+    "content": "1. Enter Settings, DragMode by click right mouse button 2. Select the left component with the mouse, press the left button and drag to the screen to complete the layout\n 3. After selecting a component, you can press delete or backspace to delete\n 4. Press Esc to exit\n 5. Bookmarks or Shift/Alt + keys can be clicked with the middle mouse button to open bookmarks when done\n"
   },
   "sponsor": {
     "title": "Sponsor a coffee",

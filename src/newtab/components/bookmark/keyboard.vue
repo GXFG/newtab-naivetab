@@ -76,8 +76,8 @@ const delayResetPressKey = () => {
   }, 200)
 }
 
-const openPage = (url: string, active = true) => {
-  if (!active) {
+const openPage = (url: string, isBgOpen = false) => {
+  if (isBgOpen) {
     // 后台打开
     createTab(url, false)
     delayResetPressKey()
@@ -87,12 +87,18 @@ const openPage = (url: string, active = true) => {
     // 以新标签页打开
     createTab(url)
     delayResetPressKey()
-  } else {
-    // 当前新标签页打开
-    state.isLoadPageLoading = true
-    window.$loadingBar.start()
-    window.location.href = url
+    return
   }
+  if (!/http/.test(url)) {
+    // 非http协议只能以新标签页打开
+    createTab(url)
+    delayResetPressKey()
+    return
+  }
+  // 当前标签页打开
+  state.isLoadPageLoading = true
+  window.$loadingBar.start()
+  window.location.href = url
 }
 
 const onClickKey = (key: string, url: string) => {
@@ -118,26 +124,35 @@ const onMouseDownKey = (e: MouseEvent, url: string) => {
 let timer = null as any
 
 const keyboardTask = (e: KeyboardEvent) => {
-  const { key, shiftKey } = e
-  const lowerCaseKey = key.toLowerCase()
-  const translateKey = KEYBOARD_CODE_TO_LABEL_MAP[lowerCaseKey] || lowerCaseKey
-  const index = KEYBOARD_KEY_LIST.indexOf(translateKey)
+  const { code, shiftKey, ctrlKey, altKey, metaKey } = e
+  let labelKey = KEYBOARD_CODE_TO_LABEL_MAP[code] || code
+  if (/Key|Digit/.test(labelKey)) {
+    // 处理字母和数字按键
+    labelKey = labelKey.slice(-1).toLowerCase()
+  }
+  const index = KEYBOARD_KEY_LIST.indexOf(labelKey)
   if (index === -1) {
+    return
+  }
+  if (ctrlKey || metaKey) {
+    // 忽略ctrl/meta键
     return
   }
   const url = localBookmarkList.value[index].url
   if (url.length === 0) {
     return
   }
+  // 按下shift/alt + key 可以后台打开书签
+  const isBgOpenPage = shiftKey || altKey
   if (!localConfig.bookmark.isDblclickOpen) {
-    state.currSelectKey = translateKey
-    openPage(url, !shiftKey)
+    state.currSelectKey = labelKey
+    openPage(url, isBgOpenPage)
   } else {
     clearTimeout(timer)
-    if (translateKey === state.currSelectKey) {
-      openPage(url, !shiftKey)
+    if (labelKey === state.currSelectKey) {
+      openPage(url, isBgOpenPage)
     } else {
-      state.currSelectKey = translateKey
+      state.currSelectKey = labelKey
       timer = setTimeout(() => {
         state.currSelectKey = ''
       }, localConfig.bookmark.dblclickIntervalTime)
