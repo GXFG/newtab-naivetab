@@ -302,7 +302,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           cursor: pointer;
         }
         .item__select_year {
-          width: 75px;
+          width: 80px;
         }
         .item__select_month {
           flex: 0 0 auto;
