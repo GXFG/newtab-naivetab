@@ -331,9 +331,11 @@ export const globalState = reactive({
 
 const initAvailableFontList = async() => {
   const fontCheck = new Set(FONT_LIST.sort())
+  // 在所有字体加载完成后进行操作
   await document.fonts.ready
   const availableList = new Set()
   for (const font of fontCheck.values()) {
+    // https://developer.mozilla.org/zh-CN/docs/Web/API/FontFaceSet/check
     if (document.fonts.check(`12px "${font}"`)) {
       availableList.add(font)
     }
