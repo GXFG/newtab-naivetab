@@ -85,8 +85,12 @@ const mergeState = (state: any, acceptState: any) => {
   if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
     return acceptState
   }
-  // 二者均为Object、且state为空Object时，返回acceptState，对应案例如setting中的keymap数据
+  // 二者均为Object，且state为空Object时，返回acceptState
   if (Object.keys(state).length === 0) {
+    return acceptState
+  }
+  // 二者均为Object，特殊处理keymap数据，直接返回acceptState
+  if (Object.prototype.hasOwnProperty.call(state, 'q')) {
     return acceptState
   }
   const filterState = {} as any

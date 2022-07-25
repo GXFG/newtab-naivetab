@@ -41,24 +41,6 @@ export const keyboardSettingRowList = computed(() => getKeyboardList(KEYBOARD_KE
 
 export const keyboardRowList = computed(() => getKeyboardList(localBookmarkList.value))
 
-const isInitialized = useStorageLocal('data-bookmark-initialized', false)
-
-export const initBookmarkListData = () => {
-  if (isInitialized.value) {
-    return
-  }
-  log('Bookmark initLocalList')
-  localBookmarkList.value = []
-  KEYBOARD_KEY_LIST.forEach((key: string) => {
-    localBookmarkList.value.push({
-      key,
-      url: '',
-      name: '',
-    })
-  })
-  isInitialized.value = true
-}
-
 export const getDefaultBookmarkName = (url: string) => {
   if (!url) {
     return ''
@@ -79,27 +61,26 @@ export const getDefaultBookmarkName = (url: string) => {
   return name
 }
 
+const isInitialized = useStorageLocal('data-bookmark-initialized', false)
+
 const mergeBookmarkSetting = useDebounceFn(async() => {
   log('Bookmark merge setting')
-  if (!isInitialized) {
-    await sleep(300)
-  }
   for (const key of KEYBOARD_KEY_LIST) {
     const index = KEYBOARD_KEY_LIST.indexOf(key)
     const item = localConfig.bookmark.keymap[key]
-    if (!item) {
+    if (item) {
+      localBookmarkList.value[index] = {
+        key,
+        url: item.url.includes('//') ? item.url : `https://${item.url}`,
+        name: item.name || getDefaultBookmarkName(item.url),
+      }
+    } else {
       // 初始化无设置数据的按键
       localBookmarkList.value[index] = {
         key,
         url: '',
         name: '',
       }
-      continue
-    }
-    localBookmarkList.value[index] = {
-      key,
-      url: item.url.includes('//') ? item.url : `https://${item.url}`,
-      name: item.name || getDefaultBookmarkName(item.url),
     }
   }
 }, MERGE_BOOKMARK_DELAY)
@@ -111,3 +92,20 @@ watch(
   },
   { deep: true },
 )
+
+export const initBookmarkListData = () => {
+  if (isInitialized.value) {
+    return
+  }
+  log('Bookmark initLocalList')
+  localBookmarkList.value = []
+  KEYBOARD_KEY_LIST.forEach((key: string) => {
+    localBookmarkList.value.push({
+      key,
+      url: '',
+      name: '',
+    })
+  })
+  isInitialized.value = true
+  mergeBookmarkSetting()
+}

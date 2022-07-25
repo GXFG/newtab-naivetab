@@ -66,10 +66,31 @@ export const defaultConfig = {
     isSymbolEnabled: true,
     isNumberEnabled: false,
     isNewTabOpen: true,
-    isDblclickOpen: true,
+    isDblclickOpen: false,
     isNameVisible: true,
     dblclickIntervalTime: 200, // ms
-    keymap: {},
+    keymap: {
+      q: {
+        url: 'www.baidu.com',
+        name: '',
+      },
+      w: {
+        url: 's.weibo.com/top/summary?cate=realtimehot',
+        name: 'weibo',
+      },
+      e: {
+        url: 'www.zhihu.com',
+        name: '',
+      },
+      b: {
+        url: 't.bilibili.com',
+        name: 'bilibili',
+      },
+      v: {
+        url: 'www.v2ex.com',
+        name: '',
+      },
+    },
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 50,
