@@ -18,7 +18,7 @@ export const styleConst = ref({
   auxiliaryLineElement: ['#69c0ff', ''],
   bgMoveableComponentMain: ['rgba(100,181,246, 0.5)', ''],
   bgMoveableComponentActive: ['rgba(100,181,246, 0.7)', ''],
-  bgMoveableComponentDelete: ['rgba(250,82,82, 0.7)', ''],
+  bgMoveableComponentDelete: ['rgba(250,82,82, 1)', ''],
   moveableToolDeleteBtnColor: ['#ffa39e', ''],
   borderMoveableToolItem: ['#95a5a6', ''],
   bgMoveableToolDrawer: ['rgba(0, 0, 0, 0.6)', ''],

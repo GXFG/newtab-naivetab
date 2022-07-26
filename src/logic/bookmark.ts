@@ -1,6 +1,6 @@
 import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, sleep, log } from '@/logic'
+import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 

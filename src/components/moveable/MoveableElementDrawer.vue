@@ -343,7 +343,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
     cursor: pointer;
     transition: all 0.3s ease;
     .delete__icon {
-      font-size: 36px;
+      font-size: 38px;
       color: v-bind(bgMoveableComponentDelete);
     }
   }

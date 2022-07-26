@@ -65,7 +65,7 @@ export const defaultConfig = {
     enabled: false,
     isSymbolEnabled: true,
     isNumberEnabled: false,
-    isNewTabOpen: true,
+    isNewTabOpen: false,
     isDblclickOpen: false,
     isNameVisible: true,
     dblclickIntervalTime: 200, // ms
@@ -80,6 +80,10 @@ export const defaultConfig = {
       },
       e: {
         url: 'www.zhihu.com',
+        name: '',
+      },
+      g: {
+        url: 'www.google.com',
         name: '',
       },
       b: {
@@ -373,22 +377,8 @@ export const switchSettingDrawerVisible = (status: boolean) => {
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localConfig.general.lang] || 'en')
 
-export const isFirstOpen = useStorageLocal('data-first', true)
-
-export const initFirstOpen = () => {
-  if (!isFirstOpen.value) {
-    return
-  }
-  // 首次打开扩展时，打开画布模式 & 帮助弹窗
-  toggleIsDragMode(true)
-  isFirstOpen.value = false
-}
-
 export const openWhatsNewModal = () => {
   globalState.isWhatsNewModalVisible = true
-}
-export const closeWhatsNewModal = () => {
-  globalState.isWhatsNewModalVisible = false
 }
 
 export const openHelpModal = () => {
@@ -397,6 +387,18 @@ export const openHelpModal = () => {
 
 export const openSponsorModal = () => {
   globalState.isSponsorModalVisible = true
+}
+
+export const isFirstOpen = useStorageLocal('data-first', true)
+
+export const initFirstOpen = () => {
+  if (!isFirstOpen.value) {
+    return
+  }
+  // 首次打开扩展时，打开画布模式 & 帮助弹窗
+  toggleIsDragMode(true)
+  openHelpModal()
+  isFirstOpen.value = false
 }
 
 export const getLocalVersion = () => {

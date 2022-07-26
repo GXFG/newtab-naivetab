@@ -19,25 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import { globalState, isFirstOpen, isDragMode } from '@/logic'
+import { globalState } from '@/logic'
 
 const onCloseModal = () => {
   globalState.isHelpModalVisible = false
 }
 
-watch(
-  isDragMode,
-  (value) => {
-    if (!value) {
-      return
-    }
-    if (!isFirstOpen.value) {
-      return
-    }
-    globalState.isHelpModalVisible = true
-  },
-  { immediate: true },
-)
 </script>
 
 <style scoped>
