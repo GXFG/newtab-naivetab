@@ -32,6 +32,7 @@
                     :class="{ 'label__info--move': isDragMode }"
                     @mouseenter="handleWarningMouseEnter()"
                     @mouseleave="handleWarningMouseLeave()"
+                    @click="onPinWarning()"
                   >
                     <vaadin:warning />
                   </div>
@@ -40,7 +41,7 @@
                   <p class="weather__indices">
                     {{ weatherWarningInfo }}
                   </p>
-                  <div v-if="weatherState.state.isWarningVisible" class="icon__wrap" @click="onCloseWarning()">
+                  <div v-if="weatherState.state.isWarningVisible" class="icon__wrap" @click="onUnpinWarning()">
                     <ri:close-circle-line />
                   </div>
                 </div>
@@ -156,7 +157,11 @@ const handleWarningMouseLeave = () => {
   state.isWarningVisible = false
 }
 
-const onCloseWarning = () => {
+const onPinWarning = () => {
+  weatherState.value.state.isWarningVisible = true
+}
+
+const onUnpinWarning = () => {
   weatherState.value.state.isWarningVisible = false
 }
 

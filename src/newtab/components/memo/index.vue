@@ -80,6 +80,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         height: v-bind(customHeight);
         font-size: v-bind(customFontSize);
         .n-input__textarea-el {
+          caret-color: v-bind(customFontColor);
           color: v-bind(customFontColor);
         }
       }
