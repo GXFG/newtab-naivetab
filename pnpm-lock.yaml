@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@antfu/eslint-config': ^0.20.7
   '@ffflorian/jszip-cli': ^3.1.6
-  '@iconify/json': ^2.1.83
+  '@iconify/json': ^2.1.84
   '@iconify/vue': ^3.2.1
   '@intlify/vite-plugin-vue-i18n': ^3.4.0
   '@types/chrome': ^0.0.162
@@ -50,7 +50,7 @@ dependencies:
 devDependencies:
   '@antfu/eslint-config': 0.20.7_he2ccbldppg44uulnyq4rwocfa
   '@ffflorian/jszip-cli': 3.1.6
-  '@iconify/json': 2.1.83
+  '@iconify/json': 2.1.84
   '@iconify/vue': 3.2.1_vue@3.2.37
   '@intlify/vite-plugin-vue-i18n': 3.4.0_2ucvgzqnxo56d5qy6khcbzvdn4
   '@types/chrome': 0.0.162
@@ -71,11 +71,11 @@ devDependencies:
   naive-ui: 2.31.0_vue@3.2.37
   npm-run-all: 4.1.5
   rimraf: 3.0.2
-  rollup-plugin-visualizer: 5.7.1_rollup@2.77.1
+  rollup-plugin-visualizer: 5.7.1_rollup@2.77.2
   typescript: 4.7.4
-  unplugin-auto-import: 0.9.5_z4seaqqmwsgsh7pjdzdgb5cpiq
-  unplugin-icons: 0.14.7_2awbhycstr2jrux72dcwp2osdm
-  unplugin-vue-components: 0.19.9_y5stac3jxhs2fbmhp2zlj4fwrm
+  unplugin-auto-import: 0.9.5_kkjciaguuhchr73omjqcr7jhve
+  unplugin-icons: 0.14.7_25rezm3dw2idd4lrey66azaqau
+  unplugin-vue-components: 0.19.9_xwyo2vbexlji4if5xmwd3ephdm
   vite: 2.9.14
   vite-plugin-md: 0.11.9_vite@2.9.14
   vite-plugin-windicss: 1.8.7_vite@2.9.14
@@ -336,8 +336,8 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@iconify/json/2.1.83:
-    resolution: {integrity: sha512-mapm/qoT4xbROvSI8Ol90P4lFb74vK4oSzWftg2GmiVYcdPO5TENwf9Odtx+xLhjiFHwfeZk+dn/NNqBbybr3w==}
+  /@iconify/json/2.1.84:
+    resolution: {integrity: sha512-e/EbhMina1Pqt7JhFVPbw5iJo0TpJRiJDfVzIKoUjQiucYOVbLKP7WLir+uYF99W1pnXTA+izYETBdEXM3M0nA==}
     dependencies:
       '@iconify/types': 1.1.0
       pathe: 0.3.2
@@ -5718,7 +5718,7 @@ packages:
       glob: 7.2.3
     dev: true
 
-  /rollup-plugin-visualizer/5.7.1_rollup@2.77.1:
+  /rollup-plugin-visualizer/5.7.1_rollup@2.77.2:
     resolution: {integrity: sha512-E/IgOMnmXKlc6ICyf53ok1b6DxPeNVUs3R0kYYPuDpGfofT4bkiG+KtSMlGjMACFmfwbbqTVDZBIF7sMZVKJbA==}
     engines: {node: '>=14'}
     hasBin: true
@@ -5727,13 +5727,13 @@ packages:
     dependencies:
       nanoid: 3.3.4
       open: 8.4.0
-      rollup: 2.77.1
+      rollup: 2.77.2
       source-map: 0.7.4
       yargs: 17.5.1
     dev: true
 
-  /rollup/2.77.1:
-    resolution: {integrity: sha512-GhutNJrvTYD6s1moo+kyq7lD9DeR5HDyXo4bDFlDSkepC9kVKY+KK/NSZFzCmeXeia3kEzVuToQmHRdugyZHxw==}
+  /rollup/2.77.2:
+    resolution: {integrity: sha512-m/4YzYgLcpMQbxX3NmAqDvwLATZzxt8bIegO78FZLl+lAgKJBd1DRAOeEiZcKOIOPjxE6ewHWHNgGEalFXuz1g==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
@@ -6502,7 +6502,7 @@ packages:
       through: 2.3.8
     dev: true
 
-  /unimport/0.4.7_gb7pxktvahb4daphcpsfap3rg4:
+  /unimport/0.4.7_6dn5uy4nku3tvd4e66pn7imirq:
     resolution: {integrity: sha512-V2Pbscd1VSdgWm1/OI2pjtydEOTjE7DDnHZKhpOq7bSUBc1i8+1f6PK8jI1lJ1plRDcSNr0DLtAmtU9NPkFQpw==}
     dependencies:
       '@rollup/pluginutils': 4.2.1
@@ -6514,7 +6514,7 @@ packages:
       pathe: 0.3.2
       scule: 0.2.1
       strip-literal: 0.4.0
-      unplugin: 0.7.2_gb7pxktvahb4daphcpsfap3rg4
+      unplugin: 0.7.2_6dn5uy4nku3tvd4e66pn7imirq
     transitivePeerDependencies:
       - esbuild
       - rollup
@@ -6550,7 +6550,7 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /unplugin-auto-import/0.9.5_z4seaqqmwsgsh7pjdzdgb5cpiq:
+  /unplugin-auto-import/0.9.5_kkjciaguuhchr73omjqcr7jhve:
     resolution: {integrity: sha512-CskZjMM+p/QZev7y4JgaAFrf63ui4VGS4HrDMm6VIiVjwnmQ0wPugo58GGhYa+W2Hyv6zGffYO6uYHfeVlDZDA==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -6564,8 +6564,8 @@ packages:
       '@vueuse/core': 8.9.4_vue@3.2.37
       local-pkg: 0.4.2
       magic-string: 0.26.2
-      unimport: 0.4.7_gb7pxktvahb4daphcpsfap3rg4
-      unplugin: 0.7.2_gb7pxktvahb4daphcpsfap3rg4
+      unimport: 0.4.7_6dn5uy4nku3tvd4e66pn7imirq
+      unplugin: 0.7.2_6dn5uy4nku3tvd4e66pn7imirq
     transitivePeerDependencies:
       - esbuild
       - rollup
@@ -6573,7 +6573,7 @@ packages:
       - webpack
     dev: true
 
-  /unplugin-icons/0.14.7_2awbhycstr2jrux72dcwp2osdm:
+  /unplugin-icons/0.14.7_25rezm3dw2idd4lrey66azaqau:
     resolution: {integrity: sha512-TrNnEdpaXMdiG5BsCgvU6cv/gSLYvIk1f8wGCGZmOo4wmi3nqYBuqIEuiXhmmyXdDZuRRpCaOzCnCYYZ5H7U8g==}
     peerDependencies:
       '@svgr/core': '>=5.5.0'
@@ -6597,7 +6597,7 @@ packages:
       debug: 4.3.4
       kolorist: 1.5.1
       local-pkg: 0.4.2
-      unplugin: 0.7.2_gb7pxktvahb4daphcpsfap3rg4
+      unplugin: 0.7.2_6dn5uy4nku3tvd4e66pn7imirq
     transitivePeerDependencies:
       - esbuild
       - rollup
@@ -6606,7 +6606,7 @@ packages:
       - webpack
     dev: true
 
-  /unplugin-vue-components/0.19.9_y5stac3jxhs2fbmhp2zlj4fwrm:
+  /unplugin-vue-components/0.19.9_xwyo2vbexlji4if5xmwd3ephdm:
     resolution: {integrity: sha512-i5mZtg85euPWZrGswFkoa9pf4WjKCP5qOjnwOyg3KOKVzFjnP3osCdrunQMjtoMKehTdz1vV6baZH8bZR4PNgg==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -6628,7 +6628,7 @@ packages:
       magic-string: 0.26.2
       minimatch: 5.1.0
       resolve: 1.22.1
-      unplugin: 0.7.2_gb7pxktvahb4daphcpsfap3rg4
+      unplugin: 0.7.2_6dn5uy4nku3tvd4e66pn7imirq
       vue: 3.2.37
     transitivePeerDependencies:
       - esbuild
@@ -6638,7 +6638,7 @@ packages:
       - webpack
     dev: true
 
-  /unplugin/0.7.2_gb7pxktvahb4daphcpsfap3rg4:
+  /unplugin/0.7.2_6dn5uy4nku3tvd4e66pn7imirq:
     resolution: {integrity: sha512-m7thX4jP8l5sETpLdUASoDOGOcHaOVtgNyrYlToyQUvILUtEzEnngRBrHnAX3IKqooJVmXpoa/CwQ/QqzvGaHQ==}
     peerDependencies:
       esbuild: '>=0.13'
@@ -6658,7 +6658,7 @@ packages:
       acorn: 8.8.0
       chokidar: 3.5.3
       esbuild: 0.14.50
-      rollup: 2.77.1
+      rollup: 2.77.2
       vite: 2.9.14
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.4.4
@@ -6807,7 +6807,7 @@ packages:
       esbuild: 0.14.50
       postcss: 8.4.14
       resolve: 1.22.1
-      rollup: 2.77.1
+      rollup: 2.77.2
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

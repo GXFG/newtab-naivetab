@@ -27,6 +27,7 @@ import {
   localConfig,
   localState,
   renderBackgroundImage,
+  setEdgeFavicon,
   downloadConfig,
   initFirstOpen,
   handleUpdate,
@@ -37,6 +38,7 @@ import {
 
 onMounted(async() => {
   renderBackgroundImage()
+  setEdgeFavicon()
   startTimer()
   startKeyboard()
   downloadConfig()

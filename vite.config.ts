@@ -63,15 +63,16 @@ export const sharedConfig: UserConfig = {
     // https://github.com/antfu/unplugin-icons
     Icons(),
 
+    // html内引用的资源直接存储在/extension/assets, 无需转换
     // rewrite assets to use relative path
-    {
-      name: 'assets-rewrite',
-      enforce: 'post',
-      apply: 'build',
-      transformIndexHtml(html, { path }) {
-        return html.replace(/"\/assets\//g, `"${relative(dirname(path), '/assets')}/`)
-      },
-    },
+    // {
+    //   name: 'assets-rewrite',
+    //   enforce: 'post',
+    //   apply: 'build',
+    //   transformIndexHtml(html, { path }) {
+    //     return html.replace(/"\/assets\//g, `"${relative(dirname(path), '/assets')}/`)
+    //   },
+    // },
 
     // visualizer(),
   ],

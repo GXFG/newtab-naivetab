@@ -1,5 +1,5 @@
 import pkg from '../../package.json'
-import { isChrome } from '@/env'
+import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
 import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, log } from '@/logic'
@@ -103,9 +103,9 @@ export const defaultConfig = {
       yOffsetValue: 1,
       yTranslateValue: 0,
     },
-    margin: 3,
-    width: 50,
-    borderRadius: 4,
+    margin: 2,
+    width: 53,
+    borderRadius: 3,
     fontFamily: 'Arial',
     fontSize: 12,
     fontColor: ['rgba(15, 23, 42, 1)', 'rgba(15, 23, 42, 1)'],
@@ -479,6 +479,21 @@ export const getStyleField = (component: ConfigField, field: string, unit?: stri
     }
     return style
   })
+}
+
+/**
+ * 针对Edge 设置为其他favicon 避免展示黑色方块
+ * 等价于 <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+ */
+export const setEdgeFavicon = () => {
+  if (!isEdge) {
+    return
+  }
+  const link = document.createElement('link')
+  link.setAttribute('rel', 'shortcut icon')
+  link.setAttribute('type', 'image/x-icon')
+  link.setAttribute('href', '/assets/favicon.ico')
+  document.getElementsByTagName('head')[0].appendChild(link)
 }
 
 watch(() => localConfig.general.pageTitle, () => {
