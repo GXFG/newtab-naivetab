@@ -45,7 +45,7 @@
                 </div>
                 <div v-else class="content__empty">
                   <NButton ghost @click="onRetryNews(source.value)">
-                    {{ $t('common.retry') }}
+                    {{ $t('common.login') }}
                   </NButton>
                 </div>
               </div>

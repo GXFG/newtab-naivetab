@@ -6,13 +6,15 @@
     :theme="currTheme"
     :theme-overrides="themeOverrides"
   >
-    <NNotificationProvider>
-      <NMessageProvider>
-        <NLoadingBarProvider>
-          <Content />
-        </NLoadingBarProvider>
-      </NMessageProvider>
-    </NNotificationProvider>
+    <NDialogProvider>
+      <NNotificationProvider>
+        <NMessageProvider>
+          <NLoadingBarProvider>
+            <Content />
+          </NLoadingBarProvider>
+        </NMessageProvider>
+      </NNotificationProvider>
+    </NDialogProvider>
   </NConfigProvider>
 </template>
 

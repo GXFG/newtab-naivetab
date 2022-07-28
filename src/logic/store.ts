@@ -352,7 +352,7 @@ export const globalState = reactive({
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
-  isHelpModalVisible: false,
+  isUserGuideModalVisible: false,
   isWhatsNewModalVisible: false,
   isSponsorModalVisible: false,
   isSearchFocused: false,
@@ -389,7 +389,7 @@ export const openWhatsNewModal = () => {
 }
 
 export const openHelpModal = () => {
-  globalState.isHelpModalVisible = true
+  globalState.isUserGuideModalVisible = true
 }
 
 export const openSponsorModal = () => {

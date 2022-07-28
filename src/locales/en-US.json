@@ -59,7 +59,7 @@
     "format": "Format",
     "linkTips": "Click on ? icon to access the link below",
     "whatsNew": "What's New",
-    "usingHelp": "Using Help",
+    "userGuide": "User Guide",
     "preview": "Preview",
     "switch": "Switch",
     "refresh": "Refresh",
@@ -74,7 +74,8 @@
     "feedback": "Feedback",
     "other": "Other",
     "help": "Help",
-    "retry": "Retry"
+    "retry": "Retry",
+    "login": "Login"
   },
   "prompts": {
     "pleaseWait": "In progress, Please wait",
@@ -86,9 +87,16 @@
     "positiveFeedback": "Give a positive feedback",
     "buyMeACoffee": "Buy me a coffee"
   },
-  "help": {
-    "title": "Help",
-    "content": "1. Enter Settings, DragMode by click right mouse button 2. Select the left component with the mouse, press the left button and drag to the screen to complete the layout\n 3. After selecting a component, you can press delete or backspace to delete\n 4. Press Esc to exit\n 5. Bookmarks or Shift/Alt + keys can be clicked with the middle mouse button to open bookmarks when done\n"
+  "guide": {
+    "title": "User Guide",
+    "text0": "首次使用教程：",
+    "text1": "1. 添加组件：首次安装后，默认处于“画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成对组件的添加和布局",
+    "text2": "2. 删除组件：选中组件后可拖动至右上角的垃圾桶，或按delete/backspace键以移除",
+    "text3": "3. 退出/关闭：通过点击左上角或按Esc键可退出“画布模式”；单击鼠标右键可再次进入“设置”、“画布模式”",
+    "text4": "——————————————————————————————————————",
+    "text5": "组件使用说明：",
+    "text6": "1. 针对所有组件：右键点击组件可打开设置抽屉，可进行包括功能、样式的修改",
+    "text7": "2. 书签：通过鼠标左键点击or按下键盘对应按键完成前台打开书签；鼠标中键点按书签或Shift/Alt + 按键以完成后台打开书签"
   },
   "sponsor": {
     "title": "Sponsor a coffee",
@@ -123,7 +131,7 @@
     "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",
     "importSettingsLabel": "Import setting",
     "importSettingsValue": "Import",
-    "importSettingsTips":"Import settings from a local file. If you encounter problems, please click the export configuration below to compare and merge the differences with the local files currently to be imported, and finally re import",
+    "importSettingsTips": "Import settings from a local file. If you encounter problems, please click the export configuration below to compare and merge the differences with the local files currently to be imported, and finally re import",
     "exportSettingLabel": "Export setting",
     "exportSettingValue": "Export",
     "exportSettingTips": "It is recommended that you export your app settings regularly to prevent the loss of important data",
