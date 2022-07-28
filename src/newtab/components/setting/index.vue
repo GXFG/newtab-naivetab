@@ -141,7 +141,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       top: 0;
       left: 0;
       padding: 15px 50px 0 20px;
-      width: 600px;
+      width: 630px;
       user-select: none;
       background-color: var(--n-color);
     }

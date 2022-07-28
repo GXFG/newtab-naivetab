@@ -2,7 +2,7 @@ import pkg from '../../package.json'
 import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, log } from '@/logic'
+import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -15,10 +15,13 @@ export const defaultConfig = {
     isLoadPageAnimationEnabled: true,
     backgroundImageSource: 1, // 0:localFile, 1:network
     backgroundImageHighQuality: false,
-    backgroundImageName: 'YurisNight_ZH-CN5738817931',
-    backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
+    // backgroundImageName: 'YurisNight_ZH-CN5738817931', v1.0.0删除
+    // backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', v1.0.0删除
+    backgroundImageNames: ['YurisNight_ZH-CN5738817931', 'MoonPhases_ZH-CN3779272016'],
+    backgroundImageDescs: ['宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', '一组月相照片 (© Delpixart/Getty Images)'],
     isBackgroundImageCustomUrlEnabled: false,
-    backgroundImageCustomUrl: '',
+    // backgroundImageCustomUrl: '', v1.0.0删除
+    backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.YurisNight_ZH-CN5738817931_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.MoonPhases_ZH-CN3779272016_1920x1080.jpg'],
     favoriteImageList: [
       {
         name: 'ChurchillBears_ZH-CN1430090934',
@@ -43,6 +46,10 @@ export const defaultConfig = {
       {
         name: 'YurisNight_ZH-CN5738817931',
         desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
+      },
+      {
+        name: 'MoonPhases_ZH-CN3779272016',
+        desc: '一组月相照片 (© Delpixart/Getty Images)',
       },
     ],
     layout: {
@@ -312,7 +319,7 @@ export const localConfig = reactive({
 })
 
 export const localState = useStorageLocal('l-state', {
-  currAppearanceCode: 0, // 0:light | 1:dark
+  currAppearanceCode: 0 as 0 | 1, // 0:light | 1:dark
   syncTimeMap: {
     general: 0,
     bookmark: 0,
@@ -401,23 +408,29 @@ export const initFirstOpen = () => {
   isFirstOpen.value = false
 }
 
-export const getLocalVersion = () => {
-  let version = localConfig.general.version
-  // handle old version 兼容小于0.9版本的旧数据结构
-  const settingGeneral = localStorage.getItem('setting-general')
-  if (settingGeneral) {
-    version = JSON.parse(settingGeneral).version || 0
-  }
-  return version
-}
-
 export const handleUpdate = async() => {
   const version = getLocalVersion()
   log('Version', version)
-  const localVersion = +version.split('.').join('')
-  const currPkgVersion = +pkg.version.split('.').join('')
-  if (localVersion >= currPkgVersion) {
+  if (!compareLeftVersionLessThanRightVersions(version, pkg.version)) {
     return
+  }
+  // handle old version 兼容小于1.0.0版本的旧image结构
+  if (compareLeftVersionLessThanRightVersions(version, '1.0.0')) {
+    const oldBackgroundImageName = (localConfig.general as any).backgroundImageName
+    if (oldBackgroundImageName) {
+      localConfig.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]
+      delete (localConfig.general as any).backgroundImageName
+    }
+    const oldBackgroundImageDescs = (localConfig.general as any).backgroundImageDesc
+    if (oldBackgroundImageDescs) {
+      localConfig.general.backgroundImageDescs = [oldBackgroundImageDescs, oldBackgroundImageDescs]
+      delete (localConfig.general as any).backgroundImageDesc
+    }
+    const oldBackgroundImageCustomUrl = (localConfig.general as any).backgroundImageCustomUrl
+    if (oldBackgroundImageCustomUrl) {
+      localConfig.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
+      delete (localConfig.general as any).backgroundImageCustomUrl
+    }
   }
   log('Get new version', pkg.version)
   localConfig.general.version = pkg.version
@@ -425,7 +438,7 @@ export const handleUpdate = async() => {
   window.$notification.success({
     title: `${window.$t('common.update')}${window.$t('common.success')}`,
     content: `${window.$t('common.version')} ${pkg.version}`,
-    duration: 5000,
+    duration: 3000,
   })
   // 刷新配置设置
   await updateSetting()

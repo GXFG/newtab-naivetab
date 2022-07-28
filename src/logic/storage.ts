@@ -2,7 +2,17 @@ import { useDebounceFn } from '@vueuse/core'
 import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
 import { MERGE_CONFIG_DELAY } from './const'
-import { defaultConfig, localConfig, localState, globalState, getLocalVersion, switchSettingDrawerVisible } from './store'
+import { defaultConfig, localConfig, localState, globalState, switchSettingDrawerVisible, compareLeftVersionLessThanRightVersions } from '@/logic'
+
+export const getLocalVersion = () => {
+  let version = localConfig.general.version
+  // handle old version 兼容小于0.9版本的旧数据结构
+  const settingGeneral = localStorage.getItem('setting-general')
+  if (settingGeneral) {
+    version = JSON.parse(settingGeneral).version || 0
+  }
+  return version
+}
 
 export const isUploadConfigLoading = computed(() => {
   let isLoading = false
@@ -81,7 +91,7 @@ const mergeState = (state: any, acceptState: any) => {
   if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
     return acceptState
   }
-  // 只处理纯Object类型，其余如Array等对象类型均直接返回acceptState，
+  // 只处理纯Object类型，其余如Array等对象类型均直接返回acceptState
   if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
     return acceptState
   }
@@ -112,10 +122,8 @@ export const updateSetting = (acceptRawState = localConfig) => {
   let acceptState = acceptRawState
   return new Promise((resolve) => {
     try {
-      const version = getLocalVersion()
-      const versionPureNum = +version.split('.').join('')
       // handle old version 继承<0.9版本的旧配置结构
-      if (versionPureNum < 90) {
+      if (compareLeftVersionLessThanRightVersions(getLocalVersion(), '0.9.0')) {
         const processedOldConfig = {} as any
         for (const configField of Object.keys(defaultConfig)) {
           // 映射旧的配置key
@@ -258,7 +266,7 @@ export const importSetting = async(text: string) => {
   }
   log('FileContent', fileContent)
   try {
-  // handle old version 转换<0.9版本的旧配置文件结构
+    // handle old version 转换<0.9版本的旧配置文件结构
     if (Object.prototype.hasOwnProperty.call(fileContent, 'style')) {
       log('Old version config')
       const newConfig = {} as any
@@ -268,11 +276,29 @@ export const importSetting = async(text: string) => {
           ...fileContent.setting[configField] || {},
         }
       }
-      // 更新版本号
-      newConfig.general.version = pkg.version
       fileContent = newConfig
       log('FileContentTransform', fileContent)
     }
+    // handle old version 兼容小于1.0.0版本的旧image结构
+    if (compareLeftVersionLessThanRightVersions(fileContent.general.version, '1.0.0')) {
+      const oldBackgroundImageName = (fileContent.general as any).backgroundImageName
+      if (oldBackgroundImageName) {
+        fileContent.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]
+        delete fileContent.general.backgroundImageName
+      }
+      const oldBackgroundImageDescs = (fileContent.general as any).backgroundImageDesc
+      if (oldBackgroundImageDescs) {
+        fileContent.general.backgroundImageDescs = [oldBackgroundImageDescs, oldBackgroundImageDescs]
+        delete fileContent.general.backgroundImageDesc
+      }
+      const oldBackgroundImageCustomUrl = (fileContent.general as any).backgroundImageCustomUrl
+      if (oldBackgroundImageCustomUrl) {
+        fileContent.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
+        delete fileContent.general.backgroundImageCustomUrl
+      }
+    }
+    log('FileContentTransform', fileContent)
+    fileContent.general.version = pkg.version // 更新版本号
     await updateSetting(fileContent)
     window.$message.success(`${window.$t('common.import')}${window.$t('common.success')}`)
     globalState.isImportSettingLoading = false

@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
-import { localConfig } from '@/logic'
+import { localConfig, localState } from '@/logic'
 
 /**
  * e.g.: http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
@@ -19,10 +19,10 @@ export const currBackgroundImageUrl = computed(() => {
     return imageState.value.localBackgroundBase64
   }
   if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
-    return localConfig.general.backgroundImageCustomUrl
+    return localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
   }
   const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
-  return getBingImageUrlFromName(localConfig.general.backgroundImageName, quality)
+  return getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
 })
 
 export const previewImageListMap = computed(() => ({
@@ -72,12 +72,14 @@ export const renderBackgroundImage = () => {
 watch([
   () => imageState.value.localBackgroundBase64,
   () => localConfig.general.backgroundImageSource,
-  () => localConfig.general.backgroundImageName,
+  () => localConfig.general.backgroundImageNames,
 ], () => {
   if (!localConfig.general.isBackgroundImageEnabled) {
     return
   }
   renderBackgroundImage()
+}, {
+  deep: true,
 })
 
 export const onRefreshImageList = () => {

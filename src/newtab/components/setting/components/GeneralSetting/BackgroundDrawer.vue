@@ -5,24 +5,23 @@
       <div class="modal__content">
         <!-- current -->
         <div>
-          <NForm class="content__config" label-placement="left" :label-width="60">
-            <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
+          <NForm class="content__config" label-placement="left" :label-width="80">
             <NFormItem :label="$t('common.origin')">
-              <NSelect
-                v-model:value="localConfig.general.backgroundImageSource"
-                :options="backgroundImageSourceList"
-                class="setting__row-element"
-              />
+              <NSelect v-model:value="localConfig.general.backgroundImageSource" :options="backgroundImageSourceList" />
+            </NFormItem>
+            <NFormItem v-if="localConfig.general.backgroundImageSource === 1" :label="$t('common.appearance')">
+              <NSelect v-model:value="localConfig.general.appearance" :options="themeList" />
             </NFormItem>
             <!-- local -->
+            <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
             <NFormItem v-if="localConfig.general.backgroundImageSource === 0" :label="$t('common.select')">
               <NButton class="setting__row-element" @click="onSelectBackgroundImage">
                 <uil:import />&nbsp;{{ $t('common.import') }}
               </NButton>
+              <Tips :content="$t('general.localBackgroundTips')" />
               <p class="setting__row-element">
                 {{ imageState.localBackgroundFileName }}
               </p>
-              <Tips :content="$t('general.localBackgroundTips')" />
             </NFormItem>
             <!-- network -->
             <template v-else-if="localConfig.general.backgroundImageSource === 1">
@@ -30,10 +29,11 @@
                 <NSwitch v-model:value="localConfig.general.isBackgroundImageCustomUrlEnabled" />
                 <NInput
                   v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
-                  v-model:value="localConfig.general.backgroundImageCustomUrl"
+                  v-model:value="localConfig.general.backgroundImageCustomUrls[localState.currAppearanceCode]"
                   class="setting__row-element"
                   type="text"
                   placeholder="https://"
+                  @blur="handleBackgroundImageCustomUrlBlur"
                 />
               </NFormItem>
             </template>
@@ -41,22 +41,30 @@
           <p class="current__label">
             {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
           </p>
-          <div class="current__image image__item">
-            <BackgroundImageElement :lazy="false" :data="currImageData" />
+          <div class="current__image">
+            <div class="image__content">
+              <BackgroundDrawerImageElement :lazy="false" :data="currImageData" />
+            </div>
           </div>
-          <NForm class="content__config" label-placement="left" :label-width="60">
-            <NFormItem v-if="!localConfig.general.isBackgroundImageCustomUrlEnabled" :label="$t('common.4k')">
+          <NForm class="content__config" label-placement="left" :label-width="80">
+            <NFormItem
+              v-if="localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
+              :label="$t('common.4k')"
+            >
               <NSwitch v-model:value="localConfig.general.backgroundImageHighQuality" />
             </NFormItem>
           </NForm>
         </div>
         <!-- list -->
-        <NSpin :show="isImageListLoading">
+        <NSpin
+          v-if="localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
+          :show="isImageListLoading"
+        >
           <NCollapse default-expanded-names="bing" accordion>
             <NCollapseItem v-for="origin of Object.keys(previewImageListMap)" :key="origin" :title="$t(`common.${origin}`)" :name="origin">
               <div class="picker__images">
                 <div v-for="item in previewImageListMap[origin]" :key="item.name" class="image__item">
-                  <BackgroundImageElement :data="item" select :delete="origin === 'favorite'" />
+                  <BackgroundDrawerImageElement :data="item" select :delete="origin === 'favorite'" />
                 </div>
               </div>
             </NCollapseItem>
@@ -67,8 +75,8 @@
   </NDrawer>
 </template>
 <script setup lang="ts">
-import { gaEvent, previewImageListMap, localConfig, imageState, isImageListLoading, currBackgroundImageUrl } from '@/logic'
-
+import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
+import { gaEvent, previewImageListMap, localConfig, localState, imageState, isImageListLoading, currBackgroundImageUrl } from '@/logic'
 const props = defineProps({
   show: {
     type: Boolean,
@@ -76,11 +84,17 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['update:show'])
 
 const onCloseModal = () => {
-  emit('close')
+  emit('update:show', false)
 }
+
+const themeList = computed(() => [
+  { label: window.$t('common.auto'), value: 'auto' },
+  { label: window.$t('common.light'), value: 'light' },
+  { label: window.$t('common.dark'), value: 'dark' },
+])
 
 const backgroundImageSourceList = computed(() => [
   { label: window.$t('common.local'), value: 0 },
@@ -89,11 +103,11 @@ const backgroundImageSourceList = computed(() => [
 
 const currImageData = computed(() => {
   let data: any = {
-    name: localConfig.general.backgroundImageName,
-    desc: localConfig.general.backgroundImageDesc,
+    name: localConfig.general.backgroundImageNames[localState.value.currAppearanceCode],
+    desc: localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode],
   }
   if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
-    // not from bing
+    // not from Bing
     data = {
       url: currBackgroundImageUrl.value,
     }
@@ -102,6 +116,7 @@ const currImageData = computed(() => {
 })
 
 const bgImageFileInputEl = ref()
+
 const onSelectBackgroundImage = () => {
   (bgImageFileInputEl as any).value.value = null
   bgImageFileInputEl.value.click()
@@ -117,13 +132,20 @@ const onBackgroundImageFileChange = (e: any) => {
   const reader = new FileReader()
   reader.readAsDataURL(file)
   reader.onload = () => {
-    const res: any = reader.result // base64
-    imageState.value.localBackgroundBase64 = res
+    const base64Text: any = reader.result
     imageState.value.localBackgroundFileName = file.name
+    imageState.value.localBackgroundBase64 = base64Text
   }
   gaEvent('setting-background-image', 'click', 'select-file')
 }
 
+const handleBackgroundImageCustomUrlBlur = () => {
+  // 当只单独设置了浅色or深色外观的背景时，默认同步另一外观为相同的背景
+  if (localConfig.general.backgroundImageCustomUrls[+!localState.value.currAppearanceCode].length === 0) {
+    localConfig.general.backgroundImageCustomUrls[+!localState.value.currAppearanceCode]
+      = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
+  }
+}
 </script>
 
 <style scoped>
@@ -134,10 +156,17 @@ const onBackgroundImageFileChange = (e: any) => {
     flex: 1;
   }
   .current__label {
-    opacity: 0.6;
+    color: var(--n-label-text-color);
   }
   .current__image {
-    height: 125px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .image__content {
+      margin: 2.3%;
+      width: 45%;
+      min-height: 125px;
+    }
   }
   .picker__images {
     display: flex;
