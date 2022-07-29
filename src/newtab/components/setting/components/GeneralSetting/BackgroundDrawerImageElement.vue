@@ -6,7 +6,7 @@
       <img v-else :src="currImageUrl" alt="" @click="onSelectImage()">
     </NSpin>
     <div v-if="isCurrSelectedImage" class="image__current-mask">
-      <line-md:confirm-circle />
+      <ic:outline-check-circle />
     </div>
     <div class="image__toolbar">
       <NPopover v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { FAVORITE_MAX_COUNT, getStyleField, createTab, localConfig, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
+import { FAVORITE_MAX_COUNT, getStyleField, createTab, localConfig, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
 
 const props = defineProps({
   data: {
@@ -72,15 +72,15 @@ const isCurrSelectedImage = computed(() => {
   if (!props.select) {
     return false
   }
-  return props.data.name === localConfig.general.backgroundImageName
+  return props.data.name === localConfig.general.backgroundImageNames[localState.value.currAppearanceCode]
 })
 
 const onSelectImage = () => {
   if (!props.select) {
     return
   }
-  localConfig.general.backgroundImageName = props.data.name
-  localConfig.general.backgroundImageDesc = props.data.desc
+  localConfig.general.backgroundImageNames[localState.value.currAppearanceCode] = props.data.name
+  localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode] = props.data.desc
 }
 
 const onViewImage = () => {

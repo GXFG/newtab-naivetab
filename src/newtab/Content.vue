@@ -2,7 +2,7 @@
   <!-- component -->
   <BackgroundImg />
   <RightClickMenu />
-  <HelpModal />
+  <UserGuideModal />
   <WhatsNewModal />
   <SponsorModal />
   <MoveableGuideLine />
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { useMessage, useNotification, useLoadingBar } from 'naive-ui'
+import { useMessage, useNotification, useDialog, useLoadingBar } from 'naive-ui'
 import Setting from './components/setting/index.vue'
 import News from '@/newtab/components/news/index.vue'
 import Calendar from '@/newtab/components/calendar/index.vue'
@@ -35,5 +35,6 @@ import Search from '@/newtab/components/search/index.vue'
 
 window.$message = useMessage()
 window.$notification = useNotification()
+window.$dialog = useDialog()
 window.$loadingBar = useLoadingBar()
 </script>

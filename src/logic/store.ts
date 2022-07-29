@@ -1,8 +1,8 @@
 import pkg from '../../package.json'
-import { isChrome } from '@/env'
+import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, log } from '@/logic'
+import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -13,12 +13,15 @@ export const defaultConfig = {
     drawerPlacement: 'right' as any,
     isBackgroundImageEnabled: true,
     isLoadPageAnimationEnabled: true,
-    backgroundImageSource: 1, // 0:localFile, 1:network
+    backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
     backgroundImageHighQuality: false,
-    backgroundImageName: 'YurisNight_ZH-CN5738817931',
-    backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
+    // backgroundImageName: 'YurisNight_ZH-CN5738817931', v1.0.0删除
+    // backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', v1.0.0删除
+    backgroundImageNames: ['YurisNight_ZH-CN5738817931', 'MoonPhases_ZH-CN3779272016'],
+    backgroundImageDescs: ['宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', '一组月相照片 (© Delpixart/Getty Images)'],
     isBackgroundImageCustomUrlEnabled: false,
-    backgroundImageCustomUrl: '',
+    // backgroundImageCustomUrl: '', v1.0.0删除
+    backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.YurisNight_ZH-CN5738817931_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.MoonPhases_ZH-CN3779272016_1920x1080.jpg'],
     favoriteImageList: [
       {
         name: 'ChurchillBears_ZH-CN1430090934',
@@ -44,6 +47,10 @@ export const defaultConfig = {
         name: 'YurisNight_ZH-CN5738817931',
         desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
       },
+      {
+        name: 'MoonPhases_ZH-CN3779272016',
+        desc: '一组月相照片 (© Delpixart/Getty Images)',
+      },
     ],
     layout: {
       xOffsetKey: 'right',
@@ -56,7 +63,7 @@ export const defaultConfig = {
     fontFamily: 'Arial',
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    primaryColor: ['rgba(34, 117, 213, 1)', 'rgba(34, 117, 213, 1)'],
+    primaryColor: ['rgba(25, 125, 153, 1)', 'rgba(25, 125, 153, 1)'],
     backgroundColor: ['rgba(53, 54, 58, 1)', 'rgba(53, 54, 58, 1)'],
     bgOpacity: 1,
     bgBlur: 0,
@@ -65,11 +72,36 @@ export const defaultConfig = {
     enabled: false,
     isSymbolEnabled: true,
     isNumberEnabled: false,
-    isNewTabOpen: true,
-    isDblclickOpen: true,
+    isNewTabOpen: false,
+    isDblclickOpen: false,
     isNameVisible: true,
     dblclickIntervalTime: 200, // ms
-    keymap: {},
+    keymap: {
+      q: {
+        url: 'www.baidu.com',
+        name: '',
+      },
+      w: {
+        url: 's.weibo.com/top/summary?cate=realtimehot',
+        name: 'weibo',
+      },
+      e: {
+        url: 'www.zhihu.com',
+        name: '',
+      },
+      g: {
+        url: 'www.google.com',
+        name: '',
+      },
+      b: {
+        url: 't.bilibili.com',
+        name: 'bilibili',
+      },
+      v: {
+        url: 'www.v2ex.com',
+        name: '',
+      },
+    },
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 50,
@@ -78,14 +110,14 @@ export const defaultConfig = {
       yOffsetValue: 1,
       yTranslateValue: 0,
     },
-    margin: 3,
-    width: 50,
-    borderRadius: 4,
+    margin: 2,
+    width: 53,
+    borderRadius: 3,
     fontFamily: 'Arial',
     fontSize: 12,
     fontColor: ['rgba(15, 23, 42, 1)', 'rgba(15, 23, 42, 1)'],
-    backgroundColor: ['rgba(209, 213, 219, 1)', 'rgba(212, 212, 216, 1)'],
-    backgroundActiveColor: ['rgba(255, 255, 255, 1)', 'rgba(71,85,105, 1)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(212, 212, 216, 1)'],
+    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(71,85,105, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
     borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
@@ -125,7 +157,7 @@ export const defaultConfig = {
       yOffsetValue: 25,
       yTranslateValue: 0,
     },
-    width: 150,
+    width: 145,
   },
   date: {
     enabled: true,
@@ -160,11 +192,11 @@ export const defaultConfig = {
     fontFamily: 'Arial',
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(30, 30, 30, 1)'],
-    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(113, 113, 113, 1)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
+    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(71,85,105, 1)', 'rgba(73,73,77, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
   },
@@ -240,7 +272,7 @@ export const defaultConfig = {
     isBorderEnabled: true,
     borderWidth: 1,
     borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
-    backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(74, 74, 74, 0.1)'],
+    backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(24, 24, 24, 0.3)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
   },
@@ -262,12 +294,12 @@ export const defaultConfig = {
     fontFamily: 'Arial',
     fontSize: 13,
     fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
-    fontActiveColor: ['rgba(36, 64, 179, 1)', 'rgba(75, 94, 104, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(30, 30, 30, 1)'],
-    backgroundActiveColor: ['rgba(239, 239, 245, 1)', 'rgba(54, 54, 54, 1)'],
+    fontActiveColor: ['rgba(36, 64, 179, 1)', 'rgba(155, 177, 254, 1)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
+    backgroundActiveColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
   },
@@ -287,7 +319,7 @@ export const localConfig = reactive({
 })
 
 export const localState = useStorageLocal('l-state', {
-  currAppearanceCode: 0, // 0:light | 1:dark
+  currAppearanceCode: 0 as 0 | 1, // 0:light | 1:dark
   syncTimeMap: {
     general: 0,
     bookmark: 0,
@@ -320,7 +352,7 @@ export const globalState = reactive({
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
-  isHelpModalVisible: false,
+  isUserGuideModalVisible: false,
   isWhatsNewModalVisible: false,
   isSponsorModalVisible: false,
   isSearchFocused: false,
@@ -331,9 +363,11 @@ export const globalState = reactive({
 
 const initAvailableFontList = async() => {
   const fontCheck = new Set(FONT_LIST.sort())
+  // 在所有字体加载完成后进行操作
   await document.fonts.ready
   const availableList = new Set()
   for (const font of fontCheck.values()) {
+    // https://developer.mozilla.org/zh-CN/docs/Web/API/FontFaceSet/check
     if (document.fonts.check(`12px "${font}"`)) {
       availableList.add(font)
     }
@@ -350,6 +384,18 @@ export const switchSettingDrawerVisible = (status: boolean) => {
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localConfig.general.lang] || 'en')
 
+export const openWhatsNewModal = () => {
+  globalState.isWhatsNewModalVisible = true
+}
+
+export const openUserGuideModal = () => {
+  globalState.isUserGuideModalVisible = true
+}
+
+export const openSponsorModal = () => {
+  globalState.isSponsorModalVisible = true
+}
+
 export const isFirstOpen = useStorageLocal('data-first', true)
 
 export const initFirstOpen = () => {
@@ -358,41 +404,44 @@ export const initFirstOpen = () => {
   }
   // 首次打开扩展时，打开画布模式 & 帮助弹窗
   toggleIsDragMode(true)
-  isFirstOpen.value = false
-}
-
-export const openWhatsNewModal = () => {
-  globalState.isWhatsNewModalVisible = true
-}
-export const closeWhatsNewModal = () => {
-  globalState.isWhatsNewModalVisible = false
-}
-
-export const openHelpModal = () => {
-  globalState.isHelpModalVisible = true
-}
-
-export const openSponsorModal = () => {
-  globalState.isSponsorModalVisible = true
-}
-
-export const getLocalVersion = () => {
-  let version = localConfig.general.version
-  // handle old version 兼容小于0.9版本的旧数据结构
-  const settingGeneral = localStorage.getItem('setting-general')
-  if (settingGeneral) {
-    version = JSON.parse(settingGeneral).version || 0
-  }
-  return version
+  openUserGuideModal()
 }
 
 export const handleUpdate = async() => {
   const version = getLocalVersion()
   log('Version', version)
-  const localVersion = +version.split('.').join('')
-  const currPkgVersion = +pkg.version.split('.').join('')
-  if (localVersion >= currPkgVersion) {
+  if (!compareLeftVersionLessThanRightVersions(version, pkg.version)) {
     return
+  }
+  // handle old version 兼容小于1.0.0版本的旧image配置
+  if (compareLeftVersionLessThanRightVersions(version, '1.0.0')) {
+    let newLocalDataImages = {}
+    const localDataImages = localStorage.getItem('data-images')
+    if (localDataImages) {
+      newLocalDataImages = {
+        syncTime: 0,
+        imageList: [],
+        localBackgroundFileName: '',
+        localBackgroundBase64: '',
+        ...JSON.parse(localDataImages),
+      }
+    }
+    localStorage.setItem('data-images', JSON.stringify(newLocalDataImages))
+    const oldBackgroundImageName = (localConfig.general as any).backgroundImageName
+    if (oldBackgroundImageName) {
+      localConfig.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]
+      delete (localConfig.general as any).backgroundImageName
+    }
+    const oldBackgroundImageDescs = (localConfig.general as any).backgroundImageDesc
+    if (oldBackgroundImageDescs) {
+      localConfig.general.backgroundImageDescs = [oldBackgroundImageDescs, oldBackgroundImageDescs]
+      delete (localConfig.general as any).backgroundImageDesc
+    }
+    const oldBackgroundImageCustomUrl = (localConfig.general as any).backgroundImageCustomUrl
+    if (oldBackgroundImageCustomUrl) {
+      localConfig.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
+      delete (localConfig.general as any).backgroundImageCustomUrl
+    }
   }
   log('Get new version', pkg.version)
   localConfig.general.version = pkg.version
@@ -400,7 +449,7 @@ export const handleUpdate = async() => {
   window.$notification.success({
     title: `${window.$t('common.update')}${window.$t('common.success')}`,
     content: `${window.$t('common.version')} ${pkg.version}`,
-    duration: 5000,
+    duration: 3000,
   })
   // 刷新配置设置
   await updateSetting()
@@ -454,6 +503,21 @@ export const getStyleField = (component: ConfigField, field: string, unit?: stri
     }
     return style
   })
+}
+
+/**
+ * 针对Edge 设置为其他favicon 避免展示黑色方块
+ * 等价于 <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+ */
+export const setEdgeFavicon = () => {
+  if (!isEdge) {
+    return
+  }
+  const link = document.createElement('link')
+  link.setAttribute('rel', 'shortcut icon')
+  link.setAttribute('type', 'image/x-icon')
+  link.setAttribute('href', '/assets/favicon.ico')
+  document.getElementsByTagName('head')[0].appendChild(link)
 }
 
 watch(() => localConfig.general.pageTitle, () => {

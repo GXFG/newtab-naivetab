@@ -6,13 +6,12 @@
 </template>
 
 <script setup lang="ts">
-import { localConfig, currBackgroundImageUrl, isImageLoading } from '@/logic'
+import { localConfig, currBackgroundImageUrl, isImageLoading, updateImages } from '@/logic'
 
-const bgStyle = computed(() => {
-  if (localConfig.general.isBackgroundImageEnabled) {
-    return `background-image: url(${currBackgroundImageUrl.value});`
-  }
-  return ''
+const bgStyle = computed(() => (localConfig.general.isBackgroundImageEnabled ? `background-image: url(${currBackgroundImageUrl.value});` : ''))
+
+onMounted(() => {
+  updateImages()
 })
 
 const customOpacity = computed(() => (isImageLoading.value ? 0 : localConfig.general.bgOpacity))

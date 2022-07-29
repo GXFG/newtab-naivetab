@@ -8,8 +8,8 @@ export const URL_QWEATHER_HOME = 'https://www.qweather.com/'
 
 export const FONT_LIST = [
   // common
-  'Cascadia Code', 'Fira Code',
-  // Windows 10
+  'Arial Rounded MT Bold', 'Cascadia Code', 'Fira Code',
+  // Windows
   'Arial', 'Arial Black', 'Bahnschrift', 'Calibri', 'Cambria', 'Cambria Math', 'Candara', 'Comic Sans MS', 'Consolas', 'Constantia', 'Corbel', 'Courier New', 'Ebrima', 'Franklin Gothic Medium', 'Gabriola', 'Gadugi', 'Georgia', 'HoloLens MDL2 Assets', 'Impact', 'Ink Free', 'Javanese Text', 'Leelawadee UI', 'Lucida Console', 'Lucida Sans Unicode', 'Malgun Gothic', 'Marlett', 'Microsoft Himalaya', 'Microsoft JhengHei', 'Microsoft New Tai Lue', 'Microsoft PhagsPa', 'Microsoft Sans Serif', 'Microsoft Tai Le', 'Microsoft YaHei', 'Microsoft Yi Baiti', 'MingLiU-ExtB', 'Mongolian Baiti', 'MS Gothic', 'MV Boli', 'Myanmar Text', 'Nirmala UI', 'Palatino Linotype', 'Segoe MDL2 Assets', 'Segoe Print', 'Segoe Script', 'Segoe UI', 'Segoe UI Historic', 'Segoe UI Emoji', 'Segoe UI Symbol', 'SimSun', 'Sitka', 'Sylfaen', 'Symbol', 'Tahoma', 'Times New Roman', 'Trebuchet MS', 'Verdana', 'Webdings', 'Wingdings', 'Yu Gothic',
   // macOS
   'American Typewriter', 'Andale Mono', 'Arial', 'Arial Black', 'Arial Narrow', 'Arial Rounded MT Bold', 'Arial Unicode MS', 'Avenir', 'Avenir Next', 'Avenir Next Condensed', 'Baskerville', 'Big Caslon', 'Bodoni 72', 'Bodoni 72 Oldstyle', 'Bodoni 72 Smallcaps', 'Bradley Hand', 'Brush Script MT', 'Chalkboard', 'Chalkboard SE', 'Chalkduster', 'Charter', 'Cochin', 'Comic Sans MS', 'Copperplate', 'Courier', 'Courier New', 'Didot', 'DIN Alternate', 'DIN Condensed', 'Futura', 'Geneva', 'Georgia', 'Gill Sans', 'Helvetica', 'Helvetica Neue', 'Herculanum', 'Hoefler Text', 'Impact', 'Lucida Grande', 'Luminari', 'Marker Felt', 'Menlo', 'Microsoft Sans Serif', 'Monaco', 'Noteworthy', 'Optima', 'Palatino', 'Papyrus', 'Phosphate', 'Rockwell', 'Savoye LET', 'SignPainter', 'Skia', 'Snell Roundhand', 'Tahoma', 'Times', 'Times New Roman', 'Trattatello', 'Trebuchet MS', 'Verdana', 'Zapfino',
@@ -20,16 +20,16 @@ export const KEYBOARD_KEY_LIST = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '
  * real key code -> label key
  */
 export const KEYBOARD_CODE_TO_LABEL_MAP = {
-  '-': '-',
-  '=': '+',
-  'Backspace': 'BS',
-  '[': '{',
-  ']': '}',
-  ';': ':',
-  '\'': '"',
-  ',': '<',
-  '.': '>',
-  '/': '?',
+  Minus: '-',
+  Equal: '+',
+  Backspace: 'BS',
+  BracketLeft: '{',
+  BracketRight: '}',
+  Semicolon: ':',
+  Quote: '"',
+  Comma: '<',
+  Period: '>',
+  Slash: '?',
 }
 
 // MAX_WRITE_OPERATIONS_PER_HOUR = 1800, https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
@@ -57,10 +57,10 @@ export const DAYJS_LANG_MAP = {
 }
 
 export const SEARCH_ENGINE_LIST = [
-  { label: 'google', value: 'https://www.google.com/search?q={query}' },
-  { label: 'baidu', value: 'https://www.baidu.com/s?word={query}' },
-  { label: 'bing', value: 'https://cn.bing.com/search?q={query}' },
   { label: 'github', value: 'https://github.com/search?q={query}' },
+  { label: 'google', value: 'https://www.google.com/search?q={query}' },
+  { label: 'bing', value: 'https://cn.bing.com/search?q={query}' },
+  { label: 'baidu', value: 'https://www.baidu.com/s?word={query}' },
   { label: '360', value: 'https://www.so.com/s?q={query}' },
   { label: 'sogou', value: 'https://www.sogou.com/web?query={query}' },
   { label: 'yahoo', value: 'https://search.yahoo.com/search?p={query}' },

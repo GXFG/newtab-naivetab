@@ -16,6 +16,32 @@ export const sleep = (time: number) => {
   })
 }
 
+/**
+ * leftVersion < rightVersion ?
+ */
+export const compareLeftVersionLessThanRightVersions = (leftVersion: string, rightVersion: string): boolean => {
+  const leftVersionList = leftVersion.split('.')
+  const rightVersionList = rightVersion.split('.')
+  const maxLen = Math.max(leftVersionList.length, rightVersionList.length)
+  while (leftVersionList.length < maxLen) {
+    leftVersionList.push('0')
+  }
+  while (rightVersionList.length < maxLen) {
+    rightVersionList.push('0')
+  }
+  for (let i = 0; i < maxLen; i++) {
+    const leftItem = parseInt(leftVersionList[i])
+    const rightItem = parseInt(rightVersionList[i])
+    if (leftItem > rightItem) {
+      return false
+    } else if (leftItem < rightItem) {
+      return true
+    }
+  }
+  // =
+  return false
+}
+
 export const downloadImageByUrl = async(url: string, filename = `${Date.now()}`) => {
   const image = await fetch(url)
   const imageBlog = await image.blob()

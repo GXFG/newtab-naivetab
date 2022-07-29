@@ -1,6 +1,6 @@
 import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, sleep, log } from '@/logic'
+import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
@@ -23,7 +23,7 @@ const getKeyboardList = (originList: any[]) => {
       rowList.push(originList.slice(range[0]))
     } else {
       if (Array.isArray(range[0])) {
-        // 处理特殊按键的拼接，如：数字 + BS [[0, 10], [12, 13]]
+        // 处理特殊按键的拼接，如：数字行 + BS [[0, 10], [12, 13]]
         let tempList: any = []
         for (const rangeItem of range) {
           tempList = [...tempList, ...originList.slice(rangeItem[0], rangeItem[1])]
@@ -40,24 +40,6 @@ const getKeyboardList = (originList: any[]) => {
 export const keyboardSettingRowList = computed(() => getKeyboardList(KEYBOARD_KEY_LIST))
 
 export const keyboardRowList = computed(() => getKeyboardList(localBookmarkList.value))
-
-const isInitialized = useStorageLocal('data-bookmark-initialized', false)
-
-export const initBookmarkListData = () => {
-  if (isInitialized.value) {
-    return
-  }
-  log('Bookmark initLocalList')
-  localBookmarkList.value = []
-  KEYBOARD_KEY_LIST.forEach((key: string) => {
-    localBookmarkList.value.push({
-      key,
-      url: '',
-      name: '',
-    })
-  })
-  isInitialized.value = true
-}
 
 export const getDefaultBookmarkName = (url: string) => {
   if (!url) {
@@ -79,27 +61,26 @@ export const getDefaultBookmarkName = (url: string) => {
   return name
 }
 
+const isInitialized = useStorageLocal('data-bookmark-initialized', false)
+
 const mergeBookmarkSetting = useDebounceFn(async() => {
   log('Bookmark merge setting')
-  if (!isInitialized) {
-    await sleep(300)
-  }
   for (const key of KEYBOARD_KEY_LIST) {
     const index = KEYBOARD_KEY_LIST.indexOf(key)
     const item = localConfig.bookmark.keymap[key]
-    if (!item) {
+    if (item) {
+      localBookmarkList.value[index] = {
+        key,
+        url: item.url.includes('//') ? item.url : `https://${item.url}`,
+        name: item.name || getDefaultBookmarkName(item.url),
+      }
+    } else {
       // 初始化无设置数据的按键
       localBookmarkList.value[index] = {
         key,
         url: '',
         name: '',
       }
-      continue
-    }
-    localBookmarkList.value[index] = {
-      key,
-      url: item.url.includes('//') ? item.url : `https://${item.url}`,
-      name: item.name || getDefaultBookmarkName(item.url),
     }
   }
 }, MERGE_BOOKMARK_DELAY)
@@ -111,3 +92,20 @@ watch(
   },
   { deep: true },
 )
+
+export const initBookmarkListData = () => {
+  if (isInitialized.value) {
+    return
+  }
+  log('Bookmark initLocalList')
+  localBookmarkList.value = []
+  KEYBOARD_KEY_LIST.forEach((key: string) => {
+    localBookmarkList.value.push({
+      key,
+      url: '',
+      name: '',
+    })
+  })
+  isInitialized.value = true
+  mergeBookmarkSetting()
+}

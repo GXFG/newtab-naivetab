@@ -1,5 +1,5 @@
 <template>
-  <BookmarkPicker :show="state.isBookmarkModalVisible" @close="toggleIsBookmarkPickerVisible" @select="onSelectBookmark" />
+  <BookmarkPicker v-model:show="state.isBookmarkModalVisible" @select="onSelectBookmark" />
 
   <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['bookmarkKeyboard']">
     <!-- bookmarkKeyboard -->
@@ -127,10 +127,6 @@ const state = reactive({
   currImporKey: '',
 })
 
-const toggleIsBookmarkPickerVisible = () => {
-  state.isBookmarkModalVisible = !state.isBookmarkModalVisible
-}
-
 const onCreateKey = (key: string) => {
   localConfig.bookmark.keymap[key] = {
     url: '',
@@ -179,7 +175,7 @@ const onImportBookmark = async(key: string) => {
     return
   }
   state.currImporKey = key
-  toggleIsBookmarkPickerVisible()
+  state.isBookmarkModalVisible = true
 }
 
 const onSelectBookmark = (payload: ChromeBookmarkItem) => {

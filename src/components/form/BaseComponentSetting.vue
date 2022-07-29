@@ -14,11 +14,11 @@
     </NFormItem>
     <NFormItem v-if="isRenderField('width')" :label="$t('common.width')">
       <NSlider v-model:value="localConfig[props.cname].width" :step="1" :min="1" :max="1000" />
-      <NInputNumber v-model:value="localConfig[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="500" />
+      <NInputNumber v-model:value="localConfig[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="1000" />
     </NFormItem>
     <NFormItem v-if="isRenderField('height')" :label="$t('common.height')">
       <NSlider v-model:value="localConfig[props.cname].height" :step="1" :min="1" :max="1000" />
-      <NInputNumber v-model:value="localConfig[props.cname].height" class="setting__input-number" :step="1" :min="1" :max="500" />
+      <NInputNumber v-model:value="localConfig[props.cname].height" class="setting__input-number" :step="1" :min="1" :max="1000" />
     </NFormItem>
     <NFormItem v-if="isRenderField('borderRadius')" :label="$t('common.borderRadius')">
       <NSlider v-model:value="localConfig[props.cname].borderRadius" :step="1" :min="0" :max="200" />

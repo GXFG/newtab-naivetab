@@ -6,13 +6,15 @@
     :theme="currTheme"
     :theme-overrides="themeOverrides"
   >
-    <NNotificationProvider>
-      <NMessageProvider>
-        <NLoadingBarProvider>
-          <Content />
-        </NLoadingBarProvider>
-      </NMessageProvider>
-    </NNotificationProvider>
+    <NDialogProvider>
+      <NNotificationProvider>
+        <NMessageProvider>
+          <NLoadingBarProvider>
+            <Content />
+          </NLoadingBarProvider>
+        </NMessageProvider>
+      </NNotificationProvider>
+    </NDialogProvider>
   </NConfigProvider>
 </template>
 
@@ -27,6 +29,7 @@ import {
   localConfig,
   localState,
   renderBackgroundImage,
+  setEdgeFavicon,
   downloadConfig,
   initFirstOpen,
   handleUpdate,
@@ -37,6 +40,7 @@ import {
 
 onMounted(async() => {
   renderBackgroundImage()
+  setEdgeFavicon()
   startTimer()
   startKeyboard()
   downloadConfig()

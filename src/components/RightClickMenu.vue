@@ -24,7 +24,7 @@ import {
   getTargetDataFromEvent,
   globalState,
   createTab,
-  openHelpModal,
+  openUserGuideModal,
   openWhatsNewModal,
   openSponsorModal,
 } from '@/logic'
@@ -57,13 +57,13 @@ const menuList = computed(() => [
     key: 'd1',
   },
   {
-    label: window.$t('help.title'),
+    label: window.$t('common.help'),
     key: 'help',
     icon: renderIconFunc('ph:info-bold'),
     children: [
       {
-        label: window.$t('common.usingHelp'),
-        key: 'usingHelp',
+        label: window.$t('common.userGuide'),
+        key: 'userGuide',
         icon: renderIconFunc('ic:baseline-help-outline'),
       },
       {
@@ -122,8 +122,8 @@ const menuActionMap = {
     switchSettingDrawerVisible(false)
     toggleIsDragMode()
   },
-  usingHelp: () => {
-    openHelpModal()
+  userGuide: () => {
+    openUserGuideModal()
   },
   whatsNew: () => {
     openWhatsNewModal()

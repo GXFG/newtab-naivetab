@@ -4,6 +4,7 @@ interface Window {
   $t: any // vue-i18n
   $message: any
   $notification: any
+  $dialog: any
   $loadingBar: any
 }
 

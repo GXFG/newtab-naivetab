@@ -29,10 +29,10 @@
               :loading="state.isSuggestLoading"
               :disabled="isDragMode"
               clearable
-              @focus="onSearchFocus()"
+              @focus="onSearchFocus"
               @blur="onSearchBlur"
               @input="onSearchInput"
-              @keyup.enter="handleSearch()"
+              @keypress.enter="handleSearch()"
             />
             <NButton
               v-if="localConfig.search.iconEnabled"
@@ -185,9 +185,11 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       font-size: v-bind(customFontSize);
       background-color: v-bind(customBackgroundColor);
       .n-input__input-el {
+        caret-color: v-bind(customFontColor);
         color: v-bind(customFontColor) !important;
       }
-      .n-input__input-el::input-placeholder {
+      /* Todo 浅色模式下placeholder颜色失败 */
+      /* .n-input__input-el::input-placeholder {
         color: v-bind(customFontColor) !important;
       }
       .n-input__input-el::-webkit-input-placeholder {
@@ -195,7 +197,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       }
       .n-input__input-el::-moz-placeholder {
         color: v-bind(customFontColor) !important;
-      }
+      } */
     }
     .input__main--move {
       cursor: move !important;

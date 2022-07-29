@@ -1,5 +1,5 @@
 <template>
-  <ImagePicker :show="state.isImageModalVisible" @close="toggleIsImageModalVisible" />
+  <BackgroundDrawer v-model:show="state.isBackgroundDrawerVisible" />
 
   <!-- main -->
   <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
@@ -28,7 +28,7 @@
       <!-- backgroundImage -->
       <NFormItem :label="$t('common.backgroundImage')">
         <NSwitch v-model:value="localConfig.general.isBackgroundImageEnabled" />
-        <NButton class="setting__row-element" @click="toggleIsImageModalVisible()">
+        <NButton v-if="localConfig.general.isBackgroundImageEnabled" class="setting__row-element" @click="openBackgroundDrawer()">
           <tabler:edit />&nbsp;{{ $t('common.edit') }}
         </NButton>
       </NFormItem>
@@ -85,8 +85,19 @@
 </template>
 
 <script setup lang="ts">
-import ImagePicker from './ImagePicker.vue'
-import { defaultConfig, exportSetting, gaEvent, localConfig, localState, globalState, isUploadConfigLoading, importSetting, onRefreshImageList, refreshSetting, resetSetting } from '@/logic'
+import BackgroundDrawer from './BackgroundDrawer.vue'
+import {
+  defaultConfig,
+  exportSetting,
+  gaEvent,
+  localConfig,
+  localState,
+  globalState,
+  isUploadConfigLoading,
+  importSetting,
+  refreshSetting,
+  resetSetting,
+} from '@/logic'
 import i18n from '@/lib/i18n'
 
 const { proxy }: any = getCurrentInstance()
@@ -96,7 +107,7 @@ const state = reactive({
     label: locale,
     value: locale,
   })),
-  isImageModalVisible: false,
+  isBackgroundDrawerVisible: false,
 })
 
 const themeList = computed(() => [
@@ -118,11 +129,8 @@ const onChangeLocale = (locale: string) => {
   gaEvent('setting-locale', 'click', 'change')
 }
 
-const toggleIsImageModalVisible = () => {
-  state.isImageModalVisible = !state.isImageModalVisible
-  if (state.isImageModalVisible) {
-    onRefreshImageList()
-  }
+const openBackgroundDrawer = () => {
+  state.isBackgroundDrawerVisible = true
 }
 
 const syncTime = computed(() => {

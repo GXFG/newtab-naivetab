@@ -5,7 +5,7 @@
         <Currentlog />
       </div>
       <div class="card__footer">
-        <NButton class="footer__btn" type="primary" ghost size="small" :loading="globalState.isClearStorageLoading" @click="onClose()">
+        <NButton class="footer__btn" type="primary" ghost size="small" :loading="globalState.isClearStorageLoading" @click="onCloseModal()">
           <template #icon>
             <div class="icon__wrap">
               <ri:close-circle-line />
@@ -20,10 +20,10 @@
 
 <script setup lang="ts">
 import Currentlog from '../../../CHANGELOG.md'
-import { globalState, closeWhatsNewModal } from '@/logic'
+import { globalState } from '@/logic'
 
-const onClose = async() => {
-  closeWhatsNewModal()
+const onCloseModal = () => {
+  globalState.isWhatsNewModalVisible = false
 }
 </script>
 

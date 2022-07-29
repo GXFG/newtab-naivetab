@@ -15,7 +15,7 @@ export const moveState = reactive({
   isBottomVisible: false,
   isLeftVisible: false,
   isRightVisible: false,
-  dragTempEnabledMap: { // 临时开启组件，只有鼠标放下时才进行真正的开启
+  dragTempEnabledMap: { // 临时开启组件，只有鼠标按键抬起时才进行真正的开启
     bookmark: false,
     clockDigital: false,
     clockAnalog: false,
