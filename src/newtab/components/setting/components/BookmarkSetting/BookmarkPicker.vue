@@ -1,5 +1,5 @@
 <template>
-  <NDrawer :show="props.show" :width="550" @update:show="onCloseModal()">
+  <NDrawer :show="props.show" :width="550" @update:show="handleUpdateShow">
     <NDrawerContent :title="$t('setting.bookmark')" closable>
       <NTree
         block-line
@@ -25,7 +25,11 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['close', 'select'])
+const emit = defineEmits(['update:show', 'select'])
+
+const onClose = () => {
+  emit('update:show', false)
+}
 
 const state = reactive({
   bookmarks: [] as any,
@@ -37,14 +41,17 @@ const state = reactive({
           return
         }
         emit('select', option)
-        emit('close')
+        onClose()
       },
     }
   },
 })
 
-const onCloseModal = () => {
-  emit('close')
+const handleUpdateShow = (value: boolean) => {
+  if (value) {
+    return
+  }
+  onClose()
 }
 
 const onGetBookmark = () => {

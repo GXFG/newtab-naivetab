@@ -78,7 +78,8 @@
     "login": "登录"
   },
   "form": {
-    "applyToAppearance": "应用于外观"
+    "applyToAppearance": "应用于外观",
+    "photoOfTheDay": "每日一图"
   },
   "prompts": {
     "linkTips": "点击 ? 图标，访问以下链接",

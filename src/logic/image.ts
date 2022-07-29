@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
-import { localConfig, localState } from '@/logic'
+import { localConfig, localState, log } from '@/logic'
 
 /**
  * e.g.: http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
@@ -9,6 +9,7 @@ import { localConfig, localState } from '@/logic'
 export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `http://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
 
 export const imageState = useStorageLocal('data-images', {
+  syncTime: 0,
   imageList: [] as BingImageItem[],
   localBackgroundFileName: '',
   localBackgroundBase64: '',
@@ -18,11 +19,20 @@ export const currBackgroundImageUrl = computed(() => {
   if (localConfig.general.backgroundImageSource === 0) {
     return imageState.value.localBackgroundBase64
   }
-  if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
-    return localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
-  }
+  let imageUrl = ''
   const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
-  return getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
+  if (localConfig.general.backgroundImageSource === 1) {
+    if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
+      imageUrl = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
+    } else {
+      imageUrl = getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
+    }
+  } else if (localConfig.general.backgroundImageSource === 2) {
+    const todayImage = imageState.value.imageList[0]
+    const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
+    imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
+  }
+  return imageUrl
 })
 
 export const previewImageListMap = computed(() => ({
@@ -43,7 +53,9 @@ const getImages = async() => {
     isImageListLoading.value = true
     const data: any = await getBingImages()
     isImageListLoading.value = false
+    imageState.value.syncTime = dayjs().valueOf()
     imageState.value.imageList = data.images
+    log('Image update imageList')
   } catch (e) {
     isImageListLoading.value = false
   }
@@ -59,6 +71,7 @@ loadImageEle.onload = () => {
 }
 
 loadImageEle.onerror = () => {
+  console.timeEnd('renderBackgroundImage')
   isImageLoading.value = false
 }
 
@@ -67,6 +80,18 @@ export const renderBackgroundImage = () => {
   loadImageEle.src = '' // 取消上一张图片的加载，为确保严格按加载顺序生效
   isImageLoading.value = true
   loadImageEle.src = currBackgroundImageUrl.value
+}
+
+export const updateImages = () => {
+  if (!localConfig.general.isBackgroundImageEnabled || localConfig.general.backgroundImageSource !== 2) {
+    return
+  }
+  const currTS = dayjs().valueOf()
+  // 最小刷新间隔为2小时
+  if (currTS - imageState.value.syncTime <= 3600000 * 2) {
+    return
+  }
+  getImages()
 }
 
 watch([
@@ -78,10 +103,9 @@ watch([
     return
   }
   renderBackgroundImage()
+  if (localConfig.general.backgroundImageSource === 2) {
+    updateImages()
+  }
 }, {
   deep: true,
 })
-
-export const onRefreshImageList = () => {
-  getImages()
-}

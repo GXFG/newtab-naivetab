@@ -322,18 +322,6 @@ export const resetSetting = () => {
   location.reload()
 }
 
-export const checkPermission = (field: OptionsPermission) => {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.permissions.contains({ permissions: [field] }, (granted) => {
-        resolve(granted)
-      })
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
 export const requestPermission = (field: OptionsPermission) => {
   return new Promise((resolve, reject) => {
     try {

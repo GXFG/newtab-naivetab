@@ -78,7 +78,8 @@
     "login": "Login"
   },
   "form": {
-    "applyToAppearance": "Apply to appearance"
+    "applyToAppearance": "Apply to appearance",
+    "photoOfTheDay": "Photo of the day"
   },
   "prompts": {
     "linkTips": "Click on ? icon to access the link below",

@@ -13,7 +13,7 @@ export const defaultConfig = {
     drawerPlacement: 'right' as any,
     isBackgroundImageEnabled: true,
     isLoadPageAnimationEnabled: true,
-    backgroundImageSource: 1, // 0:localFile, 1:network
+    backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
     backgroundImageHighQuality: false,
     // backgroundImageName: 'YurisNight_ZH-CN5738817931', v1.0.0删除
     // backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', v1.0.0删除
@@ -413,8 +413,20 @@ export const handleUpdate = async() => {
   if (!compareLeftVersionLessThanRightVersions(version, pkg.version)) {
     return
   }
-  // handle old version 兼容小于1.0.0版本的旧image结构
+  // handle old version 兼容小于1.0.0版本的旧image配置
   if (compareLeftVersionLessThanRightVersions(version, '1.0.0')) {
+    let newLocalDataImages = {}
+    const localDataImages = localStorage.getItem('data-images')
+    if (localDataImages) {
+      newLocalDataImages = {
+        syncTime: 0,
+        imageList: [],
+        localBackgroundFileName: '',
+        localBackgroundBase64: '',
+        ...JSON.parse(localDataImages),
+      }
+    }
+    localStorage.setItem('data-images', JSON.stringify(newLocalDataImages))
     const oldBackgroundImageName = (localConfig.general as any).backgroundImageName
     if (oldBackgroundImageName) {
       localConfig.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]

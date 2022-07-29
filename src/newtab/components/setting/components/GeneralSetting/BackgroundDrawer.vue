@@ -9,9 +9,6 @@
             <NFormItem :label="$t('common.origin')">
               <NSelect v-model:value="localConfig.general.backgroundImageSource" :options="backgroundImageSourceList" />
             </NFormItem>
-            <NFormItem v-if="localConfig.general.backgroundImageSource === 1" :label="$t('form.applyToAppearance')">
-              <NSelect v-model:value="localConfig.general.appearance" :options="themeList" />
-            </NFormItem>
             <!-- local -->
             <input ref="bgImageFileInputEl" style="display: none" type="file" accept="image/*" @change="onBackgroundImageFileChange">
             <NFormItem v-if="localConfig.general.backgroundImageSource === 0" :label="$t('common.select')">
@@ -41,6 +38,20 @@
           <p class="current__label">
             {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
           </p>
+          <NTabs
+            v-if="localConfig.general.backgroundImageSource === 1"
+            type="segment"
+            size="small"
+            :default-value="state.applyToAppearance"
+            @update:value="handleAppearanceChange"
+          >
+            <NTab name="light">
+              {{ $t('common.light') }}
+            </NTab>
+            <NTab name="dark">
+              {{ $t('common.dark') }}
+            </NTab>
+          </NTabs>
           <div class="current__image">
             <div class="image__content">
               <BackgroundDrawerImageElement :lazy="false" :data="currImageData" />
@@ -48,14 +59,14 @@
           </div>
           <NForm class="content__config" label-placement="left" :label-width="80">
             <NFormItem
-              v-if="localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
+              v-if="localConfig.general.backgroundImageSource !== 0 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
               :label="$t('common.4k')"
             >
               <NSwitch v-model:value="localConfig.general.backgroundImageHighQuality" />
             </NFormItem>
           </NForm>
         </div>
-        <!-- list -->
+        <!-- list 仅来源为网络时展示 -->
         <NSpin
           v-if="localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
           :show="isImageListLoading"
@@ -76,7 +87,7 @@
 </template>
 <script setup lang="ts">
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
-import { gaEvent, previewImageListMap, localConfig, localState, imageState, isImageListLoading, currBackgroundImageUrl } from '@/logic'
+import { gaEvent, previewImageListMap, localConfig, localState, imageState, isImageListLoading, currBackgroundImageUrl, updateImages } from '@/logic'
 const props = defineProps({
   show: {
     type: Boolean,
@@ -90,16 +101,33 @@ const onCloseModal = () => {
   emit('update:show', false)
 }
 
-const themeList = computed(() => [
-  { label: window.$t('common.auto'), value: 'auto' },
-  { label: window.$t('common.light'), value: 'light' },
-  { label: window.$t('common.dark'), value: 'dark' },
-])
-
 const backgroundImageSourceList = computed(() => [
   { label: window.$t('common.local'), value: 0 },
   { label: window.$t('common.network'), value: 1 },
+  { label: window.$t('form.photoOfTheDay'), value: 2 },
 ])
+
+const state = reactive({
+  lastAppearance: localConfig.general.appearance, // 记录当前设置的外观，用于关闭抽屉时恢复
+  applyToAppearance: localState.value.currAppearanceCode === 0 ? 'light' : 'dark',
+})
+
+watch(
+  () => props.show,
+  (value: boolean) => {
+    if (value) {
+      updateImages()
+      state.lastAppearance = localConfig.general.appearance
+      state.applyToAppearance = localState.value.currAppearanceCode === 0 ? 'light' : 'dark'
+    } else {
+      localConfig.general.appearance = state.lastAppearance
+    }
+  },
+)
+
+const handleAppearanceChange = (value: 'light' | 'dark') => {
+  localConfig.general.appearance = value
+}
 
 const currImageData = computed(() => {
   let data: any = {
@@ -108,9 +136,7 @@ const currImageData = computed(() => {
   }
   if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
     // not from Bing
-    data = {
-      url: currBackgroundImageUrl.value,
-    }
+    data = { url: currBackgroundImageUrl.value }
   }
   return data
 })
@@ -156,6 +182,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
     flex: 1;
   }
   .current__label {
+    margin-bottom: 5px;
     color: var(--n-label-text-color);
   }
   .current__image {
