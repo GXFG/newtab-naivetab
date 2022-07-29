@@ -24,7 +24,7 @@ import {
   getTargetDataFromEvent,
   globalState,
   createTab,
-  openHelpModal,
+  openUserGuideModal,
   openWhatsNewModal,
   openSponsorModal,
 } from '@/logic'
@@ -123,7 +123,7 @@ const menuActionMap = {
     toggleIsDragMode()
   },
   userGuide: () => {
-    openHelpModal()
+    openUserGuideModal()
   },
   whatsNew: () => {
     openWhatsNewModal()

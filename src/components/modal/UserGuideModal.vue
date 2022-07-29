@@ -10,7 +10,7 @@
         <NButton class="footer__btn" type="primary" ghost size="small" @click="onConfirm()">
           <template #icon>
             <div class="icon__wrap">
-              <line-md:confirm-circle />
+              <ic:outline-check-circle />
             </div>
           </template>
           {{ $t('common.confirm') }}
@@ -23,19 +23,30 @@
 <script setup lang="ts">
 import { globalState, isFirstOpen } from '@/logic'
 
+const onShowTips = () => {
+  window.$notification.info({
+    title: window.$t('guide.tipsTitle'),
+    content: window.$t('guide.tipsContent'),
+    duration: 10000,
+  })
+}
+
 const onConfirm = () => {
   if (!isFirstOpen.value) {
     globalState.isUserGuideModalVisible = false
     return
   }
+  // 首次关闭时弹出引导提示
   window.$dialog.info({
-    title: '确认关闭',
-    content: '可通过点击鼠标右键找到该弹窗',
-    positiveText: '确定',
-    negativeText: '取消',
+    title: window.$t('guide.backTitle'),
+    content: window.$t('guide.backContent'),
+    positiveText: window.$t('common.confirm'),
+    negativeText: window.$t('common.cancel'),
     maskClosable: false,
     onPositiveClick: () => {
       globalState.isUserGuideModalVisible = false
+      isFirstOpen.value = false
+      onShowTips()
     },
   })
 }

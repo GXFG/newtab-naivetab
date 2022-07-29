@@ -6,7 +6,7 @@
       </NButton>
     </template>
     <p class="tips-content">
-      {{ `${link ? $t('common.linkTips') + '\n ' : ''}${props.content}` }}
+      {{ `${link ? $t('prompts.linkTips') + '\n ' : ''}${props.content}` }}
     </p>
   </NPopover>
 </template>

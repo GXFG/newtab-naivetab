@@ -9,7 +9,7 @@
             <NFormItem :label="$t('common.origin')">
               <NSelect v-model:value="localConfig.general.backgroundImageSource" :options="backgroundImageSourceList" />
             </NFormItem>
-            <NFormItem v-if="localConfig.general.backgroundImageSource === 1" :label="$t('common.appearance')">
+            <NFormItem v-if="localConfig.general.backgroundImageSource === 1" :label="$t('form.applyToAppearance')">
               <NSelect v-model:value="localConfig.general.appearance" :options="themeList" />
             </NFormItem>
             <!-- local -->

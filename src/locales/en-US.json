@@ -2,6 +2,7 @@
   "common": {
     "version": "Version",
     "confirm": "Confirm",
+    "cancel": "Cancel",
     "open": "Open",
     "close": "Close",
     "exit": "Exit",
@@ -57,7 +58,6 @@
     "icon": "Icon",
     "config": "Config",
     "format": "Format",
-    "linkTips": "Click on ? icon to access the link below",
     "whatsNew": "What's New",
     "userGuide": "User Guide",
     "preview": "Preview",
@@ -77,7 +77,11 @@
     "retry": "Retry",
     "login": "Login"
   },
+  "form": {
+    "applyToAppearance": "Apply to appearance"
+  },
   "prompts": {
+    "linkTips": "Click on ? icon to access the link below",
     "pleaseWait": "In progress, Please wait",
     "imageTooLarge": "Image too large",
     "favoriteLimt": "The maximum number of favorites has been reached"
@@ -88,15 +92,19 @@
     "buyMeACoffee": "Buy me a coffee"
   },
   "guide": {
+    "tipsTitle":"Tips",
+    "tipsContent":"When you don't know how to use it, click the right mouse button to try it",
+    "backTitle": "Confirm",
+    "backContent": "The guide can be found by right-clicking on the mouse button",
     "title": "User Guide",
-    "text0": "首次使用教程：",
-    "text1": "1. 添加组件：首次安装后，默认处于“画布模式”下，选中左侧抽屉内的组件，拖动至屏幕内以完成对组件的添加和布局",
-    "text2": "2. 删除组件：选中组件后可拖动至右上角的垃圾桶，或按delete/backspace键以移除",
-    "text3": "3. 退出/关闭：通过点击左上角或按Esc键可退出“画布模式”；单击鼠标右键可再次进入“设置”、“画布模式”",
+    "text0": "First-time tutorial:",
+    "text1": "1. Add components: After the first installation, the 'Drag Mode' is turned on by default, at this time the components in the left drawer are selected, and dragged to the screen to complete the addition and layout of the components",
+    "text2": "2. Remove components: In Drag Mode, with the component selected in the screen, drag to the trash can in the upper-right corner, or press delete/backspace to remove the component",
+    "text3": "3. Exit/Close: Click the close button in the upper left corner or press the Esc key to exit 'Drag Mode'; From the right mouse button menu, you can enter the 'Component Settings', 'Drag Mode' again",
     "text4": "——————————————————————————————————————",
-    "text5": "组件使用说明：",
-    "text6": "1. 针对所有组件：右键点击组件可打开设置抽屉，可进行包括功能、样式的修改",
-    "text7": "2. 书签：通过鼠标左键点击or按下键盘对应按键完成前台打开书签；鼠标中键点按书签或Shift/Alt + 按键以完成后台打开书签"
+    "text5": "Instructions for using the component:",
+    "text6": "1. For all components: hover over the component, right-click to call up the settings menu, click 'Component Settings', you can modify the function and style",
+    "text7": "2. Bookmarks: click or press the corresponding key on the keyboard by clicking the left mouse button to open the website directly; Click on the bookmark with the middle mouse button or press shift/Alt + the corresponding button to open the website when you are done"
   },
   "sponsor": {
     "title": "Sponsor a coffee",

@@ -6,7 +6,7 @@
       <img v-else :src="currImageUrl" alt="" @click="onSelectImage()">
     </NSpin>
     <div v-if="isCurrSelectedImage" class="image__current-mask">
-      <line-md:confirm-circle />
+      <ic:outline-check-circle />
     </div>
     <div class="image__toolbar">
       <NPopover v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">

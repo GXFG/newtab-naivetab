@@ -388,7 +388,7 @@ export const openWhatsNewModal = () => {
   globalState.isWhatsNewModalVisible = true
 }
 
-export const openHelpModal = () => {
+export const openUserGuideModal = () => {
   globalState.isUserGuideModalVisible = true
 }
 
@@ -404,8 +404,7 @@ export const initFirstOpen = () => {
   }
   // 首次打开扩展时，打开画布模式 & 帮助弹窗
   toggleIsDragMode(true)
-  openHelpModal()
-  isFirstOpen.value = false
+  openUserGuideModal()
 }
 
 export const handleUpdate = async() => {
