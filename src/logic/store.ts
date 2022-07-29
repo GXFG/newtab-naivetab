@@ -1,3 +1,4 @@
+import { NButton } from 'naive-ui'
 import pkg from '../../package.json'
 import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
@@ -447,9 +448,23 @@ export const handleUpdate = async() => {
   localConfig.general.version = pkg.version
   // 更新成功提示
   window.$notification.success({
+    duration: 8000,
     title: `${window.$t('common.update')}${window.$t('common.success')}`,
     content: `${window.$t('common.version')} ${pkg.version}`,
-    duration: 3000,
+    action: () =>
+      h(
+        NButton,
+        {
+          text: true,
+          type: 'primary',
+          onClick: () => {
+            openWhatsNewModal()
+          },
+        },
+        {
+          default: () => window.$t('common.whatsNew'),
+        },
+      ),
   })
   // 刷新配置设置
   await updateSetting()
