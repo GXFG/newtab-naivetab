@@ -9,8 +9,8 @@
 
     <!-- size -->
     <NFormItem v-if="isRenderField('margin')" :label="$t('common.margin')">
-      <NSlider v-model:value="localConfig[props.cname].margin" :step="1" :min="1" :max="100" />
-      <NInputNumber v-model:value="localConfig[props.cname].margin" class="setting__input-number" :step="1" :min="1" :max="100" />
+      <NSlider v-model:value="localConfig[props.cname].margin" :step="0.1" :min="0" :max="100" />
+      <NInputNumber v-model:value="localConfig[props.cname].margin" class="setting__input-number" :step="0.1" :min="0" :max="100" />
     </NFormItem>
     <NFormItem v-if="isRenderField('width')" :label="$t('common.width')">
       <NSlider v-model:value="localConfig[props.cname].width" :step="1" :min="1" :max="1000" />
@@ -29,8 +29,8 @@
       <NInputNumber v-model:value="localConfig[props.cname].fontSize" class="setting__input-number" :step="1" :min="12" :max="200" />
     </NFormItem>
     <NFormItem v-if="isRenderField('letterSpacing')" :label="$t('common.letterSpacing')">
-      <NSlider v-model:value="localConfig[props.cname].letterSpacing" :step="1" :min="0" :max="20" />
-      <NInputNumber v-model:value="localConfig[props.cname].letterSpacing" class="setting__input-number" :step="1" :min="0" :max="20" />
+      <NSlider v-model:value="localConfig[props.cname].letterSpacing" :step="0.1" :min="0" :max="20" />
+      <NInputNumber v-model:value="localConfig[props.cname].letterSpacing" class="setting__input-number" :step="0.1" :min="0" :max="20" />
     </NFormItem>
 
     <!-- color -->
