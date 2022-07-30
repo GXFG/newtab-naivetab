@@ -49,6 +49,14 @@ export const defaultConfig = {
         name: 'PrathameshJaju_ZH-CN2207606082',
         desc: '月球的高清合成影像 (© Prathamesh Jaju)',
       },
+      {
+        name: 'MoonlightRainier_ZH-CN6263832605',
+        desc: '雷尼尔山上空的银河星系，美国华盛顿州 (© Brad Goldpaint/Cavan)',
+      },
+      {
+        name: 'Balsamroot_ZH-CN9456182640',
+        desc: '山下盛开的箭叶脂根菊，美国大提顿国家公园 (© Mike Cavaroc/Tandem Stills + Motion)',
+      },
     ],
     layout: {
       xOffsetKey: 'right',
@@ -109,7 +117,7 @@ export const defaultConfig = {
       yTranslateValue: 0,
     },
     margin: 2,
-    width: 50,
+    width: 53,
     borderRadius: 3,
     fontFamily: 'Arial',
     fontSize: 12,
