@@ -102,6 +102,8 @@ const stopDrag = () => {
   if (offsetData.yTranslateValue !== -1) {
     localConfig[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
   }
+  // 重置dragStyle，避免覆盖组件containerStyle属性，:style="dragStyle || containerStyle"
+  emit('drag', '')
 }
 
 const onDrag = (e: MouseEvent) => {

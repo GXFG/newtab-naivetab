@@ -1,8 +1,8 @@
 <template>
-  <!-- ImagePicker: bing & favorite -->
-  <NDrawer :show="props.show" :width="550" @update:show="onCloseModal()">
+  <!-- BackgroundDrawer: bing & favorite -->
+  <NDrawer :show="props.show" :width="550" :height="350" :placement="localConfig.general.drawerPlacement" to="#background__drawer" @update:show="onCloseModal()">
     <NDrawerContent :title="`${$t('common.edit')}${$t('common.backgroundImage')}`" closable>
-      <div class="modal__content">
+      <div class="drawer__content">
         <!-- current -->
         <div>
           <NForm class="content__config" label-placement="left" :label-width="80">
@@ -175,8 +175,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
 </script>
 
 <style scoped>
-.modal__content {
-  height: 88vh;
+.drawer__content {
   .content__config {
     margin-right: 18px;
     flex: 1;

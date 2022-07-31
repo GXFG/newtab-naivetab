@@ -22,7 +22,7 @@ const responseHandler = (response: AxiosResponse) => {
 }
 
 const responseErrorHandler = (error: AxiosError) => {
-  window.$message.error(`${error}`)
+  window.$message.error(`${error.message}: ${error.config.url}`)
   return Promise.reject(error)
 }
 

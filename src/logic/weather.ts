@@ -120,12 +120,12 @@ export const updateWeather = () => {
     return
   }
   const currTS = dayjs().valueOf()
-  // 实时天气最小刷新间隔为10分钟
-  if (currTS - weatherState.value.now.syncTime >= 60000 * 10) {
+  // 实时天气最小刷新间隔为30分钟
+  if (currTS - weatherState.value.now.syncTime >= 60000 * 30) {
     getNowData()
   }
-  // 空气质量最小刷新间隔为2小时
-  if (currTS - weatherState.value.air.syncTime >= 3600000 * 2) {
+  // 空气质量最小刷新间隔为3小时
+  if (currTS - weatherState.value.air.syncTime >= 3600000 * 3) {
     getAirData()
   }
   // 生活指数最小刷新间隔为4小时

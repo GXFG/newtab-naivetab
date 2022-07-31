@@ -69,7 +69,6 @@ import {
   getStyleField,
   updateNews,
   onRetryNews,
-  refreshNews,
 } from '@/logic'
 
 const CNAME = 'news'
@@ -113,7 +112,7 @@ watch(isRender, (value) => {
   if (!value) {
     return
   }
-  refreshNews()
+  updateNews()
 })
 
 const dragStyle = ref('')
