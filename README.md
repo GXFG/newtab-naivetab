@@ -24,6 +24,7 @@
 8. 语言支持（zh-CN、en-US）
 
 ## 📷预览
+
 ![0](https://user-images.githubusercontent.com/20944987/182008382-52846401-b323-481f-bc03-f9851b7042ac.png)
 ![1](https://user-images.githubusercontent.com/20944987/182008384-a6ca2503-8c83-4fe9-a580-ac6b2f686bc8.png)
 ![2](https://user-images.githubusercontent.com/20944987/182008410-863cf051-b9c8-42f9-8632-2a551b0d8cf4.png)
@@ -46,6 +47,5 @@
 ## 🌼感谢
 
 - [Vitesse-webext](https://github.com/antfu/vitesse-webext)
-- [VueUse](https://vueuse.org/guide/index.html)
 - [Naiveui](https://www.naiveui.com/zh-CN/os-theme)
 - [icones](https://icones.js.org)
