@@ -26,12 +26,12 @@
 </template>
 
 <script setup lang="ts">
-import { ANALOG_CLOCK_THEME, addTimerTask, removeTimerTask, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { addTimerTask, removeTimerTask, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockAnalog'
 const isRender = getIsComponentRender(CNAME)
 
-const currTheme = computed(() => ANALOG_CLOCK_THEME.find(item => item.value === localConfig.clockAnalog.theme)?.label || 'light')
+const currTheme = computed(() => localState.value.currAppearanceLabel)
 
 const state = reactive({
   isAnimationEnable: true,

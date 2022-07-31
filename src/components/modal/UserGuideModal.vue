@@ -24,7 +24,7 @@
 import { globalState, isFirstOpen } from '@/logic'
 
 const onShowTips = () => {
-  window.$notification.info({
+  window.$notification.warning({
     title: window.$t('guide.tipsTitle'),
     content: window.$t('guide.tipsContent'),
     duration: 10000,
@@ -37,8 +37,8 @@ const onConfirm = () => {
     return
   }
   // 首次关闭时弹出引导提示
-  window.$dialog.info({
-    title: window.$t('guide.backTitle'),
+  window.$dialog.warning({
+    title: window.$t('guide.tipsTitle'),
     content: window.$t('guide.backContent'),
     positiveText: window.$t('common.confirm'),
     negativeText: window.$t('common.cancel'),

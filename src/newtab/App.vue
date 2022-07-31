@@ -63,10 +63,12 @@ watch(
   () => {
     if (localConfig.general.appearance === 'auto') {
       localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
+      localState.value.currAppearanceLabel = osTheme.value || 'light'
       currTheme.value = osTheme.value === 'dark' ? darkTheme : null
       return
     }
-    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance]
+    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance] as 0 | 1
+    localState.value.currAppearanceLabel = localConfig.general.appearance as 'light' | 'dark'
     currTheme.value = localConfig.general.appearance === 'dark' ? darkTheme : null
   },
   { immediate: true },

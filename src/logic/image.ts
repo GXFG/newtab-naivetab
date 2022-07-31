@@ -83,9 +83,6 @@ export const renderBackgroundImage = () => {
 }
 
 export const updateImages = () => {
-  if (!localConfig.general.isBackgroundImageEnabled || localConfig.general.backgroundImageSource !== 2) {
-    return
-  }
   const currTS = dayjs().valueOf()
   // 最小刷新间隔为2小时
   if (currTS - imageState.value.syncTime <= 3600000 * 2) {

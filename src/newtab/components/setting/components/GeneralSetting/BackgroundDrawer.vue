@@ -109,7 +109,7 @@ const backgroundImageSourceList = computed(() => [
 
 const state = reactive({
   lastAppearance: localConfig.general.appearance, // 记录当前设置的外观，用于关闭抽屉时恢复
-  applyToAppearance: localState.value.currAppearanceCode === 0 ? 'light' : 'dark',
+  applyToAppearance: localState.value.currAppearanceLabel,
 })
 
 watch(
@@ -118,7 +118,7 @@ watch(
     if (value) {
       updateImages()
       state.lastAppearance = localConfig.general.appearance
-      state.applyToAppearance = localState.value.currAppearanceCode === 0 ? 'light' : 'dark'
+      state.applyToAppearance = localState.value.currAppearanceLabel
     } else {
       localConfig.general.appearance = state.lastAppearance
     }

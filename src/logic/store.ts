@@ -1,3 +1,4 @@
+import { NButton } from 'naive-ui'
 import pkg from '../../package.json'
 import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
@@ -7,33 +8,38 @@ import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, 
 export const defaultConfig = {
   general: {
     version: pkg.version,
-    appearance: 'auto', // light | dark | auto
-    pageTitle: 'NewTab',
+    appearance: 'auto' as 'light' | 'dark' | 'auto',
+    pageTitle: chrome.i18n.getUILanguage() === 'en-US' ? 'NewTab' : '新标签页',
     lang: chrome.i18n.getUILanguage() || 'en-US',
-    drawerPlacement: 'right' as any,
+    drawerPlacement: 'right' as 'left' | 'right',
     isBackgroundImageEnabled: true,
     isLoadPageAnimationEnabled: true,
     backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
     backgroundImageHighQuality: false,
-    // backgroundImageName: 'YurisNight_ZH-CN5738817931', v1.0.0删除
-    // backgroundImageDesc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', v1.0.0删除
     backgroundImageNames: ['YurisNight_ZH-CN5738817931', 'MoonPhases_ZH-CN3779272016'],
     backgroundImageDescs: ['宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', '一组月相照片 (© Delpixart/Getty Images)'],
     isBackgroundImageCustomUrlEnabled: false,
-    // backgroundImageCustomUrl: '', v1.0.0删除
     backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.YurisNight_ZH-CN5738817931_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.MoonPhases_ZH-CN3779272016_1920x1080.jpg'],
     favoriteImageList: [
+      {
+        name: 'YurisNight_ZH-CN5738817931',
+        desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
+      },
+      {
+        name: 'MoonPhases_ZH-CN3779272016',
+        desc: '一组月相照片 (© Delpixart/Getty Images)',
+      },
       {
         name: 'ChurchillBears_ZH-CN1430090934',
         desc: '好奇地看着相机的北极熊，加拿大丘吉尔镇 (© Matthias Breiter/Minden Pictures)',
       },
       {
-        name: 'DarwinsArch_ZH-CN9740478501',
-        desc: '达尔文岛的达尔文拱门，厄瓜多尔加拉帕戈斯 (© miralex/Getty Images)',
-      },
-      {
         name: 'WinterHalo_ZH-CN0666553211',
         desc: '厄尔士山脉上的光晕，德国萨克森州 (© Martin Ruegner/Getty Images)',
+      },
+      {
+        name: 'DarwinsArch_ZH-CN9740478501',
+        desc: '达尔文岛的达尔文拱门，厄瓜多尔加拉帕戈斯 (© miralex/Getty Images)',
       },
       {
         name: 'PoetrysCave_ZH-CN3196193909',
@@ -44,12 +50,12 @@ export const defaultConfig = {
         desc: '月球的高清合成影像 (© Prathamesh Jaju)',
       },
       {
-        name: 'YurisNight_ZH-CN5738817931',
-        desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
+        name: 'MoonlightRainier_ZH-CN6263832605',
+        desc: '雷尼尔山上空的银河星系，美国华盛顿州 (© Brad Goldpaint/Cavan)',
       },
       {
-        name: 'MoonPhases_ZH-CN3779272016',
-        desc: '一组月相照片 (© Delpixart/Getty Images)',
+        name: 'Balsamroot_ZH-CN9456182640',
+        desc: '山下盛开的箭叶脂根菊，美国大提顿国家公园 (© Mike Cavaroc/Tandem Stills + Motion)',
       },
     ],
     layout: {
@@ -82,19 +88,19 @@ export const defaultConfig = {
         name: '',
       },
       w: {
-        url: 's.weibo.com/top/summary?cate=realtimehot',
-        name: 'weibo',
-      },
-      e: {
         url: 'www.zhihu.com',
         name: '',
+      },
+      e: {
+        url: 'www.weibo.com',
+        name: 'weibo',
       },
       g: {
         url: 'www.google.com',
         name: '',
       },
       b: {
-        url: 't.bilibili.com',
+        url: 'www.bilibili.com',
         name: 'bilibili',
       },
       v: {
@@ -115,12 +121,12 @@ export const defaultConfig = {
     borderRadius: 3,
     fontFamily: 'Arial',
     fontSize: 12,
-    fontColor: ['rgba(15, 23, 42, 1)', 'rgba(15, 23, 42, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(212, 212, 216, 1)'],
-    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(71,85,105, 1)'],
+    fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
+    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73,73,77, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71,85,105, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(71,85,105, 1)', 'rgba(73,73,77, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
   },
@@ -138,7 +144,7 @@ export const defaultConfig = {
     },
     fontFamily: 'Arial Rounded MT Bold',
     fontSize: 80,
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     fontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(33, 33, 33, 1)', 'rgba(33, 33, 33, 1)'],
@@ -148,7 +154,6 @@ export const defaultConfig = {
   },
   clockAnalog: {
     enabled: true,
-    theme: 0, // themeList的索引
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 50,
@@ -196,7 +201,7 @@ export const defaultConfig = {
     backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71,85,105, 1)', 'rgba(73,73,77, 1)'],
+    borderColor: ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
   },
@@ -246,7 +251,7 @@ export const defaultConfig = {
     fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(71, 85, 105, 1)', 'rgba(73,73,77, 1)'],
     backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(74, 74, 74, 0.1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
@@ -271,7 +276,7 @@ export const defaultConfig = {
     fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(71, 85, 105, 1)', 'rgba(73,73,77, 1)'],
     backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(24, 24, 24, 0.3)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
@@ -319,6 +324,7 @@ export const localConfig = reactive({
 })
 
 export const localState = useStorageLocal('l-state', {
+  currAppearanceLabel: 'light' as 'light' | 'dark',
   currAppearanceCode: 0 as 0 | 1, // 0:light | 1:dark
   syncTimeMap: {
     general: 0,
@@ -447,9 +453,23 @@ export const handleUpdate = async() => {
   localConfig.general.version = pkg.version
   // 更新成功提示
   window.$notification.success({
+    duration: 8000,
     title: `${window.$t('common.update')}${window.$t('common.success')}`,
     content: `${window.$t('common.version')} ${pkg.version}`,
-    duration: 3000,
+    action: () =>
+      h(
+        NButton,
+        {
+          text: true,
+          type: 'primary',
+          onClick: () => {
+            openWhatsNewModal()
+          },
+        },
+        {
+          default: () => window.$t('common.whatsNew'),
+        },
+      ),
   })
   // 刷新配置设置
   await updateSetting()

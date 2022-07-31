@@ -301,6 +301,9 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           margin: 0 8%;
           cursor: pointer;
         }
+        .n-base-selection-input__content {
+          color: v-bind(customFontColor);
+        }
         .item__select_year {
           width: 80px;
         }
