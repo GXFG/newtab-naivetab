@@ -24,14 +24,11 @@
 8. 语言支持（zh-CN、en-US）
 
 ## 📷预览
-
-| 描述 | 预览 |
-| ---- | ---- |
-| 简单、高效、可高度自定义的新标签页 | <img width="1280" alt="0" src="https://user-images.githubusercontent.com/20944987/154078631-8ee7fe8d-d2e2-4643-8608-c8b0825bb419.png"> |
-| 支持自动/手动切换浅色、深色模式 |  <img width="1280" alt="1" src="https://user-images.githubusercontent.com/20944987/154078950-69c6fc2b-a8b7-4fd4-bb98-59d2826224a8.png"> |
-| 组件可拖放在任意位置，完全自定义 | <img width="1280" alt="2" src="https://user-images.githubusercontent.com/20944987/154079047-1bb6dcd5-0b1a-4bbf-99fd-ea726e6d0c15.png"> |
-| 组件支持丰富的自定义样式 | <img width="1280" alt="3" src="https://user-images.githubusercontent.com/20944987/154079176-258da34f-f2e8-4303-9054-2e6996e0aefa.png"> |
-| 包含书签、时钟、日期、天气、万年历等模块 | <img width="1280" alt="4" src="https://user-images.githubusercontent.com/20944987/154079205-a0b3a0e1-7984-4e2d-9bbf-adfbb005ee25.png"> |
+![0](https://user-images.githubusercontent.com/20944987/182008382-52846401-b323-481f-bc03-f9851b7042ac.png)
+![1](https://user-images.githubusercontent.com/20944987/182008384-a6ca2503-8c83-4fe9-a580-ac6b2f686bc8.png)
+![2](https://user-images.githubusercontent.com/20944987/182008410-863cf051-b9c8-42f9-8632-2a551b0d8cf4.png)
+![3](https://user-images.githubusercontent.com/20944987/182008413-0a31337b-9f67-49f9-b6e2-1ff53e011734.png)
+![4](https://user-images.githubusercontent.com/20944987/182008416-8cf78850-bee3-4cd1-97f7-53418b87df1f.png)
 
 ## 🛠️安装
 
