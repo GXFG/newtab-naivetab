@@ -86,3 +86,17 @@ body {
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   } */
 }
+
+.n-drawer-body-content-wrapper::-webkit-scrollbar {
+  width: 10px;
+}
+.n-drawer-body-content-wrapper::-webkit-scrollbar-thumb {
+  background: #808080;
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.n-drawer-body-content-wrapper::-webkit-scrollbar-track {
+  background: #ccc;
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}

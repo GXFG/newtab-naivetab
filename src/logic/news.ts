@@ -40,7 +40,7 @@ export const getBaiduNews = async() => {
     newsList = newsList.slice(1)
     newsState.value.baidu.list = newsList
     newsState.value.baidu.syncTime = dayjs().valueOf()
-    log('News update baidu')
+    log('News-update baidu')
   } catch (e) {
     console.warn(e)
   }
@@ -65,7 +65,7 @@ export const getZhihuNews = async() => {
     })
     newsState.value.zhihu.list = newsList
     newsState.value.zhihu.syncTime = dayjs().valueOf()
-    log('News update zhihu')
+    log('News-update zhihu')
   } catch (e) {
     console.warn(e)
   }
@@ -83,20 +83,22 @@ export const getWeiboNews = async() => {
     eleList.each((i, ele) => {
       const url = `https://s.weibo.com${$(ele).children('.td-02').children('a').attr('href')}`
       const desc = $(ele).children('.td-02').children('a').text().trim()
-      let hot: string | number = $(ele).children('.td-02').children('span').text()
-      let type = ''
-      if (isNaN(parseInt(hot))) { // 处理格式如：AB 123
-        const hotList = hot.split(' ')
-        type = `${hotList[0]} `
-        hot = hotList[1]
+      let hot: string | number = $(ele).children('.td-02').children('span').text().trim()
+      if (hot) {
+        let type = ''
+        if (isNaN(parseInt(hot))) { // 处理格式如：AB 123
+          const hotList = hot.split(' ')
+          type = `${hotList[0]} `
+          hot = hotList[1]
+        }
+        hot = `${type}${Math.floor((+hot / 10000))}w`
+        newsList.push({ url, desc, hot })
       }
-      hot = `${type}${Math.floor((+hot / 10000))}w`
-      newsList.push({ url, desc, hot })
     })
     newsList = newsList.slice(1)
     newsState.value.weibo.list = newsList
     newsState.value.weibo.syncTime = dayjs().valueOf()
-    log('News update weibo')
+    log('News-update weibo')
   } catch (e) {
     console.warn(e)
   }
@@ -118,7 +120,7 @@ export const getV2exNews = async() => {
     })
     newsState.value.v2ex.list = newsList
     newsState.value.v2ex.syncTime = dayjs().valueOf()
-    log('News update v2ex')
+    log('News-update v2ex')
   } catch (e) {
     console.warn(e)
   }
@@ -142,32 +144,26 @@ export const onRetryNews = (value: NewsSources) => {
   }, 3000)
 }
 
-export const refreshNews = () => {
-  getBaiduNews()
-  getZhihuNews()
-  getWeiboNews()
-  getV2exNews()
-}
-
 export const updateNews = () => {
   if (!localConfig.news.enabled) {
     return
   }
   const currTS = dayjs().valueOf()
   // 最小刷新间隔为30分钟
-  if (currTS - newsState.value.baidu.syncTime <= 60000 * 30) {
-    return
-  }
-  if (localConfig.news.sourceList.includes('baidu')) {
+  if (localConfig.news.sourceList.includes('baidu') && (currTS - newsState.value.baidu.syncTime >= 60000 * 30)) {
     getBaiduNews()
   }
-  if (localConfig.news.sourceList.includes('zhihu')) {
+  if (localConfig.news.sourceList.includes('zhihu') && (currTS - newsState.value.zhihu.syncTime >= 60000 * 30)) {
     getZhihuNews()
   }
-  if (localConfig.news.sourceList.includes('weibo')) {
+  if (localConfig.news.sourceList.includes('weibo') && (currTS - newsState.value.weibo.syncTime >= 60000 * 30)) {
     getWeiboNews()
   }
-  if (localConfig.news.sourceList.includes('v2ex')) {
+  if (localConfig.news.sourceList.includes('v2ex') && (currTS - newsState.value.v2ex.syncTime >= 60000 * 30)) {
     getV2exNews()
   }
 }
+
+watch(() => localConfig.news.sourceList, () => {
+  updateNews()
+})

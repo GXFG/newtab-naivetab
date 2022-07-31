@@ -194,7 +194,7 @@ export const downloadConfig = () => {
         const targetSyncTime = target.syncTime
         const localSyncTime = localState.value.syncTimeMap[field]
         if (targetSyncTime === localSyncTime) {
-          log(`Config-${field} not update`)
+          log(`Config-${field} no update`)
           continue
         }
         if (targetSyncTime < localSyncTime) {
@@ -202,6 +202,7 @@ export const downloadConfig = () => {
           uploadConfigFn(field)
           continue
         }
+        log(`Config-${field} update`)
         pendingConfig[field] = targetConfig
         localState.value.syncTimeMap[field] = targetSyncTime
       }
