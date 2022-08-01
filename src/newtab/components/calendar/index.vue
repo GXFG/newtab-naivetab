@@ -21,7 +21,7 @@
             />
           </div>
           <div class="options__item">
-            <NButton class="item__btn" text :disabled="isDragMode" @click="onPrevMonth()">
+            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onPrevMonth()">
               <fa-solid:angle-left />
             </NButton>
             <NSelect
@@ -32,12 +32,19 @@
               :disabled="isDragMode"
               @update:value="onDateChange()"
             />
-            <NButton class="item__btn" text :disabled="isDragMode" @click="onNextMonth()">
+            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onNextMonth()">
               <fa-solid:angle-right />
             </NButton>
           </div>
           <div class="options__item options__reset">
-            <NButton v-show="isResetBtnVisible" class="item__btn" text :disabled="isDragMode" @click="onReset()">
+            <NButton
+              v-show="isResetBtnVisible"
+              class="item__btn"
+              text
+              :disabled="isDragMode"
+              :style="isDragMode ? 'cursor: move;' : ''"
+              @click="onReset()"
+            >
               <si-glyph:arrow-backward />
             </NButton>
           </div>
@@ -55,6 +62,7 @@
             :key="item.date"
             class="body__item"
             :class="{
+              'body__item--hover': !isDragMode,
               'body__item--active': item.isToday,
               'body__item--blur': item.isNotCurrMonth,
               'body__item--weekend': item.isWeekend,
@@ -81,8 +89,8 @@
 </template>
 
 <script setup lang="ts">
-import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 import { calendar } from '@/lib/calendar'
+import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
@@ -351,9 +359,6 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         border-radius: v-bind(customBorderRadius);
         border: 1px solid rgba(0, 0, 0, 0);
         overflow: hidden;
-        &:hover {
-          border: 1px solid v-bind(customItemBackgroundActiveColor);
-        }
         .item__day {
         }
         .item__desc {
@@ -388,6 +393,9 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         .item__label--rest {
           background-color: v-bind(textColorRed);
         }
+      }
+      .body__item--hover:hover {
+        border: 1px solid v-bind(customItemBackgroundActiveColor);
       }
       .body__item--work {
         color: v-bind(textColorRed) !important;

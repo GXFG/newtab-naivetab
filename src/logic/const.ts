@@ -37,9 +37,9 @@ export const MERGE_CONFIG_DELAY = 2000
 
 export const MERGE_BOOKMARK_DELAY = 500
 
-export const DRAG_TRIGGER_DISTANCE = 10
+export const DRAG_TRIGGER_DISTANCE = 20
 
-export const FAVORITE_MAX_COUNT = 12
+export const FAVORITE_IMAGE_MAX_COUNT = 12
 
 export const APPEARANCE_TO_CODE_MAP = {
   light: 0,

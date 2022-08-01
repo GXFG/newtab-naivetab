@@ -55,6 +55,7 @@ import {
   getDomainIcon,
   localBookmarkList,
   keyboardRowList,
+  keyboardCurrAllKeyList,
   initBookmarkListData,
 } from '@/logic'
 
@@ -124,11 +125,18 @@ const onMouseDownKey = (e: MouseEvent, url: string) => {
 let timer = null as any
 
 const keyboardTask = (e: KeyboardEvent) => {
+  if (isDragMode.value) {
+    return
+  }
   const { code, shiftKey, ctrlKey, altKey, metaKey } = e
   let labelKey = KEYBOARD_CODE_TO_LABEL_MAP[code] || code
   if (/Key|Digit/.test(labelKey)) {
     // 处理字母和数字按键
     labelKey = labelKey.slice(-1).toLowerCase()
+  }
+  // 过滤非当前配置下的按键
+  if (!keyboardCurrAllKeyList.value.includes(labelKey)) {
+    return
   }
   const index = KEYBOARD_KEY_LIST.indexOf(labelKey)
   if (index === -1) {

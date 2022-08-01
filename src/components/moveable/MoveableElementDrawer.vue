@@ -6,8 +6,8 @@
     @mouseleave="handleContainerMouseLeave"
   >
     <!-- drawer -->
-    <div class="tool__drawer">
-      <div v-if="isDragMode" class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
+    <div v-if="isDragMode" class="tool__drawer">
+      <div class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
         <ic:baseline-chevron-right class="switch__icon" :class="{ 'switch__icon--active': isElementDrawerVisible }" />
       </div>
       <div class="drawer__header">
@@ -33,6 +33,7 @@
     </div>
     <!-- delete -->
     <div
+      v-if="isDragMode"
       class="tool__delete"
       :class="{ 'tool__delete--active': isDeleteBtnVisible }"
       @mouseenter="handlerDeleteMouseEnter"
@@ -150,7 +151,7 @@ const handleElementMouseMove = async(e: MouseEvent) => {
   isStartDragTaskRan = true
   moveState.dragTempEnabledMap[moveState.currDragTarget.name] = true
   await nextTick()
-  moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true)
+  moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true) // startDrag(e: MouseEvent, resite)
 }
 
 const handleElementMouseUp = (e: MouseEvent) => {
@@ -163,14 +164,14 @@ const handleElementMouseUp = (e: MouseEvent) => {
   isStartDragTaskRan = false
 }
 
-const initMouseTask = () => {
+const initElementMouseTask = () => {
   moveState.MouseDownTaskMap.set('element', handleElementMouseDown)
   moveState.MouseMoveTaskMap.set('element', handleElementMouseMove)
   moveState.MouseUpTaskMap.set('element', handleElementMouseUp)
 }
 
 onMounted(() => {
-  initMouseTask()
+  initElementMouseTask()
 })
 
 // delete
@@ -245,7 +246,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
   height: 100vh;
   color: #fff;
   background-color: v-bind(bgMoveableToolDrawer);
-  transition: all 0.3s ease;
+  transition: all 300ms ease;
   .tool__drawer {
     display: flex;
     flex-direction: column;
@@ -268,7 +269,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
       .switch__icon {
         flex: 0 0 auto;
         font-size: 24px;
-        transition: all 0.1s ease;
+        transition: all 400ms ease;
       }
       .switch__icon--active {
         transform: rotate(180deg);

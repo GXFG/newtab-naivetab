@@ -100,8 +100,8 @@ const handleMousedown = (e: MouseEvent) => {
   if (moveState.currDragTarget.type === -1) {
     return
   }
-  const mouseTask = getMouseTaskKey()
-  moveState.MouseDownTaskMap.get(mouseTask)(e)
+  const taskKey = getMouseTaskKey()
+  moveState.MouseDownTaskMap.get(taskKey)(e)
 }
 
 const handleMousemove = (e: MouseEvent) => {
@@ -124,8 +124,9 @@ const handleMouseup = (e: MouseEvent) => {
   if (!isDragMode.value || moveState.currDragTarget.type === -1) {
     return
   }
-  const mouseTask = getMouseTaskKey()
-  moveState.MouseUpTaskMap.get(mouseTask)(e)
+  const taskKey = getMouseTaskKey()
+  moveState.MouseUpTaskMap.get(taskKey)(e)
+  // 鼠标抬起时根据上一次状态决定是否打开Element抽屉
   if (lastIsElementDrawerVisible) {
     toggleIsElementDrawerVisible(true)
     lastIsElementDrawerVisible = null

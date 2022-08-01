@@ -1,7 +1,8 @@
-<!-- 最外层div的style会被用来存放v-bind的变量，不能再进行:style操作 -->
+<!-- 最外层div的style会被用来存放v-bind的css变量，不能再进行:style绑定操作 -->
+<!-- 第二层div用来统一控制画布模式下的cursor样式 -->
 <template>
   <div>
-    <div ref="moveableWrapEl" :style="moveableWrapStyle" class="moveable-wrap">
+    <div :style="moveableWrapStyle" class="moveable__wrap">
       <slot />
     </div>
   </div>
@@ -21,10 +22,8 @@ const emit = defineEmits(['drag'])
 
 const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move !important;' : ''))
 
-const moveableWrapEl = ref()
-const targetEle = ref()
-
 const state = reactive({
+  targetContainerEle: null as any,
   startState: {
     top: 0,
     left: 0,
@@ -52,8 +51,8 @@ const getPercentageInHeight = (currHeight: number) => +((currHeight / window.inn
  * @param resite 是否重置位置（以光标位置为组件的中心）
  */
 const startDrag = async(e: MouseEvent, resite = false) => {
-  await nextTick() // 确保可以获取到targetEle
-  const { top, left, width, height } = targetEle.value.getBoundingClientRect()
+  await nextTick() // 确保可以获取到 targetContainerEle
+  const { top, left, width, height } = state.targetContainerEle.getBoundingClientRect()
   state.startState = {
     top,
     left,
@@ -64,12 +63,12 @@ const startDrag = async(e: MouseEvent, resite = false) => {
   }
   if (resite) {
     // 默认光标位置为component的中心
-    const _top = e.clientY - height / 2
-    const _left = e.clientX - width / 2
-    localConfig[props.componentName as Components].layout.xOffsetValue = getPercentageInWidth(_left)
-    localConfig[props.componentName as Components].layout.yOffsetValue = getPercentageInHeight(_top)
-    state.startState.top = _top
-    state.startState.left = _left
+    const offsetTop = e.clientY - height / 2
+    const offsetLeft = e.clientX - width / 2
+    localConfig[props.componentName as Components].layout.xOffsetValue = getPercentageInWidth(offsetLeft)
+    localConfig[props.componentName as Components].layout.yOffsetValue = getPercentageInHeight(offsetTop)
+    state.startState.top = offsetTop
+    state.startState.left = offsetLeft
   }
   moveState.isDragingMap[props.componentName] = true
   moveState.isComponentDraging = true
@@ -102,7 +101,7 @@ const stopDrag = () => {
   if (offsetData.yTranslateValue !== -1) {
     localConfig[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
   }
-  // 重置dragStyle，避免覆盖组件containerStyle属性，:style="dragStyle || containerStyle"
+  // 重置dragStyle，避免覆盖组件containerStyle属性（:style="dragStyle || containerStyle"）造成导入设置文件不会刷新布局
   emit('drag', '')
 }
 
@@ -199,16 +198,15 @@ onMounted(() => {
 })
 
 const isEnabled = computed(() => localConfig[props.componentName].enabled || moveState.dragTempEnabledMap[props.componentName])
-const isCurrent = computed(() => props.componentName === moveState.currDragTarget.name)
-
-const initTargetEle = async() => {
-  await nextTick()
-  targetEle.value = document.querySelector(`.${props.componentName}__container`)
-}
+const isCurrentActive = computed(() => props.componentName === moveState.currDragTarget.name)
 
 const modifyMoveableWrapClass = async(isAdd: boolean, ...classList: string[]) => {
   await nextTick()
-  const targetClassList = moveableWrapEl.value?.children[0]?.children[0]?.classList
+  state.targetContainerEle = document.querySelector(`.${props.componentName}__container`)
+  if (!state.targetContainerEle) {
+    return
+  }
+  const targetClassList = state.targetContainerEle.classList
   if (targetClassList === undefined) {
     return
   }
@@ -219,49 +217,32 @@ const modifyMoveableWrapClass = async(isAdd: boolean, ...classList: string[]) =>
   }
 }
 
-const modifyMoveableWrapBorder = async(isAdd: boolean) => {
-  if (isAdd) {
+// 开启/关闭组件/DragMode时，为所有组件添加或移除对应class
+watch([isDragMode, isEnabled], async() => {
+  if (isDragMode.value) {
     modifyMoveableWrapClass(true, 'element-auxiliary-line', 'element-bg-hover')
   } else {
     modifyMoveableWrapClass(false, 'element-auxiliary-line', 'element-bg-hover', 'element-active', 'element-delete')
   }
-}
-
-// 开启或关闭DragMode时为所有当前启用的组件添加或移除对应class
-watch(
-  isDragMode,
-  (value) => {
-    if (!isEnabled.value) {
-      return
-    }
-    initTargetEle()
-    modifyMoveableWrapBorder(value)
-  },
-  { immediate: true },
-)
-
-// 当为DragMode且组件启用时添加对应class
-watch(isEnabled, (value: boolean) => {
-  if (!isDragMode.value || !value) {
-    return
-  }
-  initTargetEle()
-  modifyMoveableWrapBorder(true)
 })
 
-// 为当前选中的组件增加对应class
-watch(isCurrent, async(value) => {
-  if (!isDragMode.value || !isEnabled.value) {
-    return
-  }
+// 拖拽组件时，移除所有组件的hover样式
+watch(
+  () => moveState.isComponentDraging,
+  (value) => {
+    modifyMoveableWrapClass(!value, 'element-bg-hover')
+  },
+)
+
+// 为选中的组件增加active样式
+watch(isCurrentActive, (value) => {
   modifyMoveableWrapClass(value, 'element-active')
-  modifyMoveableWrapClass(!value, 'element-bg-hover') // 当前选中的Component无hover样式
 })
 
 watch(
   () => moveState.isDeleteHover,
-  async(value) => {
-    if (!isCurrent.value) {
+  (value) => {
+    if (!isCurrentActive.value) {
       return
     }
     modifyMoveableWrapClass(value, 'element-delete')
@@ -276,7 +257,7 @@ const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
 
 <style>
 .element-auxiliary-line {
-  outline: 1px dashed v-bind(auxiliaryLineElement) !important;
+  outline: 2px dashed v-bind(auxiliaryLineElement) !important;
 }
 
 .element-bg-hover:hover {

@@ -17,6 +17,7 @@
             placeholder=" "
             autosize
             :disabled="isDragMode"
+            :style="isDragMode ? 'cursor: move;' : ''"
             :show-count="localConfig.memo.countEnabled"
             @focus="onFocus"
             @blur="onBlur"

@@ -1,14 +1,16 @@
 <template>
-  <div v-show="moveState.isXAxisCenterVisible" class="axis xaxis__center" />
-  <div v-show="moveState.isYAxisCenterVisible" class="axis yaxis__center" />
-  <div v-show="moveState.isTopVisible" class="bound bound__top" />
-  <div v-show="moveState.isBottomVisible" class="bound bound__bottom" />
-  <div v-show="moveState.isLeftVisible" class="bound bound__left" />
-  <div v-show="moveState.isRightVisible" class="bound bound__right" />
+  <div v-if="isDragMode">
+    <div v-show="moveState.isXAxisCenterVisible" class="axis xaxis__center" />
+    <div v-show="moveState.isYAxisCenterVisible" class="axis yaxis__center" />
+    <div v-show="moveState.isTopVisible" class="bound bound__top" />
+    <div v-show="moveState.isBottomVisible" class="bound bound__bottom" />
+    <div v-show="moveState.isLeftVisible" class="bound bound__left" />
+    <div v-show="moveState.isRightVisible" class="bound bound__right" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { getStyleConst, moveState } from '@/logic'
+import { getStyleConst, moveState, isDragMode } from '@/logic'
 
 const auxiliaryLineMain = getStyleConst('auxiliaryLineMain')
 const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
@@ -38,7 +40,7 @@ const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
 /* 画布边界辅助线 */
 .bound {
   z-index: 20;
-  outline: 1px solid v-bind(auxiliaryLineBound);
+  outline: 2px solid v-bind(auxiliaryLineBound);
 }
 .bound__top {
   position: fixed;
