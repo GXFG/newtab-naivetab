@@ -9,36 +9,16 @@ export const moveState = reactive({
   MouseUpTaskMap: new Map() as any,
   isComponentDraging: false,
   isDeleteHover: false,
+  // 辅助线
   isXAxisCenterVisible: false,
   isYAxisCenterVisible: false,
-  isTopVisible: false,
-  isBottomVisible: false,
-  isLeftVisible: false,
-  isRightVisible: false,
-  dragTempEnabledMap: { // 临时开启组件，只有鼠标按键抬起时才进行真正的开启
-    bookmark: false,
-    clockDigital: false,
-    clockAnalog: false,
-    date: false,
-    calendar: false,
-    search: false,
-    weather: false,
-    memo: false,
-    news: false,
-  },
-  isDragingMap: { // 是否正在拖动中
-    bookmark: false,
-    clockDigital: false,
-    clockAnalog: false,
-    date: false,
-    calendar: false,
-    search: false,
-    weather: false,
-    memo: false,
-    news: false,
-  },
+  isTopBoundVisible: false,
+  isBottomBoundVisible: false,
+  isLeftBoundVisible: false,
+  isRightBoundVisible: false,
+  // 当前点击组件的属性
   currDragTarget: {
-    type: -1 as TargetType | -1,
+    type: -1 as TargetType | -1, // 1:componentName | 2:elementName
     name: '' as Components | '',
   },
 })
@@ -68,7 +48,7 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
     while (!target.getAttribute('data-target-type')) {
       target = target.parentNode
     }
-  } catch (e) { }
+  } catch (e) {}
   if (!target.getAttribute) {
     return {
       type: -1,
@@ -76,19 +56,19 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
     }
   }
   const type = (+target.getAttribute('data-target-type') as 1 | 2) || -1
-  const name: Components = target.getAttribute('data-target-name') || ''
+  const name = target.getAttribute('data-target-name') || ''
   return { type, name }
 }
 
-const getMouseTaskKey = () => {
+const currMouseTaskKey = computed(() => {
   let taskKey = ''
   if (moveState.currDragTarget.type === 1) {
     taskKey = moveState.currDragTarget.name
   } else if (moveState.currDragTarget.type === 2) {
-    taskKey = 'element'
+    taskKey = 'element-general'
   }
   return taskKey
-}
+})
 
 const handleMousedown = (e: MouseEvent) => {
   if (!isDragMode.value || e.button !== 0) {
@@ -100,17 +80,14 @@ const handleMousedown = (e: MouseEvent) => {
   if (moveState.currDragTarget.type === -1) {
     return
   }
-  const mouseTask = getMouseTaskKey()
-  moveState.MouseDownTaskMap.get(mouseTask)(e)
+  moveState.MouseDownTaskMap.get(currMouseTaskKey.value)(e)
 }
 
 const handleMousemove = (e: MouseEvent) => {
   if (!isDragMode.value || e.buttons === 0 || moveState.currDragTarget.type === -1) {
     return
   }
-  for (const task of moveState.MouseMoveTaskMap.values()) {
-    task(e)
-  }
+  moveState.MouseMoveTaskMap.get(currMouseTaskKey.value)(e)
   // 鼠标移动时隐藏Element抽屉
   if (lastIsElementDrawerVisible === null) {
     lastIsElementDrawerVisible = isElementDrawerVisible.value
@@ -124,8 +101,8 @@ const handleMouseup = (e: MouseEvent) => {
   if (!isDragMode.value || moveState.currDragTarget.type === -1) {
     return
   }
-  const mouseTask = getMouseTaskKey()
-  moveState.MouseUpTaskMap.get(mouseTask)(e)
+  moveState.MouseUpTaskMap.get(currMouseTaskKey.value)(e)
+  // 鼠标抬起时根据上一次状态决定是否打开Element抽屉
   if (lastIsElementDrawerVisible) {
     toggleIsElementDrawerVisible(true)
     lastIsElementDrawerVisible = null
@@ -139,7 +116,7 @@ const mouseTaskMap = {
   mouseleave: handleMouseup,
 }
 
-const onHandleListener = (isInit: boolean) => {
+const handleListener = (isInit: boolean) => {
   const bodyEle = document.querySelector('body') as HTMLElement
   const listenerFunc = isInit ? bodyEle.addEventListener : bodyEle.removeEventListener
   for (const eventName of Object.keys(mouseTaskMap)) {
@@ -149,12 +126,13 @@ const onHandleListener = (isInit: boolean) => {
 
 watch(isDragMode, (value) => {
   if (!value) {
-    onHandleListener(false)
+    handleListener(false)
     onResetState()
     return
   }
-  toggleIsElementDrawerVisible(true) // 开启画布模式时默认打开Element抽屉
+  // 开启画布模式时默认打开Element抽屉
+  toggleIsElementDrawerVisible(true)
   nextTick(() => {
-    onHandleListener(true)
+    handleListener(true)
   })
 }, { immediate: true })

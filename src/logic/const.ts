@@ -1,3 +1,4 @@
+export const URL_FEEDBACK = 'mailto:gxfgim@outlook.com?subject=NaiveTab Feedback'
 export const URL_CHROME_STORE = 'https://chrome.google.com/webstore/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem?utm_source=chrome-ntp-icon'
 export const URL_EDGE_STORE = 'https://microsoftedge.microsoft.com/addons/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/kejadmppkffccjopodhekdnmkofidmjl'
 export const URL_GITHUB = 'https://github.com/GXFG/newtab-naivetab'
@@ -37,9 +38,9 @@ export const MERGE_CONFIG_DELAY = 2000
 
 export const MERGE_BOOKMARK_DELAY = 500
 
-export const DRAG_TRIGGER_DISTANCE = 10
+export const DRAG_TRIGGER_DISTANCE = 20
 
-export const FAVORITE_MAX_COUNT = 12
+export const FAVORITE_IMAGE_MAX_COUNT = 12
 
 export const APPEARANCE_TO_CODE_MAP = {
   light: 0,

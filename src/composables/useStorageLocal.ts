@@ -21,7 +21,7 @@ export const useStorageLocal: <T>(key: string, defaultValue: T) => Ref<UnwrapRef
         const value = JSON.stringify(state.value)
         localStorage.setItem(key, value)
         // console.log(`@set ${key}`, value)
-      }, 500)
+      }, 800)
     },
     {
       deep: true,

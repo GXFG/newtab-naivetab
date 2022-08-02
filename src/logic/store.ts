@@ -69,7 +69,7 @@ export const defaultConfig = {
     fontFamily: 'Arial',
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    primaryColor: ['rgba(25, 125, 153, 1)', 'rgba(25, 125, 153, 1)'],
+    primaryColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
     backgroundColor: ['rgba(53, 54, 58, 1)', 'rgba(53, 54, 58, 1)'],
     bgOpacity: 1,
     bgBlur: 0,
@@ -88,24 +88,40 @@ export const defaultConfig = {
         name: '',
       },
       w: {
-        url: 'www.zhihu.com',
-        name: '',
-      },
-      e: {
         url: 'www.weibo.com',
         name: 'weibo',
+      },
+      t: {
+        url: 'www.draw.io',
+        name: '',
+      },
+      d: {
+        url: 'www.douban.com',
+        name: '',
       },
       g: {
         url: 'www.google.com',
         name: '',
       },
-      b: {
-        url: 'www.bilibili.com',
-        name: 'bilibili',
+      z: {
+        url: 'www.zhihu.com',
+        name: '',
       },
       v: {
         url: 'www.v2ex.com',
         name: '',
+      },
+      b: {
+        url: 'www.bilibili.com',
+        name: '',
+      },
+      n: {
+        url: 'www.youku.com',
+        name: '',
+      },
+      m: {
+        url: 'v.qq.com',
+        name: 'tencent',
       },
     },
     layout: {
@@ -201,7 +217,7 @@ export const defaultConfig = {
     backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)'],
+    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
   },
@@ -251,7 +267,7 @@ export const defaultConfig = {
     fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71, 85, 105, 1)', 'rgba(73,73,77, 1)'],
+    borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
     backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(74, 74, 74, 0.1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
@@ -276,7 +292,7 @@ export const defaultConfig = {
     fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71, 85, 105, 1)', 'rgba(73,73,77, 1)'],
+    borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
     backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(24, 24, 24, 0.3)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
@@ -489,7 +505,7 @@ export const getDomainIcon = (url: string) => {
   return `${url}/favicon.ico`
 }
 
-export const getIsComponentRender = (componentName: Components) => computed(() => localConfig[componentName].enabled || moveState.dragTempEnabledMap[componentName])
+export const getIsComponentRender = (componentName: Components) => computed(() => localConfig[componentName].enabled)
 
 export const getLayoutStyle = (name: string) => {
   return computed(() => {

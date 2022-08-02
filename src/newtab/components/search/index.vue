@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="search" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="search">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
       <NDropdown
         :show="localConfig.search.suggestionEnabled && state.isSuggestVisible"

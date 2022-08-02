@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="clockDigital" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockDigital">
     <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
       <div
         class="clockDigital__container"

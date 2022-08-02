@@ -99,7 +99,7 @@ const mergeState = (state: any, acceptState: any) => {
   if (Object.keys(state).length === 0) {
     return acceptState
   }
-  // 二者均为Object，特殊处理keymap数据，直接返回acceptState
+  // 特殊处理 bookmark.keymap 数据，直接返回acceptState
   if (Object.prototype.hasOwnProperty.call(state, 'q')) {
     return acceptState
   }

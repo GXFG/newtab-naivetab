@@ -2,12 +2,12 @@
   <div
     id="moveable-tool"
     :class="{ 'moveable-tool--active': isDragMode && isElementDrawerVisible }"
-    @mouseenter="handleContainerMouseEnter"
-    @mouseleave="handleContainerMouseLeave"
+    @mouseenter="handleElementDrawerMouseEnter"
+    @mouseleave="handleElementDrawerMouseLeave"
   >
     <!-- drawer -->
-    <div class="tool__drawer">
-      <div v-if="isDragMode" class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
+    <div v-if="isDragMode" class="tool__drawer">
+      <div class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
         <ic:baseline-chevron-right class="switch__icon" :class="{ 'switch__icon--active': isElementDrawerVisible }" />
       </div>
       <div class="drawer__header">
@@ -33,13 +33,15 @@
     </div>
     <!-- delete -->
     <div
+      v-if="isDragMode"
       class="tool__delete"
-      :class="{ 'tool__delete--active': isDeleteBtnVisible }"
+      :class="{ 'tool__delete--active': isDragMode && moveState.isComponentDraging }"
       @mouseenter="handlerDeleteMouseEnter"
       @mouseleave="handlerDeleteMouseLeave"
       @mouseup="handlerDeleteMouseUp"
     >
-      <ri:delete-bin-6-line class="delete__icon" />
+      <tabler:trash v-show="!moveState.isDeleteHover" class="delete__icon" />
+      <tabler:trash-x v-show="moveState.isDeleteHover" class="delete__icon" />
     </div>
   </div>
 </template>
@@ -129,76 +131,57 @@ const elementList = computed(() => [
 ])
 
 // ElementDrawer
-const handleContainerMouseEnter = () => {
+const handleElementDrawerMouseEnter = () => {
   state.isCursorInElementDrawer = true
 }
-const handleContainerMouseLeave = () => {
+
+const handleElementDrawerMouseLeave = () => {
   state.isCursorInElementDrawer = false
 }
 
 // Element
-let isStartDragTaskRan = false
-const handleElementMouseDown = () => {
-  isStartDragTaskRan = false
+const handleElementMouseDown = async(e: MouseEvent) => {
+  localConfig[moveState.currDragTarget.name].enabled = true
+  await nextTick()
+  // 以光标位置为组件的中心开始拖拽
+  moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true) // startDrag(e: MouseEvent, resite: boolean)
+  // 执行一次 onDragging，为消除首次启用组件时会展示上次存储的布局
+  moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)(e)
 }
 
 const handleElementMouseMove = async(e: MouseEvent) => {
-  if (isStartDragTaskRan) {
-    // 确保MouseDownTaskMap只执行一次
-    return
-  }
-  isStartDragTaskRan = true
-  moveState.dragTempEnabledMap[moveState.currDragTarget.name] = true
-  await nextTick()
-  moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true)
+  moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)(e)
 }
 
 const handleElementMouseUp = (e: MouseEvent) => {
   moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
-  if (!state.isCursorInElementDrawer) {
-    // 保存启用状态
-    localConfig[moveState.currDragTarget.name].enabled = true
-  }
-  moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
-  isStartDragTaskRan = false
+  const isEnabled = !state.isCursorInElementDrawer
+  localConfig[moveState.currDragTarget.name].enabled = isEnabled
 }
 
-const initMouseTask = () => {
-  moveState.MouseDownTaskMap.set('element', handleElementMouseDown)
-  moveState.MouseMoveTaskMap.set('element', handleElementMouseMove)
-  moveState.MouseUpTaskMap.set('element', handleElementMouseUp)
+const initElementMouseTask = () => {
+  moveState.MouseDownTaskMap.set('element-general', handleElementMouseDown)
+  moveState.MouseMoveTaskMap.set('element-general', handleElementMouseMove)
+  moveState.MouseUpTaskMap.set('element-general', handleElementMouseUp)
 }
 
 onMounted(() => {
-  initMouseTask()
+  initElementMouseTask()
 })
-
-// delete
-const isDeleteBtnVisible = computed(() => isDragMode.value && moveState.isComponentDraging)
 
 const onDeleteComponent = () => {
   localConfig[moveState.currDragTarget.name].enabled = false
-  moveState.dragTempEnabledMap[moveState.currDragTarget.name] = false
 }
 
 const handlerDeleteMouseEnter = () => {
-  if (!moveState.isComponentDraging) {
-    return
-  }
   moveState.isDeleteHover = true
 }
 
 const handlerDeleteMouseLeave = () => {
-  if (!moveState.isComponentDraging) {
-    return
-  }
   moveState.isDeleteHover = false
 }
 
 const handlerDeleteMouseUp = () => {
-  if (!moveState.isComponentDraging) {
-    return
-  }
   onDeleteComponent()
   moveState.isDeleteHover = false
 }
@@ -208,12 +191,12 @@ const keyboardHandler = (e: KeyboardEvent) => {
   if (!isDragMode.value) {
     return
   }
-  const { key } = e
-  if (key === 'Escape') {
+  const { code } = e
+  if (code === 'Escape') {
     toggleIsDragMode()
     return
   }
-  if (['Delete', 'Backspace'].includes(key)) {
+  if (['Delete', 'Backspace'].includes(code)) {
     if (moveState.currDragTarget.name.length === 0) {
       return
     }
@@ -221,8 +204,7 @@ const keyboardHandler = (e: KeyboardEvent) => {
   }
 }
 
-const CNAME = 'moveable-tool'
-addKeyboardTask(CNAME, keyboardHandler)
+addKeyboardTask('moveable-tool', keyboardHandler)
 
 const customPrimaryColor = getStyleField('general', 'primaryColor')
 const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
@@ -245,7 +227,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
   height: 100vh;
   color: #fff;
   background-color: v-bind(bgMoveableToolDrawer);
-  transition: all 0.3s ease;
+  transition: all 300ms ease;
   .tool__drawer {
     display: flex;
     flex-direction: column;
@@ -268,7 +250,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
       .switch__icon {
         flex: 0 0 auto;
         font-size: 24px;
-        transition: all 0.1s ease;
+        transition: all 400ms ease;
       }
       .switch__icon--active {
         transform: rotate(180deg);
@@ -332,24 +314,26 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
   .tool__delete {
     z-index: 20;
     position: fixed;
-    top: -45px;
-    right: -45px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 45px;
-    height: 45px;
-    border-radius: 2px;
+    top: -200px;
+    right: -200px;
+    width: 200px;
+    height: 200px;
     cursor: pointer;
+    background-color: v-bind(bgMoveableComponentDelete);
     transition: all 0.3s ease;
+    transform: rotate(45deg);
     .delete__icon {
-      font-size: 38px;
-      color: v-bind(bgMoveableComponentDelete);
+      position: absolute;
+      bottom: 20px;
+      left: 80px;
+      font-size: 36px;
+      color: #fff;
+      transform: rotate(-45deg);
     }
   }
   .tool__delete--active {
-    top: 8vh;
-    right: 10vw;
+    top: -100px;
+    right: -100px;
   }
 }
 </style>

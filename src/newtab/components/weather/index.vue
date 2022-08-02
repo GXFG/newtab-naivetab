@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="weather" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="weather">
     <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
       <div class="weather__container" :style="dragStyle || containerStyle">
         <NowWeather />

@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="news" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="news">
     <div v-if="isRender" id="news" data-target-type="1" data-target-name="news">
       <div
         class="news__container"
@@ -10,7 +10,7 @@
         }"
       >
         <div class="news__wrap">
-          <NTabs type="segment" animated justify-content="space-evenly" @update:value="handleChangeCurrTab">
+          <NTabs type="segment" animated justify-content="space-evenly" @before-leave="!isDragMode" @update:value="handleChangeCurrTab">
             <NTabPane v-for="source in selectNewsSourceList" :key="source.value" :name="source.value" :tab="source.label">
               <div class="news__content">
                 <div v-if="newsState[source.value] && newsState[source.value].list.length !== 0">

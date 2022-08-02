@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="date" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="date">
     <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
       <div class="date__container" :style="dragStyle || containerStyle" :class="{ 'date__container--shadow': localConfig.date.isShadowEnabled }">
         <p class="date__text">

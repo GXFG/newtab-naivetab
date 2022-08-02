@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { FAVORITE_MAX_COUNT, getStyleField, createTab, localConfig, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
+import { FAVORITE_IMAGE_MAX_COUNT, getStyleField, createTab, localConfig, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
 
 const props = defineProps({
   data: {
@@ -99,7 +99,7 @@ const isFavoriteIconVisible = computed(() => {
 })
 
 const onFavoriteImage = () => {
-  if (localConfig.general.favoriteImageList.length >= FAVORITE_MAX_COUNT) {
+  if (localConfig.general.favoriteImageList.length >= FAVORITE_IMAGE_MAX_COUNT) {
     window.$message.error(window.$t('prompts.favoriteLimt'))
     return
   }

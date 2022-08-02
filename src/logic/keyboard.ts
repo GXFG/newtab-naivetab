@@ -1,13 +1,13 @@
 import { globalState, switchSettingDrawerVisible } from '@/logic'
 
-const tasks = new Map()
+const taskMap = new Map()
 
 export const addKeyboardTask = (key: string, task: (e: KeyboardEvent) => void) => {
-  tasks.set(key, task)
+  taskMap.set(key, task)
 }
 
 export const removeKeyboardTask = (key: string) => {
-  tasks.delete(key)
+  taskMap.delete(key)
 }
 
 export const startKeyboard = () => {
@@ -19,7 +19,7 @@ export const startKeyboard = () => {
       }
       return
     }
-    for (const task of tasks.values()) {
+    for (const task of taskMap.values()) {
       task(e)
     }
   }

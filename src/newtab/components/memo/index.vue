@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="memo" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="memo">
     <div v-if="isRender" id="memo" data-target-type="1" data-target-name="memo">
       <div
         class="memo__container"
@@ -17,6 +17,7 @@
             placeholder=" "
             autosize
             :disabled="isDragMode"
+            :style="isDragMode ? 'cursor: move;' : ''"
             :show-count="localConfig.memo.countEnabled"
             @focus="onFocus"
             @blur="onBlur"
