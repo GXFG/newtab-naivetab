@@ -15,6 +15,7 @@
 import { Icon } from '@iconify/vue'
 import { isEdge } from '@/env'
 import {
+  URL_FEEDBACK,
   URL_GITHUB_ISSUSE,
   URL_CHROME_STORE,
   URL_EDGE_STORE,
@@ -111,11 +112,12 @@ const menuList = computed(() => [
 
 const menuActionMap = {
   setting: () => {
-    let tabName = state.currComponentName
-    if (tabName.includes('clock')) {
-      tabName = 'clock'
+    let settingDrawerTabName = state.currComponentName
+    // 时钟的设置均在同一tab页内
+    if (settingDrawerTabName.includes('clock')) {
+      settingDrawerTabName = 'clock'
     }
-    globalState.currSettingTabValue = tabName.length === 0 ? 'general' : tabName
+    globalState.currSettingTabValue = settingDrawerTabName.length === 0 ? 'general' : settingDrawerTabName
     switchSettingDrawerVisible(true)
   },
   dragMode: () => {
@@ -132,7 +134,7 @@ const menuActionMap = {
     createTab(URL_GITHUB_ISSUSE)
   },
   feedbackEmail: () => {
-    createTab('mailto:gxfgim@outlook.com?subject=NaiveTab Feedback')
+    createTab(URL_FEEDBACK)
   },
   positiveFeedback: () => {
     createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)
@@ -145,7 +147,9 @@ const menuActionMap = {
 const onSelectMenu = (key: string) => {
   state.isMenuVisible = false
   const action = menuActionMap[key]
-  action && action()
+  if (action) {
+    action()
+  }
 }
 
 const onCloseMenu = () => {

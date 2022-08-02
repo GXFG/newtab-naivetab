@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="calendar" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="calendar">
     <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
       <div
         class="calendar__container"

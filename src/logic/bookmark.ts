@@ -41,7 +41,7 @@ export const keyboardRowList = computed(() => getKeyboardList(localBookmarkList.
 
 export const keyboardSettingRowList = computed(() => getKeyboardList(KEYBOARD_KEY_LIST))
 
-export const keyboardCurrAllKeyList = computed(() => {
+export const keyboardCurrentModelAllKeyList = computed(() => {
   const allKey = [] as string[]
   for (const row of keyboardSettingRowList.value) {
     for (const key of row) {

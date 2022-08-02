@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="bookmark" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="bookmark">
     <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
       <div class="bookmark__container" :style="dragStyle || containerStyle">
         <div v-for="(rowData, rowIndex) in keyboardRowList" :key="rowIndex" class="bookmark__row">
@@ -55,7 +55,7 @@ import {
   getDomainIcon,
   localBookmarkList,
   keyboardRowList,
-  keyboardCurrAllKeyList,
+  keyboardCurrentModelAllKeyList,
   initBookmarkListData,
 } from '@/logic'
 
@@ -135,7 +135,7 @@ const keyboardTask = (e: KeyboardEvent) => {
     labelKey = labelKey.slice(-1).toLowerCase()
   }
   // 过滤非当前配置下的按键
-  if (!keyboardCurrAllKeyList.value.includes(labelKey)) {
+  if (!keyboardCurrentModelAllKeyList.value.includes(labelKey)) {
     return
   }
   const index = KEYBOARD_KEY_LIST.indexOf(labelKey)

@@ -1,5 +1,5 @@
 <template>
-  <MoveableComponentWrap componentName="clockAnalog" @drag="(style) => (dragStyle = style)">
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockAnalog">
     <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
       <div class="clockAnalog__container" :style="dragStyle || containerStyle">
         <div v-show="state.isClockVisible" class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
