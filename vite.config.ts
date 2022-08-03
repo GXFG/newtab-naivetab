@@ -1,4 +1,4 @@
-import { dirname, relative, resolve } from 'path'
+import { resolve } from 'path'
 import type { UserConfig } from 'vite'
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
