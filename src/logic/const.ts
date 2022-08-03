@@ -42,6 +42,8 @@ export const DRAG_TRIGGER_DISTANCE = 20
 
 export const FAVORITE_IMAGE_MAX_COUNT = 12
 
+export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 20
+
 export const APPEARANCE_TO_CODE_MAP = {
   light: 0,
   dark: 1,

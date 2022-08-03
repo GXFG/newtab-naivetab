@@ -443,8 +443,6 @@ export const handleUpdate = async() => {
       newLocalDataImages = {
         syncTime: 0,
         imageList: [],
-        localBackgroundFileName: '',
-        localBackgroundBase64: '',
         ...JSON.parse(localDataImages),
       }
     }

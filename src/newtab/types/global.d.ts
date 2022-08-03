@@ -8,6 +8,14 @@ interface Window {
   $loadingBar: any
 }
 
+type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
+
+interface LocalBackgroundImageItem{
+  appearanceCode: string
+  fileName: string
+  fileContent: string
+}
+
 type OptionsPermission = 'bookmarks'
 
 type TargetType = 1 | 2 // 1:component 2:element
