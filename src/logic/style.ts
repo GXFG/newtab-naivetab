@@ -1,10 +1,3 @@
-import 'virtual:windi.css'
-import './reset.css'
-import './main.css'
-import './animation.css'
-import './qweather-icons.css'
-import './font.css'
-
 /**
  * key: ['lightColor', 'darkColor']
  * 其中默认 darkColor = lightColor

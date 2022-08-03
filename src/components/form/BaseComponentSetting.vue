@@ -88,8 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { localConfig, localState, globalState } from '@/logic'
-import { swatcheColors } from '@/styles/index'
+import { swatcheColors, localConfig, localState, globalState } from '@/logic'
 
 const props = defineProps({
   cname: {

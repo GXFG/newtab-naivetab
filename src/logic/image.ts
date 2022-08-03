@@ -85,8 +85,10 @@ export const renderBackgroundImage = async() => {
   console.time('renderBackgroundImage')
   if (localConfig.general.backgroundImageSource === 0) {
     const result: LocalBackgroundImageItem = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
-    imageState.currBackgroundImageFileName = result.fileName
-    imageState.currBackgroundImageFileContent = result.fileContent
+    if (result) {
+      imageState.currBackgroundImageFileName = result.fileName
+      imageState.currBackgroundImageFileContent = result.fileContent
+    }
   }
   loadImageEle.src = '' // 取消上一张图片的加载，为确保严格按加载顺序生效
   isImageLoading.value = true
