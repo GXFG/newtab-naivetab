@@ -9,11 +9,11 @@ interface Window {
 }
 
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
+type DatabaseStore = 'localBackgroundImages'
 
 interface LocalBackgroundImageItem{
   appearanceCode: string
-  fileName: string
-  fileContent: string
+  file: File
 }
 
 type OptionsPermission = 'bookmarks'

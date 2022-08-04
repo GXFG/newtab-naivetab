@@ -15,13 +15,13 @@ export const imageLocalState = useStorageLocal('data-images', {
 
 export const imageState = reactive({
   currBackgroundImageFileName: '',
-  currBackgroundImageFileContent: '',
+  currBackgroundImageFileObjectURL: '',
 })
 
 export const currBackgroundImageUrl = computed(() => {
   // 本地
   if (localConfig.general.backgroundImageSource === 0) {
-    return imageState.currBackgroundImageFileContent
+    return imageState.currBackgroundImageFileObjectURL
   }
   let imageUrl = ''
   const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
@@ -85,9 +85,10 @@ export const renderBackgroundImage = async() => {
   console.time('renderBackgroundImage')
   if (localConfig.general.backgroundImageSource === 0) {
     const result: LocalBackgroundImageItem = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
+    // 首次选择backgroundImageSource为本地时无数据
     if (result) {
-      imageState.currBackgroundImageFileName = result.fileName
-      imageState.currBackgroundImageFileContent = result.fileContent
+      imageState.currBackgroundImageFileName = result.file.name
+      imageState.currBackgroundImageFileObjectURL = URL.createObjectURL(result.file)
     }
   }
   loadImageEle.src = '' // 取消上一张图片的加载，为确保严格按加载顺序生效

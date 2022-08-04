@@ -11,7 +11,9 @@ import { localConfig, currBackgroundImageUrl, isImageLoading, updateImages } fro
 const bgStyle = computed(() => (localConfig.general.isBackgroundImageEnabled ? `background-image: url(${currBackgroundImageUrl.value});` : ''))
 
 onMounted(() => {
-  updateImages()
+  if (localConfig.general.backgroundImageSource === 2) {
+    updateImages()
+  }
 })
 
 const customOpacity = computed(() => (isImageLoading.value ? 0 : localConfig.general.bgOpacity))

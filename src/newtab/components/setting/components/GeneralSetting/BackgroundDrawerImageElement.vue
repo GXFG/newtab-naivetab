@@ -1,14 +1,18 @@
 <template>
   <div class="image-wrap" :class="{ 'image-wrap--active': isCurrSelectedImage }">
     <NSpin :show="isCurrSelectedImage && isImageLoading">
+      <div v-if="!isHasImage" class="image__empty">
+        <ph:image-square />
+      </div>
       <!-- 懒加载的img不支持reactive变量 -->
-      <img v-if="lazy" v-lazy="currImageUrl" alt="" @click="onSelectImage()">
+      <img v-else-if="lazy" v-lazy="currImageUrl" alt="" @click="onSelectImage()">
       <img v-else :src="currImageUrl" alt="" @click="onSelectImage()">
     </NSpin>
     <div v-if="isCurrSelectedImage" class="image__current-mask">
       <ic:outline-check-circle />
     </div>
-    <div class="image__toolbar">
+    <!-- toolbar -->
+    <div v-if="isToolbarVisible" class="image__toolbar">
       <NPopover v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">
         <template #trigger>
           <div class="toolbar__icon">
@@ -44,7 +48,11 @@ import { FAVORITE_IMAGE_MAX_COUNT, getStyleField, createTab, localConfig, localS
 
 const props = defineProps({
   data: {
-    type: Object,
+    type: Object as () => {
+      url: string // 存在url时优先使用url，忽略bing name
+      name: string
+      desc: string
+    },
     required: true,
   },
   lazy: {
@@ -60,6 +68,10 @@ const props = defineProps({
     default: false,
   },
 })
+
+const isHasImage = computed(() => (props.data.url && props.data.url.length !== 0) || (props.data.name && props.data.name.length !== 0))
+
+const isToolbarVisible = computed(() => props.data.name && props.data.name.length !== 0)
 
 const currImageUrl = computed(() => {
   if (props.data.url && props.data.url.length !== 0) {
@@ -130,6 +142,12 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
     .image__toolbar {
       bottom: 0 !important;
     }
+  }
+  .image__empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
   }
   .image__toolbar {
     z-index: 2;
