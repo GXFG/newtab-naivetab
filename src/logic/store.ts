@@ -2,8 +2,8 @@ import { NButton } from 'naive-ui'
 import pkg from '../../package.json'
 import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { styleConst } from '@/styles/index'
-import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, moveState, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
+import { styleConst } from '@/styles/const'
+import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -443,8 +443,6 @@ export const handleUpdate = async() => {
       newLocalDataImages = {
         syncTime: 0,
         imageList: [],
-        localBackgroundFileName: '',
-        localBackgroundBase64: '',
         ...JSON.parse(localDataImages),
       }
     }

@@ -83,6 +83,7 @@ video {
   padding: 0;
   border: 0;
   font-size: 100%;
+  line-height: 1;
   font: inherit;
   vertical-align: baseline;
 }
@@ -123,7 +124,26 @@ table {
   border-spacing: 0;
 }
 
+*,
+:before,
+:after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: currentColor;
+}
+
 *:focus {
   border: none !important;
   outline: none !important;
+}
+
+/* 消除图片底部间隙 */
+img {
+  border-style: solid;
+  display: block;
+  vertical-align: middle;
+  max-width: 100%;
+  height: auto;
 }

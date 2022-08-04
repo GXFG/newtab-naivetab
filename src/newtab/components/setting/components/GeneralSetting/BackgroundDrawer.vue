@@ -1,6 +1,13 @@
 <template>
   <!-- BackgroundDrawer: bing & favorite -->
-  <NDrawer :show="props.show" :width="550" :height="350" :placement="localConfig.general.drawerPlacement" to="#background__drawer" @update:show="onCloseModal()">
+  <NDrawer
+    :show="props.show"
+    :width="550"
+    :height="350"
+    :placement="localConfig.general.drawerPlacement"
+    to="#background__drawer"
+    @update:show="onCloseModal()"
+  >
     <NDrawerContent :title="`${$t('common.edit')}${$t('common.backgroundImage')}`" closable>
       <div class="drawer__content">
         <!-- current -->
@@ -17,7 +24,7 @@
               </NButton>
               <Tips :content="$t('general.localBackgroundTips')" />
               <p class="setting__row-element">
-                {{ imageState.localBackgroundFileName }}
+                {{ imageState.currBackgroundImageFileName }}
               </p>
             </NFormItem>
             <!-- network -->
@@ -39,7 +46,7 @@
             {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
           </p>
           <NTabs
-            v-if="localConfig.general.backgroundImageSource === 1"
+            v-if="[0, 1].includes(localConfig.general.backgroundImageSource)"
             type="segment"
             size="small"
             :default-value="state.applyToAppearance"
@@ -87,7 +94,19 @@
 </template>
 <script setup lang="ts">
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
-import { gaEvent, previewImageListMap, localConfig, localState, imageState, isImageListLoading, currBackgroundImageUrl, updateImages } from '@/logic'
+import {
+  LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M,
+  databaseStore,
+  gaEvent,
+  previewImageListMap,
+  localConfig,
+  localState,
+  imageState,
+  isImageListLoading,
+  currBackgroundImageUrl,
+  updateImages,
+} from '@/logic'
+
 const props = defineProps({
   show: {
     type: Boolean,
@@ -135,7 +154,7 @@ const currImageData = computed(() => {
     desc: localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode],
   }
   if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
-    // not from Bing
+    // not from Bing url
     data = { url: currBackgroundImageUrl.value }
   }
   return data
@@ -149,20 +168,33 @@ const onSelectBackgroundImage = () => {
   gaEvent('setting-background-image', 'click', 'open')
 }
 
-const onBackgroundImageFileChange = (e: any) => {
+const onBackgroundImageFileChange = async(e: any) => {
+  gaEvent('setting-background-image', 'click', 'select-file')
   const file = e.target.files[0]
-  if (file.size > 4 * 1024 * 1024) {
+  if (file.size > LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M * 1024 * 1024) {
     window.$message.error(window.$t('prompts.imageTooLarge'))
     return
   }
-  const reader = new FileReader()
-  reader.readAsDataURL(file)
-  reader.onload = () => {
-    const base64Text: any = reader.result
-    imageState.value.localBackgroundFileName = file.name
-    imageState.value.localBackgroundBase64 = base64Text
+  imageState.currBackgroundImageFileName = file.name
+  imageState.currBackgroundImageFileObjectURL = URL.createObjectURL(file)
+  let handleType: DatabaseHandleType = 'add'
+  const currAppearanceImage = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
+  if (currAppearanceImage) {
+    handleType = 'put'
   }
-  gaEvent('setting-background-image', 'click', 'select-file')
+  databaseStore('localBackgroundImages', handleType, {
+    appearanceCode: localState.value.currAppearanceCode,
+    file,
+  })
+  // 当只单独设置了浅色or深色外观的背景时，默认同步另一外观为相同的背景
+  const oppositeAppearanceImage = await databaseStore('localBackgroundImages', 'get', +!localState.value.currAppearanceCode)
+  if (oppositeAppearanceImage) {
+    return
+  }
+  databaseStore('localBackgroundImages', 'add', {
+    appearanceCode: +!localState.value.currAppearanceCode,
+    file,
+  })
 }
 
 const handleBackgroundImageCustomUrlBlur = () => {

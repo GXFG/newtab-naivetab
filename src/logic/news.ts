@@ -60,8 +60,12 @@ export const getZhihuNews = async() => {
       let hot = i === 0
         ? ($(ele).children('.HotItem-metrics')[0] as any).children[2].data
         : $(ele).children('.HotItem-metrics').text() || ''
-      hot = `${hot.split(' ')[0]}w`
-      newsList.push({ url, desc, hot })
+      const count = hot.split(' ')[0]
+      if (!isNaN(count)) {
+        // 过滤盐选推荐
+        hot = `${count}w`
+        newsList.push({ url, desc, hot })
+      }
     })
     newsState.value.zhihu.list = newsList
     newsState.value.zhihu.syncTime = dayjs().valueOf()
@@ -141,7 +145,7 @@ export const onRetryNews = (value: NewsSources) => {
     if (func) {
       func()
     }
-  }, 3000)
+  }, 5000)
 }
 
 export const updateNews = () => {

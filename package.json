@@ -1,9 +1,9 @@
 {
   "name": "newtab-naivetab",
   "displayName": "NaiveTab - New Tab",
-  "version": "1.1.0",
-  "description": "一款简洁的浏览器新标签页扩展",
+  "version": "1.2.0",
   "private": true,
+  "description": "一款简洁的浏览器新标签页扩展",
   "scripts": {
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:prepare dev:web",
     "dev:prepare": "esno scripts/prepare.ts",
@@ -23,10 +23,15 @@
     "lint": "eslint '{src,scripts}/**/*.{json,ts,js,vue}'",
     "preinstall": "npx only-allow pnpm"
   },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12",
+    "dayjs": "^1.11.4"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^0.20.7",
     "@ffflorian/jszip-cli": "^3.1.6",
-    "@iconify/json": "^2.1.86",
+    "@iconify/json": "^2.1.87",
     "@iconify/vue": "^3.2.1",
     "@intlify/vite-plugin-vue-i18n": "^3.4.0",
     "@types/chrome": "^0.0.162",
@@ -61,10 +66,5 @@
     "web-ext": "^6.8.0",
     "webext-bridge": "^5.0.5",
     "webextension-polyfill": "^0.9.0"
-  },
-  "dependencies": {
-    "axios": "^0.27.2",
-    "cheerio": "^1.0.0-rc.12",
-    "dayjs": "^1.11.4"
   }
 }
