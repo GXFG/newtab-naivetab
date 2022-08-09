@@ -83,7 +83,7 @@ export const gaEvent = (category: string, action: string, opt_label: string, opt
   if (opt_noninteraction !== undefined) {
     param.push(opt_noninteraction)
   }
-  log('ga', param)
+  // log('ga', param)
   // window.dataLayer.push(param)
-  window._gaq.push(param)
+  // window._gaq.push(param)
 }

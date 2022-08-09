@@ -498,7 +498,7 @@ export const createTab = (url: string, active = true) => {
 
 export const getDomainIcon = (url: string) => {
   if (isChrome) {
-    return `chrome://favicon/size/32@2x/${url}`
+    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`
   }
   return `${url}/favicon.ico`
 }

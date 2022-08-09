@@ -11,8 +11,6 @@
 dist
 dist-ssr
 node_modules
-extension/_locales
-extension/manifest.json
+extension
 src/auto-imports.d.ts
-src/components.d.ts
 stats.html

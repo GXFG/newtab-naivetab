@@ -10,9 +10,10 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Markdown from 'vite-plugin-md'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import WindiCSS from 'vite-plugin-windicss'
-// import visualizer from 'rollup-plugin-visualizer'
 import windiConfig from './windi.config'
 import { r, port, isDev } from './scripts/utils'
+import { MV3Hmr } from './vite-mv3-hmr'
+// import visualizer from 'rollup-plugin-visualizer'
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
@@ -107,7 +108,6 @@ export default defineConfig(({ command }) => ({
     // },
     rollupOptions: {
       input: {
-        // background: r('src/background/index.html'),
         newtab: r('src/newtab/index.html'),
       },
     },
@@ -120,6 +120,7 @@ export default defineConfig(({ command }) => ({
     WindiCSS({
       config: windiConfig,
     }),
+    MV3Hmr(),
   ],
   test: {
     globals: true,
