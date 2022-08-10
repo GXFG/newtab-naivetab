@@ -13,4 +13,5 @@ dist-ssr
 node_modules
 extension
 src/auto-imports.d.ts
+src/components.d.ts
 stats.html
