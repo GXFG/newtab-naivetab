@@ -24,7 +24,6 @@ import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarPr
 import Content from './Content.vue'
 import {
   APPEARANCE_TO_CODE_MAP,
-  gaEvent,
   getStyleField,
   localConfig,
   localState,
@@ -47,7 +46,6 @@ onMounted(async() => {
   await nextTick()
   initFirstOpen()
   handleUpdate()
-  gaEvent('page-home', 'view', 'view')
 })
 
 onUnmounted(() => {

@@ -89,7 +89,6 @@ import BackgroundDrawer from './BackgroundDrawer.vue'
 import {
   defaultConfig,
   exportSetting,
-  gaEvent,
   localConfig,
   localState,
   globalState,
@@ -126,7 +125,6 @@ const drawerPlacementList = computed(() => [
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
   localConfig.general.lang = locale
-  gaEvent('setting-locale', 'click', 'change')
 }
 
 const openBackgroundDrawer = () => {
@@ -146,7 +144,6 @@ const importSettingInputEl = ref()
 const onImportSetting = () => {
   (importSettingInputEl as any).value.value = null
   importSettingInputEl.value.click()
-  gaEvent('setting-import', 'click', 'open')
 }
 
 const onImportFileChange = (e: any) => {
@@ -160,16 +157,13 @@ const onImportFileChange = (e: any) => {
   reader.onload = () => {
     importSetting(reader.result as any)
   }
-  gaEvent('setting-import', 'click', 'select-file')
 }
 
 const onExportSetting = () => {
   exportSetting()
-  gaEvent('setting-export', 'click', 'open')
 }
 
 const onResetSetting = () => {
   resetSetting()
-  gaEvent('setting-reset', 'click', 'open')
 }
 </script>

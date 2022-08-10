@@ -97,7 +97,6 @@ import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
 import {
   LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M,
   databaseStore,
-  gaEvent,
   previewImageListMap,
   localConfig,
   localState,
@@ -165,11 +164,9 @@ const bgImageFileInputEl = ref()
 const onSelectBackgroundImage = () => {
   (bgImageFileInputEl as any).value.value = null
   bgImageFileInputEl.value.click()
-  gaEvent('setting-background-image', 'click', 'open')
 }
 
 const onBackgroundImageFileChange = async(e: any) => {
-  gaEvent('setting-background-image', 'click', 'select-file')
   const file = e.target.files[0]
   if (file.size > LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M * 1024 * 1024) {
     window.$message.error(window.$t('prompts.imageTooLarge'))
