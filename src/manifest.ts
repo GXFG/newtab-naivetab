@@ -14,6 +14,7 @@ export async function getManifest() {
     default_locale: 'zh_CN',
     action: {
       default_icon: './assets/img/icon/icon.png',
+      default_popup: './dist/popup/index.html',
     },
     icons: {
       16: './assets/img/icon/icon-16x16.png',
@@ -23,6 +24,7 @@ export async function getManifest() {
     permissions: [
       'storage',
       'favicon',
+      'tabs',
     ],
     host_permissions: [
       '*://*/*',
@@ -33,12 +35,12 @@ export async function getManifest() {
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',
     },
+    // background: {
+    //   service_worker: './dist/background/index.mjs',
+    // },
     // options_ui: {
     //   page: './dist/options/index.html',
     //   open_in_tab: true,
-    // },
-    // background: {
-    //   service_worker: './dist/background/index.mjs',
     // },
     // content_scripts: [
     //   {

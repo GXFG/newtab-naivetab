@@ -109,6 +109,7 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       input: {
         newtab: r('src/newtab/index.html'),
+        popup: r('src/popup/index.html'),
       },
     },
     chunkSizeWarningLimit: 2000,

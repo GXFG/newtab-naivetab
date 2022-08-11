@@ -1,9 +1,10 @@
-import { NButton } from 'naive-ui'
+import type { GlobalThemeOverrides } from 'naive-ui'
+import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import pkg from '../../package.json'
 import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -383,6 +384,42 @@ export const globalState = reactive({
   currNewsTabValue: localConfig.news.sourceList[0] || '',
 })
 
+// UI language
+const NATIVE_UI_LOCALE_MAP = {
+  'zh-CN': zhCN,
+  'en-US': enUS,
+}
+
+export const nativeUILang = ref(NATIVE_UI_LOCALE_MAP[localConfig.general.lang] || enUS)
+
+watch(
+  () => localConfig.general.lang,
+  () => {
+    nativeUILang.value = NATIVE_UI_LOCALE_MAP[localConfig.general.lang] || enUS
+  },
+)
+
+// Theme
+export const currTheme = ref()
+
+const osTheme = useOsTheme() // light | dark | null
+
+watch(
+  [() => osTheme.value, () => localConfig.general.appearance],
+  () => {
+    if (localConfig.general.appearance === 'auto') {
+      localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
+      localState.value.currAppearanceLabel = osTheme.value || 'light'
+      currTheme.value = osTheme.value === 'dark' ? darkTheme : null
+      return
+    }
+    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance] as 0 | 1
+    localState.value.currAppearanceLabel = localConfig.general.appearance as 'light' | 'dark'
+    currTheme.value = localConfig.general.appearance === 'dark' ? darkTheme : null
+  },
+  { immediate: true },
+)
+
 const initAvailableFontList = async() => {
   const fontCheck = new Set(FONT_LIST.sort())
   // 在所有字体加载完成后进行操作
@@ -537,6 +574,17 @@ export const getStyleField = (component: ConfigField, field: string, unit?: stri
     }
     return style
   })
+}
+
+const customPrimaryColor = getStyleField('general', 'primaryColor')
+
+export const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: customPrimaryColor.value,
+    primaryColorSuppl: customPrimaryColor.value,
+    primaryColorHover: '#7f8c8d',
+    primaryColorPressed: '#57606f',
+  },
 }
 
 /**

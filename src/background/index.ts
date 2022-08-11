@@ -1,3 +1,4 @@
+// !!background Cannot use import statement outside a module
 import type { Tabs } from 'webextension-polyfill'
 import browser from 'webextension-polyfill'
 import { onMessage, sendMessage } from 'webext-bridge'
