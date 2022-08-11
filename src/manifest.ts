@@ -23,14 +23,10 @@ export async function getManifest() {
     permissions: [
       'storage',
       'favicon',
-      // 'https://cn.bing.com/', // image
-      // 'https://*.qweather.com/', // weather
-      // 'https://*.baidu.com/', // search, news
-      // 'https://*.zhihu.com/', // news
-      // 'https://*.weibo.com/', // news
-      // 'https://*.v2ex.com/', // news
     ],
-    host_permissions: ['*://*/*'],
+    host_permissions: [
+      '*://*/*',
+    ],
     optional_permissions: [
       'bookmarks',
     ],
@@ -75,7 +71,6 @@ export async function getManifest() {
 
     // this is required on dev for Vite script to load
 
-    // manifest.content_security_policy = `script-src \'self\' https://www.googletagmanager.com http://localhost:${port}; object-src \'self\'`
     // manifest.content_security_policy = `script-src \'self\' https://ssl.google-analytics.com http://localhost:${port}; object-src \'self\'`
   }
 
