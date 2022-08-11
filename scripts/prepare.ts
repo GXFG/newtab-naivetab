@@ -11,7 +11,6 @@ async function stubIndexHtml() {
   const views = [
     'newtab',
     'popup',
-    'background',
     // 'options',
   ]
 
