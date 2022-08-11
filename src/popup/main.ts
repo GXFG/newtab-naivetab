@@ -1,6 +1,6 @@
 import '../styles/reset.css'
 import { createApp } from 'vue'
-import App from './Popup.vue'
+import App from './App.vue'
 import i18n from '@/lib/i18n'
 
 const app = createApp(App)

@@ -576,7 +576,7 @@ export const getStyleField = (component: ConfigField, field: string, unit?: stri
   })
 }
 
-const customPrimaryColor = getStyleField('general', 'primaryColor')
+export const customPrimaryColor = getStyleField('general', 'primaryColor')
 
 export const themeOverrides: GlobalThemeOverrides = {
   common: {

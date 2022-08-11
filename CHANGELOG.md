@@ -1,6 +1,7 @@
 # 更新日志
 
 ## 🌟V1.3.0
+- 新增：增加了快速添加书签的Popup action，点击浏览器工具栏上的NaiveTab图标试试看吧
 - 优化：升级Manifest V3；移除Google Analytics
 
 ## 🌟V1.2.0
