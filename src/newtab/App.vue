@@ -1,11 +1,5 @@
 <template>
-  <NConfigProvider
-    id="container"
-    :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }"
-    :locale="nativeUILang"
-    :theme="currTheme"
-    :theme-overrides="themeOverrides"
-  >
+  <NConfigProvider id="container" :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }" :locale="nativeUILang" :theme="currTheme" :theme-overrides="themeOverrides">
     <NDialogProvider>
       <NNotificationProvider>
         <NMessageProvider>
@@ -20,7 +14,6 @@
 
 <script setup lang="ts">
 import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
-import Content from './Content.vue'
 import {
   getStyleField,
   localConfig,
@@ -32,10 +25,12 @@ import {
   downloadConfig,
   initFirstOpen,
   handleUpdate,
+  handleBookmarkPending,
   startKeyboard,
   startTimer,
   stopTimer,
 } from '@/logic'
+import Content from '@/newtab/Content.vue'
 
 onMounted(async() => {
   renderBackgroundImage()
@@ -45,6 +40,7 @@ onMounted(async() => {
   downloadConfig()
   await nextTick()
   initFirstOpen()
+  handleBookmarkPending()
   handleUpdate()
 })
 
