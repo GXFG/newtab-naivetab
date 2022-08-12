@@ -6,16 +6,15 @@ import { isDev, port, r } from '../scripts/utils'
 export async function getManifest() {
   const pkg = await fs.readJSON(r('package.json')) as typeof PkgType
 
-  // update this file to update this manifest.json
-  // can also be conditional based on your need
   const manifest: Manifest.WebExtensionManifest = {
-    manifest_version: 2,
+    manifest_version: 3,
     name: '__MSG_appName__',
     version: pkg.version,
     description: '__MSG_appDesc__',
     default_locale: 'zh_CN',
-    browser_action: {
+    action: {
       default_icon: './assets/img/icon/icon.png',
+      default_popup: './dist/popup/index.html',
     },
     icons: {
       16: './assets/img/icon/icon-16x16.png',
@@ -24,13 +23,11 @@ export async function getManifest() {
     },
     permissions: [
       'storage',
-      'chrome://favicon/',
-      'https://cn.bing.com/', // image
-      'https://*.qweather.com/', // weather
-      'https://*.baidu.com/', // search, news
-      'https://*.zhihu.com/', // news
-      'https://*.weibo.com/', // news
-      'https://*.v2ex.com/', // news
+      'favicon',
+      'tabs',
+    ],
+    host_permissions: [
+      '*://*/*',
     ],
     optional_permissions: [
       'bookmarks',
@@ -38,36 +35,45 @@ export async function getManifest() {
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',
     },
+    // background: {
+    //   service_worker: './dist/background/index.mjs',
+    // },
     // options_ui: {
     //   page: './dist/options/index.html',
     //   open_in_tab: true,
-    //   chrome_style: false,
     // },
-    // background: {
-    //   page: './dist/background/index.html',
-    //   persistent: false,
-    // },
-    // content_scripts: [{
-    //   matches: ['http://*/*', 'https://*/*'],
-    //   js: ['./dist/contentScripts/index.global.js'],
-    // }],
-    // web_accessible_resources: [
-    //   'dist/contentScripts/style.css',
+    // content_scripts: [
+    //   {
+    //     matches: ['http://*/*', 'https://*/*'],
+    //     js: ['./dist/contentScripts/index.global.js'],
+    //   },
     // ],
-    // content_security_policy: 'script-src \'self\' https://www.googletagmanager.com; object-src \'self\'',
-    content_security_policy: 'script-src \'self\' https://ssl.google-analytics.com; object-src \'self\'',
+    // web_accessible_resources: [
+    //   {
+    //     resources: ['dist/contentScripts/style.css'],
+    //     matches: ['<all_urls>'],
+    //   },
+    // ],
+    // content_security_policy: 'script-src \'self\' https://ssl.google-analytics.com; object-src \'self\'',
+    content_security_policy: {
+      extension_pages: isDev
+        // this is required on dev for Vite script to load
+        ? `script-src 'self' http://localhost:${port}; object-src 'self' http://localhost:${port}`
+        : 'script-src \'self\'; object-src \'self\'',
+    },
   }
 
   if (isDev) {
     // for content script, as browsers will cache them for each reload,
     // we use a background script to always inject the latest version
     // see src/background/contentScriptHMR.ts
+
     // delete manifest.content_scripts
     // manifest.permissions?.push('webNavigation')
 
     // this is required on dev for Vite script to load
-    // manifest.content_security_policy = `script-src \'self\' https://www.googletagmanager.com http://localhost:${port}; object-src \'self\'`
-    manifest.content_security_policy = `script-src \'self\' https://ssl.google-analytics.com http://localhost:${port}; object-src \'self\'`
+
+    // manifest.content_security_policy = `script-src \'self\' https://ssl.google-analytics.com http://localhost:${port}; object-src \'self\'`
   }
 
   return manifest

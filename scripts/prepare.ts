@@ -2,24 +2,24 @@
 import { execSync } from 'child_process'
 import fs from 'fs-extra'
 import chokidar from 'chokidar'
-import { r, port, isDev, log } from './utils'
+import { r, isDev, log } from './utils'
 
 /**
  * Stub index.html to use Vite in development
  */
 async function stubIndexHtml() {
   const views = [
-    // 'options',
-    // 'popup',
-    // 'background',
     'newtab',
+    'popup',
+    // 'options',
   ]
 
   for (const view of views) {
     await fs.ensureDir(r(`extension/dist/${view}`))
     let data = await fs.readFile(r(`src/${view}/index.html`), 'utf-8')
 
-    data = data.replace('"./main.ts"', `"http://localhost:${port}/${view}/main.ts"`)
+    data = data
+      .replace('"./main.ts"', `"/${view}/main.ts.js"`)
       .replace('<div id="app"></div>', '<div id="app">Vite server did not start</div>')
 
     data += `<style type="text/css">
@@ -48,6 +48,9 @@ function writeManifest() {
 function writeLocales() {
   execSync('npx esno ./scripts/locale.ts', { stdio: 'inherit' })
 }
+
+fs.ensureDirSync(r('extension'))
+fs.copySync(r('assets'), r('extension/assets'))
 
 writeManifest()
 writeLocales()

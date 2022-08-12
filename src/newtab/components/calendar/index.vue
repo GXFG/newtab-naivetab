@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import { calendar } from '@/lib/calendar'
-import { LEGAL_HOLIDAY_ENUM, gaEvent, isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
+import { LEGAL_HOLIDAY_ENUM, isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
@@ -229,7 +229,6 @@ const onPrevMonth = () => {
     state.currMonth -= 1
   }
   onRender()
-  gaEvent('calendar-prev', 'click', '')
 }
 
 const onNextMonth = () => {
@@ -240,7 +239,6 @@ const onNextMonth = () => {
     state.currMonth += 1
   }
   onRender()
-  gaEvent('calendar-next', 'click', '')
 }
 
 const onDateChange = () => {
@@ -254,7 +252,6 @@ const onReset = () => {
   state.currMonth = dayjs().get('month') + 1
   state.currDay = dayjs().get('date')
   onRender()
-  gaEvent('calendar-reset', 'click', '')
 }
 
 const dragStyle = ref('')

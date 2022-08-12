@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { useMessage, useNotification, useDialog, useLoadingBar } from 'naive-ui'
-import Setting from './components/setting/index.vue'
+import Setting from '@/newtab/components/setting/index.vue'
 import News from '@/newtab/components/news/index.vue'
 import Calendar from '@/newtab/components/calendar/index.vue'
 import KeyboardBookmark from '@/newtab/components/bookmark/keyboard.vue'

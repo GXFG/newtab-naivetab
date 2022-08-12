@@ -1,6 +1,6 @@
 /**
- * key: ['lightColor', 'darkColor']
- * 其中默认 darkColor = lightColor
+ * styleKey: ['lightColor', 'darkColor']
+ * 其中darkColor未定义时默认取lightColor的值
  */
 export const styleConst = ref({
   // setting
@@ -20,6 +20,19 @@ export const styleConst = ref({
   bgCalendarRest: ['rgba(255, 110, 110, 0.4)', ''],
   bgCalendarWork: ['rgba(122, 122, 122, 0.5)', ''],
   bgCalendarLabelWork: ['rgba(122, 122, 122, 0.6)', ''],
+  // popup
+  popupKeyboardBorder: ['rgb(224, 224, 230)', 'rgba(73, 73, 77, 1)'],
+  popupKeyboardHoverBg: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
+  popupKeyboardActiveBg: ['rgba(209, 213, 219, 0.8)', 'rgba(73, 73, 77, 0.8)'],
 })
 
-export const swatcheColors = ['rgba(255, 255, 255, 1)', 'rgba(209, 213, 219, 1)', 'rgba(44, 62, 80, 1)', 'rgba(52, 52, 57, 1)', 'rgba(53, 54, 58, 1)', 'rgba(73, 73, 77, 1)', 'rgba(15, 23, 42, 1)', 'rgba(16, 152, 173, 1)']
+export const swatcheColors = [
+  'rgba(255, 255, 255, 1)',
+  'rgba(53, 54, 58, 1)',
+  'rgba(209, 213, 219, 1)',
+  'rgba(44, 62, 80, 1)',
+  'rgba(52, 52, 57, 1)',
+  'rgba(73, 73, 77, 1)',
+  'rgba(15, 23, 42, 1)',
+  'rgba(16, 152, 173, 1)',
+]

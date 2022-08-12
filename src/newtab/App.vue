@@ -1,11 +1,5 @@
 <template>
-  <NConfigProvider
-    id="container"
-    :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }"
-    :locale="nativeUILang"
-    :theme="currTheme"
-    :theme-overrides="themeOverrides"
-  >
+  <NConfigProvider id="container" :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }" :locale="nativeUILang" :theme="currTheme" :theme-overrides="themeOverrides">
     <NDialogProvider>
       <NNotificationProvider>
         <NMessageProvider>
@@ -19,24 +13,24 @@
 </template>
 
 <script setup lang="ts">
-import type { GlobalThemeOverrides } from 'naive-ui'
-import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider, darkTheme, enUS, useOsTheme, zhCN } from 'naive-ui'
-import Content from './Content.vue'
+import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
 import {
-  APPEARANCE_TO_CODE_MAP,
-  gaEvent,
   getStyleField,
   localConfig,
-  localState,
+  nativeUILang,
+  currTheme,
+  themeOverrides,
   renderBackgroundImage,
   setEdgeFavicon,
   downloadConfig,
   initFirstOpen,
   handleUpdate,
+  handleBookmarkPending,
   startKeyboard,
   startTimer,
   stopTimer,
 } from '@/logic'
+import Content from '@/newtab/Content.vue'
 
 onMounted(async() => {
   renderBackgroundImage()
@@ -46,63 +40,17 @@ onMounted(async() => {
   downloadConfig()
   await nextTick()
   initFirstOpen()
+  handleBookmarkPending()
   handleUpdate()
-  gaEvent('page-home', 'view', 'view')
 })
 
 onUnmounted(() => {
   stopTimer()
 })
 
-// theme
-const osTheme = useOsTheme() // light | dark | null
-const currTheme = ref()
-
-watch(
-  [() => osTheme.value, () => localConfig.general.appearance],
-  () => {
-    if (localConfig.general.appearance === 'auto') {
-      localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
-      localState.value.currAppearanceLabel = osTheme.value || 'light'
-      currTheme.value = osTheme.value === 'dark' ? darkTheme : null
-      return
-    }
-    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance] as 0 | 1
-    localState.value.currAppearanceLabel = localConfig.general.appearance as 'light' | 'dark'
-    currTheme.value = localConfig.general.appearance === 'dark' ? darkTheme : null
-  },
-  { immediate: true },
-)
-
-// UI language
-const nativeUILang = ref(enUS)
-
-const NATIVE_UI_LOCALE_MAP = {
-  'zh-CN': zhCN,
-  'en-US': enUS,
-}
-
-watch(
-  () => localConfig.general.lang,
-  () => {
-    nativeUILang.value = NATIVE_UI_LOCALE_MAP[localConfig.general.lang] || enUS
-  },
-  { immediate: true },
-)
-
 const CNAME = 'general'
-const customPrimaryColor = getStyleField(CNAME, 'primaryColor')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
-
-const themeOverrides: GlobalThemeOverrides = {
-  common: {
-    primaryColor: customPrimaryColor.value,
-    primaryColorSuppl: customPrimaryColor.value,
-    primaryColorHover: '#7f8c8d',
-    primaryColorPressed: '#57606f',
-  },
-}
 </script>
 
 <style>

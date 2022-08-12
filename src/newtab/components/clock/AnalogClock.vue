@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { addTimerTask, removeTimerTask, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { addVisibilityTask, addTimerTask, removeTimerTask, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'clockAnalog'
 const isRender = getIsComponentRender(CNAME)
@@ -132,8 +132,8 @@ watch(
 )
 
 // page切换后台时隐藏动画，避免后续页面切换至前天时指针动画执行过多
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
+addVisibilityTask(CNAME, (hidden) => {
+  if (hidden) {
     state.isAnimationEnable = false
   } else {
     setTimeout(() => {

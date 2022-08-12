@@ -1,13 +1,7 @@
-import { sendMessage, onMessage } from 'webext-bridge'
+// !!background Cannot use import statement outside a module
 import type { Tabs } from 'webextension-polyfill'
-
-// only on dev mode
-if (import.meta.hot) {
-  // @ts-expect-error for background HMR
-  import('/@vite/client')
-  // load latest content script
-  import('./contentScriptHMR')
-}
+import browser from 'webextension-polyfill'
+import { onMessage, sendMessage } from 'webext-bridge'
 
 browser.runtime.onInstalled.addListener((): void => {
   // eslint-disable-next-line no-console

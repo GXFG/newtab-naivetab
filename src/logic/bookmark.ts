@@ -1,6 +1,35 @@
 import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, log } from '@/logic'
+import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, addVisibilityTask, log } from '@/logic'
+
+// Handle new bookmarks to be processed from popup modal
+export const handleBookmarkPending = () => {
+  const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
+    isPending: false,
+    keymap: {},
+  })
+  if (!bookmarkPendingData.value.isPending) {
+    return
+  }
+  log('Update bookmark from popup')
+  for (const key of Object.keys(bookmarkPendingData.value.keymap)) {
+    const item = bookmarkPendingData.value.keymap[key]
+    localConfig.bookmark.keymap[key] = {
+      url: item.url,
+      name: item.name,
+    }
+  }
+  bookmarkPendingData.value.isPending = false
+  bookmarkPendingData.value.keymap = {}
+}
+
+// page切换前台时刷新通过pupop新增的书签
+addVisibilityTask('bookmark', (hidden) => {
+  if (hidden) {
+    return
+  }
+  handleBookmarkPending()
+})
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 

@@ -1,9 +1,10 @@
-import { NButton } from 'naive-ui'
+import type { GlobalThemeOverrides } from 'naive-ui'
+import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import pkg from '../../package.json'
 import { isChrome, isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -139,10 +140,10 @@ export const defaultConfig = {
     fontSize: 12,
     fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
     backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73,73,77, 1)'],
+    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(71,85,105, 1)', 'rgba(73,73,77, 1)'],
+    borderColor: ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
   },
@@ -383,6 +384,42 @@ export const globalState = reactive({
   currNewsTabValue: localConfig.news.sourceList[0] || '',
 })
 
+// UI language
+const NATIVE_UI_LOCALE_MAP = {
+  'zh-CN': zhCN,
+  'en-US': enUS,
+}
+
+export const nativeUILang = ref(NATIVE_UI_LOCALE_MAP[localConfig.general.lang] || enUS)
+
+watch(
+  () => localConfig.general.lang,
+  () => {
+    nativeUILang.value = NATIVE_UI_LOCALE_MAP[localConfig.general.lang] || enUS
+  },
+)
+
+// Theme
+export const currTheme = ref()
+
+const osTheme = useOsTheme() // light | dark | null
+
+watch(
+  [() => osTheme.value, () => localConfig.general.appearance],
+  () => {
+    if (localConfig.general.appearance === 'auto') {
+      localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
+      localState.value.currAppearanceLabel = osTheme.value || 'light'
+      currTheme.value = osTheme.value === 'dark' ? darkTheme : null
+      return
+    }
+    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance] as 0 | 1
+    localState.value.currAppearanceLabel = localConfig.general.appearance as 'light' | 'dark'
+    currTheme.value = localConfig.general.appearance === 'dark' ? darkTheme : null
+  },
+  { immediate: true },
+)
+
 const initAvailableFontList = async() => {
   const fontCheck = new Set(FONT_LIST.sort())
   // 在所有字体加载完成后进行操作
@@ -498,7 +535,7 @@ export const createTab = (url: string, active = true) => {
 
 export const getDomainIcon = (url: string) => {
   if (isChrome) {
-    return `chrome://favicon/size/32@2x/${url}`
+    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`
   }
   return `${url}/favicon.ico`
 }
@@ -537,6 +574,17 @@ export const getStyleField = (component: ConfigField, field: string, unit?: stri
     }
     return style
   })
+}
+
+export const customPrimaryColor = getStyleField('general', 'primaryColor')
+
+export const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: customPrimaryColor.value,
+    primaryColorSuppl: customPrimaryColor.value,
+    primaryColorHover: '#7f8c8d',
+    primaryColorPressed: '#57606f',
+  },
 }
 
 /**
