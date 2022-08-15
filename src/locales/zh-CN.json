@@ -172,6 +172,7 @@
   },
   "search": {
     "searchEngine": "搜索引擎",
+    "customEngine": "自定义引擎",
     "placeholder": "占位文本",
     "icon": "搜索按钮",
     "suggestion": "搜索建议"

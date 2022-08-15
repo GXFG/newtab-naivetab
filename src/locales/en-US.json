@@ -172,6 +172,7 @@
   },
   "search": {
     "searchEngine": "Search engine",
+    "customEngine": "Custom engine",
     "placeholder": "Placeholder",
     "icon": "Icon",
     "suggestion": "Suggestion"
