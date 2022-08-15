@@ -128,7 +128,8 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
         user-select: none;
 
         &:hover {
-          background-color: v-bind(popupKeyboardHoverBg);;
+          background-color: v-bind(popupKeyboardHoverBg);
+          ;
         }
 
         .item__current {
@@ -173,7 +174,11 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
 
     .footer__btn {
       min-width: 120px;
+
       .icon__wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         font-size: 16px;
       }
     }
