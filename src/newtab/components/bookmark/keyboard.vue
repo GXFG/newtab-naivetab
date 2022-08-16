@@ -15,8 +15,7 @@
               'row__item--shadow': localConfig.bookmark.isShadowEnabled,
             }"
             :title="item.url"
-            @click="onClickKey(item.key, item.url)"
-            @mousedown="onMouseDownKey($event, item.url)"
+            @mousedown="onMouseDownKey($event, item.key, item.url)"
           >
             <div v-if="state.currSelectKey === item.key && state.isLoadPageLoading" class="item__loading">
               <eos-icons:loading />
@@ -77,21 +76,15 @@ const delayResetPressKey = () => {
   }, 200)
 }
 
-const openPage = (url: string, isBgOpen = false) => {
+const openPage = (url: string, isBgOpen = false, isNewTabOpen = false) => {
   if (isBgOpen) {
     // 后台打开
     createTab(url, false)
     delayResetPressKey()
     return
   }
-  if (localConfig.bookmark.isNewTabOpen) {
-    // 以新标签页打开
-    createTab(url)
-    delayResetPressKey()
-    return
-  }
-  if (!/http/.test(url)) {
-    // 非http协议只能以新标签页打开
+  if (isNewTabOpen || localConfig.bookmark.isNewTabOpen || !/http/.test(url)) {
+    // 以新标签页打开，其中非http协议只能以新标签页打开
     createTab(url)
     delayResetPressKey()
     return
@@ -102,23 +95,19 @@ const openPage = (url: string, isBgOpen = false) => {
   window.location.href = url
 }
 
-const onClickKey = (key: string, url: string) => {
+const onMouseDownKey = (e: MouseEvent, key: string, url: string) => {
   if (isDragMode.value || url.length === 0) {
     return
   }
-  state.currSelectKey = KEYBOARD_CODE_TO_LABEL_MAP[key] || key
-  openPage(url)
-}
-
-const onMouseDownKey = (e: MouseEvent, url: string) => {
-  if (e.button !== 1) {
-    return
+  const { button, shiftKey, altKey } = e
+  if (button === 0) {
+    // 按下鼠标左键
+    state.currSelectKey = KEYBOARD_CODE_TO_LABEL_MAP[key] || key
+    openPage(url, altKey, shiftKey) // shift + 点击key新标签页打开，alt + key 后台打开书签
+  } else if (button === 1) {
+    // 按下鼠标中键
+    openPage(url, true)
   }
-  // 按下鼠标中键
-  if (isDragMode.value) {
-    return
-  }
-  createTab(url, false)
 }
 
 // keyboard listener
@@ -131,7 +120,7 @@ const keyboardTask = (e: KeyboardEvent) => {
   const { code, shiftKey, ctrlKey, altKey, metaKey } = e
   let labelKey = KEYBOARD_CODE_TO_LABEL_MAP[code] || code
   if (/Key|Digit/.test(labelKey)) {
-    // 处理字母和数字按键
+    // 处理字母和数字按键的code: KeyA => a, Digit1 => 1
     labelKey = labelKey.slice(-1).toLowerCase()
   }
   // 过滤非当前配置下的按键
@@ -150,15 +139,14 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (url.length === 0) {
     return
   }
-  // 按下shift/alt + key 可以后台打开书签
-  const isBgOpenPage = shiftKey || altKey
+  // shift + key 新标签页打开，alt + key 后台打开书签
   if (!localConfig.bookmark.isDblclickOpen) {
     state.currSelectKey = labelKey
-    openPage(url, isBgOpenPage)
+    openPage(url, altKey, shiftKey)
   } else {
     clearTimeout(timer)
     if (labelKey === state.currSelectKey) {
-      openPage(url, isBgOpenPage)
+      openPage(url, altKey, shiftKey)
     } else {
       state.currSelectKey = labelKey
       timer = setTimeout(() => {
