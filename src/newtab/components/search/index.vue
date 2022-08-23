@@ -152,7 +152,9 @@ const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customPadding = getStyleField(CNAME, 'padding', 'px')
 const customWidth = getStyleField(CNAME, 'width', 'px')
+const customHeight = getStyleField(CNAME, 'height', 'px')
 const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
@@ -182,22 +184,17 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     .input__main {
       flex: 1;
       width: v-bind(customWidth);
+      height: v-bind(customHeight);
       font-size: v-bind(customFontSize);
-      background-color: v-bind(customBackgroundColor);
-      .n-input__input-el {
-        caret-color: v-bind(customFontColor);
-        color: v-bind(customFontColor) !important;
+      background-color: transparent;
+      .n-input-wrapper {
+        padding: 0 v-bind(customPadding);
+        .n-input__input-el {
+          height: v-bind(customHeight);
+          color: v-bind(customFontColor) !important;
+          caret-color: v-bind(customFontColor);
+        }
       }
-      /* Todo 浅色模式下placeholder颜色失败 */
-      /* .n-input__input-el::input-placeholder {
-        color: v-bind(customFontColor) !important;
-      }
-      .n-input__input-el::-webkit-input-placeholder {
-        color: v-bind(customFontColor) !important;
-      }
-      .n-input__input-el::-moz-placeholder {
-        color: v-bind(customFontColor) !important;
-      } */
     }
     .input__main--move {
       cursor: move !important;
