@@ -233,6 +233,9 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
     flex-direction: column;
     align-items: center;
     height: 100vh;
+    backdrop-filter: saturate(50%) blur(4px);
+    /* background-image: radial-gradient(transparent 1px, #000 1px); */
+    /* background-size: 4px 4px; */
     .drawer__switch {
       position: absolute;
       top: 50vh;
@@ -286,7 +289,6 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
         width: 75%;
         height: 45px;
         font-size: 16px;
-        /* text-align: center; */
         border: 1px solid v-bind(borderMoveableToolItem);
         border-radius: 3px;
         cursor: move;
