@@ -13,7 +13,7 @@ export const MV3Hmr = (): PluginOption => {
     async configureServer(server) {
       const originWsSend: (payload: HMRPayload) => void = server.ws.send
 
-      server.ws.send = async function(payload: HMRPayload) {
+      server.ws.send = async function (payload: HMRPayload) {
         if (payload.type === 'update') {
           for (const update of payload.updates) {
             await writeToDisk(update.path)
@@ -60,8 +60,9 @@ export const MV3Hmr = (): PluginOption => {
           code = code
             .replace(/\/@vite\/client/g, '/dist/mv3client.mjs')
             .replace(/(\/\.vite\/deps\/\S+?)\?v=\w+/g, '$1')
-          if (isWin) { code = code
-            .replace(/(from\s+["']\/@fs\/)[A-Z]:\//g, '$1')
+          if (isWin) {
+            code = code
+              .replace(/(from\s+["']\/@fs\/)[A-Z]:\//g, '$1')
           }
 
           const targetFile = normalizeFsUrl(isWin
@@ -82,7 +83,7 @@ function normalizeViteUrl(url: string, type: string) {
   url = url.replace(/\?v=\w+$/, '')
 
   if (type === 'js' && !url.endsWith('.js') && !url.endsWith('.mjs'))
-    url = `${url}.js`.replace(/vue\?/, 'vue_')
+    url = `${url}.js`.replace(/vue\?/, 'vue.js_')
 
   return url
 }
