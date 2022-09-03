@@ -1,6 +1,6 @@
 <template>
   <NCard id="popup" :title="`${$t('common.add')}${$t('setting.bookmark')}`">
-    <NForm label-placement="left" :label-width="50" require-mark-placement="left" :model="state">
+    <NForm label-placement="left" :label-width="55" require-mark-placement="left" :model="state">
       <NFormItem :label="$t('bookmark.urlLabel')" path="url" :rule="{ required: true }">
         <NInput v-model:value="state.url" :placeholder="$t('bookmark.urlPlaceholder')" clearable autofocus />
       </NFormItem>
@@ -42,6 +42,7 @@
     </div>
   </NCard>
 </template>
+
 <script setup lang="ts">
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { localConfig, customPrimaryColor, getStyleConst, keyboardRowList, getDefaultBookmarkName, getDomainIcon } from '@/logic'
@@ -128,7 +129,8 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
         user-select: none;
 
         &:hover {
-          background-color: v-bind(popupKeyboardHoverBg);;
+          background-color: v-bind(popupKeyboardHoverBg);
+          ;
         }
 
         .item__current {
@@ -173,7 +175,11 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
 
     .footer__btn {
       min-width: 120px;
+
       .icon__wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         font-size: 16px;
       }
     }

@@ -12,6 +12,10 @@
       <NSlider v-model:value="localConfig[props.cname].margin" :step="0.1" :min="0" :max="100" />
       <NInputNumber v-model:value="localConfig[props.cname].margin" class="setting__input-number" :step="0.1" :min="0" :max="100" />
     </NFormItem>
+    <NFormItem v-if="isRenderField('padding')" :label="$t('common.padding')">
+      <NSlider v-model:value="localConfig[props.cname].padding" :step="0.1" :min="0" :max="100" />
+      <NInputNumber v-model:value="localConfig[props.cname].padding" class="setting__input-number" :step="0.1" :min="0" :max="100" />
+    </NFormItem>
     <NFormItem v-if="isRenderField('width')" :label="$t('common.width')">
       <NSlider v-model:value="localConfig[props.cname].width" :step="1" :min="1" :max="1000" />
       <NInputNumber v-model:value="localConfig[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="1000" />
@@ -21,8 +25,8 @@
       <NInputNumber v-model:value="localConfig[props.cname].height" class="setting__input-number" :step="1" :min="1" :max="1000" />
     </NFormItem>
     <NFormItem v-if="isRenderField('borderRadius')" :label="$t('common.borderRadius')">
-      <NSlider v-model:value="localConfig[props.cname].borderRadius" :step="1" :min="0" :max="200" />
-      <NInputNumber v-model:value="localConfig[props.cname].borderRadius" class="setting__input-number" :step="1" :min="0" :max="200" />
+      <NSlider v-model:value="localConfig[props.cname].borderRadius" :step="0.1" :min="0" :max="200" />
+      <NInputNumber v-model:value="localConfig[props.cname].borderRadius" class="setting__input-number" :step="0.1" :min="0" :max="200" />
     </NFormItem>
     <NFormItem v-if="isRenderField('fontFamily')" :label="$t('common.font')">
       <NSelect v-model:value="localConfig[props.cname].fontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />

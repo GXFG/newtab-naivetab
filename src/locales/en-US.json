@@ -52,6 +52,7 @@
     "bing": "Bing",
     "favorite": "Favorite",
     "margin": "Margin",
+    "padding": "Padding",
     "width": "Width",
     "height": "Height",
     "borderRadius": "Radius",
@@ -104,7 +105,7 @@
     "text4": "—————————————————————————————————————",
     "text5": "Instructions for using the component:",
     "text6": "1. For all components: hover over the component, right-click to call up the settings menu, click 'Component Settings', you can modify the function and style",
-    "text7": "2. Bookmarks: click or press the corresponding key on the keyboard by clicking the left mouse button to open the website directly; Click on the bookmark with the middle mouse button or press shift/Alt + the corresponding button to open the website when you are done"
+    "text7": "2. Bookmarks: click or press the corresponding key on the keyboard by clicking the left mouse button to open the website directly; Shift + key to finish opening a bookmark in a new tab, middle-click a bookmark or Alt + key to finish opening a bookmark in the background"
   },
   "sponsor": {
     "title": "Sponsor a coffee",
@@ -172,6 +173,7 @@
   },
   "search": {
     "searchEngine": "Search engine",
+    "customEngine": "Custom engine",
     "placeholder": "Placeholder",
     "icon": "Icon",
     "suggestion": "Suggestion"
