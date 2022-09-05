@@ -94,8 +94,8 @@
     "buyMeACoffee": "Buy me a coffee"
   },
   "guide": {
-    "tipsTitle":"Tips",
-    "tipsContent":"When you don't know how to use it, click the right mouse button to try it",
+    "tipsTitle": "Tips",
+    "tipsContent": "When you don't know how to use it, click the right mouse button to try it",
     "backContent": "The guide can be found by right-clicking on the mouse button",
     "title": "User Guide",
     "text0": "First-time tutorial:",

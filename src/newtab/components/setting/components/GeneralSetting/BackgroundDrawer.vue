@@ -92,6 +92,7 @@
     </NDrawerContent>
   </NDrawer>
 </template>
+
 <script setup lang="ts">
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
 import {
@@ -166,7 +167,7 @@ const onSelectBackgroundImage = () => {
   bgImageFileInputEl.value.click()
 }
 
-const onBackgroundImageFileChange = async(e: any) => {
+const onBackgroundImageFileChange = async (e: any) => {
   const file = e.target.files[0]
   if (file.size > LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M * 1024 * 1024) {
     window.$message.error(window.$t('prompts.imageTooLarge'))

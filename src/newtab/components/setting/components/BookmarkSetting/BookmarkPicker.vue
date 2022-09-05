@@ -13,6 +13,7 @@
     </NDrawerContent>
   </NDrawer>
 </template>
+
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
@@ -83,7 +84,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
   return res
 }
 
-const onInitBookmarks = async() => {
+const onInitBookmarks = async () => {
   const res: any = await onGetBookmark()
   let root = res[0].children
   root = formatBookmark(root)

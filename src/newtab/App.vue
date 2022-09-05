@@ -32,7 +32,7 @@ import {
 } from '@/logic'
 import Content from '@/newtab/Content.vue'
 
-onMounted(async() => {
+onMounted(async () => {
   renderBackgroundImage()
   setEdgeFavicon()
   startTimer()

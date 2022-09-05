@@ -100,7 +100,7 @@ const onSearch = () => {
 
 const handleSearch = useDebounceFn(onSearch, 200)
 
-const getBaiduSuggest = async() => {
+const getBaiduSuggest = async () => {
   if (state.searchValue.length === 0) {
     return
   }

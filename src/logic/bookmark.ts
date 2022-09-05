@@ -102,7 +102,7 @@ export const getDefaultBookmarkName = (url: string) => {
 
 const isInitialized = useStorageLocal('data-bookmark-initialized', false)
 
-const mergeBookmarkSetting = useDebounceFn(async() => {
+const mergeBookmarkSetting = useDebounceFn(async () => {
   log('Bookmark merge setting')
   for (const key of KEYBOARD_KEY_LIST) {
     const index = KEYBOARD_KEY_LIST.indexOf(key)

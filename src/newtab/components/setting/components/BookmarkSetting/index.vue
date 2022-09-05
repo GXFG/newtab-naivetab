@@ -169,7 +169,7 @@ const handleDragEnd = () => {
   onBookmarkStopDrag()
 }
 
-const onImportBookmark = async(key: string) => {
+const onImportBookmark = async (key: string) => {
   const granted = await requestPermission('bookmarks')
   if (!granted) {
     return

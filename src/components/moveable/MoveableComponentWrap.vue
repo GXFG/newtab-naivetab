@@ -55,7 +55,7 @@ const getPercentageInHeight = (currHeight: number) => +((currHeight / window.inn
  * @param e
  * @param resite 是否重置位置（以光标位置为组件的中心）
  */
-const startDrag = async(e: MouseEvent, resite = false) => {
+const startDrag = async (e: MouseEvent, resite = false) => {
   await nextTick() // 确保可以获取到 targetContainerEle
   const { top, left, width, height } = state.targetContainerEle.getBoundingClientRect()
   state.startState = {
@@ -199,7 +199,7 @@ onMounted(() => {
 
 const isCurrentActive = computed(() => props.componentName === moveState.currDragTarget.name)
 
-const modifyMoveableWrapClass = async(isAdd: boolean, ...classList: string[]) => {
+const modifyMoveableWrapClass = async (isAdd: boolean, ...classList: string[]) => {
   await nextTick()
   state.targetContainerEle = document.querySelector(`.${props.componentName}__container`)
   if (!state.targetContainerEle) {

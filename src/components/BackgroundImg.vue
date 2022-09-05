@@ -31,7 +31,7 @@ const customOpacity = computed(() => (isImageLoading.value ? 0 : localConfig.gen
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    filter: blur(v-bind(localConfig.general.bgBlur + 'px'));
+    filter: blur(v-bind(`${localConfig.general.bgBlur}px`));
     opacity: v-bind(customOpacity);
   }
 }

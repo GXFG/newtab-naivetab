@@ -34,7 +34,7 @@ const databaseInit = (): Promise<boolean> => {
   })
 }
 
-export const databaseStore = async(storeName: DatabaseStore, type: DatabaseHandleType, payload: any): Promise<any> => {
+export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHandleType, payload: any): Promise<any> => {
   if (!isInitialized) {
     await databaseInit()
   }
