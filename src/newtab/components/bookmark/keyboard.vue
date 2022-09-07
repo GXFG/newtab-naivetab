@@ -103,7 +103,7 @@ const onMouseDownKey = (e: MouseEvent, key: string, url: string) => {
   if (button === 0) {
     // 按下鼠标左键
     state.currSelectKey = KEYBOARD_CODE_TO_LABEL_MAP[key] || key
-    openPage(url, altKey, shiftKey) // shift + 点击key新标签页打开，alt + key 后台打开书签
+    openPage(url, shiftKey, altKey) // shift + 点击key后台打开书签，alt + key 新标签页打开
   } else if (button === 1) {
     // 按下鼠标中键
     openPage(url, true)
@@ -139,14 +139,14 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (url.length === 0) {
     return
   }
-  // shift + key 新标签页打开，alt + key 后台打开书签
+  // shift + key 后台打开书签，alt + key 新标签页打开
   if (!localConfig.bookmark.isDblclickOpen) {
     state.currSelectKey = labelKey
-    openPage(url, altKey, shiftKey)
+    openPage(url, shiftKey, altKey)
   } else {
     clearTimeout(timer)
     if (labelKey === state.currSelectKey) {
-      openPage(url, altKey, shiftKey)
+      openPage(url, shiftKey, altKey)
     } else {
       state.currSelectKey = labelKey
       timer = setTimeout(() => {

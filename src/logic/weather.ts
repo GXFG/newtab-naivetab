@@ -111,7 +111,7 @@ const getWarningData = async () => {
   }
   weatherState.value.warning.list = data.warning
   weatherState.value.warning.syncTime = dayjs().valueOf()
-  weatherState.value.state.isWarningVisible = data.warning.length !== 0
+  weatherState.value.state.isWarningVisible = data.warning && data.warning.length && data.warning.length !== 0
   log('Weather update warning')
 }
 

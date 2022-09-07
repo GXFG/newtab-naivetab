@@ -4,5 +4,119 @@
   },
   "appDesc": {
     "message": "Customize your new tabs: Includes bookmarks, clocks, dates, weather, perpetual calendars, and more."
+  },
+  "command1": {
+    "message": "Open bookmark 1"
+  },
+  "command2": {
+    "message": "Open bookmark 2"
+  },
+  "command3": {
+    "message": "Open bookmark 3"
+  },
+  "command4": {
+    "message": "Open bookmark 4"
+  },
+  "command5": {
+    "message": "Open bookmark 5"
+  },
+  "command6": {
+    "message": "Open bookmark 6"
+  },
+  "command7": {
+    "message": "Open bookmark 7"
+  },
+  "command8": {
+    "message": "Open bookmark 8"
+  },
+  "command9": {
+    "message": "Open bookmark 9"
+  },
+  "command0": {
+    "message": "Open bookmark 0"
+  },
+  "commandQ": {
+    "message": "Open bookmark Q"
+  },
+  "commandW": {
+    "message": "Open bookmark W"
+  },
+  "commandE": {
+    "message": "Open bookmark E"
+  },
+  "commandR": {
+    "message": "Open bookmark R"
+  },
+  "commandT": {
+    "message": "Open bookmark T"
+  },
+  "commandY": {
+    "message": "Open bookmark Y"
+  },
+  "commandU": {
+    "message": "Open bookmark U"
+  },
+  "commandI": {
+    "message": "Open bookmark I"
+  },
+  "commandO": {
+    "message": "Open bookmark O"
+  },
+  "commandP": {
+    "message": "Open bookmark P"
+  },
+  "commandA": {
+    "message": "Open bookmark A"
+  },
+  "commandS": {
+    "message": "Open bookmark S"
+  },
+  "commandD": {
+    "message": "Open bookmark D"
+  },
+  "commandF": {
+    "message": "Open bookmark F"
+  },
+  "commandG": {
+    "message": "Open bookmark G"
+  },
+  "commandH": {
+    "message": "Open bookmark H"
+  },
+  "commandJ": {
+    "message": "Open bookmark J"
+  },
+  "commandK": {
+    "message": "Open bookmark K"
+  },
+  "commandL": {
+    "message": "Open bookmark L"
+  },
+  "commandZ": {
+    "message": "Open bookmark Z"
+  },
+  "commandX": {
+    "message": "Open bookmark X"
+  },
+  "commandC": {
+    "message": "Open bookmark C"
+  },
+  "commandV": {
+    "message": "Open bookmark V"
+  },
+  "commandB": {
+    "message": "Open bookmark B"
+  },
+  "commandN": {
+    "message": "Open bookmark N"
+  },
+  "commandM": {
+    "message": "Open bookmark M"
+  },
+  "commandComma": {
+    "message": "Open bookmark <"
+  },
+  "commandPeriod": {
+    "message": "Open bookmark >"
   }
 }

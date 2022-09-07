@@ -77,12 +77,13 @@ export const defaultConfig = {
   },
   bookmark: {
     enabled: false,
+    isListenBackgroundKeystrokes: true,
+    isDblclickOpen: false,
+    dblclickIntervalTime: 200, // ms
+    isNewTabOpen: false,
     isSymbolEnabled: true,
     isNumberEnabled: false,
-    isNewTabOpen: false,
-    isDblclickOpen: false,
     isNameVisible: true,
-    dblclickIntervalTime: 200, // ms
     keymap: {
       q: {
         url: 'www.baidu.com',

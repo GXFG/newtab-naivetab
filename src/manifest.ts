@@ -35,9 +35,138 @@ export async function getManifest() {
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',
     },
-    // background: {
-    //   service_worker: './dist/background/index.mjs',
-    // },
+    // 一个扩展可以有很多命令，但只能指定 4 个建议的键。
+    commands: {
+      1: {
+        description: '__MSG_command1__',
+      },
+      2: {
+        description: '__MSG_command2__',
+      },
+      3: {
+        description: '__MSG_command3__',
+      },
+      4: {
+        description: '__MSG_command4__',
+      },
+      5: {
+        description: '__MSG_command5__',
+      },
+      6: {
+        description: '__MSG_command6__',
+      },
+      7: {
+        description: '__MSG_command7__',
+      },
+      8: {
+        description: '__MSG_command8__',
+      },
+      9: {
+        description: '__MSG_command9__',
+      },
+      0: {
+        description: '__MSG_command0__',
+      },
+      q: {
+        suggested_key: {
+          default: 'Alt+Q',
+        },
+        description: '__MSG_commandQ__',
+      },
+      w: {
+        suggested_key: {
+          default: 'Alt+W',
+        },
+        description: '__MSG_commandW__',
+      },
+      e: {
+        description: '__MSG_commandE__',
+      },
+      r: {
+        description: '__MSG_commandR__',
+      },
+      t: {
+        description: '__MSG_commandT__',
+      },
+      y: {
+        description: '__MSG_commandY__',
+      },
+      u: {
+        description: '__MSG_commandU__',
+      },
+      i: {
+        description: '__MSG_commandI__',
+      },
+      o: {
+        description: '__MSG_commandO__',
+      },
+      p: {
+        description: '__MSG_commandP__',
+      },
+      a: {
+        suggested_key: {
+          default: 'Alt+A',
+        },
+        description: '__MSG_commandA__',
+      },
+      s: {
+        suggested_key: {
+          default: 'Alt+S',
+        },
+        description: '__MSG_commandS__',
+      },
+      d: {
+        description: '__MSG_commandD__',
+      },
+      f: {
+        description: '__MSG_commandF__',
+      },
+      g: {
+        description: '__MSG_commandG__',
+      },
+      h: {
+        description: '__MSG_commandH__',
+      },
+      j: {
+        description: '__MSG_commandJ__',
+      },
+      k: {
+        description: '__MSG_commandK__',
+      },
+      l: {
+        description: '__MSG_commandL__',
+      },
+      z: {
+        description: '__MSG_commandZ__',
+      },
+      x: {
+        description: '__MSG_commandX__',
+      },
+      c: {
+        description: '__MSG_commandC__',
+      },
+      v: {
+        description: '__MSG_commandV__',
+      },
+      b: {
+        description: '__MSG_commandB__',
+      },
+      n: {
+        description: '__MSG_commandN__',
+      },
+      m: {
+        description: '__MSG_commandM__',
+      },
+      Comma: {
+        description: '__MSG_commandComma__',
+      },
+      Period: {
+        description: '__MSG_commandPeriod__',
+      },
+    },
+    background: {
+      service_worker: './dist/background/index.mjs',
+    },
     // options_ui: {
     //   page: './dist/options/index.html',
     //   open_in_tab: true,

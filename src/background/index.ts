@@ -1,46 +1,69 @@
 // !!background Cannot use import statement outside a module
-import type { Tabs } from 'webextension-polyfill'
-import browser from 'webextension-polyfill'
-import { onMessage, sendMessage } from 'webext-bridge'
+// import browser from 'webextension-polyfill'
 
-browser.runtime.onInstalled.addListener((): void => {
-  console.log('Extension installed')
+chrome.runtime.onInstalled.addListener((): void => {
+  console.log('NaiveTab installed')
 })
 
-let previousTabId = 0
+const createTab = (url: string) => {
+  chrome.tabs.create({ url, active: true })
+}
 
-// communication example: send previous tab title from background page
-// see shim.d.ts for type declaration
-browser.tabs.onActivated.addListener(async ({ tabId }) => {
-  if (!previousTabId) {
-    previousTabId = tabId
+let keyboardData = {
+  KEYBOARD_CODE_TO_LABEL_MAP: {} as any,
+  keyboardCurrentModelAllKeyList: [] as string[],
+  bookmarkConfig: {} as any,
+}
+
+const setKeyboardData = (data: {
+  KEYBOARD_CODE_TO_LABEL_MAP: any
+  keyboardCurrentModelAllKeyList: string[]
+  bookmarkConfig: any
+}) => {
+  keyboardData = data
+}
+
+let timer = null as any
+let laskCommand = ''
+
+const handleKeyboard = (command: string) => {
+  const { KEYBOARD_CODE_TO_LABEL_MAP, bookmarkConfig, keyboardCurrentModelAllKeyList } = keyboardData
+  if (!bookmarkConfig.isListenBackgroundKeystrokes) {
     return
   }
-
-  let tab: Tabs.Tab
-
-  try {
-    tab = await browser.tabs.get(previousTabId)
-    previousTabId = tabId
-  }
-  catch {
+  const labelKey = KEYBOARD_CODE_TO_LABEL_MAP[command] || command
+  if (!keyboardCurrentModelAllKeyList.includes(labelKey)) {
     return
   }
+  let url = bookmarkConfig.keymap[labelKey] ? bookmarkConfig.keymap[labelKey].url : ''
+  if (url.length === 0) {
+    return
+  }
+  url = url.includes('//') ? url : `https://${url}`
+  if (!bookmarkConfig.isDblclickOpen) {
+    createTab(url)
+    return
+  }
+  clearTimeout(timer)
+  if (laskCommand === labelKey) {
+    createTab(url)
+  } else {
+    laskCommand = labelKey
+    timer = setTimeout(() => {
+      laskCommand = ''
+    }, bookmarkConfig.dblclickIntervalTime)
+  }
+}
 
-  console.log('previous tab', tab)
-  sendMessage('tab-prev', { title: tab.title }, { context: 'content-script', tabId })
+chrome.runtime.onMessage.addListener((message) => {
+  console.log('onMessage', message)
+  const { name, data } = message
+  if (name === 'keyboard') {
+    setKeyboardData(data)
+  }
 })
 
-onMessage('get-current-tab', async () => {
-  try {
-    const tab = await browser.tabs.get(previousTabId)
-    return {
-      title: tab?.title,
-    }
-  }
-  catch {
-    return {
-      title: undefined,
-    }
-  }
+chrome.commands.onCommand.addListener((command) => {
+  console.log(`onCommand: ${command}`)
+  handleKeyboard(command)
 })
