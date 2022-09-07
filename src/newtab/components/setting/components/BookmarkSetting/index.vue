@@ -6,6 +6,19 @@
     <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
       <BaseComponentSetting cname="bookmark">
         <template #header>
+          <NFormItem :label="$t('bookmark.listenBackgroundKeystrokes')">
+            <div class="setting__input-wrap">
+              <div class="setting__input_item">
+                <NSwitch v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes" />
+                <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
+              </div>
+              <div v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="setting__input_item">
+                <NButton ghost type="primary" @click="createTab(URL_EXTENSIONS_SHORTCUTS)">
+                  <material-symbols:keyboard-alt-outline />&nbsp;{{ $t('bookmark.customKeys') }}
+                </NButton>
+              </div>
+            </div>
+          </NFormItem>
           <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
             <div class="setting__input-wrap">
               <div class="setting__input_item">
@@ -35,7 +48,6 @@
           <NFormItem :label="$t('bookmark.showName')">
             <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
           </NFormItem>
-
           <div class="modal__bookmark">
             <NInputGroup class="bookmark__label">
               <p class="label__text">
@@ -118,7 +130,7 @@
 
 <script setup lang="ts">
 import BookmarkPicker from './BookmarkPicker.vue'
-import { localConfig, keyboardSettingRowList, getDefaultBookmarkName, requestPermission } from '@/logic'
+import { URL_EXTENSIONS_SHORTCUTS, localConfig, keyboardSettingRowList, getDefaultBookmarkName, requestPermission, createTab } from '@/logic'
 
 const state = reactive({
   isBookmarkModalVisible: false,
@@ -169,7 +181,7 @@ const handleDragEnd = () => {
   onBookmarkStopDrag()
 }
 
-const onImportBookmark = async(key: string) => {
+const onImportBookmark = async (key: string) => {
   const granted = await requestPermission('bookmarks')
   if (!granted) {
     return

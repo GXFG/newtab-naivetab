@@ -140,7 +140,7 @@ const handleElementDrawerMouseLeave = () => {
 }
 
 // Element
-const handleElementMouseDown = async(e: MouseEvent) => {
+const handleElementMouseDown = async (e: MouseEvent) => {
   localConfig[moveState.currDragTarget.name].enabled = true
   await nextTick()
   // 以光标位置为组件的中心开始拖拽
@@ -149,7 +149,7 @@ const handleElementMouseDown = async(e: MouseEvent) => {
   moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)(e)
 }
 
-const handleElementMouseMove = async(e: MouseEvent) => {
+const handleElementMouseMove = async (e: MouseEvent) => {
   moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)(e)
 }
 

@@ -22,7 +22,7 @@ export const newsState = useStorageLocal('data-news', {
   },
 })
 
-export const getBaiduNews = async() => {
+export const getBaiduNews = async () => {
   const data: string = await http.get(NEWS_SOURCE_MAP.baidu)
   try {
     if (!data) {
@@ -46,7 +46,7 @@ export const getBaiduNews = async() => {
   }
 }
 
-export const getZhihuNews = async() => {
+export const getZhihuNews = async () => {
   const data: string = await http.get(NEWS_SOURCE_MAP.zhihu)
   try {
     if (!data) {
@@ -75,7 +75,7 @@ export const getZhihuNews = async() => {
   }
 }
 
-export const getWeiboNews = async() => {
+export const getWeiboNews = async () => {
   const data: string = await http.get(NEWS_SOURCE_MAP.weibo)
   try {
     if (!data) {
@@ -108,7 +108,7 @@ export const getWeiboNews = async() => {
   }
 }
 
-export const getV2exNews = async() => {
+export const getV2exNews = async () => {
   const data: string = await http.get(NEWS_SOURCE_MAP.v2ex)
   try {
     if (!data) {

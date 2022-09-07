@@ -64,7 +64,7 @@ export const weatherWarningInfo = computed(() => {
   return warningList.join('\n')
 })
 
-const getNowData = async() => {
+const getNowData = async () => {
   const data = await getWeatherNow()
   if (data.code !== '200') {
     return
@@ -74,7 +74,7 @@ const getNowData = async() => {
   log('Weather update now')
 }
 
-const getForecastData = async() => {
+const getForecastData = async () => {
   const data = await getWeatherForecast()
   if (data.code !== '200') {
     return
@@ -84,7 +84,7 @@ const getForecastData = async() => {
   log('Weather update forecast')
 }
 
-const getIndicesData = async() => {
+const getIndicesData = async () => {
   const data = await getWeatherIndices()
   if (data.code !== '200') {
     return
@@ -94,7 +94,7 @@ const getIndicesData = async() => {
   log('Weather update indices')
 }
 
-const getAirData = async() => {
+const getAirData = async () => {
   const data = await getWeatherAirNow()
   if (data.code !== '200') {
     return
@@ -104,14 +104,14 @@ const getAirData = async() => {
   log('Weather update air')
 }
 
-const getWarningData = async() => {
+const getWarningData = async () => {
   const data = await getWeatherWarning()
   if (data.code !== '200') {
     return
   }
   weatherState.value.warning.list = data.warning
   weatherState.value.warning.syncTime = dayjs().valueOf()
-  weatherState.value.state.isWarningVisible = data.warning.length !== 0
+  weatherState.value.state.isWarningVisible = data.warning && data.warning.length && data.warning.length !== 0
   log('Weather update warning')
 }
 

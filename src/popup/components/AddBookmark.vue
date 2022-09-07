@@ -21,7 +21,12 @@
               </p>
               <div class="item__img">
                 <!-- 使用新增书签来替换icon展示 -->
-                <img v-if="item.key in bookmarkPendingData.keymap" class="img__main" :src="getDomainIcon(bookmarkPendingData.keymap[item.key].url)" :ondragstart="() => false">
+                <img
+                  v-if="item.key in bookmarkPendingData.keymap"
+                  class="img__main"
+                  :src="getDomainIcon(bookmarkPendingData.keymap[item.key].url)"
+                  :ondragstart="() => false"
+                >
                 <img v-else-if="item.url" class="img__main" :src="getDomainIcon(item.url)" :ondragstart="() => false">
               </div>
             </div>
@@ -120,7 +125,7 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
         align-items: center;
         position: relative;
         margin: 1px;
-        padding: 1px;
+        padding: 2px;
         width: 36px;
         height: 36px;
         border-radius: 3px;
@@ -130,7 +135,6 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
 
         &:hover {
           background-color: v-bind(popupKeyboardHoverBg);
-          ;
         }
 
         .item__current {

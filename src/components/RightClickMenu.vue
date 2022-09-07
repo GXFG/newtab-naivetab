@@ -156,7 +156,7 @@ const onCloseMenu = () => {
   state.isMenuVisible = false
 }
 
-const handleContextMenu = async(e: MouseEvent) => {
+const handleContextMenu = async (e: MouseEvent) => {
   e.preventDefault()
   if (globalState.isSettingDrawerVisible) {
     return

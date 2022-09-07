@@ -70,7 +70,7 @@ const state = reactive({
   cityList: [] as SelectStringItem[],
 })
 
-const getLocation = async() => {
+const getLocation = async () => {
   if (state.isSearchLoading || state.keyword.length === 0) {
     return
   }

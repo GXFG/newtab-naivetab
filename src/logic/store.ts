@@ -77,12 +77,13 @@ export const defaultConfig = {
   },
   bookmark: {
     enabled: false,
+    isListenBackgroundKeystrokes: true,
+    isDblclickOpen: false,
+    dblclickIntervalTime: 200, // ms
+    isNewTabOpen: false,
     isSymbolEnabled: true,
     isNumberEnabled: false,
-    isNewTabOpen: false,
-    isDblclickOpen: false,
     isNameVisible: true,
-    dblclickIntervalTime: 200, // ms
     keymap: {
       q: {
         url: 'www.baidu.com',
@@ -422,7 +423,7 @@ watch(
   { immediate: true },
 )
 
-const initAvailableFontList = async() => {
+const initAvailableFontList = async () => {
   const fontCheck = new Set(FONT_LIST.sort())
   // 在所有字体加载完成后进行操作
   await document.fonts.ready
@@ -468,7 +469,7 @@ export const initFirstOpen = () => {
   openUserGuideModal()
 }
 
-export const handleUpdate = async() => {
+export const handleUpdate = async () => {
   const version = getLocalVersion()
   log('Version', version)
   if (!compareLeftVersionLessThanRightVersions(version, pkg.version)) {
@@ -565,7 +566,7 @@ export const getStyleConst = (field: string) => {
 export const getStyleField = (component: ConfigField, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
     let style = field.split('.').reduce((r: any, c: string) => r[c], localConfig[component])
-    if (style instanceof Array) {
+    if (Array.isArray(style)) {
       return style[localState.value.currAppearanceCode]
     }
     if (ratio) {

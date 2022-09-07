@@ -4,5 +4,119 @@
   },
   "appDesc": {
     "message": "自定义你的新标签页：包含书签、时钟、日期、天气、万年历等模块。"
+  },
+  "command1": {
+    "message": "打开书签 1"
+  },
+  "command2": {
+    "message": "打开书签 2"
+  },
+  "command3": {
+    "message": "打开书签 3"
+  },
+  "command4": {
+    "message": "打开书签 4"
+  },
+  "command5": {
+    "message": "打开书签 5"
+  },
+  "command6": {
+    "message": "打开书签 6"
+  },
+  "command7": {
+    "message": "打开书签 7"
+  },
+  "command8": {
+    "message": "打开书签 8"
+  },
+  "command9": {
+    "message": "打开书签 9"
+  },
+  "command0": {
+    "message": "打开书签 0"
+  },
+  "commandQ": {
+    "message": "打开书签 Q"
+  },
+  "commandW": {
+    "message": "打开书签 W"
+  },
+  "commandE": {
+    "message": "打开书签 E"
+  },
+  "commandR": {
+    "message": "打开书签 R"
+  },
+  "commandT": {
+    "message": "打开书签 T"
+  },
+  "commandY": {
+    "message": "打开书签 Y"
+  },
+  "commandU": {
+    "message": "打开书签 U"
+  },
+  "commandI": {
+    "message": "打开书签 I"
+  },
+  "commandO": {
+    "message": "打开书签 O"
+  },
+  "commandP": {
+    "message": "打开书签 P"
+  },
+  "commandA": {
+    "message": "打开书签 A"
+  },
+  "commandS": {
+    "message": "打开书签 S"
+  },
+  "commandD": {
+    "message": "打开书签 D"
+  },
+  "commandF": {
+    "message": "打开书签 F"
+  },
+  "commandG": {
+    "message": "打开书签 G"
+  },
+  "commandH": {
+    "message": "打开书签 H"
+  },
+  "commandJ": {
+    "message": "打开书签 J"
+  },
+  "commandK": {
+    "message": "打开书签 K"
+  },
+  "commandL": {
+    "message": "打开书签 L"
+  },
+  "commandZ": {
+    "message": "打开书签 Z"
+  },
+  "commandX": {
+    "message": "打开书签 X"
+  },
+  "commandC": {
+    "message": "打开书签 C"
+  },
+  "commandV": {
+    "message": "打开书签 V"
+  },
+  "commandB": {
+    "message": "打开书签 B"
+  },
+  "commandN": {
+    "message": "打开书签 N"
+  },
+  "commandM": {
+    "message": "打开书签 M"
+  },
+  "commandComma": {
+    "message": "打开书签 <"
+  },
+  "commandPeriod": {
+    "message": "打开书签 >"
   }
 }

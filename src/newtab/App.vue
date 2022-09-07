@@ -25,6 +25,7 @@ import {
   downloadConfig,
   initFirstOpen,
   handleUpdate,
+  sendBookmarkDataToBg,
   handleBookmarkPending,
   startKeyboard,
   startTimer,
@@ -32,7 +33,7 @@ import {
 } from '@/logic'
 import Content from '@/newtab/Content.vue'
 
-onMounted(async() => {
+onMounted(async () => {
   renderBackgroundImage()
   setEdgeFavicon()
   startTimer()
@@ -40,6 +41,7 @@ onMounted(async() => {
   downloadConfig()
   await nextTick()
   initFirstOpen()
+  sendBookmarkDataToBg()
   handleBookmarkPending()
   handleUpdate()
 })

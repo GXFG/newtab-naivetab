@@ -61,7 +61,7 @@ const getClockImageUrl = (type: 'background' | 'marker' | 'hour' | 'minute' | 's
   return `/assets/img/clock/${currTheme.value}/${type}.png`
 }
 
-const initClockImage = async() => {
+const initClockImage = async () => {
   const url = getClockImageUrl('background')
   await imageLoadComplete(url)
   state.isClockVisible = true

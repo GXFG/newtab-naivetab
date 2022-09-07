@@ -56,6 +56,7 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'px')
     .date__text {
       font-size: v-bind(customFontSize);
       letter-spacing: v-bind(customLetterSpacing);
+      white-space: nowrap;
     }
   }
   .date__container--shadow {

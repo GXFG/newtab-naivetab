@@ -1,35 +1,6 @@
 import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, localConfig, addVisibilityTask, log } from '@/logic'
-
-// Handle new bookmarks to be processed from popup modal
-export const handleBookmarkPending = () => {
-  const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
-    isPending: false,
-    keymap: {},
-  })
-  if (!bookmarkPendingData.value.isPending) {
-    return
-  }
-  log('Update bookmark from popup')
-  for (const key of Object.keys(bookmarkPendingData.value.keymap)) {
-    const item = bookmarkPendingData.value.keymap[key]
-    localConfig.bookmark.keymap[key] = {
-      url: item.url,
-      name: item.name,
-    }
-  }
-  bookmarkPendingData.value.isPending = false
-  bookmarkPendingData.value.keymap = {}
-}
-
-// page切换前台时刷新通过pupop新增的书签
-addVisibilityTask('bookmark', (hidden) => {
-  if (hidden) {
-    return
-  }
-  handleBookmarkPending()
-})
+import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, MERGE_CONFIG_DELAY, KEYBOARD_CODE_TO_LABEL_MAP, localConfig, addVisibilityTask, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
@@ -102,7 +73,7 @@ export const getDefaultBookmarkName = (url: string) => {
 
 const isInitialized = useStorageLocal('data-bookmark-initialized', false)
 
-const mergeBookmarkSetting = useDebounceFn(async() => {
+const mergeBookmarkSetting = useDebounceFn(async () => {
   log('Bookmark merge setting')
   for (const key of KEYBOARD_KEY_LIST) {
     const index = KEYBOARD_KEY_LIST.indexOf(key)
@@ -148,3 +119,55 @@ export const initBookmarkListData = () => {
   isInitialized.value = true
   mergeBookmarkSetting()
 }
+
+// Handle new bookmarks to be processed from popup modal
+export const handleBookmarkPending = () => {
+  const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
+    isPending: false,
+    keymap: {},
+  })
+  if (!bookmarkPendingData.value.isPending) {
+    return
+  }
+  log('Update bookmark from popup')
+  for (const key of Object.keys(bookmarkPendingData.value.keymap)) {
+    const item = bookmarkPendingData.value.keymap[key]
+    localConfig.bookmark.keymap[key] = {
+      url: item.url,
+      name: item.name,
+    }
+  }
+  bookmarkPendingData.value.isPending = false
+  bookmarkPendingData.value.keymap = {}
+}
+
+// page切换前台时刷新通过pupop新增的书签
+addVisibilityTask('bookmark', (hidden) => {
+  if (hidden) {
+    return
+  }
+  handleBookmarkPending()
+})
+
+export const sendBookmarkDataToBg = () => {
+  chrome.runtime.sendMessage(
+    {
+      name: 'keyboard',
+      data: {
+        KEYBOARD_CODE_TO_LABEL_MAP,
+        bookmarkConfig: localConfig.bookmark,
+        keyboardCurrentModelAllKeyList: keyboardCurrentModelAllKeyList.value,
+      },
+    },
+  )
+}
+
+const handleSendBookmarkDataToBg = useDebounceFn(() => { sendBookmarkDataToBg() }, MERGE_CONFIG_DELAY)
+
+watch(
+  () => localConfig.bookmark,
+  () => {
+    handleSendBookmarkDataToBg()
+  },
+  { deep: true },
+)

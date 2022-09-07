@@ -54,7 +54,7 @@ export const previewImageListMap = computed(() => ({
 
 export const isImageListLoading = ref(false)
 
-const getImages = async() => {
+const getImages = async () => {
   try {
     isImageListLoading.value = true
     const data: any = await getBingImages()
@@ -81,7 +81,7 @@ loadImageEle.onerror = () => {
   isImageLoading.value = false
 }
 
-export const renderBackgroundImage = async() => {
+export const renderBackgroundImage = async () => {
   console.time('renderBackgroundImage')
   if (localConfig.general.backgroundImageSource === 0) {
     const result: LocalBackgroundImageItem = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)

@@ -40,7 +40,7 @@ const uploadConfigFn = (field: ConfigField) => {
       data: localConfig[field],
     }),
   }
-  chrome.storage.sync.set(payload, async() => {
+  chrome.storage.sync.set(payload, async () => {
     const error = chrome.runtime.lastError
     if (error) {
       log(`Upload config-${field} error`, error)
@@ -222,7 +222,7 @@ const clearStorage = (clearAll = false) => {
     content: window.$t('prompts.pleaseWait'),
   })
   return new Promise((resolve) => {
-    const cancelListenerSync = watch(isUploadConfigLoading, async(value) => {
+    const cancelListenerSync = watch(isUploadConfigLoading, async (value) => {
       if (value) {
         log('Clear localStorage wait') // 等待config同步完成、localStorage写入完成后再进行后续操作
         return
@@ -241,14 +241,14 @@ const clearStorage = (clearAll = false) => {
   })
 }
 
-export const refreshSetting = async() => {
+export const refreshSetting = async () => {
   globalState.isClearStorageLoading = true
   await updateSetting()
   await clearStorage()
   globalState.isClearStorageLoading = false
 }
 
-export const importSetting = async(text: string) => {
+export const importSetting = async (text: string) => {
   if (!text) {
     return
   }

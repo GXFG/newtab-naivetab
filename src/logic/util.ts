@@ -42,7 +42,7 @@ export const compareLeftVersionLessThanRightVersions = (leftVersion: string, rig
   return false
 }
 
-export const downloadImageByUrl = async(url: string, filename = `${Date.now()}`) => {
+export const downloadImageByUrl = async (url: string, filename = `${Date.now()}`) => {
   const image = await fetch(url)
   const imageBlog = await image.blob()
   const imageURL = window.URL.createObjectURL(imageBlog)
