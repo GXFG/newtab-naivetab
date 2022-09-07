@@ -157,7 +157,7 @@
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "listenBackgroundKeystrokes": "后台监听快捷键",
+    "listenBackgroundKeystrokes": "全局快捷键",
     "listenBackgroundKeystrokesTips": "自定义快捷键，实现在浏览器内快速打开指定书签",
     "newTabOpen": "以新标签页打开",
     "dblclickKeyToOpen": "双击按键打开",

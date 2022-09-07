@@ -157,7 +157,7 @@
     "apMark": "a.p./p.m."
   },
   "bookmark": {
-    "listenBackgroundKeystrokes": "Listen background keystrokes",
+    "listenBackgroundKeystrokes": "Global shortcuts",
     "listenBackgroundKeystrokesTips": "Customize shortcut keys to quickly open specified bookmarks in the browser",
     "newTabOpen": "Open in newtab",
     "dblclickKeyToOpen": "Dblclick open",
