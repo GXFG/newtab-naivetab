@@ -89,7 +89,7 @@ const onCommit = () => {
   window.$message.success(`${window.$t('common.add')}${window.$t('common.success')}`)
 }
 
-const popupMainWidth = localConfig.bookmark.isNumberEnabled ? '600px' : '570px'
+const popupMainWidth = localConfig.bookmark.isNumberEnabled ? '608px' : '570px'
 const popupKeyboardBorder = getStyleConst('popupKeyboardBorder')
 const popupKeyboardHoverBg = getStyleConst('popupKeyboardHoverBg')
 const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')

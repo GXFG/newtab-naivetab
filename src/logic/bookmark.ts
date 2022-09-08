@@ -1,24 +1,24 @@
 import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, MERGE_BOOKMARK_DELAY, MERGE_CONFIG_DELAY, KEYBOARD_CODE_TO_LABEL_MAP, localConfig, addVisibilityTask, log } from '@/logic'
+import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, MERGE_BOOKMARK_DELAY, MERGE_CONFIG_DELAY, localConfig, addVisibilityTask, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
 const keyboardSplitList = computed(() => {
-  let splitList: any = [[13, 23], [25, 34], [36, 43]]
+  let splitList: any = KEYBOARD_SPLIT_RANGE_MAP.letter
   if (localConfig.bookmark.isSymbolEnabled && localConfig.bookmark.isNumberEnabled) {
-    splitList = [[0, 13], [13, 25], [25, 36], [36]]
+    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterSymbolNumber
   } else if (localConfig.bookmark.isSymbolEnabled) {
-    splitList = [[13, 25], [25, 36], [36]]
+    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterSymbol
   } else if (localConfig.bookmark.isNumberEnabled) {
-    splitList = [[[0, 10], [12, 13]], [13, 23], [25, 34], [36, 43]]
+    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterNumber
   }
   return splitList
 })
 
-const getKeyboardList = (originList: any[]) => {
+export const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => {
   const rowList: any[] = []
-  for (const range of keyboardSplitList.value) {
+  for (const range of keyboardSplitList) {
     if (range.length === 1) {
       rowList.push(originList.slice(range[0]))
     } else {
@@ -37,9 +37,9 @@ const getKeyboardList = (originList: any[]) => {
   return rowList
 }
 
-export const keyboardRowList = computed(() => getKeyboardList(localBookmarkList.value))
+export const keyboardRowList = computed(() => getKeyboardList(keyboardSplitList.value, localBookmarkList.value))
 
-export const keyboardSettingRowList = computed(() => getKeyboardList(KEYBOARD_KEY_LIST))
+export const keyboardSettingRowList = computed(() => getKeyboardList(keyboardSplitList.value, KEYBOARD_KEY_LIST))
 
 export const keyboardCurrentModelAllKeyList = computed(() => {
   const allKey = [] as string[]
@@ -149,25 +149,23 @@ addVisibilityTask('bookmark', (hidden) => {
   handleBookmarkPending()
 })
 
-export const sendBookmarkDataToBg = () => {
+const sendBookmarkMessageToBg = () => {
   chrome.runtime.sendMessage(
     {
       name: 'keyboard',
       data: {
-        KEYBOARD_CODE_TO_LABEL_MAP,
-        bookmarkConfig: localConfig.bookmark,
-        keyboardCurrentModelAllKeyList: keyboardCurrentModelAllKeyList.value,
+        msg: 'refresh',
       },
     },
   )
 }
 
-const handleSendBookmarkDataToBg = useDebounceFn(() => { sendBookmarkDataToBg() }, MERGE_CONFIG_DELAY)
+const handleSendBookmarkMessageToBg = useDebounceFn(() => { sendBookmarkMessageToBg() }, MERGE_CONFIG_DELAY)
 
 watch(
   () => localConfig.bookmark,
   () => {
-    handleSendBookmarkDataToBg()
+    handleSendBookmarkMessageToBg()
   },
   { deep: true },
 )

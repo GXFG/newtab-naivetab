@@ -25,7 +25,6 @@ import {
   downloadConfig,
   initFirstOpen,
   handleUpdate,
-  sendBookmarkDataToBg,
   handleBookmarkPending,
   startKeyboard,
   startTimer,
@@ -41,7 +40,6 @@ onMounted(async () => {
   downloadConfig()
   await nextTick()
   initFirstOpen()
-  sendBookmarkDataToBg()
   handleBookmarkPending()
   handleUpdate()
 })
