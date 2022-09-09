@@ -10,6 +10,7 @@ export default defineConfig(() => ({
   format: ['esm'],
   target: 'esnext',
   ignoreWatch: ['**/extension/**'],
+  treeshake: true,
   splitting: false,
   sourcemap: isDev ? 'inline' : false,
   define: {

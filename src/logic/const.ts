@@ -18,6 +18,7 @@ export const FONT_LIST = [
 ]
 
 export const KEYBOARD_KEY_LIST = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 'BS', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?']
+
 /**
  * real key code -> label key
  */
@@ -32,6 +33,13 @@ export const KEYBOARD_CODE_TO_LABEL_MAP = {
   Comma: '<',
   Period: '>',
   Slash: '?',
+}
+
+export const KEYBOARD_SPLIT_RANGE_MAP = {
+  letter: [[13, 23], [25, 34], [36, 43]],
+  letterSymbol: [[13, 25], [25, 36], [36]],
+  letterNumber: [[[0, 10], [12, 13]], [13, 23], [25, 34], [36, 43]], // 特殊处理：数字行 + BS = [[0, 10], [12, 13]]
+  letterSymbolNumber: [[0, 13], [13, 25], [25, 36], [36]],
 }
 
 // MAX_WRITE_OPERATIONS_PER_HOUR = 1800, https://developer.chrome.com/docs/extensions/reference/storage/#property-sync

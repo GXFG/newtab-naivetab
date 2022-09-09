@@ -35,6 +35,9 @@ export async function getManifest() {
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',
     },
+    background: {
+      service_worker: './dist/background/index.mjs',
+    },
     // 一个扩展可以有很多命令，但只能指定 4 个建议的键。
     commands: {
       1: {
@@ -163,9 +166,6 @@ export async function getManifest() {
       Period: {
         description: '__MSG_commandPeriod__',
       },
-    },
-    background: {
-      service_worker: './dist/background/index.mjs',
     },
     // options_ui: {
     //   page: './dist/options/index.html',
