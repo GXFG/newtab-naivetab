@@ -13,7 +13,7 @@
                 <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
               </div>
               <div v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="setting__input_item">
-                <NButton ghost type="primary" @click="createTab(URL_EXTENSIONS_SHORTCUTS)">
+                <NButton ghost type="primary" @click="openShortcutsPage()">
                   <material-symbols:keyboard-alt-outline />&nbsp;{{ $t('bookmark.customKeys') }}
                 </NButton>
               </div>
@@ -130,7 +130,8 @@
 
 <script setup lang="ts">
 import BookmarkPicker from './BookmarkPicker.vue'
-import { URL_EXTENSIONS_SHORTCUTS, localConfig, keyboardSettingRowList, getDefaultBookmarkName, requestPermission, createTab } from '@/logic'
+import { isEdge } from '@/env'
+import { URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, localConfig, keyboardSettingRowList, getDefaultBookmarkName, requestPermission, createTab } from '@/logic'
 
 const state = reactive({
   isBookmarkModalVisible: false,
@@ -138,6 +139,8 @@ const state = reactive({
   currDragKey: '',
   currImporKey: '',
 })
+
+const openShortcutsPage = () => createTab(isEdge ? URL_EDGE_EXTENSIONS_SHORTCUTS : URL_CHROME_EXTENSIONS_SHORTCUTS)
 
 const onCreateKey = (key: string) => {
   localConfig.bookmark.keymap[key] = {
