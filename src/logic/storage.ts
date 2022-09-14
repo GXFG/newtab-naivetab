@@ -1,7 +1,7 @@
 import { useDebounceFn } from '@vueuse/core'
 import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
-import { MERGE_CONFIG_DELAY } from './const'
+import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY } from './const'
 import { defaultConfig, localConfig, localState, globalState, switchSettingDrawerVisible, compareLeftVersionLessThanRightVersions } from '@/logic'
 
 export const getLocalVersion = () => {
@@ -15,9 +15,12 @@ export const getLocalVersion = () => {
 }
 
 export const isUploadConfigLoading = computed(() => {
+  if (!Object.prototype.hasOwnProperty.call(localState.value, 'isUploadConfigStatusMap')) {
+    return false
+  }
   let isLoading = false
-  for (const key of Object.keys(globalState.isUploadConfigLoadingMap)) {
-    if (globalState.isUploadConfigLoadingMap[key]) {
+  for (const key of Object.keys(localState.value.isUploadConfigStatusMap)) {
+    if (localState.value.isUploadConfigStatusMap[key].loading) {
       isLoading = true
       break
     }
@@ -27,13 +30,13 @@ export const isUploadConfigLoading = computed(() => {
 
 /**
  * https://developer.chrome.com/docs/extensions/reference/storage/
- * chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192  注意单个配置不可超过8k
+ * 注意单个配置不可超过8k chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192
  */
 const uploadConfigFn = (field: ConfigField) => {
-  globalState.isUploadConfigLoadingMap[field] = true
-  log(`Upload config-${field}`)
+  localState.value.isUploadConfigStatusMap[field].loading = true
+  log(`Upload config-${field} start`)
   const currTime = Date.now()
-  localState.value.syncTimeMap[field] = currTime
+  localState.value.isUploadConfigStatusMap[field].syncTime = currTime
   const payload = {
     [`naive-tab-${field}`]: JSON.stringify({
       syncTime: currTime,
@@ -50,21 +53,36 @@ const uploadConfigFn = (field: ConfigField) => {
     }
     setTimeout(() => {
       // 确保isUploadConfigLoading的值不会抖动，消除多个配置排队同步时中间出现的短暂值均为false的间隙
-      globalState.isUploadConfigLoadingMap[field] = false
+      localState.value.isUploadConfigStatusMap[field].loading = false
     }, 100)
   })
 }
 
-const uploadConfigGeneral = useDebounceFn(() => { uploadConfigFn('general') }, MERGE_CONFIG_DELAY)
-const uploadConfigBookmark = useDebounceFn(() => { uploadConfigFn('bookmark') }, MERGE_CONFIG_DELAY)
-const uploadConfigClockDigital = useDebounceFn(() => { uploadConfigFn('clockDigital') }, MERGE_CONFIG_DELAY)
-const uploadConfigClockAnalog = useDebounceFn(() => { uploadConfigFn('clockAnalog') }, MERGE_CONFIG_DELAY)
-const uploadConfigDate = useDebounceFn(() => { uploadConfigFn('date') }, MERGE_CONFIG_DELAY)
-const uploadConfigCalendar = useDebounceFn(() => { uploadConfigFn('calendar') }, MERGE_CONFIG_DELAY)
-const uploadConfigSearch = useDebounceFn(() => { uploadConfigFn('search') }, MERGE_CONFIG_DELAY)
-const uploadConfigWeather = useDebounceFn(() => { uploadConfigFn('weather') }, MERGE_CONFIG_DELAY)
-const uploadConfigMemo = useDebounceFn(() => { uploadConfigFn('memo') }, MERGE_CONFIG_DELAY)
-const uploadConfigNews = useDebounceFn(() => { uploadConfigFn('news') }, MERGE_CONFIG_DELAY)
+const genUploadConfigDebounceFn = (field: ConfigField) => {
+  return useDebounceFn(() => {
+    uploadConfigFn(field)
+  }, MERGE_CONFIG_DELAY, { maxWait: MERGE_CONFIG_MAX_DELAY })
+}
+
+const genWathUploadConfigFn = (field: ConfigField) => {
+  const debounceFn = genUploadConfigDebounceFn(field)
+  return () => {
+    localState.value.isUploadConfigStatusMap[field].loading = true
+    log(`Upload config-${field} ready`)
+    debounceFn()
+  }
+}
+
+const uploadConfigGeneral = genWathUploadConfigFn('general')
+const uploadConfigBookmark = genWathUploadConfigFn('bookmark')
+const uploadConfigClockDigital = genWathUploadConfigFn('clockDigital')
+const uploadConfigClockAnalog = genWathUploadConfigFn('clockAnalog')
+const uploadConfigDate = genWathUploadConfigFn('date')
+const uploadConfigCalendar = genWathUploadConfigFn('calendar')
+const uploadConfigSearch = genWathUploadConfigFn('search')
+const uploadConfigWeather = genWathUploadConfigFn('weather')
+const uploadConfigMemo = genWathUploadConfigFn('memo')
+const uploadConfigNews = genWathUploadConfigFn('news')
 
 watch(() => localConfig.general, () => { uploadConfigGeneral() }, { deep: true })
 watch(() => localConfig.bookmark, () => { uploadConfigBookmark() }, { deep: true })
@@ -165,8 +183,24 @@ export const updateSetting = (acceptRawState = localConfig) => {
   })
 }
 
+export const handleMissedUploadConfig = (): boolean => {
+  if (Object.prototype.hasOwnProperty.call(localState.value, 'isUploadConfigStatusMap')) {
+    for (const field of Object.keys(localState.value.isUploadConfigStatusMap) as ConfigField[]) {
+      if (localState.value.isUploadConfigStatusMap[field].loading) {
+        log('Todo upload config', field)
+        uploadConfigFn(field)
+      }
+    }
+  }
+  if (isUploadConfigLoading.value) {
+    log('Handle Missed UploadConfig')
+    return true
+  }
+  return false
+}
+
 /**
- * 下载配置信息
+ * 载入远程配置信息：如果存在上一次未同步完的数据会进行上传配置信息，而不会执行下载过程
  * chrome.storage 格式示例：
  * {
  *   `naive-tab-${field}`: '{
@@ -175,8 +209,12 @@ export const updateSetting = (acceptRawState = localConfig) => {
  *   }'
  * }
  */
-export const downloadConfig = () => {
-  console.time('downloadConfig')
+export const loadRemoteConfig = () => {
+  const isLoading = handleMissedUploadConfig()
+  if (isLoading) {
+    return
+  }
+  console.time('loadRemoteConfig')
   chrome.storage.sync.get(null, (data) => {
     const error = chrome.runtime.lastError
     if (error) {
@@ -192,7 +230,7 @@ export const downloadConfig = () => {
         const target = JSON.parse(data[`naive-tab-${field}`])
         const targetConfig = target.data
         const targetSyncTime = target.syncTime
-        const localSyncTime = localState.value.syncTimeMap[field]
+        const localSyncTime = localState.value.isUploadConfigStatusMap[field].syncTime
         if (targetSyncTime === localSyncTime) {
           log(`Config-${field} no update`)
           continue
@@ -204,10 +242,10 @@ export const downloadConfig = () => {
         }
         log(`Config-${field} update`)
         pendingConfig[field] = targetConfig
-        localState.value.syncTimeMap[field] = targetSyncTime
+        localState.value.isUploadConfigStatusMap[field].syncTime = targetSyncTime
       }
     }
-    console.timeEnd('downloadConfig')
+    console.timeEnd('loadRemoteConfig')
     if (Object.keys(pendingConfig).length === 0) {
       return
     }

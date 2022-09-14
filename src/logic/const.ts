@@ -24,7 +24,7 @@ export const FONT_LIST = [
 export const KEYBOARD_KEY_LIST = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 'BS', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?']
 
 /**
- * real key code -> label key
+ * real key code -> label key name
  */
 export const KEYBOARD_CODE_TO_LABEL_MAP = {
   Minus: '-',
@@ -46,10 +46,12 @@ export const KEYBOARD_SPLIT_RANGE_MAP = {
   letterSymbolNumber: [[0, 13], [13, 25], [25, 36], [36]],
 }
 
-// MAX_WRITE_OPERATIONS_PER_HOUR = 1800, https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
+/**
+ * MAX_WRITE_OPERATIONS_PER_HOUR = 1800 https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
+ * 3600s / 1800 = 2s
+ */
 export const MERGE_CONFIG_DELAY = 2000
-
-export const MERGE_BOOKMARK_DELAY = 500
+export const MERGE_CONFIG_MAX_DELAY = 5000
 
 export const DRAG_TRIGGER_DISTANCE = 20
 

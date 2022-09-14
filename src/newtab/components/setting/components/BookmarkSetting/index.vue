@@ -63,7 +63,7 @@
             <div class="bookmark__content">
               <!-- left: keyList -->
               <div class="content__key">
-                <div v-for="rowData of keyboardSettingRowList" :key="rowData" class="bookmark__group">
+                <div v-for="rowData of keyboardRowKeyList" :key="rowData" class="bookmark__group">
                   <NInputGroupLabel v-for="key of rowData" :key="key" class="bookmark__key">
                     {{ `${key.toUpperCase()}` }}
                   </NInputGroupLabel>
@@ -71,7 +71,7 @@
               </div>
               <!-- right: config -->
               <div class="content__config">
-                <transition-group v-for="rowData of keyboardSettingRowList" :key="rowData" name="flip-list" tag="div" class="bookmark__group">
+                <transition-group v-for="rowData of keyboardRowKeyList" :key="rowData" name="flip-list" tag="div" class="bookmark__group">
                   <NInputGroup
                     v-for="key of rowData"
                     :key="key"
@@ -97,7 +97,7 @@
                         class="input__main"
                         type="text"
                         clearable
-                        :placeholder="getDefaultBookmarkName(localConfig.bookmark.keymap[key].url)"
+                        :placeholder="getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[key].url)"
                       />
                       <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
                         <cil:resize-height />
@@ -131,7 +131,7 @@
 <script setup lang="ts">
 import BookmarkPicker from './BookmarkPicker.vue'
 import { isEdge } from '@/env'
-import { URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, localConfig, keyboardSettingRowList, getDefaultBookmarkName, requestPermission, createTab } from '@/logic'
+import { URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, localConfig, keyboardRowKeyList, getDefaultBookmarkNameFromUrl, requestPermission, createTab } from '@/logic'
 
 const state = reactive({
   isBookmarkModalVisible: false,

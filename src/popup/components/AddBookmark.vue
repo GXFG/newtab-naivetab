@@ -6,28 +6,26 @@
       </NFormItem>
 
       <NFormItem :label="$t('bookmark.nameLabel')">
-        <NInput v-model:value="state.name" :placeholder="getDefaultBookmarkName(state.url)" clearable />
+        <NInput v-model:value="state.name" :placeholder="getDefaultBookmarkNameFromUrl(state.url)" clearable />
       </NFormItem>
 
       <NFormItem :label="$t('bookmark.keyLabel')" path="key" :rule="{ required: true }">
         <div class="popup__keyboard">
-          <div v-for="row in keyboardRowList" :key="row" class="keyboard__row">
-            <div v-for="item in row" :key="item.key" class="row__item" @click="selectKey(item.key)">
-              <div v-if="item.key === state.key" class="item__current">
+          <div v-for="rowList in keyboardRowKeyList" :key="rowList" class="keyboard__row">
+            <div v-for="key in rowList" :key="key" class="row__item" @click="selectKey(key)">
+              <div v-if="key === state.key" class="item__current">
                 <ic:outline-check-circle />
               </div>
               <p class="item__key">
-                {{ `${item.key.toUpperCase()}` }}
+                {{ `${key.toUpperCase()}` }}
               </p>
               <div class="item__img">
-                <!-- 使用新增书签来替换icon展示 -->
                 <img
-                  v-if="item.key in bookmarkPendingData.keymap"
+                  v-if="getBookmarkConfigUrl(key)"
                   class="img__main"
-                  :src="getDomainIcon(bookmarkPendingData.keymap[item.key].url)"
+                  :src="getFaviconFromUrl(getBookmarkConfigUrl(key))"
                   :ondragstart="() => false"
                 >
-                <img v-else-if="item.url" class="img__main" :src="getDomainIcon(item.url)" :ondragstart="() => false">
               </div>
             </div>
           </div>
@@ -36,12 +34,7 @@
     </NForm>
 
     <div class="popup__footer">
-      <NButton class="footer__btn" type="primary" :disabled="isCommitBtnDisabled" @click="onCommit()">
-        <template #icon>
-          <div class="icon__wrap">
-            <ic:outline-check-circle />
-          </div>
-        </template>
+      <NButton class="footer__btn" type="primary" :disabled="isCommitBtnDisabled" :loading="state.isCommitLoading" @click="onCommit()">
         {{ $t('common.confirm') }}
       </NButton>
     </div>
@@ -50,17 +43,21 @@
 
 <script setup lang="ts">
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { localConfig, customPrimaryColor, getStyleConst, keyboardRowList, getDefaultBookmarkName, getDomainIcon } from '@/logic'
-
-const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
-  isPending: false,
-  keymap: {},
-})
+import {
+  localConfig,
+  customPrimaryColor,
+  getStyleConst,
+  keyboardRowKeyList,
+  getDefaultBookmarkNameFromUrl,
+  getFaviconFromUrl,
+  getBookmarkConfigUrl,
+} from '@/logic'
 
 const state = reactive({
   url: '',
   name: '',
   key: '',
+  isCommitLoading: false,
 })
 
 const getCurrentTabUrl = () => {
@@ -80,13 +77,21 @@ const selectKey = (key: string) => {
 
 const isCommitBtnDisabled = computed(() => state.url.length === 0 || state.key.length === 0)
 
+const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
+  isPending: false,
+})
+
 const onCommit = () => {
+  state.isCommitLoading = true
   bookmarkPendingData.value.isPending = true
-  bookmarkPendingData.value.keymap[state.key] = {
+  localConfig.bookmark.keymap[state.key] = {
     url: state.url,
     name: state.name,
   }
-  window.$message.success(`${window.$t('common.add')}${window.$t('common.success')}`)
+  setTimeout(() => {
+    state.isCommitLoading = false
+    window.$message.success(`${window.$t('common.add')}${window.$t('common.success')}`)
+  }, 1200)
 }
 
 const popupMainWidth = localConfig.bookmark.isNumberEnabled ? '608px' : '570px'

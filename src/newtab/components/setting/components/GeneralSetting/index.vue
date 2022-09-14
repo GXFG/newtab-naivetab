@@ -133,8 +133,8 @@ const openBackgroundDrawer = () => {
 
 const syncTime = computed(() => {
   const syncTimeList = [] as number[]
-  for (const field of Object.keys(defaultConfig) as ConfigField[]) {
-    syncTimeList.push(localState.value.syncTimeMap[field])
+  for (const field of Object.keys(localState.value.isUploadConfigStatusMap)) {
+    syncTimeList.push(localState.value.isUploadConfigStatusMap[field].syncTime)
   }
   const maxSyncTime = Math.max(...syncTimeList)
   return dayjs(maxSyncTime).format('YYYY-MM-DD HH:mm:ss')

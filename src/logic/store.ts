@@ -1,7 +1,7 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import pkg from '../../package.json'
-import { isChrome, isEdge } from '@/env'
+import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
 import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
@@ -343,38 +343,58 @@ export const localConfig = reactive({
   news: useStorageLocal('c-news', defaultConfig.news),
 })
 
-export const localState = useStorageLocal('l-state', {
+const defaultLocalState = {
   currAppearanceLabel: 'light' as 'light' | 'dark',
   currAppearanceCode: 0 as 0 | 1, // 0:light | 1:dark
-  syncTimeMap: {
-    general: 0,
-    bookmark: 0,
-    clockDigital: 0,
-    clockAnalog: 0,
-    date: 0,
-    calendar: 0,
-    search: 0,
-    weather: 0,
-    memo: 0,
-    news: 0,
+  isUploadConfigStatusMap: {
+    general: {
+      loading: false,
+      syncTime: 0,
+    },
+    bookmark: {
+      loading: false,
+      syncTime: 0,
+    },
+    clockDigital: {
+      loading: false,
+      syncTime: 0,
+    },
+    clockAnalog: {
+      loading: false,
+      syncTime: 0,
+    },
+    date: {
+      loading: false,
+      syncTime: 0,
+    },
+    calendar: {
+      loading: false,
+      syncTime: 0,
+    },
+    search: {
+      loading: false,
+      syncTime: 0,
+    },
+    weather: {
+      loading: false,
+      syncTime: 0,
+    },
+    memo: {
+      loading: false,
+      syncTime: 0,
+    },
+    news: {
+      loading: false,
+      syncTime: 0,
+    },
   },
-})
+}
+
+export const localState = useStorageLocal('l-state', defaultLocalState)
 
 export const globalState = reactive({
   isSettingDrawerVisible: false,
   availableFontList: [] as any[],
-  isUploadConfigLoadingMap: {
-    general: false,
-    bookmark: false,
-    clockDigital: false,
-    clockAnalog: false,
-    date: false,
-    calendar: false,
-    search: false,
-    weather: false,
-    memo: false,
-    news: false,
-  },
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
@@ -502,6 +522,16 @@ export const handleUpdate = async () => {
       localConfig.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
       delete (localConfig.general as any).backgroundImageCustomUrl
     }
+  } else if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
+    let newLocalState = {}
+    const localState: any = localStorage.getItem('l-state')
+    if (localState) {
+      newLocalState = {
+        ...defaultLocalState,
+        ...JSON.parse(localState),
+      }
+    }
+    localStorage.setItem('l-state', JSON.stringify(newLocalState))
   }
   log('Get new version', pkg.version)
   localConfig.general.version = pkg.version
@@ -527,20 +557,6 @@ export const handleUpdate = async () => {
   })
   // 刷新配置设置
   await updateSetting()
-}
-
-export const createTab = (url: string, active = true) => {
-  if (url.length === 0) {
-    return
-  }
-  chrome.tabs.create({ url, active })
-}
-
-export const getDomainIcon = (url: string) => {
-  if (isChrome) {
-    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`
-  }
-  return `${url}/favicon.ico`
 }
 
 export const getIsComponentRender = (componentName: Components) => computed(() => localConfig[componentName].enabled)

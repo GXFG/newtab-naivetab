@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { getDomainIcon } from '@/logic'
+import { getFaviconFromUrl } from '@/logic'
 
 const props = defineProps({
   show: {
@@ -73,7 +73,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
     const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
     const curr: any = {
       ...item,
-      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getDomainIcon(item.url) }), // ico
+      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url) }), // ico
     }
     if (isFolder) {
       curr.children = formatBookmark(item.children)

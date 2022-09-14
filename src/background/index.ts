@@ -1,6 +1,7 @@
 // !!background Cannot use import statement outside a module
 // import browser from 'webextension-polyfill'
 import { KEYBOARD_KEY_LIST, KEYBOARD_CODE_TO_LABEL_MAP, KEYBOARD_SPLIT_RANGE_MAP } from '@/logic/const'
+import { log, createTab } from '@/logic/util'
 
 // src/logic/bookmark.ts
 const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => {
@@ -24,14 +25,6 @@ const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => {
   return rowList
 }
 
-// src/logic/store.ts
-const createTab = (url: string, active = true) => {
-  if (url.length === 0) {
-    return
-  }
-  chrome.tabs.create({ url, active })
-}
-
 let bookmarkConfig = null as any
 let currentModelAllKeyList = [] as string[]
 
@@ -53,20 +46,15 @@ const getKeyboardData = async () => new Promise((resolve) => {
     bookmarkConfig = JSON.parse(config).data
     const keyboardList = getKeyboardList(getKeyboardSplitList(), KEYBOARD_KEY_LIST)
     currentModelAllKeyList = keyboardList.flat(Infinity)
-    console.log('KeyboardData', bookmarkConfig, currentModelAllKeyList)
     resolve(true)
   })
 })
-
-getKeyboardData()
 
 let timer = null as any
 let laskCommand = ''
 
 const handleKeyboard = async (command: string) => {
-  if (!bookmarkConfig) {
-    await getKeyboardData()
-  }
+  await getKeyboardData()
   if (!bookmarkConfig.isListenBackgroundKeystrokes) {
     return
   }
@@ -95,18 +83,16 @@ const handleKeyboard = async (command: string) => {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('NaiveTab installed')
+  log('NaiveTab installed')
 })
 
-chrome.runtime.onMessage.addListener((message) => {
-  console.log('onMessage', message)
-  const { name } = message
-  if (name === 'keyboard') {
-    getKeyboardData()
-  }
-})
+// chrome.runtime.onMessage.addListener((message) => {
+//   log('onMessage', message)
+//   const { name } = message
+//   if (name === 'keyboard') {}
+// })
 
 chrome.commands.onCommand.addListener((command) => {
-  console.log(`onCommand: ${command}`)
+  log(`onCommand: ${command}`)
   handleKeyboard(command)
 })

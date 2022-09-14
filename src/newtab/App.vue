@@ -22,10 +22,10 @@ import {
   themeOverrides,
   renderBackgroundImage,
   setEdgeFavicon,
-  downloadConfig,
+  loadRemoteConfig,
+  resetBookmarkPending,
   initFirstOpen,
   handleUpdate,
-  handleBookmarkPending,
   startKeyboard,
   startTimer,
   stopTimer,
@@ -37,10 +37,10 @@ onMounted(async () => {
   setEdgeFavicon()
   startTimer()
   startKeyboard()
-  downloadConfig()
+  loadRemoteConfig()
+  resetBookmarkPending()
   await nextTick()
   initFirstOpen()
-  handleBookmarkPending()
   handleUpdate()
 })
 
