@@ -190,6 +190,7 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
                         <NInputGroupLabel
                           v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
                           class="item__shortcut"
+                          :title="globalState.allCommandsMap[key]"
                           @click="openShortcutsPage()"
                         >
                           {{ globalState.allCommandsMap[key] || '-' }}
@@ -280,6 +281,7 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
             }
           }
           .item__shortcut {
+            padding: 0;
             width: 15%;
             line-height: 34px;
             text-align: center;
