@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, log, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -480,7 +480,7 @@ export const openSponsorModal = () => {
 
 export const isFirstOpen = useStorageLocal('data-first', true)
 
-export const initFirstOpen = () => {
+export const handleFirstOpen = () => {
   if (!isFirstOpen.value) {
     return
   }
@@ -489,49 +489,20 @@ export const initFirstOpen = () => {
   openUserGuideModal()
 }
 
-export const handleUpdate = async () => {
+export const handleStateResetAndUpdate = () => {
+  resetBookmarkPending()
+  const version = getLocalVersion()
+  // handle old version
+  if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
+    localState.value.isUploadConfigStatusMap = defaultLocalState.isUploadConfigStatusMap
+  }
+}
+
+export const handleAppUpdate = async () => {
   const version = getLocalVersion()
   log('Version', version)
   if (!compareLeftVersionLessThanRightVersions(version, pkg.version)) {
     return
-  }
-  // handle old version 兼容小于1.0.0版本的旧image配置
-  if (compareLeftVersionLessThanRightVersions(version, '1.0.0')) {
-    let newLocalDataImages = {}
-    const localDataImages = localStorage.getItem('data-images')
-    if (localDataImages) {
-      newLocalDataImages = {
-        syncTime: 0,
-        imageList: [],
-        ...JSON.parse(localDataImages),
-      }
-    }
-    localStorage.setItem('data-images', JSON.stringify(newLocalDataImages))
-    const oldBackgroundImageName = (localConfig.general as any).backgroundImageName
-    if (oldBackgroundImageName) {
-      localConfig.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]
-      delete (localConfig.general as any).backgroundImageName
-    }
-    const oldBackgroundImageDescs = (localConfig.general as any).backgroundImageDesc
-    if (oldBackgroundImageDescs) {
-      localConfig.general.backgroundImageDescs = [oldBackgroundImageDescs, oldBackgroundImageDescs]
-      delete (localConfig.general as any).backgroundImageDesc
-    }
-    const oldBackgroundImageCustomUrl = (localConfig.general as any).backgroundImageCustomUrl
-    if (oldBackgroundImageCustomUrl) {
-      localConfig.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
-      delete (localConfig.general as any).backgroundImageCustomUrl
-    }
-  } else if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
-    let newLocalState = {}
-    const localState: any = localStorage.getItem('l-state')
-    if (localState) {
-      newLocalState = {
-        ...defaultLocalState,
-        ...JSON.parse(localState),
-      }
-    }
-    localStorage.setItem('l-state', JSON.stringify(newLocalState))
   }
   log('Get new version', pkg.version)
   localConfig.general.version = pkg.version

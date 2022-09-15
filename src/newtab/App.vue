@@ -22,26 +22,28 @@ import {
   themeOverrides,
   renderBackgroundImage,
   setEdgeFavicon,
-  loadRemoteConfig,
-  resetBookmarkPending,
-  initFirstOpen,
-  handleUpdate,
   startKeyboard,
   startTimer,
   stopTimer,
+  handleStateResetAndUpdate,
+  handleMissedUploadConfig,
+  loadRemoteConfig,
+  handleFirstOpen,
+  handleAppUpdate,
 } from '@/logic'
 import Content from '@/newtab/Content.vue'
 
 onMounted(async () => {
   renderBackgroundImage()
   setEdgeFavicon()
+  handleStateResetAndUpdate()
   startTimer()
   startKeyboard()
-  loadRemoteConfig()
-  resetBookmarkPending()
+  await handleMissedUploadConfig()
+  await loadRemoteConfig()
   await nextTick()
-  initFirstOpen()
-  handleUpdate()
+  handleFirstOpen()
+  handleAppUpdate()
 })
 
 onUnmounted(() => {
