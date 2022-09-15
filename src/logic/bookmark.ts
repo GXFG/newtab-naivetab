@@ -69,14 +69,14 @@ export const getDefaultBookmarkNameFromUrl = (url: string) => {
 }
 
 export const getBookmarkConfigName = (key: string) => {
-  if (!Object.prototype.hasOwnProperty.call(localConfig.bookmark.keymap, key)) {
+  if (!localConfig.bookmark.keymap[key]) {
     return ''
   }
   return localConfig.bookmark.keymap[key].name || getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[key].url)
 }
 
 export const getBookmarkConfigUrl = (key: string) => {
-  if (!Object.prototype.hasOwnProperty.call(localConfig.bookmark.keymap, key)) {
+  if (!localConfig.bookmark.keymap[key]) {
     return ''
   }
   const url = localConfig.bookmark.keymap[key].url
