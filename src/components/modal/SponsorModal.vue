@@ -1,3 +1,13 @@
+<script setup lang="ts">
+import { globalState } from '@/logic'
+
+const paymentList = ['alipay', 'wechat']
+
+const onCloseModal = () => {
+  globalState.isSponsorModalVisible = false
+}
+</script>
+
 <template>
   <NModal :show="globalState.isSponsorModalVisible" :mask-closable="false">
     <NCard class="card__wrap" :title="`${$t('sponsor.title')} ☕️`">
@@ -27,16 +37,6 @@
     </NCard>
   </NModal>
 </template>
-
-<script setup lang="ts">
-import { globalState } from '@/logic'
-
-const paymentList = ['alipay', 'wechat']
-
-const onCloseModal = () => {
-  globalState.isSponsorModalVisible = false
-}
-</script>
 
 <style scoped>
 .card__wrap {

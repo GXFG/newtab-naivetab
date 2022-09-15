@@ -1,10 +1,3 @@
-<template>
-  <!-- save css var -->
-  <div id="background">
-    <div id="background__container" :style="bgStyle" />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { localConfig, currBackgroundImageUrl, isImageLoading, updateImages } from '@/logic'
 
@@ -18,6 +11,13 @@ onMounted(() => {
 
 const customOpacity = computed(() => (isImageLoading.value ? 0 : localConfig.general.bgOpacity))
 </script>
+
+<template>
+  <!-- save css var -->
+  <div id="background">
+    <div id="background__container" :style="bgStyle" />
+  </div>
+</template>
 
 <style>
 #background {

@@ -1,14 +1,3 @@
-<template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="weather">
-    <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
-      <div class="weather__container" :style="dragStyle || containerStyle">
-        <NowWeather />
-        <ForecastWeather />
-      </div>
-    </div>
-  </MoveableComponentWrap>
-</template>
-
 <script setup lang="ts">
 import NowWeather from './NowWeather.vue'
 import ForecastWeather from './ForecastWeather.vue'
@@ -35,6 +24,17 @@ const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 </script>
+
+<template>
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="weather">
+    <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
+      <div class="weather__container" :style="dragStyle || containerStyle">
+        <NowWeather />
+        <ForecastWeather />
+      </div>
+    </div>
+  </MoveableComponentWrap>
+</template>
 
 <style>
 #weather {

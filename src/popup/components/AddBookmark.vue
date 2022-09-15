@@ -1,46 +1,3 @@
-<template>
-  <NCard id="popup" :title="`${$t('common.add')}${$t('setting.bookmark')}`">
-    <NForm label-placement="left" :label-width="55" require-mark-placement="left" :model="state">
-      <NFormItem :label="$t('bookmark.urlLabel')" path="url" :rule="{ required: true }">
-        <NInput v-model:value="state.url" :placeholder="$t('bookmark.urlPlaceholder')" clearable autofocus />
-      </NFormItem>
-
-      <NFormItem :label="$t('bookmark.nameLabel')">
-        <NInput v-model:value="state.name" :placeholder="getDefaultBookmarkNameFromUrl(state.url)" clearable />
-      </NFormItem>
-
-      <NFormItem :label="$t('bookmark.keyLabel')" path="key" :rule="{ required: true }">
-        <div class="popup__keyboard">
-          <div v-for="rowList in keyboardRowKeyList" :key="rowList" class="keyboard__row">
-            <div v-for="key in rowList" :key="key" class="row__item" @click="selectKey(key)">
-              <div v-if="key === state.key" class="item__current">
-                <ic:outline-check-circle />
-              </div>
-              <p class="item__key">
-                {{ `${key.toUpperCase()}` }}
-              </p>
-              <div class="item__img">
-                <img
-                  v-if="getBookmarkConfigUrl(key)"
-                  class="img__main"
-                  :src="getFaviconFromUrl(getBookmarkConfigUrl(key))"
-                  :ondragstart="() => false"
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-      </NFormItem>
-    </NForm>
-
-    <div class="popup__footer">
-      <NButton class="footer__btn" type="primary" :disabled="isCommitBtnDisabled" :loading="state.isCommitLoading" @click="onCommit()">
-        {{ $t('common.confirm') }}
-      </NButton>
-    </div>
-  </NCard>
-</template>
-
 <script setup lang="ts">
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import {
@@ -99,6 +56,49 @@ const popupKeyboardBorder = getStyleConst('popupKeyboardBorder')
 const popupKeyboardHoverBg = getStyleConst('popupKeyboardHoverBg')
 const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
 </script>
+
+<template>
+  <NCard id="popup" :title="`${$t('common.add')}${$t('setting.bookmark')}`">
+    <NForm label-placement="left" :label-width="55" require-mark-placement="left" :model="state">
+      <NFormItem :label="$t('bookmark.urlLabel')" path="url" :rule="{ required: true }">
+        <NInput v-model:value="state.url" :placeholder="$t('bookmark.urlPlaceholder')" clearable autofocus />
+      </NFormItem>
+
+      <NFormItem :label="$t('bookmark.nameLabel')">
+        <NInput v-model:value="state.name" :placeholder="getDefaultBookmarkNameFromUrl(state.url)" clearable />
+      </NFormItem>
+
+      <NFormItem :label="$t('bookmark.keyLabel')" path="key" :rule="{ required: true }">
+        <div class="popup__keyboard">
+          <div v-for="rowList in keyboardRowKeyList" :key="rowList" class="keyboard__row">
+            <div v-for="key in rowList" :key="key" class="row__item" @click="selectKey(key)">
+              <div v-if="key === state.key" class="item__current">
+                <ic:outline-check-circle />
+              </div>
+              <p class="item__key">
+                {{ `${key.toUpperCase()}` }}
+              </p>
+              <div class="item__img">
+                <img
+                  v-if="getBookmarkConfigUrl(key)"
+                  class="img__main"
+                  :src="getFaviconFromUrl(getBookmarkConfigUrl(key))"
+                  :ondragstart="() => false"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </NFormItem>
+    </NForm>
+
+    <div class="popup__footer">
+      <NButton class="footer__btn" type="primary" :disabled="isCommitBtnDisabled" :loading="state.isCommitLoading" @click="onCommit()">
+        {{ $t('common.confirm') }}
+      </NButton>
+    </div>
+  </NCard>
+</template>
 
 <style scoped>
 #popup {

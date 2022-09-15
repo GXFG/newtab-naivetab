@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { URL_DAYJS_FORMAT, localConfig } from '@/logic'
+</script>
+
 <template>
   <BaseComponentSetting cname="date">
     <template #header>
@@ -8,7 +12,3 @@
     </template>
   </BaseComponentSetting>
 </template>
-
-<script setup lang="ts">
-import { URL_DAYJS_FORMAT, localConfig } from '@/logic'
-</script>

@@ -1,30 +1,3 @@
-<template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockAnalog">
-    <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
-      <div class="clockAnalog__container" :style="dragStyle || containerStyle">
-        <div v-show="state.isClockVisible" class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
-          <div class="clock__base clock__base--animation" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
-          <div
-            class="clock__base clock__hour"
-            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isHourAnimationEnable }"
-            :style="`background-image: url(/assets/img/clock/${currTheme}/hour.png);`"
-          />
-          <div
-            class="clock__base clock__minute"
-            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isMinuteAnimationEnable }"
-            :style="`background-image: url(/assets/img/clock/${currTheme}/minute.png);`"
-          />
-          <div
-            class="clock__base clock__second"
-            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isSecondAnimationEnable }"
-            :style="`background-image: url(/assets/img/clock/${currTheme}/second.png);`"
-          />
-        </div>
-      </div>
-    </div>
-  </MoveableComponentWrap>
-</template>
-
 <script setup lang="ts">
 import { addVisibilityTask, addTimerTask, removeTimerTask, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
@@ -149,6 +122,33 @@ const hourDeg = computed(() => `${state.hourDeg}deg`)
 const minuteDeg = computed(() => `${state.minuteDeg}deg`)
 const secondDeg = computed(() => `${state.secondDeg}deg`)
 </script>
+
+<template>
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockAnalog">
+    <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
+      <div class="clockAnalog__container" :style="dragStyle || containerStyle">
+        <div v-show="state.isClockVisible" class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
+          <div class="clock__base clock__base--animation" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
+          <div
+            class="clock__base clock__hour"
+            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isHourAnimationEnable }"
+            :style="`background-image: url(/assets/img/clock/${currTheme}/hour.png);`"
+          />
+          <div
+            class="clock__base clock__minute"
+            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isMinuteAnimationEnable }"
+            :style="`background-image: url(/assets/img/clock/${currTheme}/minute.png);`"
+          />
+          <div
+            class="clock__base clock__second"
+            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isSecondAnimationEnable }"
+            :style="`background-image: url(/assets/img/clock/${currTheme}/second.png);`"
+          />
+        </div>
+      </div>
+    </div>
+  </MoveableComponentWrap>
+</template>
 
 <style scoped>
 /* https://cssanimation.rocks/clocks/ */

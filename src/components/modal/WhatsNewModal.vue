@@ -1,3 +1,12 @@
+<script setup lang="ts">
+import Currentlog from '../../../CHANGELOG.md'
+import { globalState } from '@/logic'
+
+const onCloseModal = () => {
+  globalState.isWhatsNewModalVisible = false
+}
+</script>
+
 <template>
   <NModal :show="globalState.isWhatsNewModalVisible" :mask-closable="false">
     <NCard class="card__wrap" :title="`✨${$t('common.whatsNew')}✨`">
@@ -17,15 +26,6 @@
     </NCard>
   </NModal>
 </template>
-
-<script setup lang="ts">
-import Currentlog from '../../../CHANGELOG.md'
-import { globalState } from '@/logic'
-
-const onCloseModal = () => {
-  globalState.isWhatsNewModalVisible = false
-}
-</script>
 
 <style scoped>
 .card__wrap {

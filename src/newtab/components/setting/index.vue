@@ -1,45 +1,3 @@
-<template>
-  <div id="background__drawer" />
-  <div id="setting">
-    <!-- Drawer: height在位置是 top 和 bottom 时生效 -->
-    <NDrawer
-      v-model:show="globalState.isSettingDrawerVisible"
-      class="drawer-wrap"
-      :style="drawerStyle"
-      :width="600"
-      :height="400"
-      :placement="localConfig.general.drawerPlacement"
-      to="#setting"
-    >
-      <NDrawerContent>
-        <div class="drawer__content">
-          <NTabs type="line" :value="globalState.currSettingTabValue" @update:value="onTabsChange">
-            <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
-              <component :is="item.component" />
-            </NTabPane>
-          </NTabs>
-        </div>
-        <!-- bottom -->
-        <div class="drawer__bottom" :style="`background-color: ${bgBottomBar};`">
-          <div class="bottom__left">
-            <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
-              <mdi:eye-circle-outline />&nbsp;{{ $t('common.preview') }}
-            </NButton>
-          </div>
-          <p class="bottom__version">
-            Ver.{{ `${pkg.version}` }}
-          </p>
-          <div class="bottom__right">
-            <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
-              <carbon:logo-github />
-            </NButton>
-          </div>
-        </div>
-      </NDrawerContent>
-    </NDrawer>
-  </div>
-</template>
-
 <script setup lang="ts">
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting/index.vue'
@@ -122,6 +80,48 @@ const handlerPreviewLeave = () => {
 const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
 const bgBottomBar = getStyleConst('bgBottomBar')
 </script>
+
+<template>
+  <div id="background__drawer" />
+  <div id="setting">
+    <!-- Drawer: height在位置是 top 和 bottom 时生效 -->
+    <NDrawer
+      v-model:show="globalState.isSettingDrawerVisible"
+      class="drawer-wrap"
+      :style="drawerStyle"
+      :width="600"
+      :height="400"
+      :placement="localConfig.general.drawerPlacement"
+      to="#setting"
+    >
+      <NDrawerContent>
+        <div class="drawer__content">
+          <NTabs type="line" :value="globalState.currSettingTabValue" @update:value="onTabsChange">
+            <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
+              <component :is="item.component" />
+            </NTabPane>
+          </NTabs>
+        </div>
+        <!-- bottom -->
+        <div class="drawer__bottom" :style="`background-color: ${bgBottomBar};`">
+          <div class="bottom__left">
+            <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
+              <mdi:eye-circle-outline />&nbsp;{{ $t('common.preview') }}
+            </NButton>
+          </div>
+          <p class="bottom__version">
+            Ver.{{ `${pkg.version}` }}
+          </p>
+          <div class="bottom__right">
+            <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
+              <carbon:logo-github />
+            </NButton>
+          </div>
+        </div>
+      </NDrawerContent>
+    </NDrawer>
+  </div>
+</template>
 
 <style>
 #setting {

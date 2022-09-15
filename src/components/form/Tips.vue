@@ -1,16 +1,3 @@
-<template>
-  <NPopover trigger="hover">
-    <template #trigger>
-      <NButton text class="tips__btn" @click="onClick()">
-        <ph:question-bold class="btn__icon" />
-      </NButton>
-    </template>
-    <p class="tips-content">
-      {{ `${link ? `${$t('prompts.linkTips')}\n ` : ''}${props.content}` }}
-    </p>
-  </NPopover>
-</template>
-
 <script setup lang="ts">
 import { createTab } from '@/logic'
 
@@ -32,6 +19,19 @@ const onClick = () => {
   createTab(props.content)
 }
 </script>
+
+<template>
+  <NPopover trigger="hover">
+    <template #trigger>
+      <NButton text class="tips__btn" @click="onClick()">
+        <ph:question-bold class="btn__icon" />
+      </NButton>
+    </template>
+    <p class="tips-content">
+      {{ `${link ? `${$t('prompts.linkTips')}\n ` : ''}${props.content}` }}
+    </p>
+  </NPopover>
+</template>
 
 <style scoped>
 .tips-content {

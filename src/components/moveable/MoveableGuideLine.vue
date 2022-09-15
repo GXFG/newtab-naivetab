@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { getStyleConst, moveState, isDragMode } from '@/logic'
+
+const auxiliaryLineMain = getStyleConst('auxiliaryLineMain')
+const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
+</script>
+
 <template>
   <div v-if="isDragMode">
     <div v-show="moveState.isXAxisCenterVisible" class="axis xaxis__center" />
@@ -8,13 +15,6 @@
     <div v-show="moveState.isRightBoundVisible" class="bound bound__right" />
   </div>
 </template>
-
-<script setup lang="ts">
-import { getStyleConst, moveState, isDragMode } from '@/logic'
-
-const auxiliaryLineMain = getStyleConst('auxiliaryLineMain')
-const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
-</script>
 
 <style>
 /* 画布中心辅助线 */

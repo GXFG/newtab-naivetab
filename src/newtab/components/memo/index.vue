@@ -1,3 +1,31 @@
+<script setup lang="ts">
+import { isDragMode, globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+
+const CNAME = 'memo'
+const isRender = getIsComponentRender(CNAME)
+
+const onFocus = () => {
+  globalState.isMemoFocused = true
+}
+
+const onBlur = () => {
+  globalState.isMemoFocused = false
+}
+
+const dragStyle = ref('')
+const containerStyle = getLayoutStyle(CNAME)
+const customWidth = getStyleField(CNAME, 'width', 'px')
+const customHeight = getStyleField(CNAME, 'height', 'px')
+const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontColor = getStyleField(CNAME, 'fontColor')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
+const customBorderColor = getStyleField(CNAME, 'borderColor')
+const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
+const customShadowColor = getStyleField(CNAME, 'shadowColor')
+</script>
+
 <template>
   <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="memo">
     <div v-if="isRender" id="memo" data-target-type="1" data-target-name="memo">
@@ -27,34 +55,6 @@
     </div>
   </MoveableComponentWrap>
 </template>
-
-<script setup lang="ts">
-import { isDragMode, globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
-
-const CNAME = 'memo'
-const isRender = getIsComponentRender(CNAME)
-
-const onFocus = () => {
-  globalState.isMemoFocused = true
-}
-
-const onBlur = () => {
-  globalState.isMemoFocused = false
-}
-
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(CNAME)
-const customWidth = getStyleField(CNAME, 'width', 'px')
-const customHeight = getStyleField(CNAME, 'height', 'px')
-const customFontFamily = getStyleField(CNAME, 'fontFamily')
-const customFontColor = getStyleField(CNAME, 'fontColor')
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
-const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
-const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
-const customBorderColor = getStyleField(CNAME, 'borderColor')
-const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
-const customShadowColor = getStyleField(CNAME, 'shadowColor')
-</script>
 
 <style>
 #memo {

@@ -1,3 +1,87 @@
+<script setup lang="ts">
+import BookmarkPicker from './BookmarkPicker.vue'
+import { isEdge } from '@/env'
+import {
+  URL_CHROME_EXTENSIONS_SHORTCUTS,
+  URL_EDGE_EXTENSIONS_SHORTCUTS,
+  globalState,
+  localConfig,
+  keyboardRowKeyList,
+  getDefaultBookmarkNameFromUrl,
+  requestPermission,
+  createTab,
+} from '@/logic'
+
+const state = reactive({
+  isBookmarkModalVisible: false,
+  isBookmarkDragEnabled: false,
+  currDragKey: '',
+  currImporKey: '',
+})
+
+const openShortcutsPage = () => createTab(isEdge ? URL_EDGE_EXTENSIONS_SHORTCUTS : URL_CHROME_EXTENSIONS_SHORTCUTS)
+
+const onCreateKey = (key: string) => {
+  localConfig.bookmark.keymap[key] = {
+    url: '',
+    name: '',
+  }
+}
+
+const onDeleteKey = (key: string) => {
+  delete localConfig.bookmark.keymap[key]
+}
+
+const onBookmarkStartDrag = () => {
+  state.isBookmarkDragEnabled = true
+}
+
+const onBookmarkStopDrag = () => {
+  state.isBookmarkDragEnabled = false
+}
+
+const handleDragStart = (key: string) => {
+  state.currDragKey = key
+}
+
+const handleDragEnter = (e: any, targetKey: string) => {
+  e.preventDefault()
+  if (state.currDragKey === targetKey) {
+    return
+  }
+  const targetData = localConfig.bookmark.keymap[targetKey]
+  localConfig.bookmark.keymap[targetKey] = localConfig.bookmark.keymap[state.currDragKey]
+  localConfig.bookmark.keymap[state.currDragKey] = targetData
+  state.currDragKey = targetKey
+}
+
+const handleDragOver = (e: any) => {
+  e.preventDefault() // 阻止松开按键后的返回动画
+}
+
+const handleDragEnd = () => {
+  onBookmarkStopDrag()
+}
+
+const onImportBookmark = async (key: string) => {
+  const granted = await requestPermission('bookmarks')
+  if (!granted) {
+    return
+  }
+  state.currImporKey = key
+  state.isBookmarkModalVisible = true
+}
+
+const onSelectBookmark = (payload: ChromeBookmarkItem) => {
+  localConfig.bookmark.keymap[state.currImporKey] = {
+    url: payload.url,
+    name: payload.title,
+  }
+}
+
+const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgroundKeystrokes ? '24%' : '30%')
+</script>
+
 <template>
   <BookmarkPicker v-model:show="state.isBookmarkModalVisible" @select="onSelectBookmark" />
 
@@ -139,90 +223,6 @@
     </NCollapseItem>
   </NCollapse>
 </template>
-
-<script setup lang="ts">
-import BookmarkPicker from './BookmarkPicker.vue'
-import { isEdge } from '@/env'
-import {
-  URL_CHROME_EXTENSIONS_SHORTCUTS,
-  URL_EDGE_EXTENSIONS_SHORTCUTS,
-  globalState,
-  localConfig,
-  keyboardRowKeyList,
-  getDefaultBookmarkNameFromUrl,
-  requestPermission,
-  createTab,
-} from '@/logic'
-
-const state = reactive({
-  isBookmarkModalVisible: false,
-  isBookmarkDragEnabled: false,
-  currDragKey: '',
-  currImporKey: '',
-})
-
-const openShortcutsPage = () => createTab(isEdge ? URL_EDGE_EXTENSIONS_SHORTCUTS : URL_CHROME_EXTENSIONS_SHORTCUTS)
-
-const onCreateKey = (key: string) => {
-  localConfig.bookmark.keymap[key] = {
-    url: '',
-    name: '',
-  }
-}
-
-const onDeleteKey = (key: string) => {
-  delete localConfig.bookmark.keymap[key]
-}
-
-const onBookmarkStartDrag = () => {
-  state.isBookmarkDragEnabled = true
-}
-
-const onBookmarkStopDrag = () => {
-  state.isBookmarkDragEnabled = false
-}
-
-const handleDragStart = (key: string) => {
-  state.currDragKey = key
-}
-
-const handleDragEnter = (e: any, targetKey: string) => {
-  e.preventDefault()
-  if (state.currDragKey === targetKey) {
-    return
-  }
-  const targetData = localConfig.bookmark.keymap[targetKey]
-  localConfig.bookmark.keymap[targetKey] = localConfig.bookmark.keymap[state.currDragKey]
-  localConfig.bookmark.keymap[state.currDragKey] = targetData
-  state.currDragKey = targetKey
-}
-
-const handleDragOver = (e: any) => {
-  e.preventDefault() // 阻止松开按键后的返回动画
-}
-
-const handleDragEnd = () => {
-  onBookmarkStopDrag()
-}
-
-const onImportBookmark = async (key: string) => {
-  const granted = await requestPermission('bookmarks')
-  if (!granted) {
-    return
-  }
-  state.currImporKey = key
-  state.isBookmarkModalVisible = true
-}
-
-const onSelectBookmark = (payload: ChromeBookmarkItem) => {
-  localConfig.bookmark.keymap[state.currImporKey] = {
-    url: payload.url,
-    name: payload.title,
-  }
-}
-
-const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgroundKeystrokes ? '24%' : '30%')
-</script>
 
 <style>
 .flip-list-move {

@@ -1,45 +1,3 @@
-<template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="bookmark">
-    <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
-      <div class="bookmark__container" :style="dragStyle || containerStyle">
-        <div v-for="(rowData, rowIndex) in keyboardRowKeyList" :key="rowIndex" class="bookmark__row">
-          <div
-            v-for="key in rowData"
-            :key="key"
-            class="row__item"
-            :class="{
-              'row__item--move': isDragMode,
-              'row__item--hover': !isDragMode && getBookmarkConfigUrl(key).length !== 0,
-              'row__item--active': state.currSelectKey === key,
-              'row__item--border': localConfig.bookmark.isBorderEnabled,
-              'row__item--shadow': localConfig.bookmark.isShadowEnabled,
-            }"
-            :title="getBookmarkConfigUrl(key)"
-            @mousedown="onMouseDownKey($event, key, getBookmarkConfigUrl(key))"
-          >
-            <div v-if="state.currSelectKey === key && state.isLoadPageLoading" class="item__loading">
-              <eos-icons:loading />
-            </div>
-            <p class="item__key">
-              {{ `${key.toUpperCase()}` }}
-            </p>
-            <div class="item__img">
-              <div class="img__wrap">
-                <img v-if="getBookmarkConfigUrl(key)" class="img__main" :src="getFaviconFromUrl(getBookmarkConfigUrl(key))" :ondragstart="() => false">
-              </div>
-            </div>
-            <p v-if="localConfig.bookmark.isNameVisible" class="item__name">
-              {{ getBookmarkConfigName(key) }}
-            </p>
-            <!-- 按键定位标志F & J -->
-            <div v-if="['f', 'j'].includes(key)" class="item__cursor" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </MoveableComponentWrap>
-</template>
-
 <script setup lang="ts">
 import {
   KEYBOARD_KEY_LIST,
@@ -172,6 +130,48 @@ const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
+
+<template>
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="bookmark">
+    <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
+      <div class="bookmark__container" :style="dragStyle || containerStyle">
+        <div v-for="(rowData, rowIndex) in keyboardRowKeyList" :key="rowIndex" class="bookmark__row">
+          <div
+            v-for="key in rowData"
+            :key="key"
+            class="row__item"
+            :class="{
+              'row__item--move': isDragMode,
+              'row__item--hover': !isDragMode && getBookmarkConfigUrl(key).length !== 0,
+              'row__item--active': state.currSelectKey === key,
+              'row__item--border': localConfig.bookmark.isBorderEnabled,
+              'row__item--shadow': localConfig.bookmark.isShadowEnabled,
+            }"
+            :title="getBookmarkConfigUrl(key)"
+            @mousedown="onMouseDownKey($event, key, getBookmarkConfigUrl(key))"
+          >
+            <div v-if="state.currSelectKey === key && state.isLoadPageLoading" class="item__loading">
+              <eos-icons:loading />
+            </div>
+            <p class="item__key">
+              {{ `${key.toUpperCase()}` }}
+            </p>
+            <div class="item__img">
+              <div class="img__wrap">
+                <img v-if="getBookmarkConfigUrl(key)" class="img__main" :src="getFaviconFromUrl(getBookmarkConfigUrl(key))" :ondragstart="() => false">
+              </div>
+            </div>
+            <p v-if="localConfig.bookmark.isNameVisible" class="item__name">
+              {{ getBookmarkConfigName(key) }}
+            </p>
+            <!-- 按键定位标志F & J -->
+            <div v-if="['f', 'j'].includes(key)" class="item__cursor" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </MoveableComponentWrap>
+</template>
 
 <style scoped>
 #bookmark {

@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { localConfig } from '@/logic'
+</script>
+
 <template>
   <BaseComponentSetting cname="memo">
     <template #header>
@@ -7,7 +11,3 @@
     </template>
   </BaseComponentSetting>
 </template>
-
-<script setup lang="ts">
-import { localConfig } from '@/logic'
-</script>

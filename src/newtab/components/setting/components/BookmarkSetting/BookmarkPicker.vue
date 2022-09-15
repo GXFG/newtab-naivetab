@@ -1,19 +1,3 @@
-<template>
-  <NDrawer :show="props.show" :width="550" @update:show="handleUpdateShow">
-    <NDrawerContent :title="$t('setting.bookmark')" closable>
-      <NTree
-        block-line
-        :data="state.bookmarks"
-        key-field="id"
-        label-field="title"
-        :selectable="false"
-        :default-expanded-keys="state.defaultExpandedKeys"
-        :node-props="state.nodeProps"
-      />
-    </NDrawerContent>
-  </NDrawer>
-</template>
-
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
@@ -101,6 +85,22 @@ watch(
   },
 )
 </script>
+
+<template>
+  <NDrawer :show="props.show" :width="550" @update:show="handleUpdateShow">
+    <NDrawerContent :title="$t('setting.bookmark')" closable>
+      <NTree
+        block-line
+        :data="state.bookmarks"
+        key-field="id"
+        label-field="title"
+        :selectable="false"
+        :default-expanded-keys="state.defaultExpandedKeys"
+        :node-props="state.nodeProps"
+      />
+    </NDrawerContent>
+  </NDrawer>
+</template>
 
 <style scoped>
 </style>

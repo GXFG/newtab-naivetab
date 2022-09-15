@@ -1,51 +1,3 @@
-<template>
-  <div
-    id="moveable-tool"
-    :class="{ 'moveable-tool--active': isDragMode && isElementDrawerVisible }"
-    @mouseenter="handleElementDrawerMouseEnter"
-    @mouseleave="handleElementDrawerMouseLeave"
-  >
-    <!-- drawer -->
-    <div v-if="isDragMode" class="tool__drawer">
-      <div class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
-        <ic:baseline-chevron-right class="switch__icon" :class="{ 'switch__icon--active': isElementDrawerVisible }" />
-      </div>
-      <div class="drawer__header">
-        <NButton ghost type="warning" @click="toggleIsDragMode()">
-          <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}${$t('common.dragMode')}` }}
-        </NButton>
-      </div>
-      <div class="drawer__content">
-        <div
-          v-for="item in elementList"
-          v-show="!item.disabled"
-          :key="item.label"
-          class="content__item"
-          data-target-type="2"
-          :data-target-name="item.componentName"
-        >
-          <div class="item__icon" :style="`font-size:${item.iconSize}px`">
-            <Icon :icon="item.iconName" />
-          </div>
-          <span class="item__text">{{ item.label }}</span>
-        </div>
-      </div>
-    </div>
-    <!-- delete -->
-    <div
-      v-if="isDragMode"
-      class="tool__delete"
-      :class="{ 'tool__delete--active': isDragMode && moveState.isComponentDraging }"
-      @mouseenter="handlerDeleteMouseEnter"
-      @mouseleave="handlerDeleteMouseLeave"
-      @mouseup="handlerDeleteMouseUp"
-    >
-      <tabler:trash v-show="!moveState.isDeleteHover" class="delete__icon" />
-      <tabler:trash-x v-show="moveState.isDeleteHover" class="delete__icon" />
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import {
@@ -212,6 +164,54 @@ const bgMoveableComponentDelete = getStyleConst('bgMoveableComponentDelete')
 const bgMoveableToolDrawer = getStyleConst('bgMoveableToolDrawer')
 const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
 </script>
+
+<template>
+  <div
+    id="moveable-tool"
+    :class="{ 'moveable-tool--active': isDragMode && isElementDrawerVisible }"
+    @mouseenter="handleElementDrawerMouseEnter"
+    @mouseleave="handleElementDrawerMouseLeave"
+  >
+    <!-- drawer -->
+    <div v-if="isDragMode" class="tool__drawer">
+      <div class="drawer__switch" @click="handleToggleIsElementDrawerVisible()">
+        <ic:baseline-chevron-right class="switch__icon" :class="{ 'switch__icon--active': isElementDrawerVisible }" />
+      </div>
+      <div class="drawer__header">
+        <NButton ghost type="warning" @click="toggleIsDragMode()">
+          <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}${$t('common.dragMode')}` }}
+        </NButton>
+      </div>
+      <div class="drawer__content">
+        <div
+          v-for="item in elementList"
+          v-show="!item.disabled"
+          :key="item.label"
+          class="content__item"
+          data-target-type="2"
+          :data-target-name="item.componentName"
+        >
+          <div class="item__icon" :style="`font-size:${item.iconSize}px`">
+            <Icon :icon="item.iconName" />
+          </div>
+          <span class="item__text">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>
+    <!-- delete -->
+    <div
+      v-if="isDragMode"
+      class="tool__delete"
+      :class="{ 'tool__delete--active': isDragMode && moveState.isComponentDraging }"
+      @mouseenter="handlerDeleteMouseEnter"
+      @mouseleave="handlerDeleteMouseLeave"
+      @mouseup="handlerDeleteMouseUp"
+    >
+      <tabler:trash v-show="!moveState.isDeleteHover" class="delete__icon" />
+      <tabler:trash-x v-show="moveState.isDeleteHover" class="delete__icon" />
+    </div>
+  </div>
+</template>
 
 <style>
 .moveable-tool--active {
