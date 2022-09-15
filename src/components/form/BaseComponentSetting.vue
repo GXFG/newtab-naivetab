@@ -1,5 +1,5 @@
 <template>
-  <NForm label-placement="left" :label-width="110">
+  <NForm label-placement="left" :label-width="120">
     <slot name="header" />
 
     <NDivider title-placement="left">

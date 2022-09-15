@@ -172,7 +172,8 @@
     "urlLabel": "地址",
     "urlPlaceholder": "",
     "nameLabel": "名称",
-    "namePlaceholder": "可选"
+    "namePlaceholder": "可选",
+    "shortcutLabel": "快捷键"
   },
   "search": {
     "searchEngine": "搜索引擎",

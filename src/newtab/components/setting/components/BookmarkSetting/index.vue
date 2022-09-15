@@ -14,7 +14,7 @@
               </div>
               <div v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="setting__input_item">
                 <NButton ghost type="primary" @click="openShortcutsPage()">
-                  <material-symbols:keyboard-alt-outline />&nbsp;{{ $t('bookmark.customKeys') }}
+                  <ic:twotone-keyboard-command-key />&nbsp;{{ $t('bookmark.customKeys') }}
                 </NButton>
               </div>
             </div>
@@ -59,6 +59,9 @@
               <p class="label__text">
                 {{ $t('bookmark.nameLabel') }}
               </p>
+              <p v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="label__text">
+                {{ $t('bookmark.shortcutLabel') }}
+              </p>
             </NInputGroup>
             <div class="bookmark__content">
               <!-- left: keyList -->
@@ -83,22 +86,31 @@
                     @dragend="handleDragEnd()"
                   >
                     <template v-if="localConfig.bookmark.keymap[key]">
-                      <NInput
-                        key="url"
-                        v-model:value="localConfig.bookmark.keymap[key].url"
-                        class="input__main"
-                        type="text"
-                        clearable
-                        :placeholder="$t('bookmark.urlPlaceholder')"
-                      />
-                      <NInput
-                        key="name"
-                        v-model:value="localConfig.bookmark.keymap[key].name"
-                        class="input__main"
-                        type="text"
-                        clearable
-                        :placeholder="getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[key].url)"
-                      />
+                      <div class="item__container">
+                        <NInput
+                          key="url"
+                          v-model:value="localConfig.bookmark.keymap[key].url"
+                          class="input__main"
+                          type="text"
+                          clearable
+                          :placeholder="$t('bookmark.urlPlaceholder')"
+                        />
+                        <NInput
+                          key="name"
+                          v-model:value="localConfig.bookmark.keymap[key].name"
+                          class="input__main"
+                          type="text"
+                          clearable
+                          :placeholder="getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[key].url)"
+                        />
+                        <NInputGroupLabel
+                          v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
+                          class="item__shortcut"
+                          @click="openShortcutsPage()"
+                        >
+                          {{ globalState.allCommandsMap[key] || '-' }}
+                        </NInputGroupLabel>
+                      </div>
                       <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
                         <cil:resize-height />
                       </NInputGroupLabel>
@@ -111,7 +123,7 @@
                             <ri:delete-bin-6-line />
                           </NButton>
                         </template>
-                        {{ $t('common.confirm') }}?
+                        {{ $t('common.delete') }}?
                       </NPopconfirm>
                     </template>
                     <NButton v-else class="item__create" @click="onCreateKey(key)">
@@ -131,7 +143,16 @@
 <script setup lang="ts">
 import BookmarkPicker from './BookmarkPicker.vue'
 import { isEdge } from '@/env'
-import { URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, localConfig, keyboardRowKeyList, getDefaultBookmarkNameFromUrl, requestPermission, createTab } from '@/logic'
+import {
+  URL_CHROME_EXTENSIONS_SHORTCUTS,
+  URL_EDGE_EXTENSIONS_SHORTCUTS,
+  globalState,
+  localConfig,
+  keyboardRowKeyList,
+  getDefaultBookmarkNameFromUrl,
+  requestPermission,
+  createTab,
+} from '@/logic'
 
 const state = reactive({
   isBookmarkModalVisible: false,
@@ -199,6 +220,8 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
     name: payload.title,
   }
 }
+
+const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgroundKeystrokes ? '24%' : '30%')
 </script>
 
 <style>
@@ -211,19 +234,22 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-right: 130px;
+    padding-bottom: 3px;
     .label__text {
       opacity: 0.6;
+      text-align: center;
       &:nth-of-type(1) {
         width: 43px;
-        text-align: center;
       }
       &:nth-of-type(2) {
-        width: 50%;
-        text-align: center;
+        flex: 1;
       }
       &:nth-of-type(3) {
-        width: 50%;
-        padding-left: 7%;
+        width: 25%;
+      }
+      &:nth-of-type(4) {
+        width: 13%;
       }
     }
   }
@@ -243,12 +269,22 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
       padding-bottom: 10px;
       .bookmark__item {
         margin-bottom: 5px;
-        .input__main {
-          &:nth-of-type(1) {
-            flex: 1;
+        .item__container {
+          display: flex;
+          .input__main {
+            &:nth-of-type(1) {
+              flex: 1;
+            }
+            &:nth-of-type(2) {
+              width: v-bind(customNameInputWidth);
+            }
           }
-          &:nth-of-type(2) {
-            width: 25%;
+          .item__shortcut {
+            width: 15%;
+            line-height: 34px;
+            text-align: center;
+            font-size: 12px;
+            cursor: alias;
           }
         }
         .item__create {

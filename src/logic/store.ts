@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, log, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, log, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -395,6 +395,7 @@ export const localState = useStorageLocal('l-state', defaultLocalState)
 export const globalState = reactive({
   isSettingDrawerVisible: false,
   availableFontList: [] as any[],
+  allCommandsMap: {},
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
@@ -443,6 +444,15 @@ watch(
   { immediate: true },
 )
 
+export const getAllCommandsConfig = () => {
+  chrome.commands.getAll((commands) => {
+    for (const { name, shortcut } of commands) {
+      const labelKey = KEYBOARD_CODE_TO_LABEL_MAP[(name as string)] || name
+      globalState.allCommandsMap[labelKey] = shortcut
+    }
+  })
+}
+
 const initAvailableFontList = async () => {
   const fontCheck = new Set(FONT_LIST.sort())
   // 在所有字体加载完成后进行操作
@@ -461,6 +471,9 @@ export const switchSettingDrawerVisible = (status: boolean) => {
   globalState.isSettingDrawerVisible = status
   if (status && globalState.availableFontList.length === 0) {
     initAvailableFontList()
+  }
+  if (Object.keys(globalState.allCommandsMap).length === 0) {
+    getAllCommandsConfig()
   }
 }
 

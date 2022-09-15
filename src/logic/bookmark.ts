@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isChrome } from '@/env'
-import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, defaultConfig, localConfig, addVisibilityTask, log } from '@/logic'
+import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
@@ -93,6 +93,9 @@ export const resetBookmarkPending = () => {
 addVisibilityTask('bookmark', (hidden) => {
   if (hidden) {
     return
+  }
+  if (globalState.isSettingDrawerVisible) {
+    getAllCommandsConfig()
   }
   const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
     isPending: false,
