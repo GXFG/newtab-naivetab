@@ -68,3 +68,5 @@ export const createTab = (url: string, active = true) => {
   }
   chrome.tabs.create({ url, active })
 }
+
+export const padUrlHttps = (url: string) => url.includes('//') ? url : `https://${url}`

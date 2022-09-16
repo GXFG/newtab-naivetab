@@ -1,7 +1,7 @@
 // !!background Cannot use import statement outside a module
 // import browser from 'webextension-polyfill'
 import { KEYBOARD_KEY_LIST, KEYBOARD_CODE_TO_LABEL_MAP, KEYBOARD_SPLIT_RANGE_MAP } from '@/logic/const'
-import { log, createTab } from '@/logic/util'
+import { log, createTab, padUrlHttps } from '@/logic/util'
 
 // src/logic/bookmark.ts
 const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => {
@@ -66,7 +66,7 @@ const handleKeyboard = async (command: string) => {
   if (url.length === 0) {
     return
   }
-  url = url.includes('//') ? url : `https://${url}`
+  url = padUrlHttps(url)
   if (!bookmarkConfig.isDblclickOpen) {
     createTab(url)
     return

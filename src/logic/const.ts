@@ -12,6 +12,31 @@ export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/forma
 export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'
 export const URL_QWEATHER_HOME = 'https://www.qweather.com/'
 
+/**
+ * MAX_WRITE_OPERATIONS_PER_HOUR = 1800 https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
+ * 3600s / 1800 = 2s
+ */
+export const MERGE_CONFIG_DELAY = 2000
+export const MERGE_CONFIG_MAX_DELAY = 5000
+
+export const DRAG_TRIGGER_DISTANCE = 20
+
+export const FAVORITE_IMAGE_MAX_COUNT = 16
+
+export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
+
+export const SECOND_MODAL_WIDTH = 550
+
+export const APPEARANCE_TO_CODE_MAP = {
+  light: 0,
+  dark: 1,
+}
+
+export const DAYJS_LANG_MAP = {
+  'zh-CN': 'zh-cn',
+  'en-US': 'en',
+}
+
 export const FONT_LIST = [
   // common
   'Arial Rounded MT Bold', 'Cascadia Code', 'Fira Code',
@@ -46,27 +71,11 @@ export const KEYBOARD_SPLIT_RANGE_MAP = {
   letterSymbolNumber: [[0, 13], [13, 25], [25, 36], [36]],
 }
 
-/**
- * MAX_WRITE_OPERATIONS_PER_HOUR = 1800 https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
- * 3600s / 1800 = 2s
- */
-export const MERGE_CONFIG_DELAY = 2000
-export const MERGE_CONFIG_MAX_DELAY = 5000
-
-export const DRAG_TRIGGER_DISTANCE = 20
-
-export const FAVORITE_IMAGE_MAX_COUNT = 16
-
-export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
-
-export const APPEARANCE_TO_CODE_MAP = {
-  light: 0,
-  dark: 1,
-}
-
-export const DAYJS_LANG_MAP = {
-  'zh-CN': 'zh-cn',
-  'en-US': 'en',
+export const NEWS_SOURCE_MAP = {
+  baidu: 'https://top.baidu.com/board?tab=realtime',
+  zhihu: 'https://www.zhihu.com/hot',
+  weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
+  v2ex: 'https://www.v2ex.com/?tab=hot',
 }
 
 export const SEARCH_ENGINE_LIST = [
@@ -95,13 +104,6 @@ export const WEATHER_TEMPERATURE_UNIT_MAP = {
 export const WEATHER_SPEED_UNIT_MAP = {
   mph: 'mph',
   kph: 'km/h',
-}
-
-export const NEWS_SOURCE_MAP = {
-  baidu: 'https://top.baidu.com/board?tab=realtime',
-  zhihu: 'https://www.zhihu.com/hot',
-  weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
-  v2ex: 'https://www.v2ex.com/?tab=hot',
 }
 
 /**

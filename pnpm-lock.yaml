@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@antfu/eslint-config': ^0.26.3
   '@ffflorian/jszip-cli': ^3.1.6
-  '@iconify/json': ^2.1.107
+  '@iconify/json': ^2.1.108
   '@iconify/vue': ^3.2.1
   '@intlify/vite-plugin-vue-i18n': ^6.0.1
   '@types/chrome': ^0.0.195
@@ -53,7 +53,7 @@ dependencies:
 devDependencies:
   '@antfu/eslint-config': 0.26.3_irgkl5vooow2ydyo6aokmferha
   '@ffflorian/jszip-cli': 3.1.6
-  '@iconify/json': 2.1.107
+  '@iconify/json': 2.1.108
   '@iconify/vue': 3.2.1_vue@3.2.39
   '@intlify/vite-plugin-vue-i18n': 6.0.1_vite@2.9.15+vue-i18n@9.2.2
   '@types/chrome': 0.0.195
@@ -159,7 +159,7 @@ packages:
     dependencies:
       '@antfu/eslint-config-ts': 0.26.3_irgkl5vooow2ydyo6aokmferha
       eslint: 8.23.1
-      eslint-plugin-vue: 9.4.0_eslint@8.23.1
+      eslint-plugin-vue: 9.5.0_eslint@8.23.1
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -184,7 +184,7 @@ packages:
       eslint-plugin-n: 15.2.5_eslint@8.23.1
       eslint-plugin-promise: 6.0.1_eslint@8.23.1
       eslint-plugin-unicorn: 43.0.2_eslint@8.23.1
-      eslint-plugin-vue: 9.4.0_eslint@8.23.1
+      eslint-plugin-vue: 9.5.0_eslint@8.23.1
       eslint-plugin-yml: 1.2.0_eslint@8.23.1
       jsonc-eslint-parser: 2.1.0
       yaml-eslint-parser: 1.1.0
@@ -395,8 +395,8 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@iconify/json/2.1.107:
-    resolution: {integrity: sha512-VJUQI4SDyOoa+DefJ5jdY5dOju52QUNfbaV6+hgFEp7QoP5ae7ZfQo+GcKYf+mvLb56U3UJL/E25PMFqHcZcYw==}
+  /@iconify/json/2.1.108:
+    resolution: {integrity: sha512-7Cd15eXt493VT6APSQn+oNT3NqSnK/tfQPTqoh2K3aeHQNfVzkEmWPSyrzqWUAqOFHcA/Xtfz/pvd/25ecDbcQ==}
     dependencies:
       '@iconify/types': 2.0.0
       pathe: 0.3.7
@@ -2918,8 +2918,8 @@ packages:
       strip-indent: 3.0.0
     dev: true
 
-  /eslint-plugin-vue/9.4.0_eslint@8.23.1:
-    resolution: {integrity: sha512-Nzz2QIJ8FG+rtJaqT/7/ru5ie2XgT9KCudkbN0y3uFYhQ41nuHEaboLAiqwMcK006hZPQv/rVMRhUIwEGhIvfQ==}
+  /eslint-plugin-vue/9.5.0_eslint@8.23.1:
+    resolution: {integrity: sha512-Dm4KJRD6yFZGy6OhtgcG35oMR9rAhGfP6vbANw2k5wvQn9YjKu9huRV3Y63pYUbqPTHJ3V4v5+EcGmJSSjWgSA==}
     engines: {node: ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.2.0 || ^7.0.0 || ^8.0.0
@@ -6130,8 +6130,8 @@ packages:
       acorn: 8.8.0
     dev: true
 
-  /sucrase/3.26.0:
-    resolution: {integrity: sha512-iWWppLcRrEwHaHefYJaJP9XQdRJO+tZfy/kDZizar5Ur1IK8XN48nwMFnDupXw2uvNtjWd8I58vVH42inBT/2Q==}
+  /sucrase/3.27.0:
+    resolution: {integrity: sha512-IjpEeFzOWCGrB/e2DnPawkFajW6ONFFgs+lQT1+Ts5Z5ZM9gPnxpDh0q8tu7HVLt6IfRiUTbSsjfhqjHOP/cwQ==}
     engines: {node: '>=8'}
     hasBin: true
     dependencies:
@@ -6349,7 +6349,7 @@ packages:
       resolve-from: 5.0.0
       rollup: 2.79.0
       source-map: 0.8.0-beta.0
-      sucrase: 3.26.0
+      sucrase: 3.27.0
       tree-kill: 1.2.2
       typescript: 4.8.3
     transitivePeerDependencies:

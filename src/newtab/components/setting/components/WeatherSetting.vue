@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { URL_QWEATHER_START, localConfig } from '@/logic'
+import { SECOND_MODAL_WIDTH, URL_QWEATHER_START, localConfig } from '@/logic'
 import { getCityLookup } from '@/api'
 
 const temperatureUnitOptions = [
@@ -64,7 +64,7 @@ const onOpenCityPicker = () => {
 
 <template>
   <!-- CityPicker -->
-  <NDrawer v-model:show="state.isCityPickerVisible" :width="550">
+  <NDrawer v-model:show="state.isCityPickerVisible" :width="SECOND_MODAL_WIDTH">
     <NDrawerContent :title="`${$t('common.edit')}${$t('weather.city')}`" closable>
       <NAutoComplete
         v-model:value="state.keyword"

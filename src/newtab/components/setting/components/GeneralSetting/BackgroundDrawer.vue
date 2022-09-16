@@ -2,6 +2,7 @@
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
 import {
   LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M,
+  SECOND_MODAL_WIDTH,
   databaseStore,
   previewImageListMap,
   localConfig,
@@ -113,7 +114,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
   <!-- BackgroundDrawer: bing & favorite -->
   <NDrawer
     :show="props.show"
-    :width="550"
+    :width="SECOND_MODAL_WIDTH"
     :height="350"
     :placement="localConfig.general.drawerPlacement"
     to="#background__drawer"

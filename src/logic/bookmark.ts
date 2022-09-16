@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isChrome } from '@/env'
-import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, log } from '@/logic'
+import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
@@ -52,7 +52,7 @@ export const getDefaultBookmarkNameFromUrl = (url: string) => {
   if (!url) {
     return ''
   }
-  const padUrl = url.includes('//') ? url : `https://${url}`
+  const padUrl = padUrlHttps(url)
   const domain = padUrl.split('/')[2]
   if (!domain) {
     return ''
@@ -80,7 +80,7 @@ export const getBookmarkConfigUrl = (key: string) => {
     return ''
   }
   const url = localConfig.bookmark.keymap[key].url
-  return url.includes('//') ? url : `https://${url}`
+  return padUrlHttps(url)
 }
 
 export const resetBookmarkPending = () => {
@@ -89,17 +89,18 @@ export const resetBookmarkPending = () => {
   }))
 }
 
-// page切换前台时刷新通过pupop新增的书签
 addVisibilityTask('bookmark', (hidden) => {
   if (hidden) {
     return
   }
+  // page切换前台时刷新快捷键配置信息
   if (globalState.isSettingDrawerVisible) {
     getAllCommandsConfig()
   }
   const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
     isPending: false,
   })
+  // page切换前台时刷新通过pupop新增的书签
   if (!bookmarkPendingData.value.isPending) {
     return
   }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { getFaviconFromUrl } from '@/logic'
+import { SECOND_MODAL_WIDTH, getFaviconFromUrl } from '@/logic'
 
 const props = defineProps({
   show: {
@@ -87,7 +87,7 @@ watch(
 </script>
 
 <template>
-  <NDrawer :show="props.show" :width="550" @update:show="handleUpdateShow">
+  <NDrawer :show="props.show" :width="SECOND_MODAL_WIDTH" @update:show="handleUpdateShow">
     <NDrawerContent :title="$t('setting.bookmark')" closable>
       <NTree
         block-line
@@ -102,5 +102,11 @@ watch(
   </NDrawer>
 </template>
 
-<style scoped>
+<style>
+.n-tree .n-tree-node-content .n-tree-node-content__text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
 </style>
