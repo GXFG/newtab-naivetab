@@ -1,13 +1,5 @@
 <!-- 最外层div的style会被用来存放v-bind的css变量，不能再进行:style绑定操作 -->
 <!-- 第二层div用来统一控制画布模式下的cursor样式 -->
-<template>
-  <div>
-    <div :style="moveableWrapStyle" class="moveable__wrap">
-      <slot />
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { DRAG_TRIGGER_DISTANCE, getStyleConst, localConfig, moveState, isDragMode } from '@/logic'
 
@@ -263,6 +255,14 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 const bgMoveableComponentActive = getStyleConst('bgMoveableComponentActive')
 const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
 </script>
+
+<template>
+  <div>
+    <div :style="moveableWrapStyle" class="moveable__wrap">
+      <slot />
+    </div>
+  </div>
+</template>
 
 <style>
 .element-auxiliary-line {

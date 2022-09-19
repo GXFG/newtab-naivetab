@@ -38,7 +38,7 @@ export const compareLeftVersionLessThanRightVersions = (leftVersion: string, rig
       return true
     }
   }
-  // =
+  // equal
   return false
 }
 
@@ -61,3 +61,12 @@ export const downloadJsonByTagA = (result: any, filename = 'file') => {
   link.setAttribute('download', filename)
   link.click()
 }
+
+export const createTab = (url: string, active = true) => {
+  if (url.length === 0) {
+    return
+  }
+  chrome.tabs.create({ url, active })
+}
+
+export const padUrlHttps = (url: string) => url.includes('//') ? url : `https://${url}`

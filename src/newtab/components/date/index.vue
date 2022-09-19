@@ -1,15 +1,3 @@
-<template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="date">
-    <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
-      <div class="date__container" :style="dragStyle || containerStyle" :class="{ 'date__container--shadow': localConfig.date.isShadowEnabled }">
-        <p class="date__text">
-          {{ state.date }}
-        </p>
-      </div>
-    </div>
-  </MoveableComponentWrap>
-</template>
-
 <script setup lang="ts">
 import { currDayjsLang, localConfig, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
@@ -44,6 +32,18 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'px')
 </script>
+
+<template>
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="date">
+    <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
+      <div class="date__container" :style="dragStyle || containerStyle" :class="{ 'date__container--shadow': localConfig.date.isShadowEnabled }">
+        <p class="date__text">
+          {{ state.date }}
+        </p>
+      </div>
+    </div>
+  </MoveableComponentWrap>
+</template>
 
 <style scoped>
 #date {

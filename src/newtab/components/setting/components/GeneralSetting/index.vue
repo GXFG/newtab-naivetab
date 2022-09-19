@@ -1,3 +1,87 @@
+<script setup lang="ts">
+import BackgroundDrawer from './BackgroundDrawer.vue'
+import {
+  defaultConfig,
+  exportSetting,
+  localConfig,
+  localState,
+  globalState,
+  isUploadConfigLoading,
+  importSetting,
+  refreshSetting,
+  resetSetting,
+} from '@/logic'
+import i18n from '@/lib/i18n'
+
+const { proxy }: any = getCurrentInstance()
+
+const state = reactive({
+  i18nList: i18n.global.availableLocales.map((locale: string) => ({
+    label: locale,
+    value: locale,
+  })),
+  isBackgroundDrawerVisible: false,
+})
+
+const themeList = computed(() => [
+  { label: window.$t('common.auto'), value: 'auto' },
+  { label: window.$t('common.light'), value: 'light' },
+  { label: window.$t('common.dark'), value: 'dark' },
+])
+
+const drawerPlacementList = computed(() => [
+  { label: window.$t('common.left'), value: 'left' },
+  { label: window.$t('common.right'), value: 'right' },
+  { label: window.$t('common.top'), value: 'top' },
+  { label: window.$t('common.bottom'), value: 'bottom' },
+])
+
+const onChangeLocale = (locale: string) => {
+  proxy.$i18n.locale = locale
+  localConfig.general.lang = locale
+}
+
+const openBackgroundDrawer = () => {
+  state.isBackgroundDrawerVisible = true
+}
+
+const syncTime = computed(() => {
+  const syncTimeList = [] as number[]
+  for (const field of Object.keys(localState.value.isUploadConfigStatusMap)) {
+    syncTimeList.push(localState.value.isUploadConfigStatusMap[field].syncTime)
+  }
+  const maxSyncTime = Math.max(...syncTimeList)
+  return dayjs(maxSyncTime).format('YYYY-MM-DD HH:mm:ss')
+})
+
+const importSettingInputEl = ref()
+const onImportSetting = () => {
+  (importSettingInputEl as any).value.value = null
+  importSettingInputEl.value.click()
+}
+
+const onImportFileChange = (e: any) => {
+  const file = e.target.files[0]
+  if (!file.name.includes('.json')) {
+    e.target.value = null
+    return
+  }
+  const reader = new FileReader()
+  reader.readAsText(file)
+  reader.onload = () => {
+    importSetting(reader.result as any)
+  }
+}
+
+const onExportSetting = () => {
+  exportSetting()
+}
+
+const onResetSetting = () => {
+  resetSetting()
+}
+</script>
+
 <template>
   <BackgroundDrawer v-model:show="state.isBackgroundDrawerVisible" />
 
@@ -83,87 +167,3 @@
     </template>
   </BaseComponentSetting>
 </template>
-
-<script setup lang="ts">
-import BackgroundDrawer from './BackgroundDrawer.vue'
-import {
-  defaultConfig,
-  exportSetting,
-  localConfig,
-  localState,
-  globalState,
-  isUploadConfigLoading,
-  importSetting,
-  refreshSetting,
-  resetSetting,
-} from '@/logic'
-import i18n from '@/lib/i18n'
-
-const { proxy }: any = getCurrentInstance()
-
-const state = reactive({
-  i18nList: i18n.global.availableLocales.map((locale: string) => ({
-    label: locale,
-    value: locale,
-  })),
-  isBackgroundDrawerVisible: false,
-})
-
-const themeList = computed(() => [
-  { label: window.$t('common.auto'), value: 'auto' },
-  { label: window.$t('common.light'), value: 'light' },
-  { label: window.$t('common.dark'), value: 'dark' },
-])
-
-const drawerPlacementList = computed(() => [
-  { label: window.$t('common.left'), value: 'left' },
-  { label: window.$t('common.right'), value: 'right' },
-  { label: window.$t('common.top'), value: 'top' },
-  { label: window.$t('common.bottom'), value: 'bottom' },
-])
-
-const onChangeLocale = (locale: string) => {
-  proxy.$i18n.locale = locale
-  localConfig.general.lang = locale
-}
-
-const openBackgroundDrawer = () => {
-  state.isBackgroundDrawerVisible = true
-}
-
-const syncTime = computed(() => {
-  const syncTimeList = [] as number[]
-  for (const field of Object.keys(defaultConfig) as ConfigField[]) {
-    syncTimeList.push(localState.value.syncTimeMap[field])
-  }
-  const maxSyncTime = Math.max(...syncTimeList)
-  return dayjs(maxSyncTime).format('YYYY-MM-DD HH:mm:ss')
-})
-
-const importSettingInputEl = ref()
-const onImportSetting = () => {
-  (importSettingInputEl as any).value.value = null
-  importSettingInputEl.value.click()
-}
-
-const onImportFileChange = (e: any) => {
-  const file = e.target.files[0]
-  if (!file.name.includes('.json')) {
-    e.target.value = null
-    return
-  }
-  const reader = new FileReader()
-  reader.readAsText(file)
-  reader.onload = () => {
-    importSetting(reader.result as any)
-  }
-}
-
-const onExportSetting = () => {
-  exportSetting()
-}
-
-const onResetSetting = () => {
-  resetSetting()
-}
-</script>

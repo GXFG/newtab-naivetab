@@ -1,12 +1,41 @@
 export const URL_FEEDBACK = 'mailto:gxfgim@outlook.com?subject=NaiveTab Feedback'
 export const URL_CHROME_STORE = 'https://chrome.google.com/webstore/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem?utm_source=chrome-ntp-icon'
 export const URL_EDGE_STORE = 'https://microsoftedge.microsoft.com/addons/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/kejadmppkffccjopodhekdnmkofidmjl'
+
+export const URL_CHROME_EXTENSIONS_SHORTCUTS = 'chrome://extensions/shortcuts#:~:text=NaiveTab-,%2D%20%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5,-%E6%BF%80%E6%B4%BB%E8%AF%A5%E6%89%A9%E5%B1%95'
+export const URL_EDGE_EXTENSIONS_SHORTCUTS = 'edge://extensions/shortcuts#:~:text=%E5%9C%A8%20Edge%20%E4%B8%AD-,NaiveTab%20%2D%20%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5,-%E6%BF%80%E6%B4%BB%E6%89%A9%E5%B1%95'
+
 export const URL_GITHUB = 'https://github.com/GXFG/newtab-naivetab'
 export const URL_GITHUB_ISSUSE = 'https://github.com/GXFG/newtab-naivetab/issues'
+
 export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
 export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'
 export const URL_QWEATHER_HOME = 'https://www.qweather.com/'
-export const URL_EXTENSIONS_SHORTCUTS = 'chrome://extensions/shortcuts#:~:text=%E6%9B%B4%E6%96%B0-,NaiveTab%20%2D%20%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5,-%E6%BF%80%E6%B4%BB%E8%AF%A5%E6%89%A9%E5%B1%95'
+
+/**
+ * MAX_WRITE_OPERATIONS_PER_HOUR = 1800 https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
+ * 3600s / 1800 = 2s
+ */
+export const MERGE_CONFIG_DELAY = 2000
+export const MERGE_CONFIG_MAX_DELAY = 5000
+
+export const DRAG_TRIGGER_DISTANCE = 20
+
+export const FAVORITE_IMAGE_MAX_COUNT = 16
+
+export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
+
+export const SECOND_MODAL_WIDTH = 550
+
+export const APPEARANCE_TO_CODE_MAP = {
+  light: 0,
+  dark: 1,
+}
+
+export const DAYJS_LANG_MAP = {
+  'zh-CN': 'zh-cn',
+  'en-US': 'en',
+}
 
 export const FONT_LIST = [
   // common
@@ -20,7 +49,7 @@ export const FONT_LIST = [
 export const KEYBOARD_KEY_LIST = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 'BS', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?']
 
 /**
- * real key code -> label key
+ * real key code -> label key name
  */
 export const KEYBOARD_CODE_TO_LABEL_MAP = {
   Minus: '-',
@@ -42,25 +71,11 @@ export const KEYBOARD_SPLIT_RANGE_MAP = {
   letterSymbolNumber: [[0, 13], [13, 25], [25, 36], [36]],
 }
 
-// MAX_WRITE_OPERATIONS_PER_HOUR = 1800, https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
-export const MERGE_CONFIG_DELAY = 2000
-
-export const MERGE_BOOKMARK_DELAY = 500
-
-export const DRAG_TRIGGER_DISTANCE = 20
-
-export const FAVORITE_IMAGE_MAX_COUNT = 16
-
-export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
-
-export const APPEARANCE_TO_CODE_MAP = {
-  light: 0,
-  dark: 1,
-}
-
-export const DAYJS_LANG_MAP = {
-  'zh-CN': 'zh-cn',
-  'en-US': 'en',
+export const NEWS_SOURCE_MAP = {
+  baidu: 'https://top.baidu.com/board?tab=realtime',
+  zhihu: 'https://www.zhihu.com/hot',
+  weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
+  v2ex: 'https://www.v2ex.com/?tab=hot',
 }
 
 export const SEARCH_ENGINE_LIST = [
@@ -89,13 +104,6 @@ export const WEATHER_TEMPERATURE_UNIT_MAP = {
 export const WEATHER_SPEED_UNIT_MAP = {
   mph: 'mph',
   kph: 'km/h',
-}
-
-export const NEWS_SOURCE_MAP = {
-  baidu: 'https://top.baidu.com/board?tab=realtime',
-  zhihu: 'https://www.zhihu.com/hot',
-  weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
-  v2ex: 'https://www.v2ex.com/?tab=hot',
 }
 
 /**

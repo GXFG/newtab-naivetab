@@ -1,10 +1,10 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import pkg from '../../package.json'
-import { isChrome, isEdge } from '@/env'
+import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, compareLeftVersionLessThanRightVersions, log } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, log, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -343,38 +343,59 @@ export const localConfig = reactive({
   news: useStorageLocal('c-news', defaultConfig.news),
 })
 
-export const localState = useStorageLocal('l-state', {
+const defaultLocalState = {
   currAppearanceLabel: 'light' as 'light' | 'dark',
   currAppearanceCode: 0 as 0 | 1, // 0:light | 1:dark
-  syncTimeMap: {
-    general: 0,
-    bookmark: 0,
-    clockDigital: 0,
-    clockAnalog: 0,
-    date: 0,
-    calendar: 0,
-    search: 0,
-    weather: 0,
-    memo: 0,
-    news: 0,
+  isUploadConfigStatusMap: {
+    general: {
+      loading: false,
+      syncTime: 0,
+    },
+    bookmark: {
+      loading: false,
+      syncTime: 0,
+    },
+    clockDigital: {
+      loading: false,
+      syncTime: 0,
+    },
+    clockAnalog: {
+      loading: false,
+      syncTime: 0,
+    },
+    date: {
+      loading: false,
+      syncTime: 0,
+    },
+    calendar: {
+      loading: false,
+      syncTime: 0,
+    },
+    search: {
+      loading: false,
+      syncTime: 0,
+    },
+    weather: {
+      loading: false,
+      syncTime: 0,
+    },
+    memo: {
+      loading: false,
+      syncTime: 0,
+    },
+    news: {
+      loading: false,
+      syncTime: 0,
+    },
   },
-})
+}
+
+export const localState = useStorageLocal('l-state', defaultLocalState)
 
 export const globalState = reactive({
   isSettingDrawerVisible: false,
   availableFontList: [] as any[],
-  isUploadConfigLoadingMap: {
-    general: false,
-    bookmark: false,
-    clockDigital: false,
-    clockAnalog: false,
-    date: false,
-    calendar: false,
-    search: false,
-    weather: false,
-    memo: false,
-    news: false,
-  },
+  allCommandsMap: {},
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
@@ -423,6 +444,15 @@ watch(
   { immediate: true },
 )
 
+export const getAllCommandsConfig = () => {
+  chrome.commands.getAll((commands) => {
+    for (const { name, shortcut } of commands) {
+      const labelKey = KEYBOARD_CODE_TO_LABEL_MAP[(name as string)] || name
+      globalState.allCommandsMap[labelKey] = shortcut
+    }
+  })
+}
+
 const initAvailableFontList = async () => {
   const fontCheck = new Set(FONT_LIST.sort())
   // 在所有字体加载完成后进行操作
@@ -442,6 +472,9 @@ export const switchSettingDrawerVisible = (status: boolean) => {
   if (status && globalState.availableFontList.length === 0) {
     initAvailableFontList()
   }
+  if (Object.keys(globalState.allCommandsMap).length === 0) {
+    getAllCommandsConfig()
+  }
 }
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localConfig.general.lang] || 'en')
@@ -460,7 +493,7 @@ export const openSponsorModal = () => {
 
 export const isFirstOpen = useStorageLocal('data-first', true)
 
-export const initFirstOpen = () => {
+export const handleFirstOpen = () => {
   if (!isFirstOpen.value) {
     return
   }
@@ -469,39 +502,20 @@ export const initFirstOpen = () => {
   openUserGuideModal()
 }
 
-export const handleUpdate = async () => {
+export const handleStateResetAndUpdate = () => {
+  resetBookmarkPending()
+  const version = getLocalVersion()
+  // handle old version
+  if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
+    localState.value.isUploadConfigStatusMap = defaultLocalState.isUploadConfigStatusMap
+  }
+}
+
+export const handleAppUpdate = async () => {
   const version = getLocalVersion()
   log('Version', version)
   if (!compareLeftVersionLessThanRightVersions(version, pkg.version)) {
     return
-  }
-  // handle old version 兼容小于1.0.0版本的旧image配置
-  if (compareLeftVersionLessThanRightVersions(version, '1.0.0')) {
-    let newLocalDataImages = {}
-    const localDataImages = localStorage.getItem('data-images')
-    if (localDataImages) {
-      newLocalDataImages = {
-        syncTime: 0,
-        imageList: [],
-        ...JSON.parse(localDataImages),
-      }
-    }
-    localStorage.setItem('data-images', JSON.stringify(newLocalDataImages))
-    const oldBackgroundImageName = (localConfig.general as any).backgroundImageName
-    if (oldBackgroundImageName) {
-      localConfig.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]
-      delete (localConfig.general as any).backgroundImageName
-    }
-    const oldBackgroundImageDescs = (localConfig.general as any).backgroundImageDesc
-    if (oldBackgroundImageDescs) {
-      localConfig.general.backgroundImageDescs = [oldBackgroundImageDescs, oldBackgroundImageDescs]
-      delete (localConfig.general as any).backgroundImageDesc
-    }
-    const oldBackgroundImageCustomUrl = (localConfig.general as any).backgroundImageCustomUrl
-    if (oldBackgroundImageCustomUrl) {
-      localConfig.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
-      delete (localConfig.general as any).backgroundImageCustomUrl
-    }
   }
   log('Get new version', pkg.version)
   localConfig.general.version = pkg.version
@@ -527,20 +541,6 @@ export const handleUpdate = async () => {
   })
   // 刷新配置设置
   await updateSetting()
-}
-
-export const createTab = (url: string, active = true) => {
-  if (url.length === 0) {
-    return
-  }
-  chrome.tabs.create({ url, active })
-}
-
-export const getDomainIcon = (url: string) => {
-  if (isChrome) {
-    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`
-  }
-  return `${url}/favicon.ico`
 }
 
 export const getIsComponentRender = (componentName: Components) => computed(() => localConfig[componentName].enabled)

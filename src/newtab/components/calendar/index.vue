@@ -1,93 +1,3 @@
-<template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="calendar">
-    <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
-      <div
-        class="calendar__container"
-        :style="dragStyle || containerStyle"
-        :class="{
-          'calendar__container-shadow': localConfig.calendar.isShadowEnabled,
-          'calendar__container-border': localConfig.calendar.isBorderEnabled,
-        }"
-      >
-        <div class="calendar__options">
-          <div class="options__item">
-            <NSelect
-              v-model:value="state.currYear"
-              class="item__select_year"
-              size="small"
-              :options="state.yearList"
-              :disabled="isDragMode"
-              @update:value="onDateChange()"
-            />
-          </div>
-          <div class="options__item">
-            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onPrevMonth()">
-              <fa-solid:angle-left />
-            </NButton>
-            <NSelect
-              v-model:value="state.currMonth"
-              class="item__select_month"
-              size="small"
-              :options="monthsList"
-              :disabled="isDragMode"
-              @update:value="onDateChange()"
-            />
-            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onNextMonth()">
-              <fa-solid:angle-right />
-            </NButton>
-          </div>
-          <div class="options__item options__reset">
-            <NButton
-              v-show="isResetBtnVisible"
-              class="item__btn"
-              text
-              :disabled="isDragMode"
-              :style="isDragMode ? 'cursor: move;' : ''"
-              @click="onReset()"
-            >
-              <si-glyph:arrow-backward />
-            </NButton>
-          </div>
-        </div>
-        <!-- header -->
-        <ul class="calendar__header">
-          <li v-for="item in weekList" :key="item.value" class="header__item" :class="{ 'header__item--weekend': [6, 7].includes(item.value) }">
-            {{ item.label }}
-          </li>
-        </ul>
-        <!-- body -->
-        <ul class="calendar__body">
-          <li
-            v-for="item in state.dateList"
-            :key="item.date"
-            class="body__item"
-            :class="{
-              'body__item--hover': !isDragMode,
-              'body__item--active': item.isToday,
-              'body__item--blur': item.isNotCurrMonth,
-              'body__item--weekend': item.isWeekend,
-              'body__item--rest': item.type === 1,
-              'body__item--work': item.type === 2,
-            }"
-          >
-            <span
-              v-if="item.type"
-              class="item__label"
-              :class="{
-                'item__label--rest': item.type === 1,
-                'item__label--work': item.type === 2,
-              }"
-            >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
-            <span v-if="item.isToday" class="item__today">{{ $t('calendar.today') }}</span>
-            <span class="item__day">{{ item.day }}</span>
-            <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </MoveableComponentWrap>
-</template>
-
 <script setup lang="ts">
 import { calendar } from '@/lib/calendar'
 import { LEGAL_HOLIDAY_ENUM, isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
@@ -272,6 +182,96 @@ const bgCalendarRest = getStyleConst('bgCalendarRest')
 const bgCalendarWork = getStyleConst('bgCalendarWork')
 const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
 </script>
+
+<template>
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="calendar">
+    <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
+      <div
+        class="calendar__container"
+        :style="dragStyle || containerStyle"
+        :class="{
+          'calendar__container-shadow': localConfig.calendar.isShadowEnabled,
+          'calendar__container-border': localConfig.calendar.isBorderEnabled,
+        }"
+      >
+        <div class="calendar__options">
+          <div class="options__item">
+            <NSelect
+              v-model:value="state.currYear"
+              class="item__select_year"
+              size="small"
+              :options="state.yearList"
+              :disabled="isDragMode"
+              @update:value="onDateChange()"
+            />
+          </div>
+          <div class="options__item">
+            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onPrevMonth()">
+              <fa-solid:angle-left />
+            </NButton>
+            <NSelect
+              v-model:value="state.currMonth"
+              class="item__select_month"
+              size="small"
+              :options="monthsList"
+              :disabled="isDragMode"
+              @update:value="onDateChange()"
+            />
+            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onNextMonth()">
+              <fa-solid:angle-right />
+            </NButton>
+          </div>
+          <div class="options__item options__reset">
+            <NButton
+              v-show="isResetBtnVisible"
+              class="item__btn"
+              text
+              :disabled="isDragMode"
+              :style="isDragMode ? 'cursor: move;' : ''"
+              @click="onReset()"
+            >
+              <si-glyph:arrow-backward />
+            </NButton>
+          </div>
+        </div>
+        <!-- header -->
+        <ul class="calendar__header">
+          <li v-for="item in weekList" :key="item.value" class="header__item" :class="{ 'header__item--weekend': [6, 7].includes(item.value) }">
+            {{ item.label }}
+          </li>
+        </ul>
+        <!-- body -->
+        <ul class="calendar__body">
+          <li
+            v-for="item in state.dateList"
+            :key="item.date"
+            class="body__item"
+            :class="{
+              'body__item--hover': !isDragMode,
+              'body__item--active': item.isToday,
+              'body__item--blur': item.isNotCurrMonth,
+              'body__item--weekend': item.isWeekend,
+              'body__item--rest': item.type === 1,
+              'body__item--work': item.type === 2,
+            }"
+          >
+            <span
+              v-if="item.type"
+              class="item__label"
+              :class="{
+                'item__label--rest': item.type === 1,
+                'item__label--work': item.type === 2,
+              }"
+            >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
+            <span v-if="item.isToday" class="item__today">{{ $t('calendar.today') }}</span>
+            <span class="item__day">{{ item.day }}</span>
+            <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </MoveableComponentWrap>
+</template>
 
 <style>
 #calendar {

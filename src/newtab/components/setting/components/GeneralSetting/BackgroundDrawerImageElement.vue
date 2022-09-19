@@ -1,48 +1,3 @@
-<template>
-  <div class="image-wrap" :class="{ 'image-wrap--active': isCurrSelectedImage }">
-    <NSpin :show="isCurrSelectedImage && isImageLoading">
-      <div v-if="!isHasImage" class="image__empty">
-        <ph:image-square />
-      </div>
-      <!-- 懒加载的img不支持reactive变量 -->
-      <img v-else-if="lazy" v-lazy="currImageUrl" alt="" @click="onSelectImage()">
-      <img v-else :src="currImageUrl" alt="" @click="onSelectImage()">
-    </NSpin>
-    <div v-if="isCurrSelectedImage" class="image__current-mask">
-      <ic:outline-check-circle />
-    </div>
-    <!-- toolbar -->
-    <div v-if="isToolbarVisible" class="image__toolbar">
-      <NPopover v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">
-        <template #trigger>
-          <div class="toolbar__icon">
-            <ic:outline-info />
-          </div>
-        </template>
-        <p>{{ props.data.desc }}</p>
-      </NPopover>
-      <div class="toolbar__icon" @click="onViewImage()">
-        <mdi:eye-circle-outline />
-      </div>
-      <div class="toolbar__icon" @click="onSaveImage()">
-        <ri:download-2-fill />
-      </div>
-      <div v-if="isFavoriteIconVisible" class="toolbar__icon" @click="onFavoriteImage()">
-        <mi:favorite />
-      </div>
-      <!-- delete -->
-      <NPopconfirm v-if="props.delete" @positive-click="onUnFavoriteImage()">
-        <template #trigger>
-          <div class="toolbar__icon">
-            <ri:delete-bin-6-line />
-          </div>
-        </template>
-        {{ $t('common.confirm') }}?
-      </NPopconfirm>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { FAVORITE_IMAGE_MAX_COUNT, getStyleField, createTab, localConfig, localState, downloadImageByUrl, isImageLoading, getBingImageUrlFromName } from '@/logic'
 
@@ -129,6 +84,51 @@ const onUnFavoriteImage = () => {
 
 const customPrimaryColor = getStyleField('general', 'primaryColor')
 </script>
+
+<template>
+  <div class="image-wrap" :class="{ 'image-wrap--active': isCurrSelectedImage }">
+    <NSpin :show="isCurrSelectedImage && isImageLoading">
+      <div v-if="!isHasImage" class="image__empty">
+        <ph:image-square />
+      </div>
+      <!-- 懒加载的img不支持reactive变量 -->
+      <img v-else-if="lazy" v-lazy="currImageUrl" alt="" @click="onSelectImage()">
+      <img v-else :src="currImageUrl" alt="" @click="onSelectImage()">
+    </NSpin>
+    <div v-if="isCurrSelectedImage" class="image__current-mask">
+      <ic:outline-check-circle />
+    </div>
+    <!-- toolbar -->
+    <div v-if="isToolbarVisible" class="image__toolbar">
+      <NPopover v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">
+        <template #trigger>
+          <div class="toolbar__icon">
+            <ic:outline-info />
+          </div>
+        </template>
+        <p>{{ props.data.desc }}</p>
+      </NPopover>
+      <div class="toolbar__icon" @click="onViewImage()">
+        <mdi:eye-circle-outline />
+      </div>
+      <div class="toolbar__icon" @click="onSaveImage()">
+        <ri:download-2-fill />
+      </div>
+      <div v-if="isFavoriteIconVisible" class="toolbar__icon" @click="onFavoriteImage()">
+        <mi:favorite />
+      </div>
+      <!-- delete -->
+      <NPopconfirm v-if="props.delete" @positive-click="onUnFavoriteImage()">
+        <template #trigger>
+          <div class="toolbar__icon">
+            <ri:delete-bin-6-line />
+          </div>
+        </template>
+        {{ $t('common.confirm') }}?
+      </NPopconfirm>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .image-wrap {

@@ -1,22 +1,3 @@
-<template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockDigital">
-    <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
-      <div
-        class="clockDigital__container"
-        :style="dragStyle || containerStyle"
-        :class="{ 'clockDigital__container--shadow': localConfig.clockDigital.isShadowEnabled }"
-      >
-        <div class="clock__time">
-          <p class="time__text">
-            {{ state.time }}
-          </p>
-          <span v-if="localConfig.clockDigital.unitEnabled" class="time__unit">{{ state.unit }}</span>
-        </div>
-      </div>
-    </div>
-  </MoveableComponentWrap>
-</template>
-
 <script setup lang="ts">
 import { localConfig, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
@@ -54,6 +35,25 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customUnitFontSize = getStyleField(CNAME, 'unit.fontSize', 'px')
 const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'px')
 </script>
+
+<template>
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockDigital">
+    <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
+      <div
+        class="clockDigital__container"
+        :style="dragStyle || containerStyle"
+        :class="{ 'clockDigital__container--shadow': localConfig.clockDigital.isShadowEnabled }"
+      >
+        <div class="clock__time">
+          <p class="time__text">
+            {{ state.time }}
+          </p>
+          <span v-if="localConfig.clockDigital.unitEnabled" class="time__unit">{{ state.unit }}</span>
+        </div>
+      </div>
+    </div>
+  </MoveableComponentWrap>
+</template>
 
 <style scoped>
 #digital-clock {

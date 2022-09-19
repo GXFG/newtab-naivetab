@@ -1,5 +1,59 @@
+<script setup lang="ts">
+import { swatcheColors } from '@/styles/const'
+import { localConfig, localState, globalState } from '@/logic'
+
+const props = defineProps({
+  cname: {
+    type: String,
+    required: true,
+  },
+  dividerName: {
+    type: String,
+  },
+})
+
+const isRenderField = (field: string) => {
+  return field in localConfig[props.cname]
+}
+
+const availableFontOptions = computed(() =>
+  globalState.availableFontList.map((font: string) => ({
+    label: font,
+    value: font,
+  })),
+)
+
+const fontSelectRenderLabel = (option: SelectStringItem) => {
+  return [
+    h(
+      'div',
+      {
+        style: {
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+      },
+      [
+        h('span', {}, option.label),
+        h(
+          'span',
+          {
+            style: {
+              fontFamily: option.label,
+            },
+          },
+          'abc-ABC-0123',
+        ),
+      ],
+    ),
+  ]
+}
+</script>
+
 <template>
-  <NForm label-placement="left" :label-width="110">
+  <NForm label-placement="left" :label-width="120">
     <slot name="header" />
 
     <NDivider title-placement="left">
@@ -90,60 +144,6 @@
     <slot name="footer" />
   </NForm>
 </template>
-
-<script setup lang="ts">
-import { swatcheColors } from '@/styles/const'
-import { localConfig, localState, globalState } from '@/logic'
-
-const props = defineProps({
-  cname: {
-    type: String,
-    required: true,
-  },
-  dividerName: {
-    type: String,
-  },
-})
-
-const isRenderField = (field: string) => {
-  return field in localConfig[props.cname]
-}
-
-const availableFontOptions = computed(() =>
-  globalState.availableFontList.map((font: string) => ({
-    label: font,
-    value: font,
-  })),
-)
-
-const fontSelectRenderLabel = (option: SelectStringItem) => {
-  return [
-    h(
-      'div',
-      {
-        style: {
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        },
-      },
-      [
-        h('span', {}, option.label),
-        h(
-          'span',
-          {
-            style: {
-              fontFamily: option.label,
-            },
-          },
-          'abc-ABC-0123',
-        ),
-      ],
-    ),
-  ]
-}
-</script>
 
 <style>
 .n-base-select-option__content {

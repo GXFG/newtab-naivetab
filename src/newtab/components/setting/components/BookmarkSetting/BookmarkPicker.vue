@@ -1,23 +1,7 @@
-<template>
-  <NDrawer :show="props.show" :width="550" @update:show="handleUpdateShow">
-    <NDrawerContent :title="$t('setting.bookmark')" closable>
-      <NTree
-        block-line
-        :data="state.bookmarks"
-        key-field="id"
-        label-field="title"
-        :selectable="false"
-        :default-expanded-keys="state.defaultExpandedKeys"
-        :node-props="state.nodeProps"
-      />
-    </NDrawerContent>
-  </NDrawer>
-</template>
-
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { getDomainIcon } from '@/logic'
+import { SECOND_MODAL_WIDTH, getFaviconFromUrl } from '@/logic'
 
 const props = defineProps({
   show: {
@@ -73,7 +57,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
     const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
     const curr: any = {
       ...item,
-      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getDomainIcon(item.url) }), // ico
+      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url) }), // ico
     }
     if (isFolder) {
       curr.children = formatBookmark(item.children)
@@ -102,5 +86,27 @@ watch(
 )
 </script>
 
-<style scoped>
+<template>
+  <NDrawer :show="props.show" :width="SECOND_MODAL_WIDTH" @update:show="handleUpdateShow">
+    <NDrawerContent :title="$t('setting.bookmark')" closable>
+      <NTree
+        block-line
+        :data="state.bookmarks"
+        key-field="id"
+        label-field="title"
+        :selectable="false"
+        :default-expanded-keys="state.defaultExpandedKeys"
+        :node-props="state.nodeProps"
+      />
+    </NDrawerContent>
+  </NDrawer>
+</template>
+
+<style>
+.n-tree .n-tree-node-content .n-tree-node-content__text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
 </style>

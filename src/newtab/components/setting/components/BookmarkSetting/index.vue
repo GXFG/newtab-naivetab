@@ -1,136 +1,16 @@
-<template>
-  <BookmarkPicker v-model:show="state.isBookmarkModalVisible" @select="onSelectBookmark" />
-
-  <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['bookmarkKeyboard']">
-    <!-- bookmarkKeyboard -->
-    <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
-      <BaseComponentSetting cname="bookmark">
-        <template #header>
-          <NFormItem :label="$t('bookmark.listenBackgroundKeystrokes')">
-            <div class="setting__input-wrap">
-              <div class="setting__input_item">
-                <NSwitch v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes" />
-                <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
-              </div>
-              <div v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="setting__input_item">
-                <NButton ghost type="primary" @click="createTab(URL_EXTENSIONS_SHORTCUTS)">
-                  <material-symbols:keyboard-alt-outline />&nbsp;{{ $t('bookmark.customKeys') }}
-                </NButton>
-              </div>
-            </div>
-          </NFormItem>
-          <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
-            <div class="setting__input-wrap">
-              <div class="setting__input_item">
-                <NSwitch v-model:value="localConfig.bookmark.isDblclickOpen" />
-                <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
-              </div>
-              <div v-if="localConfig.bookmark.isDblclickOpen" class="setting__input_item">
-                <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
-                <NInputNumber v-model:value="localConfig.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
-                  <template #suffix>
-                    ms
-                  </template>
-                </NInputNumber>
-                <Tips :content="$t('bookmark.intervalTimeTips')" />
-              </div>
-            </div>
-          </NFormItem>
-          <NFormItem :label="$t('bookmark.newTabOpen')">
-            <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
-          </NFormItem>
-          <NFormItem :label="$t('bookmark.showNumberKey')">
-            <NSwitch v-model:value="localConfig.bookmark.isNumberEnabled" />
-          </NFormItem>
-          <NFormItem :label="$t('bookmark.showSymbolKey')">
-            <NSwitch v-model:value="localConfig.bookmark.isSymbolEnabled" />
-          </NFormItem>
-          <NFormItem :label="$t('bookmark.showName')">
-            <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
-          </NFormItem>
-          <div class="modal__bookmark">
-            <NInputGroup class="bookmark__label">
-              <p class="label__text">
-                {{ $t('bookmark.keyLabel') }}
-              </p>
-              <p class="label__text">
-                {{ $t('bookmark.urlLabel') }}
-              </p>
-              <p class="label__text">
-                {{ $t('bookmark.nameLabel') }}
-              </p>
-            </NInputGroup>
-            <div class="bookmark__content">
-              <!-- left: keyList -->
-              <div class="content__key">
-                <div v-for="rowData of keyboardSettingRowList" :key="rowData" class="bookmark__group">
-                  <NInputGroupLabel v-for="key of rowData" :key="key" class="bookmark__key">
-                    {{ `${key.toUpperCase()}` }}
-                  </NInputGroupLabel>
-                </div>
-              </div>
-              <!-- right: config -->
-              <div class="content__config">
-                <transition-group v-for="rowData of keyboardSettingRowList" :key="rowData" name="flip-list" tag="div" class="bookmark__group">
-                  <NInputGroup
-                    v-for="key of rowData"
-                    :key="key"
-                    class="bookmark__item"
-                    :draggable="state.isBookmarkDragEnabled"
-                    @dragstart="handleDragStart(key)"
-                    @dragenter="handleDragEnter($event, key)"
-                    @dragover="handleDragOver($event)"
-                    @dragend="handleDragEnd()"
-                  >
-                    <template v-if="localConfig.bookmark.keymap[key]">
-                      <NInput
-                        key="url"
-                        v-model:value="localConfig.bookmark.keymap[key].url"
-                        class="input__main"
-                        type="text"
-                        clearable
-                        :placeholder="$t('bookmark.urlPlaceholder')"
-                      />
-                      <NInput
-                        key="name"
-                        v-model:value="localConfig.bookmark.keymap[key].name"
-                        class="input__main"
-                        type="text"
-                        clearable
-                        :placeholder="getDefaultBookmarkName(localConfig.bookmark.keymap[key].url)"
-                      />
-                      <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
-                        <cil:resize-height />
-                      </NInputGroupLabel>
-                      <NButton @click="onImportBookmark(key)">
-                        <lucide:bookmark-plus />
-                      </NButton>
-                      <NPopconfirm @positive-click="onDeleteKey(key)">
-                        <template #trigger>
-                          <NButton>
-                            <ri:delete-bin-6-line />
-                          </NButton>
-                        </template>
-                        {{ $t('common.confirm') }}?
-                      </NPopconfirm>
-                    </template>
-                    <NButton v-else class="item__create" @click="onCreateKey(key)">
-                      <zondicons:add-solid />
-                    </NButton>
-                  </NInputGroup>
-                </transition-group>
-              </div>
-            </div>
-          </div>
-        </template>
-      </BaseComponentSetting>
-    </NCollapseItem>
-  </NCollapse>
-</template>
-
 <script setup lang="ts">
 import BookmarkPicker from './BookmarkPicker.vue'
-import { URL_EXTENSIONS_SHORTCUTS, localConfig, keyboardSettingRowList, getDefaultBookmarkName, requestPermission, createTab } from '@/logic'
+import { isEdge } from '@/env'
+import {
+  URL_CHROME_EXTENSIONS_SHORTCUTS,
+  URL_EDGE_EXTENSIONS_SHORTCUTS,
+  globalState,
+  localConfig,
+  keyboardRowKeyList,
+  getDefaultBookmarkNameFromUrl,
+  requestPermission,
+  createTab,
+} from '@/logic'
 
 const state = reactive({
   isBookmarkModalVisible: false,
@@ -138,6 +18,8 @@ const state = reactive({
   currDragKey: '',
   currImporKey: '',
 })
+
+const openShortcutsPage = () => createTab(isEdge ? URL_EDGE_EXTENSIONS_SHORTCUTS : URL_CHROME_EXTENSIONS_SHORTCUTS)
 
 const onCreateKey = (key: string) => {
   localConfig.bookmark.keymap[key] = {
@@ -196,7 +78,152 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
     name: payload.title,
   }
 }
+
+const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgroundKeystrokes ? '24%' : '30%')
 </script>
+
+<template>
+  <BookmarkPicker v-model:show="state.isBookmarkModalVisible" @select="onSelectBookmark" />
+
+  <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['bookmarkKeyboard']">
+    <!-- bookmarkKeyboard -->
+    <NCollapseItem :title="$t('setting.bookmarkKeyboard')" name="bookmarkKeyboard">
+      <BaseComponentSetting cname="bookmark">
+        <template #header>
+          <NFormItem :label="$t('bookmark.listenBackgroundKeystrokes')">
+            <div class="setting__input-wrap">
+              <div class="setting__input_item">
+                <NSwitch v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes" />
+                <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
+              </div>
+              <div v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="setting__input_item">
+                <NButton ghost type="primary" @click="openShortcutsPage()">
+                  <ic:twotone-keyboard-command-key />&nbsp;{{ $t('bookmark.customKeys') }}
+                </NButton>
+              </div>
+            </div>
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
+            <div class="setting__input-wrap">
+              <div class="setting__input_item">
+                <NSwitch v-model:value="localConfig.bookmark.isDblclickOpen" />
+                <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
+              </div>
+              <div v-if="localConfig.bookmark.isDblclickOpen" class="setting__input_item">
+                <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
+                <NInputNumber v-model:value="localConfig.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
+                  <template #suffix>
+                    ms
+                  </template>
+                </NInputNumber>
+                <Tips :content="$t('bookmark.intervalTimeTips')" />
+              </div>
+            </div>
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.newTabOpen')">
+            <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.showNumberKey')">
+            <NSwitch v-model:value="localConfig.bookmark.isNumberEnabled" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.showSymbolKey')">
+            <NSwitch v-model:value="localConfig.bookmark.isSymbolEnabled" />
+          </NFormItem>
+          <NFormItem :label="$t('bookmark.showName')">
+            <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
+          </NFormItem>
+          <div class="modal__bookmark">
+            <NInputGroup class="bookmark__label">
+              <p class="label__text">
+                {{ $t('bookmark.keyLabel') }}
+              </p>
+              <p class="label__text">
+                {{ $t('bookmark.urlLabel') }}
+              </p>
+              <p class="label__text">
+                {{ $t('bookmark.nameLabel') }}
+              </p>
+              <p v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="label__text">
+                {{ $t('bookmark.shortcutLabel') }}
+              </p>
+            </NInputGroup>
+            <div class="bookmark__content">
+              <!-- left: keyList -->
+              <div class="content__key">
+                <div v-for="rowData of keyboardRowKeyList" :key="rowData" class="bookmark__group">
+                  <NInputGroupLabel v-for="key of rowData" :key="key" class="bookmark__key">
+                    {{ `${key.toUpperCase()}` }}
+                  </NInputGroupLabel>
+                </div>
+              </div>
+              <!-- right: config -->
+              <div class="content__config">
+                <transition-group v-for="rowData of keyboardRowKeyList" :key="rowData" name="flip-list" tag="div" class="bookmark__group">
+                  <NInputGroup
+                    v-for="key of rowData"
+                    :key="key"
+                    class="bookmark__item"
+                    :draggable="state.isBookmarkDragEnabled"
+                    @dragstart="handleDragStart(key)"
+                    @dragenter="handleDragEnter($event, key)"
+                    @dragover="handleDragOver($event)"
+                    @dragend="handleDragEnd()"
+                  >
+                    <template v-if="localConfig.bookmark.keymap[key]">
+                      <div class="item__container">
+                        <NInput
+                          key="url"
+                          v-model:value="localConfig.bookmark.keymap[key].url"
+                          class="input__main"
+                          type="text"
+                          clearable
+                          :placeholder="$t('bookmark.urlPlaceholder')"
+                        />
+                        <NInput
+                          key="name"
+                          v-model:value="localConfig.bookmark.keymap[key].name"
+                          class="input__main"
+                          type="text"
+                          clearable
+                          :placeholder="getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[key].url)"
+                        />
+                        <NInputGroupLabel
+                          v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
+                          class="item__shortcut"
+                          :title="globalState.allCommandsMap[key]"
+                          @click="openShortcutsPage()"
+                        >
+                          {{ globalState.allCommandsMap[key] || '-' }}
+                        </NInputGroupLabel>
+                      </div>
+                      <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
+                        <cil:resize-height />
+                      </NInputGroupLabel>
+                      <NButton @click="onImportBookmark(key)">
+                        <lucide:bookmark-plus />
+                      </NButton>
+                      <NPopconfirm @positive-click="onDeleteKey(key)">
+                        <template #trigger>
+                          <NButton>
+                            <ri:delete-bin-6-line />
+                          </NButton>
+                        </template>
+                        {{ $t('common.delete') }}?
+                      </NPopconfirm>
+                    </template>
+                    <NButton v-else class="item__create" @click="onCreateKey(key)">
+                      <zondicons:add-solid />
+                    </NButton>
+                  </NInputGroup>
+                </transition-group>
+              </div>
+            </div>
+          </div>
+        </template>
+      </BaseComponentSetting>
+    </NCollapseItem>
+  </NCollapse>
+</template>
 
 <style>
 .flip-list-move {
@@ -208,19 +235,22 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-right: 130px;
+    padding-bottom: 3px;
     .label__text {
       opacity: 0.6;
+      text-align: center;
       &:nth-of-type(1) {
         width: 43px;
-        text-align: center;
       }
       &:nth-of-type(2) {
-        width: 50%;
-        text-align: center;
+        flex: 1;
       }
       &:nth-of-type(3) {
-        width: 50%;
-        padding-left: 7%;
+        width: 25%;
+      }
+      &:nth-of-type(4) {
+        width: 13%;
       }
     }
   }
@@ -240,12 +270,23 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
       padding-bottom: 10px;
       .bookmark__item {
         margin-bottom: 5px;
-        .input__main {
-          &:nth-of-type(1) {
-            flex: 1;
+        .item__container {
+          display: flex;
+          .input__main {
+            &:nth-of-type(1) {
+              flex: 1;
+            }
+            &:nth-of-type(2) {
+              width: v-bind(customNameInputWidth);
+            }
           }
-          &:nth-of-type(2) {
-            width: 25%;
+          .item__shortcut {
+            padding: 0;
+            width: 15%;
+            line-height: 34px;
+            text-align: center;
+            font-size: 12px;
+            cursor: alias;
           }
         }
         .item__create {

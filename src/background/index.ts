@@ -1,6 +1,7 @@
 // !!background Cannot use import statement outside a module
 // import browser from 'webextension-polyfill'
 import { KEYBOARD_KEY_LIST, KEYBOARD_CODE_TO_LABEL_MAP, KEYBOARD_SPLIT_RANGE_MAP } from '@/logic/const'
+import { log, createTab, padUrlHttps } from '@/logic/util'
 
 // src/logic/bookmark.ts
 const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => {
@@ -24,12 +25,8 @@ const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => {
   return rowList
 }
 
-const createTab = (url: string) => {
-  chrome.tabs.create({ url, active: true })
-}
-
 let bookmarkConfig = null as any
-let keyboardCurrentModelAllKeyList = [] as string[]
+let currentModelAllKeyList = [] as string[]
 
 const getKeyboardSplitList = () => {
   let splitList: any = KEYBOARD_SPLIT_RANGE_MAP.letter
@@ -43,37 +40,33 @@ const getKeyboardSplitList = () => {
   return splitList
 }
 
-const initKeyboardData = () => {
+const getKeyboardData = async () => new Promise((resolve) => {
   chrome.storage.sync.get(null, (data) => {
     const config = data['naive-tab-bookmark']
     bookmarkConfig = JSON.parse(config).data
     const keyboardList = getKeyboardList(getKeyboardSplitList(), KEYBOARD_KEY_LIST)
-    keyboardCurrentModelAllKeyList = keyboardList.flat(Infinity)
-    console.log('KeyboardData', bookmarkConfig, keyboardCurrentModelAllKeyList)
+    currentModelAllKeyList = keyboardList.flat(Infinity)
+    resolve(true)
   })
-}
-
-initKeyboardData()
+})
 
 let timer = null as any
 let laskCommand = ''
 
-const handleKeyboard = (command: string) => {
-  if (!bookmarkConfig) {
-    return
-  }
+const handleKeyboard = async (command: string) => {
+  await getKeyboardData()
   if (!bookmarkConfig.isListenBackgroundKeystrokes) {
     return
   }
   const labelKey = KEYBOARD_CODE_TO_LABEL_MAP[command] || command
-  if (!keyboardCurrentModelAllKeyList.includes(labelKey)) {
+  if (!currentModelAllKeyList.includes(labelKey)) {
     return
   }
-  let url = bookmarkConfig.keymap[labelKey] ? bookmarkConfig.keymap[labelKey].url : ''
+  let url: string = bookmarkConfig.keymap[labelKey] ? bookmarkConfig.keymap[labelKey].url : ''
   if (url.length === 0) {
     return
   }
-  url = url.includes('//') ? url : `https://${url}`
+  url = padUrlHttps(url)
   if (!bookmarkConfig.isDblclickOpen) {
     createTab(url)
     return
@@ -90,18 +83,16 @@ const handleKeyboard = (command: string) => {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('NaiveTab installed')
+  log('NaiveTab installed')
 })
 
-chrome.runtime.onMessage.addListener((message) => {
-  console.log('onMessage', message)
-  const { name } = message
-  if (name === 'keyboard') {
-    initKeyboardData()
-  }
-})
+// chrome.runtime.onMessage.addListener((message) => {
+//   log('onMessage', message)
+//   const { name } = message
+//   if (name === 'keyboard') {}
+// })
 
 chrome.commands.onCommand.addListener((command) => {
-  console.log(`onCommand: ${command}`)
+  log(`onCommand: ${command}`)
   handleKeyboard(command)
 })

@@ -1,6 +1,6 @@
-import { useDebounceFn } from '@vueuse/core'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, MERGE_BOOKMARK_DELAY, MERGE_CONFIG_DELAY, localConfig, addVisibilityTask, log } from '@/logic'
+import { isChrome } from '@/env'
+import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
 
 export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
 
@@ -37,25 +37,22 @@ export const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => 
   return rowList
 }
 
-export const keyboardRowList = computed(() => getKeyboardList(keyboardSplitList.value, localBookmarkList.value))
+export const keyboardRowKeyList = computed(() => getKeyboardList(keyboardSplitList.value, KEYBOARD_KEY_LIST))
 
-export const keyboardSettingRowList = computed(() => getKeyboardList(keyboardSplitList.value, KEYBOARD_KEY_LIST))
+export const keyboardCurrentModelAllKeyList = computed(() => keyboardRowKeyList.value.flat(Infinity))
 
-export const keyboardCurrentModelAllKeyList = computed(() => {
-  const allKey = [] as string[]
-  for (const row of keyboardSettingRowList.value) {
-    for (const key of row) {
-      allKey.push(key)
-    }
+export const getFaviconFromUrl = (url: string) => {
+  if (isChrome) {
+    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`
   }
-  return allKey
-})
+  return `${url}/favicon.ico`
+}
 
-export const getDefaultBookmarkName = (url: string) => {
+export const getDefaultBookmarkNameFromUrl = (url: string) => {
   if (!url) {
     return ''
   }
-  const padUrl = url.includes('//') ? url : `https://${url}`
+  const padUrl = padUrlHttps(url)
   const domain = padUrl.split('/')[2]
   if (!domain) {
     return ''
@@ -71,101 +68,43 @@ export const getDefaultBookmarkName = (url: string) => {
   return name
 }
 
-const isInitialized = useStorageLocal('data-bookmark-initialized', false)
-
-const mergeBookmarkSetting = useDebounceFn(async () => {
-  log('Bookmark merge setting')
-  for (const key of KEYBOARD_KEY_LIST) {
-    const index = KEYBOARD_KEY_LIST.indexOf(key)
-    const item = localConfig.bookmark.keymap[key]
-    if (item) {
-      localBookmarkList.value[index] = {
-        key,
-        url: item.url.includes('//') ? item.url : `https://${item.url}`,
-        name: item.name || getDefaultBookmarkName(item.url),
-      }
-    } else {
-      // 初始化无设置数据的按键
-      localBookmarkList.value[index] = {
-        key,
-        url: '',
-        name: '',
-      }
-    }
+export const getBookmarkConfigName = (key: string) => {
+  if (!localConfig.bookmark.keymap[key]) {
+    return ''
   }
-}, MERGE_BOOKMARK_DELAY)
-
-watch(
-  () => localConfig.bookmark.keymap,
-  () => {
-    mergeBookmarkSetting()
-  },
-  { deep: true },
-)
-
-export const initBookmarkListData = () => {
-  if (isInitialized.value) {
-    return
-  }
-  log('Bookmark initLocalList')
-  localBookmarkList.value = []
-  KEYBOARD_KEY_LIST.forEach((key: string) => {
-    localBookmarkList.value.push({
-      key,
-      url: '',
-      name: '',
-    })
-  })
-  isInitialized.value = true
-  mergeBookmarkSetting()
+  return localConfig.bookmark.keymap[key].name || getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[key].url)
 }
 
-// Handle new bookmarks to be processed from popup modal
-export const handleBookmarkPending = () => {
-  const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
+export const getBookmarkConfigUrl = (key: string) => {
+  if (!localConfig.bookmark.keymap[key]) {
+    return ''
+  }
+  const url = localConfig.bookmark.keymap[key].url
+  return padUrlHttps(url)
+}
+
+export const resetBookmarkPending = () => {
+  localStorage.setItem('data-bookmark-pending', JSON.stringify({
     isPending: false,
-    keymap: {},
-  })
-  if (!bookmarkPendingData.value.isPending) {
-    return
-  }
-  log('Update bookmark from popup')
-  for (const key of Object.keys(bookmarkPendingData.value.keymap)) {
-    const item = bookmarkPendingData.value.keymap[key]
-    localConfig.bookmark.keymap[key] = {
-      url: item.url,
-      name: item.name,
-    }
-  }
-  bookmarkPendingData.value.isPending = false
-  bookmarkPendingData.value.keymap = {}
+  }))
 }
 
-// page切换前台时刷新通过pupop新增的书签
 addVisibilityTask('bookmark', (hidden) => {
   if (hidden) {
     return
   }
-  handleBookmarkPending()
+  // page切换前台时刷新快捷键配置信息
+  if (globalState.isSettingDrawerVisible) {
+    getAllCommandsConfig()
+  }
+  const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
+    isPending: false,
+  })
+  // page切换前台时刷新通过pupop新增的书签
+  if (!bookmarkPendingData.value.isPending) {
+    return
+  }
+  log('Update bookmark from popup')
+  localConfig.bookmark = useStorageLocal('c-bookmark', defaultConfig.bookmark) as any
+  resetBookmarkPending()
 })
-
-const sendBookmarkMessageToBg = () => {
-  chrome.runtime.sendMessage(
-    {
-      name: 'keyboard',
-      data: {
-        msg: 'refresh',
-      },
-    },
-  )
-}
-
-const handleSendBookmarkMessageToBg = useDebounceFn(() => { sendBookmarkMessageToBg() }, MERGE_CONFIG_DELAY)
-
-watch(
-  () => localConfig.bookmark,
-  () => {
-    handleSendBookmarkMessageToBg()
-  },
-  { deep: true },
-)

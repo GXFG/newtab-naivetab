@@ -1,16 +1,3 @@
-<template>
-  <NDropdown
-    placement="bottom-start"
-    trigger="manual"
-    :x="state.posX"
-    :y="state.posY"
-    :options="menuList"
-    :show="state.isMenuVisible"
-    :on-clickoutside="onCloseMenu"
-    @select="onSelectMenu"
-  />
-</template>
-
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { isEdge } from '@/env'
@@ -172,6 +159,19 @@ const handleContextMenu = async (e: MouseEvent) => {
 
 document.oncontextmenu = handleContextMenu
 </script>
+
+<template>
+  <NDropdown
+    placement="bottom-start"
+    trigger="manual"
+    :x="state.posX"
+    :y="state.posY"
+    :options="menuList"
+    :show="state.isMenuVisible"
+    :on-clickoutside="onCloseMenu"
+    @select="onSelectMenu"
+  />
+</template>
 
 <style>
 .n-dropdown-menu {

@@ -140,12 +140,10 @@ const newsSourceFuncMap = {
 export const onRetryNews = (value: NewsSources) => {
   // 部分网站需要先打开页面登录后才可访问
   createTab(NEWS_SOURCE_MAP[value], true)
-  setTimeout(() => {
-    const func = newsSourceFuncMap[value]
-    if (func) {
-      func()
-    }
-  }, 5000)
+  const func = newsSourceFuncMap[value]
+  if (func) {
+    func()
+  }
 }
 
 export const updateNews = () => {

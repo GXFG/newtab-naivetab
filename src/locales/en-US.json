@@ -172,7 +172,8 @@
     "urlLabel": "Url",
     "urlPlaceholder": "",
     "nameLabel": "Name",
-    "namePlaceholder": "Optional"
+    "namePlaceholder": "Optional",
+    "shortcutLabel": "Shortcut"
   },
   "search": {
     "searchEngine": "Search engine",

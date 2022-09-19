@@ -1,25 +1,3 @@
-<template>
-  <NModal :show="globalState.isUserGuideModalVisible" :mask-closable="false">
-    <NCard class="card__wrap" :title="`📝 ${$t('guide.title')}`">
-      <div class="modal__content">
-        <p v-for="index in [...Array(8).keys()]" :key="index">
-          {{ $t(`guide.text${index}`) }}
-        </p>
-      </div>
-      <div class="card__footer">
-        <NButton class="footer__btn" type="primary" ghost size="small" @click="onConfirm()">
-          <template #icon>
-            <div class="icon__wrap">
-              <ic:outline-check-circle />
-            </div>
-          </template>
-          {{ $t('common.confirm') }}
-        </NButton>
-      </div>
-    </NCard>
-  </NModal>
-</template>
-
 <script setup lang="ts">
 import { globalState, isFirstOpen } from '@/logic'
 
@@ -51,6 +29,28 @@ const onConfirm = () => {
   })
 }
 </script>
+
+<template>
+  <NModal :show="globalState.isUserGuideModalVisible" :mask-closable="false">
+    <NCard class="card__wrap" :title="`📝 ${$t('guide.title')}`">
+      <div class="modal__content">
+        <p v-for="index in [...Array(8).keys()]" :key="index">
+          {{ $t(`guide.text${index}`) }}
+        </p>
+      </div>
+      <div class="card__footer">
+        <NButton class="footer__btn" type="primary" ghost size="small" @click="onConfirm()">
+          <template #icon>
+            <div class="icon__wrap">
+              <ic:outline-check-circle />
+            </div>
+          </template>
+          {{ $t('common.confirm') }}
+        </NButton>
+      </div>
+    </NCard>
+  </NModal>
+</template>
 
 <style scoped>
 .card__wrap {

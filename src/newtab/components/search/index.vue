@@ -1,56 +1,3 @@
-<template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="search">
-    <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
-      <NDropdown
-        :show="localConfig.search.suggestionEnabled && state.isSuggestVisible"
-        :options="state.suggestList"
-        :placement="state.placementValue"
-        :show-arrow="true"
-        @select="handleSelectSuggest"
-        @clickoutside="handleSelectOutside"
-      >
-        <div
-          class="search__container"
-          :style="dragStyle || containerStyle"
-          :class="{
-            'search__container--focus': localConfig.search.isBorderEnabled && globalState.isSearchFocused,
-            'search__container--border': localConfig.search.isBorderEnabled,
-            'search__container--shadow': localConfig.search.isShadowEnabled,
-          }"
-        >
-          <NInputGroup>
-            <NInput
-              v-model:value="state.searchValue"
-              type="text"
-              size="large"
-              class="input__main"
-              :class="{ 'input__main--move': isDragMode }"
-              :placeholder="localConfig.search.placeholder || localConfig.search.urlName"
-              :loading="state.isSuggestLoading"
-              :disabled="isDragMode"
-              clearable
-              @focus="onSearchFocus"
-              @blur="onSearchBlur"
-              @input="onSearchInput"
-              @keypress.enter="handleSearch()"
-            />
-            <NButton
-              v-if="localConfig.search.iconEnabled"
-              class="input__search"
-              :class="{ 'input__search--move': isDragMode }"
-              size="large"
-              text
-              @click="handleSearch()"
-            >
-              <il:search />
-            </NButton>
-          </NInputGroup>
-        </div>
-      </NDropdown>
-    </div>
-  </MoveableComponentWrap>
-</template>
-
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { localConfig, globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab } from '@/logic'
@@ -161,6 +108,59 @@ const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
+
+<template>
+  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="search">
+    <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
+      <NDropdown
+        :show="localConfig.search.suggestionEnabled && state.isSuggestVisible"
+        :options="state.suggestList"
+        :placement="state.placementValue"
+        :show-arrow="true"
+        @select="handleSelectSuggest"
+        @clickoutside="handleSelectOutside"
+      >
+        <div
+          class="search__container"
+          :style="dragStyle || containerStyle"
+          :class="{
+            'search__container--focus': localConfig.search.isBorderEnabled && globalState.isSearchFocused,
+            'search__container--border': localConfig.search.isBorderEnabled,
+            'search__container--shadow': localConfig.search.isShadowEnabled,
+          }"
+        >
+          <NInputGroup>
+            <NInput
+              v-model:value="state.searchValue"
+              type="text"
+              size="large"
+              class="input__main"
+              :class="{ 'input__main--move': isDragMode }"
+              :placeholder="localConfig.search.placeholder || localConfig.search.urlName"
+              :loading="state.isSuggestLoading"
+              :disabled="isDragMode"
+              clearable
+              @focus="onSearchFocus"
+              @blur="onSearchBlur"
+              @input="onSearchInput"
+              @keypress.enter="handleSearch()"
+            />
+            <NButton
+              v-if="localConfig.search.iconEnabled"
+              class="input__search"
+              :class="{ 'input__search--move': isDragMode }"
+              size="large"
+              text
+              @click="handleSearch()"
+            >
+              <il:search />
+            </NButton>
+          </NInputGroup>
+        </div>
+      </NDropdown>
+    </div>
+  </MoveableComponentWrap>
+</template>
 
 <style>
 #search {

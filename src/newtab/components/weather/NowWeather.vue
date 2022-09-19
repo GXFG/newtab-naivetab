@@ -1,3 +1,79 @@
+<script setup lang="ts">
+import {
+  URL_QWEATHER_HOME,
+  WEATHER_TEMPERATURE_UNIT_MAP,
+  WEATHER_SPEED_UNIT_MAP,
+  isDragMode,
+  weatherState,
+  weatherIndicesInfo,
+  weatherWarningInfo,
+  localConfig,
+  getStyleField,
+  createTab,
+} from '@/logic'
+
+const CNAME = 'weather'
+
+const state = reactive({
+  isWarningVisible: false,
+  isIndicesVisible: false,
+})
+
+const isWeatherWarning = computed(() => weatherState.value.warning.list.length > 0)
+
+const warningVisible = computed(() => {
+  if (isDragMode.value) {
+    return false
+  }
+  return state.isWarningVisible || weatherState.value.state.isWarningVisible
+})
+
+const handleWarningMouseEnter = () => {
+  if (isDragMode.value) {
+    return
+  }
+  state.isWarningVisible = true
+}
+
+const handleWarningMouseLeave = () => {
+  state.isWarningVisible = false
+}
+
+const onPinWarning = () => {
+  weatherState.value.state.isWarningVisible = true
+}
+
+const onUnpinWarning = () => {
+  weatherState.value.state.isWarningVisible = false
+}
+
+const handleIndicesMouseEnter = () => {
+  if (isDragMode.value) {
+    return
+  }
+  state.isIndicesVisible = true
+}
+const handleIndicesMouseLeave = () => {
+  state.isIndicesVisible = false
+}
+
+const onOpenWeather = () => {
+  if (isDragMode.value) {
+    return
+  }
+  createTab(URL_QWEATHER_HOME)
+}
+
+const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[localConfig.weather.temperatureUnit])
+const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[localConfig.weather.speedUnit])
+
+const customIconSize = getStyleField(CNAME, 'iconSize', 'px')
+const customLabelSize = getStyleField(CNAME, 'fontSize', 'px', 1.4)
+const customFontSize = getStyleField(CNAME, 'fontSize', 'px', 1.2)
+const customLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 1.5)
+const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 2)
+</script>
+
 <template>
   <div id="now">
     <div class="now__icon">
@@ -115,82 +191,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import {
-  URL_QWEATHER_HOME,
-  WEATHER_TEMPERATURE_UNIT_MAP,
-  WEATHER_SPEED_UNIT_MAP,
-  isDragMode,
-  weatherState,
-  weatherIndicesInfo,
-  weatherWarningInfo,
-  localConfig,
-  getStyleField,
-  createTab,
-} from '@/logic'
-
-const CNAME = 'weather'
-
-const state = reactive({
-  isWarningVisible: false,
-  isIndicesVisible: false,
-})
-
-const isWeatherWarning = computed(() => weatherState.value.warning.list.length > 0)
-
-const warningVisible = computed(() => {
-  if (isDragMode.value) {
-    return false
-  }
-  return state.isWarningVisible || weatherState.value.state.isWarningVisible
-})
-
-const handleWarningMouseEnter = () => {
-  if (isDragMode.value) {
-    return
-  }
-  state.isWarningVisible = true
-}
-
-const handleWarningMouseLeave = () => {
-  state.isWarningVisible = false
-}
-
-const onPinWarning = () => {
-  weatherState.value.state.isWarningVisible = true
-}
-
-const onUnpinWarning = () => {
-  weatherState.value.state.isWarningVisible = false
-}
-
-const handleIndicesMouseEnter = () => {
-  if (isDragMode.value) {
-    return
-  }
-  state.isIndicesVisible = true
-}
-const handleIndicesMouseLeave = () => {
-  state.isIndicesVisible = false
-}
-
-const onOpenWeather = () => {
-  if (isDragMode.value) {
-    return
-  }
-  createTab(URL_QWEATHER_HOME)
-}
-
-const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[localConfig.weather.temperatureUnit])
-const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[localConfig.weather.speedUnit])
-
-const customIconSize = getStyleField(CNAME, 'iconSize', 'px')
-const customLabelSize = getStyleField(CNAME, 'fontSize', 'px', 1.4)
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px', 1.2)
-const customLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 1.5)
-const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 2)
-</script>
 
 <style>
 .weather__indices_wrap {
