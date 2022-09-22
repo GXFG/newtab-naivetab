@@ -46,6 +46,9 @@ const openBackgroundDrawer = () => {
 }
 
 const syncTime = computed(() => {
+  if (!Object.prototype.hasOwnProperty.call(localState.value, 'isUploadConfigStatusMap')) {
+    return '0'
+  }
   const syncTimeList = [] as number[]
   for (const field of Object.keys(localState.value.isUploadConfigStatusMap)) {
     syncTimeList.push(localState.value.isUploadConfigStatusMap[field].syncTime)
