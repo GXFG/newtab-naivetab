@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, toggleIsDragMode, updateSetting, getLocalVersion, log, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -485,6 +485,7 @@ export const openWhatsNewModal = () => {
 
 export const openUserGuideModal = () => {
   globalState.isUserGuideModalVisible = true
+  createTab(URL_NAIVETAB_DOC)
 }
 
 export const openSponsorModal = () => {
