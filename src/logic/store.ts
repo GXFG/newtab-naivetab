@@ -505,9 +505,8 @@ export const handleFirstOpen = () => {
 
 export const handleStateResetAndUpdate = () => {
   resetBookmarkPending()
-  const version = getLocalVersion()
   // handle old version
-  if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
+  if (!localState.value.isUploadConfigStatusMap) {
     localState.value.isUploadConfigStatusMap = defaultLocalState.isUploadConfigStatusMap
   }
 }
