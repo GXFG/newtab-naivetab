@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/20944987/147905855-2a1eaebf-d7af-45d1-9aa2-2f96806d79c9.png" />
+  <img src="https://user-images.githubusercontent.com/20944987/147905855-2a1eaebf-d7af-45d1-9aa2-2f96806d79c9.png" width="64" height="64" />
   <h1 align="center">NaiveTab</h1>
   <p align="center">A naive newtab page extensions</p>
   <p align="center">English | <a href="https://github.com/GXFG/newtab-naivetab/blob/main/README.md">中文</a></p>
@@ -23,13 +23,9 @@
 7. Set up support export json file backup
 8. Language support (zh-CN, en-US)
 
-## 📷Preview
+## 🚀Get started
 
-![0](https://user-images.githubusercontent.com/20944987/182008382-52846401-b323-481f-bc03-f9851b7042ac.png)
-![1](https://user-images.githubusercontent.com/20944987/182008384-a6ca2503-8c83-4fe9-a580-ac6b2f686bc8.png)
-![2](https://user-images.githubusercontent.com/20944987/182008410-863cf051-b9c8-42f9-8632-2a551b0d8cf4.png)
-![3](https://user-images.githubusercontent.com/20944987/182008413-0a31337b-9f67-49f9-b6e2-1ff53e011734.png)
-![4](https://user-images.githubusercontent.com/20944987/182008416-8cf78850-bee3-4cd1-97f7-53418b87df1f.png)
+https://gxfg.github.io/naivetab-doc
 
 ## 🛠️Install
 
@@ -38,7 +34,7 @@
 
 ## 📜Changelog
 
-[View Changelog](https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md)
+See [CHANGELOG.md](https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md)
 
 ## 🏗Contribute
 
@@ -46,6 +42,6 @@
 
 ## 🌼Thanks
 
-- [Vitesse-webext](https://github.com/antfu/vitesse-webext)
-- [Naiveui](https://www.naiveui.com/zh-CN/os-theme)
 - [icones](https://icones.js.org)
+- [Naive UI](https://www.naiveui.com)
+- [Vitesse-webext](https://github.com/antfu/vitesse-webext)
