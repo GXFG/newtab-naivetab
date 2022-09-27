@@ -9,7 +9,7 @@ import SearchSetting from './components/SearchSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import NewsSetting from './components/NewsSetting.vue'
-import { URL_GITHUB, getStyleConst, localConfig, globalState, createTab } from '@/logic'
+import { URL_GITHUB, URL_NAIVETAB_DOC_HOME, getStyleConst, localConfig, globalState, createTab } from '@/logic'
 
 const tabPaneList = computed(() => [
   {
@@ -113,7 +113,10 @@ const bgBottomBar = getStyleConst('bgBottomBar')
             Ver.{{ `${pkg.version}` }}
           </p>
           <div class="bottom__right">
-            <NButton text class="right__icon" title="Github" @click="createTab(URL_GITHUB)">
+            <NButton text class="right__icon" title="Guide" @click="createTab(URL_NAIVETAB_DOC_HOME)">
+              <tabler:book />
+            </NButton>
+            <NButton text class="right__icon" title="GitHub" @click="createTab(URL_GITHUB)">
               <carbon:logo-github />
             </NButton>
           </div>

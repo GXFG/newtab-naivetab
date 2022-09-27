@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -202,6 +202,7 @@ export const defaultConfig = {
   },
   calendar: {
     enabled: true,
+    weekBeginsOn: 1, // 1 monday, 7 sunday
     layout: {
       xOffsetKey: 'right',
       xOffsetValue: 0,
@@ -485,7 +486,9 @@ export const openWhatsNewModal = () => {
 
 export const openUserGuideModal = () => {
   globalState.isUserGuideModalVisible = true
-  createTab(URL_NAIVETAB_DOC)
+  setTimeout(() => {
+    createTab(URL_NAIVETAB_DOC_STARTED)
+  }, 300)
 }
 
 export const openSponsorModal = () => {

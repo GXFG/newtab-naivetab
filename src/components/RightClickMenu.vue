@@ -72,7 +72,7 @@ const menuList = computed(() => [
         icon: renderIconFunc('bx:message-rounded-dots'),
         children: [
           {
-            label: 'Github',
+            label: 'GitHub',
             key: 'feedbackGithub',
             icon: renderIconFunc('carbon:logo-github'),
           },
