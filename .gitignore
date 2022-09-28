@@ -7,7 +7,6 @@
 *.log
 *.pem
 *.xpi
-*.zip
 dist
 dist-ssr
 node_modules

@@ -7,6 +7,8 @@ export const URL_EDGE_EXTENSIONS_SHORTCUTS = 'edge://extensions/shortcuts#:~:tex
 
 export const URL_GITHUB = 'https://github.com/GXFG/newtab-naivetab'
 export const URL_GITHUB_ISSUSE = 'https://github.com/GXFG/newtab-naivetab/issues'
+export const URL_NAIVETAB_DOC_HOME = 'https://gxfg.github.io/naivetab-doc/'
+export const URL_NAIVETAB_DOC_STARTED = 'https://gxfg.github.io/naivetab-doc/guide/getting-started.html'
 
 export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/format'
 export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'

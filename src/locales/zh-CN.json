@@ -204,7 +204,8 @@
     "sunday": "周日",
     "today": "今",
     "work": "班",
-    "rest": "休"
+    "rest": "休",
+    "weekBeginsOn": "一周开始于"
   },
   "weather": {
     "warning": "天气预警",

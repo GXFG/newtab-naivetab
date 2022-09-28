@@ -204,7 +204,8 @@
     "sunday": "Sun",
     "today": "T",
     "work": "W",
-    "rest": "R"
+    "rest": "R",
+    "weekBeginsOn": "Week Begins"
   },
   "weather": {
     "warning": "Warning",

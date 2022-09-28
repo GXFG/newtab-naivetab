@@ -38,15 +38,24 @@ const monthsList = computed(() => [
   { label: window.$t('calendar.december'), value: 12 },
 ])
 
-const weekList = computed(() => [
-  { label: window.$t('calendar.monday'), value: 1 },
-  { label: window.$t('calendar.tuesday'), value: 2 },
-  { label: window.$t('calendar.wednesday'), value: 3 },
-  { label: window.$t('calendar.thursday'), value: 4 },
-  { label: window.$t('calendar.friday'), value: 5 },
-  { label: window.$t('calendar.saturday'), value: 6 },
-  { label: window.$t('calendar.sunday'), value: 7 },
-])
+const sundayOption = { label: window.$t('calendar.sunday'), value: 7 }
+
+const weekList = computed(() => {
+  const list = [
+    { label: window.$t('calendar.monday'), value: 1 },
+    { label: window.$t('calendar.tuesday'), value: 2 },
+    { label: window.$t('calendar.wednesday'), value: 3 },
+    { label: window.$t('calendar.thursday'), value: 4 },
+    { label: window.$t('calendar.friday'), value: 5 },
+    { label: window.$t('calendar.saturday'), value: 6 },
+  ]
+  if (localConfig.calendar.weekBeginsOn === 7) {
+    list.unshift(sundayOption)
+  } else if (localConfig.calendar.weekBeginsOn === 1) {
+    list.push(sundayOption)
+  }
+  return list
+})
 
 const holidayTypeToDesc = computed(() => ({
   1: window.$t('calendar.rest'),
@@ -54,12 +63,11 @@ const holidayTypeToDesc = computed(() => ({
 }))
 
 /**
- * type: 1start, 2main, 3end
- * dateEl: dayjs element
+ * dateEle: dayjs element
  */
-const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
-  const formatDate = dateEl.format('YYYY-MM-DD')
-  const shortDate = dateEl.format('MMDD')
+const genDateList = (type: 'start' | 'main' | 'end', dateEle: any) => {
+  const formatDate = dateEle.format('YYYY-MM-DD')
+  const shortDate = dateEle.format('MMDD')
   const lunar: Calendar = calendar.solar2lunar(...formatDate.split('-'))
   const { cYear, cDay, nWeek, isToday, festival, lunarFestival, Term, IMonthCn, IDayCn, lDay } = lunar
   // desc优先级：阳历节日，阴历节日，节气，阴历月份，阴历日期
@@ -77,9 +85,9 @@ const genDateList = (type: 1 | 2 | 3, dateEl: any) => {
     isToday,
     isWeekend: [6, 7].includes(nWeek),
     isFestival,
-    isNotCurrMonth: type !== 2,
+    isNotCurrMonth: type !== 'main',
   }
-  if (type === 1) {
+  if (type === 'start') {
     state.dateList.unshift(param)
   } else {
     state.dateList.push(param)
@@ -90,15 +98,18 @@ const onRender = () => {
   state.dateList = []
 
   const currMonthFirstDate = `${state.currYear}-${state.currMonth}-01`
-  let currMonthFirstWeek = dayjs(currMonthFirstDate).day()
-  currMonthFirstWeek = currMonthFirstWeek === 0 ? 7 : currMonthFirstWeek
+  let currMonthFirstDateWeek = dayjs(currMonthFirstDate).day()
+  currMonthFirstDateWeek = currMonthFirstDateWeek === 0 ? 7 : currMonthFirstDateWeek // 1234567
 
   // padStart
-  let padStartCount = currMonthFirstWeek - 1
-  padStartCount = padStartCount === 0 ? 7 : padStartCount
+  let padStartCount = currMonthFirstDateWeek - 1
+  if (localConfig.calendar.weekBeginsOn === 7) {
+    // begins on sunday
+    padStartCount = currMonthFirstDateWeek === 7 ? 0 : currMonthFirstDateWeek
+  }
   for (let index = 0; index < padStartCount; index += 1) {
-    const dateEL = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
-    genDateList(1, dateEL)
+    const dateEle = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
+    genDateList('start', dateEle)
   }
 
   const currMonthLastDate = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
@@ -107,29 +118,40 @@ const onRender = () => {
   const currMonthLastDay = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
     .subtract(1, 'day')
     .get('date')
-  let currMonthLastWeek = dayjs(currMonthLastDate).day()
-  currMonthLastWeek = currMonthLastWeek === 0 ? 7 : currMonthLastWeek
+  let currMonthLastDateWeek = dayjs(currMonthLastDate).day()
+  currMonthLastDateWeek = currMonthLastDateWeek === 0 ? 7 : currMonthLastDateWeek
   // add main
   for (let index = 0; index < currMonthLastDay; index += 1) {
-    const dateEL = dayjs(`${state.currYear}-${state.currMonth}-${index + 1}`)
-    genDateList(2, dateEL)
+    const dateEle = dayjs(`${state.currYear}-${state.currMonth}-${index + 1}`)
+    genDateList('main', dateEle)
   }
 
   // padEnd
-  let padEndCount = 7 - currMonthLastWeek
+  let padEndCount = 7 - currMonthLastDateWeek
+  if (localConfig.calendar.weekBeginsOn === 7) {
+    // begins on sunday
+    padEndCount = currMonthLastDateWeek === 7 ? 6 : 6 - currMonthLastDateWeek
+  }
   if (state.dateList.length + padEndCount === 35) {
-    // 确保为6行
+    // 确保整体为6行
     padEndCount += 7
   }
   for (let index = 0; index < padEndCount; index += 1) {
-    const dateEl = dayjs(currMonthLastDate).add(index + 1, 'day')
-    genDateList(3, dateEl)
+    const dateEle = dayjs(currMonthLastDate).add(index + 1, 'day')
+    genDateList('end', dateEle)
   }
 }
 
 onMounted(() => {
   onRender()
 })
+
+watch(
+  () => localConfig.calendar.weekBeginsOn,
+  () => {
+    onRender()
+  },
+)
 
 const onPrevMonth = () => {
   if (state.currMonth === 1) {
