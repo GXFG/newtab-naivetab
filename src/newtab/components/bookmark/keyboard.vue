@@ -12,7 +12,6 @@ import {
   getFaviconFromUrl,
   getBookmarkConfigName,
   getBookmarkConfigUrl,
-  localBookmarkList,
   keyboardRowKeyList,
   keyboardCurrentModelAllKeyList,
 } from '@/logic'
@@ -90,7 +89,7 @@ const keyboardTask = (e: KeyboardEvent) => {
     // 忽略ctrl/meta键
     return
   }
-  const url = localBookmarkList.value[index].url
+  const url = getBookmarkConfigUrl(labelKey)
   if (url.length === 0) {
     return
   }
