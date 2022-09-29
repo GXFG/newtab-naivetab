@@ -2,8 +2,6 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isChrome } from '@/env'
 import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
 
-export const localBookmarkList = useStorageLocal('data-bookmark', [] as BookmarkItem[])
-
 const keyboardSplitList = computed(() => {
   let splitList: any = KEYBOARD_SPLIT_RANGE_MAP.letter
   if (localConfig.bookmark.isSymbolEnabled && localConfig.bookmark.isNumberEnabled) {
