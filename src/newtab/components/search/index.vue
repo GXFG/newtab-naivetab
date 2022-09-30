@@ -14,16 +14,16 @@ const state = reactive({
   suggestList: [],
 })
 
-const onSearchFocus = () => {
+const handleSearchFocus = () => {
   globalState.isSearchFocused = true
   state.isSuggestVisible = true
 }
 
-const onSearchBlur = () => {
+const handleSearchBlur = () => {
   globalState.isSearchFocused = false
 }
 
-const onSearchInput = () => {
+const handleSearchInput = () => {
   if (state.searchValue.length === 0 || state.isSuggestVisible) {
     return
   }
@@ -43,12 +43,6 @@ const onSearch = () => {
   state.isSuggestVisible = false
   createTab(url)
   state.searchValue = ''
-}
-
-const handleSearch = useDebounceFn(onSearch, 200)
-
-const handleInputEnter = () => {
-  onSearch()
 }
 
 const handleSelectSuggest = (key: string) => {
@@ -144,10 +138,10 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               :loading="state.isSuggestLoading"
               :disabled="isDragMode"
               clearable
-              @focus="onSearchFocus"
-              @blur="onSearchBlur"
-              @input="onSearchInput"
-              @keyup.enter="handleInputEnter()"
+              @focus="handleSearchFocus"
+              @blur="handleSearchBlur"
+              @input="handleSearchInput"
+              @keyup.enter="onSearch()"
             />
             <NButton
               v-if="localConfig.search.iconEnabled"
@@ -155,7 +149,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               :class="{ 'input__search--move': isDragMode }"
               size="large"
               text
-              @click="handleSearch()"
+              @click="onSearch()"
             >
               <il:search />
             </NButton>
