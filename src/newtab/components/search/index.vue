@@ -47,6 +47,20 @@ const onSearch = () => {
 
 const handleSearch = useDebounceFn(onSearch, 200)
 
+const handleInputEnter = () => {
+  onSearch()
+}
+
+const handleSelectSuggest = (key: string) => {
+  state.searchValue = key
+  state.isSuggestVisible = false
+  onSearch()
+}
+
+const handleSelectOutside = () => {
+  state.isSuggestVisible = false
+}
+
 const getBaiduSuggest = async () => {
   if (state.searchValue.length === 0) {
     return
@@ -83,16 +97,6 @@ watch(
 watch(isDragMode, () => {
   onClearValue()
 })
-
-const handleSelectSuggest = (key: string) => {
-  state.searchValue = key
-  state.isSuggestVisible = false
-  handleSearch()
-}
-
-const handleSelectOutside = () => {
-  state.isSuggestVisible = false
-}
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
@@ -143,7 +147,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               @focus="onSearchFocus"
               @blur="onSearchBlur"
               @input="onSearchInput"
-              @keypress.enter="handleSearch()"
+              @keyup.enter="handleInputEnter()"
             />
             <NButton
               v-if="localConfig.search.iconEnabled"
