@@ -14,16 +14,16 @@ const state = reactive({
   suggestList: [],
 })
 
-const onSearchFocus = () => {
+const handleSearchFocus = () => {
   globalState.isSearchFocused = true
   state.isSuggestVisible = true
 }
 
-const onSearchBlur = () => {
+const handleSearchBlur = () => {
   globalState.isSearchFocused = false
 }
 
-const onSearchInput = () => {
+const handleSearchInput = () => {
   if (state.searchValue.length === 0 || state.isSuggestVisible) {
     return
   }
@@ -45,7 +45,15 @@ const onSearch = () => {
   state.searchValue = ''
 }
 
-const handleSearch = useDebounceFn(onSearch, 200)
+const handleSelectSuggest = (key: string) => {
+  state.searchValue = key
+  state.isSuggestVisible = false
+  onSearch()
+}
+
+const handleSelectOutside = () => {
+  state.isSuggestVisible = false
+}
 
 const getBaiduSuggest = async () => {
   if (state.searchValue.length === 0) {
@@ -83,16 +91,6 @@ watch(
 watch(isDragMode, () => {
   onClearValue()
 })
-
-const handleSelectSuggest = (key: string) => {
-  state.searchValue = key
-  state.isSuggestVisible = false
-  handleSearch()
-}
-
-const handleSelectOutside = () => {
-  state.isSuggestVisible = false
-}
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
@@ -140,10 +138,10 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               :loading="state.isSuggestLoading"
               :disabled="isDragMode"
               clearable
-              @focus="onSearchFocus"
-              @blur="onSearchBlur"
-              @input="onSearchInput"
-              @keypress.enter="handleSearch()"
+              @focus="handleSearchFocus"
+              @blur="handleSearchBlur"
+              @input="handleSearchInput"
+              @keyup.enter="onSearch()"
             />
             <NButton
               v-if="localConfig.search.iconEnabled"
@@ -151,7 +149,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               :class="{ 'input__search--move': isDragMode }"
               size="large"
               text
-              @click="handleSearch()"
+              @click="onSearch()"
             >
               <il:search />
             </NButton>

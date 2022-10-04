@@ -4,6 +4,7 @@ import { isEdge } from '@/env'
 import {
   URL_CHROME_EXTENSIONS_SHORTCUTS,
   URL_EDGE_EXTENSIONS_SHORTCUTS,
+  KEYBOARD_KEY_BAN_LIST,
   globalState,
   localConfig,
   keyboardRowKeyList,
@@ -132,6 +133,7 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
           <NFormItem :label="$t('bookmark.showName')">
             <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
           </NFormItem>
+
           <div class="modal__bookmark">
             <NInputGroup class="bookmark__label">
               <p class="label__text">
@@ -147,6 +149,7 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
                 {{ $t('bookmark.shortcutLabel') }}
               </p>
             </NInputGroup>
+
             <div class="bookmark__content">
               <!-- left: keyList -->
               <div class="content__key">
@@ -193,7 +196,11 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
                           :title="globalState.allCommandsMap[key]"
                           @click="openShortcutsPage()"
                         >
-                          {{ globalState.allCommandsMap[key] || '-' }}
+                          <template v-if="globalState.allCommandsMap[key]">
+                            {{ globalState.allCommandsMap[key] }}
+                          </template>
+                          <ion:ban v-else-if="KEYBOARD_KEY_BAN_LIST.includes(key)" />
+                          <ic:outline-add v-else />
                         </NInputGroupLabel>
                       </div>
                       <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
@@ -232,6 +239,9 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
 
 .modal__bookmark {
   .bookmark__label {
+    /* position:sticky;
+    top: -17px;
+    z-index: 2; */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -281,6 +291,9 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
             }
           }
           .item__shortcut {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 0;
             width: 15%;
             line-height: 34px;
