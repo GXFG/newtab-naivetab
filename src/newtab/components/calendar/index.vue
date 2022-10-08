@@ -188,16 +188,16 @@ const onReset = () => {
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
-const customContainerWidth = getStyleField(CNAME, 'width', 'px', 7.4)
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customContainerWidth = getStyleField(CNAME, 'width', 'vmin', 7.4)
+const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
-const customItemWidth = getStyleField(CNAME, 'width', 'px')
-const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
+const customItemWidth = getStyleField(CNAME, 'width', 'vmin')
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
 const customItemBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
 const textColorRed = getStyleConst('textColorRed')
 const bgCalendarRest = getStyleConst('bgCalendarRest')
@@ -229,7 +229,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           </div>
           <div class="options__item">
             <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onPrevMonth()">
-              <fa-solid:angle-left />
+              <fa-solid:angle-left class="btn__icon" />
             </NButton>
             <NSelect
               v-model:value="state.currMonth"
@@ -240,7 +240,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
               @update:value="onDateChange()"
             />
             <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onNextMonth()">
-              <fa-solid:angle-right />
+              <fa-solid:angle-right class="btn__icon" />
             </NButton>
           </div>
           <div class="options__item options__reset">
@@ -252,7 +252,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
               :style="isDragMode ? 'cursor: move;' : ''"
               @click="onReset()"
             >
-              <si-glyph:arrow-backward />
+              <si-glyph:arrow-backward class="btn__icon" />
             </NButton>
           </div>
         </div>
@@ -325,23 +325,27 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           display: flex;
           justify-content: center;
           align-items: center;
-          margin: 0 8%;
+          margin: 0 0.8vmin;
           cursor: pointer;
+          .btn__icon {
+            font-size: v-bind(customFontSize);
+          }
         }
         .n-base-selection-input__content {
-          color: v-bind(customFontColor);
+          color: v-bind(customFontColor) !important;
+          font-size: v-bind(customFontSize) !important;
         }
         .item__select_year {
           width: 80px;
         }
         .item__select_month {
           flex: 0 0 auto;
-          width: 110px;
+          width: 95px;
         }
       }
       .options__reset {
         flex: 0 0 auto;
-        width: 30px;
+        width: 0.8vmin;
       }
     }
     .calendar__header {
@@ -363,15 +367,17 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
     .calendar__body {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
       .body__item {
         position: relative;
+        flex: 0 0 auto;
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
+        justify-content: center;
         align-items: center;
         box-sizing: border-box;
-        padding: 1%;
-        margin: 1px;
+        margin: 0.1vmin;
         width: v-bind(customItemWidth);
         height: v-bind(customItemWidth);
         text-align: center;
@@ -381,9 +387,12 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         .item__day {
         }
         .item__desc {
+          margin-top: 0.2vmin;
           color: v-bind(customFontColor);
           font-size: 12px;
-          transform: scale(0.8);
+          transform: scale(0.7);
+          overflow: hidden;
+          white-space: nowrap;
         }
         .item__desc--highlight {
           color: v-bind(textColorRed);
@@ -394,7 +403,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           right: -7%;
           padding: 7%;
           color: v-bind(customFontColor);
-          font-size: 13px;
+          font-size: 12px;
           transform: scale(0.7);
         }
         .item__label {
@@ -403,7 +412,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           left: -7%;
           padding: 7%;
           color: v-bind(customFontColor);
-          font-size: 13px;
+          font-size: 12px;
           transform: scale(0.7);
         }
         .item__label--work {

@@ -565,6 +565,7 @@ export const getStyleConst = (field: string) => {
 
 /**
  * e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
+ * 当unit为vmin时会自动将 ratio * 0.1
  */
 export const getStyleField = (component: ConfigField, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
@@ -576,6 +577,9 @@ export const getStyleField = (component: ConfigField, field: string, unit?: stri
       style = style * ratio
     }
     if (unit) {
+      if (unit === 'vmin') {
+        style = style * 0.1
+      }
       style = `${style}${unit}`
     }
     return style

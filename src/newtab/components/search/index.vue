@@ -96,11 +96,11 @@ const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
-const customPadding = getStyleField(CNAME, 'padding', 'px')
-const customWidth = getStyleField(CNAME, 'width', 'px')
-const customHeight = getStyleField(CNAME, 'height', 'px')
-const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
+const customPadding = getStyleField(CNAME, 'padding', 'vmin')
+const customWidth = getStyleField(CNAME, 'width', 'vmin')
+const customHeight = getStyleField(CNAME, 'height', 'vmin')
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
@@ -151,7 +151,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               text
               @click="onSearch()"
             >
-              <il:search />
+              <il:search class="search__icon" />
             </NButton>
           </NInputGroup>
         </div>
@@ -201,6 +201,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       width: 50px;
       color: v-bind(customFontColor) !important;
       cursor: pointer;
+      .search__icon {
+        font-size: v-bind(customFontSize);
+      }
     }
     .input__search--move {
       cursor: move !important;

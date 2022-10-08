@@ -117,7 +117,7 @@ addVisibilityTask(CNAME, (hidden) => {
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
-const customWidth = getStyleField(CNAME, 'width', 'px')
+const customWidth = getStyleField(CNAME, 'width', 'vmin')
 const hourDeg = computed(() => `${state.hourDeg}deg`)
 const minuteDeg = computed(() => `${state.minuteDeg}deg`)
 const secondDeg = computed(() => `${state.secondDeg}deg`)

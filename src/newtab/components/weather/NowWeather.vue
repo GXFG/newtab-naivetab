@@ -67,11 +67,11 @@ const onOpenWeather = () => {
 const temperatureUnit = computed(() => WEATHER_TEMPERATURE_UNIT_MAP[localConfig.weather.temperatureUnit])
 const speedUnit = computed(() => WEATHER_SPEED_UNIT_MAP[localConfig.weather.speedUnit])
 
-const customIconSize = getStyleField(CNAME, 'iconSize', 'px')
-const customLabelSize = getStyleField(CNAME, 'fontSize', 'px', 1.4)
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px', 1.2)
-const customLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 1.5)
-const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 2)
+const customIconSize = getStyleField(CNAME, 'iconSize', 'vmin')
+const customLabelSize = getStyleField(CNAME, 'fontSize', 'vmin', 1.4)
+const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 1.2)
+const customLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 1.5)
+const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
 </script>
 
 <template>
@@ -240,6 +240,7 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'px', 2)
           justify-content: center;
           align-items: flex-start;
           .value__text {
+            font-size: v-bind(customFontSize);
           }
           .value__text--l {
             font-size: v-bind(customLargeFontSize);
