@@ -58,14 +58,14 @@ watch(isRender, (value) => {
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
-const customMargin = getStyleField(CNAME, 'margin', 'px')
-const customWidth = getStyleField(CNAME, 'width', 'px')
-const customHeight = getStyleField(CNAME, 'height', 'px')
+const customMargin = getStyleField(CNAME, 'margin', 'vmin')
+const customWidth = getStyleField(CNAME, 'width', 'vmin')
+const customHeight = getStyleField(CNAME, 'height', 'vmin')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
+const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
-const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customFontActiveColor = getStyleField(CNAME, 'fontActiveColor')
 const customBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
@@ -156,6 +156,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       // line bottom border
       .n-tabs .n-tabs-nav.n-tabs-nav--line-type .n-tabs-nav-scroll-content {
         border-bottom: v-bind(customBorderWidth) solid v-bind(customBorderColor) !important;
+      }
+      .n-tabs-tab__label {
+        font-size: v-bind(customFontSize);
       }
       .news__content {
         height: v-bind(customHeight);

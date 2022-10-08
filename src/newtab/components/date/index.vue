@@ -28,9 +28,9 @@ const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
-const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'px')
+const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
 </script>
 
 <template>

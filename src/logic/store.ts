@@ -135,7 +135,7 @@ export const defaultConfig = {
       yTranslateValue: 0,
     },
     margin: 2,
-    width: 53,
+    width: 58,
     borderRadius: 3,
     fontFamily: 'Arial',
     fontSize: 12,
@@ -161,13 +161,13 @@ export const defaultConfig = {
       yTranslateValue: -50,
     },
     fontFamily: 'Arial Rounded MT Bold',
-    fontSize: 80,
+    fontSize: 90,
     letterSpacing: 1.5,
     fontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(33, 33, 33, 1)', 'rgba(33, 33, 33, 1)'],
     unit: {
-      fontSize: 30,
+      fontSize: 35,
     },
   },
   clockAnalog: {
@@ -180,7 +180,7 @@ export const defaultConfig = {
       yOffsetValue: 25,
       yTranslateValue: 0,
     },
-    width: 145,
+    width: 150,
   },
   date: {
     enabled: true,
@@ -190,11 +190,11 @@ export const defaultConfig = {
       xOffsetValue: 50,
       xTranslateValue: -50,
       yOffsetKey: 'top',
-      yOffsetValue: 58,
+      yOffsetValue: 57,
       yTranslateValue: 0,
     },
     fontFamily: 'Arial Rounded MT Bold',
-    fontSize: 26,
+    fontSize: 30,
     letterSpacing: 1,
     fontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
     isShadowEnabled: true,
@@ -211,7 +211,7 @@ export const defaultConfig = {
       yOffsetValue: 0,
       yTranslateValue: 0,
     },
-    width: 45,
+    width: 48,
     borderRadius: 4,
     fontFamily: 'Arial',
     fontSize: 14,
@@ -266,7 +266,7 @@ export const defaultConfig = {
     padding: 25,
     width: 400,
     height: 45,
-    borderRadius: 27.5,
+    borderRadius: 5.5,
     fontFamily: 'Arial',
     fontSize: 18,
     fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
@@ -314,8 +314,8 @@ export const defaultConfig = {
       yTranslateValue: 0,
     },
     margin: 12,
-    width: 350,
-    height: 310,
+    width: 370,
+    height: 340,
     borderRadius: 4,
     fontFamily: 'Arial',
     fontSize: 13,
@@ -565,6 +565,7 @@ export const getStyleConst = (field: string) => {
 
 /**
  * e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
+ * 当unit为vmin时会自动将 ratio * 0.1
  */
 export const getStyleField = (component: ConfigField, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
@@ -576,6 +577,9 @@ export const getStyleField = (component: ConfigField, field: string, unit?: stri
       style = style * ratio
     }
     if (unit) {
+      if (unit === 'vmin') {
+        style = style * 0.1
+      }
       style = `${style}${unit}`
     }
     return style
