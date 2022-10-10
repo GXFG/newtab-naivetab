@@ -70,6 +70,10 @@ export const KEYBOARD_CODE_TO_LABEL_MAP = {
   Slash: '?',
 }
 
+export const KEYBOARD_LABEL_TO_KEY_FOR_SHOW_MAP = {
+  BS: '⌫',
+}
+
 export const KEYBOARD_SPLIT_RANGE_MAP = {
   letter: [[13, 23], [25, 34], [36, 43]],
   letterSymbol: [[13, 25], [25, 36], [36]],

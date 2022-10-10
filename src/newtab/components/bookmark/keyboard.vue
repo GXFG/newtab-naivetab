@@ -2,6 +2,7 @@
 import {
   KEYBOARD_KEY_LIST,
   KEYBOARD_CODE_TO_LABEL_MAP,
+  KEYBOARD_LABEL_TO_KEY_FOR_SHOW_MAP,
   isDragMode,
   localConfig,
   getIsComponentRender,
@@ -153,7 +154,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               <eos-icons:loading />
             </div>
             <p class="item__key">
-              {{ `${key.toUpperCase()}` }}
+              {{ KEYBOARD_LABEL_TO_KEY_FOR_SHOW_MAP[key] || `${key.toUpperCase()}` }}
             </p>
             <div class="item__img">
               <div class="img__wrap">
