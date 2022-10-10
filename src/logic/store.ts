@@ -58,6 +58,10 @@ export const defaultConfig = {
         name: 'Balsamroot_ZH-CN9456182640',
         desc: '山下盛开的箭叶脂根菊，美国大提顿国家公园 (© Mike Cavaroc/Tandem Stills + Motion)',
       },
+      {
+        name: 'ChukchiSea_ZH-CN7218471261',
+        desc: '楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)',
+      },
     ],
     layout: {
       xOffsetKey: 'right',
@@ -85,45 +89,61 @@ export const defaultConfig = {
     isNumberEnabled: false,
     isNameVisible: true,
     keymap: {
-      q: {
+      'q': {
         url: 'www.baidu.com',
         name: '',
       },
-      w: {
+      'w': {
         url: 'www.weibo.com',
         name: 'weibo',
       },
-      t: {
-        url: 'www.draw.io',
-        name: '',
-      },
-      d: {
-        url: 'www.douban.com',
-        name: '',
-      },
-      g: {
+      'g': {
         url: 'www.google.com',
         name: '',
       },
-      z: {
+      'z': {
         url: 'www.zhihu.com',
         name: '',
       },
-      v: {
-        url: 'www.v2ex.com',
-        name: '',
-      },
-      b: {
+      'b': {
         url: 'www.bilibili.com',
         name: '',
       },
-      n: {
+      'n': {
         url: 'www.youku.com',
         name: '',
       },
-      m: {
+      'm': {
         url: 'v.qq.com',
         name: 'tencent',
+      },
+      '<': {
+        url: 'www.douyin.com',
+        name: '',
+      },
+      'e': {
+        url: 'www.toutiao.com',
+        name: '',
+      },
+      'x': {
+        url: 'www.v2ex.com',
+        name: '',
+      },
+      't': {
+        url: 'www.draw.io',
+        name: '',
+      },
+      'd': {
+        url: 'www.douban.com',
+        name: '',
+      },
+      'j': {
+        url: 'www.jd.com',
+        name: '',
+      },
+      'k': {
+        url: 'www.taobao.com',
+        name: '',
       },
     },
     layout: {
@@ -160,7 +180,7 @@ export const defaultConfig = {
       yOffsetValue: 50,
       yTranslateValue: -50,
     },
-    fontFamily: 'Arial Rounded MT Bold',
+    fontFamily: 'LESLIEB',
     fontSize: 90,
     letterSpacing: 1.5,
     fontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
@@ -193,7 +213,7 @@ export const defaultConfig = {
       yOffsetValue: 57,
       yTranslateValue: 0,
     },
-    fontFamily: 'Arial Rounded MT Bold',
+    fontFamily: 'LESLIEB',
     fontSize: 30,
     letterSpacing: 1,
     fontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
