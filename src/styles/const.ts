@@ -29,6 +29,7 @@ export const styleConst = ref({
 export const swatcheColors = [
   'rgba(255, 255, 255, 1)',
   'rgba(53, 54, 58, 1)',
+  'rgba(101, 101, 101, 0.28)',
   'rgba(209, 213, 219, 1)',
   'rgba(44, 62, 80, 1)',
   'rgba(52, 52, 57, 1)',

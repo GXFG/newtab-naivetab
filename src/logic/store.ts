@@ -16,27 +16,19 @@ export const defaultConfig = {
     isBackgroundImageEnabled: true,
     isLoadPageAnimationEnabled: true,
     backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
-    backgroundImageHighQuality: false,
-    backgroundImageNames: ['YurisNight_ZH-CN5738817931', 'MoonPhases_ZH-CN3779272016'],
-    backgroundImageDescs: ['宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)', '一组月相照片 (© Delpixart/Getty Images)'],
+    backgroundImageHighQuality: true,
+    backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'MoonPhases_ZH-CN3779272016'],
+    backgroundImageDescs: ['楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)', '一组月相照片 (© Delpixart/Getty Images)'],
     isBackgroundImageCustomUrlEnabled: false,
-    backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.YurisNight_ZH-CN5738817931_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.MoonPhases_ZH-CN3779272016_1920x1080.jpg'],
+    backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.MoonPhases_ZH-CN3779272016_1920x1080.jpg'],
     favoriteImageList: [
       {
-        name: 'YurisNight_ZH-CN5738817931',
-        desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
+        name: 'ChukchiSea_ZH-CN7218471261',
+        desc: '楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)',
       },
       {
         name: 'MoonPhases_ZH-CN3779272016',
         desc: '一组月相照片 (© Delpixart/Getty Images)',
-      },
-      {
-        name: 'ChurchillBears_ZH-CN1430090934',
-        desc: '好奇地看着相机的北极熊，加拿大丘吉尔镇 (© Matthias Breiter/Minden Pictures)',
-      },
-      {
-        name: 'WinterHalo_ZH-CN0666553211',
-        desc: '厄尔士山脉上的光晕，德国萨克森州 (© Martin Ruegner/Getty Images)',
       },
       {
         name: 'DarwinsArch_ZH-CN9740478501',
@@ -47,8 +39,20 @@ export const defaultConfig = {
         desc: '鸟瞰罗卡附近的Grotta della Poesia，意大利莱切 (© Amazing Aerial Agency/Offset by Shutterstock)',
       },
       {
+        name: 'YurisNight_ZH-CN5738817931',
+        desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
+      },
+      {
         name: 'PrathameshJaju_ZH-CN2207606082',
         desc: '月球的高清合成影像 (© Prathamesh Jaju)',
+      },
+      {
+        name: 'ChurchillBears_ZH-CN1430090934',
+        desc: '好奇地看着相机的北极熊，加拿大丘吉尔镇 (© Matthias Breiter/Minden Pictures)',
+      },
+      {
+        name: 'WinterHalo_ZH-CN0666553211',
+        desc: '厄尔士山脉上的光晕，德国萨克森州 (© Martin Ruegner/Getty Images)',
       },
       {
         name: 'MoonlightRainier_ZH-CN6263832605',
@@ -57,10 +61,6 @@ export const defaultConfig = {
       {
         name: 'Balsamroot_ZH-CN9456182640',
         desc: '山下盛开的箭叶脂根菊，美国大提顿国家公园 (© Mike Cavaroc/Tandem Stills + Motion)',
-      },
-      {
-        name: 'ChukchiSea_ZH-CN7218471261',
-        desc: '楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)',
       },
     ],
     layout: {
@@ -191,7 +191,7 @@ export const defaultConfig = {
     },
   },
   clockAnalog: {
-    enabled: true,
+    enabled: false,
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 50,
@@ -292,7 +292,7 @@ export const defaultConfig = {
     fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(101, 101, 101, 0.28)', 'rgba(71,85,105, 1)'],
     backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(74, 74, 74, 0.1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
@@ -317,7 +317,7 @@ export const defaultConfig = {
     fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
     isBorderEnabled: true,
     borderWidth: 1,
-    borderColor: ['rgba(167, 176, 188, 1)', 'rgba(71,85,105, 1)'],
+    borderColor: ['rgba(101, 101, 101, 0.28)', 'rgba(71,85,105, 1)'],
     backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(24, 24, 24, 0.3)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
@@ -523,7 +523,9 @@ export const handleFirstOpen = () => {
   }
   // 首次打开扩展时，打开画布模式 & 帮助弹窗
   toggleIsDragMode(true)
-  openUserGuideModal()
+  setTimeout(() => {
+    openUserGuideModal()
+  }, 500)
 }
 
 export const handleStateResetAndUpdate = () => {
