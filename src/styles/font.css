@@ -1,4 +1,59 @@
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display */
+
 @font-face {
   font-family: 'Arial Rounded MT Bold';
-  src: url('/assets/fonts/arial-rounded-bold.ttf') format('truetype');
+  src: url('/assets/fonts/arial-rounded-bold.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'LED7';
+  src: url('/assets/fonts/7LED.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'Advanced Led Board-7';
+  src: url('/assets/fonts/advanced-led-board-7.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'KBSkittled';
+  src: url('/assets/fonts/KBSkittled.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'LESLIEB';
+  src: url('/assets/fonts/LESLIEB.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'The Led Display St';
+  src: url('/assets/fonts/the-led-display-st.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'LCDMono2';
+  src: url('/assets/fonts/LCDMono2-ultra.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'LCD';
+  src: url('/assets/fonts/LCD-regular.ttf');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'Pixel Lcd Machine';
+  src: url('/assets/fonts/pixel-lcd-machine.ttf');
+  font-display: fallback;
+}
+
+body {
+  font-family: 'Arial Rounded MT Bold', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD', 'Pixel Lcd Machine';
 }
