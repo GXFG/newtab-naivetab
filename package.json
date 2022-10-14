@@ -1,10 +1,10 @@
 {
   "name": "newtab-naivetab",
-  "displayName": "NaiveTab - New Tab",
-  "version": "1.7.5",
+  "displayName": "NaiveTab - Newtab page",
+  "version": "1.8.0",
   "private": true,
   "packageManager": "pnpm@7.9.5",
-  "description": "一款简洁的浏览器新标签页扩展",
+  "description": "一款简洁高效的浏览器新标签页扩展，可以高度自定义你的新标签页",
   "scripts": {
     "watch": "npm nodemon --ignore '*.d.ts' --watch 'src' -e ts,js,mjs,json,vue --exec 'npm build:web'",
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:*",
@@ -29,19 +29,20 @@
   "dependencies": {
     "axios": "^0.27.2",
     "cheerio": "^1.0.0-rc.12",
-    "dayjs": "^1.11.5"
+    "dayjs": "^1.11.5",
+    "lunar-javascript": "^1.2.33"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.26.3",
     "@ffflorian/jszip-cli": "^3.1.6",
-    "@iconify/json": "^2.1.119",
+    "@iconify/json": "^2.1.121",
     "@iconify/vue": "^3.2.1",
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@types/chrome": "^0.0.195",
     "@types/fs-extra": "^9.0.13",
-    "@types/node": "^18.8.3",
+    "@types/node": "18.8.0",
     "@types/webextension-polyfill": "^0.9.1",
-    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
     "@vitejs/plugin-vue": "^2.3.4",
     "@vue/compiler-sfc": "^3.2.40",
     "@vueuse/core": "^9.3.0",
@@ -53,7 +54,7 @@
     "esno": "^0.16.3",
     "fs-extra": "^10.1.0",
     "kolorist": "^1.6.0",
-    "naive-ui": "^2.33.4",
+    "naive-ui": "^2.33.5",
     "nodemon": "^2.0.20",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",

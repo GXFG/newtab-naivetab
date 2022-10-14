@@ -18,66 +18,66 @@ const state = reactive({
 
 const elementList = computed(() => [
   {
-    label: window.$t('setting.bookmark'),
+    label: window.$t('setting.bookmarkKeyboard'),
     componentName: 'bookmark',
     iconName: 'ic:outline-keyboard-alt',
-    iconSize: 28,
+    iconSize: 2.8,
     disabled: localConfig.bookmark.enabled,
   },
   {
     label: window.$t('setting.clockDigital'),
     componentName: 'clockDigital',
     iconName: 'mdi:clock-digital',
-    iconSize: 30,
+    iconSize: 3,
     disabled: localConfig.clockDigital.enabled,
   },
   {
     label: window.$t('setting.clockAnalog'),
     componentName: 'clockAnalog',
     iconName: 'grommet-icons:clock',
-    iconSize: 26,
+    iconSize: 2.5,
     disabled: localConfig.clockAnalog.enabled,
   },
   {
     label: window.$t('setting.date'),
     componentName: 'date',
     iconName: 'system-uicons:calendar-date',
-    iconSize: 26,
+    iconSize: 2.6,
     disabled: localConfig.date.enabled,
   },
   {
     label: window.$t('setting.calendar'),
     componentName: 'calendar',
     iconName: 'uiw:date',
-    iconSize: 22,
+    iconSize: 2.2,
     disabled: localConfig.calendar.enabled,
   },
   {
     label: window.$t('setting.search'),
     componentName: 'search',
-    iconName: 'teenyicons:search-circle-outline',
-    iconSize: 24,
+    iconName: 'fluent:search-square-24-regular',
+    iconSize: 2.8,
     disabled: localConfig.search.enabled,
   },
   {
     label: window.$t('setting.memo'),
     componentName: 'memo',
-    iconName: 'fluent:notepad-edit-16-regular',
-    iconSize: 24,
+    iconName: 'material-symbols:note-alt-outline',
+    iconSize: 2.6,
     disabled: localConfig.memo.enabled,
   },
   {
     label: window.$t('setting.weather'),
     componentName: 'weather',
     iconName: 'mdi:weather-cloudy',
-    iconSize: 28,
+    iconSize: 2.8,
     disabled: localConfig.weather.enabled,
   },
   {
     label: window.$t('setting.news'),
     componentName: 'news',
     iconName: 'majesticons:newspaper-line',
-    iconSize: 24,
+    iconSize: 2.4,
     disabled: localConfig.news.enabled,
   },
 ])
@@ -191,7 +191,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
           data-target-type="2"
           :data-target-name="item.componentName"
         >
-          <div class="item__icon" :style="`font-size:${item.iconSize}px`">
+          <div class="item__icon" :style="`font-size:${item.iconSize}vmin`">
             <Icon :icon="item.iconName" />
           </div>
           <span class="item__text">{{ item.label }}</span>
@@ -222,8 +222,8 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
   z-index: 20;
   position: relative;
   top: 0;
-  left: -230px;
-  width: 230px;
+  left: -30vmin;
+  width: 30vmin;
   height: 100vh;
   color: #fff;
   background-color: v-bind(bgMoveableToolDrawer);
@@ -279,16 +279,15 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding-top: 10px;
       width: 100%;
       .content__item {
         flex-shrink: 1;
         display: flex;
         align-items: center;
-        margin: 10px 0;
+        margin: 2vmin 0;
         width: 75%;
-        height: 45px;
-        font-size: 16px;
+        height: 6vmin;
+        font-size: 1.6vmin;
         border: 1px solid v-bind(borderMoveableToolItem);
         border-radius: 3px;
         cursor: move;
@@ -297,13 +296,13 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
           display: flex;
           justify-content: center;
           align-items: center;
-          width: 50px;
-          height: 45px;
+          width: 6vmin;
+          height: 6vmin;
         }
         .item__text {
           flex: 1;
-          height: 45px;
-          line-height: 45px;
+          height: 6vmin;
+          line-height: 6vmin;
           text-align: center;
           border-left: 1px solid v-bind(borderMoveableToolItem);
         }

@@ -82,9 +82,12 @@ export const KEYBOARD_SPLIT_RANGE_MAP = {
 }
 
 export const NEWS_SOURCE_MAP = {
+  toutiao: 'https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc',
   baidu: 'https://top.baidu.com/board?tab=realtime',
   zhihu: 'https://www.zhihu.com/hot',
   weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
+  kr36: 'https://36kr.com/hot-list/catalog',
+  bilibili: 'https://www.bilibili.com/v/popular/rank/all',
   v2ex: 'https://www.v2ex.com/?tab=hot',
 }
 
@@ -114,50 +117,4 @@ export const WEATHER_TEMPERATURE_UNIT_MAP = {
 export const WEATHER_SPEED_UNIT_MAP = {
   mph: 'mph',
   kph: 'km/h',
-}
-
-/**
- * 1休，2班
- */
-export const LEGAL_HOLIDAY_ENUM: any = {
-  2022: {
-    '0101': 1,
-    '0102': 1,
-    '0103': 1,
-    '0129': 2,
-    '0130': 2,
-    '0131': 1,
-    '0201': 1,
-    '0202': 1,
-    '0203': 1,
-    '0204': 1,
-    '0205': 1,
-    '0206': 1,
-    '0402': 2,
-    '0403': 1,
-    '0404': 1,
-    '0405': 1,
-    '0424': 2,
-    '0430': 1,
-    '0501': 1,
-    '0502': 1,
-    '0503': 1,
-    '0504': 1,
-    '0507': 2,
-    '0603': 1,
-    '0604': 1,
-    '0605': 1,
-    '0910': 1,
-    '0911': 1,
-    '0912': 1,
-    '1001': 1,
-    '1002': 1,
-    '1003': 1,
-    '1004': 1,
-    '1005': 1,
-    '1006': 1,
-    '1007': 1,
-    '1008': 2,
-    '1009': 2,
-  },
 }

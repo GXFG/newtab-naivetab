@@ -121,11 +121,11 @@ const onResetSetting = () => {
       </NFormItem>
       <NFormItem v-if="localConfig.general.isBackgroundImageEnabled" :label="$t('common.blur')">
         <NSlider v-model:value="localConfig.general.bgBlur" :step="0.1" :min="0" :max="200" />
-        <NInputNumber v-model:value="localConfig.general.bgBlur" class="setting__input-number" :step="0.1" :min="0" :max="200" />
+        <NInputNumber v-model:value="localConfig.general.bgBlur" class="setting__item-element setting__input-number" :step="0.1" :min="0" :max="200" />
       </NFormItem>
       <NFormItem v-if="localConfig.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
         <NSlider v-model:value="localConfig.general.bgOpacity" :step="0.01" :min="0" :max="1" />
-        <NInputNumber v-model:value="localConfig.general.bgOpacity" class="setting__input-number" :step="0.01" :min="0" :max="1" />
+        <NInputNumber v-model:value="localConfig.general.bgOpacity" class="setting__item-element setting__input-number" :step="0.01" :min="0" :max="1" />
       </NFormItem>
 
       <!-- setting -->

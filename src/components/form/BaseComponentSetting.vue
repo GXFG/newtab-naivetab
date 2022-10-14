@@ -64,32 +64,34 @@ const fontSelectRenderLabel = (option: SelectStringItem) => {
     <!-- size -->
     <NFormItem v-if="isRenderField('margin')" :label="$t('common.margin')">
       <NSlider v-model:value="localConfig[props.cname].margin" :step="0.1" :min="0" :max="100" />
-      <NInputNumber v-model:value="localConfig[props.cname].margin" class="setting__input-number" :step="0.1" :min="0" :max="100" />
+      <NInputNumber v-model:value="localConfig[props.cname].margin" class="setting__item-element setting__input-number" :step="0.1" :min="0" :max="100" />
     </NFormItem>
     <NFormItem v-if="isRenderField('padding')" :label="$t('common.padding')">
       <NSlider v-model:value="localConfig[props.cname].padding" :step="0.1" :min="0" :max="100" />
-      <NInputNumber v-model:value="localConfig[props.cname].padding" class="setting__input-number" :step="0.1" :min="0" :max="100" />
+      <NInputNumber v-model:value="localConfig[props.cname].padding" class="setting__item-element setting__input-number" :step="0.1" :min="0" :max="100" />
     </NFormItem>
     <NFormItem v-if="isRenderField('width')" :label="$t('common.width')">
       <NSlider v-model:value="localConfig[props.cname].width" :step="1" :min="1" :max="1000" />
-      <NInputNumber v-model:value="localConfig[props.cname].width" class="setting__input-number" :step="1" :min="1" :max="1000" />
+      <NInputNumber v-model:value="localConfig[props.cname].width" class="setting__item-element setting__input-number" :step="1" :min="1" :max="1000" />
     </NFormItem>
     <NFormItem v-if="isRenderField('height')" :label="$t('common.height')">
       <NSlider v-model:value="localConfig[props.cname].height" :step="1" :min="1" :max="1000" />
-      <NInputNumber v-model:value="localConfig[props.cname].height" class="setting__input-number" :step="1" :min="1" :max="1000" />
+      <NInputNumber v-model:value="localConfig[props.cname].height" class="setting__item-element setting__input-number" :step="1" :min="1" :max="1000" />
     </NFormItem>
     <NFormItem v-if="isRenderField('borderRadius')" :label="$t('common.borderRadius')">
       <NSlider v-model:value="localConfig[props.cname].borderRadius" :step="0.1" :min="0" :max="200" />
-      <NInputNumber v-model:value="localConfig[props.cname].borderRadius" class="setting__input-number" :step="0.1" :min="0" :max="200" />
+      <NInputNumber v-model:value="localConfig[props.cname].borderRadius" class="setting__item-element setting__input-number" :step="0.1" :min="0" :max="200" />
     </NFormItem>
     <NFormItem v-if="isRenderField('fontFamily')" :label="$t('common.font')">
       <NSelect v-model:value="localConfig[props.cname].fontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
-      <NInputNumber v-model:value="localConfig[props.cname].fontSize" class="setting__input-number" :step="1" :min="12" :max="200" />
+      <NInputNumber v-model:value="localConfig[props.cname].fontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="200" />
     </NFormItem>
     <NFormItem v-if="isRenderField('letterSpacing')" :label="$t('common.letterSpacing')">
-      <NSlider v-model:value="localConfig[props.cname].letterSpacing" :step="0.1" :min="0" :max="20" />
-      <NInputNumber v-model:value="localConfig[props.cname].letterSpacing" class="setting__input-number" :step="0.1" :min="0" :max="20" />
+      <NSlider v-model:value="localConfig[props.cname].letterSpacing" :step="0.1" :min="0" :max="200" />
+      <NInputNumber v-model:value="localConfig[props.cname].letterSpacing" class="setting__item-element setting__input-number" :step="0.1" :min="0" :max="200" />
     </NFormItem>
+
+    <slot name="size" />
 
     <!-- color -->
     <NFormItem v-if="isRenderField('primaryColor')" :label="$t('common.primaryColor')">
@@ -124,7 +126,7 @@ const fontSelectRenderLabel = (option: SelectStringItem) => {
       <NInputNumber
         v-if="isRenderField('borderWidth')"
         v-model:value="localConfig[props.cname].borderWidth"
-        class="setting__input-number"
+        class="setting__item-element setting__input-number"
         :step="1"
         :min="1"
         :max="10"
@@ -140,6 +142,8 @@ const fontSelectRenderLabel = (option: SelectStringItem) => {
         :swatches="swatcheColors"
       />
     </NFormItem>
+
+    <slot name="color" />
 
     <slot name="footer" />
   </NForm>

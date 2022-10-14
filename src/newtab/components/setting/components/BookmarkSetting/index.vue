@@ -112,7 +112,7 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
               </div>
               <div v-if="localConfig.bookmark.isDblclickOpen" class="setting__input_item">
                 <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
-                <NInputNumber v-model:value="localConfig.bookmark.dblclickIntervalTime" class="setting__input-number--unit" :min="0" :step="1">
+                <NInputNumber v-model:value="localConfig.bookmark.dblclickIntervalTime" class="setting__item-element setting__input-number--unit" :min="0" :step="1">
                   <template #suffix>
                     ms
                   </template>

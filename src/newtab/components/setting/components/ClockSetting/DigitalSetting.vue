@@ -22,7 +22,7 @@ import { URL_DAYJS_FORMAT, localConfig } from '@/logic'
         <NInputNumber
           v-if="localConfig.clockDigital.unitEnabled"
           v-model:value="localConfig.clockDigital.unit.fontSize"
-          class="setting__input-number"
+          class="setting__item-element setting__input-number"
           :min="12"
           :step="1"
         />

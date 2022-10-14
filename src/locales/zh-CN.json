@@ -18,6 +18,7 @@
     "export": "导出",
     "enabled": "启用",
     "layout": "布局",
+    "label": "标签",
     "left": "左",
     "right": "右",
     "top": "上",
@@ -48,7 +49,7 @@
     "drawerSite": "抽屉位置",
     "local": "本地",
     "network": "网络",
-    "4k": "4k分辨率",
+    "uhd": "UHD分辨率",
     "bing": "Bing",
     "favorite": "收藏",
     "margin": "外边距",
@@ -124,10 +125,10 @@
     "clockAnalog": "模拟时钟",
     "date": "日期",
     "search": "搜索",
-    "calendar": "日历",
+    "calendar": "万年历",
     "weather": "天气",
     "memo": "备忘录",
-    "news": "新闻"
+    "news": "资讯"
   },
   "general": {
     "globalStyle": "全局样式",
@@ -205,7 +206,10 @@
     "today": "今",
     "work": "班",
     "rest": "休",
-    "weekBeginsOn": "一周开始于"
+    "workDesc": "调休日",
+    "restDesc": "休息日",
+    "weekBeginsOn": "一周开始于",
+    "holiday": "节假日"
   },
   "weather": {
     "warning": "天气预警",
@@ -219,10 +223,14 @@
     "wordCount": "字数统计"
   },
   "news": {
-    "source": "新闻来源",
+    "source": "资讯来源",
+    "refreshInterval": "刷新间隔",
+    "toutiao": "头条",
     "baidu": "百度",
     "zhihu": "知乎",
     "weibo": "微博",
+    "kr36": "36氪",
+    "bilibili": "B站",
     "v2ex": "V2EX"
   }
 }

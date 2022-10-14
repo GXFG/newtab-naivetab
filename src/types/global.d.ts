@@ -162,10 +162,11 @@ interface ForecastItem {
   windSpeedNight: string // "3"
 }
 
-type NewsSources = 'baidu' | 'zhihu' | 'weibo' | 'v2ex'
+type NewsSources = 'toutiao' | 'baidu' | 'zhihu' | 'weibo' | 'kr36' | 'bilibili' | 'v2ex'
 
 interface NewsListItem {
   url: string
   desc: string
   hot: string
+  cover?: string
 }

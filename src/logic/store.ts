@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -16,27 +16,27 @@ export const defaultConfig = {
     isBackgroundImageEnabled: true,
     isLoadPageAnimationEnabled: true,
     backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
-    backgroundImageHighQuality: true,
-    backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'MoonPhases_ZH-CN3779272016'],
-    backgroundImageDescs: ['楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)', '一组月相照片 (© Delpixart/Getty Images)'],
+    backgroundImageHighQuality: false,
+    backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'DolomitesMW_ZH-CN3307894335'],
+    backgroundImageDescs: ['楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)', '多洛米蒂山上空的银河，意大利 (© Carlos Fernandez/Getty Images)'],
     isBackgroundImageCustomUrlEnabled: false,
-    backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.MoonPhases_ZH-CN3779272016_1920x1080.jpg'],
+    backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.DolomitesMW_ZH-CN3307894335_1920x1080.jpg'],
     favoriteImageList: [
       {
         name: 'ChukchiSea_ZH-CN7218471261',
         desc: '楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)',
       },
       {
-        name: 'MoonPhases_ZH-CN3779272016',
-        desc: '一组月相照片 (© Delpixart/Getty Images)',
+        name: 'DolomitesMW_ZH-CN3307894335',
+        desc: '多洛米蒂山上空的银河，意大利 (© Carlos Fernandez/Getty Images)',
       },
       {
-        name: 'DarwinsArch_ZH-CN9740478501',
-        desc: '达尔文岛的达尔文拱门，厄瓜多尔加拉帕戈斯 (© miralex/Getty Images)',
+        name: 'YosemiteNightSky_ZH-CN5864740024',
+        desc: '半穹顶景观点上空的银河，优胜美地国家公园，加利福尼亚州 (© Cory Marshall/Tandem Stills + Motion)',
       },
       {
-        name: 'PoetrysCave_ZH-CN3196193909',
-        desc: '鸟瞰罗卡附近的Grotta della Poesia，意大利莱切 (© Amazing Aerial Agency/Offset by Shutterstock)',
+        name: 'LavaTube_ZH-CN5458469336',
+        desc: '漏出“天窗”的熔岩管，夏威夷火山国家公园 (© Tom Schwabel/Tandem Stills + Motion)',
       },
       {
         name: 'YurisNight_ZH-CN5738817931',
@@ -55,12 +55,20 @@ export const defaultConfig = {
         desc: '厄尔士山脉上的光晕，德国萨克森州 (© Martin Ruegner/Getty Images)',
       },
       {
-        name: 'MoonlightRainier_ZH-CN6263832605',
-        desc: '雷尼尔山上空的银河星系，美国华盛顿州 (© Brad Goldpaint/Cavan)',
+        name: 'DarwinsArch_ZH-CN9740478501',
+        desc: '达尔文岛的达尔文拱门，厄瓜多尔加拉帕戈斯 (© miralex/Getty Images)',
+      },
+      {
+        name: 'PoetrysCave_ZH-CN3196193909',
+        desc: '鸟瞰罗卡附近的Grotta della Poesia，意大利莱切 (© Amazing Aerial Agency/Offset by Shutterstock)',
       },
       {
         name: 'Balsamroot_ZH-CN9456182640',
         desc: '山下盛开的箭叶脂根菊，美国大提顿国家公园 (© Mike Cavaroc/Tandem Stills + Motion)',
+      },
+      {
+        name: 'HalfwayDay_ZH-CN1333459630',
+        desc: '分隔两个湖泊的公路，苏格兰高地 (© Abstract Aerial Art/Getty Images)',
       },
     ],
     layout: {
@@ -237,36 +245,19 @@ export const defaultConfig = {
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
     backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
+    backgroundActiveColor: ['rgba(16, 152, 173, 0.5)', 'rgba(16, 152, 173, 0.5)'],
     isBorderEnabled: true,
     borderWidth: 1,
     borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
     isShadowEnabled: true,
     shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-  },
-  weather: {
-    enabled: false,
-    apiKey: '72db57326f9f494ab04d1d431bc127e9',
-    city: {
-      id: '101010300', // 101010300
-      name: '中国-北京市-北京-朝阳', // "中国-北京市-北京-朝阳"
-    },
-    temperatureUnit: 'c', // 'c' | 'f'
-    speedUnit: 'kph', // 'kph' | 'mph'
-    iconEnabled: true,
-    forecastEnabled: false,
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 50,
-      xTranslateValue: -50,
-      yOffsetKey: 'bottom',
-      yOffsetValue: 5,
-      yTranslateValue: 0,
-    },
-    fontFamily: 'Arial Rounded MT Bold',
-    fontSize: 14,
-    fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-    iconSize: 50,
+    holidayFontColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
+    restItemBackgroundColor: ['rgba(255, 110, 110, 0.4)', 'rgba(255, 110, 110, 0.4)'],
+    workItemBackgroundColor: ['rgba(122, 122, 122, 0.5)', 'rgba(122, 122, 122, 0.5)'],
+    restLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+    workLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+    restLabelBackgroundColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
+    workLabelBackgroundColor: ['rgba(122, 122, 122, 1)', 'rgb(122, 122, 122, 1)'],
   },
   search: {
     enabled: true,
@@ -322,9 +313,34 @@ export const defaultConfig = {
     isShadowEnabled: true,
     shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
   },
+  weather: {
+    enabled: false,
+    apiKey: '72db57326f9f494ab04d1d431bc127e9',
+    city: {
+      id: '101010300', // 101010300
+      name: '中国-北京市-北京-朝阳', // "中国-北京市-北京-朝阳"
+    },
+    temperatureUnit: 'c', // 'c' | 'f'
+    speedUnit: 'kph', // 'kph' | 'mph'
+    iconEnabled: true,
+    forecastEnabled: false,
+    layout: {
+      xOffsetKey: 'left',
+      xOffsetValue: 50,
+      xTranslateValue: -50,
+      yOffsetKey: 'bottom',
+      yOffsetValue: 5,
+      yTranslateValue: 0,
+    },
+    fontFamily: 'Arial Rounded MT Bold',
+    fontSize: 14,
+    fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+    iconSize: 50,
+  },
   news: {
     enabled: false,
-    sourceList: ['zhihu', 'weibo'] as NewsSources[],
+    sourceList: ['baidu', 'weibo'] as NewsSources[],
+    refreshIntervalTime: 90,
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 0,
@@ -338,7 +354,7 @@ export const defaultConfig = {
     height: 340,
     borderRadius: 4,
     fontFamily: 'Arial',
-    fontSize: 13,
+    fontSize: 14,
     fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
     fontActiveColor: ['rgba(36, 64, 179, 1)', 'rgba(155, 177, 254, 1)'],
     backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
@@ -359,8 +375,8 @@ export const localConfig = reactive({
   date: useStorageLocal('c-date', defaultConfig.date),
   calendar: useStorageLocal('c-calendar', defaultConfig.calendar),
   search: useStorageLocal('c-search', defaultConfig.search),
-  weather: useStorageLocal('c-weather', defaultConfig.weather),
   memo: useStorageLocal('c-memo', defaultConfig.memo),
+  weather: useStorageLocal('c-weather', defaultConfig.weather),
   news: useStorageLocal('c-news', defaultConfig.news),
 })
 
@@ -543,8 +559,34 @@ export const handleAppUpdate = async () => {
     return
   }
   log('Get new version', pkg.version)
+  // @@@@ 每次更新均需要手动处理新版本变更的本地数据结构，
+  if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
+    let newLocalState = {}
+    const localState: any = localStorage.getItem('l-state')
+    if (localState) {
+      newLocalState = {
+        ...defaultLocalState,
+        ...JSON.parse(localState),
+      }
+    }
+    localStorage.setItem('l-state', JSON.stringify(newLocalState))
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.7.5')) {
+    newsState.value.toutiao = {
+      syncTime: 0,
+      list: [],
+    }
+    newsState.value.kr36 = {
+      syncTime: 0,
+      list: [],
+    }
+    newsState.value.bilibili = {
+      syncTime: 0,
+      list: [],
+    }
+  }
+  // 更新local版本号
   localConfig.general.version = pkg.version
-  // 更新成功提示
   window.$notification.success({
     duration: 8000,
     title: `${window.$t('common.update')}${window.$t('common.success')}`,
