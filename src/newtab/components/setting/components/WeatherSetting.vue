@@ -101,7 +101,7 @@ const onOpenCityPicker = () => {
           </div>
           <div v-if="localConfig.weather.iconEnabled" class="setting__input_item">
             <NSlider v-model:value="localConfig.weather.iconSize" class="item__grow" :step="1" :min="30" :max="200" />
-            <NInputNumber v-model:value="localConfig.weather.iconSize" class="setting__input-number" :step="1" :min="30" :max="200" />
+            <NInputNumber v-model:value="localConfig.weather.iconSize" class="setting__item-element setting__input-number" :step="1" :min="30" :max="200" />
           </div>
         </div>
       </NFormItem>

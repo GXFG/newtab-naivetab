@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { calendar } from '@/lib/calendar'
-import { LEGAL_HOLIDAY_ENUM, isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
+import { Solar, Lunar, HolidayUtil } from 'lunar-javascript'
+import { isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
@@ -14,13 +14,14 @@ const state = reactive({
   dateList: [] as {
     date: string // YYYY-MM-DD
     day: number // D
-    desc: string
-    type: number // 1休，2班
+    desc: string // 节日
+    type: number // 0不展示，1休，2班
     isToday: boolean
     isWeekend: boolean
     isFestival: boolean
     isNotCurrMonth: boolean
   }[],
+  currDetailDate: '',
 })
 
 const monthsList = computed(() => [
@@ -67,23 +68,34 @@ const holidayTypeToDesc = computed(() => ({
  */
 const genDateList = (type: 'start' | 'main' | 'end', dateEle: any) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
-  const shortDate = dateEle.format('MMDD')
-  const lunar: Calendar = calendar.solar2lunar(...formatDate.split('-'))
-  const { cYear, cDay, nWeek, isToday, festival, lunarFestival, Term, IMonthCn, IDayCn, lDay } = lunar
-  // desc优先级：阳历节日，阴历节日，节气，阴历月份，阴历日期
+  const targetDateEle = new Date(formatDate)
+  const funcParams = [dateEle.get('year'), dateEle.get('month') + 1, dateEle.get('date')]
+  const solarEle = Solar.fromDate(targetDateEle)
+  const lunarEle = Lunar.fromDate(targetDateEle)
+  const holidayEle = HolidayUtil.getHoliday(...funcParams)
+
+  // desc优先级：阳历节日, 阴历节日, 节气, 阴历月份, 阴历日期
+  let desc = solarEle.getFestivals()[0] || lunarEle.getFestivals()[0] || lunarEle.getJieQi() || ''
   let isFestival = true
-  let desc = festival || lunarFestival || Term || ''
   if (desc.length === 0) {
     isFestival = false
-    desc = lDay === 1 ? IMonthCn : IDayCn
+    desc = lunarEle.getDay() === 1 ? `${lunarEle.getMonthInChinese()}月` : lunarEle.getDayInChinese()
   }
+
+  let dayType = 0
+  if (holidayEle && holidayEle.isWork()) {
+    dayType = 2
+  } else if (holidayEle && holidayEle.getName()) {
+    dayType = 1
+  }
+
   const param = {
     date: formatDate,
-    day: cDay,
+    day: dateEle.get('date'),
     desc,
-    type: (LEGAL_HOLIDAY_ENUM[cYear] && LEGAL_HOLIDAY_ENUM[cYear][shortDate]) || 0,
-    isToday,
-    isWeekend: [6, 7].includes(nWeek),
+    type: dayType,
+    isToday: state.today === formatDate,
+    isWeekend: [6, 0].includes(dateEle.get('day')),
     isFestival,
     isNotCurrMonth: type !== 'main',
   }
@@ -186,6 +198,45 @@ const onReset = () => {
   onRender()
 }
 
+const detailInfo = reactive({
+  date: '',
+  week: '',
+  lunar: '',
+  solarFestivals: '',
+  lunarFestivals: '',
+  xingzuo: '',
+  yi: '',
+  ji: '',
+  jishen: '',
+  xiongsha: '',
+})
+
+const onToggleDetailPopover = (date?: string) => {
+  if (isDragMode.value) {
+    return
+  }
+  if (!date) {
+    state.currDetailDate = ''
+    return
+  }
+  const targetDateEle = new Date(date)
+  const lunarEle = Lunar.fromDate(targetDateEle)
+  const solarEle = Solar.fromDate(targetDateEle)
+
+  detailInfo.date = date
+  detailInfo.week = `星期${lunarEle.getWeekInChinese()}`
+  detailInfo.lunar = `${lunarEle.getYearInGanZhi()}${lunarEle.getYearShengXiao()}年 农历${lunarEle.getMonthInChinese()}月${lunarEle.getDayInChinese()}`
+  detailInfo.solarFestivals = `${solarEle.getFestivals().join(' ')} ${solarEle.getOtherFestivals().join(' ')}`
+  detailInfo.lunarFestivals = `${lunarEle.getFestivals().join(' ')} ${lunarEle.getOtherFestivals().join(' ')}`
+  detailInfo.xingzuo = solarEle.getXingZuo()
+  detailInfo.yi = lunarEle.getDayYi().join(' ')
+  detailInfo.ji = lunarEle.getDayJi().join(' ')
+  detailInfo.jishen = lunarEle.getDayJiShen().join(' ')
+  detailInfo.xiongsha = lunarEle.getDayXiongSha().join(' ')
+
+  state.currDetailDate = date
+}
+
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
 const customContainerWidth = getStyleField(CNAME, 'width', 'vmin', 7.4)
@@ -199,10 +250,14 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customItemWidth = getStyleField(CNAME, 'width', 'vmin')
 const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
 const customItemBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
-const textColorRed = getStyleConst('textColorRed')
-const bgCalendarRest = getStyleConst('bgCalendarRest')
-const bgCalendarWork = getStyleConst('bgCalendarWork')
-const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
+
+const customHolidayFontColor = getStyleField(CNAME, 'holidayFontColor')
+const customRestItemBackgroundColor = getStyleField(CNAME, 'restItemBackgroundColor')
+const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundColor')
+const customRestLabelBackgroundColor = getStyleField(CNAME, 'restLabelBackgroundColor')
+const customWorkLabelBackgroundColor = getStyleField(CNAME, 'workLabelBackgroundColor')
+const customRestLabelFontColor = getStyleField(CNAME, 'restLabelFontColor')
+const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
 </script>
 
 <template>
@@ -264,30 +319,83 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         </ul>
         <!-- body -->
         <ul class="calendar__body">
-          <li
-            v-for="item in state.dateList"
-            :key="item.date"
-            class="body__item"
-            :class="{
-              'body__item--hover': !isDragMode,
-              'body__item--active': item.isToday,
-              'body__item--blur': item.isNotCurrMonth,
-              'body__item--weekend': item.isWeekend,
-              'body__item--rest': item.type === 1,
-              'body__item--work': item.type === 2,
-            }"
-          >
-            <span
-              v-if="item.type"
-              class="item__label"
-              :class="{
-                'item__label--rest': item.type === 1,
-                'item__label--work': item.type === 2,
-              }"
-            >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
-            <span v-if="item.isToday" class="item__today">{{ $t('calendar.today') }}</span>
-            <span class="item__day">{{ item.day }}</span>
-            <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
+          <li v-for="item in state.dateList" :key="item.date" @click="onToggleDetailPopover(item.date)">
+            <NPopover
+              style="max-width: 300px"
+              display-directive="if"
+              :show="state.currDetailDate === item.date"
+              :title="item.date"
+              trigger="manual"
+              @clickoutside="onToggleDetailPopover()"
+            >
+              <template #trigger>
+                <div
+                  class="body__item"
+                  :class="{
+                    'body__item--hover': !isDragMode,
+                    'body__item--active': item.isToday,
+                    'body__item--blur': item.isNotCurrMonth,
+                    'body__item--weekend': item.isWeekend,
+                    'body__item--rest': item.type === 1,
+                    'body__item--work': item.type === 2,
+                  }"
+                >
+                  <span
+                    v-if="item.type"
+                    class="item__label"
+                    :class="{
+                      'item__label--rest': item.type === 1,
+                      'item__label--work': item.type === 2,
+                    }"
+                  >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
+                  <span v-if="item.isToday" class="item__today">{{ $t('calendar.today') }}</span>
+                  <span class="item__day">{{ item.day }}</span>
+                  <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
+                </div>
+              </template>
+              <!-- detail -->
+              <div class="calendar__detail">
+                <p class="detail__date">
+                  {{ detailInfo.date }}
+                  {{ detailInfo.lunar }}
+                </p>
+                <p class="detail__holiday">
+                  {{ `${detailInfo.solarFestivals} ${detailInfo.lunarFestivals}` }}
+                </p>
+                <div class="detail__row">
+                  <p class="row__tag row__tag--yi">
+                    易
+                  </p>
+                  <p class="row__value">
+                    {{ detailInfo.yi }}
+                  </p>
+                </div>
+                <div class="detail__row">
+                  <p class="row__tag row__tag--ji">
+                    忌
+                  </p>
+                  <p class="row__value">
+                    {{ detailInfo.ji }}
+                  </p>
+                </div>
+                <div class="detail__row">
+                  <p class="row__label">
+                    吉神
+                  </p>
+                  <p class="row__value">
+                    {{ detailInfo.jishen }}
+                  </p>
+                </div>
+                <div class="detail__row">
+                  <p class="row__label">
+                    凶杀
+                  </p>
+                  <p class="row__value">
+                    {{ detailInfo.xiongsha }}
+                  </p>
+                </div>
+              </div>
+            </NPopover>
           </li>
         </ul>
       </div>
@@ -361,7 +469,7 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         text-align: center;
       }
       .header__item--weekend {
-        color: v-bind(textColorRed);
+        color: v-bind(customHolidayFontColor);
       }
     }
     .calendar__body {
@@ -384,18 +492,19 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
         border-radius: v-bind(customBorderRadius);
         border: 1px solid rgba(0, 0, 0, 0);
         overflow: hidden;
+        cursor: pointer;
         .item__day {
         }
         .item__desc {
           margin-top: 0.2vmin;
           color: v-bind(customFontColor);
-          font-size: 12px;
-          transform: scale(0.7);
+          font-size: v-bind(customFontSize);
+          transform: scale(0.8);
           overflow: hidden;
           white-space: nowrap;
         }
         .item__desc--highlight {
-          color: v-bind(textColorRed);
+          color: v-bind(customHolidayFontColor);
         }
         .item__today {
           position: absolute;
@@ -403,38 +512,39 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
           right: -7%;
           padding: 7%;
           color: v-bind(customFontColor);
-          font-size: 12px;
-          transform: scale(0.7);
+          font-size: v-bind(customFontSize);
+          transform: scale(0.8);
         }
         .item__label {
           position: absolute;
           top: -7%;
           left: -7%;
           padding: 7%;
-          color: v-bind(customFontColor);
-          font-size: 12px;
-          transform: scale(0.7);
+          font-size: v-bind(customFontSize);
+          transform: scale(0.8);
         }
         .item__label--work {
-          background-color: v-bind(bgCalendarLabelWork);
+          color: v-bind(customWorkLabelFontColor);
+          background-color: v-bind(customWorkLabelBackgroundColor);
         }
         .item__label--rest {
-          background-color: v-bind(textColorRed);
+          color: v-bind(customRestLabelFontColor);
+          background-color: v-bind(customRestLabelBackgroundColor);
         }
       }
       .body__item--hover:hover {
         border: 1px solid v-bind(customItemBackgroundActiveColor);
       }
       .body__item--work {
-        color: v-bind(textColorRed) !important;
-        background-color: v-bind(bgCalendarWork);
+        color: v-bind(customHolidayFontColor) !important;
+        background-color: v-bind(customWorkItemBackgroundColor);
       }
       .body__item--rest {
         color: v-bind(customFontColor) !important;
-        background-color: v-bind(bgCalendarRest);
+        background-color: v-bind(customRestItemBackgroundColor);
       }
       .body__item--weekend {
-        color: v-bind(textColorRed);
+        color: v-bind(customHolidayFontColor);
       }
       .body__item--active {
         background-color: v-bind(customItemBackgroundActiveColor);
@@ -449,6 +559,44 @@ const bgCalendarLabelWork = getStyleConst('bgCalendarLabelWork')
   }
   .calendar__container-shadow {
     box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;
+  }
+}
+
+.calendar__detail {
+  line-height: 1.6;
+  .detail__date {
+    text-align: center;
+  }
+  .detail__holiday {
+    color: rgba(250, 82, 82, 1);
+    text-align: center;
+  }
+  .detail__row {
+    display: flex;
+    .row__tag {
+      flex: 0 0 auto;
+      margin: 0 10px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      color: #fff;
+      border-radius: 50%;
+    }
+    .row__tag--yi {
+      background-color: rgb(0, 128, 0);
+    }
+    .row__tag--ji {
+      background-color: rgb(250, 82, 82);
+    }
+    .row__label {
+      flex: 0 0 auto;
+      width: 40px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .row__value {
+    }
   }
 }
 </style>

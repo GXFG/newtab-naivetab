@@ -35,6 +35,14 @@ body {
 .setting__row-element {
   margin-left: 10px;
 }
+.setting__item-element {
+  flex: 0 0 auto;
+  margin-left: 10px;
+}
+.setting__label {
+  margin-bottom: 10px;
+  opacity: 0.6;
+}
 .setting__input-wrap {
   flex: 1;
   display: flex;
@@ -50,13 +58,9 @@ body {
   }
 }
 .setting__input-number {
-  flex: 0 0 auto;
-  margin-left: 10px;
   width: 110px;
 }
 .setting__input-number--unit {
-  flex: 0 0 auto;
-  margin-left: 10px;
   width: 150px;
 }
 

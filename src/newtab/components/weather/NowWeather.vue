@@ -78,7 +78,7 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
   <div id="now">
     <div class="now__icon">
       <div v-if="localConfig.weather.iconEnabled" class="icon__wrap" @click="onOpenWeather()">
-        <NPopover :show="state.isIndicesVisible" trigger="manual">
+        <NPopover :show="weatherIndicesInfo.length > 0 && state.isIndicesVisible" trigger="manual">
           <template #trigger>
             <div
               class="label__info"
@@ -126,7 +126,7 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
           </div>
         </div>
         <div class="info__item">
-          <div class="item__label">
+          <div class="item__value">
             <span class="value__text value__text--l">{{ weatherState.now.text }}</span>
           </div>
         </div>
@@ -248,7 +248,11 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
           .value__text--xl {
             font-size: v-bind(customXLargeFontSize);
           }
+          .value__text--bold {
+            font-weight: bold;
+          }
           .value__unit {
+            font-size: v-bind(customFontSize);
           }
         }
       }

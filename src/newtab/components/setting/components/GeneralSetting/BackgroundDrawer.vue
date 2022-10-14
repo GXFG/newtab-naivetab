@@ -124,7 +124,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
       <div class="drawer__content">
         <!-- current -->
         <div>
-          <NForm class="content__config" label-placement="left" :label-width="80">
+          <NForm class="content__config" label-placement="left" :label-width="100">
             <NFormItem :label="$t('common.origin')">
               <NSelect v-model:value="localConfig.general.backgroundImageSource" :options="backgroundImageSourceList" />
             </NFormItem>
@@ -176,10 +176,10 @@ const handleBackgroundImageCustomUrlBlur = () => {
               <BackgroundDrawerImageElement :lazy="false" :data="currImageData" />
             </div>
           </div>
-          <NForm class="content__config" label-placement="left" :label-width="80">
+          <NForm class="content__config" label-placement="left" :label-width="100">
             <NFormItem
               v-if="localConfig.general.backgroundImageSource !== 0 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
-              :label="$t('common.4k')"
+              :label="$t('common.uhd')"
             >
               <NSwitch v-model:value="localConfig.general.backgroundImageHighQuality" />
             </NFormItem>

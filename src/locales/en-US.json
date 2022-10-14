@@ -18,6 +18,7 @@
     "export": "Export",
     "enabled": "Enabled",
     "layout": "Layout",
+    "label": "Label",
     "left": "Left",
     "right": "Right",
     "top": "Top",
@@ -48,7 +49,7 @@
     "drawerSite": "Drawer Site",
     "local": "Local",
     "network": "Network",
-    "4k": "4k source",
+    "uhd": "UHD source",
     "bing": "Bing",
     "favorite": "Favorite",
     "margin": "Margin",
@@ -205,7 +206,10 @@
     "today": "T",
     "work": "W",
     "rest": "R",
-    "weekBeginsOn": "Week Begins"
+    "workDesc": "Work day",
+    "restDesc": "Rest day",
+    "weekBeginsOn": "Week Begins",
+    "holiday": "Holiday"
   },
   "weather": {
     "warning": "Warning",
@@ -220,9 +224,13 @@
   },
   "news": {
     "source": "News Source",
+    "refreshInterval": "Refresh Interval",
+    "toutiao": "Toutiao",
     "baidu": "Baidu",
     "zhihu": "Zhihu",
     "weibo": "Weibo",
+    "kr36": "36kr",
+    "bilibili": "Bilibili",
     "v2ex": "V2EX"
   }
 }

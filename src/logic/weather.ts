@@ -129,9 +129,9 @@ export const updateWeather = () => {
     getAirData()
   }
   // 生活指数最小刷新间隔为4小时
-  if (currTS - weatherState.value.indices.syncTime >= 3600000 * 4) {
-    getIndicesData()
-  }
+  // if (currTS - weatherState.value.indices.syncTime >= 3600000 * 4) {
+  //   getIndicesData()
+  // }
   // 预警最小刷新间隔为1小时
   if (currTS - weatherState.value.warning.syncTime >= 3600000 * 1) {
     getWarningData()
@@ -145,7 +145,7 @@ export const updateWeather = () => {
 export const refreshWeather = () => {
   getNowData()
   getAirData()
-  getIndicesData()
+  // getIndicesData()
   getWarningData()
   getForecastData()
 }
