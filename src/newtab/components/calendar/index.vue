@@ -388,7 +388,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                 </div>
                 <div class="detail__row">
                   <p class="row__label">
-                    凶杀
+                    凶煞
                   </p>
                   <p class="row__value">
                     {{ detailInfo.xiongsha }}
