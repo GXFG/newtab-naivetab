@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Solar, Lunar, HolidayUtil } from 'lunar-javascript'
+import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
 import { isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'calendar'
@@ -69,10 +69,9 @@ const holidayTypeToDesc = computed(() => ({
 const genDateList = (type: 'start' | 'main' | 'end', dateEle: any) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
   const targetDateEle = new Date(formatDate)
-  const funcParams = [dateEle.get('year'), dateEle.get('month') + 1, dateEle.get('date')]
   const solarEle = Solar.fromDate(targetDateEle)
   const lunarEle = Lunar.fromDate(targetDateEle)
-  const holidayEle = HolidayUtil.getHoliday(...funcParams)
+  const holidayEle = HolidayUtil.getHoliday(dateEle.get('year'), dateEle.get('month') + 1, dateEle.get('date'))
 
   // desc优先级：阳历节日, 阴历节日, 节气, 阴历月份, 阴历日期
   let desc = solarEle.getFestivals()[0] || lunarEle.getFestivals()[0] || lunarEle.getJieQi() || ''
