@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio'
-import { useStorageLocal } from '@/composables/useStorageLocal'
 import http from '@/lib/http'
+import { useStorageLocal } from '@/composables/useStorageLocal'
 import { NEWS_SOURCE_MAP, localConfig, createTab, log } from '@/logic'
 
 export const newsState = useStorageLocal('data-news', {
@@ -236,7 +236,6 @@ export const updateNews = () => {
   }
   const currTS = dayjs().valueOf()
   const intervalTime = localConfig.news.refreshIntervalTime * 60000
-  // 最小刷新间隔为60分钟
   if (localConfig.news.sourceList.includes('toutiao') && (currTS - newsState.value.toutiao.syncTime >= intervalTime || newsState.value.toutiao.list.length === 0)) {
     getToutiaoNews()
   }
