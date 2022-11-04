@@ -11,8 +11,10 @@ export const useStorageLocal: <T>(key: string, defaultValue: T) => Ref<UnwrapRef
   } else {
     localStorage.setItem(key, JSON.stringify(defaultValue))
   }
+
   const target = ref(value)
-  let timer = null as any
+  let timer: NodeJS.Timeout
+
   watch(
     () => target,
     (state) => {

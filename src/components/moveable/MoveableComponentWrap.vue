@@ -19,7 +19,7 @@ const emit = defineEmits(['update:dragStyle'])
 const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move !important;' : ''))
 
 const state = reactive({
-  targetContainerEle: null as any,
+  targetContainerEle: null as null | Element,
   startState: {
     top: 0,
     left: 0,
@@ -49,6 +49,9 @@ const getPercentageInHeight = (currHeight: number) => +((currHeight / window.inn
  */
 const startDrag = async (e: MouseEvent, resite = false) => {
   await nextTick() // 确保可以获取到 targetContainerEle
+  if (!state.targetContainerEle) {
+    return
+  }
   const { top, left, width, height } = state.targetContainerEle.getBoundingClientRect()
   state.startState = {
     top,

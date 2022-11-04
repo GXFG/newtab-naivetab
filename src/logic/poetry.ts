@@ -48,7 +48,6 @@ const getTodayPoetry = async () => {
   poetryState.value.matchTags = data.matchTags
   poetryState.value.recommendedReason = data.recommendedReason
   poetryState.value.syncTime = dayjs().valueOf()
-  log(poetryState.value.content)
 }
 
 export const updatePoetry = async () => {
@@ -56,8 +55,10 @@ export const updatePoetry = async () => {
   const intervalTime = 60 * 60000
   if (currTS - poetryState.value.syncTime >= intervalTime || poetryState.value.content.length === 0) {
     await getPoetryToken()
-    getTodayPoetry()
+    await getTodayPoetry()
   }
+  log(`${poetryState.value.content} - ${poetryState.value.origin.author}・${poetryState.value.origin.dynasty}`)
+  log(`${poetryState.value.matchTags}`)
 }
 
 updatePoetry()

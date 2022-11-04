@@ -8,6 +8,8 @@ interface Window {
   $loadingBar: any
 }
 
+type KeyLabel = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | '-' | '+' | 'BS' | 'q' | 'w' | 'e' | 'r' | 't' | 'y' | 'u' | 'i' | 'o' | 'p' | '{' | '}' | 'a' | 's' | 'd' | 'f' | 'g' | 'h' | 'j' | 'k' | 'l' | ':' | '"' | 'z' | 'x' | 'c' | 'v' | 'b' | 'n' | 'm' | '<' | '>' | '?'
+
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
 type DatabaseStore = 'localBackgroundImages'
 
@@ -22,6 +24,7 @@ type TargetType = 1 | 2 // 1:component 2:element
 type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo' | 'news'
 type ConfigField = Components | 'general'
 
+type Placement = 'top' | 'bottom' | 'left' | 'right'
 interface SelectStringItem {
   label: string
   value: string

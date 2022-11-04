@@ -66,7 +66,7 @@ const onMouseDownKey = (e: MouseEvent, key: string, url: string) => {
 }
 
 // keyboard listener
-let timer = null as any
+let timer: NodeJS.Timeout
 
 const keyboardTask = (e: KeyboardEvent) => {
   if (isDragMode.value) {

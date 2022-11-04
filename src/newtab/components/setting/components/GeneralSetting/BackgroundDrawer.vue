@@ -55,15 +55,19 @@ const handleAppearanceChange = (value: 'light' | 'dark') => {
 }
 
 const currImageData = computed(() => {
-  let data: any = {
+  if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
+    // not from Bing url
+    return {
+      url: currBackgroundImageUrl.value,
+      name: '',
+      desc: '',
+    }
+  }
+  return {
+    url: '',
     name: localConfig.general.backgroundImageNames[localState.value.currAppearanceCode],
     desc: localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode],
   }
-  if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
-    // not from Bing url
-    data = { url: currBackgroundImageUrl.value }
-  }
-  return data
 })
 
 const bgImageFileInputEl = ref()
@@ -73,8 +77,8 @@ const onSelectBackgroundImage = () => {
   bgImageFileInputEl.value.click()
 }
 
-const onBackgroundImageFileChange = async (e: any) => {
-  const file = e.target.files[0]
+const onBackgroundImageFileChange = async (e: Event) => {
+  const file = (e.target as any).files[0]
   if (file.size > LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M * 1024 * 1024) {
     window.$message.error(window.$t('prompts.imageTooLarge'))
     return

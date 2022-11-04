@@ -34,7 +34,7 @@ const databaseInit = (): Promise<boolean> => {
   })
 }
 
-export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHandleType, payload: any): Promise<any> => {
+export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHandleType, payload: unknown): Promise<unknown> => {
   if (!isInitialized) {
     await databaseInit()
   }
@@ -56,7 +56,7 @@ export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHand
       resolve(event.target.result)
     }
 
-    request.onerror = (event: any) => {
+    request.onerror = (event: Event) => {
       log(`IndexDB ${type} error`, event)
       reject(event.target)
     }

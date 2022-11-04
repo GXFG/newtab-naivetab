@@ -5,7 +5,7 @@ const logStyles = [
   'background:',
 ].join(';')
 
-export const log = (msg: string, ...args: any[]) => {
+export const log = (msg: string, ...args: unknown[]) => {
   const style = `${logStyles}${msg.includes('error') ? '#ff4757' : '#1475B2'}`
   console.log(`%c${msg}`, style, ...args)
 }
@@ -52,7 +52,7 @@ export const downloadImageByUrl = async (url: string, filename = `${Date.now()}`
   link.click()
 }
 
-export const downloadJsonByTagA = (result: any, filename = 'file') => {
+export const downloadJsonByTagA = (result: { [propName: string]: unknown }, filename = 'file') => {
   const content = JSON.stringify(result, null, 2)
   const blob = new Blob([content], { type: 'text/json' })
   const url = window.URL.createObjectURL(blob)

@@ -45,7 +45,7 @@ const handleDragStart = (key: string) => {
   state.currDragKey = key
 }
 
-const handleDragEnter = (e: any, targetKey: string) => {
+const handleDragEnter = (e: Event, targetKey: string) => {
   e.preventDefault()
   if (state.currDragKey === targetKey) {
     return
@@ -56,7 +56,7 @@ const handleDragEnter = (e: any, targetKey: string) => {
   state.currDragKey = targetKey
 }
 
-const handleDragOver = (e: any) => {
+const handleDragOver = (e: Event) => {
   e.preventDefault() // 阻止松开按键后的返回动画
 }
 
@@ -153,7 +153,7 @@ const customNameInputWidth = computed(() => localConfig.bookmark.isListenBackgro
             <div class="bookmark__content">
               <!-- left: keyList -->
               <div class="content__key">
-                <div v-for="rowData of keyboardRowKeyList" :key="rowData" class="bookmark__group">
+                <div v-for="(rowData, rowIndex) of keyboardRowKeyList" :key="rowIndex" class="bookmark__group">
                   <NInputGroupLabel v-for="key of rowData" :key="key" class="bookmark__key">
                     {{ `${key.toUpperCase()}` }}
                   </NInputGroupLabel>

@@ -1,5 +1,5 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { getWeatherNow, getWeatherForecast, getWeatherIndices, getWeatherAirNow, getWeatherWarning } from '@/api'
+import { getWeatherNow, getWeatherForecast, getWeatherAirNow, getWeatherWarning } from '@/api'
 import { localConfig, log } from '@/logic'
 
 const defaultWeatherState = {
@@ -84,15 +84,15 @@ const getForecastData = async () => {
   log('Weather update forecast')
 }
 
-const getIndicesData = async () => {
-  const data = await getWeatherIndices()
-  if (data.code !== '200') {
-    return
-  }
-  weatherState.value.indices.list = data.daily
-  weatherState.value.indices.syncTime = dayjs().valueOf()
-  log('Weather update indices')
-}
+// const getIndicesData = async () => {
+//   const data = await getWeatherIndices()
+//   if (data.code !== '200') {
+//     return
+//   }
+//   weatherState.value.indices.list = data.daily
+//   weatherState.value.indices.syncTime = dayjs().valueOf()
+//   log('Weather update indices')
+// }
 
 const getAirData = async () => {
   const data = await getWeatherAirNow()

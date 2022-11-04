@@ -10,8 +10,11 @@ const state = reactive({
   searchValue: '',
   isSuggestVisible: false,
   isSuggestLoading: false,
-  placementValue: 'bottom' as any,
-  suggestList: [],
+  placementValue: 'bottom' as Placement,
+  suggestList: [] as {
+    label: string
+    key: string
+  }[],
 })
 
 const handleSearchFocus = () => {
@@ -60,10 +63,10 @@ const getBaiduSuggest = async () => {
     return
   }
   state.isSuggestLoading = true
-  const data: any = await getBaiduSugrec(state.searchValue)
+  const data = await getBaiduSugrec(state.searchValue)
   state.isSuggestLoading = false
   if (data && data.g && data.g.length !== 0) {
-    state.suggestList = data.g.map((item: { q: string[] }) => ({
+    state.suggestList = data.g.map(item => ({
       label: item.q,
       key: item.q,
     }))

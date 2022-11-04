@@ -58,12 +58,13 @@ const syncTime = computed(() => {
 })
 
 const importSettingInputEl = ref()
+
 const onImportSetting = () => {
   (importSettingInputEl as any).value.value = null
   importSettingInputEl.value.click()
 }
 
-const onImportFileChange = (e: any) => {
+const onImportFileChange = (e) => {
   const file = e.target.files[0]
   if (!file.name.includes('.json')) {
     e.target.value = null
@@ -72,7 +73,7 @@ const onImportFileChange = (e: any) => {
   const reader = new FileReader()
   reader.readAsText(file)
   reader.onload = () => {
-    importSetting(reader.result as any)
+    importSetting(reader.result as string)
   }
 }
 

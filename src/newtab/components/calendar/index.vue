@@ -66,7 +66,7 @@ const holidayTypeToDesc = computed(() => ({
 /**
  * dateEle: dayjs element
  */
-const genDateList = (type: 'start' | 'main' | 'end', dateEle: any) => {
+const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
   const targetDateEle = new Date(formatDate)
   const solarEle = Solar.fromDate(targetDateEle)

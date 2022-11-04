@@ -57,7 +57,7 @@ export const isImageListLoading = ref(false)
 const getImages = async () => {
   try {
     isImageListLoading.value = true
-    const data: any = await getBingImages()
+    const data = await getBingImages()
     isImageListLoading.value = false
     imageLocalState.value.syncTime = dayjs().valueOf()
     imageLocalState.value.imageList = data.images
