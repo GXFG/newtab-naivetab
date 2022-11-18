@@ -431,6 +431,7 @@ export const localState = useStorageLocal('l-state', defaultLocalState)
 
 export const globalState = reactive({
   isSettingDrawerVisible: false,
+  isFullScreen: !!document.fullscreenElement,
   availableFontList: [] as string[],
   allCommandsMap: {},
   isUploadSettingLoading: false,
@@ -444,6 +445,20 @@ export const globalState = reactive({
   currSettingTabValue: 'general',
   currNewsTabValue: localConfig.news.sourceList[0] || '',
 })
+
+document.addEventListener('fullscreenchange', () => {
+  globalState.isFullScreen = !!document.fullscreenElement
+})
+
+export const toggleFullscreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen()
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen()
+    }
+  }
+}
 
 // UI language
 const NATIVE_UI_LOCALE_MAP = {
