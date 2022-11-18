@@ -1,6 +1,8 @@
 import http from '@/lib/http'
 
-export const getBingImages = (count = 8) => {
+export const getBingImages = (count = 8): Promise<{
+  images: BingImageItem[]
+}> => {
   return http({
     method: 'get',
     url: 'https://cn.bing.com/HPImageArchive.aspx',

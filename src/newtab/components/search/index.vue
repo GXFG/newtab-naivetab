@@ -7,33 +7,21 @@ const CNAME = 'search'
 const isRender = getIsComponentRender(CNAME)
 
 const state = reactive({
+  placementValue: 'bottom' as Placement,
   searchValue: '',
   isSuggestVisible: false,
   isSuggestLoading: false,
-  placementValue: 'bottom' as any,
-  suggestList: [],
+  isSuggestSelecting: false,
+  currSuggestIndex: -1,
+  suggestList: [] as {
+    label: string
+    key: string
+    props: {
+      class: string
+      onClick: () => void
+    }
+  }[],
 })
-
-const handleSearchFocus = () => {
-  globalState.isSearchFocused = true
-  state.isSuggestVisible = true
-}
-
-const handleSearchBlur = () => {
-  globalState.isSearchFocused = false
-}
-
-const handleSearchInput = () => {
-  if (state.searchValue.length === 0 || state.isSuggestVisible) {
-    return
-  }
-  state.isSuggestVisible = true
-}
-
-const onClearValue = () => {
-  state.searchValue = ''
-  state.suggestList = []
-}
 
 const onSearch = () => {
   if (state.searchValue.length === 0) {
@@ -47,7 +35,6 @@ const onSearch = () => {
 
 const handleSelectSuggest = (key: string) => {
   state.searchValue = key
-  state.isSuggestVisible = false
   onSearch()
 }
 
@@ -55,18 +42,90 @@ const handleSelectOutside = () => {
   state.isSuggestVisible = false
 }
 
+const handleSearchFocus = () => {
+  globalState.isSearchFocused = true
+  state.isSuggestVisible = true
+}
+
+const handleSearchBlur = () => {
+  globalState.isSearchFocused = false
+  state.isSuggestVisible = false
+  state.isSuggestSelecting = false
+  state.currSuggestIndex = -1
+}
+
+const handleSearchInput = () => {
+  state.isSuggestVisible = true
+  state.isSuggestSelecting = false
+  state.currSuggestIndex = -1
+}
+
+const handleSearchKeydown = (e: KeyboardEvent) => {
+  const { code, isComposing } = e
+  if (isComposing) {
+    return
+  }
+  if (code === 'Enter') {
+    onSearch()
+    return
+  }
+  if (['ArrowUp', 'ArrowDown'].includes(code)) {
+    if (!state.isSuggestVisible) {
+      return
+    }
+    e.preventDefault() // 阻止按下ArrowUp时光标移动至开头
+    state.isSuggestSelecting = true
+    if (code === 'ArrowUp') {
+      state.currSuggestIndex -= 1
+      if (state.currSuggestIndex < 0) {
+        state.currSuggestIndex = 0
+      }
+    } else if (code === 'ArrowDown') {
+      state.currSuggestIndex += 1
+      if (state.currSuggestIndex > state.suggestList.length - 1) {
+        state.currSuggestIndex = state.suggestList.length - 1
+      }
+    }
+    const text = state.suggestList[state.currSuggestIndex].label
+    state.searchValue = text
+    state.suggestList = state.suggestList.map((item, index) => ({
+      ...item,
+      props: {
+        ...item.props,
+        class: state.currSuggestIndex === index ? 'n-dropdown-option-body--pending' : '',
+      },
+    }))
+  }
+}
+
+const onClearValue = () => {
+  state.searchValue = ''
+  state.suggestList = []
+  state.isSuggestVisible = false
+  state.isSuggestSelecting = false
+  state.currSuggestIndex = -1
+}
+
 const getBaiduSuggest = async () => {
-  if (state.searchValue.length === 0) {
+  if (state.searchValue.length === 0 || state.isSuggestSelecting) {
     return
   }
   state.isSuggestLoading = true
-  const data: any = await getBaiduSugrec(state.searchValue)
+  const data = await getBaiduSugrec(state.searchValue)
   state.isSuggestLoading = false
   if (data && data.g && data.g.length !== 0) {
-    state.suggestList = data.g.map((item: { q: string[] }) => ({
-      label: item.q,
-      key: item.q,
-    }))
+    state.suggestList = data.g
+      .map(item => ({
+        label: item.q,
+        key: item.q,
+        props: {
+          class: '',
+          onClick: () => {
+            handleSelectSuggest(item.q)
+          },
+        },
+      }))
+      .slice(0, 6)
   } else {
     state.suggestList = []
   }
@@ -111,10 +170,12 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
   <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="search">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
       <NDropdown
+        class="search__dropdown"
         :show="localConfig.search.suggestionEnabled && state.isSuggestVisible"
         :options="state.suggestList"
         :placement="state.placementValue"
         :show-arrow="true"
+        :keyboard="false"
         @select="handleSelectSuggest"
         @clickoutside="handleSelectOutside"
       >
@@ -141,7 +202,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               @focus="handleSearchFocus"
               @blur="handleSearchBlur"
               @input="handleSearchInput"
-              @keyup.enter="onSearch()"
+              @keydown="handleSearchKeydown"
             />
             <NButton
               v-if="localConfig.search.iconEnabled"
@@ -149,7 +210,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               :class="{ 'input__search--move': isDragMode }"
               size="large"
               text
-              @click="onSearch()"
+              @click="onSearch"
             >
               <il:search class="search__icon" />
             </NButton>

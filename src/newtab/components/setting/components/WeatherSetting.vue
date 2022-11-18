@@ -50,7 +50,7 @@ const onChangeCity = (label: string) => {
   onSearch()
 }
 
-const onSelectCity = (value: any) => {
+const onSelectCity = (value: string) => {
   localConfig.weather.city.name = state.keyword
   localConfig.weather.city.id = value
 }

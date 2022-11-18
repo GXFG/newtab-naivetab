@@ -4,21 +4,21 @@ import { KEYBOARD_KEY_LIST, KEYBOARD_CODE_TO_LABEL_MAP, KEYBOARD_SPLIT_RANGE_MAP
 import { log, createTab, padUrlHttps } from '@/logic/util'
 
 // src/logic/bookmark.ts
-const getKeyboardList = (keyboardSplitList: any[], originList: any[]) => {
-  const rowList: any[] = []
+const getKeyboardList = (keyboardSplitList: typeof KEYBOARD_SPLIT_RANGE_MAP.letterNumber, originList: KeyLabel[]) => {
+  const rowList: KeyLabel[][] = []
   for (const range of keyboardSplitList) {
-    if (range.length === 1) {
+    if (range.length === 1 && typeof range[0] === 'number') {
       rowList.push(originList.slice(range[0]))
     } else {
       if (Array.isArray(range[0])) {
         // 处理特殊按键的拼接，如：数字行 + BS [[0, 10], [12, 13]]
-        let tempList: any = []
+        let tempList: KeyLabel[] = []
         for (const rangeItem of range) {
           tempList = [...tempList, ...originList.slice(rangeItem[0], rangeItem[1])]
         }
         rowList.push(tempList)
       } else {
-        rowList.push(originList.slice(range[0], range[1]))
+        rowList.push(originList.slice(range[0], range[1] as number))
       }
     }
   }
@@ -29,7 +29,7 @@ let bookmarkConfig = null as any
 let currentModelAllKeyList = [] as string[]
 
 const getKeyboardSplitList = () => {
-  let splitList: any = KEYBOARD_SPLIT_RANGE_MAP.letter
+  let splitList: (number[] | number[][])[] = KEYBOARD_SPLIT_RANGE_MAP.letter
   if (bookmarkConfig.isSymbolEnabled && bookmarkConfig.isNumberEnabled) {
     splitList = KEYBOARD_SPLIT_RANGE_MAP.letterSymbolNumber
   } else if (bookmarkConfig.isSymbolEnabled) {
@@ -45,12 +45,12 @@ const getKeyboardData = async () => new Promise((resolve) => {
     const config = data['naive-tab-bookmark']
     bookmarkConfig = JSON.parse(config).data
     const keyboardList = getKeyboardList(getKeyboardSplitList(), KEYBOARD_KEY_LIST)
-    currentModelAllKeyList = keyboardList.flat(Infinity)
+    currentModelAllKeyList = keyboardList.flat(Infinity) as KeyLabel[]
     resolve(true)
   })
 })
 
-let timer = null as any
+let timer: NodeJS.Timeout
 let laskCommand = ''
 
 const handleKeyboard = async (command: string) => {

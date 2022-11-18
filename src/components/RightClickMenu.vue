@@ -8,6 +8,7 @@ import {
   URL_EDGE_STORE,
   isDragMode,
   toggleIsDragMode,
+  toggleFullscreen,
   switchSettingDrawerVisible,
   getTargetDataFromEvent,
   globalState,
@@ -39,6 +40,11 @@ const menuList = computed(() => [
     label: isDragMode.value ? `${window.$t('common.exit')}${window.$t('common.dragMode')}` : window.$t('common.dragMode'),
     key: 'dragMode',
     icon: renderIconFunc('tabler:drag-drop'),
+  },
+  {
+    label: `${globalState.isFullScreen ? window.$t('common.exit') : ''}${window.$t('common.fullscreen')}`,
+    key: 'fullscreen',
+    icon: renderIconFunc('dashicons:fullscreen-alt'),
   },
   {
     type: 'divider',
@@ -110,6 +116,9 @@ const menuActionMap = {
   dragMode: () => {
     switchSettingDrawerVisible(false)
     toggleIsDragMode()
+  },
+  fullscreen: () => {
+    toggleFullscreen()
   },
   userGuide: () => {
     openUserGuideModal()

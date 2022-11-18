@@ -85,7 +85,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         }"
       >
         <div class="news__wrap">
-          <NTabs type="segment" animated justify-content="space-evenly" @before-leave="() => !isDragMode" @update:value="handleChangeCurrTab">
+          <NTabs :value="globalState.currNewsTabValue" type="segment" animated justify-content="space-evenly" @before-leave="() => !isDragMode" @update:value="handleChangeCurrTab">
             <NTabPane v-for="source in selectNewsSourceList" :key="source.value" :name="source.value" :tab="source.label">
               <div class="news__content">
                 <div v-if="newsState[source.value] && newsState[source.value].list.length !== 0">

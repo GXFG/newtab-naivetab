@@ -3,16 +3,16 @@ import { localConfig } from '@/logic/store'
 
 const modules = import.meta.globEager('../locales/*')
 
-function getLangAll(): any {
-  const target: any = {}
+function getLangAll(): { [propsName: string]: string } {
+  const target = {}
   for (const path of Object.keys(modules)) {
     if (!modules[path].default) {
-      return
+      return {}
     }
 
     const tempList = path.split('/')
     const lastPath = tempList[tempList.length - 1]
-    const pathName = lastPath.slice(0, -5)
+    const pathName = lastPath.slice(0, -5) // filter .json
 
     if (target[pathName]) {
       target[pathName] = {
@@ -26,12 +26,12 @@ function getLangAll(): any {
   return target
 }
 
-const i18n: any = createI18n({
+const i18n = createI18n({
   legacy: false,
   locale: localConfig.general.lang,
   fallbackLocale: 'en-US',
   globalInjection: true,
-  messages: getLangAll(),
+  messages: getLangAll() as any,
 })
 
 window.$t = i18n.global.t

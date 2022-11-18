@@ -17,7 +17,7 @@ const onClose = () => {
 }
 
 const state = reactive({
-  bookmarks: [] as any,
+  bookmarks: [] as ChromeBookmarkItem[],
   defaultExpandedKeys: ['1'], // 默认展开书签栏
   nodeProps: ({ option }: { option: TreeOption }) => {
     return {
@@ -39,7 +39,7 @@ const handleUpdateShow = (value: boolean) => {
   onClose()
 }
 
-const onGetBookmark = () => {
+const onGetBookmark = (): Promise<chrome.bookmarks.BookmarkTreeNode[]> => {
   return new Promise((resolve, reject) => {
     try {
       chrome.bookmarks.getTree((bookmarks) => {
@@ -52,10 +52,10 @@ const onGetBookmark = () => {
 }
 
 const formatBookmark = (root: ChromeBookmarkItem[]) => {
-  const res = [] as any
+  const res = [] as ChromeBookmarkItem[]
   for (const item of root) {
     const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
-    const curr: any = {
+    const curr = {
       ...item,
       prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url) }), // ico
     }
@@ -69,7 +69,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
 }
 
 const onInitBookmarks = async () => {
-  const res: any = await onGetBookmark()
+  const res = await onGetBookmark() as ChromeBookmarkItem[]
   let root = res[0].children
   root = formatBookmark(root)
   state.bookmarks = root

@@ -101,7 +101,7 @@ watch(() => localConfig.news, () => { uploadConfigNews() }, { deep: true })
 /**
  * 以 state 为模板与 acceptState 进行递归去重合并
  */
-const mergeState = (state: any, acceptState: any) => {
+const mergeState = (state: unknown, acceptState: unknown) => {
   if (acceptState === undefined || acceptState === null) {
     return state
   }
@@ -117,22 +117,22 @@ const mergeState = (state: any, acceptState: any) => {
     return acceptState
   }
   // 二者均为Object，且state为空Object时，返回acceptState
-  if (Object.keys(state).length === 0) {
+  if (Object.keys(state as object).length === 0) {
     return acceptState
   }
   // 特殊处理 bookmark.keymap 数据，直接返回acceptState
   if (Object.prototype.hasOwnProperty.call(state, 'q')) {
     return acceptState
   }
-  const filterState = {} as any
+  const filterState = {} as { [propName: string]: unknown }
   const fieldList = Object.keys(acceptState)
   for (const field of fieldList) {
     // 递归合并，只合并state内存在的字段
     if (Object.prototype.hasOwnProperty.call(state, field)) {
-      filterState[field] = mergeState(state[field], acceptState[field])
+      filterState[field] = mergeState((state as object)[field], acceptState[field])
     }
   }
-  return { ...state, ...filterState }
+  return { ...(state as object), ...filterState }
 }
 
 /**
@@ -192,7 +192,7 @@ export const loadRemoteConfig = () => {
         log('Load config error', error)
         return
       }
-      const pendingConfig = {} as any
+      const pendingConfig = {} as typeof defaultConfig
       for (const field of Object.keys(defaultConfig) as ConfigField[]) {
         if (!Object.prototype.hasOwnProperty.call(data, `naive-tab-${field}`)) {
           log(`Config-${field} initialize`)
@@ -294,17 +294,17 @@ export const importSetting = async (text: string) => {
     }
     // handle old version 兼容小于1.0.0版本的旧image结构
     if (compareLeftVersionLessThanRightVersions(fileContent.general.version, '1.0.0')) {
-      const oldBackgroundImageName = (fileContent.general as any).backgroundImageName
+      const oldBackgroundImageName = fileContent.general.backgroundImageName
       if (oldBackgroundImageName) {
         fileContent.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]
         delete fileContent.general.backgroundImageName
       }
-      const oldBackgroundImageDescs = (fileContent.general as any).backgroundImageDesc
+      const oldBackgroundImageDescs = fileContent.general.backgroundImageDesc
       if (oldBackgroundImageDescs) {
         fileContent.general.backgroundImageDescs = [oldBackgroundImageDescs, oldBackgroundImageDescs]
         delete fileContent.general.backgroundImageDesc
       }
-      const oldBackgroundImageCustomUrl = (fileContent.general as any).backgroundImageCustomUrl
+      const oldBackgroundImageCustomUrl = fileContent.general.backgroundImageCustomUrl
       if (oldBackgroundImageCustomUrl) {
         fileContent.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
         delete fileContent.general.backgroundImageCustomUrl

@@ -4,9 +4,9 @@ export const [isDragMode, toggleIsDragMode] = useToggle(false)
 export const [isElementDrawerVisible, toggleIsElementDrawerVisible] = useToggle(true)
 
 export const moveState = reactive({
-  MouseDownTaskMap: new Map() as any,
-  MouseMoveTaskMap: new Map() as any,
-  MouseUpTaskMap: new Map() as any,
+  MouseDownTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
+  MouseMoveTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
+  MouseUpTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
   isComponentDraging: false,
   isDeleteHover: false,
   // 辅助线
@@ -43,10 +43,10 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
   type: -1 | 1 | 2
   name: '' | Components
 } => {
-  let target: any = e.target
+  let target = e.target as HTMLInputElement
   try {
     while (!target.getAttribute('data-target-type')) {
-      target = target.parentNode
+      target = target.parentNode as HTMLInputElement
     }
   } catch (e) {}
   if (!target.getAttribute) {
@@ -55,8 +55,8 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
       name: '',
     }
   }
-  const type = (+target.getAttribute('data-target-type') as 1 | 2) || -1
-  const name = target.getAttribute('data-target-name') || ''
+  const type = (Number(target.getAttribute('data-target-type')) as 1 | 2) || -1
+  const name = target.getAttribute('data-target-name') as Components || ''
   return { type, name }
 }
 
@@ -80,14 +80,16 @@ const handleMousedown = (e: MouseEvent) => {
   if (moveState.currDragTarget.type === -1) {
     return
   }
-  moveState.MouseDownTaskMap.get(currMouseTaskKey.value)(e)
+  const task = moveState.MouseDownTaskMap.get(currMouseTaskKey.value)
+  task && task(e)
 }
 
 const handleMousemove = (e: MouseEvent) => {
   if (!isDragMode.value || e.buttons === 0 || moveState.currDragTarget.type === -1) {
     return
   }
-  moveState.MouseMoveTaskMap.get(currMouseTaskKey.value)(e)
+  const task = moveState.MouseMoveTaskMap.get(currMouseTaskKey.value)
+  task && task(e)
   // 鼠标移动时隐藏Element抽屉
   if (lastIsElementDrawerVisible === null) {
     lastIsElementDrawerVisible = isElementDrawerVisible.value
@@ -101,7 +103,8 @@ const handleMouseup = (e: MouseEvent) => {
   if (!isDragMode.value || moveState.currDragTarget.type === -1) {
     return
   }
-  moveState.MouseUpTaskMap.get(currMouseTaskKey.value)(e)
+  const task = moveState.MouseUpTaskMap.get(currMouseTaskKey.value)
+  task && task(e)
   // 鼠标抬起时根据上一次状态决定是否打开Element抽屉
   if (lastIsElementDrawerVisible) {
     toggleIsElementDrawerVisible(true)

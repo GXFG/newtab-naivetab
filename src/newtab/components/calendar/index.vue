@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Solar, Lunar, HolidayUtil } from 'lunar-javascript'
-import { isDragMode, localConfig, getIsComponentRender, getStyleConst, getLayoutStyle, getStyleField } from '@/logic'
+import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
+import { isDragMode, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
 
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
@@ -66,13 +66,12 @@ const holidayTypeToDesc = computed(() => ({
 /**
  * dateEle: dayjs element
  */
-const genDateList = (type: 'start' | 'main' | 'end', dateEle: any) => {
+const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
   const targetDateEle = new Date(formatDate)
-  const funcParams = [dateEle.get('year'), dateEle.get('month') + 1, dateEle.get('date')]
   const solarEle = Solar.fromDate(targetDateEle)
   const lunarEle = Lunar.fromDate(targetDateEle)
-  const holidayEle = HolidayUtil.getHoliday(...funcParams)
+  const holidayEle = HolidayUtil.getHoliday(dateEle.get('year'), dateEle.get('month') + 1, dateEle.get('date'))
 
   // desc优先级：阳历节日, 阴历节日, 节气, 阴历月份, 阴历日期
   let desc = solarEle.getFestivals()[0] || lunarEle.getFestivals()[0] || lunarEle.getJieQi() || ''
@@ -200,7 +199,6 @@ const onReset = () => {
 
 const detailInfo = reactive({
   date: '',
-  week: '',
   lunar: '',
   solarFestivals: '',
   lunarFestivals: '',
@@ -223,12 +221,11 @@ const onToggleDetailPopover = (date?: string) => {
   const lunarEle = Lunar.fromDate(targetDateEle)
   const solarEle = Solar.fromDate(targetDateEle)
 
-  detailInfo.date = date
-  detailInfo.week = `星期${lunarEle.getWeekInChinese()}`
+  detailInfo.date = `${date} 周${lunarEle.getWeekInChinese()}`
   detailInfo.lunar = `${lunarEle.getYearInGanZhi()}${lunarEle.getYearShengXiao()}年 农历${lunarEle.getMonthInChinese()}月${lunarEle.getDayInChinese()}`
   detailInfo.solarFestivals = `${solarEle.getFestivals().join(' ')} ${solarEle.getOtherFestivals().join(' ')}`
   detailInfo.lunarFestivals = `${lunarEle.getFestivals().join(' ')} ${lunarEle.getOtherFestivals().join(' ')}`
-  detailInfo.xingzuo = solarEle.getXingZuo()
+  detailInfo.xingzuo = `${solarEle.getXingZuo()}座`
   detailInfo.yi = lunarEle.getDayYi().join(' ')
   detailInfo.ji = lunarEle.getDayJi().join(' ')
   detailInfo.jishen = lunarEle.getDayJiShen().join(' ')
@@ -353,13 +350,17 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                   <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
                 </div>
               </template>
+
               <!-- detail -->
               <div class="calendar__detail">
                 <p class="detail__date">
                   {{ detailInfo.date }}
+                  {{ detailInfo.xingzuo }}
+                </p>
+                <p class="detail__date">
                   {{ detailInfo.lunar }}
                 </p>
-                <p class="detail__holiday">
+                <p class="detail__festival">
                   {{ `${detailInfo.solarFestivals} ${detailInfo.lunarFestivals}` }}
                 </p>
                 <div class="detail__row">
@@ -567,9 +568,10 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
   .detail__date {
     text-align: center;
   }
-  .detail__holiday {
+  .detail__festival {
     color: rgba(250, 82, 82, 1);
     text-align: center;
+    font-weight: 600;
   }
   .detail__row {
     display: flex;
@@ -587,7 +589,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
       background-color: rgb(0, 128, 0);
     }
     .row__tag--ji {
-      background-color: rgb(250, 82, 82);
+      background-color: rgba(250, 82, 82, 1);
     }
     .row__label {
       flex: 0 0 auto;

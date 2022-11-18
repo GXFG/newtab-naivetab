@@ -431,7 +431,8 @@ export const localState = useStorageLocal('l-state', defaultLocalState)
 
 export const globalState = reactive({
   isSettingDrawerVisible: false,
-  availableFontList: [] as any[],
+  isFullScreen: !!document.fullscreenElement,
+  availableFontList: [] as string[],
   allCommandsMap: {},
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
@@ -444,6 +445,20 @@ export const globalState = reactive({
   currSettingTabValue: 'general',
   currNewsTabValue: localConfig.news.sourceList[0] || '',
 })
+
+document.addEventListener('fullscreenchange', () => {
+  globalState.isFullScreen = !!document.fullscreenElement
+})
+
+export const toggleFullscreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen()
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen()
+    }
+  }
+}
 
 // UI language
 const NATIVE_UI_LOCALE_MAP = {
@@ -469,7 +484,7 @@ watch(
   [() => osTheme.value, () => localConfig.general.appearance],
   () => {
     if (localConfig.general.appearance === 'auto') {
-      localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as any]
+      localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as keyof typeof APPEARANCE_TO_CODE_MAP] as 0 | 1
       localState.value.currAppearanceLabel = osTheme.value || 'light'
       currTheme.value = osTheme.value === 'dark' ? darkTheme : null
       return
@@ -494,7 +509,7 @@ const initAvailableFontList = async () => {
   const fontCheck = new Set(FONT_LIST.sort())
   // 在所有字体加载完成后进行操作
   await document.fonts.ready
-  const availableList = new Set()
+  const availableList: Set<string> = new Set()
   for (const font of fontCheck.values()) {
     // https://developer.mozilla.org/zh-CN/docs/Web/API/FontFaceSet/check
     if (document.fonts.check(`12px "${font}"`)) {
@@ -562,7 +577,7 @@ export const handleAppUpdate = async () => {
   // @@@@ 每次更新均需要手动处理新版本变更的本地数据结构，
   if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
     let newLocalState = {}
-    const localState: any = localStorage.getItem('l-state')
+    const localState = localStorage.getItem('l-state')
     if (localState) {
       newLocalState = {
         ...defaultLocalState,

@@ -1,4 +1,4 @@
-let timer = null as any
+let timer: NodeJS.Timeout
 const tasks = new Map()
 
 export const addTimerTask = (key: string, task: () => void) => {
