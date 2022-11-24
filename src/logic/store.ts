@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -93,63 +93,63 @@ export const defaultConfig = {
     isDblclickOpen: false,
     dblclickIntervalTime: 200, // ms
     isNewTabOpen: false,
-    isSymbolEnabled: true,
-    isNumberEnabled: false,
     isNameVisible: true,
+    keyboardType: 60 as 'hhkb' | number,
+    keycapType: 'flat',
     keymap: {
-      'q': {
+      KeyQ: {
         url: 'www.baidu.com',
         name: '',
       },
-      'w': {
+      KeyW: {
         url: 'www.weibo.com',
         name: 'weibo',
       },
-      'g': {
+      KeyG: {
         url: 'www.google.com',
         name: '',
       },
-      'z': {
+      KeyZ: {
         url: 'www.zhihu.com',
         name: '',
       },
-      'b': {
+      KeyB: {
         url: 'www.bilibili.com',
         name: '',
       },
-      'n': {
+      KeyN: {
         url: 'www.youku.com',
         name: '',
       },
-      'm': {
+      KeyM: {
         url: 'v.qq.com',
         name: 'tencent',
       },
-      '<': {
+      Comma: {
         url: 'www.douyin.com',
         name: '',
       },
-      'e': {
+      KeyE: {
         url: 'www.toutiao.com',
         name: '',
       },
-      'x': {
+      KeyX: {
         url: 'www.v2ex.com',
         name: '',
       },
-      't': {
+      KeyT: {
         url: 'www.draw.io',
         name: '',
       },
-      'd': {
+      KeyD: {
         url: 'www.douban.com',
         name: '',
       },
-      'j': {
+      KeyJ: {
         url: 'www.jd.com',
         name: '',
       },
-      'k': {
+      KeyK: {
         url: 'www.taobao.com',
         name: '',
       },
@@ -162,19 +162,22 @@ export const defaultConfig = {
       yOffsetValue: 1,
       yTranslateValue: 0,
     },
-    margin: 2,
-    width: 58,
-    borderRadius: 3,
+    keycapPadding: 3,
+    keycapSize: 60,
     fontFamily: 'Arial',
     fontSize: 12,
-    fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
-    isBorderEnabled: true,
+    mainFontColor: ['rgba(34, 34, 34, 1)', 'rgba(255, 255, 255, 1)'],
+    mainBackgroundColor: ['rgba(234, 230, 231, 1)', 'rgba(52, 52, 57, 1)'],
+    emphasisOneFontColor: ['rgba(34, 34, 34, 1)', 'rgba(255, 255, 255, 1)'],
+    emphasisOneBackgroundColor: ['rgba(203, 205, 218, 1)', 'rgba(52, 52, 57, 1)'],
+    emphasisTwoFontColor: ['rgba(34, 34, 34, 1)', 'rgba(255, 255, 255, 1)'],
+    emphasisTwoBackgroundColor: ['rgba(203, 205, 218, 1)', 'rgba(52, 52, 57, 1)'],
+    isBorderEnabled: false,
     borderWidth: 1,
+    borderRadius: 5,
     borderColor: ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
+    // add keycapPadding keycapSize mainFontColor mainBackgroundColor emphasisOneFontColor emphasisOneBackgroundColor emphasisTwoFontColor emphasisTwoBackgroundColor
+    // delete margin width backgroundColor BackgroundActiveColor isShadowEnabled shadowColor
   },
   clockDigital: {
     enabled: true,
@@ -499,8 +502,7 @@ watch(
 export const getAllCommandsConfig = () => {
   chrome.commands.getAll((commands) => {
     for (const { name, shortcut } of commands) {
-      const labelKey = KEYBOARD_CODE_TO_LABEL_MAP[(name as string)] || name
-      globalState.allCommandsMap[labelKey] = shortcut
+      globalState.allCommandsMap[name as string] = shortcut
     }
   })
 }
@@ -574,7 +576,7 @@ export const handleAppUpdate = async () => {
     return
   }
   log('Get new version', pkg.version)
-  // @@@@ 每次更新均需要手动处理新版本变更的本地数据结构，
+  // @@@@ 每次更新均需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
     let newLocalState = {}
     const localState = localStorage.getItem('l-state')

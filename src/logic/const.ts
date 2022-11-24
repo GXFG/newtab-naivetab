@@ -50,53 +50,17 @@ export const FONT_LIST = [
   'American Typewriter', 'Andale Mono', 'Arial', 'Arial Black', 'Arial Narrow', 'Arial Rounded MT Bold', 'Arial Unicode MS', 'Avenir', 'Avenir Next', 'Avenir Next Condensed', 'Baskerville', 'Big Caslon', 'Bodoni 72', 'Bodoni 72 Oldstyle', 'Bodoni 72 Smallcaps', 'Bradley Hand', 'Brush Script MT', 'Chalkboard', 'Chalkboard SE', 'Chalkduster', 'Charter', 'Cochin', 'Comic Sans MS', 'Copperplate', 'Courier', 'Courier New', 'Didot', 'DIN Alternate', 'DIN Condensed', 'Futura', 'Geneva', 'Georgia', 'Gill Sans', 'Helvetica', 'Helvetica Neue', 'Herculanum', 'Hoefler Text', 'Impact', 'Lucida Grande', 'Luminari', 'Marker Felt', 'Menlo', 'Microsoft Sans Serif', 'Monaco', 'Noteworthy', 'Optima', 'Palatino', 'Papyrus', 'Phosphate', 'Rockwell', 'Savoye LET', 'SignPainter', 'Skia', 'Snell Roundhand', 'Tahoma', 'Times', 'Times New Roman', 'Trattatello', 'Trebuchet MS', 'Verdana', 'Zapfino',
 ]
 
-export const KEYBOARD_KEY_LIST: KeyLabel[] = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 'BS', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?']
-
-export const KEYBOARD_KEY_BAN_LIST = ['-', '+', 'BS', '{', '}', ':', '"', '?']
-
-/**
- * real key code -> label key name
- */
-export const KEYBOARD_CODE_TO_LABEL_MAP = {
-  Minus: '-',
-  Equal: '+',
-  Backspace: 'BS',
-  BracketLeft: '{',
-  BracketRight: '}',
-  Semicolon: ':',
-  Quote: '"',
-  Comma: '<',
-  Period: '>',
-  Slash: '?',
-}
-
-export const KEYBOARD_LABEL_TO_KEY_FOR_SHOW_MAP = {
-  BS: '⌫',
-}
-
-export const KEYBOARD_SPLIT_RANGE_MAP = {
-  letter: [
-    [13, 23],
-    [25, 34],
-    [36, 43],
-  ],
-  letterSymbol: [
-    [13, 25],
-    [25, 36],
-    [36],
-  ],
-  letterNumber: [
-    [[0, 10], [12, 13]], // 特殊处理：数字行 + BS = [[0, 10], [12, 13]]
-    [13, 23],
-    [25, 34],
-    [36, 43],
-  ],
-  letterSymbolNumber: [
-    [0, 13],
-    [13, 25],
-    [25, 36],
-    [36],
-  ],
+export const KEYBOARD_OLD_TO_NEW_CODE_MAP = {
+  '-': 'Minus',
+  '+': 'Equal',
+  'BS': 'Backspace',
+  '{': 'BracketLeft',
+  '}': 'BracketRight',
+  ':': 'Semicolon',
+  '"': 'Quote',
+  '<': 'Comma',
+  '>': 'Period',
+  '?': 'Slash',
 }
 
 export const NEWS_SOURCE_MAP = {

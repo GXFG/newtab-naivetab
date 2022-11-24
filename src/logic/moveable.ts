@@ -4,7 +4,7 @@ export const [isDragMode, toggleIsDragMode] = useToggle(false)
 export const [isElementDrawerVisible, toggleIsElementDrawerVisible] = useToggle(true)
 
 export const moveState = reactive({
-  MouseDownTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
+  MouseDownTaskMap: new Map() as Map<string, (e: MouseEvent, resite?: boolean) => unknown>,
   MouseMoveTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
   MouseUpTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
   isComponentDraging: false,

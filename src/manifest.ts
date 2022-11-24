@@ -40,124 +40,124 @@ export async function getManifest() {
     },
     // 一个扩展可以有很多命令，但只能指定 4 个建议的键。
     commands: {
-      1: {
+      Digit1: {
         description: '__MSG_command1__',
       },
-      2: {
+      Digit2: {
         description: '__MSG_command2__',
       },
-      3: {
+      Digit3: {
         description: '__MSG_command3__',
       },
-      4: {
+      Digit4: {
         description: '__MSG_command4__',
       },
-      5: {
+      Digit5: {
         description: '__MSG_command5__',
       },
-      6: {
+      Digit6: {
         description: '__MSG_command6__',
       },
-      7: {
+      Digit7: {
         description: '__MSG_command7__',
       },
-      8: {
+      Digit8: {
         description: '__MSG_command8__',
       },
-      9: {
+      Digit9: {
         description: '__MSG_command9__',
       },
-      0: {
+      Digit0: {
         description: '__MSG_command0__',
       },
-      q: {
+      KeyQ: {
         suggested_key: {
           default: 'Alt+Q',
         },
         description: '__MSG_commandQ__',
       },
-      w: {
+      KeyW: {
         suggested_key: {
           default: 'Alt+W',
         },
         description: '__MSG_commandW__',
       },
-      e: {
+      KeyE: {
         description: '__MSG_commandE__',
       },
-      r: {
+      KeyR: {
         description: '__MSG_commandR__',
       },
-      t: {
+      KeyT: {
         description: '__MSG_commandT__',
       },
-      y: {
+      KeyY: {
         description: '__MSG_commandY__',
       },
-      u: {
+      KeyU: {
         description: '__MSG_commandU__',
       },
-      i: {
+      KeyI: {
         description: '__MSG_commandI__',
       },
-      o: {
+      KeyO: {
         description: '__MSG_commandO__',
       },
-      p: {
+      KeyP: {
         description: '__MSG_commandP__',
       },
-      a: {
+      KeyA: {
         suggested_key: {
           default: 'Alt+A',
         },
         description: '__MSG_commandA__',
       },
-      s: {
+      KeyS: {
         suggested_key: {
           default: 'Alt+S',
         },
         description: '__MSG_commandS__',
       },
-      d: {
+      KeyD: {
         description: '__MSG_commandD__',
       },
-      f: {
+      KeyF: {
         description: '__MSG_commandF__',
       },
-      g: {
+      KeyG: {
         description: '__MSG_commandG__',
       },
-      h: {
+      KeyH: {
         description: '__MSG_commandH__',
       },
-      j: {
+      KeyJ: {
         description: '__MSG_commandJ__',
       },
-      k: {
+      KeyK: {
         description: '__MSG_commandK__',
       },
-      l: {
+      KeyL: {
         description: '__MSG_commandL__',
       },
-      z: {
+      KeyZ: {
         description: '__MSG_commandZ__',
       },
-      x: {
+      KeyX: {
         description: '__MSG_commandX__',
       },
-      c: {
+      KeyC: {
         description: '__MSG_commandC__',
       },
-      v: {
+      KeyV: {
         description: '__MSG_commandV__',
       },
-      b: {
+      KeyB: {
         description: '__MSG_commandB__',
       },
-      n: {
+      KeyN: {
         description: '__MSG_commandN__',
       },
-      m: {
+      KeyM: {
         description: '__MSG_commandM__',
       },
       Comma: {

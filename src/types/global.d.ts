@@ -30,6 +30,16 @@ interface SelectStringItem {
   value: string
 }
 
+interface KeyboardConfigItem {
+  label: string
+  textAlign: 'left' | 'center' | 'right'
+  size: number
+  alias?: string // LShift
+  marginLeft?: number // default 0
+  marginRight?: number // default 0
+  marginBottom?: number // default 0
+}
+
 interface ChromeBookmarkItem {
   dateAdded: number // 1618456881151
   id: string // "130"

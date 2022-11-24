@@ -132,6 +132,12 @@ const bgBottomBar = getStyleConst('bgBottomBar')
     margin-top: 50px;
     padding-bottom: 94px;
   }
+  .n-radio-group {
+    width: 100%;
+  }
+  .n-radio {
+    width: 20%;
+  }
   .drawer-wrap {
     transition: all 0.3s ease;
     .drawer__content {

@@ -1,43 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isChrome } from '@/env'
-import { KEYBOARD_KEY_LIST, KEYBOARD_SPLIT_RANGE_MAP, defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
-
-const keyboardSplitList = computed(() => {
-  let splitList: (number[] | number[][])[] = KEYBOARD_SPLIT_RANGE_MAP.letter
-  if (localConfig.bookmark.isSymbolEnabled && localConfig.bookmark.isNumberEnabled) {
-    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterSymbolNumber
-  } else if (localConfig.bookmark.isSymbolEnabled) {
-    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterSymbol
-  } else if (localConfig.bookmark.isNumberEnabled) {
-    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterNumber
-  }
-  return splitList
-})
-
-export const getKeyboardList = (keyboardSplitList: typeof KEYBOARD_SPLIT_RANGE_MAP.letterNumber, originList: KeyLabel[]) => {
-  const rowList: KeyLabel[][] = []
-  for (const range of keyboardSplitList) {
-    if (range.length === 1 && typeof range[0] === 'number') {
-      rowList.push(originList.slice(range[0] as number))
-    } else {
-      if (Array.isArray(range[0])) {
-        // 处理特殊按键的拼接，如：数字行 + BS [[0, 10], [12, 13]]
-        let tempList: KeyLabel[] = []
-        for (const rangeItem of range) {
-          tempList = [...tempList, ...originList.slice(rangeItem[0], rangeItem[1])]
-        }
-        rowList.push(tempList)
-      } else {
-        rowList.push(originList.slice(range[0], range[1] as number))
-      }
-    }
-  }
-  return rowList
-}
-
-export const keyboardRowKeyList = computed(() => getKeyboardList(keyboardSplitList.value, KEYBOARD_KEY_LIST))
-
-export const keyboardCurrentModelAllKeyList = computed(() => keyboardRowKeyList.value.flat(Infinity))
+import { defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
 
 export const getFaviconFromUrl = (url: string) => {
   if (isChrome) {
@@ -66,11 +29,11 @@ export const getDefaultBookmarkNameFromUrl = (url: string) => {
   return name
 }
 
-export const getBookmarkConfigName = (key: string) => {
-  if (!localConfig.bookmark.keymap[key]) {
+export const getBookmarkConfigName = (code: string) => {
+  if (!localConfig.bookmark.keymap[code]) {
     return ''
   }
-  return localConfig.bookmark.keymap[key].name || getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[key].url)
+  return localConfig.bookmark.keymap[code].name || getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[code].url)
 }
 
 export const getBookmarkConfigUrl = (key: string) => {
