@@ -11,6 +11,8 @@ import {
   KEYCAP_TYPE_OPTION,
   KEYCAP_PREINSTALL_OPTION,
   KEYCAP_PREINSTALL_MAP,
+  availableFontOptions,
+  fontSelectRenderLabel,
   globalState,
   localState,
   localConfig,
@@ -331,20 +333,27 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           />
         </NFormItem>
         <NFormItem :label="`${$t('common.size')}`">
-          <NSlider v-model:value="localConfig.bookmark.keycapSize" :step="1" :min="40" :max="100" />
+          <NSlider v-model:value="localConfig.bookmark.keycapSize" :step="1" :min="40" :max="150" />
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapSize"
             class="setting__item-element setting__input-number"
             :step="1"
             :min="40"
-            :max="100"
+            :max="150"
           />
         </NFormItem>
       </template>
 
       <template #color>
+        <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.font')}`">
+          <NSelect v-model:value="localConfig.bookmark.keycapKeyFontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
+          <NInputNumber v-model:value="localConfig.bookmark.keycapKeyFontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="50" />
+        </NFormItem>
+        <NFormItem :label="`${$t('bookmark.nameLabel')}${$t('common.font')}`">
+          <NSelect v-model:value="localConfig.bookmark.keycapBookmarkFontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
+          <NInputNumber v-model:value="localConfig.bookmark.keycapBookmarkFontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="50" />
+        </NFormItem>
         <NFormItem :label="$t('bookmark.keyboardType')">
-          <!-- <NSelect v-model:value="localConfig.bookmark.keyboardType" :options="KEYBOARD_TYPE_OPTION" /> -->
           <NRadioGroup v-model:value="localConfig.bookmark.keyboardType">
             <NRadio v-for="item in KEYBOARD_TYPE_OPTION" :key="item.value" :value="item.value">
               {{ item.label }}
@@ -358,7 +367,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             </NRadio>
           </NRadioGroup>
         </NFormItem>
-        <NFormItem :label="`${$t('common.load')}${$t('bookmark.keycap')}${$t('common.theme')}`">
+        <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.theme')}`">
           <NSelect
             v-model:value="preinstallTheme"
             :options="KEYCAP_PREINSTALL_OPTION"

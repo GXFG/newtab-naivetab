@@ -1,68 +1,38 @@
 // !!background Cannot use import statement outside a module
 // import browser from 'webextension-polyfill'
-import { KEYBOARD_KEY_LIST, KEYBOARD_CODE_TO_LABEL_MAP, KEYBOARD_SPLIT_RANGE_MAP } from '@/logic/const'
 import { log, createTab, padUrlHttps } from '@/logic/util'
 
-// src/logic/bookmark.ts
-const getKeyboardList = (keyboardSplitList: typeof KEYBOARD_SPLIT_RANGE_MAP.letterNumber, originList: KeyLabel[]) => {
-  const rowList: KeyLabel[][] = []
-  for (const range of keyboardSplitList) {
-    if (range.length === 1 && typeof range[0] === 'number') {
-      rowList.push(originList.slice(range[0]))
-    } else {
-      if (Array.isArray(range[0])) {
-        // 处理特殊按键的拼接，如：数字行 + BS [[0, 10], [12, 13]]
-        let tempList: KeyLabel[] = []
-        for (const rangeItem of range) {
-          tempList = [...tempList, ...originList.slice(rangeItem[0], rangeItem[1])]
-        }
-        rowList.push(tempList)
-      } else {
-        rowList.push(originList.slice(range[0], range[1] as number))
-      }
-    }
-  }
-  return rowList
-}
+const ALL_COMMAND_KEYCODE = [
+  'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0',
+  'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP',
+  'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL',
+  'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period',
+]
 
 let bookmarkConfig = null as any
-let currentModelAllKeyList = [] as string[]
 
-const getKeyboardSplitList = () => {
-  let splitList: (number[] | number[][])[] = KEYBOARD_SPLIT_RANGE_MAP.letter
-  if (bookmarkConfig.isSymbolEnabled && bookmarkConfig.isNumberEnabled) {
-    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterSymbolNumber
-  } else if (bookmarkConfig.isSymbolEnabled) {
-    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterSymbol
-  } else if (bookmarkConfig.isNumberEnabled) {
-    splitList = KEYBOARD_SPLIT_RANGE_MAP.letterNumber
-  }
-  return splitList
-}
-
-const getKeyboardData = async () => new Promise((resolve) => {
+const getBookmarkConfigData = async () => new Promise((resolve) => {
   chrome.storage.sync.get(null, (data) => {
     const config = data['naive-tab-bookmark']
     bookmarkConfig = JSON.parse(config).data
-    const keyboardList = getKeyboardList(getKeyboardSplitList(), KEYBOARD_KEY_LIST)
-    currentModelAllKeyList = keyboardList.flat(Infinity) as KeyLabel[]
     resolve(true)
   })
 })
 
-let timer: NodeJS.Timeout
+let dblclickTimer: NodeJS.Timeout
+
 let laskCommand = ''
 
 const handleKeyboard = async (command: string) => {
-  await getKeyboardData()
+  await getBookmarkConfigData()
   if (!bookmarkConfig.isListenBackgroundKeystrokes) {
     return
   }
-  const labelKey = KEYBOARD_CODE_TO_LABEL_MAP[command] || command
-  if (!currentModelAllKeyList.includes(labelKey)) {
+  const keycode = command
+  if (!ALL_COMMAND_KEYCODE.includes(keycode)) {
     return
   }
-  let url: string = bookmarkConfig.keymap[labelKey] ? bookmarkConfig.keymap[labelKey].url : ''
+  let url: string = bookmarkConfig.keymap[keycode] ? bookmarkConfig.keymap[keycode].url : ''
   if (url.length === 0) {
     return
   }
@@ -71,12 +41,12 @@ const handleKeyboard = async (command: string) => {
     createTab(url)
     return
   }
-  clearTimeout(timer)
-  if (laskCommand === labelKey) {
+  clearTimeout(dblclickTimer)
+  if (laskCommand === keycode) {
     createTab(url)
   } else {
-    laskCommand = labelKey
-    timer = setTimeout(() => {
+    laskCommand = keycode
+    dblclickTimer = setTimeout(() => {
       laskCommand = ''
     }, bookmarkConfig.dblclickIntervalTime)
   }

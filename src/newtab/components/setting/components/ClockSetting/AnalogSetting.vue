@@ -1,3 +1,3 @@
 <template>
-  <BaseComponentSetting cname="clockAnalog" />
+  <BaseComponentSetting cname="clockAnalog" :widthRange="[20, 300]" />
 </template>

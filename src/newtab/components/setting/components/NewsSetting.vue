@@ -17,7 +17,7 @@ const handleUpdateValue = () => {
 </script>
 
 <template>
-  <BaseComponentSetting cname="news">
+  <BaseComponentSetting cname="news" :widthRange="[200, 1000]" :heightRange="[50, 1000]">
     <template #header>
       <NFormItem :label="$t('news.source')">
         <NSelect

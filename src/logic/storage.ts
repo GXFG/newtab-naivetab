@@ -1,7 +1,7 @@
 import { useDebounceFn } from '@vueuse/core'
 import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
-import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY } from './const'
+import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from './const'
 import { defaultConfig, localConfig, localState, globalState, switchSettingDrawerVisible, compareLeftVersionLessThanRightVersions } from '@/logic'
 
 export const getLocalVersion = () => {
@@ -121,7 +121,7 @@ const mergeState = (state: unknown, acceptState: unknown) => {
     return acceptState
   }
   // 特殊处理 bookmark.keymap 数据，直接返回acceptState
-  if (Object.prototype.hasOwnProperty.call(state, 'q')) {
+  if (Object.prototype.hasOwnProperty.call(state, 'KeyQ') || Object.prototype.hasOwnProperty.call(state, 'KeyA') || Object.prototype.hasOwnProperty.call(state, 'KeyZ') || Object.prototype.hasOwnProperty.call(state, 'Digit1')) {
     return acceptState
   }
   const filterState = {} as { [propName: string]: unknown }
@@ -309,6 +309,24 @@ export const importSetting = async (text: string) => {
         fileContent.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
         delete fileContent.general.backgroundImageCustomUrl
       }
+    }
+    // handle old version 兼容小于1.9.0版本的旧bookmark keymap结构
+    if (compareLeftVersionLessThanRightVersions(fileContent.general.version, '1.9.0')) {
+      for (const keyLabel of Object.keys(fileContent.bookmark.keymap)) {
+        const newKeycode = KEYBOARD_OLD_TO_NEW_CODE_MAP[keyLabel]
+        if (newKeycode) {
+          fileContent.bookmark.keymap[newKeycode] = fileContent.bookmark.keymap[keyLabel]
+          delete fileContent.bookmark.keymap[keyLabel]
+        }
+      }
+      delete fileContent.bookmark.margin
+      delete fileContent.bookmark.width
+      delete fileContent.bookmark.fontFamily
+      delete fileContent.bookmark.fontSize
+      delete fileContent.bookmark.backgroundColor
+      delete fileContent.bookmark.BackgroundActiveColor
+      delete fileContent.bookmark.isShadowEnabled
+      delete fileContent.bookmark.shadowColor
     }
     log('FileContentTransform', fileContent)
     fileContent.general.version = pkg.version // 更新版本号

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { swatcheColors } from '@/styles/const'
-import { localConfig, localState, globalState } from '@/logic'
+import { localConfig, localState, availableFontOptions, fontSelectRenderLabel } from '@/logic'
 
 const props = defineProps({
   cname: {
@@ -20,11 +20,11 @@ const props = defineProps({
   },
   widthRange: {
     type: Array as () => number[],
-    default: () => [0, 100],
+    default: () => [10, 100],
   },
   heightRange: {
     type: Array as () => number[],
-    default: () => [0, 100],
+    default: () => [10, 100],
   },
   borderRadiusRange: {
     type: Array as () => number[],
@@ -34,41 +34,6 @@ const props = defineProps({
 
 const isRenderField = (field: string) => {
   return field in localConfig[props.cname]
-}
-
-const availableFontOptions = computed(() =>
-  globalState.availableFontList.map((font: string) => ({
-    label: font,
-    value: font,
-  })),
-)
-
-const fontSelectRenderLabel = (option: SelectStringItem) => {
-  return [
-    h(
-      'div',
-      {
-        style: {
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        },
-      },
-      [
-        h('span', {}, option.label),
-        h(
-          'span',
-          {
-            style: {
-              fontFamily: option.label,
-            },
-          },
-          'abc-ABC-0123',
-        ),
-      ],
-    ),
-  ]
 }
 </script>
 
@@ -104,7 +69,7 @@ const fontSelectRenderLabel = (option: SelectStringItem) => {
     </NFormItem>
     <NFormItem v-if="isRenderField('fontFamily')" :label="$t('common.font')">
       <NSelect v-model:value="localConfig[props.cname].fontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
-      <NInputNumber v-model:value="localConfig[props.cname].fontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="50" />
+      <NInputNumber v-model:value="localConfig[props.cname].fontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="100" />
     </NFormItem>
     <NFormItem v-if="isRenderField('letterSpacing')" :label="$t('common.letterSpacing')">
       <NSlider v-model:value="localConfig[props.cname].letterSpacing" :step="0.1" :min="0" :max="50" />

@@ -125,6 +125,7 @@
     "general": "General",
     "mainLabel": "Setting",
     "bookmark": "Bookmark",
+    "bookmarkKeyboard": "KeyboardBookmark",
     "bookmarkConfig": "BookmarkConfig",
     "clock": "Clock",
     "clockDigital": "DigitalClock",

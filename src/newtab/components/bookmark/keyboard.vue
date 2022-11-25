@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   KEYBOARD_CODE_TO_DEFAULT_CONFIG,
+  KEYBOARD_NOT_ALLOW_KEYCODE_LIST,
   currKeyboardConfig,
   isDragMode,
   localConfig,
@@ -77,15 +78,16 @@ const keyboardTask = (e: KeyboardEvent) => {
   }
   // e.preventDefault()
   const { code, shiftKey, ctrlKey, altKey, metaKey } = e
-  console.log(code, ctrlKey, metaKey)
+  if (KEYBOARD_NOT_ALLOW_KEYCODE_LIST.includes(code)) {
+    return
+  }
+  if (ctrlKey || metaKey) {
+    return
+  }
   // 过滤非当前配置下的按键
   if (!keyboardCurrentModelAllKeyList.value.includes(code)) {
     return
   }
-  // if (ctrlKey || metaKey) {
-  //   // 忽略ctrl/meta键
-  //   return
-  // }
   const url = getBookmarkConfigUrl(code)
   // shift + key 后台打开书签，alt + key 新标签页打开
   if (!localConfig.bookmark.isDblclickOpen) {
@@ -110,12 +112,17 @@ const dragStyle = ref('')
 
 const customPrimaryColor = getStyleField('general', 'primaryColor')
 const containerStyle = getLayoutStyle(CNAME)
-const customFontFamily = getStyleField(CNAME, 'fontFamily')
-const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
+
+const customKeycapKeyFontFamily = getStyleField(CNAME, 'keycapKeyFontFamily')
+const customKeycapKeyFontSize = getStyleField(CNAME, 'keycapKeyFontSize', 'vmin')
+const customBookmarkKeyFontFamily = getStyleField(CNAME, 'keycapBookmarkFontFamily')
+const customBookmarkKeyFontSize = getStyleField(CNAME, 'keycapBookmarkFontSize', 'vmin')
 // keycap size
 const customKeycapPadding = getStyleField(CNAME, 'keycapPadding', 'vmin')
 const customKeycapBaseSize = getStyleField(CNAME, 'keycapSize', 'vmin')
 const customKeycapBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
+// keycap-flat
+const customKeycapStageFlatPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 // keycap-gmk
 const KeycapkeycapGmkEdgeBaseSize = 0.03
 const customKeycapkeycapGmkTopBorderWidth = getStyleField(CNAME, 'keycapSize', 'vmin', KeycapkeycapGmkEdgeBaseSize)
@@ -295,8 +302,8 @@ const getKeycapIconStyle = (code: string) => {
 
 <style scoped>
 #bookmark {
-  font-size: v-bind(customFontSize);
-  font-family: v-bind(customFontFamily);
+  font-family: v-bind(customBookmarkKeyFontFamily);
+  font-size: v-bind(customBookmarkKeyFontSize);
   user-select: none;
   .bookmark__container {
     z-index: 10;
@@ -330,25 +337,27 @@ const getKeycapIconStyle = (code: string) => {
             .item__loading {
               z-index: 1;
               position: absolute;
-              top: 0;
-              left: 0;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
               display: flex;
               justify-content: center;
               align-items: center;
-              width: v-bind(customKeycapBaseSize);
-              height: v-bind(customKeycapBaseSize);
-              font-size: 220%;
               color: v-bind(customPrimaryColor);
-              background-color: rgba(0, 0, 0, 0.1);
+              color: var(--9d2920c2);
+              font-size: 190%;
             }
             .item__key {
               flex: 0 0 auto;
               padding-top: 1%;
+              font-family: v-bind(customKeycapKeyFontFamily);
+              font-size: v-bind(customKeycapKeyFontSize);
               text-align: center;
               font-weight: 500;
             }
             .item__img {
               flex: 1;
+              padding: 10%;
               height: 40%;
               display: flex;
               justify-content: center;
@@ -377,6 +386,7 @@ const getKeycapIconStyle = (code: string) => {
             }
           }
           .keycap__stage-flat {
+            padding: v-bind(customKeycapStageFlatPadding);
             border-radius: v-bind(customKeycapBorderRadius);
             border-width: 1px;
             border-color: rgba(0, 0, 0, 0.1);

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import {
+  KEYBOARD_CODE_TO_DEFAULT_CONFIG,
   localConfig,
   customPrimaryColor,
   getStyleConst,
-  keyboardRowKeyList,
+  currKeyboardConfig,
   getDefaultBookmarkNameFromUrl,
   getFaviconFromUrl,
   getBookmarkConfigUrl,
@@ -13,7 +14,7 @@ import {
 const state = reactive({
   url: '',
   name: '',
-  key: '',
+  keyCode: '',
   isCommitLoading: false,
 })
 
@@ -29,10 +30,10 @@ onMounted(() => {
 })
 
 const selectKey = (key: string) => {
-  state.key = key
+  state.keyCode = key
 }
 
-const isCommitBtnDisabled = computed(() => state.url.length === 0 || state.key.length === 0)
+const isCommitBtnDisabled = computed(() => state.url.length === 0 || state.keyCode.length === 0)
 
 const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
   isPending: false,
@@ -41,7 +42,7 @@ const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
 const onCommit = () => {
   state.isCommitLoading = true
   bookmarkPendingData.value.isPending = true
-  localConfig.bookmark.keymap[state.key] = {
+  localConfig.bookmark.keymap[state.keyCode] = {
     url: state.url,
     name: state.name,
   }
@@ -51,10 +52,62 @@ const onCommit = () => {
   }, 1200)
 }
 
-const popupMainWidth = localConfig.bookmark.isNumberEnabled ? '608px' : '570px'
+// const popupMainWidth = ['80', '84', '87'].includes(`${localConfig.bookmark.keyboardType}`) ? '740px' : '690px'
+
 const popupKeyboardBorder = getStyleConst('popupKeyboardBorder')
 const popupKeyboardHoverBg = getStyleConst('popupKeyboardHoverBg')
 const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
+
+const KEYCAP_BASE_SIZE = 36
+
+const getCustomKeycapWidth = (code: string) => {
+  let value = KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].size
+  const customSize = currKeyboardConfig.value.custom[code] && currKeyboardConfig.value.custom[code].size
+  if (customSize) {
+    value = customSize
+  }
+  const width = KEYCAP_BASE_SIZE * value
+  return width
+}
+
+const getCustomKeycapMargin = (code: string, type: 'marginLeft' | 'marginRight') => {
+  const value = currKeyboardConfig.value.custom[code] && currKeyboardConfig.value.custom[code][type]
+  if (value) {
+    return KEYCAP_BASE_SIZE * value
+  }
+  return 0
+}
+
+const getKeycapWrapStyle = (code: string) => {
+  let style = ''
+  const width = getCustomKeycapWidth(code)
+  style += `width: ${width}px; `
+  const marginLeft = getCustomKeycapMargin(code, 'marginLeft')
+  if (marginLeft) {
+    style += `margin-left: ${marginLeft}px; `
+  }
+  const marginRight = getCustomKeycapMargin(code, 'marginRight')
+  if (marginRight) {
+    style += `margin-right: ${marginRight}px; `
+  }
+  const marginBottom = currKeyboardConfig.value.custom[code] && currKeyboardConfig.value.custom[code].marginBottom
+  if (marginBottom) {
+    style += `margin-bottom: ${KEYCAP_BASE_SIZE * marginBottom}px; `
+  }
+  return style
+}
+
+const getContainerWidth = () => {
+  let totalWidth = 120
+  for (const code of currKeyboardConfig.value.list[0]) {
+    totalWidth += getCustomKeycapWidth(code)
+    totalWidth += getCustomKeycapMargin(code, 'marginLeft')
+    totalWidth += getCustomKeycapMargin(code, 'marginRight')
+  }
+  return totalWidth
+}
+
+const popupMainWidth = `${getContainerWidth()}px`
 </script>
 
 <template>
@@ -70,21 +123,23 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
 
       <NFormItem :label="$t('bookmark.keyLabel')" path="key" :rule="{ required: true }">
         <div class="popup__keyboard">
-          <div v-for="rowList in keyboardRowKeyList" :key="rowList" class="keyboard__row">
-            <div v-for="key in rowList" :key="key" class="row__item" @click="selectKey(key)">
-              <div v-if="key === state.key" class="item__current">
-                <ic:outline-check-circle />
-              </div>
-              <p class="item__key">
-                {{ `${key.toUpperCase()}` }}
-              </p>
-              <div class="item__img">
-                <img
-                  v-if="getBookmarkConfigUrl(key)"
-                  class="img__main"
-                  :src="getFaviconFromUrl(getBookmarkConfigUrl(key))"
-                  :ondragstart="() => false"
-                >
+          <div v-for="(rowData, rowIndex) of currKeyboardConfig.list" :key="rowIndex" class="keyboard__row">
+            <div v-for="code of rowData" :key="code" class="row__keycap-wrap" :style="getKeycapWrapStyle(code)">
+              <div class="row__keycap" @click="selectKey(code)">
+                <div v-if="code === state.keyCode" class="keycap__select">
+                  <ic:outline-check-circle />
+                </div>
+                <p class="keycap__label">
+                  {{ KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].label }}
+                </p>
+                <div class="keycap__img">
+                  <img
+                    v-if="getBookmarkConfigUrl(code)"
+                    class="img__main"
+                    :src="getFaviconFromUrl(getBookmarkConfigUrl(code))"
+                    :ondragstart="() => false"
+                  >
+                </div>
               </div>
             </div>
           </div>
@@ -109,68 +164,57 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
   .popup__keyboard {
     .keyboard__row {
       display: flex;
-      align-items: center;
-
-      &:nth-child(2) {
-        margin-left: 18px;
-      }
-
-      &:nth-child(3) {
-        margin-left: 36px;
-      }
-
-      &:nth-child(4) {
-        margin-left: 54px;
-      }
-
-      .row__item {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        margin: 1px;
-        padding: 2px;
-        width: 36px;
-        height: 36px;
-        border-radius: 3px;
-        border: 1px solid v-bind(popupKeyboardBorder);
-        cursor: pointer;
-        user-select: none;
-
-        &:hover {
-          background-color: v-bind(popupKeyboardHoverBg);
-        }
-
-        .item__current {
+      .row__keycap-wrap {
+        padding: 1px;
+        height: v-bind(`${KEYCAP_BASE_SIZE}px`);
+        .row__keycap {
           display: flex;
-          justify-content: center;
+          flex-direction: column;
+          justify-content: space-between;
           align-items: center;
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 36px;
-          height: 36px;
-          background-color: v-bind(popupKeyboardActiveBg);
-          color: v-bind(customPrimaryColor);
-          font-size: 18px;
+          position: relative;
+          padding: 2px;
+          width: 100%;
+          height: 100%;
           border-radius: 3px;
-        }
+          border: 1px solid v-bind(popupKeyboardBorder);
+          cursor: pointer;
+          user-select: none;
 
-        .item__key {
-          font-size: 12px;
-          line-height: 1;
-        }
+          &:hover {
+            background-color: v-bind(popupKeyboardHoverBg);
+          }
 
-        .item__img {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 16px;
+          .keycap__select {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 36px;
+            height: 36px;
+            background-color: v-bind(popupKeyboardActiveBg);
+            color: v-bind(customPrimaryColor);
+            font-size: 18px;
+            border-radius: 3px;
+          }
 
-          .img__main {
-            width: 100%;
-            height: 100%;
+          .keycap__label {
+            font-size: 12px;
+            line-height: 1;
+          }
+
+          .keycap__img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 16px;
+
+            .img__main {
+              width: 100%;
+              height: 100%;
+            }
           }
         }
       }

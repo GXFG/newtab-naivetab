@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, KEYBOARD_OLD_TO_NEW_CODE_MAP, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -94,8 +94,6 @@ export const defaultConfig = {
     dblclickIntervalTime: 200, // ms
     isNewTabOpen: false,
     isNameVisible: true,
-    keyboardType: 60 as 'hhkb' | number,
-    keycapType: 'flat',
     keymap: {
       KeyQ: {
         url: 'www.baidu.com',
@@ -162,22 +160,24 @@ export const defaultConfig = {
       yOffsetValue: 1,
       yTranslateValue: 0,
     },
-    keycapPadding: 3,
+    keyboardType: 61 as 'hhkb' | number,
+    keycapType: 'gmk',
+    keycapPadding: 1.5,
     keycapSize: 60,
-    fontFamily: 'Arial',
-    fontSize: 12,
-    mainFontColor: ['rgba(34, 34, 34, 1)', 'rgba(255, 255, 255, 1)'],
-    mainBackgroundColor: ['rgba(234, 230, 231, 1)', 'rgba(52, 52, 57, 1)'],
-    emphasisOneFontColor: ['rgba(34, 34, 34, 1)', 'rgba(255, 255, 255, 1)'],
-    emphasisOneBackgroundColor: ['rgba(203, 205, 218, 1)', 'rgba(52, 52, 57, 1)'],
-    emphasisTwoFontColor: ['rgba(34, 34, 34, 1)', 'rgba(255, 255, 255, 1)'],
-    emphasisTwoBackgroundColor: ['rgba(203, 205, 218, 1)', 'rgba(52, 52, 57, 1)'],
+    keycapKeyFontFamily: 'Arial Rounded MT Bold',
+    keycapKeyFontSize: 12,
+    keycapBookmarkFontFamily: 'Arial',
+    keycapBookmarkFontSize: 12,
+    mainFontColor: ['rgba(82,85,84,1.0)', 'rgba(228,222,221,1.0)'],
+    mainBackgroundColor: ['rgba(230,232,227,1.0)', 'rgba(95,92,82,1.0)'],
+    emphasisOneFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
+    emphasisOneBackgroundColor: ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)'],
+    emphasisTwoFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
+    emphasisTwoBackgroundColor: ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)'],
     isBorderEnabled: false,
     borderWidth: 1,
     borderRadius: 5,
     borderColor: ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)'],
-    // add keycapPadding keycapSize mainFontColor mainBackgroundColor emphasisOneFontColor emphasisOneBackgroundColor emphasisTwoFontColor emphasisTwoBackgroundColor
-    // delete margin width backgroundColor BackgroundActiveColor isShadowEnabled shadowColor
   },
   clockDigital: {
     enabled: true,
@@ -521,6 +521,41 @@ const initAvailableFontList = async () => {
   globalState.availableFontList = [...availableList.values()]
 }
 
+export const availableFontOptions = computed(() =>
+  globalState.availableFontList.map((font: string) => ({
+    label: font,
+    value: font,
+  })),
+)
+
+export const fontSelectRenderLabel = (option: SelectStringItem) => {
+  return [
+    h(
+      'div',
+      {
+        style: {
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+      },
+      [
+        h('span', {}, option.label),
+        h(
+          'span',
+          {
+            style: {
+              fontFamily: option.label,
+            },
+          },
+          'abc-ABC-0123',
+        ),
+      ],
+    ),
+  ]
+}
+
 export const switchSettingDrawerVisible = (status: boolean) => {
   globalState.isSettingDrawerVisible = status
   if (status && globalState.availableFontList.length === 0) {
@@ -600,6 +635,41 @@ export const handleAppUpdate = async () => {
     newsState.value.bilibili = {
       syncTime: 0,
       list: [],
+    }
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.9.0')) {
+    localConfig.bookmark.keyboardType = 61
+    localConfig.bookmark.keycapType = 'dsa'
+    localConfig.bookmark.keycapPadding = 1.5
+    localConfig.bookmark.keycapSize = (localConfig.bookmark as any).width || 60
+    localConfig.bookmark.keycapKeyFontFamily = 'Arial Rounded MT Bold'
+    localConfig.bookmark.keycapKeyFontSize = 12
+    localConfig.bookmark.keycapBookmarkFontFamily = 'Arial'
+    localConfig.bookmark.keycapBookmarkFontSize = 12
+    localConfig.bookmark.mainFontColor = ['rgba(82,85,84,1.0)', 'rgba(222,222,202,1.0)']
+    localConfig.bookmark.mainBackgroundColor = ['rgba(230,232,227,1.0)', 'rgba(107,114,115,1.0)']
+    localConfig.bookmark.emphasisOneFontColor = ['rgba(34,34,34,1.0)', 'rgba(222,222,202,1.0)']
+    localConfig.bookmark.emphasisOneBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(71,73,70,1.0)']
+    localConfig.bookmark.emphasisTwoFontColor = ['rgba(34,34,34,1.0)', 'rgba(222,222,202,1.0)']
+    localConfig.bookmark.emphasisTwoBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(41,127,169,1.0)']
+    localConfig.bookmark.isBorderEnabled = false
+    localConfig.bookmark.borderWidth = 1
+    localConfig.bookmark.borderRadius = 5
+    localConfig.bookmark.borderColor = ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)']
+    delete (localConfig.bookmark as any).margin
+    delete (localConfig.bookmark as any).width
+    delete (localConfig.bookmark as any).fontFamily
+    delete (localConfig.bookmark as any).fontSize
+    delete (localConfig.bookmark as any).backgroundColor
+    delete (localConfig.bookmark as any).BackgroundActiveColor
+    delete (localConfig.bookmark as any).isShadowEnabled
+    delete (localConfig.bookmark as any).shadowColor
+    for (const keyLabel of Object.keys(localConfig.bookmark.keymap)) {
+      const newKeycode = KEYBOARD_OLD_TO_NEW_CODE_MAP[keyLabel]
+      if (newKeycode) {
+        localConfig.bookmark.keymap[newKeycode] = localConfig.bookmark.keymap[keyLabel]
+        delete localConfig.bookmark.keymap[keyLabel]
+      }
     }
   }
   // 更新local版本号
