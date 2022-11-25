@@ -120,7 +120,7 @@ const customBookmarkKeyFontSize = getStyleField(CNAME, 'keycapBookmarkFontSize',
 // keycap size
 const customKeycapPadding = getStyleField(CNAME, 'keycapPadding', 'vmin')
 const customKeycapBaseSize = getStyleField(CNAME, 'keycapSize', 'vmin')
-const customKeycapBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
+const customKeycapIconPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 // keycap-flat
 const customKeycapStageFlatPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 // keycap-gmk
@@ -233,9 +233,13 @@ const iconStyleValueMap = {
 }
 
 const getKeycapIconStyle = (code: string) => {
-  let value = getCustomTextAlign(code)
-  value = iconStyleValueMap[value]
-  return `justify-content: ${value};`
+  let textAlign = getCustomTextAlign(code)
+  textAlign = iconStyleValueMap[textAlign]
+  let style = `justify-content: ${textAlign};`
+  if (!localConfig.bookmark.isNameVisible) {
+    style += `padding: ${customKeycapIconPadding.value};`
+  }
+  return style
 }
 </script>
 
@@ -357,7 +361,6 @@ const getKeycapIconStyle = (code: string) => {
             }
             .item__img {
               flex: 1;
-              padding: 10%;
               height: 40%;
               display: flex;
               justify-content: center;
