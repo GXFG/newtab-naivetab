@@ -117,9 +117,10 @@ const customKeycapKeyFontFamily = getStyleField(CNAME, 'keycapKeyFontFamily')
 const customKeycapKeyFontSize = getStyleField(CNAME, 'keycapKeyFontSize', 'vmin')
 const customBookmarkKeyFontFamily = getStyleField(CNAME, 'keycapBookmarkFontFamily')
 const customBookmarkKeyFontSize = getStyleField(CNAME, 'keycapBookmarkFontSize', 'vmin')
-// keycap size
+// keycap-base
 const customKeycapPadding = getStyleField(CNAME, 'keycapPadding', 'vmin')
 const customKeycapBaseSize = getStyleField(CNAME, 'keycapSize', 'vmin')
+const customKeycapBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
 const customKeycapIconPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 // keycap-flat
 const customKeycapStageFlatPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)

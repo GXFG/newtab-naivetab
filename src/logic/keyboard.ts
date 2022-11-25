@@ -1,4 +1,5 @@
-import { localConfig, globalState, switchSettingDrawerVisible, isMacOS } from '@/logic'
+import { isMacOS } from '@/env'
+import { localConfig, globalState, switchSettingDrawerVisible } from '@/logic'
 
 const keydownTaskMap = new Map()
 
@@ -361,9 +362,9 @@ export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   Digit0: { label: '0', textAlign: 'center', size: 1 },
   Minus: { label: '-', textAlign: 'center', size: 1 },
   Equal: { label: '+', textAlign: 'center', size: 1 },
-  Backspace: { label: '⌫', textAlign: 'right', size: 2 },
+  Backspace: { label: isMacOS ? '⌫' : 'Backspace', textAlign: 'right', size: 2 },
   // 2
-  Tab: { label: '⇥', textAlign: 'left', size: 1.5 },
+  Tab: { label: isMacOS ? '⇥' : 'Tab', textAlign: 'left', size: 1.5 },
   KeyQ: { label: 'Q', textAlign: 'center', size: 1 },
   KeyW: { label: 'W', textAlign: 'center', size: 1 },
   KeyE: { label: 'E', textAlign: 'center', size: 1 },
@@ -390,9 +391,9 @@ export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   KeyL: { label: 'L', textAlign: 'center', size: 1 },
   Semicolon: { label: ': ;', textAlign: 'center', size: 1 },
   Quote: { label: '" \'', textAlign: 'center', size: 1 },
-  Enter: { label: '⏎', textAlign: 'right', size: 2.25 },
+  Enter: { label: isMacOS ? '⏎' : 'Enter', textAlign: 'right', size: 2.25 },
   // 4
-  ShiftLeft: { label: '⇧', alias: 'LShift', textAlign: 'left', size: 2.25 },
+  ShiftLeft: { label: isMacOS ? '⇧' : 'Shift', alias: 'LShift', textAlign: 'left', size: 2.25 },
   KeyZ: { label: 'Z', textAlign: 'center', size: 1 },
   KeyX: { label: 'X', textAlign: 'center', size: 1 },
   KeyC: { label: 'C', textAlign: 'center', size: 1 },
@@ -403,19 +404,19 @@ export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   Comma: { label: '< ,', textAlign: 'center', size: 1 },
   Period: { label: '> .', textAlign: 'center', size: 1 },
   Slash: { label: '? /', textAlign: 'center', size: 1 },
-  ShiftRight: { label: '⇧', alias: 'RShift', textAlign: 'right', size: 2.75 },
+  ShiftRight: { label: isMacOS ? '⇧' : 'Shift', alias: 'RShift', textAlign: 'right', size: 2.75 },
   // 5
-  ControlLeft: { label: isMacOS() ? '⌃' : 'Ctrl', alias: 'LCtrl', textAlign: 'left', size: 1.25 },
-  MetaLeft: { label: isMacOS() ? '⌘' : 'Meta', alias: 'LMeta', textAlign: 'left', size: 1.25 },
-  AltLeft: { label: isMacOS() ? '⌥' : 'Alt', alias: 'LAlt', textAlign: 'left', size: 1.25 },
+  ControlLeft: { label: isMacOS ? '⌃' : 'Ctrl', alias: 'LCtrl', textAlign: 'left', size: 1.25 },
+  MetaLeft: { label: isMacOS ? '⌘' : 'Meta', alias: 'LMeta', textAlign: 'left', size: 1.25 },
+  AltLeft: { label: isMacOS ? '⌥' : 'Alt', alias: 'LAlt', textAlign: 'left', size: 1.25 },
   Space: { label: '', textAlign: 'center', size: 6.25 },
-  AltRight: { label: isMacOS() ? '⌥' : 'Alt', alias: 'RAlt', textAlign: 'left', size: 1.25 },
-  MetaRight: { label: isMacOS() ? '⌘' : 'Meta', alias: 'RMeta', textAlign: 'left', size: 1.25 },
-  ControlRight: { label: isMacOS() ? '⌃' : 'Ctrl', alias: 'RCtrl', textAlign: 'left', size: 1.25 },
+  AltRight: { label: isMacOS ? '⌥' : 'Alt', alias: 'RAlt', textAlign: 'left', size: 1.25 },
+  MetaRight: { label: isMacOS ? '⌘' : 'Meta', alias: 'RMeta', textAlign: 'left', size: 1.25 },
+  ControlRight: { label: isMacOS ? '⌃' : 'Ctrl', alias: 'RCtrl', textAlign: 'left', size: 1.25 },
   Fn: { label: 'Fn', textAlign: 'left', size: 1.25 },
   // Edit
   Insert: { label: 'Ins', textAlign: 'center', size: 1 },
-  Delete: { label: 'Del', textAlign: 'center', size: 1 },
+  Delete: { label: isMacOS ? '⌦' : 'Del', textAlign: 'center', size: 1 },
   Home: { label: 'Home', textAlign: 'center', size: 1 },
   End: { label: 'End', textAlign: 'center', size: 1 },
   PageUp: { label: 'PgUp', textAlign: 'center', size: 1 },
@@ -800,7 +801,7 @@ const KEYBOARD_TYPE_CONFIG = {
 }
 
 export const currKeyboardConfig = computed(() => {
-  const res = KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType] as {
+  const target = KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType || 61] as {
     isMacOS: boolean
     list: string[][]
     emphasisOneKeys: string[]
@@ -810,15 +811,15 @@ export const currKeyboardConfig = computed(() => {
     }
   }
   // if Mac, swap option & command
-  if (!res.isMacOS && isMacOS() && localConfig.bookmark.keyboardType !== 'hhkb') {
-    res.isMacOS = true
-    const lastRowIndex = res.list.length - 1
+  if (!target.isMacOS && isMacOS) {
+    target.isMacOS = true
+    const lastRowIndex = target.list.length - 1
     let leftAltIndex = -1
     let leftMetaIndex = -1
     let rightAltIndex = -1
     let rightMetaIndex = -1
-    for (let index = 0, len = res.list[lastRowIndex].length; index < len; index++) {
-      const item = res.list[lastRowIndex][index]
+    for (let index = 0, len = target.list[lastRowIndex].length; index < len; index++) {
+      const item = target.list[lastRowIndex][index]
       if (item === 'AltLeft') {
         leftAltIndex = index
       } else if (item === 'MetaLeft') {
@@ -830,13 +831,13 @@ export const currKeyboardConfig = computed(() => {
       }
     }
     if (leftAltIndex !== -1 && leftMetaIndex !== -1) {
-      [res.list[lastRowIndex][leftMetaIndex], res.list[lastRowIndex][leftAltIndex]] = [res.list[lastRowIndex][leftAltIndex], res.list[lastRowIndex][leftMetaIndex]]
+      [target.list[lastRowIndex][leftMetaIndex], target.list[lastRowIndex][leftAltIndex]] = [target.list[lastRowIndex][leftAltIndex], target.list[lastRowIndex][leftMetaIndex]]
     }
     if (rightAltIndex !== -1 && rightMetaIndex !== -1) {
-      [res.list[lastRowIndex][rightMetaIndex], res.list[lastRowIndex][rightAltIndex]] = [res.list[lastRowIndex][rightAltIndex], res.list[lastRowIndex][rightMetaIndex]]
+      [target.list[lastRowIndex][rightMetaIndex], target.list[lastRowIndex][rightAltIndex]] = [target.list[lastRowIndex][rightAltIndex], target.list[lastRowIndex][rightMetaIndex]]
     }
   }
-  return res
+  return target
 })
 
 export const keyboardCurrentModelAllKeyList = computed(() => currKeyboardConfig.value.list.flat(Infinity))

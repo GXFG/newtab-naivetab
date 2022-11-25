@@ -10,17 +10,6 @@ export const log = (msg: string, ...args: unknown[]) => {
   console.log(`%c${msg}`, style, ...args)
 }
 
-export const isMacOS = () => {
-  let target = null as null | boolean
-  return () => {
-    if (target !== null) {
-      return target
-    }
-    target = navigator.userAgent.includes('Mac OS')
-    return target
-  }
-}
-
 export const sleep = (time: number) => {
   return new Promise((resolve) => {
     setTimeout(() => { resolve(null) }, time)
