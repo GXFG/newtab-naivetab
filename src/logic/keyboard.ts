@@ -538,9 +538,10 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: [],
     custom: {
       Backslash: { size: 1 },
-      Backspace: { size: 1.5 },
-      ControlLeft: { size: 1.75 },
-      ShiftRight: { size: 1.75 },
+      Backspace: { size: 1.5, label: 'Delete', textAlign: 'left' },
+      ControlLeft: { size: 1.75, label: 'Control' },
+      Enter: { label: 'Return', textAlign: 'left' },
+      ShiftRight: { size: 1.75, textAlign: 'left' },
       Fn: { size: 1 },
       AltLeft: { size: 1, marginLeft: 1.5 },
       MetaLeft: { size: 1.5 },

@@ -24,6 +24,15 @@ const state = reactive({
   isLoadPageLoading: false,
 })
 
+const getKeycapLabel = (code: string) => {
+  let value = KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].label
+  const customLabel = currKeyboardConfig.value.custom[code] && currKeyboardConfig.value.custom[code].label
+  if (customLabel) {
+    value = customLabel
+  }
+  return value
+}
+
 let delayResetTimer: NodeJS.Timeout
 
 const delayResetPressKey = () => {
@@ -279,7 +288,7 @@ const getKeycapIconStyle = (code: string) => {
                   <eos-icons:loading />
                 </div>
                 <p class="item__key" :style="getKeycapTextStyle(code)">
-                  {{ KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].label }}
+                  {{ getKeycapLabel(code) }}
                 </p>
                 <div class="item__img" :style="getKeycapIconStyle(code)">
                   <div class="img__wrap">
