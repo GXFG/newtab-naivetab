@@ -508,7 +508,6 @@ export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
 ]
 
 export const KEYBOARD_TYPE_OPTION = [
-  { label: 'HHKB', value: 'hhkb' },
   { label: '33', value: '33' },
   { label: '45', value: '45' },
   { label: '47', value: '47' },
@@ -522,6 +521,7 @@ export const KEYBOARD_TYPE_OPTION = [
   { label: '80', value: 80 },
   { label: '84', value: 84 },
   { label: '87', value: 87 },
+  { label: 'HHKB', value: 'hhkb' },
 ]
 
 const KEYBOARD_TYPE_CONFIG = {

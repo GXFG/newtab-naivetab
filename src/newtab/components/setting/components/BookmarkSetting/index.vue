@@ -376,7 +376,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           />
         </NFormItem>
         <p class="setting__label">
-          {{ `${$t('common.main')}${$t('bookmark.keycap')}` }}
+          {{ `${$t('common.main')}${$t('bookmark.keycap')} QWERTY` }}
         </p>
         <NFormItem :label="`${$t('common.fontColor')}`">
           <NColorPicker v-model:value="localConfig.bookmark.mainFontColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
@@ -389,7 +389,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           />
         </NFormItem>
         <p class="setting__label">
-          {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} A` }}
+          {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Control` }}
         </p>
         <NFormItem :label="`${$t('common.fontColor')}`">
           <NColorPicker
@@ -406,7 +406,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           />
         </NFormItem>
         <p class="setting__label">
-          {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} B` }}
+          {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Enter` }}
         </p>
         <NFormItem :label="`${$t('common.fontColor')}`">
           <NColorPicker

@@ -103,12 +103,44 @@ export const defaultConfig = {
         url: 'www.weibo.com',
         name: 'weibo',
       },
+      KeyE: {
+        url: 'www.toutiao.com',
+        name: '',
+      },
+      KeyR: {
+        url: 'www.draw.io',
+        name: '',
+      },
+      KeyT: {
+        url: 'stackblitz.com',
+        name: '',
+      },
+      KeyA: {
+        url: 'www.taobao.com',
+        name: '',
+      },
+      KeyS: {
+        url: 'www.jd.com',
+        name: '',
+      },
+      KeyD: {
+        url: 'www.douban.com',
+        name: '',
+      },
       KeyG: {
         url: 'www.google.com',
         name: '',
       },
       KeyZ: {
         url: 'www.zhihu.com',
+        name: '',
+      },
+      KeyX: {
+        url: 'www.v2ex.com',
+        name: '',
+      },
+      KeyV: {
+        url: 'www.douyin.com',
         name: '',
       },
       KeyB: {
@@ -122,34 +154,6 @@ export const defaultConfig = {
       KeyM: {
         url: 'v.qq.com',
         name: 'tencent',
-      },
-      Comma: {
-        url: 'www.douyin.com',
-        name: '',
-      },
-      KeyE: {
-        url: 'www.toutiao.com',
-        name: '',
-      },
-      KeyX: {
-        url: 'www.v2ex.com',
-        name: '',
-      },
-      KeyT: {
-        url: 'www.draw.io',
-        name: '',
-      },
-      KeyD: {
-        url: 'www.douban.com',
-        name: '',
-      },
-      KeyJ: {
-        url: 'www.jd.com',
-        name: '',
-      },
-      KeyK: {
-        url: 'www.taobao.com',
-        name: '',
       },
     },
     layout: {
@@ -639,19 +643,19 @@ export const handleAppUpdate = async () => {
   }
   if (compareLeftVersionLessThanRightVersions(version, '1.9.0')) {
     localConfig.bookmark.keyboardType = 61
-    localConfig.bookmark.keycapType = 'dsa'
+    localConfig.bookmark.keycapType = 'gmk'
     localConfig.bookmark.keycapPadding = 1.5
-    localConfig.bookmark.keycapSize = (localConfig.bookmark as any).width || 60
+    localConfig.bookmark.keycapSize = 60
     localConfig.bookmark.keycapKeyFontFamily = 'Arial Rounded MT Bold'
     localConfig.bookmark.keycapKeyFontSize = 12
     localConfig.bookmark.keycapBookmarkFontFamily = 'Arial'
     localConfig.bookmark.keycapBookmarkFontSize = 12
-    localConfig.bookmark.mainFontColor = ['rgba(82,85,84,1.0)', 'rgba(222,222,202,1.0)']
-    localConfig.bookmark.mainBackgroundColor = ['rgba(230,232,227,1.0)', 'rgba(107,114,115,1.0)']
-    localConfig.bookmark.emphasisOneFontColor = ['rgba(34,34,34,1.0)', 'rgba(222,222,202,1.0)']
-    localConfig.bookmark.emphasisOneBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(71,73,70,1.0)']
-    localConfig.bookmark.emphasisTwoFontColor = ['rgba(34,34,34,1.0)', 'rgba(222,222,202,1.0)']
-    localConfig.bookmark.emphasisTwoBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(41,127,169,1.0)']
+    localConfig.bookmark.mainFontColor = ['rgba(82,85,84,1.0)', 'rgba(228,222,221,1.0)']
+    localConfig.bookmark.mainBackgroundColor = ['rgba(230,232,227,1.0)', 'rgba(95,92,82,1.0)']
+    localConfig.bookmark.emphasisOneFontColor = ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)']
+    localConfig.bookmark.emphasisOneBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
+    localConfig.bookmark.emphasisTwoFontColor = ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)']
+    localConfig.bookmark.emphasisTwoBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
     localConfig.bookmark.isBorderEnabled = false
     localConfig.bookmark.borderWidth = 1
     localConfig.bookmark.borderRadius = 5

@@ -29,6 +29,11 @@ export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
 
 export const SECOND_MODAL_WIDTH = 550
 
+export const TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP = {
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
+}
 export const APPEARANCE_TO_CODE_MAP = {
   light: 0,
   dark: 1,

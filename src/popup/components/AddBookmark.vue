@@ -192,8 +192,8 @@ const popupMainWidth = `${getContainerWidth()}px`
             position: absolute;
             top: 0;
             left: 0;
-            width: 36px;
-            height: 36px;
+            width: 100%;
+            height: 100%;
             background-color: v-bind(popupKeyboardActiveBg);
             color: v-bind(customPrimaryColor);
             font-size: 18px;

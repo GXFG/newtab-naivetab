@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP,
   KEYBOARD_CODE_TO_DEFAULT_CONFIG,
   KEYBOARD_NOT_ALLOW_KEYCODE_LIST,
   currKeyboardConfig,
@@ -130,6 +131,7 @@ const customBookmarkKeyFontSize = getStyleField(CNAME, 'keycapBookmarkFontSize',
 const customKeycapPadding = getStyleField(CNAME, 'keycapPadding', 'vmin')
 const customKeycapBaseSize = getStyleField(CNAME, 'keycapSize', 'vmin')
 const customKeycapBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
+const customKeycapTextPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 const customKeycapIconPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 // keycap-flat
 const customKeycapStageFlatPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
@@ -232,21 +234,23 @@ const getKeycapStageStyle = (code: string) => {
 }
 
 const getKeycapTextStyle = (code: string) => {
-  const value = getCustomTextAlign(code)
-  return `text-align: ${value};`
-}
-
-const iconStyleValueMap = {
-  left: 'flex-start',
-  center: 'center',
-  right: 'flex-end',
+  const textAlign = getCustomTextAlign(code)
+  let style = `text-align: ${textAlign};`
+  if (textAlign !== 'center') {
+    style += `padding: 0 ${customKeycapTextPadding.value};`
+  }
+  return style
 }
 
 const getKeycapIconStyle = (code: string) => {
   let textAlign = getCustomTextAlign(code)
-  textAlign = iconStyleValueMap[textAlign]
+  textAlign = TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP[textAlign]
   let style = `justify-content: ${textAlign};`
-  if (!localConfig.bookmark.isNameVisible) {
+  if (localConfig.bookmark.isNameVisible) {
+    if (textAlign !== 'center') {
+      style += `padding: 0 ${customKeycapTextPadding.value};`
+    }
+  } else {
     style += `padding: ${customKeycapIconPadding.value};`
   }
   return style
