@@ -8,7 +8,7 @@ import {
   themeOverrides,
   renderBackgroundImage,
   setEdgeFavicon,
-  startKeyboard,
+  startKeydown,
   startTimer,
   stopTimer,
   handleStateResetAndUpdate,
@@ -24,7 +24,7 @@ onMounted(async () => {
   setEdgeFavicon()
   handleStateResetAndUpdate()
   startTimer()
-  startKeyboard()
+  startKeydown()
   await handleMissedUploadConfig()
   await loadRemoteConfig()
   await nextTick()

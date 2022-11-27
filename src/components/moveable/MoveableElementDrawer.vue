@@ -5,7 +5,7 @@ import {
   toggleIsDragMode,
   isElementDrawerVisible,
   handleToggleIsElementDrawerVisible,
-  addKeyboardTask,
+  addKeydownTask,
   getStyleConst,
   getStyleField,
   moveState,
@@ -96,17 +96,29 @@ const handleElementMouseDown = async (e: MouseEvent) => {
   localConfig[moveState.currDragTarget.name].enabled = true
   await nextTick()
   // 以光标位置为组件的中心开始拖拽
-  moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)(e, true) // startDrag(e: MouseEvent, resite: boolean)
+  const mouseDownTask = moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)
+  if (mouseDownTask) {
+    mouseDownTask(e, true) // startDrag(e: MouseEvent, resite: boolean)
+  }
   // 执行一次 onDragging，为消除首次启用组件时会展示上次存储的布局
-  moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)(e)
+  const mouseMoveTask = moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)
+  if (mouseMoveTask) {
+    mouseMoveTask(e)
+  }
 }
 
 const handleElementMouseMove = async (e: MouseEvent) => {
-  moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)(e)
+  const mouseMoveTask = moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)
+  if (mouseMoveTask) {
+    mouseMoveTask(e)
+  }
 }
 
 const handleElementMouseUp = (e: MouseEvent) => {
-  moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)(e)
+  const mouseUpTask = moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)
+  if (mouseUpTask) {
+    mouseUpTask(e)
+  }
   const isEnabled = !state.isCursorInElementDrawer
   localConfig[moveState.currDragTarget.name].enabled = isEnabled
 }
@@ -156,7 +168,7 @@ const keyboardHandler = (e: KeyboardEvent) => {
   }
 }
 
-addKeyboardTask('moveable-tool', keyboardHandler)
+addKeydownTask('moveable-tool', keyboardHandler)
 
 const customPrimaryColor = getStyleField('general', 'primaryColor')
 const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')

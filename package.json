@@ -1,7 +1,7 @@
 {
   "name": "newtab-naivetab",
   "displayName": "NaiveTab - Newtab page",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "private": true,
   "packageManager": "pnpm@7.9.5",
   "description": "一款简洁高效的浏览器新标签页扩展，可以高度自定义你的新标签页",
@@ -27,7 +27,7 @@
     "lint": "eslint '{src,scripts}/**/*.{json,ts,js,vue}'"
   },
   "dependencies": {
-    "axios": "^1.1.3",
+    "axios": "^1.2.0",
     "cheerio": "^1.0.0-rc.12",
     "dayjs": "^1.11.6",
     "lunar-typescript": "^1.2.23"
@@ -50,11 +50,11 @@
     "cross-env": "^7.0.3",
     "crx": "^5.0.1",
     "esbuild": "^0.15.14",
-    "eslint": "^8.27.0",
+    "eslint": "^8.28.0",
     "esno": "^0.16.3",
     "fs-extra": "^10.1.0",
     "kolorist": "^1.6.0",
-    "naive-ui": "^2.33.5",
+    "naive-ui": "^2.34.2",
     "nodemon": "^2.0.20",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",

@@ -28,7 +28,7 @@ const onChangeSearch = (value: string, option: SelectStringItem) => {
 </script>
 
 <template>
-  <BaseComponentSetting cname="search">
+  <BaseComponentSetting cname="search" :widthRange="[200, 1000]" :heightRange="[25, 300]">
     <template #header>
       <NFormItem :label="$t('search.searchEngine')">
         <NSelect v-model:value="state.searchEngine" :options="searchEngineList" @update:value="onChangeSearch" />

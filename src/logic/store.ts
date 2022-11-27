@@ -4,7 +4,7 @@ import pkg from '../../package.json'
 import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, KEYBOARD_CODE_TO_LABEL_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
+import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, KEYBOARD_OLD_TO_NEW_CODE_MAP, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -93,65 +93,67 @@ export const defaultConfig = {
     isDblclickOpen: false,
     dblclickIntervalTime: 200, // ms
     isNewTabOpen: false,
-    isSymbolEnabled: true,
-    isNumberEnabled: false,
     isNameVisible: true,
     keymap: {
-      'q': {
+      KeyQ: {
         url: 'www.baidu.com',
         name: '',
       },
-      'w': {
+      KeyW: {
         url: 'www.weibo.com',
         name: 'weibo',
       },
-      'g': {
-        url: 'www.google.com',
-        name: '',
-      },
-      'z': {
-        url: 'www.zhihu.com',
-        name: '',
-      },
-      'b': {
-        url: 'www.bilibili.com',
-        name: '',
-      },
-      'n': {
-        url: 'www.youku.com',
-        name: '',
-      },
-      'm': {
-        url: 'v.qq.com',
-        name: 'tencent',
-      },
-      '<': {
-        url: 'www.douyin.com',
-        name: '',
-      },
-      'e': {
+      KeyE: {
         url: 'www.toutiao.com',
         name: '',
       },
-      'x': {
-        url: 'www.v2ex.com',
-        name: '',
-      },
-      't': {
+      KeyR: {
         url: 'www.draw.io',
         name: '',
       },
-      'd': {
-        url: 'www.douban.com',
+      KeyT: {
+        url: 'stackblitz.com',
         name: '',
       },
-      'j': {
+      KeyA: {
+        url: 'www.taobao.com',
+        name: '',
+      },
+      KeyS: {
         url: 'www.jd.com',
         name: '',
       },
-      'k': {
-        url: 'www.taobao.com',
+      KeyD: {
+        url: 'www.douban.com',
         name: '',
+      },
+      KeyG: {
+        url: 'www.google.com',
+        name: '',
+      },
+      KeyZ: {
+        url: 'www.zhihu.com',
+        name: '',
+      },
+      KeyX: {
+        url: 'www.v2ex.com',
+        name: '',
+      },
+      KeyV: {
+        url: 'www.douyin.com',
+        name: '',
+      },
+      KeyB: {
+        url: 'www.bilibili.com',
+        name: '',
+      },
+      KeyN: {
+        url: 'www.youku.com',
+        name: '',
+      },
+      KeyM: {
+        url: 'v.qq.com',
+        name: 'tencent',
       },
     },
     layout: {
@@ -162,19 +164,24 @@ export const defaultConfig = {
       yOffsetValue: 1,
       yTranslateValue: 0,
     },
-    margin: 2,
-    width: 58,
-    borderRadius: 3,
-    fontFamily: 'Arial',
-    fontSize: 12,
-    fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    backgroundActiveColor: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
-    isBorderEnabled: true,
+    keyboardType: 61 as 'hhkb' | number,
+    keycapType: 'gmk',
+    keycapPadding: 1.5,
+    keycapSize: 60,
+    keycapKeyFontFamily: 'Arial Rounded MT Bold',
+    keycapKeyFontSize: 12,
+    keycapBookmarkFontFamily: 'Arial',
+    keycapBookmarkFontSize: 12,
+    mainFontColor: ['rgba(82,85,84,1.0)', 'rgba(228,222,221,1.0)'],
+    mainBackgroundColor: ['rgba(230,232,227,1.0)', 'rgba(95,92,82,1.0)'],
+    emphasisOneFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
+    emphasisOneBackgroundColor: ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)'],
+    emphasisTwoFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
+    emphasisTwoBackgroundColor: ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)'],
+    isBorderEnabled: false,
     borderWidth: 1,
+    borderRadius: 5,
     borderColor: ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(44, 62, 80, 0.1)', 'rgba(0, 0, 0, 0.15)'],
   },
   clockDigital: {
     enabled: true,
@@ -499,8 +506,7 @@ watch(
 export const getAllCommandsConfig = () => {
   chrome.commands.getAll((commands) => {
     for (const { name, shortcut } of commands) {
-      const labelKey = KEYBOARD_CODE_TO_LABEL_MAP[(name as string)] || name
-      globalState.allCommandsMap[labelKey] = shortcut
+      globalState.allCommandsMap[name as string] = shortcut
     }
   })
 }
@@ -517,6 +523,41 @@ const initAvailableFontList = async () => {
     }
   }
   globalState.availableFontList = [...availableList.values()]
+}
+
+export const availableFontOptions = computed(() =>
+  globalState.availableFontList.map((font: string) => ({
+    label: font,
+    value: font,
+  })),
+)
+
+export const fontSelectRenderLabel = (option: SelectStringItem) => {
+  return [
+    h(
+      'div',
+      {
+        style: {
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+      },
+      [
+        h('span', {}, option.label),
+        h(
+          'span',
+          {
+            style: {
+              fontFamily: option.label,
+            },
+          },
+          'abc-ABC-0123',
+        ),
+      ],
+    ),
+  ]
 }
 
 export const switchSettingDrawerVisible = (status: boolean) => {
@@ -574,7 +615,7 @@ export const handleAppUpdate = async () => {
     return
   }
   log('Get new version', pkg.version)
-  // @@@@ 每次更新均需要手动处理新版本变更的本地数据结构，
+  // @@@@ 每次更新均需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
     let newLocalState = {}
     const localState = localStorage.getItem('l-state')
@@ -598,6 +639,41 @@ export const handleAppUpdate = async () => {
     newsState.value.bilibili = {
       syncTime: 0,
       list: [],
+    }
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.9.0')) {
+    localConfig.bookmark.keyboardType = 61
+    localConfig.bookmark.keycapType = 'gmk'
+    localConfig.bookmark.keycapPadding = 1.5
+    localConfig.bookmark.keycapSize = 60
+    localConfig.bookmark.keycapKeyFontFamily = 'Arial Rounded MT Bold'
+    localConfig.bookmark.keycapKeyFontSize = 12
+    localConfig.bookmark.keycapBookmarkFontFamily = 'Arial'
+    localConfig.bookmark.keycapBookmarkFontSize = 12
+    localConfig.bookmark.mainFontColor = ['rgba(82,85,84,1.0)', 'rgba(228,222,221,1.0)']
+    localConfig.bookmark.mainBackgroundColor = ['rgba(230,232,227,1.0)', 'rgba(95,92,82,1.0)']
+    localConfig.bookmark.emphasisOneFontColor = ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)']
+    localConfig.bookmark.emphasisOneBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
+    localConfig.bookmark.emphasisTwoFontColor = ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)']
+    localConfig.bookmark.emphasisTwoBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
+    localConfig.bookmark.isBorderEnabled = false
+    localConfig.bookmark.borderWidth = 1
+    localConfig.bookmark.borderRadius = 5
+    localConfig.bookmark.borderColor = ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)']
+    delete (localConfig.bookmark as any).margin
+    delete (localConfig.bookmark as any).width
+    delete (localConfig.bookmark as any).fontFamily
+    delete (localConfig.bookmark as any).fontSize
+    delete (localConfig.bookmark as any).backgroundColor
+    delete (localConfig.bookmark as any).BackgroundActiveColor
+    delete (localConfig.bookmark as any).isShadowEnabled
+    delete (localConfig.bookmark as any).shadowColor
+    for (const keyLabel of Object.keys(localConfig.bookmark.keymap)) {
+      const newKeycode = KEYBOARD_OLD_TO_NEW_CODE_MAP[keyLabel]
+      if (newKeycode) {
+        localConfig.bookmark.keymap[newKeycode] = localConfig.bookmark.keymap[keyLabel]
+        delete localConfig.bookmark.keymap[keyLabel]
+      }
     }
   }
   // 更新local版本号
