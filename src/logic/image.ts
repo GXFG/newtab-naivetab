@@ -1,12 +1,12 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
-import { databaseStore, localConfig, localState, log } from '@/logic'
+import { databaseStore, localConfig, localState, log, getFileFromUrl } from '@/logic'
 
 /**
- * e.g.: http://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
+ * e.g.: https://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
  * @param size: 1366x768, 1920x1080, UHD
  */
-export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `http://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
+export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `https://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
 
 export const imageLocalState = useStorageLocal('data-images', {
   syncTime: 0,
@@ -16,29 +16,6 @@ export const imageLocalState = useStorageLocal('data-images', {
 export const imageState = reactive({
   currBackgroundImageFileName: '',
   currBackgroundImageFileObjectURL: '',
-})
-
-export const currBackgroundImageUrl = computed(() => {
-  // 本地
-  if (localConfig.general.backgroundImageSource === 0) {
-    return imageState.currBackgroundImageFileObjectURL
-  }
-  let imageUrl = ''
-  const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
-  if (localConfig.general.backgroundImageSource === 1) {
-    // 网络
-    if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
-      imageUrl = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
-    } else {
-      imageUrl = getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
-    }
-  } else if (localConfig.general.backgroundImageSource === 2) {
-    // 每日一图
-    const todayImage = imageLocalState.value.imageList[0]
-    const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
-    imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
-  }
-  return imageUrl
 })
 
 export const previewImageListMap = computed(() => ({
@@ -67,33 +44,50 @@ const getImages = async () => {
   }
 }
 
-export const isImageLoading = ref(true)
-
-const loadImageEle = new Image()
-
-loadImageEle.onload = () => {
-  console.timeEnd('renderBackgroundImage')
-  isImageLoading.value = false
-}
-
-loadImageEle.onerror = () => {
-  console.timeEnd('renderBackgroundImage')
-  isImageLoading.value = false
-}
+export const isImageLoading = ref(false)
 
 export const renderBackgroundImage = async () => {
-  console.time('renderBackgroundImage')
+  console.time('renderImage')
+  isImageLoading.value = true
+  let dbData: BackgroundImageItem | BackgroundImageItem | null = null
   if (localConfig.general.backgroundImageSource === 0) {
-    const result: LocalBackgroundImageItem = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
-    // 首次选择backgroundImageSource为本地时无数据
-    if (result) {
-      imageState.currBackgroundImageFileName = result.file.name
-      imageState.currBackgroundImageFileObjectURL = URL.createObjectURL(result.file)
+    // 本地
+    dbData = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
+  } else {
+    // 网络
+    dbData = await databaseStore('currBackgroundImages', 'get', localState.value.currAppearanceCode)
+    if (!dbData) {
+      let imageUrl = ''
+      const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
+      if (localConfig.general.backgroundImageSource === 1) {
+        // 网络
+        if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
+          imageUrl = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
+        } else {
+          imageUrl = getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
+        }
+      } else if (localConfig.general.backgroundImageSource === 2) {
+        // 每日一图
+        const todayImage = imageLocalState.value.imageList[0]
+        const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
+        imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
+      }
+      const targetFile = await getFileFromUrl(imageUrl, imageUrl)
+      log('TargetFile', targetFile)
+      dbData = {
+        appearanceCode: localState.value.currAppearanceCode,
+        file: targetFile,
+      }
+      databaseStore('currBackgroundImages', 'add', dbData)
     }
   }
-  loadImageEle.src = '' // 取消上一张图片的加载，为确保严格按加载顺序生效
-  isImageLoading.value = true
-  loadImageEle.src = currBackgroundImageUrl.value
+  // 首次选择backgroundImageSource为本地时无数据，这里判空防止报错
+  if (dbData) {
+    imageState.currBackgroundImageFileName = dbData.file.name
+    imageState.currBackgroundImageFileObjectURL = URL.createObjectURL(dbData.file)
+  }
+  console.timeEnd('renderImage')
+  isImageLoading.value = false
 }
 
 export const updateImages = () => {
@@ -108,15 +102,23 @@ export const updateImages = () => {
 watch([
   () => localState.value.currAppearanceCode,
   () => localConfig.general.backgroundImageSource,
-  () => localConfig.general.backgroundImageNames,
 ], () => {
   if (!localConfig.general.isBackgroundImageEnabled) {
     return
   }
   renderBackgroundImage()
-  if (localConfig.general.backgroundImageSource === 2) {
-    updateImages()
+})
+
+watch([
+  () => localConfig.general.backgroundImageNames,
+  () => localConfig.general.backgroundImageHighQuality,
+  () => localConfig.general.backgroundImageCustomUrls,
+], () => {
+  if (!localConfig.general.isBackgroundImageEnabled) {
+    return
   }
+  databaseStore('currBackgroundImages', 'delete', localState.value.currAppearanceCode)
+  renderBackgroundImage()
 }, {
   deep: true,
 })

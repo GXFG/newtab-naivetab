@@ -20,7 +20,7 @@ export const defaultConfig = {
     backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'DolomitesMW_ZH-CN3307894335'],
     backgroundImageDescs: ['楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)', '多洛米蒂山上空的银河，意大利 (© Carlos Fernandez/Getty Images)'],
     isBackgroundImageCustomUrlEnabled: false,
-    backgroundImageCustomUrls: ['http://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'http://cn.bing.com/th?id=OHR.DolomitesMW_ZH-CN3307894335_1920x1080.jpg'],
+    backgroundImageCustomUrls: ['https://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'https://cn.bing.com/th?id=OHR.DolomitesMW_ZH-CN3307894335_1920x1080.jpg'],
     favoriteImageList: [
       {
         name: 'ChukchiSea_ZH-CN7218471261',

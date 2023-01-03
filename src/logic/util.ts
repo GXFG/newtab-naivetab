@@ -62,6 +62,25 @@ export const downloadJsonByTagA = (result: { [propName: string]: unknown }, file
   link.click()
 }
 
+export const getFileFromUrl = (url: string, fileName: string): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    let fileContent: any = null
+    const xhr = new XMLHttpRequest()
+    xhr.open('GET', url)
+    xhr.setRequestHeader('Accept', 'image/png')
+    xhr.responseType = 'blob'
+    xhr.onload = () => {
+      fileContent = xhr.response
+      const targetFile = new File([fileContent], fileName, { type: 'image/png' })
+      resolve(targetFile)
+    }
+    xhr.onerror = (e) => {
+      reject(e)
+    }
+    xhr.send()
+  })
+}
+
 export const createTab = (url: string, active = true) => {
   if (url.length === 0) {
     return

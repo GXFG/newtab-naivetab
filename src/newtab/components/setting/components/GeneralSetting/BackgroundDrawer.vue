@@ -9,7 +9,6 @@ import {
   localState,
   imageState,
   isImageListLoading,
-  currBackgroundImageUrl,
   updateImages,
 } from '@/logic'
 
@@ -58,7 +57,7 @@ const currImageData = computed(() => {
   if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
     // not from Bing url
     return {
-      url: currBackgroundImageUrl.value,
+      url: imageState.currBackgroundImageFileObjectURL,
       name: '',
       desc: '',
     }
@@ -88,7 +87,7 @@ const onBackgroundImageFileChange = async (e: Event) => {
   let handleType: DatabaseHandleType = 'add'
   const currAppearanceImage = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
   if (currAppearanceImage) {
-    handleType = 'put'
+    handleType = 'put' // 更新，第一次使用add，后续修改使用put
   }
   databaseStore('localBackgroundImages', handleType, {
     appearanceCode: localState.value.currAppearanceCode,

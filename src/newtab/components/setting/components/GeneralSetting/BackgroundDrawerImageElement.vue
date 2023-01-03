@@ -43,7 +43,8 @@ const isCurrSelectedImage = computed(() => {
 })
 
 const onSelectImage = () => {
-  if (!props.select) {
+  // 避免快速切换背景图导致的加载顺序错乱
+  if (!props.select || isImageLoading.value) {
     return
   }
   localConfig.general.backgroundImageNames[localState.value.currAppearanceCode] = props.data.name
