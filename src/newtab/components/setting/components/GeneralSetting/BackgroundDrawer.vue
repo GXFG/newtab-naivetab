@@ -8,8 +8,10 @@ import {
   localConfig,
   localState,
   imageState,
+  isImageLoading,
   isImageListLoading,
   updateImages,
+  compressedImageUrlToBase64,
 } from '@/logic'
 
 const props = defineProps({
@@ -82,8 +84,12 @@ const onBackgroundImageFileChange = async (e: Event) => {
     window.$message.error(window.$t('prompts.imageTooLarge'))
     return
   }
+  const imageUrl = URL.createObjectURL(file)
   imageState.currBackgroundImageFileName = file.name
-  imageState.currBackgroundImageFileObjectURL = URL.createObjectURL(file)
+  imageState.currBackgroundImageFileObjectURL = imageUrl
+  const smallBase64 = await compressedImageUrlToBase64(imageUrl)
+  localStorage.setItem('l-firstScreen', smallBase64)
+  // store DB
   let handleType: DatabaseHandleType = 'add'
   const currAppearanceImage = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
   if (currAppearanceImage) {
@@ -92,6 +98,7 @@ const onBackgroundImageFileChange = async (e: Event) => {
   databaseStore('localBackgroundImages', handleType, {
     appearanceCode: localState.value.currAppearanceCode,
     file,
+    smallBase64,
   })
   // 当只单独设置了浅色or深色外观的背景时，默认同步另一外观为相同的背景
   const oppositeAppearanceImage = await databaseStore('localBackgroundImages', 'get', +!localState.value.currAppearanceCode)
@@ -101,10 +108,22 @@ const onBackgroundImageFileChange = async (e: Event) => {
   databaseStore('localBackgroundImages', 'add', {
     appearanceCode: +!localState.value.currAppearanceCode,
     file,
+    smallBase64,
   })
 }
 
+// 确保协议为https，否则会导致报错 Tainted canvases may not be exported
+const handleCustomUrlStartWithHttps = () => {
+  const httpsUrl = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode].replace('http://', 'https://')
+  localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode] = httpsUrl
+}
+
+const handleCustomUrlUpdate = () => {
+  handleCustomUrlStartWithHttps()
+}
+
 const handleBackgroundImageCustomUrlBlur = () => {
+  handleCustomUrlStartWithHttps()
   // 当只单独设置了浅色or深色外观的背景时，默认同步另一外观为相同的背景
   if (localConfig.general.backgroundImageCustomUrls[+!localState.value.currAppearanceCode].length === 0) {
     localConfig.general.backgroundImageCustomUrls[+!localState.value.currAppearanceCode]
@@ -145,7 +164,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
             <!-- network -->
             <template v-else-if="localConfig.general.backgroundImageSource === 1">
               <NFormItem :label="$t('common.custom')">
-                <NSwitch v-model:value="localConfig.general.isBackgroundImageCustomUrlEnabled" />
+                <NSwitch v-model:value="localConfig.general.isBackgroundImageCustomUrlEnabled" @update:value="handleCustomUrlUpdate" />
                 <NInput
                   v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
                   v-model:value="localConfig.general.backgroundImageCustomUrls[localState.currAppearanceCode]"
@@ -176,7 +195,9 @@ const handleBackgroundImageCustomUrlBlur = () => {
           </NTabs>
           <div class="current__image">
             <div class="image__content">
-              <BackgroundDrawerImageElement :lazy="false" :data="currImageData" />
+              <NSpin :show="isImageLoading">
+                <BackgroundDrawerImageElement :lazy="false" :data="currImageData" />
+              </NSpin>
             </div>
           </div>
           <NForm class="content__config" label-placement="left" :label-width="100">

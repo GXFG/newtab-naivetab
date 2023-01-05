@@ -16,6 +16,15 @@ export const sleep = (time: number) => {
   })
 }
 
+export const createTab = (url: string, active = true) => {
+  if (url.length === 0) {
+    return
+  }
+  chrome.tabs.create({ url, active })
+}
+
+export const padUrlHttps = (url: string) => url.includes('//') ? url : `https://${url}`
+
 /**
  * leftVersion < rightVersion ?
  */
@@ -62,16 +71,16 @@ export const downloadJsonByTagA = (result: { [propName: string]: unknown }, file
   link.click()
 }
 
-export const getFileFromUrl = (url: string, fileName: string): Promise<File> => {
+export const urlToFile = (url: string, fileName: string): Promise<File> => {
   return new Promise((resolve, reject) => {
     let fileContent: any = null
     const xhr = new XMLHttpRequest()
     xhr.open('GET', url)
-    xhr.setRequestHeader('Accept', 'image/png')
+    xhr.setRequestHeader('Accept', 'image/jpeg')
     xhr.responseType = 'blob'
     xhr.onload = () => {
       fileContent = xhr.response
-      const targetFile = new File([fileContent], fileName, { type: 'image/png' })
+      const targetFile = new File([fileContent], fileName, { type: 'image/jpeg' })
       resolve(targetFile)
     }
     xhr.onerror = (e) => {
@@ -81,11 +90,46 @@ export const getFileFromUrl = (url: string, fileName: string): Promise<File> => 
   })
 }
 
-export const createTab = (url: string, active = true) => {
-  if (url.length === 0) {
-    return
-  }
-  chrome.tabs.create({ url, active })
+export const urlToImage = (url: string): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    const imageEle = new Image()
+    imageEle.onload = () => {
+      resolve(imageEle)
+    }
+    imageEle.onerror = () => {
+      reject(imageEle)
+    }
+    imageEle.src = url
+  })
 }
 
-export const padUrlHttps = (url: string) => url.includes('//') ? url : `https://${url}`
+export const compressedImageToBlob = (image: HTMLImageElement, quality = 0.5, width = 1366, type = 'image/jpeg'): Promise<Blob> => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+    const widthHightRatio = +(image.naturalWidth / image.naturalHeight).toFixed(2)
+    canvas.width = width
+    canvas.height = Math.ceil(width / widthHightRatio)
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+    canvas.toBlob((blob) => {
+      resolve(blob as Blob)
+    }, type, quality)
+  })
+}
+
+export const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(blob)
+    reader.onload = function (e: any) {
+      resolve(e.target.result)
+    }
+  })
+}
+
+export const compressedImageUrlToBase64 = async (imageUrl: string): Promise<string> => {
+  const imageEle = await urlToImage(imageUrl)
+  const smallBlob = await compressedImageToBlob(imageEle)
+  const smallBase64 = await blobToBase64(smallBlob)
+  return smallBase64
+}

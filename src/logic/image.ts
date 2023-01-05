@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
-import { databaseStore, localConfig, localState, log, getFileFromUrl } from '@/logic'
+import { databaseStore, localConfig, localState, log, urlToFile, compressedImageUrlToBase64 } from '@/logic'
 
 /**
  * e.g.: https://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
@@ -44,81 +44,136 @@ const getImages = async () => {
   }
 }
 
-export const isImageLoading = ref(false)
-
-export const renderBackgroundImage = async () => {
-  console.time('renderImage')
-  isImageLoading.value = true
-  let dbData: BackgroundImageItem | BackgroundImageItem | null = null
-  if (localConfig.general.backgroundImageSource === 0) {
-    // 本地
-    dbData = await databaseStore('localBackgroundImages', 'get', localState.value.currAppearanceCode)
-  } else {
-    // 网络
-    dbData = await databaseStore('currBackgroundImages', 'get', localState.value.currAppearanceCode)
-    if (!dbData) {
-      let imageUrl = ''
-      const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
-      if (localConfig.general.backgroundImageSource === 1) {
-        // 网络
-        if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
-          imageUrl = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
-        } else {
-          imageUrl = getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
-        }
-      } else if (localConfig.general.backgroundImageSource === 2) {
-        // 每日一图
-        const todayImage = imageLocalState.value.imageList[0]
-        const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
-        imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
-      }
-      const targetFile = await getFileFromUrl(imageUrl, imageUrl)
-      log('TargetFile', targetFile)
-      dbData = {
-        appearanceCode: localState.value.currAppearanceCode,
-        file: targetFile,
-      }
-      databaseStore('currBackgroundImages', 'add', dbData)
-    }
-  }
-  // 首次选择backgroundImageSource为本地时无数据，这里判空防止报错
-  if (dbData) {
-    imageState.currBackgroundImageFileName = dbData.file.name
-    imageState.currBackgroundImageFileObjectURL = URL.createObjectURL(dbData.file)
-  }
-  console.timeEnd('renderImage')
-  isImageLoading.value = false
-}
-
-export const updateImages = () => {
+export const updateImages = async () => {
   const currTS = dayjs().valueOf()
-  // 最小刷新间隔为2小时
-  if (currTS - imageLocalState.value.syncTime <= 3600000 * 2) {
+  // 最小刷新间隔为3小时
+  if (currTS - imageLocalState.value.syncTime <= 3600000 * 3) {
     return
   }
-  getImages()
+  await getImages()
 }
 
+export const isImageLoading = ref(false)
+
+const renderRawBackgroundImage = async () => {
+  console.time('RenderRawImage')
+  isImageLoading.value = true
+  let dbData: BackgroundImageItem | null = null
+  const storeName = localConfig.general.backgroundImageSource === 0 ? 'localBackgroundImages' : 'currBackgroundImages'
+  dbData = await databaseStore(storeName, 'get', localState.value.currAppearanceCode)
+  if (!dbData && localConfig.general.backgroundImageSource !== 0) {
+    // 无本地数据，且来源为网络、每日一图
+    let imageUrl = ''
+    const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
+    if (localConfig.general.backgroundImageSource === 1) {
+      // 网络
+      if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
+        imageUrl = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
+      } else {
+        imageUrl = getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
+      }
+    } else if (localConfig.general.backgroundImageSource === 2) {
+      // 每日一图
+      const todayImage = imageLocalState.value.imageList[0]
+      const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
+      imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
+    }
+    const targetFile = await urlToFile(imageUrl, imageUrl)
+    log('TargetFile', targetFile)
+    const smallBase64 = await compressedImageUrlToBase64(imageUrl)
+    dbData = {
+      appearanceCode: localState.value.currAppearanceCode,
+      file: targetFile,
+      smallBase64,
+    }
+    databaseStore('currBackgroundImages', 'add', dbData)
+    localStorage.setItem('l-firstScreen', smallBase64)
+  }
+  // 首次选择 backgroundImageSource=0本地 时无数据，这里判空防止报错
+  if (!dbData) {
+    return
+  }
+  imageState.currBackgroundImageFileName = dbData.file.name
+  requestIdleCallback(() => {
+    const rawBlobUrl = URL.createObjectURL((dbData as BackgroundImageItem).file)
+    const rawImageEle = new Image()
+    rawImageEle.src = rawBlobUrl
+    rawImageEle.onload = () => {
+      imageState.currBackgroundImageFileObjectURL = rawBlobUrl
+      isImageLoading.value = false
+      console.timeEnd('RenderRawImage')
+    }
+  })
+}
+
+const setCurrSmallBackgroundImage = async () => {
+  let dbData: BackgroundImageItem | null = null
+  const storeName = localConfig.general.backgroundImageSource === 0 ? 'localBackgroundImages' : 'currBackgroundImages'
+  dbData = await databaseStore(storeName, 'get', localState.value.currAppearanceCode)
+  if (!dbData) {
+    return
+  }
+  localStorage.setItem('l-firstScreen', dbData.smallBase64)
+}
+
+const deleteCurrSmallBackgroundImage = () => {
+  localStorage.setItem('l-firstScreen', '')
+}
+
+const deleteCurrRawBackgroundImageInDB = () => {
+  databaseStore('currBackgroundImages', 'delete', localState.value.currAppearanceCode)
+}
+
+const refreshTodayImage = async () => {
+  const oldTodayImageUrl = imageLocalState.value.imageList[0].url
+  await updateImages()
+  const newTodayImageUrl = imageLocalState.value.imageList[0].url
+  if (newTodayImageUrl !== oldTodayImageUrl) {
+    deleteCurrRawBackgroundImageInDB()
+  }
+  renderRawBackgroundImage()
+}
+
+export const initBackgroundImage = () => {
+  // render small backgroundImage
+  const localImage = localStorage.getItem('l-firstScreen') || ''
+  if (localImage) {
+    imageState.currBackgroundImageFileObjectURL = localImage
+  }
+  // render raw backgroundImage
+  if (localConfig.general.backgroundImageSource === 2) {
+    refreshTodayImage()
+  } else {
+    renderRawBackgroundImage()
+  }
+}
+
+//  no change in backgroundImage
 watch([
   () => localState.value.currAppearanceCode,
-  () => localConfig.general.backgroundImageSource,
-], () => {
+], async () => {
   if (!localConfig.general.isBackgroundImageEnabled) {
     return
   }
-  renderBackgroundImage()
+  deleteCurrSmallBackgroundImage()
+  setCurrSmallBackgroundImage()
+  renderRawBackgroundImage()
 })
 
+// existence change in backgroundImage
 watch([
+  () => localConfig.general.backgroundImageSource,
   () => localConfig.general.backgroundImageNames,
   () => localConfig.general.backgroundImageHighQuality,
+  () => localConfig.general.isBackgroundImageCustomUrlEnabled,
   () => localConfig.general.backgroundImageCustomUrls,
 ], () => {
   if (!localConfig.general.isBackgroundImageEnabled) {
     return
   }
-  databaseStore('currBackgroundImages', 'delete', localState.value.currAppearanceCode)
-  renderBackgroundImage()
+  deleteCurrSmallBackgroundImage()
+  deleteCurrRawBackgroundImageInDB()
+  renderRawBackgroundImage()
 }, {
   deep: true,
 })

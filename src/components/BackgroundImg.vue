@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { localConfig, imageState, updateImages } from '@/logic'
+import { localConfig, imageState } from '@/logic'
 
 const bgStyle = computed(() => {
   return localConfig.general.isBackgroundImageEnabled ? `background-image: url(${imageState.currBackgroundImageFileObjectURL});` : ''
 })
 
-onMounted(() => {
-  if (localConfig.general.backgroundImageSource === 2) {
-    updateImages()
-  }
-})
+const customOpacity = computed(() => (localConfig.general.bgOpacity))
 </script>
 
 <template>
@@ -32,7 +28,7 @@ onMounted(() => {
     background-repeat: no-repeat;
     background-position: center;
     filter: blur(v-bind(`${localConfig.general.bgBlur}px`));
-    opacity: v-bind(localConfig.general.bgOpacity);
+    opacity: v-bind(customOpacity);
   }
 }
 </style>

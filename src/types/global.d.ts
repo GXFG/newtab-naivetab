@@ -16,6 +16,7 @@ type DatabaseStore = 'localBackgroundImages' | 'currBackgroundImages'
 interface BackgroundImageItem{
   appearanceCode: number
   file: File
+  smallBase64: string
 }
 
 type OptionsPermission = 'bookmarks'

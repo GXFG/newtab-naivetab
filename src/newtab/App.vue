@@ -6,8 +6,7 @@ import {
   nativeUILang,
   currTheme,
   themeOverrides,
-  renderBackgroundImage,
-  setEdgeFavicon,
+  initBackgroundImage,
   startKeydown,
   startTimer,
   stopTimer,
@@ -20,8 +19,7 @@ import {
 import Content from '@/newtab/Content.vue'
 
 onMounted(async () => {
-  renderBackgroundImage()
-  setEdgeFavicon()
+  initBackgroundImage()
   handleStateResetAndUpdate()
   startTimer()
   startKeydown()

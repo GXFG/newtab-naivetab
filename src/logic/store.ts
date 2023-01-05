@@ -1,7 +1,6 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import pkg from '../../package.json'
-import { isEdge } from '@/env'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { styleConst } from '@/styles/const'
 import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, KEYBOARD_OLD_TO_NEW_CODE_MAP, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
@@ -14,7 +13,7 @@ export const defaultConfig = {
     lang: chrome.i18n.getUILanguage() || 'en-US',
     drawerPlacement: 'right' as 'left' | 'right',
     isBackgroundImageEnabled: true,
-    isLoadPageAnimationEnabled: true,
+    isLoadPageAnimationEnabled: false,
     backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
     backgroundImageHighQuality: false,
     backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'DolomitesMW_ZH-CN3307894335'],
@@ -487,20 +486,22 @@ export const currTheme = ref()
 
 const osTheme = useOsTheme() // light | dark | null
 
-watch(
-  [() => osTheme.value, () => localConfig.general.appearance],
-  () => {
-    if (localConfig.general.appearance === 'auto') {
-      localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as keyof typeof APPEARANCE_TO_CODE_MAP] as 0 | 1
-      localState.value.currAppearanceLabel = osTheme.value || 'light'
-      currTheme.value = osTheme.value === 'dark' ? darkTheme : null
-      return
-    }
-    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance] as 0 | 1
-    localState.value.currAppearanceLabel = localConfig.general.appearance as 'light' | 'dark'
-    currTheme.value = localConfig.general.appearance === 'dark' ? darkTheme : null
-  },
-  { immediate: true },
+watch([
+  () => osTheme.value,
+  () => localConfig.general.appearance,
+], () => {
+  if (localConfig.general.appearance === 'auto') {
+    localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[osTheme.value as keyof typeof APPEARANCE_TO_CODE_MAP] as 0 | 1
+    localState.value.currAppearanceLabel = osTheme.value || 'light'
+    currTheme.value = osTheme.value === 'dark' ? darkTheme : null
+    return
+  }
+  localState.value.currAppearanceCode = APPEARANCE_TO_CODE_MAP[localConfig.general.appearance] as 0 | 1
+  localState.value.currAppearanceLabel = localConfig.general.appearance as 'light' | 'dark'
+  currTheme.value = localConfig.general.appearance === 'dark' ? darkTheme : null
+}, {
+  immediate: true,
+},
 )
 
 export const getAllCommandsConfig = () => {
@@ -750,21 +751,6 @@ export const themeOverrides: GlobalThemeOverrides = {
     primaryColorHover: '#7f8c8d',
     primaryColorPressed: '#57606f',
   },
-}
-
-/**
- * 针对Edge 设置为其他favicon 避免展示黑色方块
- * 等价于 <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
- */
-export const setEdgeFavicon = () => {
-  if (!isEdge) {
-    return
-  }
-  const link = document.createElement('link')
-  link.setAttribute('rel', 'shortcut icon')
-  link.setAttribute('type', 'image/x-icon')
-  link.setAttribute('href', '/assets/favicon.ico')
-  document.getElementsByTagName('head')[0].appendChild(link)
 }
 
 watch(() => localConfig.general.pageTitle, () => {
