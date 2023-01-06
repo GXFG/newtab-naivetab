@@ -17,12 +17,15 @@ const databaseInit = (): Promise<boolean> => {
       log('IndexDB upgrade success', event)
       DB = event.target.result
       if (!DB.objectStoreNames.contains('localBackgroundImages')) {
+        // 存储本地背景图文件数据，包含浅色、深色外观两张图片
         DB.createObjectStore('localBackgroundImages', { keyPath: 'appearanceCode' })
       }
       if (!DB.objectStoreNames.contains('currBackgroundImages')) {
+        // 存储当前背景图数据，包含浅色、深色外观两张图片
         DB.createObjectStore('currBackgroundImages', { keyPath: 'appearanceCode' })
       }
-      // dbTable.createIndex('indexName', 'name', { unique: false }) // 使用索引：索引的意义在于，可以让你搜索任意字段，也就是说从任意字段拿到数据记录。如果不建立索引，默认只能搜索主键（即从主键取值）。
+      // 使用索引：索引的意义在于，可以让你搜索任意字段，也就是说从任意字段拿到数据记录。如果不建立索引，默认只能搜索主键（即从主键取值）。
+      // dbTable.createIndex('indexName', 'name', { unique: false })
     }
 
     request.onsuccess = (event: any) => {

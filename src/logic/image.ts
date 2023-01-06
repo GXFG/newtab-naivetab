@@ -62,24 +62,20 @@ const renderRawBackgroundImage = async () => {
   const storeName = localConfig.general.backgroundImageSource === 0 ? 'localBackgroundImages' : 'currBackgroundImages'
   dbData = await databaseStore(storeName, 'get', localState.value.currAppearanceCode)
   if (!dbData && localConfig.general.backgroundImageSource !== 0) {
-    // 无本地数据，且来源为网络、每日一图
+    // 当无本地数据，且来源为网络、每日一图时，自动在DB内新增当前背景图数据
     let imageUrl = ''
     const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
     if (localConfig.general.backgroundImageSource === 1) {
-      // 网络
-      if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
-        imageUrl = localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
-      } else {
-        imageUrl = getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
-      }
+      imageUrl = localConfig.general.isBackgroundImageCustomUrlEnabled
+        ? localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
+        : getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
     } else if (localConfig.general.backgroundImageSource === 2) {
-      // 每日一图
       const todayImage = imageLocalState.value.imageList[0]
       const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
       imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
     }
+    // 存储背景图数据
     const targetFile = await urlToFile(imageUrl, imageUrl)
-    log('TargetFile', targetFile)
     const smallBase64 = await compressedImageUrlToBase64(imageUrl)
     dbData = {
       appearanceCode: localState.value.currAppearanceCode,
@@ -88,6 +84,13 @@ const renderRawBackgroundImage = async () => {
     }
     databaseStore('currBackgroundImages', 'add', dbData)
     localStorage.setItem('l-firstScreen', smallBase64)
+    // 每日一图，需要同时设置深色&浅色外观为同一张壁纸
+    if (localConfig.general.backgroundImageSource === 2) {
+      databaseStore('currBackgroundImages', 'add', {
+        ...dbData,
+        appearanceCode: +!localState.value.currAppearanceCode,
+      })
+    }
   }
   // 首次选择 backgroundImageSource=0本地 时无数据，这里判空防止报错
   if (!dbData) {
@@ -120,8 +123,11 @@ const deleteCurrSmallBackgroundImage = () => {
   localStorage.setItem('l-firstScreen', '')
 }
 
-const deleteCurrRawBackgroundImageInDB = () => {
+const deleteCurrRawBackgroundImageInDB = (deleteAll = false) => {
   databaseStore('currBackgroundImages', 'delete', localState.value.currAppearanceCode)
+  if (deleteAll) {
+    databaseStore('currBackgroundImages', 'delete', +!localState.value.currAppearanceCode)
+  }
 }
 
 const refreshTodayImage = async () => {
@@ -135,12 +141,12 @@ const refreshTodayImage = async () => {
 }
 
 export const initBackgroundImage = () => {
-  // render small backgroundImage
+  // 渲染缩略图
   const localImage = localStorage.getItem('l-firstScreen') || ''
   if (localImage) {
     imageState.currBackgroundImageFileObjectURL = localImage
   }
-  // render raw backgroundImage
+  // 渲染原图
   if (localConfig.general.backgroundImageSource === 2) {
     refreshTodayImage()
   } else {
@@ -148,7 +154,7 @@ export const initBackgroundImage = () => {
   }
 }
 
-//  no change in backgroundImage
+//  资源无变化
 watch([
   () => localState.value.currAppearanceCode,
 ], async () => {
@@ -160,7 +166,7 @@ watch([
   renderRawBackgroundImage()
 })
 
-// existence change in backgroundImage
+// 涉及资源变化
 watch([
   () => localConfig.general.backgroundImageSource,
   () => localConfig.general.backgroundImageNames,
@@ -172,7 +178,12 @@ watch([
     return
   }
   deleteCurrSmallBackgroundImage()
-  deleteCurrRawBackgroundImageInDB()
+  // 背景图来源为本地，需要独立存储预览图
+  if (localConfig.general.backgroundImageSource === 0) {
+    setCurrSmallBackgroundImage()
+  }
+  // 每日一图需要同时删除深色&浅色外观下的DB数据，其他模式仅删除当前外观下的DB数据
+  deleteCurrRawBackgroundImageInDB(localConfig.general.backgroundImageSource === 2)
   renderRawBackgroundImage()
 }, {
   deep: true,
