@@ -46,6 +46,10 @@ const onSelectImage = () => {
   if (!props.select) {
     return
   }
+  // 避免快速切换背景图导致的加载顺序错乱
+  if (isImageLoading.value) {
+    return
+  }
   localConfig.general.backgroundImageNames[localState.value.currAppearanceCode] = props.data.name
   localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode] = props.data.desc
 }
@@ -98,6 +102,7 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
     <div v-if="isCurrSelectedImage" class="image__current-mask">
       <ic:outline-check-circle />
     </div>
+
     <!-- toolbar -->
     <div v-if="isToolbarVisible" class="image__toolbar">
       <NPopover v-if="props.data.desc && props.data.desc.length !== 0" trigger="hover">

@@ -83,8 +83,9 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 
 <template>
   <div id="background__drawer" />
+
   <div id="setting">
-    <!-- Drawer: height在位置是 top 和 bottom 时生效 -->
+    <!-- Drawer: height仅在位置是 top 和 bottom 时生效 -->
     <NDrawer
       v-model:show="globalState.isSettingDrawerVisible"
       class="drawer-wrap"

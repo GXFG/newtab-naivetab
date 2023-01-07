@@ -1,7 +1,7 @@
 import { log } from '@/logic'
 
 const DB_NAME = 'NaiveTabDatabase'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 let isInitialized = false
 let DB: any = null
@@ -16,8 +16,16 @@ const databaseInit = (): Promise<boolean> => {
     request.onupgradeneeded = (event: any) => {
       log('IndexDB upgrade success', event)
       DB = event.target.result
-      DB.createObjectStore('localBackgroundImages', { keyPath: 'appearanceCode' })
-      // dbTable.createIndex('indexName', 'name', { unique: false }) // 使用索引：索引的意义在于，可以让你搜索任意字段，也就是说从任意字段拿到数据记录。如果不建立索引，默认只能搜索主键（即从主键取值）。
+      if (!DB.objectStoreNames.contains('localBackgroundImages')) {
+        // 存储本地背景图文件数据，包含浅色、深色外观两张图片
+        DB.createObjectStore('localBackgroundImages', { keyPath: 'appearanceCode' })
+      }
+      if (!DB.objectStoreNames.contains('currBackgroundImages')) {
+        // 存储当前背景图数据，包含浅色、深色外观两张图片
+        DB.createObjectStore('currBackgroundImages', { keyPath: 'appearanceCode' })
+      }
+      // 使用索引：索引的意义在于，可以让你搜索任意字段，也就是说从任意字段拿到数据记录。如果不建立索引，默认只能搜索主键（即从主键取值）。
+      // dbTable.createIndex('indexName', 'name', { unique: false })
     }
 
     request.onsuccess = (event: any) => {
@@ -34,7 +42,7 @@ const databaseInit = (): Promise<boolean> => {
   })
 }
 
-export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHandleType, payload: unknown): Promise<unknown> => {
+export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHandleType, payload: unknown): Promise<any> => {
   if (!isInitialized) {
     await databaseInit()
   }
@@ -43,7 +51,7 @@ export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHand
     let request: any = null
     if (type === 'add') {
       request = store.add(payload)
-    } else if (type === 'put') {
+    } else if (type === 'put') { // 更新，第一次使用add，后续修改使用put
       request = store.put(payload)
     } else if (type === 'get') {
       request = store.get(payload)

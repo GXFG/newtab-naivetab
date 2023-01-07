@@ -44,18 +44,19 @@ const delayResetPressKey = () => {
 }
 
 const openPage = (url: string, isBgOpen = false, isNewTabOpen = false) => {
-  delayResetPressKey()
   if (url.length === 0) {
     return
   }
   if (isBgOpen) {
     // 后台打开
     createTab(url, false)
+    delayResetPressKey()
     return
   }
   if (isNewTabOpen || localConfig.bookmark.isNewTabOpen || !/http/.test(url)) {
     // 以新标签页打开，其中非http协议只能以新标签页打开
     createTab(url)
+    delayResetPressKey()
     return
   }
   // 当前标签页打开
@@ -362,7 +363,6 @@ const getKeycapIconStyle = (code: string) => {
               justify-content: center;
               align-items: center;
               color: v-bind(customPrimaryColor);
-              color: var(--9d2920c2);
               font-size: 190%;
             }
             .item__key {
