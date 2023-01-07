@@ -10,10 +10,6 @@ const props = defineProps({
     },
     required: true,
   },
-  applyToAppearanceCode: {
-    type: Number,
-    required: true,
-  },
   lazy: {
     type: Boolean,
     default: true,
@@ -43,7 +39,7 @@ const isCurrSelectedImage = computed(() => {
   if (!props.select) {
     return false
   }
-  return props.data.name === localConfig.general.backgroundImageNames[props.applyToAppearanceCode]
+  return props.data.name === localConfig.general.backgroundImageNames[localState.value.currAppearanceCode]
 })
 
 const onSelectImage = () => {
@@ -54,8 +50,8 @@ const onSelectImage = () => {
   if (isImageLoading.value) {
     return
   }
-  localConfig.general.backgroundImageNames[props.applyToAppearanceCode] = props.data.name
-  localConfig.general.backgroundImageDescs[props.applyToAppearanceCode] = props.data.desc
+  localConfig.general.backgroundImageNames[localState.value.currAppearanceCode] = props.data.name
+  localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode] = props.data.desc
 }
 
 const onViewImage = () => {

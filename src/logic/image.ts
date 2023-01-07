@@ -53,6 +53,21 @@ export const updateImages = async () => {
   await getImages()
 }
 
+const getCurrNetworkBackgroundImageUrl = (applyToAppearanceCode = localState.value.currAppearanceCode) => {
+  let imageUrl = ''
+  const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
+  if (localConfig.general.backgroundImageSource === 1) {
+    imageUrl = localConfig.general.isBackgroundImageCustomUrlEnabled
+      ? localConfig.general.backgroundImageCustomUrls[applyToAppearanceCode]
+      : getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[applyToAppearanceCode], quality)
+  } else if (localConfig.general.backgroundImageSource === 2) {
+    const todayImage = imageLocalState.value.imageList[0]
+    const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
+    imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
+  }
+  return imageUrl
+}
+
 export const isImageLoading = ref(false)
 
 const renderRawBackgroundImage = async () => {
@@ -61,19 +76,15 @@ const renderRawBackgroundImage = async () => {
   let dbData: BackgroundImageItem | null = null
   const storeName = localConfig.general.backgroundImageSource === 0 ? 'localBackgroundImages' : 'currBackgroundImages'
   dbData = await databaseStore(storeName, 'get', localState.value.currAppearanceCode)
-  if (!dbData && localConfig.general.backgroundImageSource !== 0) {
-    // 当无本地数据，且来源为网络、每日一图时，自动在DB内新增当前背景图数据
-    let imageUrl = ''
-    const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
-    if (localConfig.general.backgroundImageSource === 1) {
-      imageUrl = localConfig.general.isBackgroundImageCustomUrlEnabled
-        ? localConfig.general.backgroundImageCustomUrls[localState.value.currAppearanceCode]
-        : getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[localState.value.currAppearanceCode], quality)
-    } else if (localConfig.general.backgroundImageSource === 2) {
-      const todayImage = imageLocalState.value.imageList[0]
-      const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
-      imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
+  if (!dbData) {
+    if (localConfig.general.backgroundImageSource === 0) {
+      // 首次选择 backgroundImageSource=0本地 时无数据，直接退出
+      imageState.currBackgroundImageFileObjectURL = ''
+      isImageLoading.value = false
+      return
     }
+    // 来源为网络、每日一图时，自动在DB内新增当前背景图数据
+    const imageUrl = getCurrNetworkBackgroundImageUrl()
     // 存储背景图数据
     const targetFile = await urlToFile(imageUrl, imageUrl)
     const smallBase64 = await compressedImageUrlToBase64(imageUrl)
@@ -92,11 +103,11 @@ const renderRawBackgroundImage = async () => {
       })
     }
   }
-  // 首次选择 backgroundImageSource=0本地 时无数据，这里判空防止报错
   if (!dbData) {
+    console.error('dbData empty')
     return
   }
-  imageState.currBackgroundImageFileName = dbData.file.name
+  imageState.currBackgroundImageFileName = localConfig.general.backgroundImageSource === 0 ? dbData.file.name : ''
   requestIdleCallback(() => {
     const rawBlobUrl = URL.createObjectURL((dbData as BackgroundImageItem).file)
     const rawImageEle = new Image()
@@ -123,11 +134,9 @@ const deleteCurrSmallBackgroundImage = () => {
   localStorage.setItem('l-firstScreen', '')
 }
 
-const deleteCurrRawBackgroundImageInDB = (deleteAll = false) => {
-  databaseStore('currBackgroundImages', 'delete', localState.value.currAppearanceCode)
-  if (deleteAll) {
-    databaseStore('currBackgroundImages', 'delete', +!localState.value.currAppearanceCode)
-  }
+const deleteCurrRawBackgroundImageInDB = async () => {
+  await databaseStore('currBackgroundImages', 'delete', localState.value.currAppearanceCode)
+  await databaseStore('currBackgroundImages', 'delete', +!localState.value.currAppearanceCode)
 }
 
 const refreshTodayImage = async () => {
@@ -135,7 +144,7 @@ const refreshTodayImage = async () => {
   await updateImages()
   const newTodayImageUrl = imageLocalState.value.imageList[0].url
   if (newTodayImageUrl !== oldTodayImageUrl) {
-    deleteCurrRawBackgroundImageInDB()
+    await deleteCurrRawBackgroundImageInDB()
   }
   renderRawBackgroundImage()
 }
@@ -173,7 +182,7 @@ watch([
   () => localConfig.general.backgroundImageHighQuality,
   () => localConfig.general.isBackgroundImageCustomUrlEnabled,
   () => localConfig.general.backgroundImageCustomUrls,
-], () => {
+], async () => {
   if (!localConfig.general.isBackgroundImageEnabled) {
     return
   }
@@ -182,8 +191,7 @@ watch([
   if (localConfig.general.backgroundImageSource === 0) {
     setCurrSmallBackgroundImage()
   }
-  // 每日一图需要同时删除深色&浅色外观下的DB数据，其他模式仅删除当前外观下的DB数据
-  deleteCurrRawBackgroundImageInDB(localConfig.general.backgroundImageSource === 2)
+  await deleteCurrRawBackgroundImageInDB()
   renderRawBackgroundImage()
 }, {
   deep: true,

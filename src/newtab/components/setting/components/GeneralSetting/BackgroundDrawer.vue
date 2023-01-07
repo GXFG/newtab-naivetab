@@ -33,27 +33,14 @@ const backgroundImageSourceList = computed(() => [
   { label: window.$t('form.photoOfTheDay'), value: 2 },
 ])
 
-const state = reactive({
-  lastAppearance: localConfig.general.appearance, // 记录当前设置的外观，用于关闭抽屉时恢复
-  applyToAppearance: localState.value.currAppearanceLabel,
-})
-
 watch(
   () => props.show,
   (value: boolean) => {
     if (value) {
       updateImages()
-      state.lastAppearance = localConfig.general.appearance
-      state.applyToAppearance = localState.value.currAppearanceLabel
-    } else {
-      localConfig.general.appearance = state.lastAppearance
     }
   },
 )
-
-const handleAppearanceChange = (value: 'light' | 'dark') => {
-  localConfig.general.appearance = value
-}
 
 const currImageData = computed(() => {
   if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
@@ -176,23 +163,10 @@ const handleBackgroundImageCustomUrlBlur = () => {
               </NFormItem>
             </template>
           </NForm>
+
           <p class="current__label">
             {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
           </p>
-          <NTabs
-            v-if="[0, 1].includes(localConfig.general.backgroundImageSource)"
-            type="segment"
-            size="small"
-            :default-value="state.applyToAppearance"
-            @update:value="handleAppearanceChange"
-          >
-            <NTab name="light">
-              {{ $t('common.light') }}
-            </NTab>
-            <NTab name="dark">
-              {{ $t('common.dark') }}
-            </NTab>
-          </NTabs>
           <div class="current__image">
             <div class="image__content">
               <NSpin :show="isImageLoading">
