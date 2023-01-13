@@ -2,8 +2,24 @@ import type { GlobalThemeOverrides } from 'naive-ui'
 import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import pkg from '../../package.json'
 import { useStorageLocal } from '@/composables/useStorageLocal'
+import { isEdge } from '@/env'
 import { styleConst } from '@/styles/const'
-import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, URL_NAIVETAB_DOC_STARTED, KEYBOARD_OLD_TO_NEW_CODE_MAP, toggleIsDragMode, updateSetting, getLocalVersion, log, createTab, compareLeftVersionLessThanRightVersions, resetBookmarkPending, newsState } from '@/logic'
+import {
+  URL_CHROME_EXTENSIONS_SHORTCUTS,
+  URL_EDGE_EXTENSIONS_SHORTCUTS,
+  APPEARANCE_TO_CODE_MAP,
+  DAYJS_LANG_MAP, FONT_LIST,
+  URL_NAIVETAB_DOC_STARTED,
+  KEYBOARD_OLD_TO_NEW_CODE_MAP,
+  toggleIsDragMode,
+  updateSetting,
+  getLocalVersion,
+  log,
+  createTab,
+  compareLeftVersionLessThanRightVersions,
+  resetBookmarkPending,
+  newsState,
+} from '@/logic'
 
 export const defaultConfig = {
   general: {
@@ -511,6 +527,8 @@ export const getAllCommandsConfig = () => {
     }
   })
 }
+
+export const openConfigShortcutsPage = () => createTab(isEdge ? URL_EDGE_EXTENSIONS_SHORTCUTS : URL_CHROME_EXTENSIONS_SHORTCUTS)
 
 const initAvailableFontList = async () => {
   const fontCheck = new Set(FONT_LIST.sort())

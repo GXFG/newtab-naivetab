@@ -4,7 +4,7 @@ import DigitalSetting from './DigitalSetting.vue'
 </script>
 
 <template>
-  <NCollapse class="setting__content" display-directive="show" :default-expanded-names="['clockAnalog', 'clockDigital']">
+  <NCollapse display-directive="show" :default-expanded-names="['clockAnalog', 'clockDigital']">
     <NCollapseItem :title="$t('setting.clockDigital')" name="clockDigital">
       <DigitalSetting />
     </NCollapseItem>

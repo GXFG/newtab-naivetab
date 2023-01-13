@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useMessage } from 'naive-ui'
-import AddBookmark from '@/popup/components/AddBookmark.vue'
+import ConfigBookmark from '@/popup/components/ConfigBookmark.vue'
 
 window.$message = useMessage()
 </script>
 
 <template>
-  <AddBookmark />
+  <ConfigBookmark />
 </template>

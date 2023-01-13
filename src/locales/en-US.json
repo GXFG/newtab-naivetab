@@ -69,6 +69,7 @@
     "preview": "Preview",
     "switch": "Switch",
     "refresh": "Refresh",
+    "sort": "Sort",
     "select": "Select",
     "save": "Save",
     "current": "Current",
@@ -240,5 +241,8 @@
     "kr36": "36kr",
     "bilibili": "Bilibili",
     "v2ex": "V2EX"
+  },
+  "popup": {
+    "commitBtnTips": "Drag bookmarks to sort"
   }
 }

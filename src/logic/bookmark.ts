@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isChrome } from '@/env'
-import { defaultConfig, globalState, localConfig, addVisibilityTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
+import { defaultConfig, globalState, localConfig, addVisibilityTask, addPageFocusTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
 
 export const getFaviconFromUrl = (url: string) => {
   if (isChrome) {
@@ -41,6 +41,9 @@ export const getBookmarkConfigUrl = (key: string) => {
     return ''
   }
   const url = localConfig.bookmark.keymap[key].url
+  if (url.length === 0) {
+    return ''
+  }
   return padUrlHttps(url)
 }
 
@@ -50,22 +53,30 @@ export const resetBookmarkPending = () => {
   }))
 }
 
-addVisibilityTask('bookmark', (hidden) => {
-  if (hidden) {
-    return
-  }
+const refreshBookmarkConfig = () => {
   // page切换前台时刷新快捷键配置信息
   if (globalState.isSettingDrawerVisible) {
     getAllCommandsConfig()
   }
+  // page切换前台时刷新通过pupop修改的书签
   const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
     isPending: false,
   })
-  // page切换前台时刷新通过pupop新增的书签
   if (!bookmarkPendingData.value.isPending) {
     return
   }
   log('Update bookmark from popup')
   localConfig.bookmark = useStorageLocal('c-bookmark', defaultConfig.bookmark) as any
   resetBookmarkPending()
+}
+
+addPageFocusTask('bookmark', () => {
+  refreshBookmarkConfig()
+})
+
+addVisibilityTask('bookmark', (hidden) => {
+  if (hidden) {
+    return
+  }
+  refreshBookmarkConfig()
 })
