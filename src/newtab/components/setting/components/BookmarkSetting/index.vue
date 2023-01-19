@@ -49,7 +49,7 @@ const handleDragStart = (code: string) => {
   state.currDragKeyCode = code
 }
 
-const handleDragEnter = (e: Event, targetCode: string) => {
+const handleDragEnter = (targetCode: string) => {
   if (state.currDragKeyCode === targetCode) {
     return
   }
@@ -210,7 +210,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                     class="bookmark__item"
                     :draggable="state.isBookmarkDragEnabled"
                     @dragstart="handleDragStart(code)"
-                    @dragenter="handleDragEnter($event, code)"
+                    @dragenter="handleDragEnter(code)"
                     @dragover="handleDragOver($event)"
                     @dragend="handleDragEnd()"
                   >

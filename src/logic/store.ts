@@ -771,6 +771,21 @@ export const themeOverrides: GlobalThemeOverrides = {
   },
 }
 
+/**
+ * 针对Edge 设置为其他favicon 避免展示黑色方块
+ * 等价于 <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+ */
+export const setEdgeFavicon = () => {
+  if (!isEdge) {
+    return
+  }
+  const link = document.createElement('link')
+  link.setAttribute('rel', 'shortcut icon')
+  link.setAttribute('type', 'image/x-icon')
+  link.setAttribute('href', '/assets/favicon.ico')
+  document.getElementsByTagName('head')[0].appendChild(link)
+}
+
 watch(() => localConfig.general.pageTitle, () => {
   document.title = localConfig.general.pageTitle
 }, { immediate: true })

@@ -4,7 +4,7 @@ import { defaultConfig, globalState, localConfig, addVisibilityTask, addPageFocu
 
 export const getFaviconFromUrl = (url: string) => {
   if (isChrome) {
-    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`
+    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=128`
   }
   return `${url}/favicon.ico`
 }

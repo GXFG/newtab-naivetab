@@ -42,12 +42,9 @@ const loadCurrKeyConfig = () => {
   if (state.keyCode.length === 0) {
     return
   }
-  if (localConfig.bookmark.keymap[state.keyCode]) {
+  if (localConfig.bookmark.keymap[state.keyCode] && localConfig.bookmark.keymap[state.keyCode].url) {
     state.url = localConfig.bookmark.keymap[state.keyCode].url
     state.name = localConfig.bookmark.keymap[state.keyCode].name
-  } else {
-    state.url = ''
-    state.name = ''
   }
 }
 
@@ -98,6 +95,10 @@ const handleDragOver = (e: Event, targetCode: string) => {
 
 const handleDragEnd = () => {
   if (state.currDragKeyCode === state.targetDragKeyCode) {
+    return
+  }
+  // 忽略空书签
+  if (!localConfig.bookmark.keymap[state.currDragKeyCode]) {
     return
   }
   onCommitFuncWrap(() => {

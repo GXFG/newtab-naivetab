@@ -169,26 +169,26 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 <template>
   <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="search">
     <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
-      <NDropdown
-        class="search__dropdown"
-        :show="localConfig.search.suggestionEnabled && state.isSuggestVisible"
-        :options="state.suggestList"
-        :placement="state.placementValue"
-        :show-arrow="true"
-        :keyboard="false"
-        @select="handleSelectSuggest"
-        @clickoutside="handleSelectOutside"
+      <div
+        class="search__container"
+        :style="dragStyle || containerStyle"
+        :class="{
+          'search__container--focus': localConfig.search.isBorderEnabled && globalState.isSearchFocused,
+          'search__container--border': localConfig.search.isBorderEnabled,
+          'search__container--shadow': localConfig.search.isShadowEnabled,
+        }"
       >
-        <div
-          class="search__container"
-          :style="dragStyle || containerStyle"
-          :class="{
-            'search__container--focus': localConfig.search.isBorderEnabled && globalState.isSearchFocused,
-            'search__container--border': localConfig.search.isBorderEnabled,
-            'search__container--shadow': localConfig.search.isShadowEnabled,
-          }"
-        >
-          <NInputGroup>
+        <NInputGroup>
+          <NDropdown
+            class="search__dropdown"
+            :show="localConfig.search.suggestionEnabled && state.isSuggestVisible"
+            :options="state.suggestList"
+            :placement="state.placementValue"
+            :show-arrow="true"
+            :keyboard="false"
+            @select="handleSelectSuggest"
+            @clickoutside="handleSelectOutside"
+          >
             <NInput
               v-model:value="state.searchValue"
               type="text"
@@ -204,19 +204,19 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               @input="handleSearchInput"
               @keydown="handleSearchKeydown"
             />
-            <NButton
-              v-if="localConfig.search.iconEnabled"
-              class="input__search"
-              :class="{ 'input__search--move': isDragMode }"
-              size="large"
-              text
-              @click="onSearch"
-            >
-              <il:search class="search__icon" />
-            </NButton>
-          </NInputGroup>
-        </div>
-      </NDropdown>
+          </NDropdown>
+          <NButton
+            v-if="localConfig.search.iconEnabled"
+            class="input__search"
+            :class="{ 'input__search--move': isDragMode }"
+            size="large"
+            text
+            @click="onSearch"
+          >
+            <il:search class="search__icon" />
+          </NButton>
+        </NInputGroup>
+      </div>
     </div>
   </MoveableComponentWrap>
 </template>
@@ -238,7 +238,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     }
     .n-input,
     .n-input--focus {
-      border-radius: v-bind(customBorderRadius);
+      border-radius: v-bind(customBorderRadius) !important;
     }
     .input__main {
       flex: 1;
