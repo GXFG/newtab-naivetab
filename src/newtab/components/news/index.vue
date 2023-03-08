@@ -100,22 +100,27 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
                     >
                       {{ index + 1 }}
                     </p>
-                    <div
-                      class="row__content"
-                      :class="{
-                        'row__content--hover': !isDragMode,
-                      }"
-                      :title="item.desc"
-                      @click="onOpenPage(item.url)"
-                      @mousedown="onMouseDownKey($event, item.url)"
-                    >
-                      <p class="content__desc">
-                        {{ item.desc }}
-                      </p>
-                      <p class="content__hot">
-                        {{ item.hot }}
-                      </p>
-                    </div>
+
+                    <n-popover trigger="hover">
+                      <template #trigger>
+                        <div
+                          class="row__content"
+                          :class="{
+                            'row__content--hover': !isDragMode,
+                          }"
+                          @click="onOpenPage(item.url)"
+                          @mousedown="onMouseDownKey($event, item.url)"
+                        >
+                          <p class="content__desc">
+                            {{ item.desc }}
+                          </p>
+                          <p class="content__hot">
+                            {{ item.hot }}
+                          </p>
+                        </div>
+                      </template>
+                      <span>{{ item.desc }}</span>
+                    </n-popover>
                   </div>
                 </div>
                 <div v-else class="content__empty">
