@@ -183,7 +183,7 @@ export const handleMissedUploadConfig = async () => {
  * }
  */
 export const loadRemoteConfig = () => {
-  log('Load config')
+  log('Load config start')
   return new Promise((resolve) => {
     console.time('loadRemoteConfig')
     chrome.storage.sync.get(null, async (data) => {
@@ -221,7 +221,7 @@ export const loadRemoteConfig = () => {
         resolve(true)
         return
       }
-      log('Load config', pendingConfig)
+      log('Load config done', pendingConfig)
       await updateSetting(pendingConfig)
       resolve(true)
     })
