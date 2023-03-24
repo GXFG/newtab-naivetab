@@ -7,6 +7,7 @@ specifiers:
   '@iconify/vue': ^3.2.1
   '@intlify/vite-plugin-vue-i18n': ^6.0.3
   '@types/chrome': ^0.0.195
+  '@types/crypto-js': ^4.1.1
   '@types/fs-extra': ^9.0.13
   '@types/node': ^18.14.2
   '@types/webextension-polyfill': ^0.9.2
@@ -19,13 +20,14 @@ specifiers:
   chokidar: ^3.5.3
   cross-env: ^7.0.3
   crx: ^5.0.1
+  crypto-js: ^4.1.1
   dayjs: ^1.11.7
   esbuild: ^0.15.18
   eslint: ^8.35.0
   esno: ^0.16.3
   fs-extra: ^10.1.0
   kolorist: ^1.7.0
-  lunar-typescript: ^1.3.1
+  lunar-typescript: ^1.3.2
   naive-ui: ^2.34.3
   nodemon: ^2.0.20
   npm-run-all: ^4.1.5
@@ -49,8 +51,9 @@ specifiers:
 dependencies:
   axios: 1.3.4
   cheerio: 1.0.0-rc.12
+  crypto-js: 4.1.1
   dayjs: 1.11.7
-  lunar-typescript: 1.3.1
+  lunar-typescript: 1.3.2
 
 devDependencies:
   '@antfu/eslint-config': 0.26.3_ycpbpc6yetojsgtrx3mwntkhsu
@@ -59,6 +62,7 @@ devDependencies:
   '@iconify/vue': 3.2.1_vue@3.2.47
   '@intlify/vite-plugin-vue-i18n': 6.0.3_vite@2.9.15+vue-i18n@9.2.2
   '@types/chrome': 0.0.195
+  '@types/crypto-js': 4.1.1
   '@types/fs-extra': 9.0.13
   '@types/node': 18.14.2
   '@types/webextension-polyfill': 0.9.2
@@ -855,6 +859,10 @@ packages:
     resolution: {integrity: sha512-eHE4cQPoj6ngxBZMvVf6Hw7Mh4jMW4U9lpGmS5GBPB9RYxlFg+CHaVN7ErNY4W9XfLIEn20b4VDYaIrbq0q4uA==}
     dependencies:
       '@types/node': 18.14.2
+    dev: true
+
+  /@types/crypto-js/4.1.1:
+    resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==}
     dev: true
 
   /@types/estree/1.0.0:
@@ -2197,6 +2205,10 @@ packages:
       node-rsa: 1.1.1
       pbf: 3.2.1
     dev: true
+
+  /crypto-js/4.1.1:
+    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
+    dev: false
 
   /crypto-random-string/4.0.0:
     resolution: {integrity: sha512-x8dy3RnvYdlUcPOjkEHqozhiwzKNSq7GcPuXFbnyMOCHxX8V3OgIg/pYuabl2sbUPfIJaeAQB7PMOK8DFIdoRA==}
@@ -4838,8 +4850,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /lunar-typescript/1.3.1:
-    resolution: {integrity: sha512-6LBvvVMK+tsY/1hy3EZoInFCyktbRuqZHbvsQhKtGXEgbtuo5vvAa8MwlZAdQeu5SOM7z4/StRyHrbv+Ogtzjg==}
+  /lunar-typescript/1.3.2:
+    resolution: {integrity: sha512-p2QsPuLkTI2OI4wLbGjf7M931MQDE+PmfYym+3WkXVhrbPMGSKjWQ7zeksof1gywucmHLVTPDQUUeNCbS0Sqnw==}
     dev: false
 
   /magic-string/0.25.9:

@@ -409,42 +409,52 @@ const defaultLocalState = {
     general: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     bookmark: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     clockDigital: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     clockAnalog: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     date: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     calendar: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     search: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     weather: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     memo: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
     news: {
       loading: false,
       syncTime: 0,
+      syncId: '',
     },
   },
 }
@@ -694,6 +704,18 @@ export const handleAppUpdate = async () => {
         delete localConfig.bookmark.keymap[keyLabel]
       }
     }
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.12.0')) {
+    localState.value.isUploadConfigStatusMap.general.syncId = ''
+    localState.value.isUploadConfigStatusMap.bookmark.syncId = ''
+    localState.value.isUploadConfigStatusMap.clockDigital.syncId = ''
+    localState.value.isUploadConfigStatusMap.clockAnalog.syncId = ''
+    localState.value.isUploadConfigStatusMap.date.syncId = ''
+    localState.value.isUploadConfigStatusMap.calendar.syncId = ''
+    localState.value.isUploadConfigStatusMap.search.syncId = ''
+    localState.value.isUploadConfigStatusMap.weather.syncId = ''
+    localState.value.isUploadConfigStatusMap.memo.syncId = ''
+    localState.value.isUploadConfigStatusMap.news.syncId = ''
   }
   // 更新local版本号
   localConfig.general.version = pkg.version

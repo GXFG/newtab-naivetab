@@ -1,4 +1,5 @@
 import { useDebounceFn } from '@vueuse/core'
+import md5 from 'crypto-js/md5'
 import pkg from '../../package.json'
 import { log, downloadJsonByTagA, sleep } from './util'
 import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from './const'
@@ -37,10 +38,13 @@ const uploadConfigFn = (field: ConfigField) => {
     localState.value.isUploadConfigStatusMap[field].loading = true
     log(`Upload config-${field} start`)
     const currTime = Date.now()
+    const currConfigMd5 = md5(JSON.stringify(localConfig[field])).toString()
     localState.value.isUploadConfigStatusMap[field].syncTime = currTime
+    localState.value.isUploadConfigStatusMap[field].syncId = currConfigMd5
     const payload = {
       [`naive-tab-${field}`]: JSON.stringify({
         syncTime: currTime,
+        syncId: currConfigMd5,
         data: localConfig[field],
       }),
     }
@@ -50,7 +54,7 @@ const uploadConfigFn = (field: ConfigField) => {
         log(`Upload config-${field} error`, error)
         window.$message.error(`${window.$t('common.upload')}${window.$t('common.setting')}${window.$t('common.fail')}`)
       } else {
-        log(`Upload config-${field} complete`, currTime)
+        log(`Upload config-${field} complete`)
       }
       setTimeout(() => {
         // 确保isUploadConfigLoading的值不会抖动，消除多个配置排队同步时中间出现的短暂值均为false的间隙
@@ -178,6 +182,7 @@ export const handleMissedUploadConfig = async () => {
  * {
  *   `naive-tab-${field}`: '{
  *      syncTime: number
+ *      syncId: md5
  *      data: {}
  *   }'
  * }
@@ -201,11 +206,14 @@ export const loadRemoteConfig = () => {
           const target = JSON.parse(data[`naive-tab-${field}`])
           const targetConfig = target.data
           const targetSyncTime = target.syncTime
+          const targetSyncId = target.syncId
           const localSyncTime = localState.value.isUploadConfigStatusMap[field].syncTime
-          if (targetSyncTime === localSyncTime) {
+          const localSyncId = localState.value.isUploadConfigStatusMap[field].syncId
+          if (targetSyncId === localSyncId) {
             log(`Config-${field} no update`)
             continue
           }
+          // targetSyncId !== localSyncId
           if (targetSyncTime < localSyncTime) {
             log(`Config-${field} is overdue, reupload`)
             uploadConfigFn(field)
@@ -214,6 +222,7 @@ export const loadRemoteConfig = () => {
           log(`Config-${field} update`)
           pendingConfig[field] = targetConfig
           localState.value.isUploadConfigStatusMap[field].syncTime = targetSyncTime
+          localState.value.isUploadConfigStatusMap[field].syncId = targetSyncId
         }
       }
       console.timeEnd('loadRemoteConfig')
