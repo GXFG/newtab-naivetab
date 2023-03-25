@@ -69,6 +69,7 @@
     "preview": "预览",
     "switch": "切换",
     "refresh": "刷新",
+    "sort": "排序",
     "select": "选择",
     "save": "保存",
     "current": "当前",
@@ -240,5 +241,8 @@
     "kr36": "36氪",
     "bilibili": "B站",
     "v2ex": "V2EX"
+  },
+  "popup": {
+    "commitBtnTips": "拖动书签可以进行排序"
   }
 }

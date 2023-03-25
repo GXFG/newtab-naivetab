@@ -301,7 +301,7 @@ const getKeycapIconStyle = (code: string) => {
                       v-if="getBookmarkConfigUrl(code)"
                       class="img__main"
                       :src="getFaviconFromUrl(getBookmarkConfigUrl(code))"
-                      :ondragstart="() => false"
+                      :draggable="false"
                     >
                   </div>
                 </div>

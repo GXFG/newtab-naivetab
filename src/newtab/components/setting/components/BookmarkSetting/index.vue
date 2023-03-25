@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import BookmarkPicker from './BookmarkPicker.vue'
-import { isEdge } from '@/env'
 import { swatcheColors } from '@/styles/const'
 import {
-  URL_CHROME_EXTENSIONS_SHORTCUTS,
-  URL_EDGE_EXTENSIONS_SHORTCUTS,
   KEYBOARD_CODE_TO_DEFAULT_CONFIG,
   KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST,
   KEYBOARD_TYPE_OPTION,
@@ -19,7 +16,7 @@ import {
   currKeyboardConfig,
   getDefaultBookmarkNameFromUrl,
   requestPermission,
-  createTab,
+  openConfigShortcutsPage,
 } from '@/logic'
 
 const state = reactive({
@@ -28,8 +25,6 @@ const state = reactive({
   currDragKeyCode: '',
   currImporKey: '',
 })
-
-const openShortcutsPage = () => createTab(isEdge ? URL_EDGE_EXTENSIONS_SHORTCUTS : URL_CHROME_EXTENSIONS_SHORTCUTS)
 
 const onCreateKey = (key: string) => {
   localConfig.bookmark.keymap[key] = {
@@ -54,8 +49,7 @@ const handleDragStart = (code: string) => {
   state.currDragKeyCode = code
 }
 
-const handleDragEnter = (e: Event, targetCode: string) => {
-  e.preventDefault()
+const handleDragEnter = (targetCode: string) => {
   if (state.currDragKeyCode === targetCode) {
     return
   }
@@ -177,7 +171,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
 <template>
   <BookmarkPicker v-model:show="state.isBookmarkModalVisible" @select="onSelectBookmark" />
 
-  <NCollapse class="setting__content" display-directive="show">
+  <NCollapse display-directive="show">
     <BaseComponentSetting cname="bookmark" :marginRange="[0, 20]" :borderRadiusRange="[0, 40]">
       <template #header>
         <!-- bookmarkConfig -->
@@ -216,7 +210,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                     class="bookmark__item"
                     :draggable="state.isBookmarkDragEnabled"
                     @dragstart="handleDragStart(code)"
-                    @dragenter="handleDragEnter($event, code)"
+                    @dragenter="handleDragEnter(code)"
                     @dragover="handleDragOver($event)"
                     @dragend="handleDragEnd()"
                   >
@@ -242,7 +236,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                           v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
                           class="item__shortcut"
                           :title="globalState.allCommandsMap[code]"
-                          @click="openShortcutsPage()"
+                          @click="openConfigShortcutsPage()"
                         >
                           <template v-if="globalState.allCommandsMap[code]">
                             {{ globalState.allCommandsMap[code] }}
@@ -251,9 +245,10 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                           <ion:ban v-else />
                         </NInputGroupLabel>
                       </div>
-                      <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
+                      <!-- <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag"> -->
+                      <NButton class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
                         <cil:resize-height />
-                      </NInputGroupLabel>
+                      </NButton>
                       <NButton @click="onImportBookmark(code)">
                         <lucide:bookmark-plus />
                       </NButton>
@@ -285,7 +280,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
               <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
             </div>
             <div v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="setting__input_item">
-              <NButton ghost type="primary" @click="openShortcutsPage()">
+              <NButton ghost type="primary" @click="openConfigShortcutsPage()">
                 <ic:twotone-keyboard-command-key />&nbsp;{{ $t('bookmark.customKeys') }}
               </NButton>
             </div>
@@ -501,10 +496,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           flex: 1;
         }
         .item__move {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          cursor: row-resize;
+          cursor: row-resize !important;
         }
       }
     }

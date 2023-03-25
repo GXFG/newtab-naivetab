@@ -1,30 +1,5 @@
 import { isMacOS } from '@/env'
-import { localConfig, globalState, switchSettingDrawerVisible } from '@/logic'
-
-const keydownTaskMap = new Map()
-
-export const addKeydownTask = (key: string, task: (e: KeyboardEvent) => void) => {
-  keydownTaskMap.set(key, task)
-}
-
-export const removeKeydownTask = (key: string) => {
-  keydownTaskMap.delete(key)
-}
-
-export const startKeydown = () => {
-  document.onkeydown = (e: KeyboardEvent) => {
-    // 在'搜索框'、'备忘录'、'设置抽屉'内时忽略按键事件
-    if (globalState.isSettingDrawerVisible || globalState.isSearchFocused || globalState.isMemoFocused) {
-      if (e.key === 'Escape') {
-        switchSettingDrawerVisible(false)
-      }
-      return
-    }
-    for (const task of keydownTaskMap.values()) {
-      task(e)
-    }
-  }
-}
+import { localConfig } from '@/logic'
 
 export const stopKeydown = () => {
   document.onkeydown = null

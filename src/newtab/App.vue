@@ -7,9 +7,11 @@ import {
   currTheme,
   themeOverrides,
   initBackgroundImage,
+  setEdgeFavicon,
   startKeydown,
   startTimer,
   stopTimer,
+  onPageFocus,
   handleStateResetAndUpdate,
   handleMissedUploadConfig,
   loadRemoteConfig,
@@ -20,6 +22,7 @@ import Content from '@/newtab/Content.vue'
 
 onMounted(async () => {
   initBackgroundImage()
+  setEdgeFavicon()
   handleStateResetAndUpdate()
   startTimer()
   startKeydown()
@@ -40,12 +43,20 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 </script>
 
 <template>
-  <NConfigProvider id="container" :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }" :locale="nativeUILang" :theme="currTheme" :theme-overrides="themeOverrides">
+  <NConfigProvider
+    id="container"
+    :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }"
+    :locale="nativeUILang"
+    :theme="currTheme"
+    :theme-overrides="themeOverrides"
+  >
     <NDialogProvider>
       <NNotificationProvider>
         <NMessageProvider>
           <NLoadingBarProvider>
-            <Content />
+            <div tabindex="100" @focus="onPageFocus">
+              <Content />
+            </div>
           </NLoadingBarProvider>
         </NMessageProvider>
       </NNotificationProvider>
