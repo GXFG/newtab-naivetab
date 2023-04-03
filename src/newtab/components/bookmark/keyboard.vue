@@ -276,7 +276,7 @@ const getKeycapIconStyle = (code: string) => {
                 'row__keycap--border': localConfig.bookmark.isBorderEnabled,
               }"
               :style="getKeycapStyle(code)"
-              :title="getBookmarkConfigUrl(code)"
+              :title="`${getBookmarkConfigName(code)}・${getBookmarkConfigUrl(code)}`"
               :data-code="code"
               @mousedown="onMouseDownKey($event, code, getBookmarkConfigUrl(code))"
             >

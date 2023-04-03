@@ -29,7 +29,7 @@ const setCurrentTabUrl = () => {
   chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
     const currTab = tabs[0]
     state.url = currTab.url || ''
-    state.name = ''
+    state.name = currTab.title || ''
   })
 }
 
