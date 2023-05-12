@@ -173,8 +173,12 @@ export async function getManifest() {
     // },
     // content_scripts: [
     //   {
-    //     matches: ['http://*/*', 'https://*/*'],
-    //     js: ['./dist/contentScripts/index.global.js'],
+    //     matches: [
+    //       '<all_urls>',
+    //     ],
+    //     js: [
+    //       'dist/contentScripts/index.global.js',
+    //     ],
     //   },
     // ],
     // web_accessible_resources: [
@@ -183,27 +187,27 @@ export async function getManifest() {
     //     matches: ['<all_urls>'],
     //   },
     // ],
-    // content_security_policy: 'script-src \'self\' https://ssl.google-analytics.com; object-src \'self\'',
     content_security_policy: {
       extension_pages: isDev
         // this is required on dev for Vite script to load
-        ? `script-src 'self' http://localhost:${port}; object-src 'self' http://localhost:${port}`
+        ? `script-src \'self\' http://localhost:${port}; object-src \'self\'`
         : 'script-src \'self\'; object-src \'self\'',
     },
   }
 
-  if (isDev) {
-    // for content script, as browsers will cache them for each reload,
-    // we use a background script to always inject the latest version
-    // see src/background/contentScriptHMR.ts
+  // not work in MV3
+  // if (isDev) {
+  //   // for content script, as browsers will cache them for each reload,
+  //   // we use a background script to always inject the latest version
+  //   // see src/background/contentScriptHMR.ts
 
-    // delete manifest.content_scripts
-    // manifest.permissions?.push('webNavigation')
+  //   // delete manifest.content_scripts
+  //   // manifest.permissions?.push('webNavigation')
 
-    // this is required on dev for Vite script to load
+  //   // this is required on dev for Vite script to load
 
-    // manifest.content_security_policy = `script-src \'self\' https://ssl.google-analytics.com http://localhost:${port}; object-src \'self\'`
-  }
+  //   // manifest.content_security_policy = `script-src \'self\' https://ssl.google-analytics.com http://localhost:${port}; object-src \'self\'`
+  // }
 
   return manifest
 }
