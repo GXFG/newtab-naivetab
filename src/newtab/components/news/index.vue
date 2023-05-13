@@ -151,14 +151,14 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       .n-tabs .n-tab-pane {
         padding: 0 !important;
       }
-      // segment
+      /* segment */
       .n-tabs .n-tabs-rail {
         background-color: transparent !important;
         .n-tabs-tab-wrapper .n-tabs-tab.n-tabs-tab--active {
           background-color: v-bind(customBackgroundActiveColor) !important;
         }
       }
-      // line bottom border
+      /* line bottom border */
       .n-tabs .n-tabs-nav.n-tabs-nav--line-type .n-tabs-nav-scroll-content {
         border-bottom: v-bind(customBorderWidth) solid v-bind(customBorderColor) !important;
       }

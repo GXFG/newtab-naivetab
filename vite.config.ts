@@ -1,37 +1,48 @@
-import { resolve } from 'path'
+/// <reference types="vitest" />
+
+import { resolve } from 'node:path'
 import type { UserConfig } from 'vite'
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
-import vueI18n from '@intlify/vite-plugin-vue-i18n'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Markdown from 'vite-plugin-md'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
-import WindiCSS from 'vite-plugin-windicss'
-import windiConfig from './windi.config'
-import { r, port, isDev } from './scripts/utils'
-import { MV3Hmr } from './vite-mv3-hmr'
+import UnoCSS from 'unocss/vite'
+import postcssNesting from 'postcss-nesting'
+import { isDev, port, r } from './scripts/utils'
+import packageJson from './package.json'
 // import visualizer from 'rollup-plugin-visualizer'
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
   resolve: {
     alias: {
+      '~/': `${r('src')}/`,
       '@/': `${r('src')}/`,
       'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js',
     },
   },
   define: {
     __DEV__: isDev,
+    __NAME__: JSON.stringify(packageJson.name),
+  },
+  css: {
+    postcss: {
+      plugins: [
+        postcssNesting,
+      ],
+    },
   },
   plugins: [
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
 
-    vueI18n({
+    VueI18nPlugin({
       include: resolve(__dirname, './src/locales/**'),
     }),
 
@@ -63,6 +74,9 @@ export const sharedConfig: UserConfig = {
 
     // https://github.com/antfu/unplugin-icons
     Icons(),
+
+    // https://github.com/unocss/unocss
+    UnoCSS(),
 
     // html内引用的资源直接存储在/extension/assets, 无需转换
     // rewrite assets to use relative path
@@ -99,12 +113,15 @@ export default defineConfig(({ command }) => ({
     },
   },
   build: {
+    watch: isDev
+      ? {}
+      : undefined,
     outDir: r('extension/dist'),
     emptyOutDir: false,
     sourcemap: isDev ? 'inline' : false,
-    // minify: 'terser',
+    // https://developer.chrome.com/docs/webstore/program_policies/#:~:text=Code%20Readability%20Requirements
     // terserOptions: {
-    //   mangle: false, // https://developer.chrome.com/docs/webstore/program_policies/#:~:text=Code%20Readability%20Requirements
+    //   mangle: false,
     // },
     rollupOptions: {
       input: {
@@ -114,15 +131,6 @@ export default defineConfig(({ command }) => ({
     },
     chunkSizeWarningLimit: 2000,
   },
-  plugins: [
-    ...sharedConfig.plugins!,
-
-    // https://github.com/antfu/vite-plugin-windicss
-    WindiCSS({
-      config: windiConfig,
-    }),
-    MV3Hmr(),
-  ],
   test: {
     globals: true,
     environment: 'jsdom',
