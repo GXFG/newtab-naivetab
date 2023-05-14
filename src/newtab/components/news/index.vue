@@ -101,7 +101,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
                       {{ index + 1 }}
                     </p>
 
-                    <n-popover trigger="hover">
+                    <n-popover :delay="500" trigger="hover">
                       <template #trigger>
                         <div
                           class="row__content"

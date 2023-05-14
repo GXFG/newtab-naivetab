@@ -12,8 +12,9 @@ export const KEYCAP_TYPE_OPTION = [
 ]
 
 export const KEYCAP_PREINSTALL_OPTION = [
-  { label: 'Granite', value: 'granite' },
+  { label: 'Light', value: 'light' },
   { label: 'Dark', value: 'dark' },
+  { label: 'Granite', value: 'granite' },
   { label: 'Bentō', value: 'bento' },
   { label: 'Olivia', value: 'olivia' },
   { label: 'Oblivion', value: 'oblivion' },
@@ -47,6 +48,22 @@ export const KEYCAP_PREINSTALL_OPTION = [
 ]
 
 export const KEYCAP_PREINSTALL_MAP = {
+  light: {
+    mainFontColor: 'rgba(34,34,34,1.0)',
+    mainBackgroundColor: 'rgba(255, 255, 255, 1)',
+    emphasisOneFontColor: 'rgba(255, 255, 255, 0.9)',
+    emphasisOneBackgroundColor: 'rgba(55,54,52,1.0)',
+    emphasisTwoFontColor: 'rgba(255, 255, 255, 0.9)',
+    emphasisTwoBackgroundColor: 'rgba(34, 34, 34, 1)',
+  },
+  dark: {
+    mainFontColor: 'rgba(228,222,221,1.0)',
+    mainBackgroundColor: 'rgba(95,92,82,1.0)',
+    emphasisOneFontColor: 'rgba(228,222,221,1.0)',
+    emphasisOneBackgroundColor: 'rgba(51,52,48,1.0)',
+    emphasisTwoFontColor: 'rgba(228,222,221,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(51,52,48,1.0)',
+  },
   hana: {
     mainFontColor: 'rgba(165, 152, 197, 1)',
     mainBackgroundColor: 'rgba(239, 239, 234, 1)',
@@ -158,14 +175,6 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisOneBackgroundColor: 'rgba(51,52,48,1.0)',
     emphasisTwoFontColor: 'rgba(228,222,221,1.0)',
     emphasisTwoBackgroundColor: 'rgba(0,164,169,1.0)',
-  },
-  dark: {
-    mainFontColor: 'rgba(228,222,221,1.0)',
-    mainBackgroundColor: 'rgba(95,92,82,1.0)',
-    emphasisOneFontColor: 'rgba(228,222,221,1.0)',
-    emphasisOneBackgroundColor: 'rgba(51,52,48,1.0)',
-    emphasisTwoFontColor: 'rgba(228,222,221,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(51,52,48,1.0)',
   },
   classicOlivetti: {
     mainFontColor: 'rgba(9,101,237,1.0)',

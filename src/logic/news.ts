@@ -96,7 +96,7 @@ export const getZhihuNews = async () => {
       const desc = $(ele).children().eq(0).attr('title') || ''
       let hot = i === 0
         ? ($(ele).children('.HotItem-metrics')[0] as any).children[2].data
-        : $(ele).children('.HotItem-metrics').text() || ''
+        : ($(ele).children('.HotItem-metrics').text() || '')
       const count = hot.split(' ')[0]
       if (!isNaN(count)) {
         // 过滤盐选推荐
@@ -183,7 +183,6 @@ export const getBilibiliNews = async () => {
     })
     newsState.value.bilibili.list = newsList
     newsState.value.bilibili.syncTime = dayjs().valueOf()
-    log('News-update bilibili')
   } catch (e) {
     console.warn(e)
   }
