@@ -7,8 +7,8 @@ const newsSourceList = computed(() => [
   { label: window.$t('news.zhihu'), value: 'zhihu' },
   { label: window.$t('news.weibo'), value: 'weibo' },
   { label: window.$t('news.kr36'), value: 'kr36' },
-  { label: window.$t('news.bilibili'), value: 'bilibili' },
   { label: window.$t('news.v2ex'), value: 'v2ex' },
+  // { label: window.$t('news.bilibili'), value: 'bilibili' },
 ])
 
 const handleUpdateValue = () => {

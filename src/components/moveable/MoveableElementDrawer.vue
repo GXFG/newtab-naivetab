@@ -190,7 +190,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
         <ic:baseline-chevron-right class="switch__icon" :class="{ 'switch__icon--active': isElementDrawerVisible }" />
       </div>
       <div class="drawer__header">
-        <NButton ghost type="warning" @click="toggleIsDragMode()">
+        <NButton strong secondary type="warning" @click="toggleIsDragMode()">
           <mdi:keyboard-esc class="header__icon" />&nbsp;{{ `${$t('common.exit')}${$t('common.dragMode')}` }}
         </NButton>
       </div>

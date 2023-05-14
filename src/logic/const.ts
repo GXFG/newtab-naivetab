@@ -110,8 +110,8 @@ export const NEWS_SOURCE_MAP = {
   zhihu: 'https://www.zhihu.com/hot',
   weibo: 'https://s.weibo.com/top/summary?cate=realtimehot',
   kr36: 'https://36kr.com/hot-list/catalog',
-  bilibili: 'https://www.bilibili.com/v/popular/rank/all',
   v2ex: 'https://www.v2ex.com/?tab=hot',
+  bilibili: 'https://www.bilibili.com/v/popular/rank/all',
 }
 
 export const SEARCH_ENGINE_LIST = [

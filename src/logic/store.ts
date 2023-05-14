@@ -187,12 +187,12 @@ export const defaultConfig = {
     keycapKeyFontSize: 12,
     keycapBookmarkFontFamily: 'Arial',
     keycapBookmarkFontSize: 12,
-    mainFontColor: ['rgba(82,85,84,1.0)', 'rgba(228,222,221,1.0)'],
-    mainBackgroundColor: ['rgba(230,232,227,1.0)', 'rgba(95,92,82,1.0)'],
-    emphasisOneFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
-    emphasisOneBackgroundColor: ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)'],
-    emphasisTwoFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
-    emphasisTwoBackgroundColor: ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)'],
+    mainFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
+    mainBackgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(95,92,82,1.0)'],
+    emphasisOneFontColor: ['rgba(255, 255, 255, 0.9)', 'rgba(228,222,221,1.0)'],
+    emphasisOneBackgroundColor: ['rgba(55,54,52,1.0)', 'rgba(51,52,48,1.0)'],
+    emphasisTwoFontColor: ['rgba(255, 255, 255, 0.9)', 'rgba(228,222,221,1.0)'],
+    emphasisTwoBackgroundColor: ['rgba(34, 34, 34, 1)', 'rgba(51,52,48,1.0)'],
     isBorderEnabled: false,
     borderWidth: 1,
     borderRadius: 5,
@@ -200,8 +200,8 @@ export const defaultConfig = {
   },
   clockDigital: {
     enabled: true,
-    format: 'hh:mm:ss',
-    unitEnabled: true,
+    format: 'HH:mm:ss',
+    unitEnabled: false,
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 50,
@@ -267,7 +267,7 @@ export const defaultConfig = {
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
     backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    backgroundActiveColor: ['rgba(16, 152, 173, 0.5)', 'rgba(16, 152, 173, 0.5)'],
+    backgroundActiveColor: ['rgba(16, 152, 173, 0.3)', 'rgba(16, 152, 173, 0.3)'],
     isBorderEnabled: true,
     borderWidth: 1,
     borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
@@ -716,6 +716,12 @@ export const handleAppUpdate = async () => {
     localState.value.isUploadConfigStatusMap.weather.syncId = ''
     localState.value.isUploadConfigStatusMap.memo.syncId = ''
     localState.value.isUploadConfigStatusMap.news.syncId = ''
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.13.0')) {
+    const biliIndex = localConfig.news.sourceList.indexOf('bilibili')
+    if (biliIndex !== -1) {
+      localConfig.news.sourceList.splice(biliIndex, 1)
+    }
   }
   // 更新local版本号
   localConfig.general.version = pkg.version

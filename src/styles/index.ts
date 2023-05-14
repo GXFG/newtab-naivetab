@@ -1,3 +1,3 @@
-import '@unocss/reset/tailwind.css'
-import './index.css'
+// import '@unocss/reset/tailwind.css'
 import 'uno.css'
+import './index.css'
