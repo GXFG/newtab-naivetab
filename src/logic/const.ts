@@ -48,7 +48,7 @@ export const FONT_LIST = [
   // common
   'Cascadia Code', 'Fira Code',
   // local
-  'Arial Rounded MT Bold', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD', 'Pixel Lcd Machine',
+  'Arial Rounded MT Bold', 'OpenCherry', 'KBD', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD', 'Pixel Lcd Machine',
   // Windows
   'Arial', 'Arial Black', 'Bahnschrift', 'Calibri', 'Cambria', 'Cambria Math', 'Candara', 'Comic Sans MS', 'Consolas', 'Constantia', 'Corbel', 'Courier New', 'Ebrima', 'Franklin Gothic Medium', 'Gabriola', 'Gadugi', 'Georgia', 'HoloLens MDL2 Assets', 'Impact', 'Ink Free', 'Javanese Text', 'Leelawadee UI', 'Lucida Console', 'Lucida Sans Unicode', 'Malgun Gothic', 'Marlett', 'Microsoft Himalaya', 'Microsoft JhengHei', 'Microsoft New Tai Lue', 'Microsoft PhagsPa', 'Microsoft Sans Serif', 'Microsoft Tai Le', 'Microsoft YaHei', 'Microsoft Yi Baiti', 'MingLiU-ExtB', 'Mongolian Baiti', 'MS Gothic', 'MV Boli', 'Myanmar Text', 'Nirmala UI', 'Palatino Linotype', 'Segoe MDL2 Assets', 'Segoe Print', 'Segoe Script', 'Segoe UI', 'Segoe UI Historic', 'Segoe UI Emoji', 'Segoe UI Symbol', 'SimSun', 'Sitka', 'Sylfaen', 'Symbol', 'Tahoma', 'Times New Roman', 'Trebuchet MS', 'Verdana', 'Webdings', 'Wingdings', 'Yu Gothic',
   // macOS
@@ -115,15 +115,15 @@ export const NEWS_SOURCE_MAP = {
 }
 
 export const SEARCH_ENGINE_LIST = [
-  { label: 'baidu', value: 'https://www.baidu.com/s?word={query}' },
-  { label: 'bing', value: 'https://cn.bing.com/search?q={query}' },
-  { label: 'google', value: 'https://www.google.com/search?q={query}' },
-  { label: 'github', value: 'https://github.com/search?q={query}' },
-  { label: 'qwant', value: 'https://www.qwant.com/?q={query}' },
-  { label: 'duckduckgo', value: 'https://duckduckgo.com?q={query}' },
-  { label: 'yandex', value: 'https://yandex.com/search?text={query}' },
-  { label: 'yahoo', value: 'https://search.yahoo.com/search?p={query}' },
-  { label: 'sogou', value: 'https://www.sogou.com/web?query={query}' },
+  { label: 'Baidu', value: 'https://www.baidu.com/s?word={query}' },
+  { label: 'Bing', value: 'https://cn.bing.com/search?q={query}' },
+  { label: 'Google', value: 'https://www.google.com/search?q={query}' },
+  { label: 'Github', value: 'https://github.com/search?q={query}' },
+  { label: 'Qwant', value: 'https://www.qwant.com/?q={query}' },
+  { label: 'Duckduckgo', value: 'https://duckduckgo.com?q={query}' },
+  { label: 'Yandex', value: 'https://yandex.com/search?text={query}' },
+  { label: 'Yahoo', value: 'https://search.yahoo.com/search?p={query}' },
+  { label: 'Sogou', value: 'https://www.sogou.com/web?query={query}' },
   { label: '360', value: 'https://www.so.com/s?q={query}' },
 ]
 
