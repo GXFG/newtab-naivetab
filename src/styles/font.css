@@ -7,6 +7,18 @@
 }
 
 @font-face {
+  font-family: 'OpenCherry';
+  src: url('/assets/fonts/OpenCherry-Regular.woff');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'KBD';
+  src: url('/assets/fonts/kbd-webfont.woff');
+  font-display: fallback;
+}
+
+@font-face {
   font-family: 'LED7';
   src: url('/assets/fonts/7LED.ttf');
   font-display: fallback;
@@ -55,5 +67,5 @@
 }
 
 body {
-  font-family: 'Arial Rounded MT Bold', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD', 'Pixel Lcd Machine';
+  font-family: 'Arial Rounded MT Bold', 'OpenCherry', 'KBD', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD', 'Pixel Lcd Machine';
 }
