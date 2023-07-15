@@ -6,6 +6,7 @@ import {
   URL_GITHUB_ISSUSE,
   URL_CHROME_STORE,
   URL_EDGE_STORE,
+  gaProxy,
   isDragMode,
   toggleIsDragMode,
   toggleFullscreen,
@@ -110,33 +111,43 @@ const menuActionMap = {
     if (settingDrawerTabName.includes('clock')) {
       settingDrawerTabName = 'clock'
     }
-    globalState.currSettingTabValue = settingDrawerTabName.length === 0 ? 'general' : settingDrawerTabName
+    const tabValue = settingDrawerTabName.length === 0 ? 'general' : settingDrawerTabName
+    globalState.currSettingTabValue = tabValue
     switchSettingDrawerVisible(true)
+    gaProxy('click', ['rightMenu', tabValue])
   },
   dragMode: () => {
     switchSettingDrawerVisible(false)
     toggleIsDragMode()
+    gaProxy('click', ['rightMenu', 'dragMode'])
   },
   fullscreen: () => {
     toggleFullscreen()
+    gaProxy('click', ['rightMenu', 'fullscreen'])
   },
   userGuide: () => {
     openUserGuideModal()
+    gaProxy('click', ['rightMenu', 'userGuide'])
   },
   whatsNew: () => {
     openWhatsNewModal()
+    gaProxy('click', ['rightMenu', 'whatsNew'])
   },
   feedbackGithub: () => {
     createTab(URL_GITHUB_ISSUSE)
+    gaProxy('click', ['rightMenu', 'feedbackGithub'])
   },
   feedbackEmail: () => {
     createTab(URL_FEEDBACK)
+    gaProxy('click', ['rightMenu', 'feedbackEmail'])
   },
   positiveFeedback: () => {
     createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)
+    gaProxy('click', ['rightMenu', 'positiveFeedback'])
   },
   buyMeACoffee: () => {
     openSponsorModal()
+    gaProxy('click', ['rightMenu', 'buyMeACoffee'])
   },
 }
 

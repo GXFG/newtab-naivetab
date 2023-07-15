@@ -153,7 +153,7 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
             <ph:plus-minus-bold />
           </div>
           <div class="item__value">
-            <span class="value__text">{{ weatherState.forecast.list[0] && `${weatherState.forecast.list[0].tempMax} / ${weatherState.forecast.list[0].tempMin}` }}
+            <span class="value__text">{{ weatherState.forecast.list[0] && `${weatherState.forecast.list[0].tempMax} ~ ${weatherState.forecast.list[0].tempMin}` }}
             </span>
             <span class="value__unit">{{ temperatureUnit }}</span>
           </div>

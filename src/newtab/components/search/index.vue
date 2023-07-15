@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { localConfig, globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab } from '@/logic'
+import { localConfig, globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab, gaProxy } from '@/logic'
 import { getBaiduSugrec } from '@/api'
 
 const CNAME = 'search'
@@ -31,6 +31,7 @@ const onSearch = () => {
   state.isSuggestVisible = false
   createTab(url)
   state.searchValue = ''
+  gaProxy('click', ['search', 'onSearch'])
 }
 
 const handleSelectSuggest = (key: string) => {

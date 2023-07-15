@@ -1,6 +1,7 @@
 // !!background Cannot use import statement outside a module
 // import browser from 'webextension-polyfill'
 import { log, createTab, padUrlHttps } from '@/logic/util'
+import { gaProxy } from '@/logic/gtag'
 
 const ALL_COMMAND_KEYCODE = [
   'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0',
@@ -56,13 +57,22 @@ chrome.runtime.onInstalled.addListener(() => {
   log('NaiveTab installed')
 })
 
+chrome.commands.onCommand.addListener((command) => {
+  log(`onCommand: ${command}`)
+  handleKeyboard(command)
+  gaProxy('press', ['service', 'command'], {
+    command,
+  })
+})
+
+addEventListener('unhandledrejection', async (event) => {
+  gaProxy('error', ['unhandledrejection'], {
+    event: JSON.stringify(event),
+  })
+})
+
 // chrome.runtime.onMessage.addListener((message) => {
 //   log('onMessage', message)
 //   const { name } = message
 //   if (name === 'keyboard') {}
 // })
-
-chrome.commands.onCommand.addListener((command) => {
-  log(`onCommand: ${command}`)
-  handleKeyboard(command)
-})

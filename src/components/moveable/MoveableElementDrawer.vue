@@ -10,6 +10,7 @@ import {
   getStyleField,
   moveState,
   localConfig,
+  gaProxy,
 } from '@/logic'
 
 const state = reactive({
@@ -121,6 +122,12 @@ const handleElementMouseUp = (e: MouseEvent) => {
   }
   const isEnabled = !state.isCursorInElementDrawer
   localConfig[moveState.currDragTarget.name].enabled = isEnabled
+  if (!isEnabled) {
+    return
+  }
+  gaProxy('move', ['element', moveState.currDragTarget.name], {
+    enabled: true,
+  })
 }
 
 const initElementMouseTask = () => {
@@ -135,6 +142,9 @@ onMounted(() => {
 
 const onDeleteComponent = () => {
   localConfig[moveState.currDragTarget.name].enabled = false
+  gaProxy('move', ['element', moveState.currDragTarget.name], {
+    enabled: false,
+  })
 }
 
 const handlerDeleteMouseEnter = () => {

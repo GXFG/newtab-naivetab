@@ -10,6 +10,7 @@ import {
   getStyleField,
   updateNews,
   onRetryNews,
+  gaProxy,
 } from '@/logic'
 
 const CNAME = 'news'
@@ -24,6 +25,7 @@ const selectNewsSourceList = computed(() =>
 
 const handleChangeCurrTab = (value: NewsSources) => {
   globalState.currNewsTabValue = value
+  gaProxy('click', ['news', 'changeTab'])
 }
 
 const onOpenPage = (url: string) => {
@@ -31,6 +33,7 @@ const onOpenPage = (url: string) => {
     return
   }
   createTab(url)
+  gaProxy('click', ['news', 'openPage'])
 }
 
 const onMouseDownKey = (e: MouseEvent, url: string) => {

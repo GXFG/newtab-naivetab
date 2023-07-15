@@ -12,7 +12,9 @@ export const log = (msg: string, ...args: unknown[]) => {
 
 export const sleep = (time: number) => {
   return new Promise((resolve) => {
-    setTimeout(() => { resolve(null) }, time)
+    setTimeout(() => {
+      resolve(null)
+    }, time)
   })
 }
 

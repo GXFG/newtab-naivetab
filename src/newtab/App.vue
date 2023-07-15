@@ -17,6 +17,7 @@ import {
   loadRemoteConfig,
   handleFirstOpen,
   handleAppUpdate,
+  gaProxy,
 } from '@/logic'
 import Content from '@/newtab/Content.vue'
 
@@ -31,6 +32,9 @@ onMounted(async () => {
   await nextTick()
   handleFirstOpen()
   handleAppUpdate()
+  gaProxy('view', ['newtab'], {
+    userAgent: navigator.userAgent,
+  })
 })
 
 onUnmounted(() => {

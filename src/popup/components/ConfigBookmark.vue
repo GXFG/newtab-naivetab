@@ -13,6 +13,7 @@ import {
   getDefaultBookmarkNameFromUrl,
   getFaviconFromUrl,
   getBookmarkConfigUrl,
+  gaProxy,
 } from '@/logic'
 
 const state = reactive({
@@ -36,6 +37,9 @@ const setCurrentTabUrl = () => {
 onMounted(() => {
   setCurrentTabUrl()
   getAllCommandsConfig()
+  gaProxy('view', ['popup'], {
+    userAgent: navigator.userAgent,
+  })
 })
 
 const loadCurrKeyConfig = () => {

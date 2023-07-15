@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
-import { isDragMode, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { isDragMode, localConfig, getIsComponentRender, getLayoutStyle, getStyleField, gaProxy } from '@/logic'
 
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
@@ -172,6 +172,7 @@ const onPrevMonth = () => {
     state.currMonth -= 1
   }
   onRender()
+  gaProxy('click', ['calendar', 'prevMonth'])
 }
 
 const onNextMonth = () => {
@@ -182,9 +183,11 @@ const onNextMonth = () => {
     state.currMonth += 1
   }
   onRender()
+  gaProxy('click', ['calendar', 'nextMonth'])
 }
 
-const onDateChange = () => {
+const onDateChange = (type: 'year' | 'month') => {
+  gaProxy('click', ['calendar', 'dateChange', type])
   onRender()
 }
 
@@ -195,6 +198,7 @@ const onReset = () => {
   state.currMonth = dayjs().get('month') + 1
   state.currDay = dayjs().get('date')
   onRender()
+  gaProxy('click', ['calendar', 'resetToady'])
 }
 
 const detailInfo = reactive({
@@ -232,6 +236,7 @@ const onToggleDetailPopover = (date?: string) => {
   detailInfo.xiongsha = lunarEle.getDayXiongSha().join(' ')
 
   state.currDetailDate = date
+  gaProxy('click', ['calendar', 'detail'])
 }
 
 const dragStyle = ref('')
@@ -276,7 +281,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
               size="small"
               :options="state.yearList"
               :disabled="isDragMode"
-              @update:value="onDateChange()"
+              @update:value="onDateChange('year')"
             />
           </div>
           <div class="options__item">
@@ -289,7 +294,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
               size="small"
               :options="monthsList"
               :disabled="isDragMode"
-              @update:value="onDateChange()"
+              @update:value="onDateChange('month')"
             />
             <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onNextMonth()">
               <fa-solid:angle-right class="btn__icon" />
