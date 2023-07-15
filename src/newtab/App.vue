@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
+import pkg from '../../package.json'
 import {
   getStyleField,
   localConfig,
@@ -34,6 +35,7 @@ onMounted(async () => {
   handleAppUpdate()
   gaProxy('view', ['newtab'], {
     userAgent: navigator.userAgent,
+    version: pkg.version,
   })
 })
 
