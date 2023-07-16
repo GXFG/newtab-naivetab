@@ -22,6 +22,16 @@ import {
 } from '@/logic'
 import Content from '@/newtab/Content.vue'
 
+const onDot = () => {
+  const [brand] = navigator.userAgentData?.brands.slice(-1) || []
+  gaProxy('view', ['newtab'], {
+    version: pkg.version,
+    userAgent: navigator.userAgent,
+    platform: navigator.userAgentData?.platform,
+    browser: `${brand.brand}_${brand.version}`,
+  })
+}
+
 onMounted(async () => {
   initBackgroundImage()
   setEdgeFavicon()
@@ -33,10 +43,7 @@ onMounted(async () => {
   await nextTick()
   handleFirstOpen()
   handleAppUpdate()
-  gaProxy('view', ['newtab'], {
-    userAgent: navigator.userAgent,
-    version: pkg.version,
-  })
+  onDot()
 })
 
 onUnmounted(() => {
