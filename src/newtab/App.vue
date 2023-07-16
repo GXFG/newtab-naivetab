@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
+import pkg from '../../package.json'
 import {
   getStyleField,
   localConfig,
@@ -17,8 +18,19 @@ import {
   loadRemoteConfig,
   handleFirstOpen,
   handleAppUpdate,
+  gaProxy,
 } from '@/logic'
 import Content from '@/newtab/Content.vue'
+
+const onDot = () => {
+  const [brand] = navigator.userAgentData?.brands.slice(-1) || []
+  gaProxy('view', ['newtab'], {
+    version: pkg.version,
+    userAgent: navigator.userAgent,
+    platform: navigator.userAgentData?.platform,
+    browser: `${brand.brand}_${brand.version}`,
+  })
+}
 
 onMounted(async () => {
   initBackgroundImage()
@@ -31,6 +43,7 @@ onMounted(async () => {
   await nextTick()
   handleFirstOpen()
   handleAppUpdate()
+  onDot()
 })
 
 onUnmounted(() => {

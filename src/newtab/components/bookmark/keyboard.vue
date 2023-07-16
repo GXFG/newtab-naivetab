@@ -15,6 +15,7 @@ import {
   getBookmarkConfigName,
   getBookmarkConfigUrl,
   keyboardCurrentModelAllKeyList,
+  gaProxy,
 } from '@/logic'
 
 const CNAME = 'bookmark'
@@ -47,6 +48,7 @@ const openPage = (url: string, isBgOpen = false, isNewTabOpen = false) => {
   if (url.length === 0) {
     return
   }
+  gaProxy('click', ['bookmark', 'openPage'])
   if (isBgOpen) {
     // 后台打开
     createTab(url, false)

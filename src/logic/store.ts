@@ -726,7 +726,7 @@ export const handleAppUpdate = async () => {
   // 更新local版本号
   localConfig.general.version = pkg.version
   window.$notification.success({
-    duration: 8000,
+    duration: 5000,
     title: `${window.$t('common.update')}${window.$t('common.success')}`,
     content: `${window.$t('common.version')} ${pkg.version}`,
     action: () =>

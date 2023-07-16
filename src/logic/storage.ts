@@ -1,3 +1,4 @@
+/* eslint-disable max-statements-per-line */
 import { useDebounceFn } from '@vueuse/core'
 import md5 from 'crypto-js/md5'
 import pkg from '../../package.json'
