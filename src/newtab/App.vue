@@ -8,7 +8,6 @@ import {
   currTheme,
   themeOverrides,
   initBackgroundImage,
-  setEdgeFavicon,
   startKeydown,
   startTimer,
   stopTimer,
@@ -34,7 +33,6 @@ const onDot = () => {
 
 onMounted(async () => {
   initBackgroundImage()
-  setEdgeFavicon()
   handleStateResetAndUpdate()
   startTimer()
   startKeydown()

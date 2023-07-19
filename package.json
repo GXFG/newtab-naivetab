@@ -2,7 +2,7 @@
   "name": "newtab-naivetab",
   "displayName": "NaiveTab - Newtab page",
   "type": "module",
-  "version": "1.15.1",
+  "version": "1.15.2",
   "private": true,
   "packageManager": "pnpm@8.0.0",
   "description": "一款简洁高效的浏览器新标签页扩展，可以高度自定义你的新标签页",

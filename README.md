@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/20944987/147905855-2a1eaebf-d7af-45d1-9aa2-2f96806d79c9.png" width="64" height="64" />
+  <img src="./assets/img/icon/icon.png" width="64" height="64" />
   <h1 align="center">NaiveTab</h1>
   <p align="center">一款简洁高效的浏览器新标签页扩展，可以高度自定义你的新标签页</p>
   <p align="center">中文 | <a href="https://github.com/GXFG/newtab-naivetab/blob/main/README.en-US.md">English</a></p>
