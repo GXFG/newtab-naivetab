@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/20944987/147905855-2a1eaebf-d7af-45d1-9aa2-2f96806d79c9.png" width="64" height="64" />
+  <img src="./assets/img/icon/icon.png" width="64" height="64" />
   <h1 align="center">NaiveTab</h1>
   <p align="center">A simple and efficient browser new tab extension that can highly customize your new tab page</p>
   <p align="center">English | <a href="https://github.com/GXFG/newtab-naivetab/blob/main/README.md">中文</a></p>
