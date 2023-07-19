@@ -41,7 +41,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.36.0",
     "@ffflorian/jszip-cli": "^3.4.1",
-    "@iconify/json": "^2.2.91",
+    "@iconify/json": "^2.2.92",
     "@iconify/vue": "^3.2.1",
     "@playwright/test": "^1.36.1",
     "@types/chrome": "^0.0.235",
