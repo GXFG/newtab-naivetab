@@ -403,8 +403,8 @@ export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   Delete: { label: isMacOS ? 'del' : 'Del', textAlign: 'center', size: 1 },
   Home: { label: isMacOS ? 'home' : 'Home', textAlign: 'center', size: 1 },
   End: { label: isMacOS ? 'end' : 'End', textAlign: 'center', size: 1 },
-  PageUp: { label: isMacOS ? 'pg up' : 'PgUp', textAlign: 'center', size: 1 },
-  PageDown: { label: isMacOS ? 'pg dn' : 'PgDn', textAlign: 'center', size: 1 },
+  PageUp: { label: isMacOS ? 'pgup' : 'PgUp', textAlign: 'center', size: 1 },
+  PageDown: { label: isMacOS ? 'pgdn' : 'PgDn', textAlign: 'center', size: 1 },
   // Navigation
   ArrowUp: { label: '↑', textAlign: 'center', size: 1 },
   ArrowDown: { label: '↓', textAlign: 'center', size: 1 },

@@ -183,7 +183,7 @@ export const defaultConfig = {
     keycapType: 'gmk',
     keycapPadding: 1.5,
     keycapSize: 60,
-    keycapKeyFontFamily: 'Arial Rounded MT Bold',
+    keycapKeyFontFamily: 'OpenCherry',
     keycapKeyFontSize: 12,
     keycapBookmarkFontFamily: 'Arial',
     keycapBookmarkFontSize: 12,
