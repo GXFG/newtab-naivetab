@@ -41,10 +41,10 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
           <NInput
             v-model:value="localConfig.memo.content"
             class="memo__input"
+            :class="{ 'memo__input--move': isDragMode }"
             type="textarea"
             placeholder=" "
             autosize
-            :disabled="isDragMode"
             :style="isDragMode ? 'cursor: move;' : ''"
             :show-count="localConfig.memo.countEnabled"
             @focus="onFocus"
@@ -83,6 +83,12 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         .n-input__textarea-el {
           caret-color: v-bind(customFontColor);
           color: v-bind(customFontColor);
+        }
+      }
+      .memo__input--move {
+        cursor: move !important;
+        .n-input__textarea-el {
+          cursor: move !important;
         }
       }
     }

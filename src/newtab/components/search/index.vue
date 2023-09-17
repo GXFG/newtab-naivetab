@@ -27,9 +27,10 @@ const onSearch = () => {
   if (state.searchValue.length === 0) {
     return
   }
-  const url = localConfig.search.urlValue.replace('{query}', state.searchValue)
+  const encodeText = encodeURIComponent(state.searchValue)
+  const searchUrl = localConfig.search.urlValue.replace('{query}', encodeText)
   state.isSuggestVisible = false
-  createTab(url)
+  createTab(searchUrl)
   state.searchValue = ''
   gaProxy('click', ['search', 'onSearch'])
 }
@@ -66,7 +67,7 @@ const handleSearchKeydown = (e: KeyboardEvent) => {
   if (isComposing) {
     return
   }
-  if (code === 'Enter') {
+  if (['Enter', 'NumpadEnter'].includes(code)) {
     onSearch()
     return
   }
@@ -198,7 +199,6 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               :class="{ 'input__main--move': isDragMode }"
               :placeholder="localConfig.search.placeholder || localConfig.search.urlName"
               :loading="state.isSuggestLoading"
-              :disabled="isDragMode"
               clearable
               @focus="handleSearchFocus"
               @blur="handleSearchBlur"
@@ -258,6 +258,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     }
     .input__main--move {
       cursor: move !important;
+      .n-input__input-el {
+        cursor: move !important;
+      }
     }
     .input__search {
       width: 50px;
