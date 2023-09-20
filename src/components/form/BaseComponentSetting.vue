@@ -69,7 +69,7 @@ const isRenderField = (field: string) => {
     </NFormItem>
     <NFormItem v-if="isRenderField('fontFamily')" :label="$t('common.font')">
       <NSelect v-model:value="localConfig[props.cname].fontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
-      <NInputNumber v-model:value="localConfig[props.cname].fontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="100" />
+      <NInputNumber v-model:value="localConfig[props.cname].fontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="200" />
     </NFormItem>
     <NFormItem v-if="isRenderField('letterSpacing')" :label="$t('common.letterSpacing')">
       <NSlider v-model:value="localConfig[props.cname].letterSpacing" :step="0.1" :min="0" :max="50" />
