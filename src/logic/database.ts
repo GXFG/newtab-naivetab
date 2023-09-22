@@ -1,4 +1,4 @@
-import { log } from '@/logic'
+import { log } from '@/logic/util'
 
 const DB_NAME = 'NaiveTabDatabase'
 const DB_VERSION = 2
@@ -51,7 +51,8 @@ export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHand
     let request: any = null
     if (type === 'add') {
       request = store.add(payload)
-    } else if (type === 'put') { // 更新，第一次使用add，后续修改使用put
+    } else if (type === 'put') {
+      // 更新，第一次使用add，后续修改使用put
       request = store.put(payload)
     } else if (type === 'get') {
       request = store.get(payload)

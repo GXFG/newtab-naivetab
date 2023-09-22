@@ -1,4 +1,4 @@
-import { globalState, switchSettingDrawerVisible } from '@/logic'
+import { globalState, switchSettingDrawerVisible } from '@/logic/store'
 
 const keydownTaskMap = new Map()
 
@@ -12,6 +12,9 @@ export const removeKeydownTask = (key: string) => {
 
 export const startKeydown = () => {
   document.onkeydown = (e: KeyboardEvent) => {
+    if (globalState.isGuideMode) {
+      return
+    }
     // 在'搜索框'、'备忘录'、'设置抽屉'内时忽略按键事件
     if (globalState.isSettingDrawerVisible || globalState.isSearchFocused || globalState.isMemoFocused) {
       if (e.key === 'Escape') {

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { createTab } from '@/logic/util'
+import { URL_GITHUB, URL_NAIVETAB_DOC_HOME } from '@/logic/const'
+import { getStyleConst, localConfig, globalState } from '@/logic/store'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting/index.vue'
 import ClockSetting from './components/ClockSetting/index.vue'
@@ -9,7 +12,6 @@ import SearchSetting from './components/SearchSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
 import WeatherSetting from './components/WeatherSetting.vue'
 import NewsSetting from './components/NewsSetting.vue'
-import { URL_GITHUB, URL_NAIVETAB_DOC_HOME, getStyleConst, localConfig, globalState, createTab } from '@/logic'
 
 const tabPaneList = computed(() => [
   {
@@ -97,27 +99,53 @@ const bgBottomBar = getStyleConst('bgBottomBar')
     >
       <NDrawerContent>
         <div class="drawer__content">
-          <NTabs type="line" :value="globalState.currSettingTabValue" @update:value="onTabsChange">
-            <NTabPane v-for="item of tabPaneList" :key="item.name" :name="item.name" :tab="item.label">
+          <NTabs
+            type="line"
+            :value="globalState.currSettingTabValue"
+            @update:value="onTabsChange"
+          >
+            <NTabPane
+              v-for="item of tabPaneList"
+              :key="item.name"
+              :name="item.name"
+              :tab="item.label"
+            >
               <component :is="item.component" />
             </NTabPane>
           </NTabs>
         </div>
         <!-- bottom -->
-        <div class="drawer__bottom" :style="`background-color: ${bgBottomBar};`">
+        <div
+          class="drawer__bottom"
+          :style="`background-color: ${bgBottomBar};`"
+        >
           <div class="bottom__left">
-            <NButton class="left__item" size="small" title="Preview" @mouseenter="handlerPreviewEnter" @mouseleave="handlerPreviewLeave">
+            <NButton
+              class="left__item"
+              size="small"
+              title="Preview"
+              @mouseenter="handlerPreviewEnter"
+              @mouseleave="handlerPreviewLeave"
+            >
               <mdi:eye-circle-outline />&nbsp;{{ $t('common.preview') }}
             </NButton>
           </div>
-          <p class="bottom__version">
-            Ver.{{ `${pkg.version}` }}
-          </p>
+          <p class="bottom__version">Ver.{{ `${pkg.version}` }}</p>
           <div class="bottom__right">
-            <NButton text class="right__icon" title="Guide" @click="createTab(URL_NAIVETAB_DOC_HOME)">
+            <NButton
+              text
+              class="right__icon"
+              title="Guide"
+              @click="createTab(URL_NAIVETAB_DOC_HOME)"
+            >
               <tabler:book />
             </NButton>
-            <NButton text class="right__icon" title="GitHub" @click="createTab(URL_GITHUB)">
+            <NButton
+              text
+              class="right__icon"
+              title="GitHub"
+              @click="createTab(URL_GITHUB)"
+            >
               <carbon:logo-github />
             </NButton>
           </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { globalState } from '@/logic/store'
 import Currentlog from '../../../CHANGELOG.md'
-import { globalState } from '@/logic'
 
 const onCloseModal = () => {
   globalState.isWhatsNewModalVisible = false
@@ -8,13 +8,26 @@ const onCloseModal = () => {
 </script>
 
 <template>
-  <NModal :show="globalState.isWhatsNewModalVisible" :mask-closable="false">
-    <NCard class="card__wrap" :title="`✨${$t('common.whatsNew')}✨`">
+  <NModal
+    :show="globalState.isWhatsNewModalVisible"
+    :mask-closable="false"
+  >
+    <NCard
+      class="card__wrap"
+      :title="`✨${$t('common.whatsNew')}✨`"
+    >
       <div class="modal__content">
         <Currentlog />
       </div>
       <div class="card__footer">
-        <NButton class="footer__btn" type="primary" ghost size="small" :loading="globalState.isClearStorageLoading" @click="onCloseModal()">
+        <NButton
+          class="footer__btn"
+          type="primary"
+          ghost
+          size="small"
+          :loading="globalState.isClearStorageLoading"
+          @click="onCloseModal()"
+        >
           <template #icon>
             <div class="icon__wrap">
               <ri:close-circle-line />

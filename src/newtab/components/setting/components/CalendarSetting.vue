@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { swatcheColors } from '@/styles/const'
-import { localConfig, localState } from '@/logic'
+import { localConfig, localState } from '@/logic/store'
 
 const beginsList = computed(() => [
   { label: window.$t('calendar.monday'), value: 1 },
@@ -12,13 +12,25 @@ const beginsList = computed(() => [
   <BaseComponentSetting cname="calendar">
     <template #header>
       <NFormItem :label="$t('calendar.weekBeginsOn')">
-        <NSelect v-model:value="localConfig.calendar.weekBeginsOn" :options="beginsList" />
+        <NRadioGroup v-model:value="localConfig.calendar.weekBeginsOn">
+          <NRadioButton
+            v-for="item in beginsList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </NRadioButton>
+        </NRadioGroup>
       </NFormItem>
     </template>
 
     <template #color>
       <NFormItem :label="`${$t('calendar.holiday')}${$t('common.fontColor')}`">
-        <NColorPicker v-model:value="localConfig.calendar.holidayFontColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
+        <NColorPicker
+          v-model:value="localConfig.calendar.holidayFontColor[localState.currAppearanceCode]"
+          show-preview
+          :swatches="swatcheColors"
+        />
       </NFormItem>
 
       <p class="setting__label">
@@ -32,7 +44,11 @@ const beginsList = computed(() => [
         />
       </NFormItem>
       <NFormItem :label="`${$t('common.label')}${$t('common.fontColor')}`">
-        <NColorPicker v-model:value="localConfig.calendar.restLabelFontColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
+        <NColorPicker
+          v-model:value="localConfig.calendar.restLabelFontColor[localState.currAppearanceCode]"
+          show-preview
+          :swatches="swatcheColors"
+        />
       </NFormItem>
       <NFormItem :label="`${$t('common.label')}${$t('common.backgroundColor')}`">
         <NColorPicker
@@ -53,7 +69,11 @@ const beginsList = computed(() => [
         />
       </NFormItem>
       <NFormItem :label="`${$t('common.label')}${$t('common.fontColor')}`">
-        <NColorPicker v-model:value="localConfig.calendar.workLabelFontColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
+        <NColorPicker
+          v-model:value="localConfig.calendar.workLabelFontColor[localState.currAppearanceCode]"
+          show-preview
+          :swatches="swatcheColors"
+        />
       </NFormItem>
       <NFormItem :label="`${$t('common.label')}${$t('common.backgroundColor')}`">
         <NColorPicker

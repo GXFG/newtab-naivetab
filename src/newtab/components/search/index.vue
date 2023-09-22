@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { localConfig, globalState, isDragMode, getIsComponentRender, getLayoutStyle, getStyleField, createTab, gaProxy } from '@/logic'
+import { gaProxy } from '@/logic/gtag'
+import { createTab } from '@/logic/util'
+import { isDragMode } from '@/logic/moveable'
+import { localConfig, globalState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 import { getBaiduSugrec } from '@/api'
 
 const CNAME = 'search'
@@ -117,7 +120,7 @@ const getBaiduSuggest = async () => {
   state.isSuggestLoading = false
   if (data && data.g && data.g.length !== 0) {
     state.suggestList = data.g
-      .map(item => ({
+      .map((item) => ({
         label: item.q,
         key: item.q,
         props: {
@@ -169,8 +172,16 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="search">
-    <div v-if="isRender" id="search" data-target-type="1" data-target-name="search">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="search"
+  >
+    <div
+      v-if="isRender"
+      id="search"
+      data-target-type="1"
+      data-target-name="search"
+    >
       <div
         class="search__container"
         :style="dragStyle || containerStyle"
@@ -234,8 +245,10 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     align-items: center;
     border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
-    .n-input__border {
+    .n-input__border,
+    .n-input__state-border {
       border: 0 !important;
+      box-shadow: none !important;
     }
     .n-input,
     .n-input--focus {
@@ -278,7 +291,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     border: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .search__container--shadow {
-    box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;
+    box-shadow:
+      v-bind(customShadowColor) 0px 2px 4px 0px,
+      v-bind(customShadowColor) 0px 2px 16px 0px;
   }
 }
 </style>

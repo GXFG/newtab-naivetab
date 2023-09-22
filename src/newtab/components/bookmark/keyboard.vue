@@ -1,22 +1,12 @@
 <script setup lang="ts">
-import {
-  TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP,
-  KEYBOARD_CODE_TO_DEFAULT_CONFIG,
-  KEYBOARD_NOT_ALLOW_KEYCODE_LIST,
-  currKeyboardConfig,
-  isDragMode,
-  localConfig,
-  getIsComponentRender,
-  getLayoutStyle,
-  getStyleField,
-  addKeydownTask,
-  createTab,
-  getFaviconFromUrl,
-  getBookmarkConfigName,
-  getBookmarkConfigUrl,
-  keyboardCurrentModelAllKeyList,
-  gaProxy,
-} from '@/logic'
+import { gaProxy } from '@/logic/gtag'
+import { createTab } from '@/logic/util'
+import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/const'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
+import { addKeydownTask } from '@/logic/task'
+import { isDragMode } from '@/logic/moveable'
+import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { getFaviconFromUrl, getBookmarkConfigName, getBookmarkConfigUrl } from '@/logic/bookmark'
 
 const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
@@ -179,7 +169,7 @@ const getCustomKeycapWidth = (code: string, addRatio = 0) => {
   if (customSize) {
     value = customSize
   }
-  value = value + addRatio
+  value += addRatio
   const width = getStyleField(CNAME, 'keycapSize', 'vmin', value)
   return width
 }
@@ -261,11 +251,34 @@ const getKeycapIconStyle = (code: string) => {
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="bookmark">
-    <div v-if="isRender" id="bookmark" data-target-type="1" data-target-name="bookmark">
-      <div class="bookmark__container" :style="dragStyle || containerStyle">
-        <div v-for="(rowItem, rowIndex) in currKeyboardConfig.list" :key="rowIndex" class="bookmark__row">
-          <div v-for="code in rowItem" :key="code" class="row__keycap-wrap" :style="getKeycapWrapStyle(code)">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="bookmark"
+  >
+    <div
+      v-if="isRender"
+      id="bookmark"
+      data-target-type="1"
+      data-target-name="bookmark"
+    >
+      <div
+        class="bookmark__container"
+        :style="dragStyle || containerStyle"
+        :class="{
+          'bookmark__container--hover': !isDragMode,
+        }"
+      >
+        <div
+          v-for="(rowItem, rowIndex) in currKeyboardConfig.list"
+          :key="rowIndex"
+          class="bookmark__row"
+        >
+          <div
+            v-for="code in rowItem"
+            :key="code"
+            class="row__keycap-wrap"
+            :style="getKeycapWrapStyle(code)"
+          >
             <div
               class="row__keycap"
               :class="{
@@ -291,27 +304,43 @@ const getKeycapIconStyle = (code: string) => {
                 }"
                 :style="getKeycapStageStyle(code)"
               >
-                <div v-if="state.currSelectKeyCode === code && state.isLoadPageLoading" class="item__loading">
+                <div
+                  v-if="state.currSelectKeyCode === code && state.isLoadPageLoading"
+                  class="item__loading"
+                >
                   <eos-icons:loading />
                 </div>
-                <p class="item__key" :style="getKeycapTextStyle(code)">
+                <p
+                  class="item__key"
+                  :style="getKeycapTextStyle(code)"
+                >
                   {{ getKeycapLabel(code) }}
                 </p>
-                <div class="item__img" :style="getKeycapIconStyle(code)">
+                <div
+                  class="item__img"
+                  :style="getKeycapIconStyle(code)"
+                >
                   <div class="img__wrap">
                     <img
                       v-if="getBookmarkConfigUrl(code)"
                       class="img__main"
                       :src="getFaviconFromUrl(getBookmarkConfigUrl(code))"
                       :draggable="false"
-                    >
+                    />
                   </div>
                 </div>
-                <p v-if="localConfig.bookmark.isNameVisible" class="item__name" :style="getKeycapTextStyle(code)">
+                <p
+                  v-if="localConfig.bookmark.isNameVisible"
+                  class="item__name"
+                  :style="getKeycapTextStyle(code)"
+                >
                   {{ getBookmarkConfigName(code) }}
                 </p>
                 <!-- 按键定位标志F & J -->
-                <div v-if="['KeyF', 'KeyJ'].includes(code)" class="item__cursor" />
+                <div
+                  v-if="['KeyF', 'KeyJ'].includes(code)"
+                  class="item__cursor"
+                />
               </div>
             </div>
           </div>
@@ -418,13 +447,7 @@ const getKeycapIconStyle = (code: string) => {
             border-top-right-radius: 4px;
             border-bottom-right-radius: 8px 4px;
             border-bottom-left-radius: 8px 4px;
-            background: linear-gradient(
-              to right,
-              rgba(255, 255, 255, 0.15) 0%,
-              rgba(0, 0, 0, 0.12) 2%,
-              rgba(255, 255, 255, 0.1) 90%,
-              rgba(255, 255, 255, 0.1) 100%
-            );
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.15) 0%, rgba(0, 0, 0, 0.12) 2%, rgba(255, 255, 255, 0.1) 90%, rgba(255, 255, 255, 0.1) 100%);
             box-shadow: 0 0 10px rgb(0 0 0 / 20%);
             background-color: inherit;
             color: inherit;
@@ -433,14 +456,7 @@ const getKeycapIconStyle = (code: string) => {
             border-width: 0px;
             border-color: rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            background: linear-gradient(
-              135deg,
-              rgba(255, 255, 255, 0.15) 0%,
-              rgba(0, 0, 0, 0.2) 3%,
-              rgba(0, 0, 0, 0.2) 10%,
-              rgba(255, 255, 255, 0.1) 80%,
-              rgba(255, 255, 255, 0.1) 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(0, 0, 0, 0.2) 3%, rgba(0, 0, 0, 0.2) 10%, rgba(255, 255, 255, 0.1) 80%, rgba(255, 255, 255, 0.1) 100%);
             background-color: inherit;
             color: inherit;
           }
@@ -450,8 +466,7 @@ const getKeycapIconStyle = (code: string) => {
           border-color: black; */
         }
         .row__keycap-gmk {
-          border-width: v-bind(customKeycapkeycapGmkTopBorderWidth) v-bind(customKeycapkeycapGmkHorizontalBorderWidth)
-            v-bind(customKeycapkeycapGmkBottomBorderWidth);
+          border-width: v-bind(customKeycapkeycapGmkTopBorderWidth) v-bind(customKeycapkeycapGmkHorizontalBorderWidth) v-bind(customKeycapkeycapGmkBottomBorderWidth);
           border-color: rgba(0, 0, 0, 0.03) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.22) rgba(100, 100, 100, 0.1);
           box-shadow: 0 0 5px rgb(0 0 0 / 50%);
         }
@@ -474,6 +489,9 @@ const getKeycapIconStyle = (code: string) => {
         }
       }
     }
+  }
+  .bookmark__container--hover {
+    cursor: pointer;
   }
 }
 </style>

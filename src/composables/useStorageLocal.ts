@@ -20,8 +20,8 @@ export const useStorageLocal: <T>(key: string, defaultValue: T) => Ref<UnwrapRef
     (state) => {
       clearTimeout(timer)
       timer = setTimeout(() => {
-        const value = JSON.stringify(state.value)
-        localStorage.setItem(key, value)
+        const valueText = JSON.stringify(state.value)
+        localStorage.setItem(key, valueText)
         // console.log(`@set ${key}`, value)
       }, 800)
     },

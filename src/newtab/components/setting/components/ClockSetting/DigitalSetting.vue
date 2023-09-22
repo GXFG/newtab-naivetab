@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { URL_DAYJS_FORMAT, localConfig } from '@/logic'
+import { URL_DAYJS_FORMAT } from '@/logic/const'
+import { localConfig } from '@/logic/store'
 </script>
 
 <template>
@@ -7,7 +8,10 @@ import { URL_DAYJS_FORMAT, localConfig } from '@/logic'
     <template #header>
       <NFormItem :label="$t('common.format')">
         <NInput v-model:value="localConfig.clockDigital.format" />
-        <Tips link :content="URL_DAYJS_FORMAT" />
+        <Tips
+          link
+          :content="URL_DAYJS_FORMAT"
+        />
       </NFormItem>
       <NFormItem :label="$t('clock.apMark')">
         <NSwitch v-model:value="localConfig.clockDigital.unitEnabled" />

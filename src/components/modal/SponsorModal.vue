@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { globalState } from '@/logic'
+import { globalState } from '@/logic/store'
 
 const paymentList = ['alipay', 'wechat']
 
@@ -9,15 +9,29 @@ const onCloseModal = () => {
 </script>
 
 <template>
-  <NModal :show="globalState.isSponsorModalVisible" :mask-closable="false">
-    <NCard class="card__wrap" :title="`${$t('sponsor.title')} ☕️`">
+  <NModal
+    :show="globalState.isSponsorModalVisible"
+    :mask-closable="false"
+  >
+    <NCard
+      class="card__wrap"
+      :title="`${$t('sponsor.title')} ☕️`"
+    >
       <p class="modal__content">
         {{ $t('sponsor.content') }}
       </p>
       <div class="modal__code">
-        <div v-for="payment in paymentList" :key="payment" class="code__item">
+        <div
+          v-for="payment in paymentList"
+          :key="payment"
+          class="code__item"
+        >
           <div class="item__img">
-            <img class="img__main" :src="`/assets/img/sponsor/${payment}.png`" alt="">
+            <img
+              class="img__main"
+              :src="`/assets/img/sponsor/${payment}.png`"
+              alt=""
+            />
           </div>
           <p class="item__title">
             {{ $t(`sponsor.${payment}`) }}
@@ -25,7 +39,13 @@ const onCloseModal = () => {
         </div>
       </div>
       <div class="card__footer">
-        <NButton class="footer__btn" type="primary" ghost size="small" @click="onCloseModal()">
+        <NButton
+          class="footer__btn"
+          type="primary"
+          ghost
+          size="small"
+          @click="onCloseModal()"
+        >
           <template #icon>
             <div class="icon__wrap">
               <fa6-regular:face-sad-cry />

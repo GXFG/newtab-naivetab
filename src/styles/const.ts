@@ -14,7 +14,7 @@ export const styleConst = ref({
   bgMoveableComponentDelete: ['rgba(250,82,82, 1)', ''],
   moveableToolDeleteBtnColor: ['#ffa39e', ''],
   borderMoveableToolItem: ['#95a5a6', ''],
-  bgMoveableToolDrawer: ['rgba(0, 0, 0, 0.6)', ''],
+  bgMoveableToolDrawer: ['rgba(32, 32, 32, 0.7)', ''],
   // popup
   popupKeyboardBorder: ['rgb(224, 224, 230)', 'rgba(73, 73, 77, 1)'],
   popupKeyboardHoverBg: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],

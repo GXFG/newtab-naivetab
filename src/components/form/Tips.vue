@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createTab } from '@/logic'
+import { createTab } from '@/logic/util'
 
 const props = defineProps({
   content: {
@@ -23,10 +23,15 @@ const onClick = () => {
 <template>
   <NPopover trigger="hover">
     <template #trigger>
-      <NButton text class="tips__btn" @click="onClick()">
+      <NButton
+        text
+        class="tips__btn"
+        @click="onClick()"
+      >
         <ph:question-bold class="btn__icon" />
       </NButton>
     </template>
+
     <p class="tips-content">
       {{ `${link ? `${$t('prompts.linkTips')}\n ` : ''}${props.content}` }}
     </p>

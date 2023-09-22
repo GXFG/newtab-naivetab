@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { isDragMode, globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { isDragMode } from '@/logic/moveable'
+import { globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 
 const CNAME = 'memo'
 const isRender = getIsComponentRender(CNAME)
@@ -27,8 +28,16 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="memo">
-    <div v-if="isRender" id="memo" data-target-type="1" data-target-name="memo">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="memo"
+  >
+    <div
+      v-if="isRender"
+      id="memo"
+      data-target-type="1"
+      data-target-name="memo"
+    >
       <div
         class="memo__container"
         :style="dragStyle || containerStyle"
@@ -84,6 +93,15 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
           caret-color: v-bind(customFontColor);
           color: v-bind(customFontColor);
         }
+        .n-input__border,
+        .n-input__state-border {
+          border: 0 !important;
+          box-shadow: none !important;
+        }
+        .n-input-word-count {
+          color: v-bind(customFontColor) !important;
+          opacity: 0.7;
+        }
       }
       .memo__input--move {
         cursor: move !important;
@@ -97,7 +115,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     border: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .memo__container--shadow {
-    box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;
+    box-shadow:
+      v-bind(customShadowColor) 0px 2px 4px 0px,
+      v-bind(customShadowColor) 0px 2px 16px 0px;
   }
   /* fix left space */
   .n-input__textarea-el {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { globalState, localConfig } from '@/logic'
+import { globalState, localConfig } from '@/logic/store'
 
 const newsSourceList = computed(() => [
   { label: window.$t('news.toutiao'), value: 'toutiao' },
@@ -17,12 +17,15 @@ const handleUpdateValue = () => {
 </script>
 
 <template>
-  <BaseComponentSetting cname="news" :widthRange="[200, 1000]" :heightRange="[50, 1000]">
+  <BaseComponentSetting
+    cname="news"
+    :width-range="[200, 1000]"
+    :height-range="[50, 1000]"
+  >
     <template #header>
       <NFormItem :label="$t('news.source')">
         <NSelect
           v-model:value="localConfig.news.sourceList"
-          placeholder=" "
           :options="newsSourceList"
           max-tag-count="responsive"
           multiple
@@ -31,10 +34,14 @@ const handleUpdateValue = () => {
         />
       </NFormItem>
       <NFormItem :label="$t('news.refreshInterval')">
-        <NInputNumber v-model:value="localConfig.news.refreshIntervalTime" class="setting__input-number--unit" :step="1" :min="30" :max="1000">
-          <template #suffix>
-            min
-          </template>
+        <NInputNumber
+          v-model:value="localConfig.news.refreshIntervalTime"
+          class="setting__input-number--unit"
+          :step="1"
+          :min="30"
+          :max="1000"
+        >
+          <template #suffix> min </template>
         </NInputNumber>
       </NFormItem>
     </template>

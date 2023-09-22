@@ -1,25 +1,15 @@
 <script setup lang="ts">
 import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
-import pkg from '../../package.json'
-import {
-  getStyleField,
-  localConfig,
-  nativeUILang,
-  currTheme,
-  themeOverrides,
-  initBackgroundImage,
-  startKeydown,
-  startTimer,
-  stopTimer,
-  onPageFocus,
-  handleStateResetAndUpdate,
-  handleMissedUploadConfig,
-  loadRemoteConfig,
-  handleFirstOpen,
-  handleAppUpdate,
-  gaProxy,
-} from '@/logic'
+import { gaProxy } from '@/logic/gtag'
+import { startKeydown, startTimer, stopTimer, onPageFocus } from '@/logic/task'
+import { handleWatchLocalConfigChange, handleMissedUploadConfig, loadRemoteConfig } from '@/logic/storage'
+import { handleFirstOpen } from '@/logic/guide'
+import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, handleStateResetAndUpdate, handleAppUpdate } from '@/logic/store'
+import { initBackgroundImage } from '@/logic/image'
+import { handleWatchNewsConfigChange } from '@/logic/news'
+import { handleWatchWeatherConfigChange } from '@/logic/weather'
 import Content from '@/newtab/Content.vue'
+import pkg from '../../package.json'
 
 const onDot = () => {
   const [brand] = navigator.userAgentData?.brands.slice(-1) || []
@@ -36,11 +26,14 @@ onMounted(async () => {
   handleStateResetAndUpdate()
   startTimer()
   startKeydown()
+  handleWatchLocalConfigChange()
   await handleMissedUploadConfig()
   await loadRemoteConfig()
   await nextTick()
   handleFirstOpen()
   handleAppUpdate()
+  handleWatchNewsConfigChange()
+  handleWatchWeatherConfigChange()
   onDot()
 })
 
@@ -65,7 +58,11 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
       <NNotificationProvider>
         <NMessageProvider>
           <NLoadingBarProvider>
-            <div tabindex="100" @focus="onPageFocus">
+            <div
+              id="container__main"
+              tabindex="100"
+              @focus="onPageFocus"
+            >
               <Content />
             </div>
           </NLoadingBarProvider>

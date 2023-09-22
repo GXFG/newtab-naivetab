@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
-import { SECOND_MODAL_WIDTH, URL_QWEATHER_START, localConfig } from '@/logic'
 import { getCityLookup } from '@/api'
+import { SECOND_MODAL_WIDTH, URL_QWEATHER_START } from '@/logic/const'
+import { localConfig } from '@/logic/store'
 
 const temperatureUnitOptions = [
   { label: '℃', value: 'c' },
@@ -50,9 +51,10 @@ const onChangeCity = (label: string) => {
   onSearch()
 }
 
-const onSelectCity = (value: string) => {
+const onSelectCity: any = (cityId: string) => {
+  console.log(cityId)
   localConfig.weather.city.name = state.keyword
-  localConfig.weather.city.id = value
+  localConfig.weather.city.id = cityId
 }
 
 const onOpenCityPicker = () => {
@@ -64,8 +66,14 @@ const onOpenCityPicker = () => {
 
 <template>
   <!-- CityPicker -->
-  <NDrawer v-model:show="state.isCityPickerVisible" :width="SECOND_MODAL_WIDTH">
-    <NDrawerContent :title="`${$t('common.edit')}${$t('weather.city')}`" closable>
+  <NDrawer
+    v-model:show="state.isCityPickerVisible"
+    :width="SECOND_MODAL_WIDTH"
+  >
+    <NDrawerContent
+      :title="`${$t('common.edit')}${$t('weather.city')}`"
+      closable
+    >
       <NAutoComplete
         v-model:value="state.keyword"
         :options="state.cityList"
@@ -76,17 +84,29 @@ const onOpenCityPicker = () => {
     </NDrawerContent>
   </NDrawer>
   <!-- main -->
-  <BaseComponentSetting id="weather__setting" cname="weather">
+  <BaseComponentSetting
+    id="weather__setting"
+    cname="weather"
+  >
     <template #header>
       <NFormItem :label="$t('weather.city')">
-        <NInput v-model:value="localConfig.weather.city.name" :disabled="true" />
-        <NButton class="setting__row-element" @click="onOpenCityPicker()">
+        <NInput
+          v-model:value="localConfig.weather.city.name"
+          :disabled="true"
+        />
+        <NButton
+          class="setting__row-element"
+          @click="onOpenCityPicker()"
+        >
           <tabler:edit class="item__icon" />
         </NButton>
       </NFormItem>
       <NFormItem label="API Key">
         <NInput v-model:value="localConfig.weather.apiKey" />
-        <Tips link :content="URL_QWEATHER_START" />
+        <Tips
+          link
+          :content="URL_QWEATHER_START"
+        />
       </NFormItem>
       <!-- <NFormItem :label="$t('weather.temperatureUnit')">
         <NSelect v-model:value="localConfig.weather.temperatureUnit" :options="temperatureUnitOptions" />
@@ -99,9 +119,24 @@ const onOpenCityPicker = () => {
           <div class="setting__input_item">
             <NSwitch v-model:value="localConfig.weather.iconEnabled" />
           </div>
-          <div v-if="localConfig.weather.iconEnabled" class="setting__input_item">
-            <NSlider v-model:value="localConfig.weather.iconSize" class="item__grow" :step="1" :min="30" :max="200" />
-            <NInputNumber v-model:value="localConfig.weather.iconSize" class="setting__item-element setting__input-number" :step="1" :min="30" :max="200" />
+          <div
+            v-if="localConfig.weather.iconEnabled"
+            class="setting__input_item"
+          >
+            <NSlider
+              v-model:value="localConfig.weather.iconSize"
+              class="item__grow"
+              :step="1"
+              :min="30"
+              :max="200"
+            />
+            <NInputNumber
+              v-model:value="localConfig.weather.iconSize"
+              class="setting__item-element setting__input-number"
+              :step="1"
+              :min="30"
+              :max="200"
+            />
           </div>
         </div>
       </NFormItem>

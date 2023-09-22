@@ -1,10 +1,10 @@
-/* eslint-disable max-statements-per-line */
-import { useDebounceFn } from '@vueuse/core'
 import md5 from 'crypto-js/md5'
+import { useDebounceFn } from '@vueuse/core'
+import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/const'
+import { defaultConfig } from '@/logic/config'
+import { compareLeftVersionLessThanRightVersions, log, downloadJsonByTagA, sleep } from '@/logic/util'
+import { localConfig, localState, globalState, switchSettingDrawerVisible } from '@/logic/store'
 import pkg from '../../package.json'
-import { log, downloadJsonByTagA, sleep } from './util'
-import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from './const'
-import { defaultConfig, localConfig, localState, globalState, switchSettingDrawerVisible, compareLeftVersionLessThanRightVersions } from '@/logic'
 
 export const getLocalVersion = () => {
   let version = localConfig.general.version
@@ -67,9 +67,13 @@ const uploadConfigFn = (field: ConfigField) => {
 }
 
 const genUploadConfigDebounceFn = (field: ConfigField) => {
-  return useDebounceFn(() => {
-    uploadConfigFn(field)
-  }, MERGE_CONFIG_DELAY, { maxWait: MERGE_CONFIG_MAX_DELAY })
+  return useDebounceFn(
+    () => {
+      uploadConfigFn(field)
+    },
+    MERGE_CONFIG_DELAY,
+    { maxWait: MERGE_CONFIG_MAX_DELAY },
+  )
 }
 
 const genWathUploadConfigFn = (field: ConfigField) => {
@@ -92,16 +96,78 @@ const uploadConfigWeather = genWathUploadConfigFn('weather')
 const uploadConfigMemo = genWathUploadConfigFn('memo')
 const uploadConfigNews = genWathUploadConfigFn('news')
 
-watch(() => localConfig.general, () => { uploadConfigGeneral() }, { deep: true })
-watch(() => localConfig.bookmark, () => { uploadConfigBookmark() }, { deep: true })
-watch(() => localConfig.clockDigital, () => { uploadConfigClockDigital() }, { deep: true })
-watch(() => localConfig.clockAnalog, () => { uploadConfigClockAnalog() }, { deep: true })
-watch(() => localConfig.date, () => { uploadConfigDate() }, { deep: true })
-watch(() => localConfig.calendar, () => { uploadConfigCalendar() }, { deep: true })
-watch(() => localConfig.search, () => { uploadConfigSearch() }, { deep: true })
-watch(() => localConfig.weather, () => { uploadConfigWeather() }, { deep: true })
-watch(() => localConfig.memo, () => { uploadConfigMemo() }, { deep: true })
-watch(() => localConfig.news, () => { uploadConfigNews() }, { deep: true })
+export const handleWatchLocalConfigChange = () => {
+  watch(
+    () => localConfig.general,
+    () => {
+      uploadConfigGeneral()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.bookmark,
+    () => {
+      uploadConfigBookmark()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.clockDigital,
+    () => {
+      uploadConfigClockDigital()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.clockAnalog,
+    () => {
+      uploadConfigClockAnalog()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.date,
+    () => {
+      uploadConfigDate()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.calendar,
+    () => {
+      uploadConfigCalendar()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.search,
+    () => {
+      uploadConfigSearch()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.weather,
+    () => {
+      uploadConfigWeather()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.memo,
+    () => {
+      uploadConfigMemo()
+    },
+    { deep: true },
+  )
+  watch(
+    () => localConfig.news,
+    () => {
+      uploadConfigNews()
+    },
+    { deep: true },
+  )
+}
 
 /**
  * 以 state 为模板与 acceptState 进行递归去重合并
@@ -126,7 +192,12 @@ const mergeState = (state: unknown, acceptState: unknown) => {
     return acceptState
   }
   // 特殊处理 bookmark.keymap 数据，直接返回acceptState
-  if (Object.prototype.hasOwnProperty.call(state, 'KeyQ') || Object.prototype.hasOwnProperty.call(state, 'KeyA') || Object.prototype.hasOwnProperty.call(state, 'KeyZ') || Object.prototype.hasOwnProperty.call(state, 'Digit1')) {
+  if (
+    Object.prototype.hasOwnProperty.call(state, 'KeyQ') ||
+    Object.prototype.hasOwnProperty.call(state, 'KeyA') ||
+    Object.prototype.hasOwnProperty.call(state, 'KeyZ') ||
+    Object.prototype.hasOwnProperty.call(state, 'Digit1')
+  ) {
     return acceptState
   }
   const filterState = {} as { [propName: string]: unknown }
@@ -172,7 +243,7 @@ export const handleMissedUploadConfig = async () => {
   for (const field of Object.keys(localState.value.isUploadConfigStatusMap) as ConfigField[]) {
     if (localState.value.isUploadConfigStatusMap[field].loading) {
       log('Handle Missed upload config', field)
-      await uploadConfigFn(field)
+      uploadConfigFn(field)
     }
   }
 }
@@ -295,8 +366,8 @@ export const importSetting = async (text: string) => {
       const newConfig = {} as any
       for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
         newConfig[configField] = {
-          ...fileContent.style[configField] || {},
-          ...fileContent.setting[configField] || {},
+          ...(fileContent.style[configField] || {}),
+          ...(fileContent.setting[configField] || {}),
         }
       }
       fileContent = newConfig

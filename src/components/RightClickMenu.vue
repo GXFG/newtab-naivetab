@@ -1,23 +1,12 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { isEdge } from '@/env'
-import {
-  URL_FEEDBACK,
-  URL_GITHUB_ISSUSE,
-  URL_CHROME_STORE,
-  URL_EDGE_STORE,
-  gaProxy,
-  isDragMode,
-  toggleIsDragMode,
-  toggleFullscreen,
-  switchSettingDrawerVisible,
-  getTargetDataFromEvent,
-  globalState,
-  createTab,
-  openUserGuideModal,
-  openWhatsNewModal,
-  openSponsorModal,
-} from '@/logic'
+import { gaProxy } from '@/logic/gtag'
+import { createTab } from '@/logic/util'
+import { URL_NAIVETAB_DOC_HOME, URL_FEEDBACK, URL_GITHUB_ISSUSE, URL_CHROME_STORE, URL_EDGE_STORE } from '@/logic/const'
+import { openUserGuide } from '@/logic/guide'
+import { isDragMode, toggleIsDragMode, getTargetDataFromEvent } from '@/logic/moveable'
+import { toggleFullscreen, switchSettingDrawerVisible, globalState, openWhatsNewModal, openSponsorModal } from '@/logic/store'
 
 const state = reactive({
   isMenuVisible: false,
@@ -30,9 +19,7 @@ const renderIconFunc = (icon: string) => () => h(Icon, { icon })
 
 const menuList = computed(() => [
   {
-    label:
-      (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`))
-      + window.$t('common.setting'),
+    label: (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
     key: 'setting',
     icon: renderIconFunc('ion:settings-outline'),
     disabled: isDragMode.value,
@@ -52,27 +39,35 @@ const menuList = computed(() => [
     key: 'd1',
   },
   {
+    label: window.$t('common.whatsNew'),
+    key: 'whatsNew',
+    icon: renderIconFunc('ic:outline-new-releases'),
+  },
+  {
     label: window.$t('common.help'),
-    key: 'help',
-    icon: renderIconFunc('ph:info-bold'),
+    key: 'other',
+    icon: renderIconFunc('ph:heart-bold'),
     children: [
+      {
+        label: window.$t('common.userDocs'),
+        key: 'userDocs',
+        icon: renderIconFunc('tabler:book'),
+      },
       {
         label: window.$t('common.userGuide'),
         key: 'userGuide',
         icon: renderIconFunc('ic:baseline-help-outline'),
       },
       {
-        label: window.$t('common.whatsNew'),
-        key: 'whatsNew',
-        icon: renderIconFunc('ic:outline-new-releases'),
+        label: window.$t('rightMenu.positiveFeedback'),
+        key: 'positiveFeedback',
+        icon: renderIconFunc('ph:thumbs-up-bold'),
       },
-    ],
-  },
-  {
-    label: window.$t('common.other'),
-    key: 'other',
-    icon: renderIconFunc('ph:heart-bold'),
-    children: [
+      {
+        label: window.$t('rightMenu.buyMeACoffee'),
+        key: 'buyMeACoffee',
+        icon: renderIconFunc('ep:coffee'),
+      },
       {
         label: window.$t('common.feedback'),
         key: 'feedback',
@@ -89,16 +84,6 @@ const menuList = computed(() => [
             icon: renderIconFunc('mdi:email-outline'),
           },
         ],
-      },
-      {
-        label: window.$t('rightMenu.positiveFeedback'),
-        key: 'positiveFeedback',
-        icon: renderIconFunc('ph:thumbs-up-bold'),
-      },
-      {
-        label: window.$t('rightMenu.buyMeACoffee'),
-        key: 'buyMeACoffee',
-        icon: renderIconFunc('ep:coffee'),
       },
     ],
   },
@@ -126,8 +111,12 @@ const menuActionMap = {
     gaProxy('click', ['rightMenu', 'fullscreen'])
   },
   userGuide: () => {
-    openUserGuideModal()
+    openUserGuide()
     gaProxy('click', ['rightMenu', 'userGuide'])
+  },
+  userDocs: () => {
+    createTab(URL_NAIVETAB_DOC_HOME)
+    gaProxy('click', ['rightMenu', 'userDocs'])
   },
   whatsNew: () => {
     openWhatsNewModal()

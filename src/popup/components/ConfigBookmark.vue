@@ -1,20 +1,9 @@
 <script setup lang="ts">
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import {
-  KEYBOARD_CODE_TO_DEFAULT_CONFIG,
-  KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST,
-  globalState,
-  localConfig,
-  customPrimaryColor,
-  getStyleConst,
-  currKeyboardConfig,
-  getAllCommandsConfig,
-  openConfigShortcutsPage,
-  getDefaultBookmarkNameFromUrl,
-  getFaviconFromUrl,
-  getBookmarkConfigUrl,
-  gaProxy,
-} from '@/logic'
+import { gaProxy } from '@/logic/gtag'
+import { globalState, localConfig, customPrimaryColor, getStyleConst, getAllCommandsConfig, openConfigShortcutsPage } from '@/logic/store'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST, currKeyboardConfig } from '@/logic/keyboard'
+import { getDefaultBookmarkNameFromUrl, getFaviconFromUrl, getBookmarkConfigUrl } from '@/logic/bookmark'
 
 const state = reactive({
   isBookmarkDragEnabled: true,
@@ -171,20 +160,50 @@ const popupMainWidth = `${getContainerWidth()}px`
 </script>
 
 <template>
-  <NCard id="popup" :title="`${$t('common.config')}${$t('setting.bookmark')}`">
-    <NForm label-placement="left" :label-width="55" require-mark-placement="left" :model="state">
-      <NFormItem :label="$t('bookmark.urlLabel')" path="url" :rule="{ required: true }">
-        <NInput v-model:value="state.url" :placeholder="$t('bookmark.urlPlaceholder')" clearable />
-        <NButton text class="set__btn" @click="setCurrentTabUrl()">
+  <NCard
+    id="popup"
+    :title="`${$t('common.config')}${$t('setting.bookmark')}`"
+  >
+    <NForm
+      label-placement="left"
+      :label-width="55"
+      require-mark-placement="left"
+      :model="state"
+    >
+      <NFormItem
+        :label="$t('bookmark.urlLabel')"
+        path="url"
+        :rule="{ required: true }"
+      >
+        <NInput
+          v-model:value="state.url"
+          :placeholder="$t('bookmark.urlPlaceholder')"
+          clearable
+        />
+        <NButton
+          text
+          class="set__btn"
+          @click="setCurrentTabUrl()"
+        >
           <tabler:current-location class="btn__icon" />
         </NButton>
       </NFormItem>
 
       <div class="popup__form">
-        <NFormItem :label="$t('bookmark.nameLabel')" class="form__name">
-          <NInput v-model:value="state.name" :placeholder="getDefaultBookmarkNameFromUrl(state.url)" clearable />
+        <NFormItem
+          :label="$t('bookmark.nameLabel')"
+          class="form__name"
+        >
+          <NInput
+            v-model:value="state.name"
+            :placeholder="getDefaultBookmarkNameFromUrl(state.url)"
+            clearable
+          />
         </NFormItem>
-        <NFormItem :label="$t('bookmark.shortcutLabel')" class="form__shortcut">
+        <NFormItem
+          :label="$t('bookmark.shortcutLabel')"
+          class="form__shortcut"
+        >
           <NInputGroupLabel
             v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
             class="shortcut__main"
@@ -200,10 +219,18 @@ const popupMainWidth = `${getContainerWidth()}px`
         </NFormItem>
       </div>
 
-      <NFormItem :label="$t('bookmark.keyLabel')" path="key" :rule="{ required: true }">
+      <NFormItem
+        :label="$t('bookmark.keyLabel')"
+        path="key"
+        :rule="{ required: true }"
+      >
         <NSpin :show="state.isCommitLoading">
           <div class="popup__keyboard">
-            <div v-for="(rowData, rowIndex) of currKeyboardConfig.list" :key="rowIndex" class="keyboard__row">
+            <div
+              v-for="(rowData, rowIndex) of currKeyboardConfig.list"
+              :key="rowIndex"
+              class="keyboard__row"
+            >
               <div
                 v-for="code of rowData"
                 :key="code"
@@ -214,8 +241,14 @@ const popupMainWidth = `${getContainerWidth()}px`
                 @dragover="handleDragOver($event, code)"
                 @dragend="handleDragEnd()"
               >
-                <div class="row__keycap" @click="selectKey(code)">
-                  <div v-if="code === state.keyCode" class="keycap__select">
+                <div
+                  class="row__keycap"
+                  @click="selectKey(code)"
+                >
+                  <div
+                    v-if="code === state.keyCode"
+                    class="keycap__select"
+                  >
                     <ic:outline-check-circle />
                   </div>
                   <p class="keycap__label">
@@ -227,7 +260,7 @@ const popupMainWidth = `${getContainerWidth()}px`
                       class="img__main"
                       :src="getFaviconFromUrl(getBookmarkConfigUrl(code))"
                       :draggable="state.isBookmarkDragEnabled"
-                    >
+                    />
                   </div>
                 </div>
               </div>
@@ -238,7 +271,13 @@ const popupMainWidth = `${getContainerWidth()}px`
     </NForm>
 
     <div class="popup__footer">
-      <NButton class="footer__btn" type="primary" :disabled="isCommitBtnDisabled" :loading="state.isCommitLoading" @click="onCommitConfigBookmark()">
+      <NButton
+        class="footer__btn"
+        type="primary"
+        :disabled="isCommitBtnDisabled"
+        :loading="state.isCommitLoading"
+        @click="onCommitConfigBookmark()"
+      >
         {{ $t('common.save') }}
       </NButton>
       <Tips :content="$t('popup.commitBtnTips')" />
@@ -281,6 +320,7 @@ const popupMainWidth = `${getContainerWidth()}px`
   }
 
   .popup__keyboard {
+    cursor: pointer;
     .keyboard__row {
       display: flex;
       .row__keycap-wrap {
@@ -299,6 +339,7 @@ const popupMainWidth = `${getContainerWidth()}px`
           border: 1px solid v-bind(popupKeyboardBorder);
           cursor: pointer;
           user-select: none;
+          transition: all 200ms ease-in-out;
 
           &:hover {
             background-color: v-bind(popupKeyboardHoverBg);
@@ -343,10 +384,9 @@ const popupMainWidth = `${getContainerWidth()}px`
   .popup__footer {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
 
     .footer__btn {
-      width: 140px;
+      width: 120px;
 
       .icon__wrap {
         display: flex;

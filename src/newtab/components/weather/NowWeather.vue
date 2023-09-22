@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import {
-  URL_QWEATHER_HOME,
-  WEATHER_TEMPERATURE_UNIT_MAP,
-  WEATHER_SPEED_UNIT_MAP,
-  isDragMode,
-  weatherState,
-  weatherIndicesInfo,
-  weatherWarningInfo,
-  localConfig,
-  getStyleField,
-  createTab,
-} from '@/logic'
+import { URL_QWEATHER_HOME, WEATHER_TEMPERATURE_UNIT_MAP, WEATHER_SPEED_UNIT_MAP } from '@/logic/const'
+import { createTab } from '@/logic/util'
+import { isDragMode } from '@/logic/moveable'
+import { localConfig, getStyleField } from '@/logic/store'
+import { weatherState, weatherIndicesInfo, weatherWarningInfo } from '@/logic/weather'
 
 const CNAME = 'weather'
 
@@ -77,8 +70,15 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
 <template>
   <div id="now">
     <div class="now__icon">
-      <div v-if="localConfig.weather.iconEnabled" class="icon__wrap" @click="onOpenWeather()">
-        <NPopover :show="weatherIndicesInfo.length > 0 && state.isIndicesVisible" trigger="manual">
+      <div
+        v-if="localConfig.weather.iconEnabled"
+        class="icon__wrap"
+        @click="onOpenWeather()"
+      >
+        <NPopover
+          :show="weatherIndicesInfo.length > 0 && state.isIndicesVisible"
+          trigger="manual"
+        >
           <template #trigger>
             <div
               class="label__info"
@@ -101,7 +101,11 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
         <div class="info__item">
           <div class="item__label">
             <div v-if="isWeatherWarning">
-              <NPopover :style="{ width: '500px' }" :show="warningVisible" trigger="manual">
+              <NPopover
+                :style="{ width: '500px' }"
+                :show="warningVisible"
+                trigger="manual"
+              >
                 <template #trigger>
                   <div
                     class="label__info"
@@ -117,7 +121,11 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
                   <p class="weather__indices">
                     {{ weatherWarningInfo }}
                   </p>
-                  <div v-if="weatherState.state.isWarningVisible" class="icon__wrap" @click="onUnpinWarning()">
+                  <div
+                    v-if="weatherState.state.isWarningVisible"
+                    class="icon__wrap"
+                    @click="onUnpinWarning()"
+                  >
                     <ri:close-circle-line />
                   </div>
                 </div>
@@ -153,8 +161,7 @@ const customXLargeFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 2)
             <ph:plus-minus-bold />
           </div>
           <div class="item__value">
-            <span class="value__text">{{ weatherState.forecast.list[0] && `${weatherState.forecast.list[0].tempMax} ~ ${weatherState.forecast.list[0].tempMin}` }}
-            </span>
+            <span class="value__text">{{ weatherState.forecast.list[0] && `${weatherState.forecast.list[0].tempMax} ~ ${weatherState.forecast.list[0].tempMin}` }} </span>
             <span class="value__unit">{{ temperatureUnit }}</span>
           </div>
         </div>

@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "ESNext",
-    "target": "es2016",
-    "lib": ["DOM", "ESNext"],
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["dom", "esnext"],
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

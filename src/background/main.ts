@@ -4,21 +4,56 @@ import { log, createTab, padUrlHttps } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
 
 const ALL_COMMAND_KEYCODE = [
-  'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0',
-  'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP',
-  'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL',
-  'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period',
+  'Digit1',
+  'Digit2',
+  'Digit3',
+  'Digit4',
+  'Digit5',
+  'Digit6',
+  'Digit7',
+  'Digit8',
+  'Digit9',
+  'Digit0',
+  'KeyQ',
+  'KeyW',
+  'KeyE',
+  'KeyR',
+  'KeyT',
+  'KeyY',
+  'KeyU',
+  'KeyI',
+  'KeyO',
+  'KeyP',
+  'KeyA',
+  'KeyS',
+  'KeyD',
+  'KeyF',
+  'KeyG',
+  'KeyH',
+  'KeyJ',
+  'KeyK',
+  'KeyL',
+  'KeyZ',
+  'KeyX',
+  'KeyC',
+  'KeyV',
+  'KeyB',
+  'KeyN',
+  'KeyM',
+  'Comma',
+  'Period',
 ]
 
 let bookmarkConfig = null as any
 
-const getBookmarkConfigData = async () => new Promise((resolve) => {
-  chrome.storage.sync.get(null, (data) => {
-    const config = data['naive-tab-bookmark']
-    bookmarkConfig = JSON.parse(config).data
-    resolve(true)
+const getBookmarkConfigData = async () =>
+  new Promise((resolve) => {
+    chrome.storage.sync.get(null, (data) => {
+      const config = data['naive-tab-bookmark']
+      bookmarkConfig = JSON.parse(config).data
+      resolve(true)
+    })
   })
-})
 
 let dblclickTimer: NodeJS.Timeout
 

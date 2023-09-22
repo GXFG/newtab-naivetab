@@ -1,6 +1,9 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isChrome } from '@/env'
-import { defaultConfig, globalState, localConfig, addVisibilityTask, addPageFocusTask, getAllCommandsConfig, padUrlHttps, log } from '@/logic'
+import { padUrlHttps, log } from '@/logic/util'
+import { defaultConfig } from '@/logic/config'
+import { addVisibilityTask, addPageFocusTask } from '@/logic/task'
+import { globalState, localConfig, getAllCommandsConfig } from '@/logic/store'
 
 export const getFaviconFromUrl = (url: string) => {
   if (isChrome) {
@@ -48,9 +51,12 @@ export const getBookmarkConfigUrl = (key: string) => {
 }
 
 export const resetBookmarkPending = () => {
-  localStorage.setItem('data-bookmark-pending', JSON.stringify({
-    isPending: false,
-  }))
+  localStorage.setItem(
+    'data-bookmark-pending',
+    JSON.stringify({
+      isPending: false,
+    }),
+  )
 }
 
 const refreshBookmarkConfig = () => {
