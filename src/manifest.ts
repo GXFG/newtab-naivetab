@@ -1,10 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
 import { isDev, port, r } from '../scripts/utils'
 
 export async function getManifest() {
-  const pkg = await fs.readJSON(r('package.json')) as typeof PkgType
+  const pkg = (await fs.readJSON(r('package.json'))) as typeof PkgType
 
   const manifest: Manifest.WebExtensionManifest = {
     manifest_version: 3,
@@ -21,17 +22,9 @@ export async function getManifest() {
       48: './assets/img/icon/icon-48x48.png',
       128: './assets/img/icon/icon-128x128.png',
     },
-    permissions: [
-      'storage',
-      'favicon',
-      'tabs',
-    ],
-    host_permissions: [
-      '*://*/*',
-    ],
-    optional_permissions: [
-      'bookmarks',
-    ],
+    permissions: ['storage', 'favicon', 'tabs'],
+    host_permissions: ['*://*/*'],
+    optional_permissions: ['bookmarks'],
     chrome_url_overrides: {
       newtab: './dist/newtab/index.html',
     },
@@ -189,9 +182,9 @@ export async function getManifest() {
     // ],
     content_security_policy: {
       extension_pages: isDev
-        // this is required on dev for Vite script to load
-        ? `script-src \'self\' http://localhost:${port}; object-src \'self\'`
-        : 'script-src \'self\'; object-src \'self\'',
+        ? // this is required on dev for Vite script to load
+          `script-src 'self' http://localhost:${port}; object-src 'self'`
+        : "script-src 'self'; object-src 'self'",
     },
   }
 

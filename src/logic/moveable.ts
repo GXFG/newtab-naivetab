@@ -1,4 +1,5 @@
 import { useToggle } from '@vueuse/core'
+import { globalState } from '@/logic/store'
 
 export const [isDragMode, toggleIsDragMode] = useToggle(false)
 export const [isElementDrawerVisible, toggleIsElementDrawerVisible] = useToggle(true)
@@ -39,7 +40,9 @@ export const handleToggleIsElementDrawerVisible = () => {
 /**
  * data-target-type: -1:'' |  1:componentName | 2:elementName
  */
-export const getTargetDataFromEvent = (e: MouseEvent): {
+export const getTargetDataFromEvent = (
+  e: MouseEvent,
+): {
   type: -1 | 1 | 2
   name: '' | Components
 } => {
@@ -48,7 +51,10 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
     while (!target.getAttribute('data-target-type')) {
       target = target.parentNode as HTMLInputElement
     }
-  } catch (e) {}
+    // eslint-disable-next-line no-empty
+  } catch (err) {
+    // 忽略点击组件外其他区域的报错
+  }
   if (!target.getAttribute) {
     return {
       type: -1,
@@ -56,7 +62,7 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
     }
   }
   const type = (Number(target.getAttribute('data-target-type')) as 1 | 2) || -1
-  const name = target.getAttribute('data-target-name') as Components || ''
+  const name = (target.getAttribute('data-target-name') as Components) || ''
   return { type, name }
 }
 
@@ -71,7 +77,7 @@ const currMouseTaskKey = computed(() => {
 })
 
 const handleMousedown = (e: MouseEvent) => {
-  if (!isDragMode.value || e.button !== 0) {
+  if (globalState.isGuideMode || !isDragMode.value || e.button !== 0) {
     return
   }
   const targetData = getTargetDataFromEvent(e)
@@ -81,15 +87,19 @@ const handleMousedown = (e: MouseEvent) => {
     return
   }
   const task = moveState.MouseDownTaskMap.get(currMouseTaskKey.value)
-  task && task(e)
+  if (task) {
+    task(e)
+  }
 }
 
 const handleMousemove = (e: MouseEvent) => {
-  if (!isDragMode.value || e.buttons === 0 || moveState.currDragTarget.type === -1) {
+  if (globalState.isGuideMode || !isDragMode.value || e.buttons === 0 || moveState.currDragTarget.type === -1) {
     return
   }
   const task = moveState.MouseMoveTaskMap.get(currMouseTaskKey.value)
-  task && task(e)
+  if (task) {
+    task(e)
+  }
   // 鼠标移动时隐藏Element抽屉
   if (lastIsElementDrawerVisible === null) {
     lastIsElementDrawerVisible = isElementDrawerVisible.value
@@ -100,11 +110,13 @@ const handleMousemove = (e: MouseEvent) => {
 }
 
 const handleMouseup = (e: MouseEvent) => {
-  if (!isDragMode.value || moveState.currDragTarget.type === -1) {
+  if (globalState.isGuideMode || !isDragMode.value || moveState.currDragTarget.type === -1) {
     return
   }
   const task = moveState.MouseUpTaskMap.get(currMouseTaskKey.value)
-  task && task(e)
+  if (task) {
+    task(e)
+  }
   // 鼠标抬起时根据上一次状态决定是否打开Element抽屉
   if (lastIsElementDrawerVisible) {
     toggleIsElementDrawerVisible(true)
@@ -127,15 +139,19 @@ const handleListener = (isInit: boolean) => {
   }
 }
 
-watch(isDragMode, (value) => {
-  if (!value) {
-    handleListener(false)
-    onResetState()
-    return
-  }
-  // 开启画布模式时默认打开Element抽屉
-  toggleIsElementDrawerVisible(true)
-  nextTick(() => {
-    handleListener(true)
-  })
-}, { immediate: true })
+watch(
+  isDragMode,
+  (value) => {
+    if (!value) {
+      handleListener(false)
+      onResetState()
+      return
+    }
+    // 开启画布模式时默认打开Element抽屉
+    toggleIsElementDrawerVisible(true)
+    nextTick(() => {
+      handleListener(true)
+    })
+  },
+  { immediate: true },
+)

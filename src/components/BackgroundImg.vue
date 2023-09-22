@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { localConfig, imageState } from '@/logic'
+import { localConfig } from '@/logic/store'
+import { imageState } from '@/logic/image'
 
 const bgStyle = computed(() => {
   return localConfig.general.isBackgroundImageEnabled ? `background-image: url(${imageState.currBackgroundImageFileObjectURL});` : ''
 })
 
-const customOpacity = computed(() => (localConfig.general.bgOpacity))
+const customOpacity = computed(() => localConfig.general.bgOpacity)
 </script>
 
 <template>
   <!-- save css var -->
   <div id="background">
-    <div id="background__container" :style="bgStyle" />
+    <div
+      id="background__container"
+      :style="bgStyle"
+    />
   </div>
 </template>
 

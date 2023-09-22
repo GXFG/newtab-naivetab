@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /// <reference types="vitest" />
 
 import { resolve } from 'node:path'
@@ -32,9 +33,7 @@ export const sharedConfig: UserConfig = {
   },
   css: {
     postcss: {
-      plugins: [
-        postcssNesting,
-      ],
+      plugins: [postcssNesting],
     },
   },
   plugins: [
@@ -49,11 +48,7 @@ export const sharedConfig: UserConfig = {
     Markdown(),
 
     AutoImport({
-      imports: [
-        'vue',
-        { 'webextension-polyfill': [['*', 'browser']] },
-        { dayjs: [['default', 'dayjs']] },
-      ],
+      imports: ['vue', { 'webextension-polyfill': [['*', 'browser']] }, { dayjs: [['default', 'dayjs']] }],
       dts: r('src/auto-imports.d.ts'),
     }),
 
@@ -66,7 +61,7 @@ export const sharedConfig: UserConfig = {
       resolvers: [
         // auto import icons
         IconsResolver({
-          componentPrefix: '',
+          prefix: '',
         }),
         NaiveUiResolver(),
       ],
@@ -92,14 +87,8 @@ export const sharedConfig: UserConfig = {
     // visualizer(),
   ],
   optimizeDeps: {
-    include: [
-      'vue',
-      '@vueuse/core',
-      'webextension-polyfill',
-    ],
-    exclude: [
-      'vue-demi',
-    ],
+    include: ['vue', '@vueuse/core', 'webextension-polyfill'],
+    exclude: ['vue-demi'],
   },
 }
 
@@ -113,9 +102,8 @@ export default defineConfig(({ command }) => ({
     },
   },
   build: {
-    watch: isDev
-      ? {}
-      : undefined,
+    target: 'esnext',
+    watch: isDev ? {} : undefined,
     outDir: r('extension/dist'),
     emptyOutDir: false,
     sourcemap: isDev ? 'inline' : false,

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import BookmarkPicker from './BookmarkPicker.vue'
 import { swatcheColors } from '@/styles/const'
 import {
   KEYBOARD_CODE_TO_DEFAULT_CONFIG,
@@ -8,16 +7,12 @@ import {
   KEYCAP_TYPE_OPTION,
   KEYCAP_PREINSTALL_OPTION,
   KEYCAP_PREINSTALL_MAP,
-  availableFontOptions,
-  fontSelectRenderLabel,
-  globalState,
-  localState,
-  localConfig,
   currKeyboardConfig,
-  getDefaultBookmarkNameFromUrl,
-  requestPermission,
-  openConfigShortcutsPage,
-} from '@/logic'
+} from '@/logic/keyboard'
+import { getDefaultBookmarkNameFromUrl } from '@/logic/bookmark'
+import { requestPermission } from '@/logic/storage'
+import { availableFontOptions, fontSelectRenderLabel, globalState, localState, localConfig, openConfigShortcutsPage } from '@/logic/store'
+import BookmarkPicker from './BookmarkPicker.vue'
 
 const state = reactive({
   isBookmarkModalVisible: false,
@@ -169,13 +164,23 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
 </script>
 
 <template>
-  <BookmarkPicker v-model:show="state.isBookmarkModalVisible" @select="onSelectBookmark" />
+  <BookmarkPicker
+    v-model:show="state.isBookmarkModalVisible"
+    @select="onSelectBookmark"
+  />
 
   <NCollapse display-directive="show">
-    <BaseComponentSetting cname="bookmark" :marginRange="[0, 20]" :borderRadiusRange="[0, 40]">
+    <BaseComponentSetting
+      cname="bookmark"
+      :margin-range="[0, 20]"
+      :border-radius-range="[0, 40]"
+    >
       <template #header>
         <!-- bookmarkConfig -->
-        <NCollapseItem :title="$t('setting.bookmarkConfig')" name="bookmarkConfig">
+        <NCollapseItem
+          :title="$t('setting.bookmarkConfig')"
+          name="bookmarkConfig"
+        >
           <div class="modal__bookmark">
             <NInputGroup class="bookmark__label">
               <p class="label__text">
@@ -187,7 +192,10 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
               <p class="label__text">
                 {{ $t('bookmark.nameLabel') }}
               </p>
-              <p v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="label__text">
+              <p
+                v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
+                class="label__text"
+              >
                 {{ $t('bookmark.shortcutLabel') }}
               </p>
             </NInputGroup>
@@ -195,15 +203,29 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             <div class="bookmark__content">
               <!-- left: keyList -->
               <div class="content__key">
-                <div v-for="(codeList, rowIndex) of currKeyboardConfig.list" :key="rowIndex" class="bookmark__group">
-                  <NInputGroupLabel v-for="code of codeList" :key="code" class="bookmark__key">
+                <div
+                  v-for="(codeList, rowIndex) of currKeyboardConfig.list"
+                  :key="rowIndex"
+                  class="bookmark__group"
+                >
+                  <NInputGroupLabel
+                    v-for="code of codeList"
+                    :key="code"
+                    class="bookmark__key"
+                  >
                     {{ KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].alias || KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].label }}
                   </NInputGroupLabel>
                 </div>
               </div>
               <!-- right: config -->
               <div class="content__config">
-                <transition-group v-for="codeList of currKeyboardConfig.list" :key="codeList" name="flip-list" tag="div" class="bookmark__group">
+                <transition-group
+                  v-for="codeList of currKeyboardConfig.list"
+                  :key="codeList"
+                  name="flip-list"
+                  tag="div"
+                  class="bookmark__group"
+                >
                   <NInputGroup
                     v-for="code of codeList"
                     :key="code"
@@ -246,7 +268,11 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                         </NInputGroupLabel>
                       </div>
                       <!-- <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag"> -->
-                      <NButton class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag">
+                      <NButton
+                        class="item__move"
+                        @mousedown="onBookmarkStartDrag"
+                        @mouseup="onBookmarkStopDrag"
+                      >
                         <cil:resize-height />
                       </NButton>
                       <NButton @click="onImportBookmark(code)">
@@ -261,7 +287,11 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                         {{ $t('common.delete') }}?
                       </NPopconfirm>
                     </template>
-                    <NButton v-else class="item__create" @click="onCreateKey(code)">
+                    <NButton
+                      v-else
+                      class="item__create"
+                      @click="onCreateKey(code)"
+                    >
                       <zondicons:add-solid />
                     </NButton>
                   </NInputGroup>
@@ -279,8 +309,15 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
               <NSwitch v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes" />
               <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
             </div>
-            <div v-if="localConfig.bookmark.isListenBackgroundKeystrokes" class="setting__input_item">
-              <NButton ghost type="primary" @click="openConfigShortcutsPage()">
+            <div
+              v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
+              class="setting__input_item"
+            >
+              <NButton
+                ghost
+                type="primary"
+                @click="openConfigShortcutsPage()"
+              >
                 <ic:twotone-keyboard-command-key />&nbsp;{{ $t('bookmark.customKeys') }}
               </NButton>
             </div>
@@ -292,7 +329,10 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
               <NSwitch v-model:value="localConfig.bookmark.isDblclickOpen" />
               <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
             </div>
-            <div v-if="localConfig.bookmark.isDblclickOpen" class="setting__input_item">
+            <div
+              v-if="localConfig.bookmark.isDblclickOpen"
+              class="setting__input_item"
+            >
               <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
               <NInputNumber
                 v-model:value="localConfig.bookmark.dblclickIntervalTime"
@@ -300,9 +340,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                 :min="0"
                 :step="1"
               >
-                <template #suffix>
-                  ms
-                </template>
+                <template #suffix> ms </template>
               </NInputNumber>
               <Tips :content="$t('bookmark.intervalTimeTips')" />
             </div>
@@ -318,7 +356,12 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
 
       <template #style>
         <NFormItem :label="`${$t('common.margin')}`">
-          <NSlider v-model:value="localConfig.bookmark.keycapPadding" :step="0.1" :min="0" :max="10" />
+          <NSlider
+            v-model:value="localConfig.bookmark.keycapPadding"
+            :step="0.1"
+            :min="0"
+            :max="10"
+          />
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapPadding"
             class="setting__item-element setting__input-number"
@@ -328,7 +371,12 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           />
         </NFormItem>
         <NFormItem :label="`${$t('common.size')}`">
-          <NSlider v-model:value="localConfig.bookmark.keycapSize" :step="1" :min="40" :max="150" />
+          <NSlider
+            v-model:value="localConfig.bookmark.keycapSize"
+            :step="1"
+            :min="40"
+            :max="150"
+          />
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapSize"
             class="setting__item-element setting__input-number"
@@ -341,25 +389,53 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
 
       <template #color>
         <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.font')}`">
-          <NSelect v-model:value="localConfig.bookmark.keycapKeyFontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
-          <NInputNumber v-model:value="localConfig.bookmark.keycapKeyFontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="50" />
+          <NSelect
+            v-model:value="localConfig.bookmark.keycapKeyFontFamily"
+            :options="availableFontOptions"
+            :render-label="fontSelectRenderLabel"
+          />
+          <NInputNumber
+            v-model:value="localConfig.bookmark.keycapKeyFontSize"
+            class="setting__item-element setting__input-number"
+            :step="1"
+            :min="12"
+            :max="50"
+          />
         </NFormItem>
         <NFormItem :label="`${$t('bookmark.nameLabel')}${$t('common.font')}`">
-          <NSelect v-model:value="localConfig.bookmark.keycapBookmarkFontFamily" :options="availableFontOptions" :render-label="fontSelectRenderLabel" />
-          <NInputNumber v-model:value="localConfig.bookmark.keycapBookmarkFontSize" class="setting__item-element setting__input-number" :step="1" :min="12" :max="50" />
+          <NSelect
+            v-model:value="localConfig.bookmark.keycapBookmarkFontFamily"
+            :options="availableFontOptions"
+            :render-label="fontSelectRenderLabel"
+          />
+          <NInputNumber
+            v-model:value="localConfig.bookmark.keycapBookmarkFontSize"
+            class="setting__item-element setting__input-number"
+            :step="1"
+            :min="12"
+            :max="50"
+          />
         </NFormItem>
         <NFormItem :label="$t('bookmark.keyboardType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keyboardType">
-            <NRadio v-for="item in KEYBOARD_TYPE_OPTION" :key="item.value" :value="item.value">
+            <NRadio
+              v-for="item in KEYBOARD_TYPE_OPTION"
+              :key="item.value"
+              :value="item.value"
+            >
               {{ item.label }}
             </NRadio>
           </NRadioGroup>
         </NFormItem>
         <NFormItem :label="$t('bookmark.keycapType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keycapType">
-            <NRadio v-for="item in KEYCAP_TYPE_OPTION" :key="item.value" :value="item.value">
+            <NRadioButton
+              v-for="item in KEYCAP_TYPE_OPTION"
+              :key="item.value"
+              :value="item.value"
+            >
               {{ item.label }}
-            </NRadio>
+            </NRadioButton>
           </NRadioGroup>
         </NFormItem>
         <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.theme')}`">
@@ -374,7 +450,11 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           {{ `${$t('common.main')}${$t('bookmark.keycap')} QWERTY` }}
         </p>
         <NFormItem :label="`${$t('common.fontColor')}`">
-          <NColorPicker v-model:value="localConfig.bookmark.mainFontColor[localState.currAppearanceCode]" show-preview :swatches="swatcheColors" />
+          <NColorPicker
+            v-model:value="localConfig.bookmark.mainFontColor[localState.currAppearanceCode]"
+            show-preview
+            :swatches="swatcheColors"
+          />
         </NFormItem>
         <NFormItem :label="`${$t('common.backgroundColor')}`">
           <NColorPicker

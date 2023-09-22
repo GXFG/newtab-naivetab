@@ -1,6 +1,8 @@
 import http from '@/lib/http'
 
-export const getBaiduSugrec = (keyword: string): Promise<{
+export const getBaiduSugrec = (
+  keyword: string,
+): Promise<{
   g: {
     q: string
   }[]

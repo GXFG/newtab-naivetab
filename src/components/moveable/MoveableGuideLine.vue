@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { getStyleConst, moveState, isDragMode } from '@/logic'
+import { moveState, isDragMode } from '@/logic/moveable'
+import { getStyleConst } from '@/logic/store'
 
 const auxiliaryLineMain = getStyleConst('auxiliaryLineMain')
 const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
@@ -7,12 +8,30 @@ const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
 
 <template>
   <div v-if="isDragMode">
-    <div v-show="moveState.isXAxisCenterVisible" class="axis xaxis__center" />
-    <div v-show="moveState.isYAxisCenterVisible" class="axis yaxis__center" />
-    <div v-show="moveState.isTopBoundVisible" class="bound bound__top" />
-    <div v-show="moveState.isBottomBoundVisible" class="bound bound__bottom" />
-    <div v-show="moveState.isLeftBoundVisible" class="bound bound__left" />
-    <div v-show="moveState.isRightBoundVisible" class="bound bound__right" />
+    <div
+      v-show="moveState.isXAxisCenterVisible"
+      class="axis xaxis__center"
+    />
+    <div
+      v-show="moveState.isYAxisCenterVisible"
+      class="axis yaxis__center"
+    />
+    <div
+      v-show="moveState.isTopBoundVisible"
+      class="bound bound__top"
+    />
+    <div
+      v-show="moveState.isBottomBoundVisible"
+      class="bound bound__bottom"
+    />
+    <div
+      v-show="moveState.isLeftBoundVisible"
+      class="bound bound__left"
+    />
+    <div
+      v-show="moveState.isRightBoundVisible"
+      class="bound bound__right"
+    />
   </div>
 </template>
 
@@ -40,7 +59,7 @@ const auxiliaryLineBound = getStyleConst('auxiliaryLineBound')
 /* 画布边界辅助线 */
 .bound {
   z-index: 20;
-  outline: 2px solid v-bind(auxiliaryLineBound);
+  outline: 3px solid v-bind(auxiliaryLineBound);
 }
 .bound__top {
   position: fixed;

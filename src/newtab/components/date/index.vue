@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { currDayjsLang, localConfig, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { addTimerTask, removeTimerTask } from '@/logic/task'
+import { currDayjsLang, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 
 const CNAME = 'date'
 const isRender = getIsComponentRender(CNAME)
@@ -34,9 +35,21 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="date">
-    <div v-if="isRender" id="date" data-target-type="1" data-target-name="date">
-      <div class="date__container" :style="dragStyle || containerStyle" :class="{ 'date__container--shadow': localConfig.date.isShadowEnabled }">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="date"
+  >
+    <div
+      v-if="isRender"
+      id="date"
+      data-target-type="1"
+      data-target-name="date"
+    >
+      <div
+        class="date__container"
+        :style="dragStyle || containerStyle"
+        :class="{ 'date__container--shadow': localConfig.date.isShadowEnabled }"
+      >
         <p class="date__text">
           {{ state.date }}
         </p>

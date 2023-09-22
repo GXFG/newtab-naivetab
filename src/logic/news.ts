@@ -1,7 +1,9 @@
 import * as cheerio from 'cheerio'
 import http from '@/lib/http'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { NEWS_SOURCE_MAP, localConfig, createTab, log } from '@/logic'
+import { NEWS_SOURCE_MAP } from '@/logic/const'
+import { createTab, log } from '@/logic/util'
+import { localConfig } from '@/logic/store'
 
 export const newsState = useStorageLocal('data-news', {
   toutiao: {
@@ -47,10 +49,10 @@ export const getToutiaoNews = async () => {
     if (!res || !res.status || res.status !== 'success') {
       return
     }
-    newsState.value.toutiao.list = res.data.map(item => ({
+    newsState.value.toutiao.list = res.data.map((item) => ({
       url: `https://www.toutiao.com/trending/${item.ClusterIdStr}`,
       desc: item.Title,
-      hot: `${Math.floor((+item.HotValue / 10000))}w`,
+      hot: `${Math.floor(+item.HotValue / 10000)}w`,
     }))
     newsState.value.toutiao.syncTime = dayjs().valueOf()
     log('News-update toutiao')
@@ -71,7 +73,7 @@ export const getBaiduNews = async () => {
       const url = ($(ele).find('.title_dIF3B').attr('href') || '').trim()
       const desc = $(ele).find('.c-single-text-ellipsis').text().trim()
       let hot = $(ele).children('.trend_2RttY').children('.hot-index_1Bl1a').text().trim()
-      hot = `${Math.floor((+hot / 10000))}w`
+      hot = `${Math.floor(+hot / 10000)}w`
       newsList.push({ url, desc, hot })
     })
     newsList = newsList.slice(1)
@@ -94,9 +96,7 @@ export const getZhihuNews = async () => {
     $('.HotItem-content').each((i, ele) => {
       const url = $(ele).children().eq(0).attr('href') || ''
       const desc = $(ele).children().eq(0).attr('title') || ''
-      let hot = i === 0
-        ? ($(ele).children('.HotItem-metrics')[0] as any).children[2].data
-        : ($(ele).children('.HotItem-metrics').text() || '')
+      let hot = i === 0 ? ($(ele).children('.HotItem-metrics')[0] as any).children[2].data : $(ele).children('.HotItem-metrics').text() || ''
       const count = hot.split(' ')[0]
       if (!isNaN(count)) {
         // 过滤盐选推荐
@@ -127,12 +127,13 @@ export const getWeiboNews = async () => {
       let hot: string | number = $(ele).children('.td-02').children('span').text().trim()
       if (hot) {
         let type = ''
-        if (isNaN(parseInt(hot))) { // 处理格式如：AB 123
+        if (isNaN(parseInt(hot, 10))) {
+          // 处理格式如：AB 123
           const hotList = hot.split(' ')
           type = `${hotList[0]} `
           hot = hotList[1]
         }
-        hot = `${type}${Math.floor((+hot / 10000))}w`
+        hot = `${type}${Math.floor(+hot / 10000)}w`
         newsList.push({ url, desc, hot })
       }
     })
@@ -258,6 +259,11 @@ export const updateNews = () => {
   }
 }
 
-watch(() => localConfig.news.sourceList, () => {
-  updateNews()
-})
+export const handleWatchNewsConfigChange = () => {
+  watch(
+    () => localConfig.news.sourceList,
+    () => {
+      updateNews()
+    },
+  )
+}

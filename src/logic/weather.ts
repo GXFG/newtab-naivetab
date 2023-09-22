@@ -1,6 +1,7 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getWeatherNow, getWeatherForecast, getWeatherAirNow, getWeatherWarning } from '@/api'
-import { localConfig, log } from '@/logic'
+import { log } from '@/logic/util'
+import { localConfig } from '@/logic/store'
 
 const defaultWeatherState = {
   state: {
@@ -150,7 +151,9 @@ export const refreshWeather = () => {
   getForecastData()
 }
 
-// 修改城市、切换语言 立即更新数据
-watch([() => localConfig.weather.city.id, () => localConfig.general.lang], () => {
-  refreshWeather()
-})
+export const handleWatchWeatherConfigChange = () => {
+  // 修改城市、切换语言 立即更新数据
+  watch([() => localConfig.weather.city.id, () => localConfig.general.lang], () => {
+    refreshWeather()
+  })
+}

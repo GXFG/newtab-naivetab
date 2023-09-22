@@ -1,9 +1,4 @@
-const logStyles = [
-  'padding: 4px 8px',
-  'color: #fff',
-  'border-radius: 3px',
-  'background:',
-].join(';')
+const logStyles = ['padding: 4px 8px', 'color: #fff', 'border-radius: 3px', 'background:'].join(';')
 
 export const log = (msg: string, ...args: unknown[]) => {
   const style = `${logStyles}${msg.includes('error') ? '#ff4757' : '#1475B2'}`
@@ -25,7 +20,7 @@ export const createTab = (url: string, active = true) => {
   chrome.tabs.create({ url, active })
 }
 
-export const padUrlHttps = (url: string) => url.includes('//') ? url : `https://${url}`
+export const padUrlHttps = (url: string) => (url.includes('//') ? url : `https://${url}`)
 
 /**
  * leftVersion < rightVersion ?
@@ -41,11 +36,12 @@ export const compareLeftVersionLessThanRightVersions = (leftVersion: string, rig
     rightVersionList.push('0')
   }
   for (let i = 0; i < maxLen; i++) {
-    const leftItem = parseInt(leftVersionList[i])
-    const rightItem = parseInt(rightVersionList[i])
+    const leftItem = parseInt(leftVersionList[i], 10)
+    const rightItem = parseInt(rightVersionList[i], 10)
     if (leftItem > rightItem) {
       return false
-    } else if (leftItem < rightItem) {
+    }
+    if (leftItem < rightItem) {
       return true
     }
   }
@@ -113,9 +109,13 @@ export const compressedImageToBlob = (image: HTMLImageElement, quality = 0.5, wi
     canvas.width = width
     canvas.height = Math.ceil(width / widthHightRatio)
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
-    canvas.toBlob((blob) => {
-      resolve(blob as Blob)
-    }, type, quality)
+    canvas.toBlob(
+      (blob) => {
+        resolve(blob as Blob)
+      },
+      type,
+      quality,
+    )
   })
 }
 
@@ -123,7 +123,7 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve) => {
     const reader = new FileReader()
     reader.readAsDataURL(blob)
-    reader.onload = function (e: any) {
+    reader.onload = (e: any) => {
       resolve(e.target.result)
     }
   })

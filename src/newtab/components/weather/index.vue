@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { updateWeather, refreshWeather } from '@/logic/weather'
 import NowWeather from './NowWeather.vue'
 import ForecastWeather from './ForecastWeather.vue'
-import { getIsComponentRender, getLayoutStyle, getStyleField, updateWeather, refreshWeather } from '@/logic'
 
 const CNAME = 'weather'
 const isRender = getIsComponentRender(CNAME)
@@ -26,9 +27,20 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="weather">
-    <div v-if="isRender" id="weather" data-target-type="1" data-target-name="weather">
-      <div class="weather__container" :style="dragStyle || containerStyle">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="weather"
+  >
+    <div
+      v-if="isRender"
+      id="weather"
+      data-target-type="1"
+      data-target-name="weather"
+    >
+      <div
+        class="weather__container"
+        :style="dragStyle || containerStyle"
+      >
         <NowWeather />
         <ForecastWeather />
       </div>

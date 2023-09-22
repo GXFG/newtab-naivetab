@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { addVisibilityTask, addTimerTask, removeTimerTask, localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { addVisibilityTask, addTimerTask, removeTimerTask } from '@/logic/task'
+import { localState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 
 const CNAME = 'clockAnalog'
 const isRender = getIsComponentRender(CNAME)
@@ -124,11 +125,29 @@ const secondDeg = computed(() => `${state.secondDeg}deg`)
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockAnalog">
-    <div v-if="isRender" id="analog-clock" data-target-type="1" data-target-name="clockAnalog">
-      <div class="clockAnalog__container" :style="dragStyle || containerStyle">
-        <div v-show="state.isClockVisible" class="container__clock" :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`">
-          <div class="clock__base clock__base--animation" :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`" />
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="clockAnalog"
+  >
+    <div
+      v-if="isRender"
+      id="analog-clock"
+      data-target-type="1"
+      data-target-name="clockAnalog"
+    >
+      <div
+        class="clockAnalog__container"
+        :style="dragStyle || containerStyle"
+      >
+        <div
+          v-show="state.isClockVisible"
+          class="container__clock"
+          :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`"
+        >
+          <div
+            class="clock__base clock__base--animation"
+            :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"
+          />
           <div
             class="clock__base clock__hour"
             :class="{ 'clock__base--animation': state.isAnimationEnable && state.isHourAnimationEnable }"

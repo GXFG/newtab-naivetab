@@ -1,17 +1,8 @@
 <script setup lang="ts">
-import BackgroundDrawer from './BackgroundDrawer.vue'
-import {
-  defaultConfig,
-  exportSetting,
-  localConfig,
-  localState,
-  globalState,
-  isUploadConfigLoading,
-  importSetting,
-  refreshSetting,
-  resetSetting,
-} from '@/logic'
 import i18n from '@/lib/i18n'
+import { exportSetting, isUploadConfigLoading, importSetting, refreshSetting, resetSetting } from '@/logic/storage'
+import { localConfig, localState, globalState } from '@/logic/store'
+import BackgroundDrawer from './BackgroundDrawer.vue'
 
 const { proxy }: any = getCurrentInstance()
 
@@ -24,7 +15,7 @@ const state = reactive({
 })
 
 const themeList = computed(() => [
-  { label: window.$t('common.auto'), value: 'auto' },
+  { label: window.$t('general.followSystem'), value: 'auto' },
   { label: window.$t('common.light'), value: 'light' },
   { label: window.$t('common.dark'), value: 'dark' },
 ])
@@ -60,7 +51,7 @@ const syncTime = computed(() => {
 const importSettingInputEl = ref()
 
 const onImportSetting = () => {
-  (importSettingInputEl as any).value.value = null
+  ;(importSettingInputEl as any).value.value = null
   importSettingInputEl.value.click()
 }
 
@@ -90,16 +81,34 @@ const onResetSetting = () => {
   <BackgroundDrawer v-model:show="state.isBackgroundDrawerVisible" />
 
   <!-- main -->
-  <BaseComponentSetting cname="general" :divider-name="$t('general.globalStyle')">
+  <BaseComponentSetting
+    cname="general"
+    :divider-name="$t('general.globalStyle')"
+  >
     <template #header>
       <NFormItem :label="$t('general.pageTitle')">
-        <NInput v-model:value="localConfig.general.pageTitle" type="text" placeholder=" " />
+        <NInput
+          v-model:value="localConfig.general.pageTitle"
+          type="text"
+        />
       </NFormItem>
       <NFormItem :label="$t('general.language')">
-        <NSelect v-model:value="proxy.$i18n.locale" :options="state.i18nList" @update:value="onChangeLocale" />
+        <NSelect
+          v-model:value="proxy.$i18n.locale"
+          :options="state.i18nList"
+          @update:value="onChangeLocale"
+        />
       </NFormItem>
       <NFormItem :label="$t('common.drawerSite')">
-        <NSelect v-model:value="localConfig.general.drawerPlacement" :options="drawerPlacementList" />
+        <NRadioGroup v-model:value="localConfig.general.drawerPlacement">
+          <NRadioButton
+            v-for="item in drawerPlacementList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </NRadioButton>
+        </NRadioGroup>
       </NFormItem>
       <NFormItem :label="$t('general.loadPageAnimation')">
         <NSwitch v-model:value="localConfig.general.isLoadPageAnimationEnabled" />
@@ -108,7 +117,15 @@ const onResetSetting = () => {
 
     <template #style>
       <NFormItem :label="$t('common.appearance')">
-        <NSelect v-model:value="localConfig.general.appearance" :options="themeList" />
+        <NRadioGroup v-model:value="localConfig.general.appearance">
+          <NRadioButton
+            v-for="item in themeList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </NRadioButton>
+        </NRadioGroup>
       </NFormItem>
     </template>
 
@@ -116,52 +133,105 @@ const onResetSetting = () => {
       <!-- backgroundImage -->
       <NFormItem :label="$t('common.backgroundImage')">
         <NSwitch v-model:value="localConfig.general.isBackgroundImageEnabled" />
-        <NButton v-if="localConfig.general.isBackgroundImageEnabled" class="setting__row-element" @click="openBackgroundDrawer()">
+        <NButton
+          v-if="localConfig.general.isBackgroundImageEnabled"
+          class="setting__row-element"
+          @click="openBackgroundDrawer()"
+        >
           <tabler:edit />&nbsp;{{ $t('common.edit') }}
         </NButton>
       </NFormItem>
-      <NFormItem v-if="localConfig.general.isBackgroundImageEnabled" :label="$t('common.blur')">
-        <NSlider v-model:value="localConfig.general.bgBlur" :step="0.1" :min="0" :max="200" />
-        <NInputNumber v-model:value="localConfig.general.bgBlur" class="setting__item-element setting__input-number" :step="0.1" :min="0" :max="200" />
+      <NFormItem
+        v-if="localConfig.general.isBackgroundImageEnabled"
+        :label="$t('common.blur')"
+      >
+        <NSlider
+          v-model:value="localConfig.general.bgBlur"
+          :step="0.1"
+          :min="0"
+          :max="200"
+        />
+        <NInputNumber
+          v-model:value="localConfig.general.bgBlur"
+          class="setting__item-element setting__input-number"
+          :step="0.1"
+          :min="0"
+          :max="200"
+        />
       </NFormItem>
-      <NFormItem v-if="localConfig.general.isBackgroundImageEnabled" :label="$t('common.opacity')">
-        <NSlider v-model:value="localConfig.general.bgOpacity" :step="0.01" :min="0" :max="1" />
-        <NInputNumber v-model:value="localConfig.general.bgOpacity" class="setting__item-element setting__input-number" :step="0.01" :min="0" :max="1" />
+      <NFormItem
+        v-if="localConfig.general.isBackgroundImageEnabled"
+        :label="$t('common.opacity')"
+      >
+        <NSlider
+          v-model:value="localConfig.general.bgOpacity"
+          :step="0.01"
+          :min="0"
+          :max="1"
+        />
+        <NInputNumber
+          v-model:value="localConfig.general.bgOpacity"
+          class="setting__item-element setting__input-number"
+          :step="0.01"
+          :min="0"
+          :max="1"
+        />
       </NFormItem>
 
       <!-- setting -->
       <NDivider title-placement="left">
         {{ $t('general.settingDividerSetting') }}
       </NDivider>
+
       <NFormItem :label="$t('general.syncTime')">
-        <NSpin :show="isUploadConfigLoading" size="small">
+        <NSpin
+          :show="isUploadConfigLoading"
+          size="small"
+        >
           <p>{{ syncTime }}</p>
         </NSpin>
         <Tips :content="$t('general.syncTimeTips')" />
       </NFormItem>
+
       <NFormItem :label="$t('general.importSettingsLabel')">
-        <NButton :loading="globalState.isImportSettingLoading" @click="onImportSetting">
+        <NButton
+          :loading="globalState.isImportSettingLoading"
+          @click="onImportSetting"
+        >
           <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
         </NButton>
-        <input ref="importSettingInputEl" style="display: none" type="file" accept=".json" @change="onImportFileChange">
+        <input
+          ref="importSettingInputEl"
+          style="display: none"
+          type="file"
+          accept=".json"
+          @change="onImportFileChange"
+        />
         <Tips :content="$t('general.importSettingsTips')" />
       </NFormItem>
+
       <NFormItem :label="$t('general.exportSettingLabel')">
-        <NButton @click="onExportSetting()">
-          <uil:export />&nbsp;{{ $t('general.exportSettingValue') }}
-        </NButton>
+        <NButton @click="onExportSetting()"> <uil:export />&nbsp;{{ $t('general.exportSettingValue') }} </NButton>
         <Tips :content="$t('general.exportSettingTips')" />
       </NFormItem>
+
       <NFormItem :label="$t('general.clearStorageLabel')">
-        <NButton :loading="globalState.isClearStorageLoading" @click="refreshSetting()">
+        <NButton
+          :loading="globalState.isClearStorageLoading"
+          @click="refreshSetting()"
+        >
           <ant-design:clear-outlined />&nbsp;{{ $t('general.clearStorageValue') }}
         </NButton>
         <Tips :content="$t('general.clearStorageTips')" />
       </NFormItem>
+
       <NFormItem :label="$t('general.resetSettingLabel')">
         <NPopconfirm @positive-click="onResetSetting()">
           <template #trigger>
-            <NButton ghost type="error">
+            <NButton
+              ghost
+              type="error"
+            >
               <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}
             </NButton>
           </template>

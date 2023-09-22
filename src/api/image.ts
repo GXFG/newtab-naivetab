@@ -1,6 +1,8 @@
 import http from '@/lib/http'
 
-export const getBingImages = (count = 8): Promise<{
+export const getBingImages = (
+  count = 8,
+): Promise<{
   images: BingImageItem[]
 }> => {
   return http({

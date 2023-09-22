@@ -1,6 +1,6 @@
 import http from '@/lib/http'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { log } from '@/logic'
+import { log } from '@/logic/util'
 
 export const poetryState = useStorageLocal('data-poetry', {
   token: '',

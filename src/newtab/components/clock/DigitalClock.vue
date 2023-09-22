@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { localConfig, addTimerTask, removeTimerTask, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic'
+import { addTimerTask, removeTimerTask } from '@/logic/task'
+import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 
 const CNAME = 'clockDigital'
 const isRender = getIsComponentRender(CNAME)
@@ -37,8 +38,16 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="clockDigital">
-    <div v-if="isRender" id="digital-clock" data-target-type="1" data-target-name="clockDigital">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="clockDigital"
+  >
+    <div
+      v-if="isRender"
+      id="digital-clock"
+      data-target-type="1"
+      data-target-name="clockDigital"
+    >
       <div
         class="clockDigital__container"
         :style="dragStyle || containerStyle"
@@ -48,7 +57,11 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
           <p class="time__text">
             {{ state.time }}
           </p>
-          <span v-if="localConfig.clockDigital.unitEnabled" class="time__unit">{{ state.unit }}</span>
+          <span
+            v-if="localConfig.clockDigital.unitEnabled"
+            class="time__unit"
+            >{{ state.unit }}</span
+          >
         </div>
       </div>
     </div>

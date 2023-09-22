@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { SECOND_MODAL_WIDTH, getFaviconFromUrl } from '@/logic'
+import { SECOND_MODAL_WIDTH } from '@/logic/const'
+import { getFaviconFromUrl } from '@/logic/bookmark'
 
 const props = defineProps({
   show: {
@@ -69,7 +70,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
 }
 
 const onInitBookmarks = async () => {
-  const res = await onGetBookmark() as ChromeBookmarkItem[]
+  const res = (await onGetBookmark()) as ChromeBookmarkItem[]
   let root = res[0].children
   root = formatBookmark(root)
   state.bookmarks = root
@@ -87,8 +88,15 @@ watch(
 </script>
 
 <template>
-  <NDrawer :show="props.show" :width="SECOND_MODAL_WIDTH" @update:show="handleUpdateShow">
-    <NDrawerContent :title="$t('setting.bookmark')" closable>
+  <NDrawer
+    :show="props.show"
+    :width="SECOND_MODAL_WIDTH"
+    @update:show="handleUpdateShow"
+  >
+    <NDrawerContent
+      :title="$t('setting.bookmark')"
+      closable
+    >
       <NTree
         block-line
         :data="state.bookmarks"

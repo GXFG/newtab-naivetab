@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import {
-  isDragMode,
-  createTab,
-  globalState,
-  localConfig,
-  newsState,
-  getIsComponentRender,
-  getLayoutStyle,
-  getStyleField,
-  updateNews,
-  onRetryNews,
-  gaProxy,
-} from '@/logic'
+import { gaProxy } from '@/logic/gtag'
+import { createTab } from '@/logic/util'
+import { isDragMode } from '@/logic/moveable'
+import { newsState, updateNews, onRetryNews } from '@/logic/news'
+import { globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 
 const CNAME = 'news'
 const isRender = getIsComponentRender(CNAME)
@@ -77,8 +69,16 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="news">
-    <div v-if="isRender" id="news" data-target-type="1" data-target-name="news">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="news"
+  >
+    <div
+      v-if="isRender"
+      id="news"
+      data-target-type="1"
+      data-target-name="news"
+    >
       <div
         class="news__container"
         :style="dragStyle || containerStyle"
@@ -88,11 +88,35 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         }"
       >
         <div class="news__wrap">
-          <NTabs :value="globalState.currNewsTabValue" type="segment" animated justify-content="space-evenly" @before-leave="() => !isDragMode" @update:value="handleChangeCurrTab">
-            <NTabPane v-for="source in selectNewsSourceList" :key="source.value" :name="source.value" :tab="source.label">
-              <div class="news__content">
-                <div v-if="newsState[source.value] && newsState[source.value].list.length !== 0">
-                  <div v-for="(item, index) in newsState[source.value] && newsState[source.value].list" :key="item.desc" class="content__item">
+          <NTabs
+            :value="globalState.currNewsTabValue"
+            type="segment"
+            animated
+            justify-content="space-evenly"
+            @before-leave="() => !isDragMode"
+            @update:value="handleChangeCurrTab"
+          >
+            <NTabPane
+              v-for="source in selectNewsSourceList"
+              :key="source.value"
+              :name="source.value"
+              :tab="source.label"
+            >
+              <div
+                class="news__content"
+                :class="{
+                  'news__content--hover': !isDragMode,
+                }"
+              >
+                <template v-if="newsState[source.value] && newsState[source.value].list.length !== 0">
+                  <div
+                    v-for="(item, index) in newsState[source.value] && newsState[source.value].list"
+                    :key="item.desc"
+                    class="content__item"
+                    :class="{
+                      'content__item--hover': !isDragMode,
+                    }"
+                  >
                     <p
                       class="row__index"
                       :class="{
@@ -104,13 +128,13 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
                       {{ index + 1 }}
                     </p>
 
-                    <n-popover :delay="500" trigger="hover">
+                    <n-popover
+                      :delay="500"
+                      trigger="hover"
+                    >
                       <template #trigger>
                         <div
                           class="row__content"
-                          :class="{
-                            'row__content--hover': !isDragMode,
-                          }"
                           @click="onOpenPage(item.url)"
                           @mousedown="onMouseDownKey($event, item.url)"
                         >
@@ -125,9 +149,15 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
                       <span>{{ item.desc }}</span>
                     </n-popover>
                   </div>
-                </div>
-                <div v-else class="content__empty">
-                  <NButton ghost @click="onRetryNews(source.value)">
+                </template>
+                <div
+                  v-else
+                  class="content__empty"
+                >
+                  <NButton
+                    ghost
+                    @click="onRetryNews(source.value)"
+                  >
                     {{ `${$t('common.login')} / ${$t('common.refresh')}` }}
                   </NButton>
                 </div>
@@ -179,7 +209,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         .content__item {
           display: flex;
           align-items: center;
-          margin: v-bind(customMargin) 0;
+          padding: v-bind(customMargin) 0;
           width: 100%;
           .row__index {
             width: 8%;
@@ -213,10 +243,9 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
               opacity: 0.7;
             }
           }
-          .row__content--hover:hover {
-            color: v-bind(customFontActiveColor);
-            cursor: pointer;
-          }
+        }
+        .content__item--hover:hover {
+          color: v-bind(customFontActiveColor);
         }
         .content__empty {
           display: flex;
@@ -225,13 +254,18 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
           height: v-bind(customHeight);
         }
       }
+      .news__content--hover:hover {
+        cursor: pointer;
+      }
     }
   }
   .news__container--border {
     border: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .news__container--shadow {
-    box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;
+    box-shadow:
+      v-bind(customShadowColor) 0px 2px 4px 0px,
+      v-bind(customShadowColor) 0px 2px 16px 0px;
   }
 }
 </style>

@@ -1,7 +1,9 @@
 <!-- 最外层div的style会被用来存放v-bind的css变量，不能再进行:style绑定操作 -->
 <!-- 第二层div用来统一控制画布模式下的cursor样式 -->
 <script setup lang="ts">
-import { DRAG_TRIGGER_DISTANCE, getStyleConst, localConfig, moveState, isDragMode } from '@/logic'
+import { DRAG_TRIGGER_DISTANCE } from '@/logic/const'
+import { moveState, isDragMode } from '@/logic/moveable'
+import { getStyleConst, localConfig } from '@/logic/store'
 
 const props = defineProps({
   dragStyle: {
@@ -229,14 +231,17 @@ watch(
 )
 
 // 画布模式下，启用当前组件时添加active样式
-watch(() => localConfig[props.componentName].enabled, (value) => {
-  if (!isDragMode.value) {
-    return
-  }
-  if (value) {
-    modifyMoveableWrapClass(true, 'element-auxiliary-line', 'element-bg-hover', 'element-active')
-  }
-})
+watch(
+  () => localConfig[props.componentName].enabled,
+  (value) => {
+    if (!isDragMode.value) {
+      return
+    }
+    if (value) {
+      modifyMoveableWrapClass(true, 'element-auxiliary-line', 'element-bg-hover', 'element-active')
+    }
+  },
+)
 
 // 选中当前组件时添加active样式
 watch(isCurrentActive, (value) => {
@@ -261,7 +266,10 @@ const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
 
 <template>
   <div>
-    <div :style="moveableWrapStyle" class="moveable__wrap">
+    <div
+      :style="moveableWrapStyle"
+      class="moveable__wrap"
+    >
       <slot />
     </div>
   </div>

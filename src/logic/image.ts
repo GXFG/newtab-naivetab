@@ -1,6 +1,8 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getBingImages } from '@/api'
-import { databaseStore, localConfig, localState, log, urlToFile, compressedImageUrlToBase64 } from '@/logic'
+import { log, urlToFile, compressedImageUrlToBase64 } from '@/logic/util'
+import { databaseStore } from '@/logic/database'
+import { localConfig, localState } from '@/logic/store'
 
 /**
  * e.g.: https://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
@@ -164,9 +166,7 @@ export const initBackgroundImage = () => {
 }
 
 //  资源无变化
-watch([
-  () => localState.value.currAppearanceCode,
-], async () => {
+watch([() => localState.value.currAppearanceCode], async () => {
   if (!localConfig.general.isBackgroundImageEnabled) {
     return
   }
@@ -176,23 +176,27 @@ watch([
 })
 
 // 涉及资源变化
-watch([
-  () => localConfig.general.backgroundImageSource,
-  () => localConfig.general.backgroundImageNames,
-  () => localConfig.general.backgroundImageHighQuality,
-  () => localConfig.general.isBackgroundImageCustomUrlEnabled,
-  () => localConfig.general.backgroundImageCustomUrls,
-], async () => {
-  if (!localConfig.general.isBackgroundImageEnabled) {
-    return
-  }
-  deleteCurrSmallBackgroundImage()
-  // 背景图来源为本地，需要独立存储预览图
-  if (localConfig.general.backgroundImageSource === 0) {
-    setCurrSmallBackgroundImage()
-  }
-  await deleteCurrRawBackgroundImageInDB()
-  renderRawBackgroundImage()
-}, {
-  deep: true,
-})
+watch(
+  [
+    () => localConfig.general.backgroundImageSource,
+    () => localConfig.general.backgroundImageNames,
+    () => localConfig.general.backgroundImageHighQuality,
+    () => localConfig.general.isBackgroundImageCustomUrlEnabled,
+    () => localConfig.general.backgroundImageCustomUrls,
+  ],
+  async () => {
+    if (!localConfig.general.isBackgroundImageEnabled) {
+      return
+    }
+    deleteCurrSmallBackgroundImage()
+    // 背景图来源为本地，需要独立存储预览图
+    if (localConfig.general.backgroundImageSource === 0) {
+      setCurrSmallBackgroundImage()
+    }
+    await deleteCurrRawBackgroundImageInDB()
+    renderRawBackgroundImage()
+  },
+  {
+    deep: true,
+  },
+)

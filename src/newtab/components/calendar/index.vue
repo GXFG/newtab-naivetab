@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
-import { isDragMode, localConfig, getIsComponentRender, getLayoutStyle, getStyleField, gaProxy } from '@/logic'
+import { gaProxy } from '@/logic/gtag'
+import { isDragMode } from '@/logic/moveable'
+import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
@@ -263,8 +265,16 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
 </script>
 
 <template>
-  <MoveableComponentWrap v-model:dragStyle="dragStyle" componentName="calendar">
-    <div v-if="isRender" id="calendar" data-target-type="1" data-target-name="calendar">
+  <MoveableComponentWrap
+    v-model:dragStyle="dragStyle"
+    component-name="calendar"
+  >
+    <div
+      v-if="isRender"
+      id="calendar"
+      data-target-type="1"
+      data-target-name="calendar"
+    >
       <div
         class="calendar__container"
         :style="dragStyle || containerStyle"
@@ -285,7 +295,13 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
             />
           </div>
           <div class="options__item">
-            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onPrevMonth()">
+            <NButton
+              class="item__btn"
+              text
+              :disabled="isDragMode"
+              :style="isDragMode ? 'cursor: move;' : ''"
+              @click="onPrevMonth()"
+            >
               <fa-solid:angle-left class="btn__icon" />
             </NButton>
             <NSelect
@@ -296,7 +312,13 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
               :disabled="isDragMode"
               @update:value="onDateChange('month')"
             />
-            <NButton class="item__btn" text :disabled="isDragMode" :style="isDragMode ? 'cursor: move;' : ''" @click="onNextMonth()">
+            <NButton
+              class="item__btn"
+              text
+              :disabled="isDragMode"
+              :style="isDragMode ? 'cursor: move;' : ''"
+              @click="onNextMonth()"
+            >
               <fa-solid:angle-right class="btn__icon" />
             </NButton>
           </div>
@@ -315,13 +337,27 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
         </div>
         <!-- header -->
         <ul class="calendar__header">
-          <li v-for="item in weekList" :key="item.value" class="header__item" :class="{ 'header__item--weekend': [6, 7].includes(item.value) }">
+          <li
+            v-for="item in weekList"
+            :key="item.value"
+            class="header__item"
+            :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
+          >
             {{ item.label }}
           </li>
         </ul>
         <!-- body -->
-        <ul class="calendar__body">
-          <li v-for="item in state.dateList" :key="item.date" @click="onToggleDetailPopover(item.date)">
+        <ul
+          class="calendar__body"
+          :class="{
+            'calendar__body--hover': !isDragMode,
+          }"
+        >
+          <li
+            v-for="item in state.dateList"
+            :key="item.date"
+            @click="onToggleDetailPopover(item.date)"
+          >
             <NPopover
               style="max-width: 300px"
               display-directive="if"
@@ -349,10 +385,19 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                       'item__label--rest': item.type === 1,
                       'item__label--work': item.type === 2,
                     }"
-                  >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
-                  <span v-if="item.isToday" class="item__today">{{ $t('calendar.today') }}</span>
+                    >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span
+                  >
+                  <span
+                    v-if="item.isToday"
+                    class="item__today"
+                    >{{ $t('calendar.today') }}</span
+                  >
                   <span class="item__day">{{ item.day }}</span>
-                  <span class="item__desc" :class="{ 'item__desc--highlight': item.isFestival }">{{ item.desc }}</span>
+                  <span
+                    class="item__desc"
+                    :class="{ 'item__desc--highlight': item.isFestival }"
+                    >{{ item.desc }}</span
+                  >
                 </div>
               </template>
 
@@ -369,33 +414,25 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                   {{ `${detailInfo.solarFestivals} ${detailInfo.lunarFestivals}` }}
                 </p>
                 <div class="detail__row">
-                  <p class="row__tag row__tag--yi">
-                    易
-                  </p>
+                  <p class="row__tag row__tag--yi">易</p>
                   <p class="row__value">
                     {{ detailInfo.yi }}
                   </p>
                 </div>
                 <div class="detail__row">
-                  <p class="row__tag row__tag--ji">
-                    忌
-                  </p>
+                  <p class="row__tag row__tag--ji">忌</p>
                   <p class="row__value">
                     {{ detailInfo.ji }}
                   </p>
                 </div>
                 <div class="detail__row">
-                  <p class="row__label">
-                    吉神
-                  </p>
+                  <p class="row__label">吉神</p>
                   <p class="row__value">
                     {{ detailInfo.jishen }}
                   </p>
                 </div>
                 <div class="detail__row">
-                  <p class="row__label">
-                    凶煞
-                  </p>
+                  <p class="row__label">凶煞</p>
                   <p class="row__value">
                     {{ detailInfo.xiongsha }}
                   </p>
@@ -498,7 +535,6 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
         border-radius: v-bind(customBorderRadius);
         border: 1px solid rgba(0, 0, 0, 0);
         overflow: hidden;
-        cursor: pointer;
         .item__day {
         }
         .item__desc {
@@ -559,12 +595,17 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
         opacity: 0.4;
       }
     }
+    .calendar__body--hover {
+      cursor: pointer;
+    }
   }
   .calendar__container-border {
     outline: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
   .calendar__container-shadow {
-    box-shadow: v-bind(customShadowColor) 0px 2px 4px 0px, v-bind(customShadowColor) 0px 2px 16px 0px;
+    box-shadow:
+      v-bind(customShadowColor) 0px 2px 4px 0px,
+      v-bind(customShadowColor) 0px 2px 16px 0px;
   }
 }
 

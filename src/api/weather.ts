@@ -1,5 +1,6 @@
 import http from '@/lib/http'
-import { WEATHER_LANG_MAP, localConfig } from '@/logic'
+import { WEATHER_LANG_MAP } from '@/logic/const'
+import { localConfig } from '@/logic/store'
 
 // https://dev.qweather.com/docs/api/geo/city-lookup/
 export const getCityLookup = (location: string) => {
