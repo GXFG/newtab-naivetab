@@ -294,6 +294,9 @@ export const handleAppUpdate = async () => {
   if (compareLeftVersionLessThanRightVersions(version, '1.17.0')) {
     localConfig.general.isFirstOpen = false
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.17.1')) {
+    localConfig.general.openPageFocusElement = 'root'
+  }
   // 更新local版本号
   localConfig.general.version = pkg.version
   updateSuccess()

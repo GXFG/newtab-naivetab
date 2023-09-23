@@ -271,3 +271,10 @@ export const WEATHER_SPEED_UNIT_MAP = {
   mph: 'mph',
   kph: 'km/h',
 }
+
+export const FOCUE_ELEMENT_SELECTOR_MAP = {
+  root: '#app',
+  bookmarkKeyboard: '#bookmark',
+  search: '#search .n-input__input-el',
+  memo: '#memo .n-input__textarea-el',
+}

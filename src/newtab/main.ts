@@ -1,4 +1,4 @@
-import '../styles/index.ts'
+import '../styles/index'
 import { createApp } from 'vue'
 import i18n from '@/lib/i18n'
 import lazyImage from '@/directive/lazyImage'

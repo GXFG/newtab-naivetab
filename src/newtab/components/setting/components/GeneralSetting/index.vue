@@ -27,6 +27,14 @@ const drawerPlacementList = computed(() => [
   { label: window.$t('common.bottom'), value: 'bottom' },
 ])
 
+const focusElementList = computed(() => [
+  { label: window.$t('general.focusBrowserDefault'), value: 'default' },
+  { label: window.$t('general.focusRoot'), value: 'root' },
+  { label: window.$t('setting.search'), value: 'search' },
+  { label: window.$t('setting.memo'), value: 'memo' },
+  { label: window.$t('setting.bookmarkKeyboard'), value: 'bookmarkKeyboard' },
+])
+
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
   localConfig.general.lang = locale
@@ -109,6 +117,12 @@ const onResetSetting = () => {
             {{ item.label }}
           </NRadioButton>
         </NRadioGroup>
+      </NFormItem>
+      <NFormItem :label="$t('general.defaultFocus')">
+        <NSelect
+          v-model:value="localConfig.general.openPageFocusElement"
+          :options="focusElementList"
+        />
       </NFormItem>
       <NFormItem :label="$t('general.loadPageAnimation')">
         <NSwitch v-model:value="localConfig.general.isLoadPageAnimationEnabled" />
