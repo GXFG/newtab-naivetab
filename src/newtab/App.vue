@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
 import { gaProxy } from '@/logic/gtag'
+import { FOCUE_ELEMENT_SELECTOR_MAP } from '@/logic/const'
 import { startKeydown, startTimer, stopTimer, onPageFocus } from '@/logic/task'
 import { handleWatchLocalConfigChange, handleMissedUploadConfig, loadRemoteConfig } from '@/logic/storage'
 import { handleFirstOpen } from '@/logic/guide'
@@ -11,6 +12,13 @@ import { handleWatchWeatherConfigChange } from '@/logic/weather'
 import Content from '@/newtab/Content.vue'
 import pkg from '../../package.json'
 
+if (localConfig.general.openPageFocusElement !== 'default') {
+  if (location.search !== '?focus') {
+    location.search = '?focus'
+    throw new Error()
+  }
+}
+
 const onDot = () => {
   const [brand] = navigator.userAgentData?.brands.slice(-1) || []
   gaProxy('view', ['newtab'], {
@@ -19,6 +27,17 @@ const onDot = () => {
     platform: navigator.userAgentData?.platform,
     browser: `${brand.brand}_${brand.version}`,
   })
+}
+
+const handleFocusPage = () => {
+  if (localConfig.general.openPageFocusElement === 'default') {
+    return
+  }
+  const selector = FOCUE_ELEMENT_SELECTOR_MAP[localConfig.general.openPageFocusElement]
+  const focusEle: any = document.querySelector(selector)
+  if (focusEle && focusEle.focus) {
+    focusEle.focus()
+  }
 }
 
 onMounted(async () => {
@@ -34,6 +53,7 @@ onMounted(async () => {
   handleAppUpdate()
   handleWatchNewsConfigChange()
   handleWatchWeatherConfigChange()
+  handleFocusPage()
   onDot()
 })
 

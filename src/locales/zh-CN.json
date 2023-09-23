@@ -105,7 +105,7 @@
   "guide": {
     "prevStep": "上一步",
     "nextStep": "下一步",
-    "doneStep": "完成",
+    "doneStep": "开始",
     "stepTitle1": "添加组件",
     "stepDescription1": "首次安装后，默认会打开“画布模式”，此时选中左侧抽屉内的组件，拖动至屏幕内任意位置以完成对组件的添加和布局",
     "stepTitle2": "移除组件",
@@ -145,6 +145,9 @@
     "generalLabel": "通用",
     "pageTitle": "页面标题",
     "followSystem": "跟随系统",
+    "defaultFocus": "默认聚焦",
+    "focusBrowserDefault": "默认",
+    "focusRoot": "根元素",
     "loadPageAnimation": "载入动画",
     "primaryColorTips": "修改后需刷新页面生效",
     "settingDividerSetting": "设置",
