@@ -60,6 +60,10 @@ const handleSearchBlur = () => {
 }
 
 const handleSearchInput = () => {
+  if (isDragMode.value) {
+    state.searchValue = ''
+    return
+  }
   state.isSuggestVisible = true
   state.isSuggestSelecting = false
   state.currSuggestIndex = -1

@@ -13,6 +13,26 @@ const onBlur = () => {
   globalState.isMemoFocused = false
 }
 
+// isDragMode下不允许输入
+let lastMemoContent = ''
+
+const handleMemoInput = () => {
+  if (lastMemoContent.length !== 0) {
+    localConfig.memo.content = lastMemoContent
+  }
+}
+
+watch(
+  () => isDragMode.value,
+  (data) => {
+    if (data) {
+      lastMemoContent = localConfig.memo.content
+    } else {
+      lastMemoContent = ''
+    }
+  },
+)
+
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
 const customWidth = getStyleField(CNAME, 'width', 'vmin')
@@ -58,6 +78,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
             :show-count="localConfig.memo.countEnabled"
             @focus="onFocus"
             @blur="onBlur"
+            @input="handleMemoInput"
           />
         </div>
       </div>
