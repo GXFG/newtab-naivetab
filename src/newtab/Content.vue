@@ -21,7 +21,7 @@ window.$loadingBar = useLoadingBar()
   <!-- component -->
   <BackgroundImg />
   <RightClickMenu />
-  <WhatsNewModal />
+  <ChangelogModal />
   <SponsorModal />
   <MoveableGuideLine />
   <MoveableElementDrawer />

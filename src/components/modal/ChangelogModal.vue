@@ -3,18 +3,18 @@ import { globalState } from '@/logic/store'
 import Currentlog from '../../../CHANGELOG.md'
 
 const onCloseModal = () => {
-  globalState.isWhatsNewModalVisible = false
+  globalState.isChangelogModalVisible = false
 }
 </script>
 
 <template>
   <NModal
-    :show="globalState.isWhatsNewModalVisible"
+    :show="globalState.isChangelogModalVisible"
     :mask-closable="false"
   >
     <NCard
       class="card__wrap"
-      :title="`✨${$t('common.whatsNew')}✨`"
+      :title="`✨${$t('rightMenu.changelog')}✨`"
     >
       <div class="modal__content">
         <Currentlog />

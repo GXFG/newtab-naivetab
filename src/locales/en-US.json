@@ -64,9 +64,6 @@
     "icon": "Icon",
     "config": "Config",
     "format": "Format",
-    "whatsNew": "What's New",
-    "userDocs": "User Docs",
-    "userGuide": "User Guide",
     "preview": "Preview",
     "switch": "Switch",
     "refresh": "Refresh",
@@ -79,11 +76,7 @@
     "upload": "Upload",
     "load": "Load",
     "setting": "Setting",
-    "dragMode": "DragMode",
-    "fullscreen": "Fullscreen",
-    "feedback": "Feedback",
     "other": "Other",
-    "help": "Help",
     "retry": "Retry",
     "login": "Login"
   },
@@ -98,25 +91,17 @@
     "favoriteLimt": "The maximum number of favorites has been reached"
   },
   "rightMenu": {
+    "editLayout": "Edit layout",
+    "doneEdit": "Done Edit",
+    "fullscreen": "Fullscreen",
     "encourage": "Encourage",
-    "positiveFeedback": "Give a positive feedback",
-    "buyMeACoffee": "Buy me a coffee"
-  },
-  "guide": {
-    "prevStep": "Prev Step",
-    "nextStep": "Next Step",
-    "doneStep": "Done",
-    "tipsTitle": "Tips",
-    "stepTitle1": "Add components",
-    "stepDescription1": "After the first installation, the 'Drag Mode' is turned on by default, at this time the components in the left drawer are selected, and dragged to the screen to complete the addition and layout of the components",
-    "stepTitle2": "Remove components",
-    "stepDescription2": "In Drag Mode, with the component selected in the screen, drag to the trash can in the upper-right corner, or press Delete/Backspace to remove the component",
-    "stepTitle3": "Exit Drag Mode",
-    "stepDescription3": "Click the close button in the upper left corner or press the Esc key to exit 'Drag Mode'; From the right mouse button menu, you can enter the 'Component Settings', 'Drag Mode' again",
-    "stepTitle4": "Right-click menu",
-    "stepDescription4": "For all components: hover over the component, right-click to bring up the settings menu, click 'Component Settings', you can modify the function and style",
-    "stepTitle5": "Complete the tutorial",
-    "stepDescription5": "Start customizing your NaiveTab"
+    "goodReview": "Give a good review",
+    "buyACupOfCoffee": "Buy a cup of coffee",
+    "userHelp": "User Help",
+    "userGuide": "User Guide",
+    "userDocs": "User Docs",
+    "changelog": "Changelog",
+    "feedback": "Feedback"
   },
   "sponsor": {
     "title": "Sponsor a coffee",
@@ -124,6 +109,22 @@
     "confirm": "Next time for sure",
     "alipay": "Alipay",
     "wechat": "Wechat"
+  },
+  "guide": {
+    "prevStep": "Prev Step",
+    "nextStep": "Next Step",
+    "doneStep": "Done",
+    "tipsTitle": "Tips",
+    "stepTitle1": "Add components",
+    "stepDescription1": "After the first installation, the 'Edit layout' is turned on by default, at this time the components in the left drawer are selected, and dragged to the screen to complete the addition and layout of the components",
+    "stepTitle2": "Remove components",
+    "stepDescription2": "selected component in the screen, drag to the trash can in the upper-right corner, or press Delete/Backspace to remove the component",
+    "stepTitle3": "Done Edit layout",
+    "stepDescription3": "Click the close button in the upper left corner or press the Esc key to exit 'Edit layout'; From the right mouse button menu, you can enter the 'Component Settings', 'Edit layout' again",
+    "stepTitle4": "Right-click menu",
+    "stepDescription4": "For all components: hover over the component, right-click to bring up the settings menu, click 'Component Settings', you can modify the function and style",
+    "stepTitle5": "Complete the tutorial",
+    "stepDescription5": "Start customizing your NaiveTab"
   },
   "setting": {
     "general": "General",
