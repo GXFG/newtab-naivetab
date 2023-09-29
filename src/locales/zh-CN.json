@@ -76,11 +76,9 @@
     "upload": "上传",
     "load": "载入",
     "setting": "设置",
-    "dragMode": "画布模式",
     "other": "其他",
     "retry": "重试",
-    "login": "登录",
-    "changelog": "更新日志"
+    "login": "登录"
   },
   "form": {
     "applyToAppearance": "应用于外观",
@@ -93,6 +91,8 @@
     "favoriteLimt": "已达到收藏最大数"
   },
   "rightMenu": {
+    "editLayout": "编辑布局",
+    "doneEdit": "完成编辑",
     "fullscreen": "全屏模式",
     "encourage": "支持应用",
     "goodReview": "给个好评",
@@ -100,6 +100,7 @@
     "userHelp": "使用帮助",
     "userGuide": "操作指南",
     "userDocs": "用户文档",
+    "changelog": "更新日志",
     "feedback": "反馈建议"
   },
   "sponsor": {
@@ -114,15 +115,15 @@
     "nextStep": "下一步",
     "doneStep": "开始",
     "stepTitle1": "添加组件",
-    "stepDescription1": "首次安装后，默认会打开“画布模式”，此时选中左侧抽屉内的组件，拖动至屏幕内任意位置以完成对组件的添加和布局",
+    "stepDescription1": "首次安装后，默认会触发“编辑布局”，此时选中左侧抽屉内的组件，拖动至屏幕内任意位置以完成对组件的添加和布局。",
     "stepTitle2": "移除组件",
-    "stepDescription2": "在“画布模式”下，选中屏幕内的组件后，拖动至右上角的垃圾桶，或按Delete/Backspace键以移除组件",
-    "stepTitle3": "退出画布模式",
-    "stepDescription3": "点击左上角关闭按钮或按Esc键 可退出“画布模式”；通过鼠标右键菜单可再次进入“组件设置”、“画布模式”",
+    "stepDescription2": "选中屏幕内的组件后，拖动至右上角的垃圾桶，或按Delete/Backspace键以移除组件。",
+    "stepTitle3": "完成编辑",
+    "stepDescription3": "点击左上角完成按钮或按Esc键，完成编辑；通过鼠标右键菜单可再次进入“编辑布局”。",
     "stepTitle4": "右键菜单",
-    "stepDescription4": "针对所有组件：鼠标悬浮在组件上，点击鼠标右键唤出设置菜单，点击“组件设置”，可进行功能、样式的修改",
+    "stepDescription4": "鼠标悬浮在组件上，点击鼠标右键唤出设置菜单，点击“组件设置”，可进行组件功能、样式的修改。",
     "stepTitle5": "完成教程",
-    "stepDescription5": "开始自定义你的 NaiveTab 吧"
+    "stepDescription5": "开始自定义你的 NaiveTab 吧。"
   },
   "setting": {
     "general": "通用",

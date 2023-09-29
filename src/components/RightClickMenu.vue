@@ -17,84 +17,87 @@ const state = reactive({
 
 const renderIconFunc = (icon: string) => () => h(Icon, { icon })
 
-const menuList = computed(() => [
-  {
-    label: (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
-    key: 'setting',
-    icon: renderIconFunc('ion:settings-outline'),
-    disabled: isDragMode.value,
-  },
-  {
-    label: isDragMode.value ? `${window.$t('common.exit')}${window.$t('common.dragMode')}` : window.$t('common.dragMode'),
-    key: 'dragMode',
-    icon: renderIconFunc('tabler:drag-drop'),
-  },
-  {
-    label: `${globalState.isFullScreen ? window.$t('common.exit') : ''}${window.$t('rightMenu.fullscreen')}`,
-    key: 'fullscreen',
-    icon: renderIconFunc('dashicons:fullscreen-alt'),
-  },
-  {
-    type: 'divider',
-    key: 'd1',
-  },
-  {
-    label: window.$t('rightMenu.userHelp'),
-    key: 'userHelp',
-    icon: renderIconFunc('ic:baseline-help-outline'),
-    children: [
-      {
-        label: window.$t('rightMenu.userGuide'),
-        key: 'userGuide',
-        icon: renderIconFunc('material-symbols:developer-guide-outline-rounded'),
-      },
-      {
-        label: window.$t('rightMenu.userDocs'),
-        key: 'userDocs',
-        icon: renderIconFunc('tabler:book'),
-      },
-      {
-        label: window.$t('common.changelog'),
-        key: 'changelog',
-        icon: renderIconFunc('ic:outline-new-releases'),
-      },
-    ],
-  },
-  {
-    label: window.$t('rightMenu.encourage'),
-    key: 'encourage',
-    icon: renderIconFunc('ph:heart-bold'),
-    children: [
-      {
-        label: window.$t('rightMenu.buyACupOfCoffee'),
-        key: 'buyACupOfCoffee',
-        icon: renderIconFunc('ep:coffee'),
-      },
-      {
-        label: window.$t('rightMenu.goodReview'),
-        key: 'goodReview',
-        icon: renderIconFunc('ph:thumbs-up-bold'),
-      },
-    ],
-  },
-  {
-    label: window.$t('rightMenu.feedback'),
-    key: 'feedback',
-    icon: renderIconFunc('bx:message-rounded-dots'),
-    children: [
-      {
-        label: 'GitHub',
-        key: 'feedbackGithub',
-        icon: renderIconFunc('carbon:logo-github'),
-      },
-      {
-        label: 'Email',
-        key: 'feedbackEmail',
-        icon: renderIconFunc('mdi:email-outline'),
-      },
-    ],
-  },
-])
+const menuList = computed(() => {
+  const resList = [
+    {
+      label: (state.currComponentName.length === 0 ? window.$t('setting.general') : window.$t(`setting.${state.currComponentName}`)) + window.$t('common.setting'),
+      key: 'setting',
+      icon: renderIconFunc('ion:settings-outline'),
+      disabled: isDragMode.value,
+    },
+    {
+      label: isDragMode.value ? window.$t('rightMenu.doneEdit') : window.$t('rightMenu.editLayout'),
+      key: 'editLayout',
+      icon: renderIconFunc('tabler:drag-drop'),
+    },
+    {
+      label: `${globalState.isFullScreen ? window.$t('common.exit') : ''}${window.$t('rightMenu.fullscreen')}`,
+      key: 'fullscreen',
+      icon: renderIconFunc('dashicons:fullscreen-alt'),
+    },
+    {
+      type: 'divider',
+      key: 'd1',
+    },
+    {
+      label: window.$t('rightMenu.userHelp'),
+      key: 'userHelp',
+      icon: renderIconFunc('ic:baseline-help-outline'),
+      children: [
+        {
+          label: window.$t('rightMenu.userGuide'),
+          key: 'userGuide',
+          icon: renderIconFunc('material-symbols:developer-guide-outline-rounded'),
+        },
+        {
+          label: window.$t('rightMenu.userDocs'),
+          key: 'userDocs',
+          icon: renderIconFunc('tabler:book'),
+        },
+        {
+          label: window.$t('rightMenu.changelog'),
+          key: 'changelog',
+          icon: renderIconFunc('ic:outline-new-releases'),
+        },
+      ],
+    },
+    {
+      label: window.$t('rightMenu.encourage'),
+      key: 'encourage',
+      icon: renderIconFunc('ph:heart-bold'),
+      children: [
+        {
+          label: window.$t('rightMenu.buyACupOfCoffee'),
+          key: 'buyACupOfCoffee',
+          icon: renderIconFunc('ep:coffee'),
+        },
+        {
+          label: window.$t('rightMenu.goodReview'),
+          key: 'goodReview',
+          icon: renderIconFunc('ph:thumbs-up-bold'),
+        },
+      ],
+    },
+    {
+      label: window.$t('rightMenu.feedback'),
+      key: 'feedback',
+      icon: renderIconFunc('bx:message-rounded-dots'),
+      children: [
+        {
+          label: 'GitHub',
+          key: 'feedbackGithub',
+          icon: renderIconFunc('carbon:logo-github'),
+        },
+        {
+          label: 'Email',
+          key: 'feedbackEmail',
+          icon: renderIconFunc('mdi:email-outline'),
+        },
+      ],
+    },
+  ]
+  return resList
+})
 
 const menuActionMap = {
   setting: () => {
@@ -108,10 +111,10 @@ const menuActionMap = {
     switchSettingDrawerVisible(true)
     gaProxy('click', ['rightMenu', tabValue])
   },
-  dragMode: () => {
+  editLayout: () => {
     switchSettingDrawerVisible(false)
     toggleIsDragMode()
-    gaProxy('click', ['rightMenu', 'dragMode'])
+    gaProxy('click', ['rightMenu', 'editLayout'])
   },
   fullscreen: () => {
     toggleFullscreen()
@@ -171,6 +174,9 @@ const openMenu = async (e: MouseEvent) => {
 
 const handleContextMenu = async (e: MouseEvent) => {
   e.preventDefault()
+  if (isDragMode.value) {
+    toggleIsDragMode(false)
+  }
   if (globalState.isGuideMode || globalState.isSettingDrawerVisible) {
     return
   }

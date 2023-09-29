@@ -221,7 +221,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
           @click="handleExitDragMode"
         >
           <mdi:keyboard-esc class="exit__icon" />
-          <p>{{ `${$t('common.exit')}${$t('common.dragMode')}` }}</p>
+          <p>{{ $t('rightMenu.doneEdit') }}</p>
         </NButton>
       </div>
 

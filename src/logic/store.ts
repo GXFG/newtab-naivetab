@@ -196,7 +196,7 @@ const updateSuccess = () => {
           },
         },
         {
-          default: () => window.$t('common.changelog'),
+          default: () => window.$t('rightMenu.changelog'),
         },
       ),
   })
@@ -299,7 +299,7 @@ export const handleAppUpdate = async () => {
   }
   // 更新local版本号
   localConfig.general.version = pkg.version
-  updateSuccess()
+  // updateSuccess()
   // 刷新配置设置
   await updateSetting()
 }

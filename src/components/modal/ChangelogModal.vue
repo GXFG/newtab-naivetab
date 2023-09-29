@@ -14,7 +14,7 @@ const onCloseModal = () => {
   >
     <NCard
       class="card__wrap"
-      :title="`✨${$t('common.changelog')}✨`"
+      :title="`✨${$t('rightMenu.changelog')}✨`"
     >
       <div class="modal__content">
         <Currentlog />
