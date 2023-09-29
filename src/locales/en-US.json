@@ -64,9 +64,6 @@
     "icon": "Icon",
     "config": "Config",
     "format": "Format",
-    "whatsNew": "What's New",
-    "userDocs": "User Docs",
-    "userGuide": "User Guide",
     "preview": "Preview",
     "switch": "Switch",
     "refresh": "Refresh",
@@ -80,12 +77,10 @@
     "load": "Load",
     "setting": "Setting",
     "dragMode": "DragMode",
-    "fullscreen": "Fullscreen",
-    "feedback": "Feedback",
     "other": "Other",
-    "help": "Help",
     "retry": "Retry",
-    "login": "Login"
+    "login": "Login",
+    "changelog": "Changelog"
   },
   "form": {
     "applyToAppearance": "Apply to appearance",
@@ -98,9 +93,21 @@
     "favoriteLimt": "The maximum number of favorites has been reached"
   },
   "rightMenu": {
+    "fullscreen": "Fullscreen",
     "encourage": "Encourage",
-    "positiveFeedback": "Give a positive feedback",
-    "buyMeACoffee": "Buy me a coffee"
+    "goodReview": "Give a good review",
+    "buyACupOfCoffee": "Buy a cup of coffee",
+    "userHelp": "User Help",
+    "userGuide": "User Guide",
+    "userDocs": "User Docs",
+    "feedback": "Feedback"
+  },
+  "sponsor": {
+    "title": "Sponsor a coffee",
+    "content": "I am a personal developer, NaiveTab can not grow without your support and encouragement, if NaiveTab is helpful to you, you can sponsor it.",
+    "confirm": "Next time for sure",
+    "alipay": "Alipay",
+    "wechat": "Wechat"
   },
   "guide": {
     "prevStep": "Prev Step",
@@ -117,13 +124,6 @@
     "stepDescription4": "For all components: hover over the component, right-click to bring up the settings menu, click 'Component Settings', you can modify the function and style",
     "stepTitle5": "Complete the tutorial",
     "stepDescription5": "Start customizing your NaiveTab"
-  },
-  "sponsor": {
-    "title": "Sponsor a coffee",
-    "content": "I am a personal developer, NaiveTab can not grow without your support and encouragement, if NaiveTab is helpful to you, you can sponsor it.",
-    "confirm": "Next time for sure",
-    "alipay": "Alipay",
-    "wechat": "Wechat"
   },
   "setting": {
     "general": "General",

@@ -64,9 +64,6 @@
     "icon": "图标",
     "config": "配置",
     "format": "格式",
-    "whatsNew": "更新日志",
-    "userDocs": "用户文档",
-    "userGuide": "使用指南",
     "preview": "预览",
     "switch": "切换",
     "refresh": "刷新",
@@ -80,12 +77,10 @@
     "load": "载入",
     "setting": "设置",
     "dragMode": "画布模式",
-    "fullscreen": "全屏模式",
-    "feedback": "反馈建议",
     "other": "其他",
-    "help": "帮助",
     "retry": "重试",
-    "login": "登录"
+    "login": "登录",
+    "changelog": "更新日志"
   },
   "form": {
     "applyToAppearance": "应用于外观",
@@ -98,9 +93,21 @@
     "favoriteLimt": "已达到收藏最大数"
   },
   "rightMenu": {
-    "encourage": "鼓励",
-    "positiveFeedback": "给个好评",
-    "buyMeACoffee": "买杯咖啡"
+    "fullscreen": "全屏模式",
+    "encourage": "支持应用",
+    "goodReview": "给个好评",
+    "buyACupOfCoffee": "买杯咖啡",
+    "userHelp": "使用帮助",
+    "userGuide": "操作指南",
+    "userDocs": "用户文档",
+    "feedback": "反馈建议"
+  },
+  "sponsor": {
+    "title": "给作者买杯咖啡",
+    "content": "我是一名个人开发者，NaiveTab的成长离不开您的支持和鼓励，如果NaiveTab对您有帮助，可以支持一下。",
+    "confirm": "下次一定",
+    "alipay": "支付宝",
+    "wechat": "微信"
   },
   "guide": {
     "prevStep": "上一步",
@@ -116,13 +123,6 @@
     "stepDescription4": "针对所有组件：鼠标悬浮在组件上，点击鼠标右键唤出设置菜单，点击“组件设置”，可进行功能、样式的修改",
     "stepTitle5": "完成教程",
     "stepDescription5": "开始自定义你的 NaiveTab 吧"
-  },
-  "sponsor": {
-    "title": "给作者买杯咖啡",
-    "content": "我是一名个人开发者，NaiveTab的成长离不开您的支持和鼓励，如果NaiveTab对您有帮助，可以支持一下。",
-    "confirm": "下次一定",
-    "alipay": "支付宝",
-    "wechat": "微信"
   },
   "setting": {
     "general": "通用",

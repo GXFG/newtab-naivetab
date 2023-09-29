@@ -3,10 +3,10 @@ import { Icon } from '@iconify/vue'
 import { isEdge } from '@/env'
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
-import { URL_NAIVETAB_DOC_HOME, URL_FEEDBACK, URL_GITHUB_ISSUSE, URL_CHROME_STORE, URL_EDGE_STORE } from '@/logic/const'
+import { URL_NAIVETAB_DOC_HOME, URL_FEEDBACK_EMAIL, URL_GITHUB_ISSUSE, URL_CHROME_STORE, URL_EDGE_STORE } from '@/logic/const'
 import { openUserGuide } from '@/logic/guide'
 import { isDragMode, toggleIsDragMode, getTargetDataFromEvent } from '@/logic/moveable'
-import { toggleFullscreen, switchSettingDrawerVisible, globalState, openWhatsNewModal, openSponsorModal } from '@/logic/store'
+import { toggleFullscreen, switchSettingDrawerVisible, globalState, openChangelogModal, openSponsorModal } from '@/logic/store'
 
 const state = reactive({
   isMenuVisible: false,
@@ -30,7 +30,7 @@ const menuList = computed(() => [
     icon: renderIconFunc('tabler:drag-drop'),
   },
   {
-    label: `${globalState.isFullScreen ? window.$t('common.exit') : ''}${window.$t('common.fullscreen')}`,
+    label: `${globalState.isFullScreen ? window.$t('common.exit') : ''}${window.$t('rightMenu.fullscreen')}`,
     key: 'fullscreen',
     icon: renderIconFunc('dashicons:fullscreen-alt'),
   },
@@ -39,51 +39,58 @@ const menuList = computed(() => [
     key: 'd1',
   },
   {
-    label: window.$t('common.whatsNew'),
-    key: 'whatsNew',
-    icon: renderIconFunc('ic:outline-new-releases'),
-  },
-  {
-    label: window.$t('common.help'),
-    key: 'other',
-    icon: renderIconFunc('ph:heart-bold'),
+    label: window.$t('rightMenu.userHelp'),
+    key: 'userHelp',
+    icon: renderIconFunc('ic:baseline-help-outline'),
     children: [
       {
-        label: window.$t('common.userDocs'),
+        label: window.$t('rightMenu.userGuide'),
+        key: 'userGuide',
+        icon: renderIconFunc('material-symbols:developer-guide-outline-rounded'),
+      },
+      {
+        label: window.$t('rightMenu.userDocs'),
         key: 'userDocs',
         icon: renderIconFunc('tabler:book'),
       },
       {
-        label: window.$t('common.userGuide'),
-        key: 'userGuide',
-        icon: renderIconFunc('ic:baseline-help-outline'),
+        label: window.$t('common.changelog'),
+        key: 'changelog',
+        icon: renderIconFunc('ic:outline-new-releases'),
       },
+    ],
+  },
+  {
+    label: window.$t('rightMenu.encourage'),
+    key: 'encourage',
+    icon: renderIconFunc('ph:heart-bold'),
+    children: [
       {
-        label: window.$t('rightMenu.positiveFeedback'),
-        key: 'positiveFeedback',
-        icon: renderIconFunc('ph:thumbs-up-bold'),
-      },
-      {
-        label: window.$t('rightMenu.buyMeACoffee'),
-        key: 'buyMeACoffee',
+        label: window.$t('rightMenu.buyACupOfCoffee'),
+        key: 'buyACupOfCoffee',
         icon: renderIconFunc('ep:coffee'),
       },
       {
-        label: window.$t('common.feedback'),
-        key: 'feedback',
-        icon: renderIconFunc('bx:message-rounded-dots'),
-        children: [
-          {
-            label: 'GitHub',
-            key: 'feedbackGithub',
-            icon: renderIconFunc('carbon:logo-github'),
-          },
-          {
-            label: 'Email',
-            key: 'feedbackEmail',
-            icon: renderIconFunc('mdi:email-outline'),
-          },
-        ],
+        label: window.$t('rightMenu.goodReview'),
+        key: 'goodReview',
+        icon: renderIconFunc('ph:thumbs-up-bold'),
+      },
+    ],
+  },
+  {
+    label: window.$t('rightMenu.feedback'),
+    key: 'feedback',
+    icon: renderIconFunc('bx:message-rounded-dots'),
+    children: [
+      {
+        label: 'GitHub',
+        key: 'feedbackGithub',
+        icon: renderIconFunc('carbon:logo-github'),
+      },
+      {
+        label: 'Email',
+        key: 'feedbackEmail',
+        icon: renderIconFunc('mdi:email-outline'),
       },
     ],
   },
@@ -110,33 +117,33 @@ const menuActionMap = {
     toggleFullscreen()
     gaProxy('click', ['rightMenu', 'fullscreen'])
   },
-  userGuide: () => {
-    openUserGuide()
-    gaProxy('click', ['rightMenu', 'userGuide'])
-  },
   userDocs: () => {
     createTab(URL_NAIVETAB_DOC_HOME)
     gaProxy('click', ['rightMenu', 'userDocs'])
   },
-  whatsNew: () => {
-    openWhatsNewModal()
-    gaProxy('click', ['rightMenu', 'whatsNew'])
+  userGuide: () => {
+    openUserGuide()
+    gaProxy('click', ['rightMenu', 'userGuide'])
+  },
+  changelog: () => {
+    openChangelogModal()
+    gaProxy('click', ['rightMenu', 'changelog'])
   },
   feedbackGithub: () => {
     createTab(URL_GITHUB_ISSUSE)
     gaProxy('click', ['rightMenu', 'feedbackGithub'])
   },
   feedbackEmail: () => {
-    createTab(URL_FEEDBACK)
+    createTab(URL_FEEDBACK_EMAIL)
     gaProxy('click', ['rightMenu', 'feedbackEmail'])
   },
-  positiveFeedback: () => {
+  goodReview: () => {
     createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)
-    gaProxy('click', ['rightMenu', 'positiveFeedback'])
+    gaProxy('click', ['rightMenu', 'goodReview'])
   },
-  buyMeACoffee: () => {
+  buyACupOfCoffee: () => {
     openSponsorModal()
-    gaProxy('click', ['rightMenu', 'buyMeACoffee'])
+    gaProxy('click', ['rightMenu', 'buyACupOfCoffee'])
   },
 }
 
@@ -148,8 +155,18 @@ const onSelectMenu = (key: string) => {
   }
 }
 
-const onCloseMenu = () => {
-  state.isMenuVisible = false
+const onClickoutside = (e: MouseEvent) => {
+  if (e.button === 0) {
+    state.isMenuVisible = false
+  }
+}
+
+const openMenu = async (e: MouseEvent) => {
+  state.posX = e.clientX
+  state.posY = e.clientY
+  const targetData = getTargetDataFromEvent(e)
+  state.currComponentName = targetData.name
+  state.isMenuVisible = true
 }
 
 const handleContextMenu = async (e: MouseEvent) => {
@@ -157,13 +174,14 @@ const handleContextMenu = async (e: MouseEvent) => {
   if (globalState.isGuideMode || globalState.isSettingDrawerVisible) {
     return
   }
+  if (!state.isMenuVisible) {
+    openMenu(e)
+    return
+  }
   state.isMenuVisible = false
-  state.posX = e.clientX
-  state.posY = e.clientY
-  const targetData = getTargetDataFromEvent(e)
-  state.currComponentName = targetData.name
-  await nextTick()
-  state.isMenuVisible = true
+  setTimeout(() => {
+    openMenu(e)
+  }, 200)
 }
 
 document.oncontextmenu = handleContextMenu
@@ -173,11 +191,11 @@ document.oncontextmenu = handleContextMenu
   <NDropdown
     placement="bottom-start"
     trigger="manual"
+    :show="state.isMenuVisible"
     :x="state.posX"
     :y="state.posY"
     :options="menuList"
-    :show="state.isMenuVisible"
-    :on-clickoutside="onCloseMenu"
+    @clickoutside="onClickoutside"
     @select="onSelectMenu"
   />
 </template>

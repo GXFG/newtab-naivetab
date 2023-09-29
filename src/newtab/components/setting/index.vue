@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createTab } from '@/logic/util'
-import { URL_GITHUB, URL_NAIVETAB_DOC_HOME } from '@/logic/const'
+import { URL_GITHUB_HOME, URL_NAIVETAB_DOC_HOME } from '@/logic/const'
 import { getStyleConst, localConfig, globalState } from '@/logic/store'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting/index.vue'
@@ -130,7 +130,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
               <mdi:eye-circle-outline />&nbsp;{{ $t('common.preview') }}
             </NButton>
           </div>
-          <p class="bottom__version">Ver.{{ `${pkg.version}` }}</p>
+          <p class="bottom__version">Ver. {{ `${pkg.version}` }}</p>
           <div class="bottom__right">
             <NButton
               text
@@ -144,7 +144,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
               text
               class="right__icon"
               title="GitHub"
-              @click="createTab(URL_GITHUB)"
+              @click="createTab(URL_GITHUB_HOME)"
             >
               <carbon:logo-github />
             </NButton>
@@ -213,6 +213,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
         }
       }
       .bottom__version {
+        opacity: 0.8;
       }
       .bottom__right {
         display: flex;

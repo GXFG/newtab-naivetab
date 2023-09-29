@@ -35,7 +35,7 @@ export const globalState = reactive({
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
-  isWhatsNewModalVisible: false,
+  isChangelogModalVisible: false,
   isSponsorModalVisible: false,
   isSearchFocused: false,
   isMemoFocused: false,
@@ -164,8 +164,8 @@ export const switchSettingDrawerVisible = (status: boolean) => {
 
 export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localConfig.general.lang] || 'en')
 
-export const openWhatsNewModal = () => {
-  globalState.isWhatsNewModalVisible = true
+export const openChangelogModal = () => {
+  globalState.isChangelogModalVisible = true
 }
 
 export const openSponsorModal = () => {
@@ -192,11 +192,11 @@ const updateSuccess = () => {
           text: true,
           type: 'primary',
           onClick: () => {
-            openWhatsNewModal()
+            openChangelogModal()
           },
         },
         {
-          default: () => window.$t('common.whatsNew'),
+          default: () => window.$t('common.changelog'),
         },
       ),
   })
