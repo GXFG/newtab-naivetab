@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { swatcheColors } from '@/styles/const'
 import {
   KEYBOARD_CODE_TO_DEFAULT_CONFIG,
   KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST,
@@ -176,6 +175,59 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
       :border-radius-range="[0, 40]"
     >
       <template #header>
+        <NFormItem :label="$t('bookmark.listenBackgroundKeystrokes')">
+          <div class="setting__input-wrap">
+            <div class="setting__input_item">
+              <NSwitch v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes" />
+              <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
+            </div>
+            <div
+              v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
+              class="setting__input_item"
+            >
+              <NButton
+                ghost
+                type="primary"
+                @click="openConfigShortcutsPage()"
+              >
+                <ic:twotone-keyboard-command-key />&nbsp;{{ $t('bookmark.customKeys') }}
+              </NButton>
+            </div>
+          </div>
+        </NFormItem>
+
+        <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
+          <div class="setting__input-wrap">
+            <div class="setting__input_item">
+              <NSwitch v-model:value="localConfig.bookmark.isDblclickOpen" />
+              <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
+            </div>
+            <div
+              v-if="localConfig.bookmark.isDblclickOpen"
+              class="setting__input_item"
+            >
+              <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
+              <NInputNumber
+                v-model:value="localConfig.bookmark.dblclickIntervalTime"
+                class="setting__item-element setting__input-number--unit"
+                :min="0"
+                :step="1"
+              >
+                <template #suffix> ms </template>
+              </NInputNumber>
+              <Tips :content="$t('bookmark.intervalTimeTips')" />
+            </div>
+          </div>
+        </NFormItem>
+
+        <NFormItem :label="$t('bookmark.newTabOpen')">
+          <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
+        </NFormItem>
+
+        <NFormItem :label="$t('bookmark.showName')">
+          <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
+        </NFormItem>
+
         <!-- bookmarkConfig -->
         <NCollapseItem
           :title="$t('setting.bookmarkConfig')"
@@ -217,6 +269,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                   </NInputGroupLabel>
                 </div>
               </div>
+
               <!-- right: config -->
               <div class="content__config">
                 <transition-group
@@ -300,58 +353,6 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             </div>
           </div>
         </NCollapseItem>
-
-        <NDivider />
-
-        <NFormItem :label="$t('bookmark.listenBackgroundKeystrokes')">
-          <div class="setting__input-wrap">
-            <div class="setting__input_item">
-              <NSwitch v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes" />
-              <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
-            </div>
-            <div
-              v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
-              class="setting__input_item"
-            >
-              <NButton
-                ghost
-                type="primary"
-                @click="openConfigShortcutsPage()"
-              >
-                <ic:twotone-keyboard-command-key />&nbsp;{{ $t('bookmark.customKeys') }}
-              </NButton>
-            </div>
-          </div>
-        </NFormItem>
-        <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
-          <div class="setting__input-wrap">
-            <div class="setting__input_item">
-              <NSwitch v-model:value="localConfig.bookmark.isDblclickOpen" />
-              <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
-            </div>
-            <div
-              v-if="localConfig.bookmark.isDblclickOpen"
-              class="setting__input_item"
-            >
-              <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
-              <NInputNumber
-                v-model:value="localConfig.bookmark.dblclickIntervalTime"
-                class="setting__item-element setting__input-number--unit"
-                :min="0"
-                :step="1"
-              >
-                <template #suffix> ms </template>
-              </NInputNumber>
-              <Tips :content="$t('bookmark.intervalTimeTips')" />
-            </div>
-          </div>
-        </NFormItem>
-        <NFormItem :label="$t('bookmark.newTabOpen')">
-          <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
-        </NFormItem>
-        <NFormItem :label="$t('bookmark.showName')">
-          <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
-        </NFormItem>
       </template>
 
       <template #style>
@@ -370,6 +371,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             :max="10"
           />
         </NFormItem>
+
         <NFormItem :label="`${$t('common.size')}`">
           <NSlider
             v-model:value="localConfig.bookmark.keycapSize"
@@ -402,6 +404,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             :max="50"
           />
         </NFormItem>
+
         <NFormItem :label="`${$t('bookmark.nameLabel')}${$t('common.font')}`">
           <NSelect
             v-model:value="localConfig.bookmark.keycapBookmarkFontFamily"
@@ -416,6 +419,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             :max="50"
           />
         </NFormItem>
+
         <NFormItem :label="$t('bookmark.keyboardType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keyboardType">
             <NRadio
@@ -427,6 +431,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             </NRadio>
           </NRadioGroup>
         </NFormItem>
+
         <NFormItem :label="$t('bookmark.keycapType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keycapType">
             <NRadioButton
@@ -438,6 +443,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             </NRadioButton>
           </NRadioGroup>
         </NFormItem>
+
         <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.theme')}`">
           <NSelect
             v-model:value="preinstallTheme"
@@ -446,57 +452,45 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             @update:value="handleKeycapColorSelectUpdate"
           />
         </NFormItem>
+
         <p class="setting__label">
           {{ `${$t('common.main')}${$t('bookmark.keycap')} QWERTY` }}
         </p>
-        <NFormItem :label="`${$t('common.fontColor')}`">
-          <NColorPicker
-            v-model:value="localConfig.bookmark.mainFontColor[localState.currAppearanceCode]"
-            show-preview
-            :swatches="swatcheColors"
-          />
-        </NFormItem>
-        <NFormItem :label="`${$t('common.backgroundColor')}`">
-          <NColorPicker
-            v-model:value="localConfig.bookmark.mainBackgroundColor[localState.currAppearanceCode]"
-            show-preview
-            :swatches="swatcheColors"
-          />
-        </NFormItem>
+        <div class="color-form__wrap">
+          <NFormItem :label="`${$t('common.fontColor')}`">
+            <CustomColorPicker v-model:value="localConfig.bookmark.mainFontColor[localState.currAppearanceCode]" />
+          </NFormItem>
+
+          <NFormItem :label="`${$t('common.backgroundColor')}`">
+            <CustomColorPicker v-model:value="localConfig.bookmark.mainBackgroundColor[localState.currAppearanceCode]" />
+          </NFormItem>
+        </div>
+
         <p class="setting__label">
           {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Control` }}
         </p>
-        <NFormItem :label="`${$t('common.fontColor')}`">
-          <NColorPicker
-            v-model:value="localConfig.bookmark.emphasisOneFontColor[localState.currAppearanceCode]"
-            show-preview
-            :swatches="swatcheColors"
-          />
-        </NFormItem>
-        <NFormItem :label="`${$t('common.backgroundColor')}`">
-          <NColorPicker
-            v-model:value="localConfig.bookmark.emphasisOneBackgroundColor[localState.currAppearanceCode]"
-            show-preview
-            :swatches="swatcheColors"
-          />
-        </NFormItem>
+        <div class="color-form__wrap">
+          <NFormItem :label="`${$t('common.fontColor')}`">
+            <CustomColorPicker v-model:value="localConfig.bookmark.emphasisOneFontColor[localState.currAppearanceCode]" />
+          </NFormItem>
+
+          <NFormItem :label="`${$t('common.backgroundColor')}`">
+            <CustomColorPicker v-model:value="localConfig.bookmark.emphasisOneBackgroundColor[localState.currAppearanceCode]" />
+          </NFormItem>
+        </div>
+
         <p class="setting__label">
           {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Enter` }}
         </p>
-        <NFormItem :label="`${$t('common.fontColor')}`">
-          <NColorPicker
-            v-model:value="localConfig.bookmark.emphasisTwoFontColor[localState.currAppearanceCode]"
-            show-preview
-            :swatches="swatcheColors"
-          />
-        </NFormItem>
-        <NFormItem :label="`${$t('common.backgroundColor')}`">
-          <NColorPicker
-            v-model:value="localConfig.bookmark.emphasisTwoBackgroundColor[localState.currAppearanceCode]"
-            show-preview
-            :swatches="swatcheColors"
-          />
-        </NFormItem>
+        <div class="color-form__wrap">
+          <NFormItem :label="`${$t('common.fontColor')}`">
+            <CustomColorPicker v-model:value="localConfig.bookmark.emphasisTwoFontColor[localState.currAppearanceCode]" />
+          </NFormItem>
+
+          <NFormItem :label="`${$t('common.backgroundColor')}`">
+            <CustomColorPicker v-model:value="localConfig.bookmark.emphasisTwoBackgroundColor[localState.currAppearanceCode]" />
+          </NFormItem>
+        </div>
       </template>
     </BaseComponentSetting>
   </NCollapse>

@@ -145,7 +145,7 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
         class="toolbar__icon"
         @click="onViewImage()"
       >
-        <mdi:eye-circle-outline />
+        <uil:bullseye />
       </div>
       <div
         class="toolbar__icon"

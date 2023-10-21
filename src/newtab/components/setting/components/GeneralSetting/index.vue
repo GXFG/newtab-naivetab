@@ -100,6 +100,7 @@ const onResetSetting = () => {
           type="text"
         />
       </NFormItem>
+
       <NFormItem :label="$t('general.language')">
         <NSelect
           v-model:value="proxy.$i18n.locale"
@@ -107,6 +108,7 @@ const onResetSetting = () => {
           @update:value="onChangeLocale"
         />
       </NFormItem>
+
       <NFormItem :label="$t('common.drawerSite')">
         <NRadioGroup v-model:value="localConfig.general.drawerPlacement">
           <NRadioButton
@@ -118,12 +120,14 @@ const onResetSetting = () => {
           </NRadioButton>
         </NRadioGroup>
       </NFormItem>
+
       <NFormItem :label="$t('general.defaultFocus')">
         <NSelect
           v-model:value="localConfig.general.openPageFocusElement"
           :options="focusElementList"
         />
       </NFormItem>
+
       <NFormItem :label="$t('general.loadPageAnimation')">
         <NSwitch v-model:value="localConfig.general.isLoadPageAnimationEnabled" />
       </NFormItem>
@@ -152,9 +156,10 @@ const onResetSetting = () => {
           class="setting__row-element"
           @click="openBackgroundDrawer()"
         >
-          <tabler:edit />&nbsp;{{ $t('common.edit') }}
+          <uil:edit />&nbsp;{{ $t('common.edit') }}
         </NButton>
       </NFormItem>
+
       <NFormItem
         v-if="localConfig.general.isBackgroundImageEnabled"
         :label="$t('common.blur')"
@@ -173,6 +178,7 @@ const onResetSetting = () => {
           :max="200"
         />
       </NFormItem>
+
       <NFormItem
         v-if="localConfig.general.isBackgroundImageEnabled"
         :label="$t('common.opacity')"
@@ -207,26 +213,28 @@ const onResetSetting = () => {
         <Tips :content="$t('general.syncTimeTips')" />
       </NFormItem>
 
-      <NFormItem :label="$t('general.importSettingsLabel')">
-        <NButton
-          :loading="globalState.isImportSettingLoading"
-          @click="onImportSetting"
-        >
-          <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
-        </NButton>
-        <input
-          ref="importSettingInputEl"
-          style="display: none"
-          type="file"
-          accept=".json"
-          @change="onImportFileChange"
-        />
-        <Tips :content="$t('general.importSettingsTips')" />
-      </NFormItem>
+      <NFormItem :label="$t('general.importExportSettingsLabel')">
+        <div>
+          <NButton
+            :loading="globalState.isImportSettingLoading"
+            @click="onImportSetting"
+          >
+            <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
+          </NButton>
+          <input
+            ref="importSettingInputEl"
+            style="display: none"
+            type="file"
+            accept=".json"
+            @change="onImportFileChange"
+          />
+          <Tips :content="$t('general.importSettingsTips')" />
+        </div>
 
-      <NFormItem :label="$t('general.exportSettingLabel')">
-        <NButton @click="onExportSetting()"> <uil:export />&nbsp;{{ $t('general.exportSettingValue') }} </NButton>
-        <Tips :content="$t('general.exportSettingTips')" />
+        <div style="margin-left: 30px">
+          <NButton @click="onExportSetting()"> <uil:export />&nbsp;{{ $t('general.exportSettingValue') }} </NButton>
+          <Tips :content="$t('general.exportSettingTips')" />
+        </div>
       </NFormItem>
 
       <NFormItem :label="$t('general.clearStorageLabel')">

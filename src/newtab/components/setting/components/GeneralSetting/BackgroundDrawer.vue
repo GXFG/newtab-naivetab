@@ -131,48 +131,45 @@ const handleBackgroundImageCustomUrlBlur = () => {
             class="content__config"
             label-placement="left"
             :label-width="100"
+            :show-feedback="false"
           >
             <NFormItem :label="$t('common.origin')">
               <NRadioGroup
                 v-model:value="localConfig.general.backgroundImageSource"
                 style="width: 100%"
               >
-                <NRadio
+                <NRadioButton
                   v-for="item in backgroundImageSourceList"
                   :key="item.value"
                   :value="item.value"
-                  style="margin-right: 15px"
                 >
                   {{ item.label }}
-                </NRadio>
+                </NRadioButton>
               </NRadioGroup>
             </NFormItem>
+
             <!-- local -->
-            <input
-              ref="bgImageFileInputEl"
-              style="display: none"
-              type="file"
-              accept="image/*"
-              @change="onBackgroundImageFileChange"
-            />
             <NFormItem
               v-if="localConfig.general.backgroundImageSource === 0"
               :label="$t('common.select')"
             >
-              <NButton
-                class="setting__row-element"
-                @click="onSelectBackgroundImage"
-              >
-                <uil:import />&nbsp;{{ $t('common.import') }}
-              </NButton>
+              <NButton @click="onSelectBackgroundImage"> <uil:import />&nbsp;{{ $t('common.import') }} </NButton>
               <Tips :content="$t('general.localBackgroundTips')" />
               <p class="setting__row-element">
                 {{ imageState.currBackgroundImageFileName }}
               </p>
+              <input
+                ref="bgImageFileInputEl"
+                style="display: none"
+                type="file"
+                accept="image/*"
+                @change="onBackgroundImageFileChange"
+              />
             </NFormItem>
+
             <!-- network -->
             <template v-else-if="localConfig.general.backgroundImageSource === 1">
-              <NFormItem :label="$t('common.custom')">
+              <NFormItem :label="`${$t('common.custom')} URL`">
                 <NSwitch
                   v-model:value="localConfig.general.isBackgroundImageCustomUrlEnabled"
                   @update:value="handleCustomUrlUpdate"
@@ -187,34 +184,27 @@ const handleBackgroundImageCustomUrlBlur = () => {
                 />
               </NFormItem>
             </template>
-          </NForm>
-
-          <p class="current__label">
-            {{ `${$t('common.current')}${$t('common.backgroundImage')}` }}
-          </p>
-          <div class="current__image">
-            <div class="image__content">
-              <NSpin :show="isImageLoading">
-                <BackgroundDrawerImageElement
-                  :lazy="false"
-                  :data="currImageData"
-                />
-              </NSpin>
-            </div>
-          </div>
-          <NForm
-            class="content__config"
-            label-placement="left"
-            :label-width="100"
-          >
+            <!-- 网络（未开启自定义），每日一图 -->
             <NFormItem
               v-if="localConfig.general.backgroundImageSource !== 0 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
               :label="$t('common.uhd')"
             >
               <NSwitch v-model:value="localConfig.general.backgroundImageHighQuality" />
             </NFormItem>
+
+            <NFormItem :label="`${$t('common.current')}${$t('common.backgroundImage')}`">
+              <div class="current__image">
+                <NSpin :show="isImageLoading">
+                  <BackgroundDrawerImageElement
+                    :lazy="false"
+                    :data="currImageData"
+                  />
+                </NSpin>
+              </div>
+            </NFormItem>
           </NForm>
         </div>
+
         <!-- list 仅来源为网络时展示 -->
         <NSpin
           v-if="localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
@@ -258,18 +248,13 @@ const handleBackgroundImageCustomUrlBlur = () => {
     flex: 1;
   }
   .current__label {
-    margin-bottom: 5px;
+    margin-bottom: -10px;
     color: var(--n-label-text-color);
   }
   .current__image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .image__content {
-      margin: 2.3%;
-      width: 45%;
-      min-height: 125px;
-    }
+    margin: 2.5%;
+    width: 60%;
+    min-height: 125px;
   }
   .picker__images {
     display: flex;

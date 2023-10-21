@@ -92,7 +92,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       v-model:show="globalState.isSettingDrawerVisible"
       class="drawer-wrap"
       :style="drawerStyle"
-      :width="600"
+      :width="610"
       :height="400"
       :placement="localConfig.general.drawerPlacement"
       to="#setting"
@@ -127,7 +127,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
               @mouseenter="handlerPreviewEnter"
               @mouseleave="handlerPreviewLeave"
             >
-              <mdi:eye-circle-outline />&nbsp;{{ $t('common.preview') }}
+              <uil:bullseye />&nbsp;{{ $t('common.preview') }}
             </NButton>
           </div>
           <p class="bottom__version">Ver. {{ `${pkg.version}` }}</p>
@@ -159,6 +159,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 #setting {
   .n-drawer .n-drawer-content.n-drawer-content--native-scrollbar .n-drawer-body-content-wrapper {
     margin-top: 50px;
+    padding: 0 var(--n-body-padding);
     padding-bottom: 94px;
   }
   .n-radio-group {
@@ -166,6 +167,14 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   }
   .n-radio {
     width: 20%;
+  }
+  .n-divider:not(.n-divider--vertical) {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+  /* color picker 居中 */
+  .n-color-picker-panel {
+    margin-left: 38px !important;
   }
   .drawer-wrap {
     transition: all 0.3s ease;

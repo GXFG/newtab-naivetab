@@ -297,6 +297,19 @@ export const handleAppUpdate = async () => {
   if (compareLeftVersionLessThanRightVersions(version, '1.17.1')) {
     localConfig.general.openPageFocusElement = 'root'
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.17.3')) {
+    localConfig.calendar.width = 50
+    localConfig.calendar.isBorderEnabled = false
+    localConfig.calendar.backgroundActiveColor = ['rgba(250, 82, 82, 0.7)', 'rgba(250, 82, 82, 0.7)']
+    localConfig.calendar.restFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.restItemBackgroundColor = ['rgba(213, 255, 203, 0.8)', 'rgba(169, 180, 156, 1)']
+    localConfig.calendar.restLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
+    localConfig.calendar.restLabelBackgroundColor = ['rgba(32, 146, 0, 1)', 'rgba(32, 146, 0, 1)']
+    localConfig.calendar.workFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.workItemBackgroundColor = ['rgba(255, 221, 221, 1)', 'rgba(218, 181, 181, 1)']
+    localConfig.calendar.workLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
+    localConfig.calendar.workLabelBackgroundColor = ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)']
+  }
   // 更新local版本号
   localConfig.general.version = pkg.version
   // updateSuccess()
