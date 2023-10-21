@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { swatcheColors } from '@/styles/const'
 import { localConfig, localState } from '@/logic/store'
 
 const beginsList = computed(() => [
@@ -26,62 +25,53 @@ const beginsList = computed(() => [
 
     <template #color>
       <NFormItem :label="`${$t('calendar.holiday')}${$t('common.fontColor')}`">
-        <NColorPicker
-          v-model:value="localConfig.calendar.holidayFontColor[localState.currAppearanceCode]"
-          show-preview
-          :swatches="swatcheColors"
-        />
+        <CustomColorPicker v-model:value="localConfig.calendar.holidayFontColor[localState.currAppearanceCode]" />
       </NFormItem>
 
       <p class="setting__label">
         {{ $t('calendar.restDesc') }}
       </p>
-      <NFormItem :label="`${$t('common.backgroundColor')}`">
-        <NColorPicker
-          v-model:value="localConfig.calendar.restItemBackgroundColor[localState.currAppearanceCode]"
-          show-preview
-          :swatches="swatcheColors"
-        />
-      </NFormItem>
-      <NFormItem :label="`${$t('common.label')}${$t('common.fontColor')}`">
-        <NColorPicker
-          v-model:value="localConfig.calendar.restLabelFontColor[localState.currAppearanceCode]"
-          show-preview
-          :swatches="swatcheColors"
-        />
-      </NFormItem>
-      <NFormItem :label="`${$t('common.label')}${$t('common.backgroundColor')}`">
-        <NColorPicker
-          v-model:value="localConfig.calendar.restLabelBackgroundColor[localState.currAppearanceCode]"
-          show-preview
-          :swatches="swatcheColors"
-        />
-      </NFormItem>
+      <div class="color-form__wrap">
+        <NFormItem :label="`${$t('common.fontColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.restFontColor[localState.currAppearanceCode]" />
+        </NFormItem>
+
+        <NFormItem :label="`${$t('common.backgroundColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.restItemBackgroundColor[localState.currAppearanceCode]" />
+        </NFormItem>
+      </div>
+      <div class="color-form__wrap">
+        <NFormItem :label="`${$t('common.label')}${$t('common.fontColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.restLabelFontColor[localState.currAppearanceCode]" />
+        </NFormItem>
+
+        <NFormItem :label="`${$t('common.label')}${$t('common.backgroundColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.restLabelBackgroundColor[localState.currAppearanceCode]" />
+        </NFormItem>
+      </div>
 
       <p class="setting__label">
         {{ $t('calendar.workDesc') }}
       </p>
-      <NFormItem :label="`${$t('common.backgroundColor')}`">
-        <NColorPicker
-          v-model:value="localConfig.calendar.workItemBackgroundColor[localState.currAppearanceCode]"
-          show-preview
-          :swatches="swatcheColors"
-        />
-      </NFormItem>
-      <NFormItem :label="`${$t('common.label')}${$t('common.fontColor')}`">
-        <NColorPicker
-          v-model:value="localConfig.calendar.workLabelFontColor[localState.currAppearanceCode]"
-          show-preview
-          :swatches="swatcheColors"
-        />
-      </NFormItem>
-      <NFormItem :label="`${$t('common.label')}${$t('common.backgroundColor')}`">
-        <NColorPicker
-          v-model:value="localConfig.calendar.workLabelBackgroundColor[localState.currAppearanceCode]"
-          show-preview
-          :swatches="swatcheColors"
-        />
-      </NFormItem>
+      <div class="color-form__wrap">
+        <NFormItem :label="`${$t('common.fontColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.workFontColor[localState.currAppearanceCode]" />
+        </NFormItem>
+
+        <NFormItem :label="`${$t('common.backgroundColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.workItemBackgroundColor[localState.currAppearanceCode]" />
+        </NFormItem>
+      </div>
+
+      <div class="color-form__wrap">
+        <NFormItem :label="`${$t('common.label')}${$t('common.fontColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.workLabelFontColor[localState.currAppearanceCode]" />
+        </NFormItem>
+
+        <NFormItem :label="`${$t('common.label')}${$t('common.backgroundColor')}`">
+          <CustomColorPicker v-model:value="localConfig.calendar.workLabelBackgroundColor[localState.currAppearanceCode]" />
+        </NFormItem>
+      </div>
     </template>
   </BaseComponentSetting>
 </template>

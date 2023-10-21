@@ -7,8 +7,8 @@ import { localConfig, globalState } from '@/logic/store'
 
 const startGuide = () => {
   const driverConfig = driver({
+    allowClose: true,
     showProgress: true,
-    allowClose: false,
     prevBtnText: window.$t('guide.prevStep'),
     nextBtnText: window.$t('guide.nextStep'),
     doneBtnText: window.$t('guide.doneStep'),
@@ -62,6 +62,13 @@ const startGuide = () => {
         },
       },
     ],
+    onCloseClick: () => {
+      localConfig.general.isFirstOpen = false
+      globalState.isGuideMode = false
+      driverConfig.moveNext()
+      driverConfig.destroy()
+      toggleIsDragMode(false)
+    },
   })
 
   driverConfig.drive()

@@ -11,9 +11,11 @@ import DigitalSetting from './DigitalSetting.vue'
     <NCollapseItem
       :title="$t('setting.clockDigital')"
       name="clockDigital"
+      style="padding-top: 13px"
     >
       <DigitalSetting />
     </NCollapseItem>
+
     <NCollapseItem
       :title="$t('setting.clockAnalog')"
       name="clockAnalog"

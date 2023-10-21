@@ -243,7 +243,7 @@ const onToggleDetailPopover = (date?: string) => {
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
-const customContainerWidth = getStyleField(CNAME, 'width', 'vmin', 7.4)
+const customContainerWidth = getStyleField(CNAME, 'width', 'vmin', 7.3)
 const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
@@ -256,6 +256,8 @@ const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
 const customItemBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
 
 const customHolidayFontColor = getStyleField(CNAME, 'holidayFontColor')
+const customRestFontColor = getStyleField(CNAME, 'restFontColor')
+const customWorkFontColor = getStyleField(CNAME, 'workFontColor')
 const customRestItemBackgroundColor = getStyleField(CNAME, 'restItemBackgroundColor')
 const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundColor')
 const customRestLabelBackgroundColor = getStyleField(CNAME, 'restLabelBackgroundColor')
@@ -335,6 +337,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
             </NButton>
           </div>
         </div>
+
         <!-- header -->
         <ul class="calendar__header">
           <li
@@ -346,6 +349,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
             {{ item.label }}
           </li>
         </ul>
+
         <!-- body -->
         <ul
           class="calendar__body"
@@ -374,6 +378,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                     'body__item--active': item.isToday,
                     'body__item--blur': item.isNotCurrMonth,
                     'body__item--weekend': item.isWeekend,
+                    'body__item--today': item.isToday,
                     'body__item--rest': item.type === 1,
                     'body__item--work': item.type === 2,
                   }"
@@ -387,15 +392,28 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                     }"
                     >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span
                   >
+                  <!-- 今 -->
                   <span
                     v-if="item.isToday"
                     class="item__today"
                     >{{ $t('calendar.today') }}</span
                   >
-                  <span class="item__day">{{ item.day }}</span>
+                  <!-- 日期 -->
+                  <span
+                    class="item__day"
+                    :class="{
+                      'item__font--rest': item.type === 1,
+                      'item__font--work': item.type === 2,
+                    }"
+                    >{{ item.day }}</span
+                  >
                   <span
                     class="item__desc"
-                    :class="{ 'item__desc--highlight': item.isFestival }"
+                    :class="{
+                      'item__font--rest': item.type === 1,
+                      'item__font--work': item.type === 2,
+                      'item__desc--highlight': item.isFestival,
+                    }"
                     >{{ item.desc }}</span
                   >
                 </div>
@@ -528,14 +546,12 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
         justify-content: center;
         align-items: center;
         box-sizing: border-box;
-        margin: 0.1vmin;
         width: v-bind(customItemWidth);
         height: v-bind(customItemWidth);
         text-align: center;
-        border-radius: v-bind(customBorderRadius);
-        border: 1px solid rgba(0, 0, 0, 0);
         overflow: hidden;
         .item__day {
+          font-weight: 500;
         }
         .item__desc {
           margin-top: 0.2vmin;
@@ -546,7 +562,13 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
           white-space: nowrap;
         }
         .item__desc--highlight {
-          color: v-bind(customHolidayFontColor);
+          color: v-bind(customHolidayFontColor) !important;
+        }
+        .item__font--work {
+          color: v-bind(customWorkFontColor);
+        }
+        .item__font--rest {
+          color: v-bind(customRestFontColor);
         }
         .item__today {
           position: absolute;
@@ -564,6 +586,7 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
           padding: 7%;
           font-size: v-bind(customFontSize);
           transform: scale(0.8);
+          border-radius: 2px;
         }
         .item__label--work {
           color: v-bind(customWorkLabelFontColor);
@@ -575,7 +598,12 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
         }
       }
       .body__item--hover:hover {
-        border: 1px solid v-bind(customItemBackgroundActiveColor);
+        opacity: 0.5;
+        transition: all 200ms ease-in-out;
+        /* outline: 1px solid v-bind(customItemBackgroundActiveColor); */
+      }
+      .body__item--today {
+        border-radius: 2px;
       }
       .body__item--work {
         color: v-bind(customHolidayFontColor) !important;

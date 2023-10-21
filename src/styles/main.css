@@ -40,7 +40,6 @@ body {
   margin-left: 10px;
 }
 .setting__label {
-  margin-bottom: 10px;
   opacity: 0.6;
 }
 .setting__input-wrap {
@@ -58,7 +57,7 @@ body {
   }
 }
 .setting__input-number {
-  width: 110px;
+  width: 103px;
 }
 .setting__input-number--unit {
   width: 150px;

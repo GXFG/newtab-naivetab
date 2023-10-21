@@ -83,6 +83,7 @@ const onOpenCityPicker = () => {
       />
     </NDrawerContent>
   </NDrawer>
+
   <!-- main -->
   <BaseComponentSetting
     id="weather__setting"
@@ -98,7 +99,7 @@ const onOpenCityPicker = () => {
           class="setting__row-element"
           @click="onOpenCityPicker()"
         >
-          <tabler:edit class="item__icon" />
+          <uil:edit class="item__icon" />
         </NButton>
       </NFormItem>
       <NFormItem label="API Key">
