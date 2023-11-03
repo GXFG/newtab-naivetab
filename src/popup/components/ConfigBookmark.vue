@@ -3,7 +3,7 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import { gaProxy } from '@/logic/gtag'
 import { globalState, localConfig, customPrimaryColor, getStyleConst, getAllCommandsConfig, openConfigShortcutsPage } from '@/logic/store'
 import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST, currKeyboardConfig } from '@/logic/keyboard'
-import { getDefaultBookmarkNameFromUrl, getFaviconFromUrl, getBookmarkConfigUrl } from '@/logic/bookmark'
+import { getDefaultBookmarkNameFromUrl, getFaviconFromUrl, getBookmarkConfigUrl, getBookmarkConfigName } from '@/logic/bookmark'
 
 const state = reactive({
   isBookmarkDragEnabled: true,
@@ -44,6 +44,13 @@ const loadCurrKeyConfig = () => {
 const selectKey = (key: string) => {
   state.keyCode = key
   loadCurrKeyConfig()
+}
+
+const onDeleteKey = () => {
+  if (state.keyCode.length === 0) {
+    return
+  }
+  delete localConfig.bookmark.keymap[state.keyCode]
 }
 
 const isCommitBtnDisabled = computed(() => {
@@ -106,7 +113,7 @@ const popupKeyboardBorder = getStyleConst('popupKeyboardBorder')
 const popupKeyboardHoverBg = getStyleConst('popupKeyboardHoverBg')
 const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
 
-const KEYCAP_BASE_SIZE = 36
+const KEYCAP_BASE_SIZE = 45
 
 const getCustomKeycapWidth = (code: string) => {
   let value = KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].size
@@ -146,7 +153,7 @@ const getKeycapWrapStyle = (code: string) => {
 }
 
 const getContainerWidth = () => {
-  let totalWidth = 120
+  let totalWidth = 80
   // 计算第一行的宽度
   for (const code of currKeyboardConfig.value.list[0]) {
     totalWidth += getCustomKeycapWidth(code)
@@ -166,8 +173,9 @@ const popupMainWidth = `${getContainerWidth()}px`
   >
     <NForm
       label-placement="left"
-      :label-width="55"
       require-mark-placement="left"
+      :label-width="55"
+      :show-feedback="false"
       :model="state"
     >
       <NFormItem
@@ -182,14 +190,14 @@ const popupMainWidth = `${getContainerWidth()}px`
         />
         <NButton
           text
-          class="set__btn"
+          class="curr__btn"
           @click="setCurrentTabUrl()"
         >
           <tabler:current-location class="btn__icon" />
         </NButton>
       </NFormItem>
 
-      <div class="popup__form">
+      <div class="popup__form_wrap">
         <NFormItem
           :label="$t('bookmark.nameLabel')"
           class="form__name"
@@ -200,6 +208,7 @@ const popupMainWidth = `${getContainerWidth()}px`
             clearable
           />
         </NFormItem>
+
         <NFormItem
           :label="$t('bookmark.shortcutLabel')"
           class="form__shortcut"
@@ -217,6 +226,23 @@ const popupMainWidth = `${getContainerWidth()}px`
             <ion:ban v-else />
           </NInputGroupLabel>
         </NFormItem>
+
+        <div class="form__delete">
+          <NPopconfirm
+            v-if="state.keyCode.length !== 0 && getBookmarkConfigUrl(state.keyCode)"
+            @positive-click="onDeleteKey()"
+          >
+            <template #trigger>
+              <NButton
+                text
+                class="delete__btn"
+              >
+                <ri:delete-bin-6-line class="btn__icon" />
+              </NButton>
+            </template>
+            {{ `${$t('common.delete')} ${KEYBOARD_CODE_TO_DEFAULT_CONFIG[state.keyCode].label}` }} ？
+          </NPopconfirm>
+        </div>
       </div>
 
       <NFormItem
@@ -251,6 +277,7 @@ const popupMainWidth = `${getContainerWidth()}px`
                   >
                     <ic:outline-check-circle />
                   </div>
+
                   <p class="keycap__label">
                     {{ KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].label }}
                   </p>
@@ -262,6 +289,9 @@ const popupMainWidth = `${getContainerWidth()}px`
                       :draggable="state.isBookmarkDragEnabled"
                     />
                   </div>
+                  <p class="keycap__name">
+                    {{ getBookmarkConfigName(code) }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -272,31 +302,49 @@ const popupMainWidth = `${getContainerWidth()}px`
 
     <div class="popup__footer">
       <NButton
-        class="footer__btn"
+        class="footer__commit"
         type="primary"
         :disabled="isCommitBtnDisabled"
         :loading="state.isCommitLoading"
         @click="onCommitConfigBookmark()"
       >
-        {{ $t('common.save') }}
+        <mingcute:save-2-line />&nbsp;{{ $t('common.save') }}
       </NButton>
+
       <Tips :content="$t('popup.commitBtnTips')" />
     </div>
   </NCard>
 </template>
 
-<style scoped>
+<style>
 #popup {
-  padding-right: 10px;
+  padding-right: 0;
   width: v-bind(popupMainWidth);
   border-radius: 0 !important;
-  .set__btn {
-    margin-left: 20px;
+  overflow: hidden;
+  .n-card-header {
+    padding-top: 12px !important;
+    padding-bottom: 3px !important;
+    .n-card-header__main {
+      font-size: 16px !important;
+    }
+  }
+  .n-card__content {
+    padding: 0 12px 12px 12px !important;
+  }
+  .n-form-item {
+    margin: 5px 0;
+  }
+
+  .curr__btn {
+    margin-left: 10px;
+    margin-right: 10px;
     .btn__icon {
       font-size: 16px;
     }
   }
-  .popup__form {
+
+  .popup__form_wrap {
     display: flex;
     align-items: center;
     .form__name {
@@ -317,6 +365,17 @@ const popupMainWidth = `${getContainerWidth()}px`
         cursor: alias;
       }
     }
+    .form__delete {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      .delete__btn {
+        .btn__icon {
+          font-size: 16px;
+        }
+      }
+    }
   }
 
   .popup__keyboard {
@@ -326,6 +385,7 @@ const popupMainWidth = `${getContainerWidth()}px`
       .row__keycap-wrap {
         padding: 1px;
         height: v-bind(`${KEYCAP_BASE_SIZE}px`);
+        cursor: pointer;
         .row__keycap {
           display: flex;
           flex-direction: column;
@@ -337,10 +397,8 @@ const popupMainWidth = `${getContainerWidth()}px`
           height: 100%;
           border-radius: 3px;
           border: 1px solid v-bind(popupKeyboardBorder);
-          cursor: pointer;
           user-select: none;
           transition: all 200ms ease-in-out;
-
           &:hover {
             background-color: v-bind(popupKeyboardHoverBg);
           }
@@ -364,17 +422,25 @@ const popupMainWidth = `${getContainerWidth()}px`
             font-size: 12px;
             line-height: 1;
           }
-
           .keycap__img {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 16px;
-
+            width: 15px;
             .img__main {
               width: 100%;
               height: 100%;
             }
+          }
+          .keycap__name {
+            flex: 0 0 auto;
+            width: 100%;
+            line-height: 1;
+            font-size: 10px;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
           }
         }
       }
@@ -384,16 +450,10 @@ const popupMainWidth = `${getContainerWidth()}px`
   .popup__footer {
     display: flex;
     justify-content: center;
+    padding-top: 3px;
 
-    .footer__btn {
+    .footer__commit {
       width: 120px;
-
-      .icon__wrap {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 16px;
-      }
     }
   }
 }

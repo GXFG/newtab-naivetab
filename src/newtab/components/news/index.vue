@@ -62,8 +62,8 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
 const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
-const customFontActiveColor = getStyleField(CNAME, 'fontActiveColor')
-const customBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
+const customUrlActiveColor = getStyleField(CNAME, 'urlActiveColor')
+const customTabActiveBackgroundColor = getStyleField(CNAME, 'tabActiveBackgroundColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 </script>
@@ -188,7 +188,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       .n-tabs .n-tabs-rail {
         background-color: transparent !important;
         .n-tabs-tab-wrapper .n-tabs-tab.n-tabs-tab--active {
-          background-color: v-bind(customBackgroundActiveColor) !important;
+          background-color: v-bind(customTabActiveBackgroundColor) !important;
         }
       }
       /* line bottom border */
@@ -245,7 +245,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
           }
         }
         .content__item--hover:hover {
-          color: v-bind(customFontActiveColor);
+          color: v-bind(customUrlActiveColor);
         }
         .content__empty {
           display: flex;

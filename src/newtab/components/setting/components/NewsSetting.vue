@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { globalState, localConfig } from '@/logic/store'
+import { globalState, localConfig, localState } from '@/logic/store'
 
 const newsSourceList = computed(() => [
   { label: window.$t('news.toutiao'), value: 'toutiao' },
@@ -44,6 +44,23 @@ const handleUpdateValue = () => {
           <template #suffix> min </template>
         </NInputNumber>
       </NFormItem>
+    </template>
+
+    <template #color>
+      <div class="setting-form__wrap">
+        <NFormItem
+          :label="`URL${$t('common.activeColor')}`"
+          class="n-form-item--color"
+        >
+          <CustomColorPicker v-model:value="localConfig.news.urlActiveColor[localState.currAppearanceCode]" />
+        </NFormItem>
+        <NFormItem
+          :label="`${$t('common.label')}${$t('common.activeColor')}`"
+          class="n-form-item--color"
+        >
+          <CustomColorPicker v-model:value="localConfig.news.tabActiveBackgroundColor[localState.currAppearanceCode]" />
+        </NFormItem>
+      </div>
     </template>
   </BaseComponentSetting>
 </template>

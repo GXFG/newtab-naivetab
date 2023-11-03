@@ -96,7 +96,7 @@ const onOpenCityPicker = () => {
           :disabled="true"
         />
         <NButton
-          class="setting__row-element"
+          class="setting__item-element"
           @click="onOpenCityPicker()"
         >
           <uil:edit class="item__icon" />

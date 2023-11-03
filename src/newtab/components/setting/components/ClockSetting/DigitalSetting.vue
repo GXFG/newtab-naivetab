@@ -18,16 +18,16 @@ import { localConfig } from '@/logic/store'
         <NSlider
           v-if="localConfig.clockDigital.unitEnabled"
           v-model:value="localConfig.clockDigital.unit.fontSize"
-          class="setting__row-element"
+          class="setting__item-element"
           :step="1"
-          :min="12"
+          :min="5"
           :max="200"
         />
         <NInputNumber
           v-if="localConfig.clockDigital.unitEnabled"
           v-model:value="localConfig.clockDigital.unit.fontSize"
           class="setting__item-element setting__input-number"
-          :min="12"
+          :min="5"
           :step="1"
         />
       </NFormItem>

@@ -206,7 +206,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
               v-if="localConfig.bookmark.isDblclickOpen"
               class="setting__input_item"
             >
-              <span class="setting__row-element">{{ $t('bookmark.intervalTime') }}</span>
+              <span class="setting__item-element">{{ $t('bookmark.intervalTime') }}</span>
               <NInputNumber
                 v-model:value="localConfig.bookmark.dblclickIntervalTime"
                 class="setting__item-element setting__input-number--unit"
@@ -222,10 +222,6 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
 
         <NFormItem :label="$t('bookmark.newTabOpen')">
           <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
-        </NFormItem>
-
-        <NFormItem :label="$t('bookmark.showName')">
-          <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
         </NFormItem>
 
         <!-- bookmarkConfig -->
@@ -355,71 +351,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
         </NCollapseItem>
       </template>
 
-      <template #style>
-        <NFormItem :label="`${$t('common.margin')}`">
-          <NSlider
-            v-model:value="localConfig.bookmark.keycapPadding"
-            :step="0.1"
-            :min="0"
-            :max="10"
-          />
-          <NInputNumber
-            v-model:value="localConfig.bookmark.keycapPadding"
-            class="setting__item-element setting__input-number"
-            :step="0.1"
-            :min="0"
-            :max="10"
-          />
-        </NFormItem>
-
-        <NFormItem :label="`${$t('common.size')}`">
-          <NSlider
-            v-model:value="localConfig.bookmark.keycapSize"
-            :step="1"
-            :min="40"
-            :max="150"
-          />
-          <NInputNumber
-            v-model:value="localConfig.bookmark.keycapSize"
-            class="setting__item-element setting__input-number"
-            :step="1"
-            :min="40"
-            :max="150"
-          />
-        </NFormItem>
-      </template>
-
-      <template #color>
-        <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.font')}`">
-          <NSelect
-            v-model:value="localConfig.bookmark.keycapKeyFontFamily"
-            :options="availableFontOptions"
-            :render-label="fontSelectRenderLabel"
-          />
-          <NInputNumber
-            v-model:value="localConfig.bookmark.keycapKeyFontSize"
-            class="setting__item-element setting__input-number"
-            :step="1"
-            :min="12"
-            :max="50"
-          />
-        </NFormItem>
-
-        <NFormItem :label="`${$t('bookmark.nameLabel')}${$t('common.font')}`">
-          <NSelect
-            v-model:value="localConfig.bookmark.keycapBookmarkFontFamily"
-            :options="availableFontOptions"
-            :render-label="fontSelectRenderLabel"
-          />
-          <NInputNumber
-            v-model:value="localConfig.bookmark.keycapBookmarkFontSize"
-            class="setting__item-element setting__input-number"
-            :step="1"
-            :min="12"
-            :max="50"
-          />
-        </NFormItem>
-
+      <template #footer>
         <NFormItem :label="$t('bookmark.keyboardType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keyboardType">
             <NRadio
@@ -454,14 +386,147 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
         </NFormItem>
 
         <p class="setting__label">
+          {{ `${$t('bookmark.keycap')}${$t('common.general')}` }}
+        </p>
+        <NFormItem :label="`${$t('common.margin')}`">
+          <NSlider
+            v-model:value="localConfig.bookmark.keycapPadding"
+            :step="0.1"
+            :min="0"
+            :max="10"
+          />
+          <NInputNumber
+            v-model:value="localConfig.bookmark.keycapPadding"
+            class="setting__item-element setting__input-number"
+            :step="0.1"
+            :min="0"
+            :max="10"
+          />
+        </NFormItem>
+
+        <NFormItem :label="`${$t('common.size')}`">
+          <NSlider
+            v-model:value="localConfig.bookmark.keycapSize"
+            :step="1"
+            :min="40"
+            :max="150"
+          />
+          <NInputNumber
+            v-model:value="localConfig.bookmark.keycapSize"
+            class="setting__item-element setting__input-number"
+            :step="1"
+            :min="40"
+            :max="150"
+          />
+        </NFormItem>
+
+        <NFormItem :label="$t('common.borderRadius')">
+          <NSlider
+            v-model:value="localConfig.bookmark.keycapBorderRadius"
+            :step="0.1"
+            :min="0"
+            :max="100"
+          />
+          <NInputNumber
+            v-model:value="localConfig.bookmark.keycapBorderRadius"
+            class="setting__item-element setting__input-number"
+            :step="0.1"
+            :min="0"
+            :max="100"
+          />
+        </NFormItem>
+
+        <NFormItem
+          :label="$t('common.border')"
+          class="n-form-item--color"
+        >
+          <NSwitch v-model:value="localConfig.bookmark.isKeycapBorderEnabled" />
+          <CustomColorPicker
+            v-model:value="localConfig.bookmark.keycapBorderColor[localState.currAppearanceCode]"
+            class="setting__item-element"
+          />
+          <NInputNumber
+            v-model:value="localConfig.bookmark.keycapBorderWidth"
+            class="setting__item-element setting__input-number"
+            :step="1"
+            :min="1"
+            :max="10"
+          />
+        </NFormItem>
+
+        <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.font')}`">
+          <NSwitch v-model:value="localConfig.bookmark.isCapKeyVisible" />
+          <template v-if="localConfig.bookmark.isCapKeyVisible">
+            <NSelect
+              v-model:value="localConfig.bookmark.keycapKeyFontFamily"
+              class="setting__item-ml"
+              :options="availableFontOptions"
+              :render-label="fontSelectRenderLabel"
+            />
+            <NInputNumber
+              v-model:value="localConfig.bookmark.keycapKeyFontSize"
+              class="setting__item-element setting__input-number"
+              :step="1"
+              :min="5"
+              :max="50"
+            />
+          </template>
+        </NFormItem>
+
+        <NFormItem :label="`${$t('common.icon')}${$t('common.size')}`">
+          <NSwitch v-model:value="localConfig.bookmark.isFaviconVisible" />
+          <template v-if="localConfig.bookmark.isFaviconVisible">
+            <NSlider
+              v-model:value="localConfig.bookmark.faviconSize"
+              class="setting__item-ml"
+              :step="0.1"
+              :min="0"
+              :max="1"
+            />
+            <NInputNumber
+              v-model:value="localConfig.bookmark.faviconSize"
+              class="setting__item-element setting__input-number"
+              :step="0.1"
+              :min="0"
+              :max="1"
+            />
+          </template>
+        </NFormItem>
+
+        <NFormItem :label="`${$t('bookmark.nameLabel')}${$t('common.font')}`">
+          <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
+          <template v-if="localConfig.bookmark.isNameVisible">
+            <NSelect
+              v-model:value="localConfig.bookmark.keycapBookmarkFontFamily"
+              class="setting__item-ml"
+              :options="availableFontOptions"
+              :render-label="fontSelectRenderLabel"
+            />
+            <NInputNumber
+              v-model:value="localConfig.bookmark.keycapBookmarkFontSize"
+              class="setting__item-element setting__input-number"
+              :step="1"
+              :min="5"
+              :max="50"
+            />
+          </template>
+        </NFormItem>
+
+        <p class="setting__label">
           {{ `${$t('common.main')}${$t('bookmark.keycap')} QWERTY` }}
         </p>
-        <div class="color-form__wrap">
-          <NFormItem :label="`${$t('common.fontColor')}`">
+        <div class="setting-form__wrap">
+          <NFormItem
+            :label="`${$t('common.fontColor')}`"
+            class="n-form-item--color"
+          >
             <CustomColorPicker v-model:value="localConfig.bookmark.mainFontColor[localState.currAppearanceCode]" />
           </NFormItem>
 
-          <NFormItem :label="`${$t('common.backgroundColor')}`">
+          <NFormItem
+            :label="`${$t('common.backgroundColor')}`"
+            class="n-form-item--color"
+          >
             <CustomColorPicker v-model:value="localConfig.bookmark.mainBackgroundColor[localState.currAppearanceCode]" />
           </NFormItem>
         </div>
@@ -469,12 +534,18 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
         <p class="setting__label">
           {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Control` }}
         </p>
-        <div class="color-form__wrap">
-          <NFormItem :label="`${$t('common.fontColor')}`">
+        <div class="setting-form__wrap">
+          <NFormItem
+            :label="`${$t('common.fontColor')}`"
+            class="n-form-item--color"
+          >
             <CustomColorPicker v-model:value="localConfig.bookmark.emphasisOneFontColor[localState.currAppearanceCode]" />
           </NFormItem>
 
-          <NFormItem :label="`${$t('common.backgroundColor')}`">
+          <NFormItem
+            :label="`${$t('common.backgroundColor')}`"
+            class="n-form-item--color"
+          >
             <CustomColorPicker v-model:value="localConfig.bookmark.emphasisOneBackgroundColor[localState.currAppearanceCode]" />
           </NFormItem>
         </div>
@@ -482,12 +553,18 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
         <p class="setting__label">
           {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Enter` }}
         </p>
-        <div class="color-form__wrap">
-          <NFormItem :label="`${$t('common.fontColor')}`">
+        <div class="setting-form__wrap">
+          <NFormItem
+            :label="`${$t('common.fontColor')}`"
+            class="n-form-item--color"
+          >
             <CustomColorPicker v-model:value="localConfig.bookmark.emphasisTwoFontColor[localState.currAppearanceCode]" />
           </NFormItem>
 
-          <NFormItem :label="`${$t('common.backgroundColor')}`">
+          <NFormItem
+            :label="`${$t('common.backgroundColor')}`"
+            class="n-form-item--color"
+          >
             <CustomColorPicker v-model:value="localConfig.bookmark.emphasisTwoBackgroundColor[localState.currAppearanceCode]" />
           </NFormItem>
         </div>

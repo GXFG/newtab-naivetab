@@ -120,10 +120,11 @@ const customKeycapKeyFontFamily = getStyleField(CNAME, 'keycapKeyFontFamily')
 const customKeycapKeyFontSize = getStyleField(CNAME, 'keycapKeyFontSize', 'vmin')
 const customBookmarkKeyFontFamily = getStyleField(CNAME, 'keycapBookmarkFontFamily')
 const customBookmarkKeyFontSize = getStyleField(CNAME, 'keycapBookmarkFontSize', 'vmin')
+const customBookmarkFaviconSize = getStyleField(CNAME, 'faviconSize')
 // keycap-base
 const customKeycapPadding = getStyleField(CNAME, 'keycapPadding', 'vmin')
 const customKeycapBaseSize = getStyleField(CNAME, 'keycapSize', 'vmin')
-const customKeycapBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
+const customKeycapBorderRadius = getStyleField(CNAME, 'keycapBorderRadius', 'vmin')
 const customKeycapTextPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 const customKeycapIconPadding = getStyleField(CNAME, 'keycapSize', 'vmin', 0.08)
 // keycap-flat
@@ -151,8 +152,8 @@ const customEmphasisOneBackgroundColor = getStyleField(CNAME, 'emphasisOneBackgr
 const customEmphasisTwoFontColor = getStyleField(CNAME, 'emphasisTwoFontColor')
 const customEmphasisTwoBackgroundColor = getStyleField(CNAME, 'emphasisTwoBackgroundColor')
 
-const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
-const customBorderColor = getStyleField(CNAME, 'borderColor')
+const customBorderWidth = getStyleField(CNAME, 'keycapBorderWidth', 'px')
+const customBorderColor = getStyleField(CNAME, 'keycapBorderColor')
 
 const getCustomTextAlign = (code: string) => {
   let value = KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].textAlign
@@ -288,7 +289,7 @@ const getKeycapIconStyle = (code: string) => {
                 'row__keycap--move': isDragMode,
                 'row__keycap--hover': !isDragMode,
                 'row__keycap--active': state.currSelectKeyCode === code,
-                'row__keycap--border': localConfig.bookmark.isBorderEnabled,
+                'row__keycap--border': localConfig.bookmark.isKeycapBorderEnabled,
               }"
               :style="getKeycapStyle(code)"
               :title="`${getBookmarkConfigName(code)}・${getBookmarkConfigUrl(code)}`"
@@ -310,17 +311,23 @@ const getKeycapIconStyle = (code: string) => {
                 >
                   <eos-icons:loading />
                 </div>
+                <!-- keycap -->
                 <p
+                  v-if="localConfig.bookmark.isCapKeyVisible"
                   class="item__key"
                   :style="getKeycapTextStyle(code)"
                 >
                   {{ getKeycapLabel(code) }}
                 </p>
+                <!-- favicon -->
                 <div
                   class="item__img"
                   :style="getKeycapIconStyle(code)"
                 >
-                  <div class="img__wrap">
+                  <div
+                    v-if="localConfig.bookmark.isFaviconVisible"
+                    class="img__wrap"
+                  >
                     <img
                       v-if="getBookmarkConfigUrl(code)"
                       class="img__main"
@@ -329,6 +336,7 @@ const getKeycapIconStyle = (code: string) => {
                     />
                   </div>
                 </div>
+                <!-- name -->
                 <p
                   v-if="localConfig.bookmark.isNameVisible"
                   class="item__name"
@@ -412,6 +420,7 @@ const getKeycapIconStyle = (code: string) => {
               align-items: center;
               .img__wrap {
                 height: 100%;
+                transform: scale(v-bind(customBookmarkFaviconSize));
                 .img__main {
                   height: 100%;
                 }
