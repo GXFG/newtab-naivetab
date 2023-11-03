@@ -250,10 +250,6 @@ export const handleAppUpdate = async () => {
     localConfig.bookmark.emphasisOneBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
     localConfig.bookmark.emphasisTwoFontColor = ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)']
     localConfig.bookmark.emphasisTwoBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
-    localConfig.bookmark.isBorderEnabled = false
-    localConfig.bookmark.borderWidth = 1
-    localConfig.bookmark.borderRadius = 5
-    localConfig.bookmark.borderColor = ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)']
     delete (localConfig.bookmark as any).margin
     delete (localConfig.bookmark as any).width
     delete (localConfig.bookmark as any).fontFamily
@@ -300,15 +296,50 @@ export const handleAppUpdate = async () => {
   if (compareLeftVersionLessThanRightVersions(version, '1.17.3')) {
     localConfig.calendar.width = 50
     localConfig.calendar.isBorderEnabled = false
-    localConfig.calendar.backgroundActiveColor = ['rgba(250, 82, 82, 0.7)', 'rgba(250, 82, 82, 0.7)']
-    localConfig.calendar.restFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.restDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
     localConfig.calendar.restItemBackgroundColor = ['rgba(213, 255, 203, 0.8)', 'rgba(169, 180, 156, 1)']
     localConfig.calendar.restLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
     localConfig.calendar.restLabelBackgroundColor = ['rgba(32, 146, 0, 1)', 'rgba(32, 146, 0, 1)']
-    localConfig.calendar.workFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.workDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
     localConfig.calendar.workItemBackgroundColor = ['rgba(255, 221, 221, 1)', 'rgba(218, 181, 181, 1)']
     localConfig.calendar.workLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
     localConfig.calendar.workLabelBackgroundColor = ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)']
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.17.12')) {
+    localConfig.bookmark.keycapBookmarkFontSize = 11
+    localConfig.calendar.dayFontFamily = 'Arial'
+    localConfig.calendar.dayFontSize = 14
+    localConfig.calendar.dayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)']
+    localConfig.calendar.descFontFamily = 'Arial'
+    localConfig.calendar.descFontSize = 10
+    localConfig.calendar.descFontColor = ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)']
+    localConfig.calendar.todayDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.todayDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.todayLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
+    localConfig.calendar.todayLabelBackgroundColor = ['rgba(22, 144, 231, 1)', 'rgba(22, 144, 231, 1)']
+    localConfig.calendar.todayItemBackgroundColor = ['rgba(159, 214, 255, 1)', 'rgba(106, 173, 224, 1)']
+    localConfig.calendar.restDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.restDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.workDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    localConfig.calendar.workDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
+    delete (localConfig.calendar as any).backgroundActiveColor
+    localConfig.news.urlActiveColor = ['rgba(36, 64, 179, 1)', 'rgba(155, 177, 254, 1)']
+    localConfig.news.tabActiveBackgroundColor = ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)']
+    delete (localConfig.news as any).fontActiveColor
+    delete (localConfig.news as any).backgroundActiveColor
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.18.0')) {
+    localConfig.bookmark.isCapKeyVisible = true
+    localConfig.bookmark.isFaviconVisible = true
+    localConfig.bookmark.faviconSize = 1
+    localConfig.bookmark.keycapBorderRadius = (localConfig.bookmark as any).borderRadius
+    localConfig.bookmark.isKeycapBorderEnabled = (localConfig.bookmark as any).isBorderEnabled
+    localConfig.bookmark.keycapBorderWidth = (localConfig.bookmark as any).borderWidth
+    localConfig.bookmark.keycapBorderColor = (localConfig.bookmark as any).borderColor
+    delete (localConfig.bookmark as any).borderRadius
+    delete (localConfig.bookmark as any).isBorderEnabled
+    delete (localConfig.bookmark as any).borderWidth
+    delete (localConfig.bookmark as any).borderColor
   }
   // 更新local版本号
   localConfig.general.version = pkg.version

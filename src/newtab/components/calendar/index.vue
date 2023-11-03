@@ -244,26 +244,43 @@ const onToggleDetailPopover = (date?: string) => {
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(CNAME)
 const customContainerWidth = getStyleField(CNAME, 'width', 'vmin', 7.3)
-const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
+
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
+const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
 const customFontColor = getStyleField(CNAME, 'fontColor')
+const customDayFontFamily = getStyleField(CNAME, 'dayFontFamily')
+const customDayFontSize = getStyleField(CNAME, 'dayFontSize', 'vmin')
+const customDayFontColor = getStyleField(CNAME, 'dayFontColor')
+const customDescFontFamily = getStyleField(CNAME, 'descFontFamily')
+const customDescFontSize = getStyleField(CNAME, 'descFontSize', 'vmin')
+const customDescFontColor = getStyleField(CNAME, 'descFontColor')
+
+const customHolidayFontColor = getStyleField(CNAME, 'holidayFontColor')
+
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customBorderWidth = getStyleField(CNAME, 'borderWidth', 'px')
 const customBorderColor = getStyleField(CNAME, 'borderColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customItemWidth = getStyleField(CNAME, 'width', 'vmin')
 const customBorderRadius = getStyleField(CNAME, 'borderRadius', 'vmin')
-const customItemBackgroundActiveColor = getStyleField(CNAME, 'backgroundActiveColor')
 
-const customHolidayFontColor = getStyleField(CNAME, 'holidayFontColor')
-const customRestFontColor = getStyleField(CNAME, 'restFontColor')
-const customWorkFontColor = getStyleField(CNAME, 'workFontColor')
-const customRestItemBackgroundColor = getStyleField(CNAME, 'restItemBackgroundColor')
-const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundColor')
+const customTodayDayFontColor = getStyleField(CNAME, 'todayDayFontColor')
+const customTodayDescFontColor = getStyleField(CNAME, 'todayDescFontColor')
+const customTodayLabelBackgroundColor = getStyleField(CNAME, 'todayLabelBackgroundColor')
+const customTodayLabelFontColor = getStyleField(CNAME, 'todayLabelFontColor')
+const customTodayItemBackgroundColor = getStyleField(CNAME, 'todayItemBackgroundColor')
+
+const customRestDayFontColor = getStyleField(CNAME, 'restDayFontColor')
+const customRestDescFontColor = getStyleField(CNAME, 'restDescFontColor')
 const customRestLabelBackgroundColor = getStyleField(CNAME, 'restLabelBackgroundColor')
-const customWorkLabelBackgroundColor = getStyleField(CNAME, 'workLabelBackgroundColor')
 const customRestLabelFontColor = getStyleField(CNAME, 'restLabelFontColor')
+const customRestItemBackgroundColor = getStyleField(CNAME, 'restItemBackgroundColor')
+
+const customWorkDayFontColor = getStyleField(CNAME, 'workDayFontColor')
+const customWorkDescFontColor = getStyleField(CNAME, 'workDescFontColor')
+const customWorkLabelBackgroundColor = getStyleField(CNAME, 'workLabelBackgroundColor')
 const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
+const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundColor')
 </script>
 
 <template>
@@ -375,7 +392,6 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                   class="body__item"
                   :class="{
                     'body__item--hover': !isDragMode,
-                    'body__item--active': item.isToday,
                     'body__item--blur': item.isNotCurrMonth,
                     'body__item--weekend': item.isWeekend,
                     'body__item--today': item.isToday,
@@ -384,34 +400,16 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
                   }"
                 >
                   <span
-                    v-if="item.type"
+                    v-if="item.type || item.isToday"
                     class="item__label"
-                    :class="{
-                      'item__label--rest': item.type === 1,
-                      'item__label--work': item.type === 2,
-                    }"
-                    >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span
-                  >
-                  <!-- 今 -->
-                  <span
-                    v-if="item.isToday"
-                    class="item__today"
-                    >{{ $t('calendar.today') }}</span
+                    >{{ item.isToday ? $t('calendar.today') : holidayTypeToDesc[item.type as 1 | 2] }}</span
                   >
                   <!-- 日期 -->
-                  <span
-                    class="item__day"
-                    :class="{
-                      'item__font--rest': item.type === 1,
-                      'item__font--work': item.type === 2,
-                    }"
-                    >{{ item.day }}</span
-                  >
+                  <span class="item__day">{{ item.day }}</span>
+                  <!-- 描述 -->
                   <span
                     class="item__desc"
                     :class="{
-                      'item__font--rest': item.type === 1,
-                      'item__font--work': item.type === 2,
                       'item__desc--highlight': item.isFestival,
                     }"
                     >{{ item.desc }}</span
@@ -551,33 +549,21 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
         text-align: center;
         overflow: hidden;
         .item__day {
+          color: v-bind(customDayFontColor);
+          font-size: v-bind(customDayFontSize);
+          font-family: v-bind(customDayFontFamily);
           font-weight: 500;
         }
         .item__desc {
           margin-top: 0.2vmin;
-          color: v-bind(customFontColor);
-          font-size: v-bind(customFontSize);
-          transform: scale(0.8);
+          color: v-bind(customDescFontColor);
+          font-size: v-bind(customDescFontSize);
+          font-family: v-bind(customDescFontFamily);
           overflow: hidden;
           white-space: nowrap;
         }
         .item__desc--highlight {
           color: v-bind(customHolidayFontColor) !important;
-        }
-        .item__font--work {
-          color: v-bind(customWorkFontColor);
-        }
-        .item__font--rest {
-          color: v-bind(customRestFontColor);
-        }
-        .item__today {
-          position: absolute;
-          top: -7%;
-          right: -7%;
-          padding: 7%;
-          color: v-bind(customFontColor);
-          font-size: v-bind(customFontSize);
-          transform: scale(0.8);
         }
         .item__label {
           position: absolute;
@@ -588,36 +574,55 @@ const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
           transform: scale(0.8);
           border-radius: 2px;
         }
-        .item__label--work {
-          color: v-bind(customWorkLabelFontColor);
-          background-color: v-bind(customWorkLabelBackgroundColor);
-        }
-        .item__label--rest {
-          color: v-bind(customRestLabelFontColor);
-          background-color: v-bind(customRestLabelBackgroundColor);
-        }
       }
       .body__item--hover:hover {
         opacity: 0.5;
         transition: all 200ms ease-in-out;
-        /* outline: 1px solid v-bind(customItemBackgroundActiveColor); */
-      }
-      .body__item--today {
-        border-radius: 2px;
       }
       .body__item--work {
-        color: v-bind(customHolidayFontColor) !important;
         background-color: v-bind(customWorkItemBackgroundColor);
+        .item__label {
+          color: v-bind(customWorkLabelFontColor);
+          background-color: v-bind(customWorkLabelBackgroundColor);
+        }
+        .item__day {
+          color: v-bind(customWorkDayFontColor);
+        }
+        .item__desc {
+          color: v-bind(customWorkDescFontColor);
+        }
       }
       .body__item--rest {
-        color: v-bind(customFontColor) !important;
         background-color: v-bind(customRestItemBackgroundColor);
+        .item__label {
+          color: v-bind(customRestLabelFontColor);
+          background-color: v-bind(customRestLabelBackgroundColor);
+        }
+        .item__day {
+          color: v-bind(customRestDayFontColor);
+        }
+        .item__desc {
+          color: v-bind(customRestDescFontColor);
+        }
       }
       .body__item--weekend {
         color: v-bind(customHolidayFontColor);
       }
-      .body__item--active {
-        background-color: v-bind(customItemBackgroundActiveColor);
+      .body__item--today {
+        border-radius: 2px;
+        background-color: v-bind(customTodayItemBackgroundColor);
+        .item__label {
+          left: auto !important;
+          right: -7% !important;
+          color: v-bind(customTodayLabelFontColor);
+          background-color: v-bind(customTodayLabelBackgroundColor);
+        }
+        .item__day {
+          color: v-bind(customTodayDayFontColor);
+        }
+        .item__desc {
+          color: v-bind(customTodayDescFontColor);
+        }
       }
       .body__item--blur {
         opacity: 0.4;

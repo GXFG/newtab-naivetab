@@ -153,7 +153,7 @@ const onResetSetting = () => {
         <NSwitch v-model:value="localConfig.general.isBackgroundImageEnabled" />
         <NButton
           v-if="localConfig.general.isBackgroundImageEnabled"
-          class="setting__row-element"
+          class="setting__item-element"
           @click="openBackgroundDrawer()"
         >
           <uil:edit />&nbsp;{{ $t('common.edit') }}

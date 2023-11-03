@@ -32,12 +32,18 @@ body {
 }
 
 /* setting */
-.setting__row-element {
-  margin-left: 10px;
+.n-form-item {
+  margin: 12px 0;
 }
-.setting__item-element {
-  flex: 0 0 auto;
-  margin-left: 10px;
+.n-form-item--color {
+  margin: 3px 0 !important;
+}
+.n-base-select-option__content {
+  width: 100% !important;
+}
+.setting-form__wrap {
+  display: flex;
+  flex-wrap: wrap;
 }
 .setting__label {
   opacity: 0.6;
@@ -55,6 +61,13 @@ body {
       margin-left: 10px;
     }
   }
+}
+.setting__item-ml {
+  margin-left: 10px;
+}
+.setting__item-element {
+  flex: 0 0 auto;
+  margin-left: 10px;
 }
 .setting__input-number {
   width: 103px;

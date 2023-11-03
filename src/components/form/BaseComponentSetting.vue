@@ -155,11 +155,15 @@ const isRenderField = (field: string) => {
         :options="availableFontOptions"
         :render-label="fontSelectRenderLabel"
       />
+      <CustomColorPicker
+        v-model:value="localConfig[props.cname].fontColor[localState.currAppearanceCode]"
+        class="setting__item-element"
+      />
       <NInputNumber
         v-model:value="localConfig[props.cname].fontSize"
         class="setting__item-element setting__input-number"
         :step="1"
-        :min="12"
+        :min="5"
         :max="200"
       />
     </NFormItem>
@@ -186,93 +190,59 @@ const isRenderField = (field: string) => {
     <slot name="size" />
 
     <!-- color -->
-    <div class="color-form__wrap">
-      <NFormItem
-        v-if="isRenderField('primaryColor')"
-        :label="$t('common.primaryColor')"
-      >
-        <CustomColorPicker v-model:value="localConfig[props.cname].primaryColor[localState.currAppearanceCode]" />
-        <Tips :content="$t('general.primaryColorTips')" />
-      </NFormItem>
+    <NFormItem
+      v-if="isRenderField('primaryColor')"
+      :label="$t('common.primaryColor')"
+      class="n-form-item--color"
+    >
+      <CustomColorPicker v-model:value="localConfig[props.cname].primaryColor[localState.currAppearanceCode]" />
+      <Tips :content="$t('general.primaryColorTips')" />
+    </NFormItem>
 
-      <NFormItem
-        v-if="isRenderField('fontColor')"
-        :label="$t('common.fontColor')"
-      >
-        <CustomColorPicker v-model:value="localConfig[props.cname].fontColor[localState.currAppearanceCode]" />
-      </NFormItem>
+    <NFormItem
+      v-if="isRenderField('backgroundColor')"
+      :label="$t('common.backgroundColor')"
+      class="n-form-item--color"
+    >
+      <CustomColorPicker v-model:value="localConfig[props.cname].backgroundColor[localState.currAppearanceCode]" />
+    </NFormItem>
 
-      <NFormItem
-        v-if="isRenderField('fontActiveColor')"
-        :label="$t('common.fontActiveColor')"
-      >
-        <CustomColorPicker v-model:value="localConfig[props.cname].fontActiveColor[localState.currAppearanceCode]" />
-      </NFormItem>
+    <NFormItem
+      v-if="isRenderField('borderColor')"
+      :label="$t('common.border')"
+      class="n-form-item--color"
+    >
+      <NSwitch v-model:value="localConfig[props.cname].isBorderEnabled" />
+      <CustomColorPicker
+        v-if="isRenderField('isBorderEnabled')"
+        v-model:value="localConfig[props.cname].borderColor[localState.currAppearanceCode]"
+        class="setting__item-element"
+      />
+      <NInputNumber
+        v-if="isRenderField('borderWidth')"
+        v-model:value="localConfig[props.cname].borderWidth"
+        class="setting__item-element setting__input-number"
+        :step="1"
+        :min="1"
+        :max="10"
+      />
+    </NFormItem>
 
-      <NFormItem
-        v-if="isRenderField('backgroundColor')"
-        :label="$t('common.backgroundColor')"
-      >
-        <CustomColorPicker v-model:value="localConfig[props.cname].backgroundColor[localState.currAppearanceCode]" />
-      </NFormItem>
-
-      <NFormItem
-        v-if="isRenderField('backgroundActiveColor')"
-        :label="$t('common.backgroundActiveColor')"
-      >
-        <CustomColorPicker v-model:value="localConfig[props.cname].backgroundActiveColor[localState.currAppearanceCode]" />
-      </NFormItem>
-
-      <NFormItem
-        v-if="isRenderField('shadowColor')"
-        :label="$t('common.shadow')"
-      >
-        <NSwitch v-model:value="localConfig[props.cname].isShadowEnabled" />
-        <CustomColorPicker
-          v-if="isRenderField('isShadowEnabled')"
-          v-model:value="localConfig[props.cname].shadowColor[localState.currAppearanceCode]"
-          class="setting__row-element"
-        />
-      </NFormItem>
-
-      <NFormItem
-        v-if="isRenderField('borderColor')"
-        :label="$t('common.border')"
-      >
-        <NSwitch v-model:value="localConfig[props.cname].isBorderEnabled" />
-        <CustomColorPicker
-          v-if="isRenderField('isBorderEnabled')"
-          v-model:value="localConfig[props.cname].borderColor[localState.currAppearanceCode]"
-          class="setting__row-element"
-        />
-        <NInputNumber
-          v-if="isRenderField('borderWidth')"
-          v-model:value="localConfig[props.cname].borderWidth"
-          class="setting__item-element setting__input-number"
-          :step="1"
-          :min="1"
-          :max="10"
-        />
-      </NFormItem>
-    </div>
+    <NFormItem
+      v-if="isRenderField('shadowColor')"
+      :label="$t('common.shadow')"
+      class="n-form-item--color"
+    >
+      <NSwitch v-model:value="localConfig[props.cname].isShadowEnabled" />
+      <CustomColorPicker
+        v-if="isRenderField('isShadowEnabled')"
+        v-model:value="localConfig[props.cname].shadowColor[localState.currAppearanceCode]"
+        class="setting__item-element"
+      />
+    </NFormItem>
 
     <slot name="color" />
 
     <slot name="footer" />
   </NForm>
 </template>
-
-<style>
-.n-form-item {
-  margin: 15px 0;
-}
-
-.n-base-select-option__content {
-  width: 100% !important;
-}
-
-.color-form__wrap {
-  display: flex;
-  flex-wrap: wrap;
-}
-</style>

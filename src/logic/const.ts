@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 export const URL_FEEDBACK_EMAIL = 'mailto:gxfgim@outlook.com?subject=NaiveTab Feedback'
-export const URL_CHROME_STORE = 'https://chrome.google.com/webstore/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem?utm_source=chrome-ntp-icon'
+export const URL_CHROME_STORE = 'https://chromewebstore.google.com/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem'
 export const URL_EDGE_STORE = 'https://microsoftedge.microsoft.com/addons/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/kejadmppkffccjopodhekdnmkofidmjl'
 
 export const URL_CHROME_EXTENSIONS_SHORTCUTS = 'chrome://extensions/shortcuts#:~:text=NaiveTab-,%2D%20%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5,-%E6%BF%80%E6%B4%BB%E8%AF%A5%E6%89%A9%E5%B1%95'

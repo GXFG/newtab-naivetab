@@ -155,7 +155,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
             >
               <NButton @click="onSelectBackgroundImage"> <uil:import />&nbsp;{{ $t('common.import') }} </NButton>
               <Tips :content="$t('general.localBackgroundTips')" />
-              <p class="setting__row-element">
+              <p class="setting__item-element">
                 {{ imageState.currBackgroundImageFileName }}
               </p>
               <input
@@ -177,7 +177,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
                 <NInput
                   v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
                   v-model:value="localConfig.general.backgroundImageCustomUrls[localState.currAppearanceCode]"
-                  class="setting__row-element"
+                  class="setting__item-element"
                   type="text"
                   placeholder="https://"
                   @blur="handleBackgroundImageCustomUrlBlur"
