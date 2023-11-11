@@ -236,7 +236,7 @@ export const handleAppUpdate = async () => {
     }
   }
   if (compareLeftVersionLessThanRightVersions(version, '1.9.0')) {
-    localConfig.bookmark.keyboardType = 61
+    localConfig.bookmark.keyboardType = 'key61'
     localConfig.bookmark.keycapType = 'gmk'
     localConfig.bookmark.keycapPadding = 1.5
     localConfig.bookmark.keycapSize = 60
@@ -340,6 +340,9 @@ export const handleAppUpdate = async () => {
     delete (localConfig.bookmark as any).isBorderEnabled
     delete (localConfig.bookmark as any).borderWidth
     delete (localConfig.bookmark as any).borderColor
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.18.1')) {
+    localConfig.bookmark.keyboardType = typeof localConfig.bookmark.keyboardType === 'number' ? `key${localConfig.bookmark.keyboardType}` : localConfig.bookmark.keyboardType
   }
   // 更新local版本号
   localConfig.general.version = pkg.version

@@ -165,7 +165,7 @@ export const defaultConfig = {
       yOffsetValue: 1,
       yTranslateValue: 0,
     },
-    keyboardType: 61 as 'hhkb' | number,
+    keyboardType: 'key61',
     keycapType: 'gmk',
     keycapPadding: 1.5,
     keycapSize: 65,
