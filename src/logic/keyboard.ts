@@ -492,20 +492,20 @@ export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
 ]
 
 export const KEYBOARD_TYPE_OPTION = [
-  { label: '33', value: '33' },
-  { label: '45', value: '45' },
-  { label: '47', value: '47' },
-  { label: '43', value: '43' },
-  { label: '53', value: '53' },
-  { label: '57', value: '57' },
-  { label: '61', value: 61 },
-  { label: '64', value: 64 },
-  { label: '67', value: 67 },
-  { label: '68', value: 68 },
-  { label: '80', value: 80 },
-  { label: '84', value: 84 },
-  { label: '87', value: 87 },
   { label: 'HHKB', value: 'hhkb' },
+  { label: '33', value: 'key33' },
+  { label: '45', value: 'key45' },
+  { label: '47', value: 'key47' },
+  { label: '43', value: 'key43' },
+  { label: '53', value: 'key53' },
+  { label: '57', value: 'key57' },
+  { label: '61', value: 'key61' },
+  { label: '64', value: 'key64' },
+  { label: '67', value: 'key67' },
+  { label: '68', value: 'key68' },
+  { label: '80', value: 'key80' },
+  { label: '84', value: 'key84' },
+  { label: '87', value: 'key87' },
 ]
 
 const KEYBOARD_TYPE_CONFIG = {
@@ -522,9 +522,9 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: [],
     custom: {
       Backslash: { size: 1 },
-      Backspace: { size: 1.5, label: 'Delete', textAlign: 'left' },
-      ControlLeft: { size: 1.75, label: 'Control' },
-      Enter: { label: 'Return', textAlign: 'left' },
+      Backspace: { size: 1.5, label: 'delete', textAlign: 'left' },
+      ControlLeft: { size: 1.75, label: 'control' },
+      Enter: { label: 'return', textAlign: 'left' },
       ShiftRight: { size: 1.75, textAlign: 'left' },
       Fn: { size: 1 },
       AltLeft: { size: 1, marginLeft: 1.5 },
@@ -534,7 +534,7 @@ const KEYBOARD_TYPE_CONFIG = {
       MetaRight: { size: 1.5 },
     },
   },
-  33: {
+  key33: {
     isMacOS: false,
     list: [
       ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight'],
@@ -551,7 +551,7 @@ const KEYBOARD_TYPE_CONFIG = {
       Slash: { marginRight: 1.25 },
     },
   },
-  45: {
+  key45: {
     isMacOS: false,
     list: [
       ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal'],
@@ -571,7 +571,7 @@ const KEYBOARD_TYPE_CONFIG = {
       Slash: { marginRight: 1.25 },
     },
   },
-  47: {
+  key47: {
     isMacOS: false,
     list: [
       ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace'],
@@ -590,7 +590,7 @@ const KEYBOARD_TYPE_CONFIG = {
       Slash: { marginRight: 2.75 },
     },
   },
-  43: {
+  key43: {
     isMacOS: false,
     list: [
       ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash'],
@@ -601,7 +601,7 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: ['Enter'],
     custom: {},
   },
-  53: {
+  key53: {
     isMacOS: false,
     list: [
       ['Escape', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace'],
@@ -613,7 +613,7 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: ['Escape', 'Enter'],
     custom: {},
   },
-  57: {
+  key57: {
     isMacOS: false,
     list: [
       ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash'],
@@ -625,7 +625,7 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: ['Escape', 'Enter'],
     custom: {},
   },
-  61: {
+  key61: {
     isMacOS: false,
     list: [
       ['Escape', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace'],
@@ -658,7 +658,7 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: ['Escape', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'],
     custom: {},
   },
-  64: {
+  key64: {
     isMacOS: false,
     list: [
       ['Escape', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace'],
@@ -696,7 +696,7 @@ const KEYBOARD_TYPE_CONFIG = {
       Fn: { size: 1 },
     },
   },
-  67: {
+  key67: {
     isMacOS: false,
     list: [
       ['Escape', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 'Backquote'],
@@ -733,7 +733,7 @@ const KEYBOARD_TYPE_CONFIG = {
       Fn: { size: 1, textAlign: 'center' },
     },
   },
-  68: {
+  key68: {
     isMacOS: false,
     list: [
       ['Escape', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 'Backquote'],
@@ -771,7 +771,7 @@ const KEYBOARD_TYPE_CONFIG = {
       ControlRight: { size: 1 },
     },
   },
-  80: {
+  key80: {
     isMacOS: false,
     list: [
       ['Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'],
@@ -838,7 +838,7 @@ const KEYBOARD_TYPE_CONFIG = {
       ArrowRight: { marginRight: 0.25 },
     },
   },
-  84: {
+  key84: {
     isMacOS: false,
     list: [
       ['Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'F13', 'F14', 'Delete'],
@@ -885,7 +885,7 @@ const KEYBOARD_TYPE_CONFIG = {
       ControlRight: { size: 1 },
     },
   },
-  87: {
+  key87: {
     isMacOS: false,
     list: [
       ['Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'F13', 'F14', 'F15'],
@@ -955,7 +955,7 @@ const KEYBOARD_TYPE_CONFIG = {
 }
 
 export const currKeyboardConfig = computed(() => {
-  const target = KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType || 61] as {
+  let target: {
     isMacOS: boolean
     list: string[][]
     emphasisOneKeys: string[]
@@ -963,6 +963,10 @@ export const currKeyboardConfig = computed(() => {
     custom: {
       [key: string]: KeyboardConfigItem
     }
+  } = KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType]
+  // 使用key61兜底
+  if (!KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType]) {
+    target = KEYBOARD_TYPE_CONFIG.key61
   }
   // if Mac, swap option & command
   if (!target.isMacOS && isMacOS) {

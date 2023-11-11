@@ -170,7 +170,7 @@ export const handleWatchLocalConfigChange = () => {
 }
 
 /**
- * 以 state 为模板与 acceptState 进行递归去重合并
+ * 以 state 为基础模板与 acceptState 进行递归去重合并
  */
 const mergeState = (state: unknown, acceptState: unknown) => {
   if (acceptState === undefined || acceptState === null) {
@@ -212,7 +212,7 @@ const mergeState = (state: unknown, acceptState: unknown) => {
 }
 
 /**
- * 处理新增配置，删除无用旧配置。默认acceptState不传递时为刷新配置结构
+ * 处理新增配置，并删除无用旧配置。默认acceptState不传递时为刷新配置数据结构
  * 以 defaultConfig 为模板与 acceptState 进行去重合并
  */
 export const updateSetting = (acceptRawState = localConfig): Promise<boolean> => {
@@ -220,14 +220,14 @@ export const updateSetting = (acceptRawState = localConfig): Promise<boolean> =>
   return new Promise((resolve) => {
     try {
       for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
+        // 只遍历 acceptState 内存在的 configField
         if (!Object.prototype.hasOwnProperty.call(acceptState, configField)) {
-          // 只遍历 acceptState 内存在的 configField
           // console.log(`!${configField}`)
           continue
         }
         for (const subField of Object.keys(defaultConfig[configField])) {
           localConfig[configField][subField] = mergeState(defaultConfig[configField][subField], acceptState[configField][subField])
-          // console.log(`${configField}-${subField}`, localConfig[configField][subField], defaultConfig[configField][subField], acceptState[configField][subField])
+          // console.log(`${configField}-${subField}`, localConfig[configField][subField], '=', defaultConfig[configField][subField], '<-', acceptState[configField][subField])
         }
       }
       log('UpdateSetting', localConfig)
@@ -275,17 +275,22 @@ export const loadRemoteConfig = () => {
           log(`Config-${field} initialize`)
           uploadConfigFn(field)
         } else {
-          const target = JSON.parse(data[`naive-tab-${field}`])
+          const target: {
+            syncTime: number
+            syncId: string // md5
+            data: any
+          } = JSON.parse(data[`naive-tab-${field}`])
           const targetConfig = target.data
           const targetSyncTime = target.syncTime
           const targetSyncId = target.syncId
           const localSyncTime = localState.value.isUploadConfigStatusMap[field].syncTime
           const localSyncId = localState.value.isUploadConfigStatusMap[field].syncId
+          // syncId(md5)一致时无需更新
           if (targetSyncId === localSyncId) {
             log(`Config-${field} no update`)
             continue
           }
-          // targetSyncId !== localSyncId
+          // 云端配置过期时直接上传本地配置
           if (targetSyncTime < localSyncTime) {
             log(`Config-${field} is overdue, reupload`)
             uploadConfigFn(field)
