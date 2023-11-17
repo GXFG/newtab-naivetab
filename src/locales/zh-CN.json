@@ -177,6 +177,7 @@
     "intervalTime": "最大间隔时间",
     "intervalTimeTips": "识别在多长时间内的双击操作",
     "keyboardType": "键盘配列",
+    "splitSpace": "分裂空格",
     "keycap": "按键",
     "keycapType": "键帽类型",
     "customKeys": "自定义快捷键",

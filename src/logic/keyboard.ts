@@ -1,14 +1,33 @@
 import { isMacOS } from '@/env'
 import { localConfig } from '@/logic/store'
 
-export const stopKeydown = () => {
-  document.onkeydown = null
-}
+export const KEYBOARD_TYPE_OPTION = [
+  { label: '33', value: 'key33' },
+  { label: '45', value: 'key45' },
+  { label: '47', value: 'key47' },
+  { label: '43', value: 'key43' },
+  { label: '53', value: 'key53' },
+  { label: '57', value: 'key57' },
+  { label: '61', value: 'key61' },
+  { label: '64', value: 'key64' },
+  { label: '67', value: 'key67' },
+  { label: '68', value: 'key68' },
+  { label: '80', value: 'key80' },
+  { label: '84', value: 'key84' },
+  { label: '87', value: 'key87' },
+  { label: 'HHKB', value: 'hhkb' },
+]
+
+export const SPLIT_SPACE_OPTION = [
+  { label: '1', value: 'space1' },
+  { label: '2', value: 'space2' },
+  { label: '3', value: 'space3' },
+]
 
 export const KEYCAP_TYPE_OPTION = [
-  { label: 'FLAT', value: 'flat' },
   { label: 'GMK', value: 'gmk' },
   { label: 'DSA', value: 'dsa' },
+  { label: 'FLAT', value: 'flat' },
 ]
 
 export const KEYCAP_PREINSTALL_OPTION = [
@@ -393,7 +412,9 @@ export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   ControlLeft: { label: isMacOS ? '⌃' : 'Ctrl', alias: 'LCtrl', textAlign: 'left', size: 1.25 },
   MetaLeft: { label: isMacOS ? '⌘' : 'Win', alias: 'LMeta', textAlign: 'left', size: 1.25 },
   AltLeft: { label: isMacOS ? '⌥' : 'Alt', alias: 'LAlt', textAlign: 'left', size: 1.25 },
-  Space: { label: '', textAlign: 'center', size: 6.25 },
+  Space: { label: '', textAlign: 'center', size: 6.25 }, //           space2 -> 3;    space3 -> 2.25
+  SpaceSplit1: { label: '', textAlign: 'center', size: 2.25 }, //  space2 -> 3.25; space3 -> 1.25
+  SpaceSplit2: { label: '', textAlign: 'center', size: 2.75 }, // space2 -> 0;    space3 -> 2.75
   AltRight: { label: isMacOS ? '⌥' : 'Alt', alias: 'RAlt', textAlign: 'left', size: 1.25 },
   MetaRight: { label: isMacOS ? '⌘' : 'Win', alias: 'RMeta', textAlign: 'left', size: 1.25 },
   ControlRight: { label: isMacOS ? '⌃' : 'Ctrl', alias: 'RCtrl', textAlign: 'left', size: 1.25 },
@@ -455,25 +476,25 @@ export const KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST = [
 
 export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
   'Escape',
-  'F1',
-  'F2',
-  'F3',
-  'F4',
-  'F5',
-  'F6',
-  'F7',
-  'F8',
-  'F9',
-  'F10',
-  'F11',
+  // 'F1',
+  // 'F2',
+  // 'F3',
+  // 'F4',
+  // 'F5',
+  // 'F6',
+  // 'F7',
+  // 'F8',
+  // 'F9',
+  // 'F10',
+  // 'F11',
   'F12',
-  'F13',
-  'F14',
-  'F15',
-  'Backspace',
-  'Tab',
-  'CapsLock',
-  'Enter',
+  // 'F13',
+  // 'F14',
+  // 'F15',
+  // 'Backspace',
+  // 'Tab',
+  // 'CapsLock',
+  // 'Enter',
   'ShiftLeft',
   'ShiftRight',
   'ControlLeft',
@@ -483,30 +504,15 @@ export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
   'AltRight',
   'MetaRight',
   'ControlRight',
-  'Insert',
-  'Delete',
-  'Home',
-  'End',
-  'PageUp',
-  'PageDown',
+  // 'Insert',
+  // 'Delete',
+  // 'Home',
+  // 'End',
+  // 'PageUp',
+  // 'PageDown',
 ]
 
-export const KEYBOARD_TYPE_OPTION = [
-  { label: 'HHKB', value: 'hhkb' },
-  { label: '33', value: 'key33' },
-  { label: '45', value: 'key45' },
-  { label: '47', value: 'key47' },
-  { label: '43', value: 'key43' },
-  { label: '53', value: 'key53' },
-  { label: '57', value: 'key57' },
-  { label: '61', value: 'key61' },
-  { label: '64', value: 'key64' },
-  { label: '67', value: 'key67' },
-  { label: '68', value: 'key68' },
-  { label: '80', value: 'key80' },
-  { label: '84', value: 'key84' },
-  { label: '87', value: 'key87' },
-]
+export const SPACE_KEYCODE_LIST = ['Space', 'SpaceSplit1', 'SpaceSplit2']
 
 const KEYBOARD_TYPE_CONFIG = {
   hhkb: {
@@ -522,9 +528,9 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: [],
     custom: {
       Backslash: { size: 1 },
-      Backspace: { size: 1.5, label: 'delete', textAlign: 'left' },
-      ControlLeft: { size: 1.75, label: 'control' },
-      Enter: { label: 'return', textAlign: 'left' },
+      Backspace: { size: 1.5, label: isMacOS ? 'delete' : 'Delete', textAlign: 'left' },
+      ControlLeft: { size: 1.75, label: isMacOS ? 'control' : 'Control' },
+      Enter: { label: isMacOS ? 'return' : 'Return', textAlign: 'left' },
       ShiftRight: { size: 1.75, textAlign: 'left' },
       Fn: { size: 1 },
       AltLeft: { size: 1, marginLeft: 1.5 },
@@ -532,6 +538,15 @@ const KEYBOARD_TYPE_CONFIG = {
       Space: { size: 6 },
       AltRight: { size: 1, marginRight: 2.5 },
       MetaRight: { size: 1.5 },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3 },
+    },
+    customSpace3: {
+      Space: { size: 2 },
+      SpaceSplit1: { size: 2 },
+      SpaceSplit2: { size: 2 },
     },
   },
   key33: {
@@ -624,6 +639,15 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisOneKeys: ['Escape', 'Backquote', 'Backspace', 'Tab', 'CapsLock', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'MetaLeft', 'AltLeft', 'AltRight', 'MetaRight', 'ControlRight', 'Fn'],
     emphasisTwoKeys: ['Escape', 'Enter'],
     custom: {},
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key61: {
     isMacOS: false,
@@ -657,6 +681,15 @@ const KEYBOARD_TYPE_CONFIG = {
     ],
     emphasisTwoKeys: ['Escape', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'],
     custom: {},
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key64: {
     isMacOS: false,
@@ -695,6 +728,15 @@ const KEYBOARD_TYPE_CONFIG = {
       AltRight: { size: 1 },
       Fn: { size: 1 },
     },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key67: {
     isMacOS: false,
@@ -731,6 +773,15 @@ const KEYBOARD_TYPE_CONFIG = {
       ShiftRight: { size: 1.75 },
       ArrowLeft: { marginLeft: 0.5 },
       Fn: { size: 1, textAlign: 'center' },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
     },
   },
   key68: {
@@ -769,6 +820,15 @@ const KEYBOARD_TYPE_CONFIG = {
       AltRight: { size: 1 },
       Fn: { size: 1 },
       ControlRight: { size: 1 },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
     },
   },
   key80: {
@@ -837,6 +897,15 @@ const KEYBOARD_TYPE_CONFIG = {
       ArrowUp: { marginRight: 1.25 },
       ArrowRight: { marginRight: 0.25 },
     },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key84: {
     isMacOS: false,
@@ -883,6 +952,15 @@ const KEYBOARD_TYPE_CONFIG = {
       AltRight: { size: 1 },
       Fn: { size: 1 },
       ControlRight: { size: 1 },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
     },
   },
   key87: {
@@ -951,6 +1029,26 @@ const KEYBOARD_TYPE_CONFIG = {
       ArrowLeft: { marginLeft: 0.5 },
       Enter: { marginRight: 3.5 },
     },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
+  },
+}
+
+const SPLIT_SPACES_CONFIG_MAP = {
+  space2: {
+    fieldName: 'customSpace2',
+    keyList: ['SpaceSplit1'],
+  },
+  space3: {
+    fieldName: 'customSpace3',
+    keyList: ['SpaceSplit1', 'SpaceSplit2'],
   },
 }
 
@@ -963,11 +1061,18 @@ export const currKeyboardConfig = computed(() => {
     custom: {
       [key: string]: KeyboardConfigItem
     }
+    customSpace2?: {
+      [key: string]: KeyboardConfigItem
+    }
+    customSpace3?: {
+      [key: string]: KeyboardConfigItem
+    }
   } = KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType]
   // 使用key61兜底
-  if (!KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType]) {
+  if (!target) {
     target = KEYBOARD_TYPE_CONFIG.key61
   }
+  target = structuredClone(target)
   // if Mac, swap option & command
   if (!target.isMacOS && isMacOS) {
     target.isMacOS = true
@@ -993,6 +1098,17 @@ export const currKeyboardConfig = computed(() => {
     }
     if (rightAltIndex !== -1 && rightMetaIndex !== -1) {
       ;[target.list[lastRowIndex][rightMetaIndex], target.list[lastRowIndex][rightAltIndex]] = [target.list[lastRowIndex][rightAltIndex], target.list[lastRowIndex][rightMetaIndex]]
+    }
+  }
+  // split space
+  const lastRowKeyList = target.list[target.list.length - 1]
+  const spaceIndex = lastRowKeyList.findIndex((text) => text === 'Space')
+  const spaceConfig = SPLIT_SPACES_CONFIG_MAP[localConfig.bookmark.splitSpace]
+  if (spaceConfig && localConfig.bookmark.splitSpace !== 'space1' && spaceIndex !== -1) {
+    lastRowKeyList.splice(spaceIndex + 1, 0, ...spaceConfig.keyList)
+    target.custom = {
+      ...target.custom,
+      ...target[spaceConfig.fieldName],
     }
   }
   return target

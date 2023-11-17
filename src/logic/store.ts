@@ -344,6 +344,9 @@ export const handleAppUpdate = async () => {
   if (compareLeftVersionLessThanRightVersions(version, '1.18.1')) {
     localConfig.bookmark.keyboardType = typeof localConfig.bookmark.keyboardType === 'number' ? `key${localConfig.bookmark.keyboardType}` : localConfig.bookmark.keyboardType
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.18.2')) {
+    localConfig.bookmark.splitSpace = 'space1'
+  }
   // 更新local版本号
   localConfig.general.version = pkg.version
   // updateSuccess()

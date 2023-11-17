@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio'
-import http from '@/lib/http'
+import request from '@/lib/request'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { NEWS_SOURCE_MAP } from '@/logic/const'
 import { createTab, log } from '@/logic/util'
@@ -44,7 +44,7 @@ export const getToutiaoNews = async () => {
       ClusterIdStr: string
       HotValue: string
     }[]
-  } = await http.get(NEWS_SOURCE_MAP.toutiao)
+  } = await request.get(NEWS_SOURCE_MAP.toutiao)
   try {
     if (!res || !res.status || res.status !== 'success') {
       return
@@ -62,7 +62,7 @@ export const getToutiaoNews = async () => {
 }
 
 export const getBaiduNews = async () => {
-  const data: string = await http.get(NEWS_SOURCE_MAP.baidu)
+  const data: string = await request.get(NEWS_SOURCE_MAP.baidu)
   try {
     if (!data) {
       return
@@ -86,7 +86,7 @@ export const getBaiduNews = async () => {
 }
 
 export const getZhihuNews = async () => {
-  const data: string = await http.get(NEWS_SOURCE_MAP.zhihu)
+  const data: string = await request.get(NEWS_SOURCE_MAP.zhihu)
   try {
     if (!data) {
       return
@@ -113,7 +113,7 @@ export const getZhihuNews = async () => {
 }
 
 export const getWeiboNews = async () => {
-  const data: string = await http.get(NEWS_SOURCE_MAP.weibo)
+  const data: string = await request.get(NEWS_SOURCE_MAP.weibo)
   try {
     if (!data) {
       return
@@ -147,7 +147,7 @@ export const getWeiboNews = async () => {
 }
 
 export const getKr36News = async () => {
-  const data: string = await http.get(NEWS_SOURCE_MAP.kr36)
+  const data: string = await request.get(NEWS_SOURCE_MAP.kr36)
   try {
     if (!data) {
       return
@@ -169,7 +169,7 @@ export const getKr36News = async () => {
 }
 
 export const getBilibiliNews = async () => {
-  const data: string = await http.get(NEWS_SOURCE_MAP.bilibili)
+  const data: string = await request.get(NEWS_SOURCE_MAP.bilibili)
   try {
     if (!data) {
       return
@@ -190,7 +190,7 @@ export const getBilibiliNews = async () => {
 }
 
 export const getV2exNews = async () => {
-  const data: string = await http.get(NEWS_SOURCE_MAP.v2ex)
+  const data: string = await request.get(NEWS_SOURCE_MAP.v2ex)
   try {
     if (!data) {
       return

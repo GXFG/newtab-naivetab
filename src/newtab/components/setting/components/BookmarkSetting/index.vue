@@ -3,6 +3,7 @@ import {
   KEYBOARD_CODE_TO_DEFAULT_CONFIG,
   KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST,
   KEYBOARD_TYPE_OPTION,
+  SPLIT_SPACE_OPTION,
   KEYCAP_TYPE_OPTION,
   KEYCAP_PREINSTALL_OPTION,
   KEYCAP_PREINSTALL_MAP,
@@ -364,6 +365,18 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           </NRadioGroup>
         </NFormItem>
 
+        <NFormItem :label="$t('bookmark.splitSpace')">
+          <NRadioGroup v-model:value="localConfig.bookmark.splitSpace">
+            <NRadio
+              v-for="item in SPLIT_SPACE_OPTION"
+              :key="item.value"
+              :value="item.value"
+            >
+              {{ item.label }}
+            </NRadio>
+          </NRadioGroup>
+        </NFormItem>
+
         <NFormItem :label="$t('bookmark.keycapType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keycapType">
             <NRadioButton
@@ -479,14 +492,14 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             <NSlider
               v-model:value="localConfig.bookmark.faviconSize"
               class="setting__item-ml"
-              :step="0.1"
+              :step="0.01"
               :min="0"
               :max="1"
             />
             <NInputNumber
               v-model:value="localConfig.bookmark.faviconSize"
               class="setting__item-element setting__input-number"
-              :step="0.1"
+              :step="0.01"
               :min="0"
               :max="1"
             />

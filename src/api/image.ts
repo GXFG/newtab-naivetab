@@ -1,11 +1,11 @@
-import http from '@/lib/http'
+import request from '@/lib/request'
 
 export const getBingImages = (
   count = 8,
 ): Promise<{
   images: BingImageItem[]
 }> => {
-  return http({
+  return request({
     method: 'get',
     url: 'https://cn.bing.com/HPImageArchive.aspx',
     params: {

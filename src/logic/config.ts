@@ -166,6 +166,7 @@ export const defaultConfig = {
       yTranslateValue: 0,
     },
     keyboardType: 'key61',
+    splitSpace: 'sapce1',
     keycapType: 'gmk',
     keycapPadding: 1.5,
     keycapSize: 65,

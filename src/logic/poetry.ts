@@ -1,4 +1,4 @@
-import http from '@/lib/http'
+import request from '@/lib/request'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { log } from '@/logic/util'
 
@@ -21,7 +21,7 @@ const getPoetryToken = async () => {
   if (poetryState.value.token.length !== 0) {
     return
   }
-  const { status, data } = await http.get('https://v2.jinrishici.com/token')
+  const { status, data } = await request.get('https://v2.jinrishici.com/token')
   if (status !== 'success') {
     return
   }
@@ -29,7 +29,7 @@ const getPoetryToken = async () => {
 }
 
 const getTodayPoetry = async () => {
-  const { status, data }: { status: string; data: PoetryData } = await http({
+  const { status, data }: { status: string; data: PoetryData } = await request({
     methods: 'get',
     url: 'https://v2.jinrishici.com/one.json',
     headers: {

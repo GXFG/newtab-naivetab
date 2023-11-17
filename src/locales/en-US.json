@@ -178,6 +178,7 @@
     "intervalTime": "Interval time",
     "intervalTimeTips": "The effective interval for double-clicking",
     "keyboardType": "Keyboard Type",
+    "splitSpace": "Split Space",
     "keycap": "Keycap",
     "keycapType": "Keycap Profile",
     "customKeys": "Custom keys",

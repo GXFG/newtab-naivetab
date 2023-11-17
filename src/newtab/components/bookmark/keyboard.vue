@@ -2,7 +2,7 @@
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/const'
-import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, SPACE_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
 import { addKeydownTask } from '@/logic/task'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
@@ -212,15 +212,16 @@ const getKeycapStageStyle = (code: string) => {
     style += `margin-top: -${customKeycapStageGmkMarginTop.value};margin-left: -${customKeycapStageGmkMarginLeft.value};`
     style += `width: ${getCustomKeycapWidth(code, -KeycapkeycapGmkEdgeHorizontalSize).value};`
     style += `height: ${customKeycapStageGmkHeight.value};`
-    if (code === 'Space') {
-      // 空格阴影效果
+    // 空格阴影效果
+    if (SPACE_KEYCODE_LIST.includes(code)) {
       style += 'background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.1) 90%); background-color: inherit; border-radius;'
     }
   } else if (localConfig.bookmark.keycapType === 'dsa') {
     style += `margin: -${customKeycapStageDsaMargin.value};`
     style += `width: ${getCustomKeycapWidth(code, -KeycapkeycapDsaEdgeSize).value};`
     style += `height: ${customKeycapStageDsaHeight.value};`
-    if (code === 'Space') {
+    // 空格阴影效果
+    if (SPACE_KEYCODE_LIST.includes(code)) {
       style += 'background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.1) 90%); background-color: inherit;'
     }
   }
@@ -311,14 +312,16 @@ const getKeycapIconStyle = (code: string) => {
                 >
                   <eos-icons:loading />
                 </div>
+
                 <!-- keycap -->
                 <p
                   v-if="localConfig.bookmark.isCapKeyVisible"
                   class="item__key"
                   :style="getKeycapTextStyle(code)"
                 >
-                  {{ getKeycapLabel(code) }}
+                  {{ getKeycapLabel(code) || '&nbsp;' }}
                 </p>
+
                 <!-- favicon -->
                 <div
                   class="item__img"
@@ -336,14 +339,16 @@ const getKeycapIconStyle = (code: string) => {
                     />
                   </div>
                 </div>
+
                 <!-- name -->
                 <p
                   v-if="localConfig.bookmark.isNameVisible"
                   class="item__name"
                   :style="getKeycapTextStyle(code)"
                 >
-                  {{ getBookmarkConfigName(code) }}
+                  {{ getBookmarkConfigName(code) || '&nbsp;' }}
                 </p>
+
                 <!-- 按键定位标志F & J -->
                 <div
                   v-if="['KeyF', 'KeyJ'].includes(code)"
