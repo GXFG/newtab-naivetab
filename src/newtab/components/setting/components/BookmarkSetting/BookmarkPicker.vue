@@ -91,6 +91,7 @@ watch(
   <NDrawer
     :show="props.show"
     :width="SECOND_MODAL_WIDTH"
+    show-mask="transparent"
     @update:show="handleUpdateShow"
   >
     <NDrawerContent

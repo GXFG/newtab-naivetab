@@ -67,7 +67,6 @@ const startGuide = () => {
       globalState.isGuideMode = false
       driverConfig.moveNext()
       driverConfig.destroy()
-      toggleIsDragMode(false)
     },
   })
 

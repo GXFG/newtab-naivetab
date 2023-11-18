@@ -28,7 +28,7 @@ export const FAVORITE_IMAGE_MAX_COUNT = 16
 
 export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
 
-export const SECOND_MODAL_WIDTH = 550
+export const SECOND_MODAL_WIDTH = 570
 
 export const TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP = {
   left: 'flex-start',

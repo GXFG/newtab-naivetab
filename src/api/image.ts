@@ -1,5 +1,6 @@
 import request from '@/lib/request'
 
+// https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=10
 export const getBingImages = (
   count = 8,
 ): Promise<{

@@ -70,8 +70,10 @@ const getNowData = async () => {
   if (data.code !== '200') {
     return
   }
-  weatherState.value.now = data.now
-  weatherState.value.now.syncTime = dayjs().valueOf()
+  weatherState.value.now = {
+    syncTime: dayjs().valueOf(),
+    ...data.now,
+  }
   log('Weather update now')
 }
 
@@ -100,8 +102,10 @@ const getAirData = async () => {
   if (data.code !== '200') {
     return
   }
-  weatherState.value.air = data.now
-  weatherState.value.air.syncTime = dayjs().valueOf()
+  weatherState.value.air = {
+    syncTime: dayjs().valueOf(),
+    ...data.now,
+  }
   log('Weather update air')
 }
 
@@ -110,9 +114,11 @@ const getWarningData = async () => {
   if (data.code !== '200') {
     return
   }
-  weatherState.value.warning.list = data.warning
-  weatherState.value.warning.syncTime = dayjs().valueOf()
-  weatherState.value.state.isWarningVisible = data.warning && data.warning.length && data.warning.length !== 0
+  weatherState.value.warning = {
+    syncTime: dayjs().valueOf(),
+    list: data.warning,
+  }
+  weatherState.value.state.isWarningVisible = !!(data.warning && data.warning.length && data.warning.length !== 0)
   log('Weather update warning')
 }
 

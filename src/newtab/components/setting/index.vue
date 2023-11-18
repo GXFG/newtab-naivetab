@@ -86,6 +86,8 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 <template>
   <div id="background__drawer" />
 
+  <div id="preset-theme__drawer" />
+
   <div id="setting">
     <!-- Drawer: height仅在位置是 top 和 bottom 时生效 -->
     <NDrawer
@@ -95,6 +97,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       :width="610"
       :height="400"
       :placement="localConfig.general.drawerPlacement"
+      show-mask="transparent"
       to="#setting"
     >
       <NDrawerContent>

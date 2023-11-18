@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import {
-  KEYBOARD_CODE_TO_DEFAULT_CONFIG,
-  KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST,
-  KEYBOARD_TYPE_OPTION,
-  SPLIT_SPACE_OPTION,
-  KEYCAP_TYPE_OPTION,
-  KEYCAP_PREINSTALL_OPTION,
-  KEYCAP_PREINSTALL_MAP,
-  currKeyboardConfig,
-} from '@/logic/keyboard'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST, KEYBOARD_TYPE_OPTION, SPLIT_SPACE_OPTION, KEYCAP_TYPE_OPTION, currKeyboardConfig } from '@/logic/keyboard'
 import { getDefaultBookmarkNameFromUrl } from '@/logic/bookmark'
 import { requestPermission } from '@/logic/storage'
 import { availableFontOptions, fontSelectRenderLabel, globalState, localState, localConfig, openConfigShortcutsPage } from '@/logic/store'
 import BookmarkPicker from './BookmarkPicker.vue'
+import PresetThemeDrawer from './PresetThemeDrawer.vue'
 
 const state = reactive({
   isBookmarkModalVisible: false,
   isBookmarkDragEnabled: false,
+  isPresetThemeDrawerVisible: false,
   currDragKeyCode: '',
   currImporKey: '',
 })
@@ -78,86 +71,8 @@ const onSelectBookmark = (payload: ChromeBookmarkItem) => {
   }
 }
 
-const keycapColorSelectRenderLabel = (option: SelectStringItem) => {
-  return [
-    h(
-      'div',
-      {
-        style: {
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        },
-      },
-      [
-        h('p', {}, option.label),
-        h(
-          'div',
-          {
-            style: {
-              width: '60%',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-            },
-          },
-          [
-            h(
-              'p',
-              {
-                style: {
-                  padding: '3px 10px',
-                  borderRadius: '3px',
-                  color: KEYCAP_PREINSTALL_MAP[option.value].mainFontColor,
-                  backgroundColor: KEYCAP_PREINSTALL_MAP[option.value].mainBackgroundColor,
-                },
-              },
-              'QWERTY',
-            ),
-            h(
-              'p',
-              {
-                style: {
-                  marginLeft: '5px',
-                  padding: '3px 10px',
-                  borderRadius: '3px',
-                  color: KEYCAP_PREINSTALL_MAP[option.value].emphasisOneFontColor,
-                  backgroundColor: KEYCAP_PREINSTALL_MAP[option.value].emphasisOneBackgroundColor,
-                },
-              },
-              'Control',
-            ),
-            h(
-              'p',
-              {
-                style: {
-                  marginLeft: '5px',
-                  padding: '3px 10px',
-                  borderRadius: '3px',
-                  color: KEYCAP_PREINSTALL_MAP[option.value].emphasisTwoFontColor,
-                  backgroundColor: KEYCAP_PREINSTALL_MAP[option.value].emphasisTwoBackgroundColor,
-                },
-              },
-              'Enter',
-            ),
-          ],
-        ),
-      ],
-    ),
-  ]
-}
-
-const preinstallTheme = ref(null)
-
-const handleKeycapColorSelectUpdate = (value: string) => {
-  localConfig.bookmark.mainFontColor[localState.value.currAppearanceCode] = KEYCAP_PREINSTALL_MAP[value].mainFontColor
-  localConfig.bookmark.mainBackgroundColor[localState.value.currAppearanceCode] = KEYCAP_PREINSTALL_MAP[value].mainBackgroundColor
-  localConfig.bookmark.emphasisOneFontColor[localState.value.currAppearanceCode] = KEYCAP_PREINSTALL_MAP[value].emphasisOneFontColor
-  localConfig.bookmark.emphasisOneBackgroundColor[localState.value.currAppearanceCode] = KEYCAP_PREINSTALL_MAP[value].emphasisOneBackgroundColor
-  localConfig.bookmark.emphasisTwoFontColor[localState.value.currAppearanceCode] = KEYCAP_PREINSTALL_MAP[value].emphasisTwoFontColor
-  localConfig.bookmark.emphasisTwoBackgroundColor[localState.value.currAppearanceCode] = KEYCAP_PREINSTALL_MAP[value].emphasisTwoBackgroundColor
-  preinstallTheme.value = null
+const openPresetThemeDrawer = () => {
+  state.isPresetThemeDrawerVisible = true
 }
 
 const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgroundKeystrokes ? '24%' : '30%'))
@@ -168,6 +83,8 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
     v-model:show="state.isBookmarkModalVisible"
     @select="onSelectBookmark"
   />
+
+  <PresetThemeDrawer v-model:show="state.isPresetThemeDrawerVisible" />
 
   <NCollapse display-directive="show">
     <BaseComponentSetting
@@ -187,8 +104,8 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
               class="setting__input_item"
             >
               <NButton
-                ghost
                 type="primary"
+                ghost
                 @click="openConfigShortcutsPage()"
               >
                 <ic:twotone-keyboard-command-key />&nbsp;{{ $t('bookmark.customKeys') }}
@@ -353,6 +270,9 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
       </template>
 
       <template #footer>
+        <p class="setting__label">
+          {{ `${$t('bookmark.keyboard')}${$t('common.config')}` }}
+        </p>
         <NFormItem :label="$t('bookmark.keyboardType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keyboardType">
             <NRadio
@@ -364,19 +284,6 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             </NRadio>
           </NRadioGroup>
         </NFormItem>
-
-        <NFormItem :label="$t('bookmark.splitSpace')">
-          <NRadioGroup v-model:value="localConfig.bookmark.splitSpace">
-            <NRadio
-              v-for="item in SPLIT_SPACE_OPTION"
-              :key="item.value"
-              :value="item.value"
-            >
-              {{ item.label }}
-            </NRadio>
-          </NRadioGroup>
-        </NFormItem>
-
         <NFormItem :label="$t('bookmark.keycapType')">
           <NRadioGroup v-model:value="localConfig.bookmark.keycapType">
             <NRadioButton
@@ -388,18 +295,141 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
             </NRadioButton>
           </NRadioGroup>
         </NFormItem>
-
-        <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.theme')}`">
-          <NSelect
-            v-model:value="preinstallTheme"
-            :options="KEYCAP_PREINSTALL_OPTION"
-            :render-label="keycapColorSelectRenderLabel"
-            @update:value="handleKeycapColorSelectUpdate"
-          />
+        <NFormItem :label="$t('bookmark.splitSpace')">
+          <NRadioGroup v-model:value="localConfig.bookmark.splitSpace">
+            <NRadioButton
+              v-for="item in SPLIT_SPACE_OPTION"
+              :key="item.value"
+              :value="item.value"
+            >
+              {{ item.label }}
+            </NRadioButton>
+          </NRadioGroup>
+        </NFormItem>
+        <NFormItem :label="`${$t('bookmark.presetTheme')}`">
+          <NButton
+            type="primary"
+            ghost
+            @click="openPresetThemeDrawer()"
+          >
+            <mingcute:finger-press-line />&nbsp;{{ $t('common.select') }}
+          </NButton>
         </NFormItem>
 
         <p class="setting__label">
-          {{ `${$t('bookmark.keycap')}${$t('common.general')}` }}
+          {{ `${$t('bookmark.shell')}${$t('common.config')}` }}
+        </p>
+        <NFormItem :label="$t('bookmark.shell')">
+          <NSwitch v-model:value="localConfig.bookmark.isShellVisible" />
+          <CustomColorPicker
+            v-if="localConfig.bookmark.isShellVisible"
+            v-model:value="localConfig.bookmark.shellColor[localState.currAppearanceCode]"
+            class="setting__item-element"
+          />
+        </NFormItem>
+        <template v-if="localConfig.bookmark.isShellVisible">
+          <NFormItem :label="`${$t('common.vertical')}${$t('common.margin')}`">
+            <NSlider
+              v-model:value="localConfig.bookmark.shellVerticalPadding"
+              :step="1"
+              :min="0"
+              :max="100"
+            />
+            <NInputNumber
+              v-model:value="localConfig.bookmark.shellVerticalPadding"
+              class="setting__item-element setting__input-number"
+              :step="1"
+              :min="0"
+              :max="100"
+            />
+          </NFormItem>
+          <NFormItem :label="`${$t('common.horizontal')}${$t('common.margin')}`">
+            <NSlider
+              v-model:value="localConfig.bookmark.shellHorizontalPadding"
+              :step="1"
+              :min="0"
+              :max="100"
+            />
+            <NInputNumber
+              v-model:value="localConfig.bookmark.shellHorizontalPadding"
+              class="setting__item-element setting__input-number"
+              :step="1"
+              :min="0"
+              :max="100"
+            />
+          </NFormItem>
+          <NFormItem :label="$t('common.borderRadius')">
+            <NSlider
+              v-model:value="localConfig.bookmark.shellBorderRadius"
+              :step="0.1"
+              :min="0"
+              :max="30"
+            />
+            <NInputNumber
+              v-model:value="localConfig.bookmark.shellBorderRadius"
+              class="setting__item-element setting__input-number"
+              :step="0.1"
+              :min="0"
+              :max="30"
+            />
+          </NFormItem>
+          <NFormItem
+            :label="$t('common.shadow')"
+            class="n-form-item--color"
+          >
+            <NSwitch v-model:value="localConfig.bookmark.isShellShadowEnabled" />
+            <CustomColorPicker
+              v-model:value="localConfig.bookmark.shellShadowColor[localState.currAppearanceCode]"
+              class="setting__item-element"
+            />
+          </NFormItem>
+          <p class="setting__label">
+            {{ `${$t('bookmark.plate')}${$t('common.config')}` }}
+          </p>
+          <NFormItem :label="$t('bookmark.plate')">
+            <NSwitch v-model:value="localConfig.bookmark.isPlateVisible" />
+            <CustomColorPicker
+              v-if="localConfig.bookmark.isPlateVisible"
+              v-model:value="localConfig.bookmark.plateColor[localState.currAppearanceCode]"
+              class="setting__item-element"
+            />
+          </NFormItem>
+          <template v-if="localConfig.bookmark.isPlateVisible">
+            <NFormItem :label="`${$t('common.margin')}`">
+              <NSlider
+                v-model:value="localConfig.bookmark.platePadding"
+                :step="0.1"
+                :min="0"
+                :max="10"
+              />
+              <NInputNumber
+                v-model:value="localConfig.bookmark.platePadding"
+                class="setting__item-element setting__input-number"
+                :step="0.1"
+                :min="0"
+                :max="10"
+              />
+            </NFormItem>
+            <NFormItem :label="$t('common.borderRadius')">
+              <NSlider
+                v-model:value="localConfig.bookmark.plateBorderRadius"
+                :step="0.1"
+                :min="0"
+                :max="10"
+              />
+              <NInputNumber
+                v-model:value="localConfig.bookmark.plateBorderRadius"
+                class="setting__item-element setting__input-number"
+                :step="0.1"
+                :min="0"
+                :max="10"
+              />
+            </NFormItem>
+          </template>
+        </template>
+
+        <p class="setting__label">
+          {{ `${$t('bookmark.keycap')}${$t('common.config')}` }}
         </p>
         <NFormItem :label="`${$t('common.margin')}`">
           <NSlider
@@ -525,48 +555,37 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           </template>
         </NFormItem>
 
-        <p class="setting__label">
-          {{ `${$t('common.main')}${$t('bookmark.keycap')} QWERTY` }}
-        </p>
-        <div class="setting-form__wrap">
+        <NFormItem :label="`${$t('bookmark.keycap')}Qwerty`">
           <NFormItem
             :label="`${$t('common.fontColor')}`"
             class="n-form-item--color"
           >
             <CustomColorPicker v-model:value="localConfig.bookmark.mainFontColor[localState.currAppearanceCode]" />
           </NFormItem>
-
           <NFormItem
             :label="`${$t('common.backgroundColor')}`"
             class="n-form-item--color"
           >
             <CustomColorPicker v-model:value="localConfig.bookmark.mainBackgroundColor[localState.currAppearanceCode]" />
           </NFormItem>
-        </div>
+        </NFormItem>
 
-        <p class="setting__label">
-          {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Control` }}
-        </p>
-        <div class="setting-form__wrap">
+        <NFormItem :label="`${$t('bookmark.keycap')}Control`">
           <NFormItem
             :label="`${$t('common.fontColor')}`"
             class="n-form-item--color"
           >
             <CustomColorPicker v-model:value="localConfig.bookmark.emphasisOneFontColor[localState.currAppearanceCode]" />
           </NFormItem>
-
           <NFormItem
             :label="`${$t('common.backgroundColor')}`"
             class="n-form-item--color"
           >
             <CustomColorPicker v-model:value="localConfig.bookmark.emphasisOneBackgroundColor[localState.currAppearanceCode]" />
           </NFormItem>
-        </div>
+        </NFormItem>
 
-        <p class="setting__label">
-          {{ `${$t('common.emphasis')}${$t('bookmark.keycap')} Enter` }}
-        </p>
-        <div class="setting-form__wrap">
+        <NFormItem :label="`${$t('bookmark.keycap')}Enter`">
           <NFormItem
             :label="`${$t('common.fontColor')}`"
             class="n-form-item--color"
@@ -580,7 +599,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
           >
             <CustomColorPicker v-model:value="localConfig.bookmark.emphasisTwoBackgroundColor[localState.currAppearanceCode]" />
           </NFormItem>
-        </div>
+        </NFormItem>
       </template>
     </BaseComponentSetting>
   </NCollapse>

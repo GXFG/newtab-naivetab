@@ -69,6 +69,7 @@ const onOpenCityPicker = () => {
   <NDrawer
     v-model:show="state.isCityPickerVisible"
     :width="SECOND_MODAL_WIDTH"
+    show-mask="transparent"
   >
     <NDrawerContent
       :title="`${$t('common.edit')}${$t('weather.city')}`"

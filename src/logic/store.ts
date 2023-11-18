@@ -345,7 +345,20 @@ export const handleAppUpdate = async () => {
     localConfig.bookmark.keyboardType = typeof localConfig.bookmark.keyboardType === 'number' ? `key${localConfig.bookmark.keyboardType}` : localConfig.bookmark.keyboardType
   }
   if (compareLeftVersionLessThanRightVersions(version, '1.18.2')) {
-    localConfig.bookmark.splitSpace = 'space1'
+    localConfig.bookmark.splitSpace = defaultConfig.bookmark.splitSpace
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.19.0')) {
+    localConfig.bookmark.isShellVisible = defaultConfig.bookmark.isShellVisible
+    localConfig.bookmark.shellVerticalPadding = defaultConfig.bookmark.shellVerticalPadding
+    localConfig.bookmark.shellHorizontalPadding = defaultConfig.bookmark.shellHorizontalPadding
+    localConfig.bookmark.shellBorderRadius = defaultConfig.bookmark.shellBorderRadius
+    localConfig.bookmark.shellColor = defaultConfig.bookmark.shellColor
+    localConfig.bookmark.isShellShadowEnabled = defaultConfig.bookmark.isShellShadowEnabled
+    localConfig.bookmark.shellShadowColor = defaultConfig.bookmark.shellShadowColor
+    localConfig.bookmark.isPlateVisible = defaultConfig.bookmark.isPlateVisible
+    localConfig.bookmark.platePadding = defaultConfig.bookmark.platePadding
+    localConfig.bookmark.plateBorderRadius = defaultConfig.bookmark.plateBorderRadius
+    localConfig.bookmark.plateColor = defaultConfig.bookmark.plateColor
   }
   // 更新local版本号
   localConfig.general.version = pkg.version
