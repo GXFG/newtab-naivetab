@@ -1,54 +1,39 @@
 import { isMacOS } from '@/env'
 import { localConfig } from '@/logic/store'
 
-export const stopKeydown = () => {
-  document.onkeydown = null
-}
-
-export const KEYCAP_TYPE_OPTION = [
-  { label: 'FLAT', value: 'flat' },
-  { label: 'GMK', value: 'gmk' },
-  { label: 'DSA', value: 'dsa' },
+export const KEYBOARD_TYPE_OPTION = [
+  { label: '33', value: 'key33' },
+  { label: '45', value: 'key45' },
+  { label: '47', value: 'key47' },
+  { label: '43', value: 'key43' },
+  { label: '53', value: 'key53' },
+  { label: '57', value: 'key57' },
+  { label: '61', value: 'key61' },
+  { label: '64', value: 'key64' },
+  { label: '67', value: 'key67' },
+  { label: '68', value: 'key68' },
+  { label: '80', value: 'key80' },
+  { label: '84', value: 'key84' },
+  { label: '87', value: 'key87' },
+  { label: 'HHKB', value: 'hhkb' },
 ]
 
-export const KEYCAP_PREINSTALL_OPTION = [
-  { label: 'Light', value: 'light' },
-  { label: 'Dark', value: 'dark' },
-  { label: 'Granite', value: 'granite' },
-  { label: 'Bentō', value: 'bento' },
-  { label: 'Olivia', value: 'olivia' },
-  { label: 'Oblivion', value: 'oblivion' },
-  { label: 'Oblivion W', value: 'oblivionW' },
-  { label: 'Classic Olivetti', value: 'classicOlivetti' },
-  { label: 'Shiko', value: 'shiko' },
-  { label: 'HHKB', value: 'hhkb' },
-  { label: 'Honeywell', value: 'honeywell' },
-  { label: 'Hana', value: 'hana' },
-  { label: 'RF 10th', value: 'rf10th' },
-  { label: 'Raindrop', value: 'raindrop' },
-  { label: 'Carbon', value: 'carbon' },
-  { label: 'Hyperfuse', value: 'hyperfuse' },
-  { label: 'Jukebox', value: 'jukebox' },
-  { label: 'Valentine', value: 'valentine' },
-  { label: 'EVA01', value: 'eva01' },
-  { label: 'Pulse', value: 'pulse' },
-  { label: 'RoyalNavy', value: 'royalNavy' },
-  { label: 'Dolch', value: 'dolch' },
-  { label: 'Lime', value: 'lime' },
-  { label: 'Eve', value: 'eve' },
-  { label: 'Godspeed', value: 'godspeed' },
-  { label: 'Jamón', value: 'jamon' },
-  { label: 'White on Black', value: 'whiteOnBlack' },
-  { label: 'βeta', value: 'beta' },
-  { label: 'DMG', value: 'dmg' },
-  { label: 'Symbiosis', value: 'symbiosis' },
-  { label: 'Posh Blue', value: 'poshBlue' },
-  { label: 'Posh Pink', value: 'poshPink' },
-  { label: 'Pitta', value: 'pitta' },
+export const SPLIT_SPACE_OPTION = [
+  { label: '1', value: 'space1' },
+  { label: '2', value: 'space2' },
+  { label: '3', value: 'space3' },
+]
+
+export const KEYCAP_TYPE_OPTION = [
+  { label: 'GMK', value: 'gmk' },
+  { label: 'DSA', value: 'dsa' },
+  { label: 'FLAT', value: 'flat' },
 ]
 
 export const KEYCAP_PREINSTALL_MAP = {
   light: {
+    label: 'Light',
+    shellColor: 'rgba(255, 255, 255, 1.0)',
     mainFontColor: 'rgba(34,34,34,1.0)',
     mainBackgroundColor: 'rgba(255, 255, 255, 1)',
     emphasisOneFontColor: 'rgba(255, 255, 255, 0.9)',
@@ -57,6 +42,8 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoBackgroundColor: 'rgba(34, 34, 34, 1)',
   },
   dark: {
+    label: 'Dark',
+    shellColor: 'rgba(55, 55, 55, 1.0)',
     mainFontColor: 'rgba(228,222,221,1.0)',
     mainBackgroundColor: 'rgba(95,92,82,1.0)',
     emphasisOneFontColor: 'rgba(228,222,221,1.0)',
@@ -64,167 +51,9 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoFontColor: 'rgba(228,222,221,1.0)',
     emphasisTwoBackgroundColor: 'rgba(51,52,48,1.0)',
   },
-  hana: {
-    mainFontColor: 'rgba(165, 152, 197, 1)',
-    mainBackgroundColor: 'rgba(239, 239, 234, 1)',
-    emphasisOneFontColor: 'rgba(239, 239, 234, 1)',
-    emphasisOneBackgroundColor: 'rgba(165, 152, 197, 1)',
-    emphasisTwoFontColor: 'rgba(239, 239, 234, 1)',
-    emphasisTwoBackgroundColor: 'rgba(165, 152, 197, 1)',
-  },
-  hhkb: {
-    mainFontColor: 'rgba(34, 34, 34, 1)',
-    mainBackgroundColor: 'rgba(234, 230, 231, 1)',
-    emphasisOneFontColor: 'rgba(34, 34, 34, 1)',
-    emphasisOneBackgroundColor: 'rgba(203, 205, 218, 1)',
-    emphasisTwoFontColor: 'rgba(34, 34, 34, 1)',
-    emphasisTwoBackgroundColor: 'rgba(203, 205, 218, 1)',
-  },
-  rf10th: {
-    mainFontColor: 'rgba(34, 34, 34, 1)',
-    mainBackgroundColor: 'rgba(152, 151, 147, 1)',
-    emphasisOneFontColor: 'rgba(34, 34, 34, 1)',
-    emphasisOneBackgroundColor: 'rgba(102, 136, 170, 1)',
-    emphasisTwoFontColor: 'rgba(34, 34, 34, 1)',
-    emphasisTwoBackgroundColor: 'rgba(102, 136, 170, 1)',
-  },
-  raindrop: {
-    mainFontColor: 'rgba(0,115,162,1.0)',
-    mainBackgroundColor: 'rgba(229,228,223,1.0)',
-    emphasisOneFontColor: 'rgba(229,228,223,1.0)',
-    emphasisOneBackgroundColor: 'rgba(0,115,162,1.0)',
-    emphasisTwoFontColor: 'rgba(229,228,223,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(0,115,162,1.0)',
-  },
-  carbon: {
-    mainFontColor: 'rgba(87,93,94,1.0)',
-    mainBackgroundColor: 'rgba(227,217,198,1.0)',
-    emphasisOneFontColor: 'rgba(237,107,33,1.0)',
-    emphasisOneBackgroundColor: 'rgba(87,93,94,1.0)',
-    emphasisTwoFontColor: 'rgba(87,93,94,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(237,107,33,1.0)',
-  },
-  honeywell: {
-    mainFontColor: 'rgba(33,34,36,1.0)',
-    mainBackgroundColor: 'rgba(239,239,234,1.0)',
-    emphasisOneFontColor: 'rgba(239,239,234,1.0)',
-    emphasisOneBackgroundColor: 'rgba(87,87,87,1.0)',
-    emphasisTwoFontColor: 'rgba(239,239,234,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(176,28,17,1.0)',
-  },
-  hyperfuse: {
-    mainFontColor: 'rgba(108,56,123,1.0)',
-    mainBackgroundColor: 'rgba(196,196,192,1.0)',
-    emphasisOneFontColor: 'rgba(93,206,186,1.0)',
-    emphasisOneBackgroundColor: 'rgba(99,105,106,1.0)',
-    emphasisTwoFontColor: 'rgba(93,206,186,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(99,105,106,1.0)',
-  },
-  granite: {
-    mainFontColor: 'rgba(82,85,84,1.0)',
-    mainBackgroundColor: 'rgba(230,232,227,1.0)',
-    emphasisOneFontColor: 'rgba(34,34,34,1.0)',
-    emphasisOneBackgroundColor: 'rgba(160,164,167,1.0)',
-    emphasisTwoFontColor: 'rgba(34,34,34,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(160,164,167,1.0)',
-  },
-  jukebox: {
-    mainFontColor: 'rgba(165,27,27,1.0)',
-    mainBackgroundColor: 'rgba(217,201,171,1.0)',
-    emphasisOneFontColor: 'rgba(165,27,27,1.0)',
-    emphasisOneBackgroundColor: 'rgba(105,208,165,1.0)',
-    emphasisTwoFontColor: 'rgba(217,201,171,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(165,27,27,1.0)',
-  },
-  valentine: {
-    mainFontColor: 'rgba(220,144,188,1.0)',
-    mainBackgroundColor: 'rgba(239,239,234,1.0)',
-    emphasisOneFontColor: 'rgba(239,239,234,1.0)',
-    emphasisOneBackgroundColor: 'rgba(220,144,188,1.0)',
-    emphasisTwoFontColor: 'rgba(239,239,234,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(220,144,188,1.0)',
-  },
-  eva01: {
-    mainFontColor: 'rgba(147,194,71,1.0)',
-    mainBackgroundColor: 'rgba(89,34,84,1.0)',
-    emphasisOneFontColor: 'rgba(89,34,84,1.0)',
-    emphasisOneBackgroundColor: 'rgba(147,194,71,1.0)',
-    emphasisTwoFontColor: 'rgba(89,34,84,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(147,194,71,1.0)',
-  },
-  pulse: {
-    mainFontColor: 'rgba(0,166,180,1.0)',
-    mainBackgroundColor: 'rgba(33,34,36,1.0)',
-    emphasisOneFontColor: 'rgba(33,34,36,1.0)',
-    emphasisOneBackgroundColor: 'rgba(0,166,180,1.0)',
-    emphasisTwoFontColor: 'rgba(33,34,36,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(0,166,180,1.0)',
-  },
-  royalNavy: {
-    mainFontColor: 'rgba(47,61,111,1.0)',
-    mainBackgroundColor: 'rgba(240,240,240,1.0)',
-    emphasisOneFontColor: 'rgba(240,240,240,1.0)',
-    emphasisOneBackgroundColor: 'rgba(47,61,111,1.0)',
-    emphasisTwoFontColor: 'rgba(240,240,240,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(169,47,13,1.0)',
-  },
-  dolch: {
-    mainFontColor: 'rgba(228,222,221,1.0)',
-    mainBackgroundColor: 'rgba(95,92,82,1.0)',
-    emphasisOneFontColor: 'rgba(228,222,221,1.0)',
-    emphasisOneBackgroundColor: 'rgba(51,52,48,1.0)',
-    emphasisTwoFontColor: 'rgba(228,222,221,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(0,164,169,1.0)',
-  },
-  classicOlivetti: {
-    mainFontColor: 'rgba(9,101,237,1.0)',
-    mainBackgroundColor: 'rgba(245,245,245,1.0)',
-    emphasisOneFontColor: 'rgba(9,101,237,1.0)',
-    emphasisOneBackgroundColor: 'rgba(207,205,194,1.0)',
-    emphasisTwoFontColor: 'rgba(245,245,245,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(9,101,237,1.0)',
-  },
-  lime: {
-    mainFontColor: 'rgba(147,194,71,1.0)',
-    mainBackgroundColor: 'rgba(229,228,223,1.0)',
-    emphasisOneFontColor: 'rgba(229,228,223,1.0)',
-    emphasisOneBackgroundColor: 'rgba(124,135,142,1.0)',
-    emphasisTwoFontColor: 'rgba(229,228,223,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(147,194,71,1.0)',
-  },
-  eve: {
-    mainFontColor: 'rgba(51,51,51,1.0)',
-    mainBackgroundColor: 'rgba(212,208,199,1.0)',
-    emphasisOneFontColor: 'rgba(39,133,219,1.0)',
-    emphasisOneBackgroundColor: 'rgba(51,51,51,1.0)',
-    emphasisTwoFontColor: 'rgba(212,208,199,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(39,133,219,1.0)',
-  },
-  godspeed: {
-    mainFontColor: 'rgba(102,102,102,1.0)',
-    mainBackgroundColor: 'rgba(211,205,193,1.0)',
-    emphasisOneFontColor: 'rgba(211,205,193,1.0)',
-    emphasisOneBackgroundColor: 'rgba(106,148,177,1.0)',
-    emphasisTwoFontColor: 'rgba(102,102,102,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(249,235,116,1.0)',
-  },
-  bento: {
-    mainFontColor: 'rgba(72,121,146,1.0)',
-    mainBackgroundColor: 'rgba(255,244,240,1.0)',
-    emphasisOneFontColor: 'rgba(248,118,126,1.0)',
-    emphasisOneBackgroundColor: 'rgba(72,121,146,1.0)',
-    emphasisTwoFontColor: 'rgba(255,244,240,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(248,118,126,1.0)',
-  },
-  jamon: {
-    mainFontColor: 'rgba(242,235,215,1.0)',
-    mainBackgroundColor: 'rgba(140,48,58,1.0)',
-    emphasisOneFontColor: 'rgba(242,235,215,1.0)',
-    emphasisOneBackgroundColor: 'rgba(178,52,60,1.0)',
-    emphasisTwoFontColor: 'rgba(66,68,70,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(242,235,215,1.0)',
-  },
   whiteOnBlack: {
+    label: 'White on Black',
+    shellColor: 'rgba(34,34,34,1.0)',
     mainFontColor: 'rgba(239,239,234,1.0)',
     mainBackgroundColor: 'rgba(34,34,34,1.0)',
     emphasisOneFontColor: 'rgba(239,239,234,1.0)',
@@ -232,31 +61,29 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoFontColor: 'rgba(239,239,234,1.0)',
     emphasisTwoBackgroundColor: 'rgba(34,34,34,1.0)',
   },
-  beta: {
-    mainFontColor: 'rgba(51,51,51,1.0)',
-    mainBackgroundColor: 'rgba(220,214,196,1.0)',
-    emphasisOneFontColor: 'rgba(51,51,51,1.0)',
-    emphasisOneBackgroundColor: 'rgba(114,116,115,1.0)',
-    emphasisTwoFontColor: 'rgba(51,51,51,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(221,118,50,1.0)',
+  granite: {
+    label: 'Granite',
+    shellColor: 'rgba(225, 219, 209, 1.0)',
+    mainFontColor: 'rgba(82,85,84,1.0)',
+    mainBackgroundColor: 'rgba(230,232,227,1.0)',
+    emphasisOneFontColor: 'rgba(34,34,34,1.0)',
+    emphasisOneBackgroundColor: 'rgba(160,164,167,1.0)',
+    emphasisTwoFontColor: 'rgba(34,34,34,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(160,164,167,1.0)',
   },
-  dmg: {
-    mainFontColor: 'rgba(29,23,112,1.0)',
-    mainBackgroundColor: 'rgba(209,205,202,1.0)',
-    emphasisOneFontColor: 'rgba(29,23,112,1.0)',
-    emphasisOneBackgroundColor: 'rgba(127,131,137,1.0)',
-    emphasisTwoFontColor: 'rgba(209,205,202,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(114,33,88,1.0)',
-  },
-  shiko: {
-    mainFontColor: 'rgba(122,153,172,1.0)',
-    mainBackgroundColor: 'rgba(221,229,237,1.0)',
-    emphasisOneFontColor: 'rgba(221,229,237,1.0)',
-    emphasisOneBackgroundColor: 'rgba(122,153,172,1.0)',
-    emphasisTwoFontColor: 'rgba(221,229,237,1.0)',
-    emphasisTwoBackgroundColor: 'rgba(161,209,238,1.0)',
+  bento: {
+    label: 'Bentō',
+    shellColor: 'rgba(255,244,240,1.0)',
+    mainFontColor: 'rgba(72,121,146,1.0)',
+    mainBackgroundColor: 'rgba(255,244,240,1.0)',
+    emphasisOneFontColor: 'rgba(248,118,126,1.0)',
+    emphasisOneBackgroundColor: 'rgba(72,121,146,1.0)',
+    emphasisTwoFontColor: 'rgba(255,244,240,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(248,118,126,1.0)',
   },
   olivia: {
+    label: 'Olivia',
+    shellColor: 'rgba(225,219,209,1.0)',
     mainFontColor: 'rgba(34,34,34,1.0)',
     mainBackgroundColor: 'rgba(225,219,209,1.0)',
     emphasisOneFontColor: 'rgba(224,177,159,1.0)',
@@ -265,6 +92,8 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoBackgroundColor: 'rgba(224,177,159,1.0)',
   },
   oblivion: {
+    label: 'Oblivion',
+    shellColor: 'rgba(107,114,115,1.0)',
     mainFontColor: 'rgba(222,222,202,1.0)',
     mainBackgroundColor: 'rgba(107,114,115,1.0)',
     emphasisOneFontColor: 'rgba(222,222,202,1.0)',
@@ -273,6 +102,8 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoBackgroundColor: 'rgba(41,127,169,1.0)',
   },
   oblivionW: {
+    label: 'Oblivion W',
+    shellColor: 'rgba(231,232,229,1.0)',
     mainFontColor: 'rgba(71,73,70,1.0)',
     mainBackgroundColor: 'rgba(231,232,229,1.0)',
     emphasisOneFontColor: 'rgba(222,222,202,1.0)',
@@ -280,7 +111,219 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoFontColor: 'rgba(222,222,202,1.0)',
     emphasisTwoBackgroundColor: 'rgba(41,127,169,1.0)',
   },
+  classicOlivetti: {
+    label: 'Classic Olivetti',
+    shellColor: 'rgba(245,245,245,1.0)',
+    mainFontColor: 'rgba(9,101,237,1.0)',
+    mainBackgroundColor: 'rgba(245,245,245,1.0)',
+    emphasisOneFontColor: 'rgba(9,101,237,1.0)',
+    emphasisOneBackgroundColor: 'rgba(207,205,194,1.0)',
+    emphasisTwoFontColor: 'rgba(245,245,245,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(9,101,237,1.0)',
+  },
+  shiko: {
+    label: 'Shiko',
+    shellColor: 'rgba(221,229,237,1.0)',
+    mainFontColor: 'rgba(122,153,172,1.0)',
+    mainBackgroundColor: 'rgba(221,229,237,1.0)',
+    emphasisOneFontColor: 'rgba(221,229,237,1.0)',
+    emphasisOneBackgroundColor: 'rgba(122,153,172,1.0)',
+    emphasisTwoFontColor: 'rgba(221,229,237,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(161,209,238,1.0)',
+  },
+  hhkb: {
+    label: 'HHKB',
+    shellColor: 'rgba(225, 219, 209, 1.0)',
+    mainFontColor: 'rgba(34, 34, 34, 1)',
+    mainBackgroundColor: 'rgba(234, 230, 231, 1)',
+    emphasisOneFontColor: 'rgba(34, 34, 34, 1)',
+    emphasisOneBackgroundColor: 'rgba(203, 205, 218, 1)',
+    emphasisTwoFontColor: 'rgba(34, 34, 34, 1)',
+    emphasisTwoBackgroundColor: 'rgba(203, 205, 218, 1)',
+  },
+  hana: {
+    label: 'Hana',
+    shellColor: 'rgba(182, 162, 192, 1)',
+    mainFontColor: 'rgba(165, 152, 197, 1)',
+    mainBackgroundColor: 'rgba(239, 239, 234, 1)',
+    emphasisOneFontColor: 'rgba(239, 239, 234, 1)',
+    emphasisOneBackgroundColor: 'rgba(165, 152, 197, 1)',
+    emphasisTwoFontColor: 'rgba(239, 239, 234, 1)',
+    emphasisTwoBackgroundColor: 'rgba(165, 152, 197, 1)',
+  },
+  rf10th: {
+    label: 'RF 10th',
+    shellColor: 'rgba(47, 47, 47, 1)',
+    mainFontColor: 'rgba(34, 34, 34, 1)',
+    mainBackgroundColor: 'rgba(152, 151, 147, 1)',
+    emphasisOneFontColor: 'rgba(34, 34, 34, 1)',
+    emphasisOneBackgroundColor: 'rgba(102, 136, 170, 1)',
+    emphasisTwoFontColor: 'rgba(34, 34, 34, 1)',
+    emphasisTwoBackgroundColor: 'rgba(102, 136, 170, 1)',
+  },
+  raindrop: {
+    label: 'Raindrop',
+    shellColor: 'rgba(225, 219, 209, 1.0)',
+    mainFontColor: 'rgba(0,115,162,1.0)',
+    mainBackgroundColor: 'rgba(229,228,223,1.0)',
+    emphasisOneFontColor: 'rgba(229,228,223,1.0)',
+    emphasisOneBackgroundColor: 'rgba(0,115,162,1.0)',
+    emphasisTwoFontColor: 'rgba(229,228,223,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(0,115,162,1.0)',
+  },
+  carbon: {
+    label: 'Carbon',
+    shellColor: 'rgba(225, 219, 209, 1.0)',
+    mainFontColor: 'rgba(87,93,94,1.0)',
+    mainBackgroundColor: 'rgba(227,217,198,1.0)',
+    emphasisOneFontColor: 'rgba(237,107,33,1.0)',
+    emphasisOneBackgroundColor: 'rgba(87,93,94,1.0)',
+    emphasisTwoFontColor: 'rgba(87,93,94,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(237,107,33,1.0)',
+  },
+  honeywell: {
+    label: 'Honeywell',
+    shellColor: 'rgba(225, 225, 225, 1.0)',
+    mainFontColor: 'rgba(33,34,36,1.0)',
+    mainBackgroundColor: 'rgba(239,239,234,1.0)',
+    emphasisOneFontColor: 'rgba(239,239,234,1.0)',
+    emphasisOneBackgroundColor: 'rgba(87,87,87,1.0)',
+    emphasisTwoFontColor: 'rgba(239,239,234,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(176,28,17,1.0)',
+  },
+  hyperfuse: {
+    label: 'Hyperfuse',
+    shellColor: 'rgba(225, 219, 209, 1.0)',
+    mainFontColor: 'rgba(108,56,123,1.0)',
+    mainBackgroundColor: 'rgba(196,196,192,1.0)',
+    emphasisOneFontColor: 'rgba(93,206,186,1.0)',
+    emphasisOneBackgroundColor: 'rgba(99,105,106,1.0)',
+    emphasisTwoFontColor: 'rgba(93,206,186,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(99,105,106,1.0)',
+  },
+  jukebox: {
+    label: 'Jukebox',
+    shellColor: 'rgba(217,201,171,1.0)',
+    mainFontColor: 'rgba(165,27,27,1.0)',
+    mainBackgroundColor: 'rgba(217,201,171,1.0)',
+    emphasisOneFontColor: 'rgba(165,27,27,1.0)',
+    emphasisOneBackgroundColor: 'rgba(105,208,165,1.0)',
+    emphasisTwoFontColor: 'rgba(217,201,171,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(165,27,27,1.0)',
+  },
+  valentine: {
+    label: 'Valentine',
+    shellColor: 'rgba(220,144,188,1.0)',
+    mainFontColor: 'rgba(220,144,188,1.0)',
+    mainBackgroundColor: 'rgba(239,239,234,1.0)',
+    emphasisOneFontColor: 'rgba(239,239,234,1.0)',
+    emphasisOneBackgroundColor: 'rgba(220,144,188,1.0)',
+    emphasisTwoFontColor: 'rgba(239,239,234,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(220,144,188,1.0)',
+  },
+  eva01: {
+    label: 'EVA01',
+    shellColor: 'rgba(89,34,84,1.0)',
+    mainFontColor: 'rgba(147,194,71,1.0)',
+    mainBackgroundColor: 'rgba(89,34,84,1.0)',
+    emphasisOneFontColor: 'rgba(89,34,84,1.0)',
+    emphasisOneBackgroundColor: 'rgba(147,194,71,1.0)',
+    emphasisTwoFontColor: 'rgba(89,34,84,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(147,194,71,1.0)',
+  },
+  pulse: {
+    label: 'Pulse',
+    shellColor: 'rgba(33,34,36,1.0)',
+    mainFontColor: 'rgba(0,166,180,1.0)',
+    mainBackgroundColor: 'rgba(33,34,36,1.0)',
+    emphasisOneFontColor: 'rgba(33,34,36,1.0)',
+    emphasisOneBackgroundColor: 'rgba(0,166,180,1.0)',
+    emphasisTwoFontColor: 'rgba(33,34,36,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(0,166,180,1.0)',
+  },
+  royalNavy: {
+    label: 'RoyalNavy',
+    shellColor: 'rgba(240,240,240,1.0)',
+    mainFontColor: 'rgba(47,61,111,1.0)',
+    mainBackgroundColor: 'rgba(240,240,240,1.0)',
+    emphasisOneFontColor: 'rgba(240,240,240,1.0)',
+    emphasisOneBackgroundColor: 'rgba(47,61,111,1.0)',
+    emphasisTwoFontColor: 'rgba(240,240,240,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(169,47,13,1.0)',
+  },
+  dolch: {
+    label: 'Dolch',
+    shellColor: 'rgba(95,92,82,1.0)',
+    mainFontColor: 'rgba(228,222,221,1.0)',
+    mainBackgroundColor: 'rgba(95,92,82,1.0)',
+    emphasisOneFontColor: 'rgba(228,222,221,1.0)',
+    emphasisOneBackgroundColor: 'rgba(51,52,48,1.0)',
+    emphasisTwoFontColor: 'rgba(228,222,221,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(0,164,169,1.0)',
+  },
+  lime: {
+    label: 'Lime',
+    shellColor: 'rgba(229,228,223,1.0)',
+    mainFontColor: 'rgba(147,194,71,1.0)',
+    mainBackgroundColor: 'rgba(229,228,223,1.0)',
+    emphasisOneFontColor: 'rgba(229,228,223,1.0)',
+    emphasisOneBackgroundColor: 'rgba(124,135,142,1.0)',
+    emphasisTwoFontColor: 'rgba(229,228,223,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(147,194,71,1.0)',
+  },
+  eve: {
+    label: 'Eve',
+    shellColor: 'rgba(212,208,199,1.0)',
+    mainFontColor: 'rgba(51,51,51,1.0)',
+    mainBackgroundColor: 'rgba(212,208,199,1.0)',
+    emphasisOneFontColor: 'rgba(39,133,219,1.0)',
+    emphasisOneBackgroundColor: 'rgba(51,51,51,1.0)',
+    emphasisTwoFontColor: 'rgba(212,208,199,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(39,133,219,1.0)',
+  },
+  godspeed: {
+    label: 'Godspeed',
+    shellColor: 'rgba(211,205,193,1.0)',
+    mainFontColor: 'rgba(102,102,102,1.0)',
+    mainBackgroundColor: 'rgba(211,205,193,1.0)',
+    emphasisOneFontColor: 'rgba(211,205,193,1.0)',
+    emphasisOneBackgroundColor: 'rgba(106,148,177,1.0)',
+    emphasisTwoFontColor: 'rgba(102,102,102,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(249,235,116,1.0)',
+  },
+  jamon: {
+    label: 'Jamón',
+    shellColor: 'rgba(140,48,58,1.0)',
+    mainFontColor: 'rgba(242,235,215,1.0)',
+    mainBackgroundColor: 'rgba(140,48,58,1.0)',
+    emphasisOneFontColor: 'rgba(242,235,215,1.0)',
+    emphasisOneBackgroundColor: 'rgba(178,52,60,1.0)',
+    emphasisTwoFontColor: 'rgba(66,68,70,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(242,235,215,1.0)',
+  },
+  beta: {
+    label: 'βeta',
+    shellColor: 'rgba(220,214,196,1.0)',
+    mainFontColor: 'rgba(51,51,51,1.0)',
+    mainBackgroundColor: 'rgba(220,214,196,1.0)',
+    emphasisOneFontColor: 'rgba(51,51,51,1.0)',
+    emphasisOneBackgroundColor: 'rgba(114,116,115,1.0)',
+    emphasisTwoFontColor: 'rgba(51,51,51,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(221,118,50,1.0)',
+  },
+  dmg: {
+    label: 'DMG',
+    shellColor: 'rgba(209,205,202,1.0)',
+    mainFontColor: 'rgba(29,23,112,1.0)',
+    mainBackgroundColor: 'rgba(209,205,202,1.0)',
+    emphasisOneFontColor: 'rgba(29,23,112,1.0)',
+    emphasisOneBackgroundColor: 'rgba(127,131,137,1.0)',
+    emphasisTwoFontColor: 'rgba(209,205,202,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(114,33,88,1.0)',
+  },
   symbiosis: {
+    label: 'Symbiosis',
+    shellColor: 'rgba(116,123,123,1.0)',
     mainFontColor: 'rgba(229,228,223,1.0)',
     mainBackgroundColor: 'rgba(116,123,123,1.0)',
     emphasisOneFontColor: 'rgba(229,228,223,1.0)',
@@ -289,6 +332,8 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoBackgroundColor: 'rgba(255,172,0,1.0)',
   },
   poshBlue: {
+    label: 'Posh Blue',
+    shellColor: 'rgba(225,219,209,1.0)',
     mainFontColor: 'rgba(34,45,90,1.0)',
     mainBackgroundColor: 'rgba(225,219,209,1.0)',
     emphasisOneFontColor: 'rgba(216,160,166,1.0)',
@@ -297,6 +342,8 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoBackgroundColor: 'rgba(216,160,166,1.0)',
   },
   poshPink: {
+    label: 'Posh Pink',
+    shellColor: 'rgba(225,219,209,1.0)',
     mainFontColor: 'rgba(34,45,90,1.0)',
     mainBackgroundColor: 'rgba(225,219,209,1.0)',
     emphasisOneFontColor: 'rgba(34,45,90,1.0)',
@@ -305,6 +352,8 @@ export const KEYCAP_PREINSTALL_MAP = {
     emphasisTwoBackgroundColor: 'rgba(34,45,90,1.0)',
   },
   pitta: {
+    label: 'Pitta',
+    shellColor: 'rgba(238,230,211,1.0)',
     mainFontColor: 'rgba(51,51,51,1.0)',
     mainBackgroundColor: 'rgba(238,230,211,1.0)',
     emphasisOneFontColor: 'rgba(51,51,51,1.0)',
@@ -393,7 +442,9 @@ export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   ControlLeft: { label: isMacOS ? '⌃' : 'Ctrl', alias: 'LCtrl', textAlign: 'left', size: 1.25 },
   MetaLeft: { label: isMacOS ? '⌘' : 'Win', alias: 'LMeta', textAlign: 'left', size: 1.25 },
   AltLeft: { label: isMacOS ? '⌥' : 'Alt', alias: 'LAlt', textAlign: 'left', size: 1.25 },
-  Space: { label: '', textAlign: 'center', size: 6.25 },
+  Space: { label: '', textAlign: 'center', size: 6.25 }, //           space2 -> 3;    space3 -> 2.25
+  SpaceSplit1: { label: '', textAlign: 'center', size: 2.25 }, //  space2 -> 3.25; space3 -> 1.25
+  SpaceSplit2: { label: '', textAlign: 'center', size: 2.75 }, // space2 -> 0;    space3 -> 2.75
   AltRight: { label: isMacOS ? '⌥' : 'Alt', alias: 'RAlt', textAlign: 'left', size: 1.25 },
   MetaRight: { label: isMacOS ? '⌘' : 'Win', alias: 'RMeta', textAlign: 'left', size: 1.25 },
   ControlRight: { label: isMacOS ? '⌃' : 'Ctrl', alias: 'RCtrl', textAlign: 'left', size: 1.25 },
@@ -455,25 +506,25 @@ export const KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST = [
 
 export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
   'Escape',
-  'F1',
-  'F2',
-  'F3',
-  'F4',
-  'F5',
-  'F6',
-  'F7',
-  'F8',
-  'F9',
-  'F10',
-  'F11',
+  // 'F1',
+  // 'F2',
+  // 'F3',
+  // 'F4',
+  // 'F5',
+  // 'F6',
+  // 'F7',
+  // 'F8',
+  // 'F9',
+  // 'F10',
+  // 'F11',
   'F12',
-  'F13',
-  'F14',
-  'F15',
-  'Backspace',
-  'Tab',
-  'CapsLock',
-  'Enter',
+  // 'F13',
+  // 'F14',
+  // 'F15',
+  // 'Backspace',
+  // 'Tab',
+  // 'CapsLock',
+  // 'Enter',
   'ShiftLeft',
   'ShiftRight',
   'ControlLeft',
@@ -483,30 +534,15 @@ export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
   'AltRight',
   'MetaRight',
   'ControlRight',
-  'Insert',
-  'Delete',
-  'Home',
-  'End',
-  'PageUp',
-  'PageDown',
+  // 'Insert',
+  // 'Delete',
+  // 'Home',
+  // 'End',
+  // 'PageUp',
+  // 'PageDown',
 ]
 
-export const KEYBOARD_TYPE_OPTION = [
-  { label: 'HHKB', value: 'hhkb' },
-  { label: '33', value: 'key33' },
-  { label: '45', value: 'key45' },
-  { label: '47', value: 'key47' },
-  { label: '43', value: 'key43' },
-  { label: '53', value: 'key53' },
-  { label: '57', value: 'key57' },
-  { label: '61', value: 'key61' },
-  { label: '64', value: 'key64' },
-  { label: '67', value: 'key67' },
-  { label: '68', value: 'key68' },
-  { label: '80', value: 'key80' },
-  { label: '84', value: 'key84' },
-  { label: '87', value: 'key87' },
-]
+export const SPACE_KEYCODE_LIST = ['Space', 'SpaceSplit1', 'SpaceSplit2']
 
 const KEYBOARD_TYPE_CONFIG = {
   hhkb: {
@@ -522,9 +558,9 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisTwoKeys: [],
     custom: {
       Backslash: { size: 1 },
-      Backspace: { size: 1.5, label: 'delete', textAlign: 'left' },
-      ControlLeft: { size: 1.75, label: 'control' },
-      Enter: { label: 'return', textAlign: 'left' },
+      Backspace: { size: 1.5, label: isMacOS ? 'delete' : 'Delete', textAlign: 'left' },
+      ControlLeft: { size: 1.75, label: isMacOS ? 'control' : 'Control' },
+      Enter: { label: isMacOS ? 'return' : 'Return', textAlign: 'left' },
       ShiftRight: { size: 1.75, textAlign: 'left' },
       Fn: { size: 1 },
       AltLeft: { size: 1, marginLeft: 1.5 },
@@ -532,6 +568,15 @@ const KEYBOARD_TYPE_CONFIG = {
       Space: { size: 6 },
       AltRight: { size: 1, marginRight: 2.5 },
       MetaRight: { size: 1.5 },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3 },
+    },
+    customSpace3: {
+      Space: { size: 2 },
+      SpaceSplit1: { size: 2 },
+      SpaceSplit2: { size: 2 },
     },
   },
   key33: {
@@ -544,9 +589,8 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisOneKeys: [],
     emphasisTwoKeys: [],
     custom: {
-      KeyQ: { marginLeft: 1.5 },
-      KeyA: { marginLeft: 1.75 },
-      KeyZ: { marginLeft: 2.25 },
+      KeyA: { marginLeft: 0.25 },
+      KeyZ: { marginLeft: 0.75 },
       Quote: { marginRight: 0.75 },
       Slash: { marginRight: 1.25 },
     },
@@ -562,10 +606,8 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisOneKeys: [],
     emphasisTwoKeys: [],
     custom: {
-      Digit1: { marginLeft: 1 },
-      KeyQ: { marginLeft: 1.5 },
-      KeyA: { marginLeft: 1.75 },
-      KeyZ: { marginLeft: 2.25 },
+      KeyA: { marginLeft: 0.25 },
+      KeyZ: { marginLeft: 0.75 },
       Equal: { marginRight: 0.5 },
       Quote: { marginRight: 0.75 },
       Slash: { marginRight: 1.25 },
@@ -582,10 +624,8 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisOneKeys: ['Backspace'],
     emphasisTwoKeys: [],
     custom: {
-      Digit1: { marginLeft: 1 },
-      KeyQ: { marginLeft: 1.5 },
-      KeyA: { marginLeft: 1.75 },
-      KeyZ: { marginLeft: 2.25 },
+      KeyA: { marginLeft: 0.25 },
+      KeyZ: { marginLeft: 0.75 },
       Quote: { marginRight: 2.25 },
       Slash: { marginRight: 2.75 },
     },
@@ -624,6 +664,15 @@ const KEYBOARD_TYPE_CONFIG = {
     emphasisOneKeys: ['Escape', 'Backquote', 'Backspace', 'Tab', 'CapsLock', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'MetaLeft', 'AltLeft', 'AltRight', 'MetaRight', 'ControlRight', 'Fn'],
     emphasisTwoKeys: ['Escape', 'Enter'],
     custom: {},
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key61: {
     isMacOS: false,
@@ -657,6 +706,15 @@ const KEYBOARD_TYPE_CONFIG = {
     ],
     emphasisTwoKeys: ['Escape', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'],
     custom: {},
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key64: {
     isMacOS: false,
@@ -695,6 +753,15 @@ const KEYBOARD_TYPE_CONFIG = {
       AltRight: { size: 1 },
       Fn: { size: 1 },
     },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key67: {
     isMacOS: false,
@@ -731,6 +798,15 @@ const KEYBOARD_TYPE_CONFIG = {
       ShiftRight: { size: 1.75 },
       ArrowLeft: { marginLeft: 0.5 },
       Fn: { size: 1, textAlign: 'center' },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
     },
   },
   key68: {
@@ -770,12 +846,21 @@ const KEYBOARD_TYPE_CONFIG = {
       Fn: { size: 1 },
       ControlRight: { size: 1 },
     },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
   },
   key80: {
     isMacOS: false,
     list: [
-      ['Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'],
-      ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 'Delete'],
+      ['Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'Delete'],
+      ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 'Insert'],
       ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'PageUp'],
       ['CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter', 'PageDown'],
       ['ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ShiftRight', 'ArrowUp'],
@@ -826,16 +911,26 @@ const KEYBOARD_TYPE_CONFIG = {
       F9: { marginLeft: 0.5, marginBottom: 0.25 },
       F10: { marginBottom: 0.25 },
       F11: { marginBottom: 0.25 },
-      F12: { marginBottom: 0.25, marginRight: 1.25 },
+      F12: { marginBottom: 0.25 },
       ShiftRight: { size: 1.75 },
       AltRight: { size: 1 },
       Fn: { size: 1 },
       ControlRight: { size: 1 },
       Delete: { marginLeft: 0.25 },
+      Insert: { marginLeft: 0.25 },
       PageUp: { marginLeft: 0.25 },
       PageDown: { marginLeft: 0.25 },
       ArrowUp: { marginRight: 1.25 },
       ArrowRight: { marginRight: 0.25 },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
     },
   },
   key84: {
@@ -883,6 +978,15 @@ const KEYBOARD_TYPE_CONFIG = {
       AltRight: { size: 1 },
       Fn: { size: 1 },
       ControlRight: { size: 1 },
+    },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
     },
   },
   key87: {
@@ -951,6 +1055,26 @@ const KEYBOARD_TYPE_CONFIG = {
       ArrowLeft: { marginLeft: 0.5 },
       Enter: { marginRight: 3.5 },
     },
+    customSpace2: {
+      Space: { size: 3 },
+      SpaceSplit1: { size: 3.25 },
+    },
+    customSpace3: {
+      Space: { size: 2.25 },
+      SpaceSplit1: { size: 1.25 },
+      SpaceSplit2: { size: 2.75 },
+    },
+  },
+}
+
+const SPLIT_SPACES_CONFIG_MAP = {
+  space2: {
+    fieldName: 'customSpace2',
+    keyList: ['SpaceSplit1'],
+  },
+  space3: {
+    fieldName: 'customSpace3',
+    keyList: ['SpaceSplit1', 'SpaceSplit2'],
   },
 }
 
@@ -963,37 +1087,59 @@ export const currKeyboardConfig = computed(() => {
     custom: {
       [key: string]: KeyboardConfigItem
     }
+    customSpace2?: {
+      [key: string]: KeyboardConfigItem
+    }
+    customSpace3?: {
+      [key: string]: KeyboardConfigItem
+    }
   } = KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType]
   // 使用key61兜底
-  if (!KEYBOARD_TYPE_CONFIG[localConfig.bookmark.keyboardType]) {
+  if (!target) {
     target = KEYBOARD_TYPE_CONFIG.key61
   }
-  // if Mac, swap option & command
-  if (!target.isMacOS && isMacOS) {
-    target.isMacOS = true
-    const lastRowIndex = target.list.length - 1
-    let leftAltIndex = -1
-    let leftMetaIndex = -1
-    let rightAltIndex = -1
-    let rightMetaIndex = -1
-    for (let index = 0, len = target.list[lastRowIndex].length; index < len; index++) {
-      const item = target.list[lastRowIndex][index]
-      if (item === 'AltLeft') {
-        leftAltIndex = index
-      } else if (item === 'MetaLeft') {
-        leftMetaIndex = index
-      } else if (item === 'AltRight') {
-        rightAltIndex = index
-      } else if (item === 'MetaRight') {
-        rightMetaIndex = index
+  target = structuredClone(target)
+  try {
+    // if Mac, swap option & command
+    if (!target.isMacOS && isMacOS) {
+      target.isMacOS = true
+      const lastRowIndex = target.list.length - 1
+      let leftAltIndex = -1
+      let leftMetaIndex = -1
+      let rightAltIndex = -1
+      let rightMetaIndex = -1
+      for (let index = 0, len = target.list[lastRowIndex].length; index < len; index++) {
+        const item = target.list[lastRowIndex][index]
+        if (item === 'AltLeft') {
+          leftAltIndex = index
+        } else if (item === 'MetaLeft') {
+          leftMetaIndex = index
+        } else if (item === 'AltRight') {
+          rightAltIndex = index
+        } else if (item === 'MetaRight') {
+          rightMetaIndex = index
+        }
+      }
+      if (leftAltIndex !== -1 && leftMetaIndex !== -1) {
+        ;[target.list[lastRowIndex][leftMetaIndex], target.list[lastRowIndex][leftAltIndex]] = [target.list[lastRowIndex][leftAltIndex], target.list[lastRowIndex][leftMetaIndex]]
+      }
+      if (rightAltIndex !== -1 && rightMetaIndex !== -1) {
+        ;[target.list[lastRowIndex][rightMetaIndex], target.list[lastRowIndex][rightAltIndex]] = [target.list[lastRowIndex][rightAltIndex], target.list[lastRowIndex][rightMetaIndex]]
       }
     }
-    if (leftAltIndex !== -1 && leftMetaIndex !== -1) {
-      ;[target.list[lastRowIndex][leftMetaIndex], target.list[lastRowIndex][leftAltIndex]] = [target.list[lastRowIndex][leftAltIndex], target.list[lastRowIndex][leftMetaIndex]]
+    // split space
+    const lastRowKeyList = target.list[target.list.length - 1]
+    const spaceIndex = lastRowKeyList.findIndex((text) => text === 'Space')
+    const spaceConfig = SPLIT_SPACES_CONFIG_MAP[localConfig.bookmark.splitSpace]
+    if (spaceConfig && localConfig.bookmark.splitSpace !== 'space1' && spaceIndex !== -1) {
+      lastRowKeyList.splice(spaceIndex + 1, 0, ...spaceConfig.keyList)
+      target.custom = {
+        ...target.custom,
+        ...target[spaceConfig.fieldName],
+      }
     }
-    if (rightAltIndex !== -1 && rightMetaIndex !== -1) {
-      ;[target.list[lastRowIndex][rightMetaIndex], target.list[lastRowIndex][rightAltIndex]] = [target.list[lastRowIndex][rightAltIndex], target.list[lastRowIndex][rightMetaIndex]]
-    }
+  } catch (e) {
+    console.error(e)
   }
   return target
 })

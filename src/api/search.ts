@@ -1,4 +1,4 @@
-import http from '@/lib/http'
+import request from '@/lib/request'
 
 export const getBaiduSugrec = (
   keyword: string,
@@ -7,7 +7,7 @@ export const getBaiduSugrec = (
     q: string
   }[]
 }> => {
-  return http({
+  return request({
     url: 'https://www.baidu.com/sugrec',
     params: {
       prod: 'pc',

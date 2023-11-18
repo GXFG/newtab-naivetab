@@ -2,10 +2,10 @@
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/const'
-import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, SPACE_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
 import { addKeydownTask } from '@/logic/task'
 import { isDragMode } from '@/logic/moveable'
-import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
 import { getFaviconFromUrl, getBookmarkConfigName, getBookmarkConfigUrl } from '@/logic/bookmark'
 
 const CNAME = 'bookmark'
@@ -116,6 +116,19 @@ const dragStyle = ref('')
 const customPrimaryColor = getStyleField('general', 'primaryColor')
 const containerStyle = getLayoutStyle(CNAME)
 
+const customShellVerticalPadding = getStyleField(CNAME, 'shellVerticalPadding', 'vmin')
+const customShellHorizontalPadding = getStyleField(CNAME, 'shellHorizontalPadding', 'vmin')
+const customShellBorderRadius = getStyleField(CNAME, 'shellBorderRadius', 'px')
+const customShellColor = getStyleField(CNAME, 'shellColor')
+const customShellShadowColor = getStyleField(CNAME, 'shellShadowColor')
+
+const customPlateSinglePadding = getStyleField(CNAME, 'platePadding', 'vmin')
+const customPlateDoublePadding = getStyleField(CNAME, 'platePadding', 'vmin', 2)
+const customPlateEdge = computed(() => `-${customPlateSinglePadding.value}`)
+const customPlateSize = computed(() => `${customPlateDoublePadding.value}`)
+const customPlateBorderRadius = getStyleField(CNAME, 'plateBorderRadius', 'px')
+const customPlateColor = getStyleField(CNAME, 'plateColor')
+
 const customKeycapKeyFontFamily = getStyleField(CNAME, 'keycapKeyFontFamily')
 const customKeycapKeyFontSize = getStyleField(CNAME, 'keycapKeyFontSize', 'vmin')
 const customBookmarkKeyFontFamily = getStyleField(CNAME, 'keycapBookmarkFontFamily')
@@ -212,15 +225,16 @@ const getKeycapStageStyle = (code: string) => {
     style += `margin-top: -${customKeycapStageGmkMarginTop.value};margin-left: -${customKeycapStageGmkMarginLeft.value};`
     style += `width: ${getCustomKeycapWidth(code, -KeycapkeycapGmkEdgeHorizontalSize).value};`
     style += `height: ${customKeycapStageGmkHeight.value};`
-    if (code === 'Space') {
-      // 空格阴影效果
+    // 空格阴影效果
+    if (SPACE_KEYCODE_LIST.includes(code)) {
       style += 'background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.1) 90%); background-color: inherit; border-radius;'
     }
   } else if (localConfig.bookmark.keycapType === 'dsa') {
     style += `margin: -${customKeycapStageDsaMargin.value};`
     style += `width: ${getCustomKeycapWidth(code, -KeycapkeycapDsaEdgeSize).value};`
     style += `height: ${customKeycapStageDsaHeight.value};`
-    if (code === 'Space') {
+    // 空格阴影效果
+    if (SPACE_KEYCODE_LIST.includes(code)) {
       style += 'background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.1) 90%); background-color: inherit;'
     }
   }
@@ -249,6 +263,8 @@ const getKeycapIconStyle = (code: string) => {
   }
   return style
 }
+
+const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 </script>
 
 <template>
@@ -266,7 +282,10 @@ const getKeycapIconStyle = (code: string) => {
         class="bookmark__container"
         :style="dragStyle || containerStyle"
         :class="{
+          'bookmark__container--drag': isDragMode,
           'bookmark__container--hover': !isDragMode,
+          'bookmark__container-shell': localConfig.bookmark.isShellVisible,
+          'bookmark__container-shell--shadow': localConfig.bookmark.isShellVisible && localConfig.bookmark.isShellShadowEnabled,
         }"
       >
         <div
@@ -280,6 +299,11 @@ const getKeycapIconStyle = (code: string) => {
             class="row__keycap-wrap"
             :style="getKeycapWrapStyle(code)"
           >
+            <div
+              v-if="localConfig.bookmark.isShellVisible && localConfig.bookmark.isPlateVisible"
+              class="row__keycap-plate"
+            />
+
             <div
               class="row__keycap"
               :class="{
@@ -311,14 +335,16 @@ const getKeycapIconStyle = (code: string) => {
                 >
                   <eos-icons:loading />
                 </div>
+
                 <!-- keycap -->
                 <p
                   v-if="localConfig.bookmark.isCapKeyVisible"
                   class="item__key"
                   :style="getKeycapTextStyle(code)"
                 >
-                  {{ getKeycapLabel(code) }}
+                  {{ getKeycapLabel(code) || '&nbsp;' }}
                 </p>
+
                 <!-- favicon -->
                 <div
                   class="item__img"
@@ -336,14 +362,16 @@ const getKeycapIconStyle = (code: string) => {
                     />
                   </div>
                 </div>
+
                 <!-- name -->
                 <p
                   v-if="localConfig.bookmark.isNameVisible"
                   class="item__name"
                   :style="getKeycapTextStyle(code)"
                 >
-                  {{ getBookmarkConfigName(code) }}
+                  {{ getBookmarkConfigName(code) || '&nbsp;' }}
                 </p>
+
                 <!-- 按键定位标志F & J -->
                 <div
                   v-if="['KeyF', 'KeyJ'].includes(code)"
@@ -372,8 +400,19 @@ const getKeycapIconStyle = (code: string) => {
       justify-content: space-between;
       .row__keycap-wrap {
         flex: 0 0 auto;
+        position: relative;
         padding: v-bind(customKeycapPadding);
         height: v-bind(customKeycapBaseSize);
+        .row__keycap-plate {
+          z-index: -1;
+          position: absolute;
+          top: v-bind(customPlateEdge);
+          left: v-bind(customPlateEdge);
+          width: calc(100% + v-bind(customPlateSize));
+          height: calc(100% + v-bind(customPlateSize));
+          background: v-bind(customPlateColor);
+          border-radius: v-bind(customPlateBorderRadius);
+        }
         .row__keycap {
           position: relative;
           width: 100%;
@@ -499,8 +538,26 @@ const getKeycapIconStyle = (code: string) => {
       }
     }
   }
+  .bookmark__container-shell {
+    padding: v-bind(customShellVerticalPadding) v-bind(customShellHorizontalPadding);
+    border-radius: v-bind(customShellBorderRadius);
+    background-color: v-bind(customShellColor) !important;
+  }
+  .bookmark__container-shell--shadow {
+    background: linear-gradient(110deg, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.15) 100%),
+      linear-gradient(10deg, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.05) 40%, rgba(0, 0, 0, 0.15) 100%);
+    box-shadow:
+      v-bind(customShellShadowColor) 0px 2px 4px 0px,
+      v-bind(customShellShadowColor) 0px 2px 16px 0px;
+  }
   .bookmark__container--hover {
     cursor: pointer;
+  }
+  .bookmark__container--drag {
+    background-color: transparent !important;
+    &:hover {
+      background-color: v-bind(bgMoveableComponentMain) !important;
+    }
   }
 }
 </style>

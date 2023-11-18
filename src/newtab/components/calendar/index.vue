@@ -2,7 +2,7 @@
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
 import { gaProxy } from '@/logic/gtag'
 import { isDragMode } from '@/logic/moveable'
-import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
 
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
@@ -281,6 +281,8 @@ const customWorkDescFontColor = getStyleField(CNAME, 'workDescFontColor')
 const customWorkLabelBackgroundColor = getStyleField(CNAME, 'workLabelBackgroundColor')
 const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
 const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundColor')
+
+const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 </script>
 
 <template>
@@ -298,8 +300,9 @@ const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundCo
         class="calendar__container"
         :style="dragStyle || containerStyle"
         :class="{
-          'calendar__container-shadow': localConfig.calendar.isShadowEnabled,
-          'calendar__container-border': localConfig.calendar.isBorderEnabled,
+          'calendar__container--drag': isDragMode,
+          'calendar__container--shadow': localConfig.calendar.isShadowEnabled,
+          'calendar__container--border': localConfig.calendar.isBorderEnabled,
         }"
       >
         <div class="calendar__options">
@@ -632,13 +635,19 @@ const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundCo
       cursor: pointer;
     }
   }
-  .calendar__container-border {
+  .calendar__container--border {
     outline: v-bind(customBorderWidth) solid v-bind(customBorderColor);
   }
-  .calendar__container-shadow {
+  .calendar__container--shadow {
     box-shadow:
       v-bind(customShadowColor) 0px 2px 4px 0px,
       v-bind(customShadowColor) 0px 2px 16px 0px;
+  }
+  .calendar__container--drag {
+    background-color: transparent !important;
+    &:hover {
+      background-color: v-bind(bgMoveableComponentMain) !important;
+    }
   }
 }
 

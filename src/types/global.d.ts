@@ -80,8 +80,8 @@ interface SelectStringItem {
 }
 
 interface KeyboardConfigItem {
-  label: string
-  textAlign: 'left' | 'center' | 'right'
+  label?: string
+  textAlign?: 'left' | 'center' | 'right'
   size: number
   alias?: string // LShift
   marginLeft?: number // default 0

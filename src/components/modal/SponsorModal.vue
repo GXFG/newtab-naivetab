@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { globalState } from '@/logic/store'
 
-const paymentList = ['alipay', 'wechat']
+const paymentList = ['wechat', 'alipay']
 
 const onCloseModal = () => {
   globalState.isSponsorModalVisible = false
@@ -20,6 +20,7 @@ const onCloseModal = () => {
       <p class="modal__content">
         {{ $t('sponsor.content') }}
       </p>
+
       <div class="modal__code">
         <div
           v-for="payment in paymentList"
@@ -38,6 +39,7 @@ const onCloseModal = () => {
           </p>
         </div>
       </div>
+
       <div class="card__footer">
         <NButton
           class="footer__btn"

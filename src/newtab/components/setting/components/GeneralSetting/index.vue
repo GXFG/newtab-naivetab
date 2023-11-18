@@ -154,9 +154,11 @@ const onResetSetting = () => {
         <NButton
           v-if="localConfig.general.isBackgroundImageEnabled"
           class="setting__item-element"
+          type="primary"
+          ghost
           @click="openBackgroundDrawer()"
         >
-          <uil:edit />&nbsp;{{ $t('common.edit') }}
+          <mingcute:finger-press-line />&nbsp;{{ $t('common.select') }}
         </NButton>
       </NFormItem>
 
@@ -216,6 +218,8 @@ const onResetSetting = () => {
       <NFormItem :label="$t('general.importExportSettingsLabel')">
         <div>
           <NButton
+            type="primary"
+            ghost
             :loading="globalState.isImportSettingLoading"
             @click="onImportSetting"
           >
@@ -232,13 +236,21 @@ const onResetSetting = () => {
         </div>
 
         <div style="margin-left: 30px">
-          <NButton @click="onExportSetting()"> <uil:export />&nbsp;{{ $t('general.exportSettingValue') }} </NButton>
+          <NButton
+            type="primary"
+            ghost
+            @click="onExportSetting()"
+          >
+            <uil:export />&nbsp;{{ $t('general.exportSettingValue') }}
+          </NButton>
           <Tips :content="$t('general.exportSettingTips')" />
         </div>
       </NFormItem>
 
       <NFormItem :label="$t('general.clearStorageLabel')">
         <NButton
+          type="primary"
+          ghost
           :loading="globalState.isClearStorageLoading"
           @click="refreshSetting()"
         >
@@ -251,8 +263,8 @@ const onResetSetting = () => {
         <NPopconfirm @positive-click="onResetSetting()">
           <template #trigger>
             <NButton
-              ghost
               type="error"
+              ghost
             >
               <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}
             </NButton>

@@ -11,7 +11,7 @@ export const defaultConfig = {
     pageTitle: 'NaiveTab',
     lang: CURR_LANG,
     drawerPlacement: 'right' as 'left' | 'right',
-    openPageFocusElement: 'bookmarkKeyboard', // default, root, search, bookmarkKeyboard
+    openPageFocusElement: 'root' as 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard',
     isLoadPageAnimationEnabled: false,
     isBackgroundImageEnabled: true,
     backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
@@ -166,13 +166,27 @@ export const defaultConfig = {
       yTranslateValue: 0,
     },
     keyboardType: 'key61',
+    splitSpace: 'space1' as 'space1' | 'space2' | 'space3',
     keycapType: 'gmk',
     keycapPadding: 1.5,
     keycapSize: 65,
     keycapBorderRadius: 5,
     isKeycapBorderEnabled: false,
     keycapBorderWidth: 1,
-    keycapBorderColor: ['rgba(71,85,105, 1)', 'rgba(73, 73, 77, 1)'],
+    keycapBorderColor: ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)'],
+    // shell
+    isShellVisible: true,
+    shellVerticalPadding: 15,
+    shellHorizontalPadding: 15,
+    shellBorderRadius: 10,
+    shellColor: ['rgba(255, 255, 255, 1.0)', 'rgba(66, 66, 70, 1.0)'],
+    isShellShadowEnabled: true,
+    shellShadowColor: ['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.4)'],
+    // plate
+    isPlateVisible: true,
+    platePadding: 3,
+    plateBorderRadius: 5,
+    plateColor: ['rgba(119, 119, 119,1.0)', 'rgba(119, 119, 119,1.0)'],
     // keycap
     isCapKeyVisible: true,
     keycapKeyFontFamily: 'OpenCherry',
@@ -181,8 +195,8 @@ export const defaultConfig = {
     keycapBookmarkFontFamily: 'Arial',
     keycapBookmarkFontSize: 11,
     isFaviconVisible: true,
-    faviconSize: 1,
-    // color
+    faviconSize: 0.9,
+    // keycap color
     mainFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
     mainBackgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(95,92,82,1.0)'],
     emphasisOneFontColor: ['rgba(255, 255, 255, 0.9)', 'rgba(228,222,221,1.0)'],

@@ -3,7 +3,7 @@ import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
 import { newsState, updateNews, onRetryNews } from '@/logic/news'
-import { globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
 
 const CNAME = 'news'
 const isRender = getIsComponentRender(CNAME)
@@ -66,6 +66,8 @@ const customUrlActiveColor = getStyleField(CNAME, 'urlActiveColor')
 const customTabActiveBackgroundColor = getStyleField(CNAME, 'tabActiveBackgroundColor')
 const customBackgroundColor = getStyleField(CNAME, 'backgroundColor')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
+
+const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 </script>
 
 <template>
@@ -83,6 +85,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         class="news__container"
         :style="dragStyle || containerStyle"
         :class="{
+          'news__container--drag': isDragMode,
           'news__container--border': localConfig.news.isBorderEnabled,
           'news__container--shadow': localConfig.news.isShadowEnabled,
         }"
@@ -257,6 +260,12 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
       .news__content--hover:hover {
         cursor: pointer;
       }
+    }
+  }
+  .news__container--drag {
+    background-color: transparent !important;
+    &:hover {
+      background-color: v-bind(bgMoveableComponentMain) !important;
     }
   }
   .news__container--border {

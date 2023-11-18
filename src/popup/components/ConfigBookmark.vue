@@ -187,6 +187,7 @@ const popupMainWidth = `${getContainerWidth()}px`
           v-model:value="state.url"
           :placeholder="$t('bookmark.urlPlaceholder')"
           clearable
+          @input="state.url = state.url.replaceAll(' ', '')"
         />
         <NButton
           text
@@ -206,6 +207,7 @@ const popupMainWidth = `${getContainerWidth()}px`
             v-model:value="state.name"
             :placeholder="getDefaultBookmarkNameFromUrl(state.url)"
             clearable
+            @input="state.name = state.name.trim()"
           />
         </NFormItem>
 

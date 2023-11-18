@@ -117,11 +117,12 @@ const handleBackgroundImageCustomUrlBlur = () => {
     :width="SECOND_MODAL_WIDTH"
     :height="350"
     :placement="localConfig.general.drawerPlacement"
+    show-mask="transparent"
     to="#background__drawer"
     @update:show="onCloseModal()"
   >
     <NDrawerContent
-      :title="`${$t('common.edit')}${$t('common.backgroundImage')}`"
+      :title="`${$t('common.select')}${$t('common.backgroundImage')}`"
       closable
     >
       <div class="drawer__content">
