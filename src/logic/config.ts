@@ -12,7 +12,8 @@ export const defaultConfig = {
     lang: CURR_LANG,
     drawerPlacement: 'right' as 'left' | 'right',
     openPageFocusElement: 'root' as 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard',
-    isLoadPageAnimationEnabled: false,
+    isLoadPageAnimationEnabled: true,
+    loadPageAnimationType: 'fade-in' as 'fade-in' | 'zoom-in',
     isBackgroundImageEnabled: true,
     backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
     backgroundImageHighQuality: false,

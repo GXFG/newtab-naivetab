@@ -61,6 +61,13 @@ onUnmounted(() => {
   stopTimer()
 })
 
+const animationClassName = computed(() => {
+  if (!localConfig.general.isLoadPageAnimationEnabled) {
+    return ''
+  }
+  return `animation--${localConfig.general.loadPageAnimationType}`
+})
+
 const CNAME = 'general'
 const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
@@ -69,7 +76,7 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 <template>
   <NConfigProvider
     id="container"
-    :class="{ 'animation--zoom-in': localConfig.general.isLoadPageAnimationEnabled }"
+    :class="animationClassName"
     :locale="nativeUILang"
     :theme="currTheme"
     :theme-overrides="themeOverrides"

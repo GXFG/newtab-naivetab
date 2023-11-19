@@ -151,6 +151,8 @@
     "focusBrowserDefault": "default",
     "focusRoot": "root element",
     "loadPageAnimation": "Load animation",
+    "fadeIn": "Fade in",
+    "zoomIn": "Zoom in",
     "primaryColorTips": "Takes effect after refresh page",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
@@ -180,6 +182,7 @@
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",
     "intervalTimeTips": "The effective interval for double-clicking",
+    "configBookmark": "Config Bookmark",
     "keyboard": "Keyboard",
     "presetTheme": "Preset Theme",
     "shell": "Shell",
@@ -257,6 +260,7 @@
     "v2ex": "V2EX"
   },
   "popup": {
+    "browserBookmark": "Browser Bookmark",
     "commitBtnTips": "Drag bookmarks to sort"
   }
 }

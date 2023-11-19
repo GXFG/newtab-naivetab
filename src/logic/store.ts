@@ -360,6 +360,10 @@ export const handleAppUpdate = async () => {
     localConfig.bookmark.plateBorderRadius = defaultConfig.bookmark.plateBorderRadius
     localConfig.bookmark.plateColor = defaultConfig.bookmark.plateColor
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.19.1')) {
+    localConfig.general.isLoadPageAnimationEnabled = defaultConfig.general.isLoadPageAnimationEnabled
+    localConfig.general.loadPageAnimationType = defaultConfig.general.loadPageAnimationType
+  }
   // 更新local版本号
   localConfig.general.version = pkg.version
   // updateSuccess()

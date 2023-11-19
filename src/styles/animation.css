@@ -10,3 +10,16 @@
 .animation--zoom-in {
   animation: zoom-in 600ms ease 50ms;
 }
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animation--fade-in {
+  animation: fade-in 200ms ease;
+}
