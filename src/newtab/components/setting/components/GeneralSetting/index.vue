@@ -35,6 +35,11 @@ const focusElementList = computed(() => [
   { label: window.$t('setting.bookmarkKeyboard'), value: 'bookmarkKeyboard' },
 ])
 
+const loadPageAnimationTypeList = computed(() => [
+  { label: window.$t('general.fadeIn'), value: 'fade-in' },
+  { label: window.$t('general.zoomIn'), value: 'zoom-in' },
+])
+
 const onChangeLocale = (locale: string) => {
   proxy.$i18n.locale = locale
   localConfig.general.lang = locale
@@ -130,6 +135,19 @@ const onResetSetting = () => {
 
       <NFormItem :label="$t('general.loadPageAnimation')">
         <NSwitch v-model:value="localConfig.general.isLoadPageAnimationEnabled" />
+        <NRadioGroup
+          v-if="localConfig.general.isLoadPageAnimationEnabled"
+          v-model:value="localConfig.general.loadPageAnimationType"
+          class="setting__item-element"
+        >
+          <NRadioButton
+            v-for="item in loadPageAnimationTypeList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </NRadioButton>
+        </NRadioGroup>
       </NFormItem>
     </template>
 

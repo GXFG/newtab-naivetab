@@ -9,6 +9,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  width: {
+    type: String,
+    default: `${SECOND_MODAL_WIDTH}`,
+  },
 })
 
 const emit = defineEmits(['update:show', 'select'])
@@ -18,6 +22,7 @@ const onClose = () => {
 }
 
 const state = reactive({
+  treePattern: '',
   bookmarks: [] as ChromeBookmarkItem[],
   defaultExpandedKeys: ['1'], // 默认展开书签栏
   nodeProps: ({ option }: { option: TreeOption }) => {
@@ -58,7 +63,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
     const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
     const curr = {
       ...item,
-      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url) }), // ico
+      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url) }), // favicon
     }
     if (isFolder) {
       curr.children = formatBookmark(item.children)
@@ -90,28 +95,40 @@ watch(
 <template>
   <NDrawer
     :show="props.show"
-    :width="SECOND_MODAL_WIDTH"
+    :width="props.width"
     show-mask="transparent"
     @update:show="handleUpdateShow"
   >
     <NDrawerContent
-      :title="$t('setting.bookmark')"
+      :title="$t('popup.browserBookmark')"
       closable
     >
+      <n-input v-model:value="state.treePattern" />
       <NTree
-        block-line
         :data="state.bookmarks"
+        :pattern="state.treePattern"
+        :show-irrelevant-nodes="false"
         key-field="id"
         label-field="title"
         :selectable="false"
+        :keyboard="false"
+        block-line
+        block-node
+        show-line
+        expand-on-click
         :default-expanded-keys="state.defaultExpandedKeys"
         :node-props="state.nodeProps"
+        style="margin-top: 5px"
       />
     </NDrawerContent>
   </NDrawer>
 </template>
 
 <style>
+.n-drawer-body-content-wrapper {
+  padding: 10px 20px !important;
+}
+
 .n-tree .n-tree-node-content .n-tree-node-content__text {
   overflow: hidden;
   white-space: nowrap;

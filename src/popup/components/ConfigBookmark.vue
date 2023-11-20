@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { gaProxy } from '@/logic/gtag'
-import { globalState, localConfig, customPrimaryColor, getStyleConst, getAllCommandsConfig, openConfigShortcutsPage } from '@/logic/store'
+import { requestPermission } from '@/logic/storage'
 import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST, currKeyboardConfig } from '@/logic/keyboard'
 import { getDefaultBookmarkNameFromUrl, getFaviconFromUrl, getBookmarkConfigUrl, getBookmarkConfigName } from '@/logic/bookmark'
+import { globalState, localConfig, customPrimaryColor, getStyleConst, getAllCommandsConfig, openConfigShortcutsPage } from '@/logic/store'
+import BookmarkPicker from '@/components/drawer/BookmarkPicker.vue'
 
 const state = reactive({
+  isBookmarkModalVisible: false,
   isBookmarkDragEnabled: true,
   isCommitLoading: false,
   currDragKeyCode: '',
@@ -13,6 +16,11 @@ const state = reactive({
   url: '',
   name: '',
   keyCode: '',
+})
+
+// 为实现page切换前台时刷新通过pupop修改的书签
+const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
+  isPending: false,
 })
 
 const setCurrentTabUrl = () => {
@@ -46,33 +54,31 @@ const selectKey = (key: string) => {
   loadCurrKeyConfig()
 }
 
-const onDeleteKey = () => {
-  if (state.keyCode.length === 0) {
-    return
-  }
-  delete localConfig.bookmark.keymap[state.keyCode]
-}
-
 const isCommitBtnDisabled = computed(() => {
   return state.keyCode.length === 0
 })
 
-const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
-  isPending: false,
-})
-
-const onCommitFuncWrap = (callback: () => void) => {
+const handleCommit = (callback: () => void) => {
   state.isCommitLoading = true
-  bookmarkPendingData.value.isPending = true // 为实现page切换前台时刷新通过pupop修改的书签
+  bookmarkPendingData.value.isPending = true
   callback()
   setTimeout(() => {
     state.isCommitLoading = false
-    window.$message.success(`${window.$t('common.edit')}${window.$t('common.success')}`)
+    window.$message.success(`${window.$t('common.success')}`)
   }, 1000)
 }
 
+const onDeleteKey = () => {
+  if (state.keyCode.length === 0) {
+    return
+  }
+  handleCommit(() => {
+    delete localConfig.bookmark.keymap[state.keyCode]
+  })
+}
+
 const onCommitConfigBookmark = () => {
-  onCommitFuncWrap(() => {
+  handleCommit(() => {
     if (state.url.length === 0) {
       delete localConfig.bookmark.keymap[state.keyCode]
     } else {
@@ -82,6 +88,20 @@ const onCommitConfigBookmark = () => {
       }
     }
   })
+}
+
+const onOpenBookmarkPicker = async () => {
+  const granted = await requestPermission('bookmarks')
+  if (!granted) {
+    return
+  }
+  state.isBookmarkModalVisible = true
+}
+
+const onSelectBookmark = (payload: ChromeBookmarkItem) => {
+  state.name = payload.title
+  state.url = payload.url
+  onCommitConfigBookmark()
 }
 
 const handleDragStart = (code: string) => {
@@ -101,7 +121,7 @@ const handleDragEnd = () => {
   if (!localConfig.bookmark.keymap[state.currDragKeyCode]) {
     return
   }
-  onCommitFuncWrap(() => {
+  handleCommit(() => {
     const targetData = localConfig.bookmark.keymap[state.targetDragKeyCode]
     localConfig.bookmark.keymap[state.targetDragKeyCode] = localConfig.bookmark.keymap[state.currDragKeyCode]
     localConfig.bookmark.keymap[state.currDragKeyCode] = targetData
@@ -167,6 +187,12 @@ const popupMainWidth = `${getContainerWidth()}px`
 </script>
 
 <template>
+  <BookmarkPicker
+    v-model:show="state.isBookmarkModalVisible"
+    width="60%"
+    @select="onSelectBookmark"
+  />
+
   <NCard
     id="popup"
     :title="`${$t('common.config')}${$t('setting.bookmark')}`"
@@ -179,6 +205,7 @@ const popupMainWidth = `${getContainerWidth()}px`
       :model="state"
     >
       <NFormItem
+        class="form__url"
         :label="$t('bookmark.urlLabel')"
         path="url"
         :rule="{ required: true }"
@@ -189,19 +216,42 @@ const popupMainWidth = `${getContainerWidth()}px`
           clearable
           @input="state.url = state.url.replaceAll(' ', '')"
         />
-        <NButton
-          text
-          class="curr__btn"
-          @click="setCurrentTabUrl()"
-        >
-          <tabler:current-location class="btn__icon" />
-        </NButton>
+
+        <div class="url__operation">
+          <NButton
+            text
+            class="operation__btn"
+            @click="setCurrentTabUrl()"
+          >
+            <tabler:current-location class="btn__icon" />
+          </NButton>
+          <NButton
+            text
+            class="operation__btn"
+            :disabled="state.keyCode.length === 0"
+            @click="onOpenBookmarkPicker()"
+          >
+            <lucide:bookmark-plus class="btn__icon" />
+          </NButton>
+          <NPopconfirm @positive-click="onDeleteKey()">
+            <template #trigger>
+              <NButton
+                text
+                class="operation__btn"
+                :disabled="state.keyCode.length === 0 || getBookmarkConfigUrl(state.keyCode).length === 0"
+              >
+                <ri:delete-bin-6-line class="btn__icon" />
+              </NButton>
+            </template>
+            {{ `${$t('common.delete')} ${KEYBOARD_CODE_TO_DEFAULT_CONFIG[state.keyCode].label}` }} ？
+          </NPopconfirm>
+        </div>
       </NFormItem>
 
       <div class="popup__form_wrap">
         <NFormItem
-          :label="$t('bookmark.nameLabel')"
           class="form__name"
+          :label="$t('bookmark.nameLabel')"
         >
           <NInput
             v-model:value="state.name"
@@ -228,23 +278,6 @@ const popupMainWidth = `${getContainerWidth()}px`
             <ion:ban v-else />
           </NInputGroupLabel>
         </NFormItem>
-
-        <div class="form__delete">
-          <NPopconfirm
-            v-if="state.keyCode.length !== 0 && getBookmarkConfigUrl(state.keyCode)"
-            @positive-click="onDeleteKey()"
-          >
-            <template #trigger>
-              <NButton
-                text
-                class="delete__btn"
-              >
-                <ri:delete-bin-6-line class="btn__icon" />
-              </NButton>
-            </template>
-            {{ `${$t('common.delete')} ${KEYBOARD_CODE_TO_DEFAULT_CONFIG[state.keyCode].label}` }} ？
-          </NPopconfirm>
-        </div>
       </div>
 
       <NFormItem
@@ -306,8 +339,7 @@ const popupMainWidth = `${getContainerWidth()}px`
       <NButton
         class="footer__commit"
         type="primary"
-        :disabled="isCommitBtnDisabled"
-        :loading="state.isCommitLoading"
+        :disabled="isCommitBtnDisabled || state.isCommitLoading"
         @click="onCommitConfigBookmark()"
       >
         <mingcute:save-2-line />&nbsp;{{ $t('common.save') }}
@@ -338,23 +370,32 @@ const popupMainWidth = `${getContainerWidth()}px`
     margin: 5px 0;
   }
 
-  .curr__btn {
-    margin-left: 10px;
-    margin-right: 10px;
-    .btn__icon {
-      font-size: 16px;
+  .url__operation {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    padding-left: 10px;
+    .operation__btn {
+      margin: 0 10px;
+      .btn__icon {
+        font-size: 16px;
+      }
     }
   }
 
   .popup__form_wrap {
     display: flex;
     align-items: center;
+    .form__url {
+      width: 100%;
+    }
     .form__name {
-      width: 65%;
+      width: 70%;
     }
     .form__shortcut {
       margin-left: 5%;
-      width: 30%;
+      width: 25%;
       .shortcut__main {
         display: flex;
         justify-content: center;
@@ -365,17 +406,6 @@ const popupMainWidth = `${getContainerWidth()}px`
         text-align: center;
         font-size: 14px;
         cursor: alias;
-      }
-    }
-    .form__delete {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 40px;
-      .delete__btn {
-        .btn__icon {
-          font-size: 16px;
-        }
       }
     }
   }

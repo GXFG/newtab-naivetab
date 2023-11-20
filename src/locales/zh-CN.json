@@ -150,6 +150,8 @@
     "focusBrowserDefault": "默认",
     "focusRoot": "根元素",
     "loadPageAnimation": "载入动画",
+    "fadeIn": "淡入",
+    "zoomIn": "放大",
     "primaryColorTips": "修改后需刷新页面生效",
     "settingDividerSetting": "设置",
     "syncTime": "同步时间",
@@ -179,6 +181,7 @@
     "dblclickKeyToOpenTips": "双击键盘按键以打开书签，防止误触按键",
     "intervalTime": "最大间隔时间",
     "intervalTimeTips": "识别在多长时间内的双击操作",
+    "configBookmark": "配置书签",
     "keyboard": "键盘",
     "presetTheme": "预设主题",
     "shell": "外壳",
@@ -256,6 +259,7 @@
     "v2ex": "V2EX"
   },
   "popup": {
+    "browserBookmark": "浏览器书签",
     "commitBtnTips": "拖动书签可以进行排序"
   }
 }
