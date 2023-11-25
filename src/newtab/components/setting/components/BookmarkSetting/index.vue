@@ -157,6 +157,7 @@ const openPresetThemeDrawer = () => {
               :step="1"
               :min="0"
               :max="100"
+              :tooltip="false"
             />
             <NInputNumber
               v-model:value="localConfig.bookmark.shellVerticalPadding"
@@ -172,6 +173,7 @@ const openPresetThemeDrawer = () => {
               :step="1"
               :min="0"
               :max="100"
+              :tooltip="false"
             />
             <NInputNumber
               v-model:value="localConfig.bookmark.shellHorizontalPadding"
@@ -187,6 +189,7 @@ const openPresetThemeDrawer = () => {
               :step="0.1"
               :min="0"
               :max="30"
+              :tooltip="false"
             />
             <NInputNumber
               v-model:value="localConfig.bookmark.shellBorderRadius"
@@ -224,6 +227,7 @@ const openPresetThemeDrawer = () => {
                 :step="0.1"
                 :min="0"
                 :max="10"
+                :tooltip="false"
               />
               <NInputNumber
                 v-model:value="localConfig.bookmark.platePadding"
@@ -239,6 +243,7 @@ const openPresetThemeDrawer = () => {
                 :step="0.1"
                 :min="0"
                 :max="10"
+                :tooltip="false"
               />
               <NInputNumber
                 v-model:value="localConfig.bookmark.plateBorderRadius"
@@ -260,6 +265,7 @@ const openPresetThemeDrawer = () => {
             :step="0.1"
             :min="0"
             :max="10"
+            :tooltip="false"
           />
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapPadding"
@@ -276,6 +282,7 @@ const openPresetThemeDrawer = () => {
             :step="1"
             :min="40"
             :max="150"
+            :tooltip="false"
           />
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapSize"
@@ -292,6 +299,7 @@ const openPresetThemeDrawer = () => {
             :step="0.1"
             :min="0"
             :max="100"
+            :tooltip="false"
           />
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapBorderRadius"
@@ -348,6 +356,7 @@ const openPresetThemeDrawer = () => {
               :step="0.01"
               :min="0"
               :max="1"
+              :tooltip="false"
             />
             <NInputNumber
               v-model:value="localConfig.bookmark.faviconSize"

@@ -41,9 +41,9 @@ const offsetData = reactive({
   yTranslateValue: -1,
 })
 
-const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(3)
+const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(5)
 
-const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(3)
+const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(5)
 
 /**
  * @param e

@@ -20,18 +20,3 @@ export const styleConst = ref({
   popupKeyboardHoverBg: ['rgba(209, 213, 219, 1)', 'rgba(73, 73, 77, 1)'],
   popupKeyboardActiveBg: ['rgba(209, 213, 219, 0.85)', 'rgba(73, 73, 77, 0.8)'],
 })
-
-export const swatcheColors = [
-  'rgba(255, 255, 255, 1)',
-  'rgba(53, 54, 58, 1)',
-  'rgba(101, 101, 101, 0.28)',
-  'rgba(122, 122, 122, 0.5)',
-  'rgba(209, 213, 219, 1)',
-  'rgba(44, 62, 80, 1)',
-  'rgba(52, 52, 57, 1)',
-  'rgba(73, 73, 77, 1)',
-  'rgba(15, 23, 42, 1)',
-  'rgba(16, 152, 173, 1)',
-  'rgba(255, 110, 110, 0.4)',
-  'rgba(250, 82, 82, 1)',
-]

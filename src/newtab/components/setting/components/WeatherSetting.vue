@@ -125,6 +125,7 @@ const onSelectCity: any = (cityId: string) => {
               :step="1"
               :min="30"
               :max="200"
+              :tooltip="false"
             />
             <NInputNumber
               v-model:value="localConfig.weather.iconSize"
