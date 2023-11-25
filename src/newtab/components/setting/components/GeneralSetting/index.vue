@@ -189,6 +189,7 @@ const onResetSetting = () => {
           :step="0.1"
           :min="0"
           :max="200"
+          :tooltip="false"
         />
         <NInputNumber
           v-model:value="localConfig.general.bgBlur"
@@ -208,6 +209,7 @@ const onResetSetting = () => {
           :step="0.01"
           :min="0"
           :max="1"
+          :tooltip="false"
         />
         <NInputNumber
           v-model:value="localConfig.general.bgOpacity"

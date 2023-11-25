@@ -22,6 +22,7 @@ import { localConfig } from '@/logic/store'
           :step="1"
           :min="5"
           :max="200"
+          :tooltip="false"
         />
         <NInputNumber
           v-if="localConfig.clockDigital.unitEnabled"

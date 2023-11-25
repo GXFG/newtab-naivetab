@@ -60,6 +60,7 @@ const isRenderField = (field: string) => {
         :step="0.1"
         :min="props.marginRange[0]"
         :max="props.marginRange[1]"
+        :tooltip="false"
       />
       <NInputNumber
         v-model:value="localConfig[props.cname].margin"
@@ -79,6 +80,7 @@ const isRenderField = (field: string) => {
         :step="0.1"
         :min="props.paddingRange[0]"
         :max="props.paddingRange[1]"
+        :tooltip="false"
       />
       <NInputNumber
         v-model:value="localConfig[props.cname].padding"
@@ -98,6 +100,7 @@ const isRenderField = (field: string) => {
         :step="1"
         :min="props.widthRange[0]"
         :max="props.widthRange[1]"
+        :tooltip="false"
       />
       <NInputNumber
         v-model:value="localConfig[props.cname].width"
@@ -117,6 +120,7 @@ const isRenderField = (field: string) => {
         :step="1"
         :min="props.heightRange[0]"
         :max="props.heightRange[1]"
+        :tooltip="false"
       />
       <NInputNumber
         v-model:value="localConfig[props.cname].height"
@@ -136,6 +140,7 @@ const isRenderField = (field: string) => {
         :step="0.1"
         :min="props.borderRadiusRange[0]"
         :max="props.borderRadiusRange[1]"
+        :tooltip="false"
       />
       <NInputNumber
         v-model:value="localConfig[props.cname].borderRadius"
@@ -177,6 +182,7 @@ const isRenderField = (field: string) => {
         :step="0.1"
         :min="0"
         :max="50"
+        :tooltip="false"
       />
       <NInputNumber
         v-model:value="localConfig[props.cname].letterSpacing"

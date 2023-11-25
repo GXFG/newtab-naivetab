@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { swatcheColors } from '@/styles/const'
+import { FAVORITE_SWATCHE_MAX_COUNT } from '@/logic/const'
+import { localConfig } from '@/logic/store'
 
 const props = defineProps({
   value: {
@@ -25,11 +26,33 @@ const handleUpdatePopoverShow = async (value: boolean) => {
   isPickerVisible.value = value
 }
 
-const backgroundColor = computed(() => props.value)
+const isFavorite = computed(() => localConfig.general.swatcheColors.includes(props.value))
+
+const addFavoriteColor = () => {
+  if (isFavorite.value) {
+    return
+  }
+  if (localConfig.general.swatcheColors.length >= FAVORITE_SWATCHE_MAX_COUNT) {
+    window.$message.error(window.$t('prompts.favoriteLimt'))
+    return
+  }
+  localConfig.general.swatcheColors.push(props.value)
+}
+
+const removeFavoriteColor = () => {
+  if (!isFavorite.value) {
+    return
+  }
+  const targetIndex = localConfig.general.swatcheColors.indexOf(props.value)
+  localConfig.general.swatcheColors.splice(targetIndex, 1)
+}
+
+const customEntryBackgroundColor = computed(() => props.value)
 </script>
 
 <template>
   <n-popover
+    id="custom-color-picker"
     placement="top"
     trigger="click"
     @update:show="handleUpdatePopoverShow"
@@ -45,10 +68,30 @@ const backgroundColor = computed(() => props.value)
       <NColorPicker
         :value="props.value"
         :show="isPickerVisible"
-        :swatches="swatcheColors"
-        placement="bottom"
+        :swatches="localConfig.general.swatcheColors"
+        placement="top"
         @update:value="handleColorUpdate"
       />
+      <div class="picker__favorite">
+        <NButton
+          v-if="!isFavorite"
+          type="primary"
+          text
+          class="favorite__btn"
+          @click="addFavoriteColor"
+        >
+          <clarity:favorite-line class="btn__icon" />
+        </NButton>
+        <NButton
+          v-else
+          type="primary"
+          text
+          class="favorite__btn"
+          @click="removeFavoriteColor"
+        >
+          <clarity:favorite-solid class="btn__icon" />
+        </NButton>
+      </div>
     </div>
   </n-popover>
 </template>
@@ -59,12 +102,40 @@ const backgroundColor = computed(() => props.value)
   height: 22px;
   border-radius: 2px;
   border: 1px solid #ccc;
-  background-color: v-bind(backgroundColor);
+  background-color: v-bind(customEntryBackgroundColor);
   cursor: pointer;
 }
 
-.color-picker__container {
-  width: 230px;
-  height: 367px;
+#custom-color-picker {
+  padding: 10px !important;
+  .v-binder-follower-content {
+    transform: translateX(10px) translateY(10px) !important;
+  }
+  .n-color-picker-panel {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: var(--n-border);
+  }
+
+  .color-picker__container {
+    position: relative;
+    width: 240px;
+    /* height: 394px; */
+    height: 399px;
+    .n-color-picker {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 213px;
+    }
+    .picker__favorite {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      .favorite__btn {
+        font-size: 18px;
+      }
+    }
+  }
 }
 </style>

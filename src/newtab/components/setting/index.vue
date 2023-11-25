@@ -180,10 +180,6 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   .n-divider .n-divider__title {
     font-size: 15px !important;
   }
-  /* color picker 居中 */
-  .n-color-picker-panel {
-    margin-left: 38px !important;
-  }
 
   .drawer-wrap {
     transition: all 0.3s ease;
