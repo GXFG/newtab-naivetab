@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { getCityLookup } from '@/api'
-import { SECOND_MODAL_WIDTH, URL_QWEATHER_START } from '@/logic/const'
+import { URL_QWEATHER_START } from '@/logic/const'
 import { localConfig } from '@/logic/store'
 
 const temperatureUnitOptions = [
@@ -15,7 +15,7 @@ const speedUnitOptions = [
 ]
 
 const state = reactive({
-  isCityPickerVisible: false,
+  isEditCityModel: false,
   isSearchLoading: false,
   keyword: '',
   cityList: [] as SelectStringItem[],
@@ -52,40 +52,14 @@ const onChangeCity = (label: string) => {
 }
 
 const onSelectCity: any = (cityId: string) => {
-  console.log(cityId)
-  localConfig.weather.city.name = state.keyword
+  const target = state.cityList.find((item) => item.value === cityId)
+  const cityName = target ? target.label : state.keyword
+  localConfig.weather.city.name = cityName
   localConfig.weather.city.id = cityId
-}
-
-const onOpenCityPicker = () => {
-  state.keyword = ''
-  state.cityList = []
-  state.isCityPickerVisible = true
 }
 </script>
 
 <template>
-  <!-- CityPicker -->
-  <NDrawer
-    v-model:show="state.isCityPickerVisible"
-    :width="SECOND_MODAL_WIDTH"
-    show-mask="transparent"
-  >
-    <NDrawerContent
-      :title="`${$t('common.edit')}${$t('weather.city')}`"
-      closable
-    >
-      <NAutoComplete
-        v-model:value="state.keyword"
-        :options="state.cityList"
-        :loading="state.isSearchLoading"
-        @update:value="onChangeCity"
-        @select="onSelectCity"
-      />
-    </NDrawerContent>
-  </NDrawer>
-
-  <!-- main -->
   <BaseComponentSetting
     id="weather__setting"
     cname="weather"
@@ -93,16 +67,34 @@ const onOpenCityPicker = () => {
     <template #header>
       <NFormItem :label="$t('weather.city')">
         <NInput
+          v-if="!state.isEditCityModel"
           v-model:value="localConfig.weather.city.name"
           :disabled="true"
         />
+        <NAutoComplete
+          v-else
+          v-model:value="state.keyword"
+          :options="state.cityList"
+          :loading="state.isSearchLoading"
+          @update:value="onChangeCity"
+          @select="onSelectCity"
+        />
+
         <NButton
+          type="primary"
+          ghost
           class="setting__item-element"
-          @click="onOpenCityPicker()"
+          @click="state.isEditCityModel = !state.isEditCityModel"
         >
-          <uil:edit class="item__icon" />
+          <template v-if="state.isEditCityModel">
+            <ic:outline-check class="item__icon" />
+          </template>
+          <template v-else>
+            <uil:edit class="item__icon" />
+          </template>
         </NButton>
       </NFormItem>
+
       <NFormItem label="API Key">
         <NInput v-model:value="localConfig.weather.apiKey" />
         <Tips
@@ -110,12 +102,14 @@ const onOpenCityPicker = () => {
           :content="URL_QWEATHER_START"
         />
       </NFormItem>
+
       <!-- <NFormItem :label="$t('weather.temperatureUnit')">
         <NSelect v-model:value="localConfig.weather.temperatureUnit" :options="temperatureUnitOptions" />
       </NFormItem>
       <NFormItem :label="$t('weather.speedUnit')">
         <NSelect v-model:value="localConfig.weather.speedUnit" :options="speedUnitOptions" />
       </NFormItem> -->
+
       <NFormItem :label="$t('weather.icon')">
         <div class="setting__input-wrap">
           <div class="setting__input_item">
@@ -142,6 +136,7 @@ const onOpenCityPicker = () => {
           </div>
         </div>
       </NFormItem>
+
       <!-- <NFormItem :label="$t('weather.forecast')">
         <NSwitch v-model:value="localConfig.weather.forecastEnabled" />
       </NFormItem> -->

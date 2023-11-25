@@ -147,7 +147,7 @@ watch(
       onResetState()
       return
     }
-    // 开启画布模式时默认打开Element抽屉
+    // 开启编辑布局时默认打开Element抽屉
     toggleIsElementDrawerVisible(true)
     nextTick(() => {
       handleListener(true)

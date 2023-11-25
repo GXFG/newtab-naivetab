@@ -3,7 +3,7 @@
 
 import { resolve } from 'node:path'
 import type { UserConfig } from 'vite'
-import { defineConfig } from 'vite'
+import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import Icons from 'unplugin-icons/vite'
@@ -40,18 +40,15 @@ export const sharedConfig: UserConfig = {
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
-
+    splitVendorChunkPlugin(),
     VueI18nPlugin({
       include: resolve(__dirname, './src/locales/**'),
     }),
-
     Markdown(),
-
     AutoImport({
       imports: ['vue', { 'webextension-polyfill': [['*', 'browser']] }, { dayjs: [['default', 'dayjs']] }],
       dts: r('src/auto-imports.d.ts'),
     }),
-
     // https://github.com/antfu/unplugin-vue-components
     Components({
       dirs: [r('src/components')],
@@ -66,12 +63,8 @@ export const sharedConfig: UserConfig = {
         NaiveUiResolver(),
       ],
     }),
-
-    // https://github.com/antfu/unplugin-icons
-    Icons(),
-
-    // https://github.com/unocss/unocss
-    UnoCSS(),
+    Icons(), // https://github.com/antfu/unplugin-icons
+    UnoCSS(), // https://github.com/unocss/unocss
 
     // html内引用的资源直接存储在/extension/assets, 无需转换
     // rewrite assets to use relative path

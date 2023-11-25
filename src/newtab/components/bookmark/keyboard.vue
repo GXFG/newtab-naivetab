@@ -316,7 +316,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                 'row__keycap--border': localConfig.bookmark.isKeycapBorderEnabled,
               }"
               :style="getKeycapStyle(code)"
-              :title="`${getBookmarkConfigName(code)}・${getBookmarkConfigUrl(code)}`"
+              :title="getBookmarkConfigName(code) ? `${getBookmarkConfigName(code)}・${getBookmarkConfigUrl(code)}` : ''"
               :data-code="code"
               @mousedown="onMouseDownKey($event, code, getBookmarkConfigUrl(code))"
             >
@@ -372,10 +372,10 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                   {{ getBookmarkConfigName(code) || '&nbsp;' }}
                 </p>
 
-                <!-- 按键定位标志F & J -->
+                <!-- 按键触摸点F & J -->
                 <div
-                  v-if="['KeyF', 'KeyJ'].includes(code)"
-                  class="item__cursor"
+                  v-if="localConfig.bookmark.isTactileBumpsVisible && ['KeyF', 'KeyJ'].includes(code)"
+                  class="item__tactile_bumps"
                 />
               </div>
             </div>
@@ -472,7 +472,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
               white-space: nowrap;
               text-overflow: ellipsis;
             }
-            .item__cursor {
+            .item__tactile_bumps {
               position: absolute;
               left: 50%;
               bottom: 0;

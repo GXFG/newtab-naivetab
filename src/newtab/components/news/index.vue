@@ -2,7 +2,7 @@
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
-import { newsState, updateNews, onRetryNews } from '@/logic/news'
+import { newsLocalState, updateNews, onRetryNews } from '@/logic/news'
 import { globalState, localConfig, getIsComponentRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
 
 const CNAME = 'news'
@@ -111,9 +111,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                   'news__content--hover': !isDragMode,
                 }"
               >
-                <template v-if="newsState[source.value] && newsState[source.value].list.length !== 0">
+                <template v-if="newsLocalState[source.value] && newsLocalState[source.value].list.length !== 0">
                   <div
-                    v-for="(item, index) in newsState[source.value] && newsState[source.value].list"
+                    v-for="(item, index) in newsLocalState[source.value] && newsLocalState[source.value].list"
                     :key="item.desc"
                     class="content__item"
                     :class="{

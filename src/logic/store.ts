@@ -8,7 +8,6 @@ import { defaultConfig, defaultLocalState } from '@/logic/config'
 import { log, createTab, compareLeftVersionLessThanRightVersions } from '@/logic/util'
 import { updateSetting, getLocalVersion } from '@/logic/storage'
 import { resetBookmarkPending } from '@/logic/bookmark'
-import { newsState } from '@/logic/news'
 import pkg from '../../package.json'
 
 export const localConfig = reactive({
@@ -210,89 +209,6 @@ export const handleAppUpdate = async () => {
   }
   log('Get new version', pkg.version)
   // TODO 每次更新均需要手动处理新版本变更的本地数据结构
-  if (compareLeftVersionLessThanRightVersions(version, '1.6.3')) {
-    let newLocalState = {}
-    const lState = localStorage.getItem('l-state')
-    if (lState) {
-      newLocalState = {
-        ...defaultLocalState,
-        ...JSON.parse(lState),
-      }
-    }
-    localStorage.setItem('l-state', JSON.stringify(newLocalState))
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.7.5')) {
-    newsState.value.toutiao = {
-      syncTime: 0,
-      list: [],
-    }
-    newsState.value.kr36 = {
-      syncTime: 0,
-      list: [],
-    }
-    newsState.value.bilibili = {
-      syncTime: 0,
-      list: [],
-    }
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.9.0')) {
-    localConfig.bookmark.keyboardType = 'key61'
-    localConfig.bookmark.keycapType = 'gmk'
-    localConfig.bookmark.keycapPadding = 1.5
-    localConfig.bookmark.keycapSize = 60
-    localConfig.bookmark.keycapKeyFontFamily = 'Arial Rounded MT Bold'
-    localConfig.bookmark.keycapKeyFontSize = 12
-    localConfig.bookmark.keycapBookmarkFontFamily = 'Arial'
-    localConfig.bookmark.keycapBookmarkFontSize = 12
-    localConfig.bookmark.mainFontColor = ['rgba(82,85,84,1.0)', 'rgba(228,222,221,1.0)']
-    localConfig.bookmark.mainBackgroundColor = ['rgba(230,232,227,1.0)', 'rgba(95,92,82,1.0)']
-    localConfig.bookmark.emphasisOneFontColor = ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)']
-    localConfig.bookmark.emphasisOneBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
-    localConfig.bookmark.emphasisTwoFontColor = ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)']
-    localConfig.bookmark.emphasisTwoBackgroundColor = ['rgba(160,164,167,1.0)', 'rgba(51,52,48,1.0)']
-    delete (localConfig.bookmark as any).margin
-    delete (localConfig.bookmark as any).width
-    delete (localConfig.bookmark as any).fontFamily
-    delete (localConfig.bookmark as any).fontSize
-    delete (localConfig.bookmark as any).backgroundColor
-    delete (localConfig.bookmark as any).BackgroundActiveColor
-    delete (localConfig.bookmark as any).isShadowEnabled
-    delete (localConfig.bookmark as any).shadowColor
-    for (const keyLabel of Object.keys(localConfig.bookmark.keymap)) {
-      const newKeycode = KEYBOARD_OLD_TO_NEW_CODE_MAP[keyLabel]
-      if (newKeycode) {
-        localConfig.bookmark.keymap[newKeycode] = localConfig.bookmark.keymap[keyLabel]
-        delete localConfig.bookmark.keymap[keyLabel]
-      }
-    }
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.12.0')) {
-    localState.value.isUploadConfigStatusMap.general.syncId = ''
-    localState.value.isUploadConfigStatusMap.bookmark.syncId = ''
-    localState.value.isUploadConfigStatusMap.clockDigital.syncId = ''
-    localState.value.isUploadConfigStatusMap.clockAnalog.syncId = ''
-    localState.value.isUploadConfigStatusMap.date.syncId = ''
-    localState.value.isUploadConfigStatusMap.calendar.syncId = ''
-    localState.value.isUploadConfigStatusMap.search.syncId = ''
-    localState.value.isUploadConfigStatusMap.weather.syncId = ''
-    localState.value.isUploadConfigStatusMap.memo.syncId = ''
-    localState.value.isUploadConfigStatusMap.news.syncId = ''
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.13.0')) {
-    const biliIndex = localConfig.news.sourceList.indexOf('bilibili')
-    if (biliIndex !== -1) {
-      localConfig.news.sourceList.splice(biliIndex, 1)
-    }
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.16.0')) {
-    localConfig.news.margin /= 2
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.17.0')) {
-    localConfig.general.isFirstOpen = false
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.17.1')) {
-    localConfig.general.openPageFocusElement = 'root'
-  }
   if (compareLeftVersionLessThanRightVersions(version, '1.17.3')) {
     localConfig.calendar.width = 50
     localConfig.calendar.isBorderEnabled = false
@@ -363,6 +279,20 @@ export const handleAppUpdate = async () => {
   if (compareLeftVersionLessThanRightVersions(version, '1.19.1')) {
     localConfig.general.isLoadPageAnimationEnabled = defaultConfig.general.isLoadPageAnimationEnabled
     localConfig.general.loadPageAnimationType = defaultConfig.general.loadPageAnimationType
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.19.3')) {
+    localConfig.bookmark.isTactileBumpsVisible = defaultConfig.bookmark.isTactileBumpsVisible
+    localConfig.general.backgroundNetworkSourceType = defaultConfig.general.backgroundNetworkSourceType
+    localConfig.general.favoriteImageList = localConfig.general.favoriteImageList.map((item) => ({
+      networkSourceType: 1,
+      name: item.name,
+    }))
+    delete (localConfig.general as any).backgroundImageDescs
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.19.4')) {
+    if (['key43', 'key57'].includes(localConfig.bookmark.keyboardType)) {
+      localConfig.bookmark.keyboardType = 'key61'
+    }
   }
   // 更新local版本号
   localConfig.general.version = pkg.version

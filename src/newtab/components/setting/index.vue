@@ -4,9 +4,8 @@ import { URL_GITHUB_HOME, URL_NAIVETAB_DOC_HOME } from '@/logic/const'
 import { getStyleConst, localConfig, globalState } from '@/logic/store'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting/index.vue'
-import ClockSetting from './components/ClockSetting/index.vue'
 import BookmarkSetting from './components/BookmarkSetting/index.vue'
-import DateSetting from './components/DateSetting.vue'
+import ClockSetting from './components/ClockSetting/index.vue'
 import CalendarSetting from './components/CalendarSetting.vue'
 import SearchSetting from './components/SearchSetting.vue'
 import MemoSetting from './components/MemoSetting.vue'
@@ -25,14 +24,9 @@ const tabPaneList = computed(() => [
     component: BookmarkSetting,
   },
   {
-    name: 'clock',
-    label: window.$t('setting.clock'),
+    name: 'clockDate',
+    label: `${window.$t('setting.clock')}/${window.$t('setting.date')}`,
     component: ClockSetting,
-  },
-  {
-    name: 'date',
-    label: window.$t('setting.date'),
-    component: DateSetting,
   },
   {
     name: 'calendar',
@@ -117,6 +111,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
             </NTabPane>
           </NTabs>
         </div>
+
         <!-- bottom -->
         <div
           class="drawer__bottom"
@@ -130,10 +125,12 @@ const bgBottomBar = getStyleConst('bgBottomBar')
               @mouseenter="handlerPreviewEnter"
               @mouseleave="handlerPreviewLeave"
             >
-              <uil:bullseye />&nbsp;{{ $t('common.preview') }}
+              <fe:picture />&nbsp;{{ $t('common.preview') }}
             </NButton>
           </div>
+
           <p class="bottom__version">Ver. {{ `${pkg.version}` }}</p>
+
           <div class="bottom__right">
             <NButton
               text
@@ -141,7 +138,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
               title="Guide"
               @click="createTab(URL_NAIVETAB_DOC_HOME)"
             >
-              <tabler:book />
+              <material-symbols:book-2-outline />
             </NButton>
             <NButton
               text
@@ -171,22 +168,27 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   .n-radio {
     width: 20%;
   }
+  /* collapse title */
+  .n-collapse-item__header-main {
+    font-size: 16px;
+    font-weight: 500 !important;
+  }
   .n-divider:not(.n-divider--vertical) {
     margin-top: 15px;
     margin-bottom: 15px;
+  }
+  .n-divider .n-divider__title {
+    font-size: 15px !important;
   }
   /* color picker 居中 */
   .n-color-picker-panel {
     margin-left: 38px !important;
   }
+
   .drawer-wrap {
     transition: all 0.3s ease;
     .drawer__content {
-      /* collapse title */
-      .n-collapse-item__header-main {
-        font-size: 16px;
-        font-weight: 500 !important;
-      }
+      padding-bottom: 80px;
       .n-tabs-tab__label {
         user-select: none;
       }
@@ -214,7 +216,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 13px 8px 13px;
+      padding: 5px 13px 5px 13px;
       width: 100%;
       .bottom__left {
         display: flex;
@@ -226,14 +228,15 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       }
       .bottom__version {
         opacity: 0.8;
+        font-size: 13px;
       }
       .bottom__right {
         display: flex;
         justify-content: center;
         align-items: center;
         .right__icon {
-          margin-left: 10px;
-          font-size: 20px;
+          margin-left: 12px;
+          font-size: 18px;
         }
       }
     }

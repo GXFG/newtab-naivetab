@@ -40,8 +40,8 @@
     "color": "color",
     "primaryColor": "Primary color",
     "fontColor": "Font color",
-    "backgroundColor": "BG color",
-    "backgroundImage": "BG image",
+    "backgroundColor": "Bg color",
+    "backgroundImage": "Bg image",
     "source": "Source",
     "blur": "Blur",
     "opacity": "Opacity",
@@ -53,6 +53,7 @@
     "network": "Network",
     "uhd": "UHD source",
     "bing": "Bing",
+    "pexels": "Pexels",
     "favorite": "Favorite",
     "margin": "Margin",
     "padding": "Padding",
@@ -82,7 +83,7 @@
   },
   "form": {
     "applyToAppearance": "Apply to appearance",
-    "photoOfTheDay": "Photo of the day"
+    "photoOfTheDay": "Bing Photo of the day"
   },
   "prompts": {
     "linkTips": "Click on ? icon to access the link below",
@@ -191,6 +192,7 @@
     "splitSpace": "Split Space",
     "keycap": "Keycap",
     "keycapType": "Keycap Profile",
+    "tactileBumps": "Tactile Bumps",
     "customKeys": "Custom keys",
     "keyLabel": "Key",
     "urlLabel": "Url",

@@ -3,7 +3,7 @@ import { LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M, SECOND_MODAL_WIDTH } from '@/logic/c
 import { databaseStore } from '@/logic/database'
 import { compressedImageUrlToBase64 } from '@/logic/util'
 import { localConfig, localState } from '@/logic/store'
-import { previewImageListMap, imageState, isImageLoading, isImageListLoading, updateImages } from '@/logic/image'
+import { previewImageListMap, imageState, isImageLoading, isImageListLoading, updateBingImages, updatePexelsImages } from '@/logic/image'
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
 
 const props = defineProps({
@@ -29,26 +29,11 @@ watch(
   () => props.show,
   (value: boolean) => {
     if (value) {
-      updateImages()
+      updateBingImages()
+      updatePexelsImages()
     }
   },
 )
-
-const currImageData = computed(() => {
-  if (!(localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled)) {
-    // not from Bing url
-    return {
-      url: imageState.currBackgroundImageFileObjectURL,
-      name: '',
-      desc: '',
-    }
-  }
-  return {
-    url: '',
-    name: localConfig.general.backgroundImageNames[localState.value.currAppearanceCode],
-    desc: localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode],
-  }
-})
 
 const bgImageFileInputEl = ref()
 
@@ -154,29 +139,37 @@ const handleBackgroundImageCustomUrlBlur = () => {
               v-if="localConfig.general.backgroundImageSource === 0"
               :label="$t('common.select')"
             >
-              <NButton @click="onSelectBackgroundImage"> <uil:import />&nbsp;{{ $t('common.import') }} </NButton>
-              <Tips :content="$t('general.localBackgroundTips')" />
-              <p class="setting__item-element">
-                {{ imageState.currBackgroundImageFileName }}
-              </p>
-              <input
-                ref="bgImageFileInputEl"
-                style="display: none"
-                type="file"
-                accept="image/*"
-                @change="onBackgroundImageFileChange"
-              />
+              <div class="form__local">
+                <div>
+                  <NButton @click="onSelectBackgroundImage"> <uil:import />&nbsp;{{ $t('common.import') }} </NButton>
+                  <Tips :content="$t('general.localBackgroundTips')" />
+                </div>
+                <p class="local__filename">
+                  {{ imageState.currBackgroundImageFileName }}
+                </p>
+                <input
+                  ref="bgImageFileInputEl"
+                  style="display: none"
+                  type="file"
+                  accept="image/*"
+                  @change="onBackgroundImageFileChange"
+                />
+              </div>
             </NFormItem>
 
             <!-- network -->
             <template v-else-if="localConfig.general.backgroundImageSource === 1">
-              <NFormItem :label="`${$t('common.custom')} URL`">
+              <NFormItem :label="`${$t('common.custom')}`">
                 <NSwitch
                   v-model:value="localConfig.general.isBackgroundImageCustomUrlEnabled"
                   @update:value="handleCustomUrlUpdate"
                 />
+              </NFormItem>
+              <NFormItem
+                v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
+                label="URL"
+              >
                 <NInput
-                  v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
                   v-model:value="localConfig.general.backgroundImageCustomUrls[localState.currAppearanceCode]"
                   class="setting__item-element"
                   type="text"
@@ -185,7 +178,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
                 />
               </NFormItem>
             </template>
-            <!-- 网络（未开启自定义），每日一图 -->
+            <!-- 网络（未开启自定义），每日一图时展示 -->
             <NFormItem
               v-if="localConfig.general.backgroundImageSource !== 0 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
               :label="$t('common.uhd')"
@@ -193,12 +186,15 @@ const handleBackgroundImageCustomUrlBlur = () => {
               <NSwitch v-model:value="localConfig.general.backgroundImageHighQuality" />
             </NFormItem>
 
+            <!-- 当前背景图 -->
             <NFormItem :label="`${$t('common.current')}${$t('common.backgroundImage')}`">
               <div class="current__image">
                 <NSpin :show="isImageLoading">
                   <BackgroundDrawerImageElement
                     :lazy="false"
-                    :data="currImageData"
+                    :data="{
+                      url: imageState.currBackgroundImageFileObjectURL,
+                    }"
                   />
                 </NSpin>
               </div>
@@ -206,36 +202,36 @@ const handleBackgroundImageCustomUrlBlur = () => {
           </NForm>
         </div>
 
-        <!-- list 仅来源为网络时展示 -->
+        <!-- list 仅来源为网络 且 非定制Url时展示 -->
         <NSpin
           v-if="localConfig.general.backgroundImageSource === 1 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
           :show="isImageListLoading"
         >
-          <NCollapse
-            default-expanded-names="bing"
-            accordion
+          <NTabs
+            type="line"
+            animated
           >
-            <NCollapseItem
-              v-for="origin of Object.keys(previewImageListMap)"
-              :key="origin"
-              :title="$t(`common.${origin}`)"
-              :name="origin"
+            <NTabPane
+              v-for="source of Object.keys(previewImageListMap)"
+              :key="source"
+              :tab="$t(`common.${source}`)"
+              :name="source"
             >
               <div class="picker__images">
                 <div
-                  v-for="item in previewImageListMap[origin]"
+                  v-for="item in previewImageListMap[source]"
                   :key="item.name"
                   class="image__item"
                 >
                   <BackgroundDrawerImageElement
                     :data="item"
                     select
-                    :delete="origin === 'favorite'"
+                    :delete="source === 'favorite'"
                   />
                 </div>
               </div>
-            </NCollapseItem>
-          </NCollapse>
+            </NTabPane>
+          </NTabs>
         </NSpin>
       </div>
     </NDrawerContent>
@@ -244,6 +240,16 @@ const handleBackgroundImageCustomUrlBlur = () => {
 
 <style scoped>
 .drawer__content {
+  .form__local {
+    display: flex;
+    flex-direction: column;
+    .local__filename {
+      width: 400px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
   .content__config {
     margin-right: 18px;
     flex: 1;
@@ -253,19 +259,19 @@ const handleBackgroundImageCustomUrlBlur = () => {
     color: var(--n-label-text-color);
   }
   .current__image {
-    margin: 2.5%;
-    width: 60%;
-    min-height: 125px;
+    margin-top: 10px;
+    width: 200px;
+    min-height: 92px;
   }
   .picker__images {
     display: flex;
     flex-wrap: wrap;
-  }
-  .image__item {
-    flex: 0 0 auto;
-    margin: 2.3%;
-    width: 45%;
-    min-height: 125px;
+    .image__item {
+      flex: 0 0 auto;
+      margin: 1.6%;
+      width: 30%;
+      min-height: 89px;
+    }
   }
 }
 </style>

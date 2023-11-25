@@ -52,7 +52,7 @@ const menuList = computed(() => {
         {
           label: window.$t('rightMenu.userDocs'),
           key: 'userDocs',
-          icon: renderIconFunc('tabler:book'),
+          icon: renderIconFunc('material-symbols:book-2-outline'),
         },
         {
           label: window.$t('rightMenu.changelog'),
@@ -102,9 +102,9 @@ const menuList = computed(() => {
 const menuActionMap = {
   setting: () => {
     let settingDrawerTabName = state.currComponentName
-    // 时钟的设置均在同一tab页内
-    if (settingDrawerTabName.includes('clock')) {
-      settingDrawerTabName = 'clock'
+    // 时钟、日期的设置均在同一tab页内
+    if (['clockDigital', 'clockAnalog', 'date'].includes(settingDrawerTabName)) {
+      settingDrawerTabName = 'clockDate'
     }
     const tabValue = settingDrawerTabName.length === 0 ? 'general' : settingDrawerTabName
     globalState.currSettingTabValue = tabValue

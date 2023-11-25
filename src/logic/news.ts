@@ -5,7 +5,7 @@ import { NEWS_SOURCE_MAP } from '@/logic/const'
 import { createTab, log } from '@/logic/util'
 import { localConfig } from '@/logic/store'
 
-export const newsState = useStorageLocal('data-news', {
+export const newsLocalState = useStorageLocal('data-news', {
   toutiao: {
     syncTime: 0,
     list: [] as NewsListItem[],
@@ -49,12 +49,12 @@ export const getToutiaoNews = async () => {
     if (!res || !res.status || res.status !== 'success') {
       return
     }
-    newsState.value.toutiao.list = res.data.map((item) => ({
+    newsLocalState.value.toutiao.list = res.data.map((item) => ({
       url: `https://www.toutiao.com/trending/${item.ClusterIdStr}`,
       desc: item.Title,
       hot: `${Math.floor(+item.HotValue / 10000)}w`,
     }))
-    newsState.value.toutiao.syncTime = dayjs().valueOf()
+    newsLocalState.value.toutiao.syncTime = dayjs().valueOf()
     log('News-update toutiao')
   } catch (e) {
     console.warn(e)
@@ -77,8 +77,8 @@ export const getBaiduNews = async () => {
       newsList.push({ url, desc, hot })
     })
     newsList = newsList.slice(1)
-    newsState.value.baidu.list = newsList
-    newsState.value.baidu.syncTime = dayjs().valueOf()
+    newsLocalState.value.baidu.list = newsList
+    newsLocalState.value.baidu.syncTime = dayjs().valueOf()
     log('News-update baidu')
   } catch (e) {
     console.warn(e)
@@ -104,8 +104,8 @@ export const getZhihuNews = async () => {
         newsList.push({ url, desc, hot })
       }
     })
-    newsState.value.zhihu.list = newsList
-    newsState.value.zhihu.syncTime = dayjs().valueOf()
+    newsLocalState.value.zhihu.list = newsList
+    newsLocalState.value.zhihu.syncTime = dayjs().valueOf()
     log('News-update zhihu')
   } catch (e) {
     console.warn(e)
@@ -138,8 +138,8 @@ export const getWeiboNews = async () => {
       }
     })
     newsList = newsList.slice(1)
-    newsState.value.weibo.list = newsList
-    newsState.value.weibo.syncTime = dayjs().valueOf()
+    newsLocalState.value.weibo.list = newsList
+    newsLocalState.value.weibo.syncTime = dayjs().valueOf()
     log('News-update weibo')
   } catch (e) {
     console.warn(e)
@@ -160,8 +160,8 @@ export const getKr36News = async () => {
       const hot = ($(ele).find('.kr-flow-bar-hot').children('span').text() || '').trim()
       newsList.push({ url, desc, hot })
     })
-    newsState.value.kr36.list = newsList
-    newsState.value.kr36.syncTime = dayjs().valueOf()
+    newsLocalState.value.kr36.list = newsList
+    newsLocalState.value.kr36.syncTime = dayjs().valueOf()
     log('News-update kr36')
   } catch (e) {
     console.warn(e)
@@ -182,8 +182,8 @@ export const getBilibiliNews = async () => {
       const hot = $(ele).find('.info .detail-state .data-box').eq(0).text().trim()
       newsList.push({ url, desc, hot })
     })
-    newsState.value.bilibili.list = newsList
-    newsState.value.bilibili.syncTime = dayjs().valueOf()
+    newsLocalState.value.bilibili.list = newsList
+    newsLocalState.value.bilibili.syncTime = dayjs().valueOf()
   } catch (e) {
     console.warn(e)
   }
@@ -203,8 +203,8 @@ export const getV2exNews = async () => {
       const hot = $(ele).find('.count_livid').text()
       newsList.push({ url, desc, hot })
     })
-    newsState.value.v2ex.list = newsList
-    newsState.value.v2ex.syncTime = dayjs().valueOf()
+    newsLocalState.value.v2ex.list = newsList
+    newsLocalState.value.v2ex.syncTime = dayjs().valueOf()
     log('News-update v2ex')
   } catch (e) {
     console.warn(e)
@@ -236,25 +236,25 @@ export const updateNews = () => {
   }
   const currTS = dayjs().valueOf()
   const intervalTime = localConfig.news.refreshIntervalTime * 60000
-  if (localConfig.news.sourceList.includes('toutiao') && (currTS - newsState.value.toutiao.syncTime >= intervalTime || newsState.value.toutiao.list.length === 0)) {
+  if (localConfig.news.sourceList.includes('toutiao') && (currTS - newsLocalState.value.toutiao.syncTime >= intervalTime || newsLocalState.value.toutiao.list.length === 0)) {
     getToutiaoNews()
   }
-  if (localConfig.news.sourceList.includes('baidu') && (currTS - newsState.value.baidu.syncTime >= intervalTime || newsState.value.baidu.list.length === 0)) {
+  if (localConfig.news.sourceList.includes('baidu') && (currTS - newsLocalState.value.baidu.syncTime >= intervalTime || newsLocalState.value.baidu.list.length === 0)) {
     getBaiduNews()
   }
-  if (localConfig.news.sourceList.includes('zhihu') && (currTS - newsState.value.zhihu.syncTime >= intervalTime || newsState.value.zhihu.list.length === 0)) {
+  if (localConfig.news.sourceList.includes('zhihu') && (currTS - newsLocalState.value.zhihu.syncTime >= intervalTime || newsLocalState.value.zhihu.list.length === 0)) {
     getZhihuNews()
   }
-  if (localConfig.news.sourceList.includes('weibo') && (currTS - newsState.value.weibo.syncTime >= intervalTime || newsState.value.weibo.list.length === 0)) {
+  if (localConfig.news.sourceList.includes('weibo') && (currTS - newsLocalState.value.weibo.syncTime >= intervalTime || newsLocalState.value.weibo.list.length === 0)) {
     getWeiboNews()
   }
-  if (localConfig.news.sourceList.includes('kr36') && (currTS - newsState.value.kr36.syncTime >= intervalTime || newsState.value.kr36.list.length === 0)) {
+  if (localConfig.news.sourceList.includes('kr36') && (currTS - newsLocalState.value.kr36.syncTime >= intervalTime || newsLocalState.value.kr36.list.length === 0)) {
     getKr36News()
   }
-  if (localConfig.news.sourceList.includes('bilibili') && (currTS - newsState.value.bilibili.syncTime >= intervalTime || newsState.value.bilibili.list.length === 0)) {
+  if (localConfig.news.sourceList.includes('bilibili') && (currTS - newsLocalState.value.bilibili.syncTime >= intervalTime || newsLocalState.value.bilibili.list.length === 0)) {
     getBilibiliNews()
   }
-  if (localConfig.news.sourceList.includes('v2ex') && (currTS - newsState.value.v2ex.syncTime >= intervalTime || newsState.value.v2ex.list.length === 0)) {
+  if (localConfig.news.sourceList.includes('v2ex') && (currTS - newsLocalState.value.v2ex.syncTime >= intervalTime || newsLocalState.value.v2ex.list.length === 0)) {
     getV2exNews()
   }
 }

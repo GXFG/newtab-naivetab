@@ -1,6 +1,6 @@
-import request from '@/lib/request'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { log } from '@/logic/util'
+import { getPoetryTokenData, getTodayPoetryData } from '@/api'
 
 export const poetryState = useStorageLocal('data-poetry', {
   token: '',
@@ -21,7 +21,7 @@ const getPoetryToken = async () => {
   if (poetryState.value.token.length !== 0) {
     return
   }
-  const { status, data } = await request.get('https://v2.jinrishici.com/token')
+  const { status, data } = await getPoetryTokenData()
   if (status !== 'success') {
     return
   }
@@ -29,13 +29,7 @@ const getPoetryToken = async () => {
 }
 
 const getTodayPoetry = async () => {
-  const { status, data }: { status: string; data: PoetryData } = await request({
-    methods: 'get',
-    url: 'https://v2.jinrishici.com/one.json',
-    headers: {
-      'X-User-Token': poetryState.value.token,
-    },
-  })
+  const { status, data } = await getTodayPoetryData(poetryState.value.token)
   if (status !== 'success') {
     return
   }
@@ -52,7 +46,8 @@ const getTodayPoetry = async () => {
 
 export const updatePoetry = async () => {
   const currTS = dayjs().valueOf()
-  const intervalTime = 60 * 60000
+  // 最小刷新间隔为4小时
+  const intervalTime = 3600000 * 4
   if (currTS - poetryState.value.syncTime >= intervalTime || poetryState.value.content.length === 0) {
     await getPoetryToken()
     await getTodayPoetry()
@@ -60,5 +55,3 @@ export const updatePoetry = async () => {
   log(`${poetryState.value.content} - ${poetryState.value.origin.author}・${poetryState.value.origin.dynasty}`)
   log(`${poetryState.value.matchTags}`)
 }
-
-updatePoetry()

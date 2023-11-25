@@ -1,5 +1,5 @@
 <!-- 最外层div的style会被用来存放v-bind的css变量，不能再进行:style绑定操作 -->
-<!-- 第二层div用来统一控制画布模式下的cursor样式 -->
+<!-- 第二层div用来统一控制编辑布局下的cursor样式 -->
 <script setup lang="ts">
 import { DRAG_TRIGGER_DISTANCE } from '@/logic/const'
 import { moveState, isDragMode } from '@/logic/moveable'
@@ -47,7 +47,7 @@ const getPercentageInHeight = (currHeight: number) => +((currHeight / window.inn
 
 /**
  * @param e
- * @param resite 是否重置位置（以光标位置为组件的中心）
+ * @param resite 是否重置位置（以光标位置为组件的中心），ElementDrawer使用以光标位置为组件的中心开始拖拽
  */
 const startDrag = async (e: MouseEvent, resite = false) => {
   await nextTick() // 确保可以获取到 targetContainerEle
@@ -86,17 +86,17 @@ const stopDrag = () => {
   if (offsetData.xOffsetKey.length !== 0) {
     localConfig[props.componentName as Components].layout.xOffsetKey = offsetData.xOffsetKey
   }
-  if (offsetData.xOffsetValue !== -1) {
-    localConfig[props.componentName as Components].layout.xOffsetValue = offsetData.xOffsetValue
-  }
-  if (offsetData.xTranslateValue !== -1) {
-    localConfig[props.componentName as Components].layout.xTranslateValue = offsetData.xTranslateValue
-  }
   if (offsetData.yOffsetKey.length !== 0) {
     localConfig[props.componentName as Components].layout.yOffsetKey = offsetData.yOffsetKey
   }
+  if (offsetData.xOffsetValue !== -1) {
+    localConfig[props.componentName as Components].layout.xOffsetValue = offsetData.xOffsetValue
+  }
   if (offsetData.yOffsetValue !== -1) {
     localConfig[props.componentName as Components].layout.yOffsetValue = offsetData.yOffsetValue
+  }
+  if (offsetData.xTranslateValue !== -1) {
+    localConfig[props.componentName as Components].layout.xTranslateValue = offsetData.xTranslateValue
   }
   if (offsetData.yTranslateValue !== -1) {
     localConfig[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
@@ -230,7 +230,7 @@ watch(
   },
 )
 
-// 画布模式下，启用当前组件时添加active样式
+// 编辑布局时，启用当前组件时添加active样式
 watch(
   () => localConfig[props.componentName].enabled,
   (value) => {
