@@ -75,7 +75,7 @@ const startGuide = () => {
 
 export const openUserGuide = async () => {
   globalState.isGuideMode = true
-  // 打开画布模式 & 用户引导
+  // 打开编辑布局 & 用户引导
   toggleIsDragMode(true)
   // 等待抽屉动画执行完成开始引导
   setTimeout(() => {

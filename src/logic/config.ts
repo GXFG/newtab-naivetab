@@ -8,72 +8,36 @@ export const defaultConfig = {
     isFirstOpen: true,
     version: pkg.version,
     appearance: 'auto' as 'light' | 'dark' | 'auto',
-    pageTitle: 'NaiveTab',
+    pageTitle: CURR_LANG === 'zh-CN' ? '新标签页' : 'NaiveTab',
     lang: CURR_LANG,
     drawerPlacement: 'right' as 'left' | 'right',
     openPageFocusElement: 'root' as 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard',
     isLoadPageAnimationEnabled: true,
     loadPageAnimationType: 'fade-in' as 'fade-in' | 'zoom-in',
     isBackgroundImageEnabled: true,
-    backgroundImageSource: 1 as 0 | 1 | 2, // 0:localFile, 1:network, 2:Photo of the Day
+    backgroundImageSource: 1 as 0 | 1 | 2, // 0 localFile, 1 network, 2 bing Photo of the Day
+    backgroundNetworkSourceType: 1 as 1 | 2, // 1 Bing, 2 Pexels
     backgroundImageHighQuality: false,
     backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'DolomitesMW_ZH-CN3307894335'],
-    backgroundImageDescs: [
-      '楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)',
-      '多洛米蒂山上空的银河，意大利 (© Carlos Fernandez/Getty Images)',
-    ],
     isBackgroundImageCustomUrlEnabled: false,
     backgroundImageCustomUrls: ['https://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'https://cn.bing.com/th?id=OHR.DolomitesMW_ZH-CN3307894335_1920x1080.jpg'],
     favoriteImageList: [
-      {
-        name: 'ChukchiSea_ZH-CN7218471261',
-        desc: '楚科奇海的浮游植物水华，美国阿拉斯加州海岸附近 (© Norman Kuring/Kathryn Hansen/U.S. Geological Survey/NASA)',
-      },
-      {
-        name: 'DolomitesMW_ZH-CN3307894335',
-        desc: '多洛米蒂山上空的银河，意大利 (© Carlos Fernandez/Getty Images)',
-      },
-      {
-        name: 'YosemiteNightSky_ZH-CN5864740024',
-        desc: '半穹顶景观点上空的银河，优胜美地国家公园，加利福尼亚州 (© Cory Marshall/Tandem Stills + Motion)',
-      },
-      {
-        name: 'LavaTube_ZH-CN5458469336',
-        desc: '漏出“天窗”的熔岩管，夏威夷火山国家公园 (© Tom Schwabel/Tandem Stills + Motion)',
-      },
-      {
-        name: 'YurisNight_ZH-CN5738817931',
-        desc: '宇航员杰夫·威廉姆斯在国际空间站拍摄到的地球 (© Jeff Williams/NASA)',
-      },
-      {
-        name: 'PrathameshJaju_ZH-CN2207606082',
-        desc: '月球的高清合成影像 (© Prathamesh Jaju)',
-      },
-      {
-        name: 'ChurchillBears_ZH-CN1430090934',
-        desc: '好奇地看着相机的北极熊，加拿大丘吉尔镇 (© Matthias Breiter/Minden Pictures)',
-      },
-      {
-        name: 'WinterHalo_ZH-CN0666553211',
-        desc: '厄尔士山脉上的光晕，德国萨克森州 (© Martin Ruegner/Getty Images)',
-      },
-      {
-        name: 'DarwinsArch_ZH-CN9740478501',
-        desc: '达尔文岛的达尔文拱门，厄瓜多尔加拉帕戈斯 (© miralex/Getty Images)',
-      },
-      {
-        name: 'PoetrysCave_ZH-CN3196193909',
-        desc: '鸟瞰罗卡附近的Grotta della Poesia，意大利莱切 (© Amazing Aerial Agency/Offset by Shutterstock)',
-      },
-      {
-        name: 'Balsamroot_ZH-CN9456182640',
-        desc: '山下盛开的箭叶脂根菊，美国大提顿国家公园 (© Mike Cavaroc/Tandem Stills + Motion)',
-      },
-      {
-        name: 'HalfwayDay_ZH-CN1333459630',
-        desc: '分隔两个湖泊的公路，苏格兰高地 (© Abstract Aerial Art/Getty Images)',
-      },
-    ],
+      { networkSourceType: 1, name: 'ChukchiSea_ZH-CN7218471261' },
+      { networkSourceType: 1, name: 'DolomitesMW_ZH-CN3307894335' },
+      { networkSourceType: 1, name: 'YosemiteNightSky_ZH-CN5864740024' },
+      { networkSourceType: 1, name: 'LavaTube_ZH-CN5458469336' },
+      { networkSourceType: 1, name: 'YurisNight_ZH-CN5738817931' },
+      { networkSourceType: 1, name: 'PrathameshJaju_ZH-CN2207606082' },
+      { networkSourceType: 1, name: 'AthensAcropolis_ZH-CN9942357439' },
+      { networkSourceType: 1, name: 'Balsamroot_ZH-CN9456182640' },
+      { networkSourceType: 1, name: 'DarwinsArch_ZH-CN9740478501' },
+      { networkSourceType: 1, name: 'ChurchillBears_ZH-CN1430090934' },
+      { networkSourceType: 1, name: 'WinterHalo_ZH-CN0666553211' },
+      { networkSourceType: 2, name: '19161535' },
+    ] as {
+      networkSourceType: 1 | 2
+      name: string
+    }[],
     layout: {
       xOffsetKey: 'right',
       xOffsetValue: 1,
@@ -141,9 +105,13 @@ export const defaultConfig = {
         url: 'www.v2ex.com',
         name: '',
       },
-      KeyV: {
+      KeyC: {
         url: 'www.douyin.com',
         name: '',
+      },
+      KeyV: {
+        url: 'v.qq.com',
+        name: 'tencent',
       },
       KeyB: {
         url: 'www.bilibili.com',
@@ -152,10 +120,6 @@ export const defaultConfig = {
       KeyN: {
         url: 'www.youku.com',
         name: '',
-      },
-      KeyM: {
-        url: 'v.qq.com',
-        name: 'tencent',
       },
     },
     layout: {
@@ -170,7 +134,7 @@ export const defaultConfig = {
     splitSpace: 'space1' as 'space1' | 'space2' | 'space3',
     keycapType: 'gmk',
     keycapPadding: 1.5,
-    keycapSize: 65,
+    keycapSize: 62,
     keycapBorderRadius: 5,
     isKeycapBorderEnabled: false,
     keycapBorderWidth: 1,
@@ -196,7 +160,8 @@ export const defaultConfig = {
     keycapBookmarkFontFamily: 'Arial',
     keycapBookmarkFontSize: 11,
     isFaviconVisible: true,
-    faviconSize: 0.9,
+    faviconSize: 1,
+    isTactileBumpsVisible: true,
     // keycap color
     mainFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
     mainBackgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(95,92,82,1.0)'],

@@ -5,5 +5,7 @@ import App from './App.vue'
 
 const app = createApp(App)
 
+// app.config.performance = true
+
 app.use(i18n)
 app.mount('#app')

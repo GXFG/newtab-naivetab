@@ -52,7 +52,7 @@ const presetThemeList = Object.keys(KEYCAP_PREINSTALL_MAP)
           @click="onSelectPresetTheme(themeKey)"
         >
           <p
-            class="theme__qwerty"
+            class="theme__label"
             :style="`color: ${KEYCAP_PREINSTALL_MAP[themeKey].mainFontColor}; background-color: ${KEYCAP_PREINSTALL_MAP[themeKey].mainBackgroundColor}`"
           >
             {{ KEYCAP_PREINSTALL_MAP[themeKey].label }}
@@ -97,7 +97,9 @@ const presetThemeList = Object.keys(KEYCAP_PREINSTALL_MAP)
     &:hover {
       opacity: 0.6;
     }
-    .theme__qwerty {
+    .theme__label {
+      font-size: 15px;
+      font-weight: 600;
       border-radius: 3px;
     }
     .theme__emphasis {

@@ -114,18 +114,6 @@ const onResetSetting = () => {
         />
       </NFormItem>
 
-      <NFormItem :label="$t('common.drawerSite')">
-        <NRadioGroup v-model:value="localConfig.general.drawerPlacement">
-          <NRadioButton
-            v-for="item in drawerPlacementList"
-            :key="item.value"
-            :value="item.value"
-          >
-            {{ item.label }}
-          </NRadioButton>
-        </NRadioGroup>
-      </NFormItem>
-
       <NFormItem :label="$t('general.defaultFocus')">
         <NSelect
           v-model:value="localConfig.general.openPageFocusElement"
@@ -142,6 +130,18 @@ const onResetSetting = () => {
         >
           <NRadioButton
             v-for="item in loadPageAnimationTypeList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </NRadioButton>
+        </NRadioGroup>
+      </NFormItem>
+
+      <NFormItem :label="$t('common.drawerSite')">
+        <NRadioGroup v-model:value="localConfig.general.drawerPlacement">
+          <NRadioButton
+            v-for="item in drawerPlacementList"
             :key="item.value"
             :value="item.value"
           >

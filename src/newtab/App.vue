@@ -9,6 +9,7 @@ import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, ha
 import { initBackgroundImage } from '@/logic/image'
 import { handleWatchNewsConfigChange } from '@/logic/news'
 import { handleWatchWeatherConfigChange } from '@/logic/weather'
+import { updatePoetry } from '@/logic/poetry'
 import Content from '@/newtab/Content.vue'
 import pkg from '../../package.json'
 
@@ -17,16 +18,6 @@ if (localConfig.general.openPageFocusElement !== 'default') {
     location.search = '?focus'
     throw new Error()
   }
-}
-
-const onDot = () => {
-  const [brand] = navigator.userAgentData?.brands.slice(-1) || []
-  gaProxy('view', ['newtab'], {
-    version: pkg.version,
-    userAgent: navigator.userAgent,
-    platform: navigator.userAgentData?.platform,
-    browser: `${brand.brand}_${brand.version}`,
-  })
 }
 
 const handleFocusPage = () => {
@@ -38,6 +29,16 @@ const handleFocusPage = () => {
   if (focusEle && focusEle.focus) {
     focusEle.focus()
   }
+}
+
+const onDot = () => {
+  const [brand] = navigator.userAgentData?.brands.slice(-1) || []
+  gaProxy('view', ['newtab'], {
+    version: pkg.version,
+    userAgent: navigator.userAgent,
+    platform: navigator.userAgentData?.platform,
+    browser: `${brand.brand}_${brand.version}`,
+  })
 }
 
 onMounted(async () => {
@@ -54,6 +55,7 @@ onMounted(async () => {
   handleWatchNewsConfigChange()
   handleWatchWeatherConfigChange()
   handleFocusPage()
+  updatePoetry()
   onDot()
 })
 

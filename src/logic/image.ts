@@ -1,18 +1,51 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { getBingImages } from '@/api'
+import { getBingImagesData, getPexelsImagesData } from '@/api'
 import { log, urlToFile, compressedImageUrlToBase64 } from '@/logic/util'
 import { databaseStore } from '@/logic/database'
 import { localConfig, localState } from '@/logic/store'
 
-/**
- * e.g.: https://cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_UHD.jpg
- * @param size: 1366x768, 1920x1080, UHD
- */
-export const getBingImageUrlFromName = (name: string, size = '1366x768'): string => `https://cn.bing.com/th?id=OHR.${name}_${size}.jpg`
+const BING_QUALITY_MAP = {
+  low: '1366x768',
+  medium: '1920x1080',
+  high: 'UHD',
+}
+
+const PEXELS_QUALITY_MAP = {
+  low: '&h=192&w=341',
+  medium: '&h=1080&w=1920',
+  high: '',
+}
+
+// cn.bing.com//th?id=OHR.YurisNight_ZH-CN5738817931_1366x768.jpg
+const getBingImageUrlFromName = (name: string, quality = 'low' as TImage.quality): string => {
+  return `https://cn.bing.com/th?id=OHR.${name}_${BING_QUALITY_MAP[quality]}.jpg`
+}
+
+// images.pexels.com/photos/19065473/pexels-photo-19065473.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=768&w=1366
+const getPexelsImageUrlFromName = (name: string, quality = 'low' as TImage.quality): string => {
+  return `https://images.pexels.com/photos/${name}/pexels-photo-${name}.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop${PEXELS_QUALITY_MAP[quality]}`
+}
+
+// networkSourceType: 1 Bing, 2 Pexels
+export const getImageUrlFromName = (networkSourceType: 1 | 2, name: string, quality = 'low' as TImage.quality) => {
+  let url = ''
+  if (networkSourceType === 1) {
+    url = getBingImageUrlFromName(name, quality)
+  } else if (networkSourceType === 2) {
+    url = getPexelsImageUrlFromName(name, quality)
+  }
+  return url
+}
 
 export const imageLocalState = useStorageLocal('data-images', {
-  syncTime: 0,
-  imageList: [] as BingImageItem[],
+  bing: {
+    syncTime: 0,
+    list: [] as TImage.BaseImageItem[],
+  },
+  pexels: {
+    syncTime: 0,
+    list: [] as TImage.BaseImageItem[],
+  },
 })
 
 export const imageState = reactive({
@@ -22,51 +55,95 @@ export const imageState = reactive({
 
 export const previewImageListMap = computed(() => ({
   favorite: localConfig.general.favoriteImageList,
-  bing: imageLocalState.value.imageList.map((item: BingImageItem) => {
-    const name = item.urlbase.split('OHR.')[1]
-    return {
-      name,
-      desc: item.copyright,
-    }
-  }),
+  bing: imageLocalState.value.bing.list.map((item) => ({
+    ...item,
+    networkSourceType: 1,
+  })),
+  pexels: imageLocalState.value.pexels.list.map((item) => ({
+    ...item,
+    networkSourceType: 2,
+  })),
 }))
 
 export const isImageListLoading = ref(false)
 
-const getImages = async () => {
+const getBingImageList = async () => {
   try {
     isImageListLoading.value = true
-    const data = await getBingImages()
+    const data = await getBingImagesData()
     isImageListLoading.value = false
-    imageLocalState.value.syncTime = dayjs().valueOf()
-    imageLocalState.value.imageList = data.images
-    log('Image update imageList')
+    imageLocalState.value.bing.syncTime = dayjs().valueOf()
+    imageLocalState.value.bing.list = data.images.map((item: TImage.BingImageItem) => {
+      const name = item.urlbase.split('OHR.')[1]
+      return {
+        name,
+        desc: item.copyright,
+      }
+    })
+    log('Image update BingImageList')
   } catch (e) {
     isImageListLoading.value = false
   }
 }
 
-export const updateImages = async () => {
+const getPexelsImageList = async () => {
+  try {
+    isImageListLoading.value = true
+    const data = await getPexelsImagesData({
+      page: 1,
+      per_page: 30,
+    })
+    isImageListLoading.value = false
+    imageLocalState.value.pexels.syncTime = dayjs().valueOf()
+    imageLocalState.value.pexels.list = data.photos.map((item: TImage.PexelsImageItem) => ({
+      name: `${item.id}`,
+      desc: `${item.alt} (${item.photographer})`,
+    }))
+    log('Image update PexelsImageList')
+  } catch (e) {
+    isImageListLoading.value = false
+  }
+}
+
+export const updateBingImages = async () => {
   const currTS = dayjs().valueOf()
   // 最小刷新间隔为3小时
-  if (currTS - imageLocalState.value.syncTime <= 3600000 * 3) {
+  if (currTS - imageLocalState.value.bing.syncTime <= 3600000 * 3) {
     return
   }
-  await getImages()
+  await getBingImageList()
+}
+
+export const updatePexelsImages = async () => {
+  const currTS = dayjs().valueOf()
+  // 最小刷新间隔为3小时
+  if (currTS - imageLocalState.value.pexels.syncTime <= 3600000 * 3) {
+    return
+  }
+  await getPexelsImageList()
 }
 
 const getCurrNetworkBackgroundImageUrl = (applyToAppearanceCode = localState.value.currAppearanceCode) => {
   let imageUrl = ''
-  const quality = localConfig.general.backgroundImageHighQuality ? 'UHD' : '1920x1080'
+  const quality: TImage.quality = localConfig.general.backgroundImageHighQuality ? 'high' : 'medium'
   if (localConfig.general.backgroundImageSource === 1) {
-    imageUrl = localConfig.general.isBackgroundImageCustomUrlEnabled
-      ? localConfig.general.backgroundImageCustomUrls[applyToAppearanceCode]
-      : getBingImageUrlFromName(localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[applyToAppearanceCode], quality)
+    // 网络
+    if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
+      imageUrl = localConfig.general.backgroundImageCustomUrls[applyToAppearanceCode]
+    } else {
+      imageUrl = getImageUrlFromName(
+        localConfig.general.backgroundNetworkSourceType,
+        localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[applyToAppearanceCode],
+        quality,
+      )
+    }
   } else if (localConfig.general.backgroundImageSource === 2) {
-    const todayImage = imageLocalState.value.imageList[0]
-    const name = (todayImage && todayImage.urlbase.split('OHR.')[1]) || ''
+    // bing每日一图
+    const todayImage = imageLocalState.value.bing.list[0]
+    const name = todayImage.name
     imageUrl = name ? getBingImageUrlFromName(name, quality) : ''
   }
+  console.log(imageUrl)
   return imageUrl
 }
 
@@ -75,7 +152,7 @@ export const isImageLoading = ref(false)
 const renderRawBackgroundImage = async () => {
   console.time('RenderRawImage')
   isImageLoading.value = true
-  let dbData: BackgroundImageItem | null = null
+  let dbData: TImage.BackgroundImageItem | null = null
   const storeName = localConfig.general.backgroundImageSource === 0 ? 'localBackgroundImages' : 'currBackgroundImages'
   dbData = await databaseStore(storeName, 'get', localState.value.currAppearanceCode)
   if (!dbData) {
@@ -111,7 +188,7 @@ const renderRawBackgroundImage = async () => {
   }
   imageState.currBackgroundImageFileName = localConfig.general.backgroundImageSource === 0 ? dbData.file.name : ''
   requestIdleCallback(() => {
-    const rawBlobUrl = URL.createObjectURL((dbData as BackgroundImageItem).file)
+    const rawBlobUrl = URL.createObjectURL((dbData as TImage.BackgroundImageItem).file)
     const rawImageEle = new Image()
     rawImageEle.src = rawBlobUrl
     rawImageEle.onload = () => {
@@ -123,7 +200,7 @@ const renderRawBackgroundImage = async () => {
 }
 
 const setCurrSmallBackgroundImage = async () => {
-  let dbData: BackgroundImageItem | null = null
+  let dbData: TImage.BackgroundImageItem | null = null
   const storeName = localConfig.general.backgroundImageSource === 0 ? 'localBackgroundImages' : 'currBackgroundImages'
   dbData = await databaseStore(storeName, 'get', localState.value.currAppearanceCode)
   if (!dbData) {
@@ -142,10 +219,10 @@ const deleteCurrRawBackgroundImageInDB = async () => {
 }
 
 const refreshTodayImage = async () => {
-  const oldTodayImageUrl = imageLocalState.value.imageList[0].url
-  await updateImages()
-  const newTodayImageUrl = imageLocalState.value.imageList[0].url
-  if (newTodayImageUrl !== oldTodayImageUrl) {
+  const oldTodayImage = imageLocalState.value.bing.list[0].name
+  await updateBingImages()
+  const newTodayImage = imageLocalState.value.bing.list[0].name
+  if (newTodayImage !== oldTodayImage) {
     await deleteCurrRawBackgroundImageInDB()
   }
   renderRawBackgroundImage()
@@ -165,7 +242,7 @@ export const initBackgroundImage = () => {
   }
 }
 
-//  资源无变化
+//  不涉及资源变化，直接从DB取
 watch([() => localState.value.currAppearanceCode], async () => {
   if (!localConfig.general.isBackgroundImageEnabled) {
     return

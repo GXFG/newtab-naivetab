@@ -378,6 +378,10 @@ const openPresetThemeDrawer = () => {
           </template>
         </NFormItem>
 
+        <NFormItem :label="$t('bookmark.tactileBumps')">
+          <NSwitch v-model:value="localConfig.bookmark.isTactileBumpsVisible" />
+        </NFormItem>
+
         <NFormItem :label="`${$t('bookmark.keycap')}Qwerty`">
           <NFormItem
             :label="`${$t('common.fontColor')}`"

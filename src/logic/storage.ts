@@ -365,37 +365,6 @@ export const importSetting = async (text: string) => {
   }
   log('FileContent', fileContent)
   try {
-    // handle old version 转换<0.9版本的旧配置文件结构
-    if (Object.prototype.hasOwnProperty.call(fileContent, 'style')) {
-      log('Old version config')
-      const newConfig = {} as any
-      for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
-        newConfig[configField] = {
-          ...(fileContent.style[configField] || {}),
-          ...(fileContent.setting[configField] || {}),
-        }
-      }
-      fileContent = newConfig
-      log('FileContentTransform', fileContent)
-    }
-    // handle old version 兼容小于1.0.0版本的旧image结构
-    if (compareLeftVersionLessThanRightVersions(fileContent.general.version, '1.0.0')) {
-      const oldBackgroundImageName = fileContent.general.backgroundImageName
-      if (oldBackgroundImageName) {
-        fileContent.general.backgroundImageNames = [oldBackgroundImageName, oldBackgroundImageName]
-        delete fileContent.general.backgroundImageName
-      }
-      const oldBackgroundImageDescs = fileContent.general.backgroundImageDesc
-      if (oldBackgroundImageDescs) {
-        fileContent.general.backgroundImageDescs = [oldBackgroundImageDescs, oldBackgroundImageDescs]
-        delete fileContent.general.backgroundImageDesc
-      }
-      const oldBackgroundImageCustomUrl = fileContent.general.backgroundImageCustomUrl
-      if (oldBackgroundImageCustomUrl) {
-        fileContent.general.backgroundImageCustomUrls = [oldBackgroundImageCustomUrl, oldBackgroundImageCustomUrl]
-        delete fileContent.general.backgroundImageCustomUrl
-      }
-    }
     // handle old version 兼容小于1.9.0版本的旧bookmark keymap结构
     if (compareLeftVersionLessThanRightVersions(fileContent.general.version, '1.9.0')) {
       for (const keyLabel of Object.keys(fileContent.bookmark.keymap)) {

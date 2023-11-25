@@ -2,14 +2,15 @@
 import { FAVORITE_IMAGE_MAX_COUNT } from '@/logic/const'
 import { createTab, downloadImageByUrl } from '@/logic/util'
 import { getStyleField, localConfig, localState } from '@/logic/store'
-import { isImageLoading, getBingImageUrlFromName } from '@/logic/image'
+import { isImageLoading, getImageUrlFromName } from '@/logic/image'
 
 const props = defineProps({
   data: {
     type: Object as () => {
-      url: string // 存在url时优先使用url，忽略bing name
-      name: string
-      desc: string
+      url?: string // 存在url时优先使用url，忽略name
+      networkSourceType?: 1 | 2 // 1 Bing, 2 Pexels
+      name?: string
+      desc?: string
     },
     required: true,
   },
@@ -32,10 +33,13 @@ const isHasImage = computed(() => (props.data.url && props.data.url.length !== 0
 const isToolbarVisible = computed(() => props.data.name && props.data.name.length !== 0)
 
 const currImageUrl = computed(() => {
+  let url = ''
   if (props.data.url && props.data.url.length !== 0) {
-    return props.data.url
+    url = props.data.url
+  } else if (props.data.networkSourceType && props.data.name) {
+    url = getImageUrlFromName(props.data.networkSourceType, props.data.name)
   }
-  return getBingImageUrlFromName(props.data.name)
+  return url
 })
 
 const isCurrSelectedImage = computed(() => {
@@ -53,23 +57,35 @@ const onSelectImage = () => {
   if (isImageLoading.value) {
     return
   }
-  localConfig.general.backgroundImageNames[localState.value.currAppearanceCode] = props.data.name
-  localConfig.general.backgroundImageDescs[localState.value.currAppearanceCode] = props.data.desc
+  if (props.data.networkSourceType) {
+    localConfig.general.backgroundNetworkSourceType = props.data.networkSourceType
+  }
+  localConfig.general.backgroundImageNames[localState.value.currAppearanceCode] = props.data.name || ''
+}
+
+const getOriginalImageUrl = () => {
+  let url = ''
+  if (props.data.url) {
+    url = props.data.url
+  } else if (props.data.networkSourceType && props.data.name) {
+    url = getImageUrlFromName(props.data.networkSourceType, props.data.name, 'high')
+  }
+  return url
 }
 
 const onViewImage = () => {
-  const url = getBingImageUrlFromName(props.data.name, 'UHD')
+  const url = getOriginalImageUrl()
   createTab(url)
 }
 
 const onSaveImage = () => {
-  const url = getBingImageUrlFromName(props.data.name, 'UHD')
+  const url = getOriginalImageUrl()
   downloadImageByUrl(url, props.data.name)
 }
 
 const isFavoriteIconVisible = computed(() => {
-  const favoriteBackgroundNameList = localConfig.general.favoriteImageList.map((item: FavoriteImageListItem) => item.name)
-  return !favoriteBackgroundNameList.includes(props.data.name)
+  const favoriteBackgroundNameList = localConfig.general.favoriteImageList.map((item) => item.name)
+  return !favoriteBackgroundNameList.includes(props.data.name || '')
 })
 
 const onFavoriteImage = () => {
@@ -77,15 +93,19 @@ const onFavoriteImage = () => {
     window.$message.error(window.$t('prompts.favoriteLimt'))
     return
   }
+  if (!props.data.networkSourceType) {
+    console.warn('networkSourceType is null')
+    return
+  }
   localConfig.general.favoriteImageList.push({
-    name: props.data.name,
-    desc: props.data.desc,
+    networkSourceType: props.data.networkSourceType,
+    name: props.data.name || '',
   })
   window.$message.success(`${window.$t('common.favorite')}${window.$t('common.success')}`)
 }
 
 const onUnFavoriteImage = () => {
-  const index = localConfig.general.favoriteImageList.findIndex((item: FavoriteImageListItem) => item.name === props.data.name)
+  const index = localConfig.general.favoriteImageList.findIndex((item) => item.name === props.data.name)
   localConfig.general.favoriteImageList.splice(index, 1)
 }
 
@@ -104,6 +124,7 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
       >
         <ph:image-square />
       </div>
+
       <!-- 懒加载的img不支持reactive变量 -->
       <img
         v-else-if="lazy"
@@ -118,6 +139,7 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
         @click="onSelectImage()"
       />
     </NSpin>
+
     <div
       v-if="isCurrSelectedImage"
       class="image__current-mask"
@@ -141,18 +163,21 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
         </template>
         <p>{{ props.data.desc }}</p>
       </NPopover>
+
       <div
         class="toolbar__icon"
         @click="onViewImage()"
       >
-        <uil:bullseye />
+        <tdesign:zoom-in />
       </div>
+
       <div
         class="toolbar__icon"
         @click="onSaveImage()"
       >
         <ri:download-2-fill />
       </div>
+
       <div
         v-if="isFavoriteIconVisible"
         class="toolbar__icon"
@@ -160,6 +185,7 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
       >
         <mi:favorite />
       </div>
+
       <!-- delete -->
       <NPopconfirm
         v-if="props.delete"

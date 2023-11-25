@@ -15,6 +15,8 @@ export const URL_DAYJS_FORMAT = 'https://dayjs.gitee.io/docs/zh-CN/display/forma
 export const URL_QWEATHER_HOME = 'https://www.qweather.com/'
 export const URL_QWEATHER_START = 'https://dev.qweather.com/docs/start'
 
+export const PEXELS_API = 'Ao3fG3suWGpoXTKYLycwrSLHSITran9E3MoHxxsTVT5z1aHjCDxZcr3m'
+
 /**
  * MAX_WRITE_OPERATIONS_PER_HOUR = 1800 https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
  * 3600s / 1800 = 2s
@@ -24,7 +26,7 @@ export const MERGE_CONFIG_MAX_DELAY = 5000
 
 export const DRAG_TRIGGER_DISTANCE = 20
 
-export const FAVORITE_IMAGE_MAX_COUNT = 16
+export const FAVORITE_IMAGE_MAX_COUNT = 30
 
 export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
 
