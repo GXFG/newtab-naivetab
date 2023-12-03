@@ -69,7 +69,7 @@ const menuList = computed(() => {
         {
           label: window.$t('rightMenu.buyACupOfCoffee'),
           key: 'buyACupOfCoffee',
-          icon: renderIconFunc('ep:coffee'),
+          icon: renderIconFunc('ci:coffee-togo'),
         },
         {
           label: window.$t('rightMenu.goodReview'),
