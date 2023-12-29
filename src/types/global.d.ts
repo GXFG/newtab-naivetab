@@ -89,7 +89,7 @@ interface ChromeBookmarkItem {
   index: number // 1
   parentId: string // "106"
   title: string // "StackBlitz"
-  url: string // "https://stackblitz.com/"
+  url?: string // "https://stackblitz.com/"
   children: ChromeBookmarkItem[]
 }
 

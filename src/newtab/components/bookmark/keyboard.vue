@@ -2,11 +2,11 @@
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/const'
-import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, SPACE_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, SPACE_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList, getKeyIndexFromList } from '@/logic/keyboard'
 import { addKeydownTask } from '@/logic/task'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
-import { getFaviconFromUrl, getBookmarkConfigName, getBookmarkConfigUrl } from '@/logic/bookmark'
+import { state as bookmarkState, currFolderBookmarks, getBookmarkForKeyboard, getFaviconFromUrl, getBookmarkConfigName, getBookmarkConfigUrl } from '@/logic/bookmark'
 
 const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
@@ -57,14 +57,23 @@ const openPage = (url: string, isBgOpen = false, isNewTabOpen = false) => {
   window.location.href = url
 }
 
-const onMouseDownKey = (e: MouseEvent, code: string, url: string) => {
-  if (isDragMode.value || url.length === 0) {
+const onMouseDownKey = (e: MouseEvent, keyCode: string, keyIndex: number) => {
+  if (isDragMode.value) {
+    return
+  }
+  const url = getBookmarkConfigUrl(keyCode, keyIndex)
+  if (url.length === 0) {
+    return
+  }
+  if (url === 'type__folder') {
+    const bookmarkItem = currFolderBookmarks.value[keyIndex] || {}
+    bookmarkState.selectedFolderTitleStack.push(bookmarkItem.title)
     return
   }
   const { button, shiftKey, altKey } = e
   if (button === 0) {
     // 按下鼠标左键
-    state.currSelectKeyCode = code
+    state.currSelectKeyCode = keyCode
     openPage(url, shiftKey, altKey) // shift + 点击key后台打开书签，alt + key 新标签页打开
   } else if (button === 1) {
     // 按下鼠标中键
@@ -91,7 +100,8 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (!keyboardCurrentModelAllKeyList.value.includes(code)) {
     return
   }
-  const url = getBookmarkConfigUrl(code)
+  // TODO
+  const url = getBookmarkConfigUrl(code, 1)
   // shift + key 后台打开书签，alt + key 新标签页打开
   if (!localConfig.bookmark.isDblclickOpen) {
     state.currSelectKeyCode = code
@@ -110,6 +120,10 @@ const keyboardTask = (e: KeyboardEvent) => {
 }
 
 addKeydownTask(CNAME, keyboardTask)
+
+onMounted(() => {
+  getBookmarkForKeyboard()
+})
 
 const dragStyle = ref('')
 
@@ -294,10 +308,10 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
           class="bookmark__row"
         >
           <div
-            v-for="code in rowItem"
-            :key="code"
+            v-for="(keyCode, columnIndex) in rowItem"
+            :key="keyCode"
             class="row__keycap-wrap"
-            :style="getKeycapWrapStyle(code)"
+            :style="getKeycapWrapStyle(keyCode)"
           >
             <div
               v-if="localConfig.bookmark.isShellVisible && localConfig.bookmark.isPlateVisible"
@@ -312,13 +326,13 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                 'row__keycap-dsa': localConfig.bookmark.keycapType === 'dsa',
                 'row__keycap--move': isDragMode,
                 'row__keycap--hover': !isDragMode,
-                'row__keycap--active': state.currSelectKeyCode === code,
+                'row__keycap--active': state.currSelectKeyCode === keyCode,
                 'row__keycap--border': localConfig.bookmark.isKeycapBorderEnabled,
               }"
-              :style="getKeycapStyle(code)"
-              :title="getBookmarkConfigName(code) ? `${getBookmarkConfigName(code)}・${getBookmarkConfigUrl(code)}` : ''"
-              :data-code="code"
-              @mousedown="onMouseDownKey($event, code, getBookmarkConfigUrl(code))"
+              :style="getKeycapStyle(keyCode)"
+              :title="getBookmarkConfigName(keyCode, getKeyIndexFromList(rowIndex, columnIndex)) ? getBookmarkConfigUrl(keyCode, getKeyIndexFromList(rowIndex, columnIndex)) : ''"
+              :data-code="keyCode"
+              @mousedown="onMouseDownKey($event, keyCode, getKeyIndexFromList(rowIndex, columnIndex))"
             >
               <div
                 class="keycap__stage"
@@ -327,10 +341,10 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                   'keycap__stage-gmk': localConfig.bookmark.keycapType === 'gmk',
                   'keycap__stage-dsa': localConfig.bookmark.keycapType === 'dsa',
                 }"
-                :style="getKeycapStageStyle(code)"
+                :style="getKeycapStageStyle(keyCode)"
               >
                 <div
-                  v-if="state.currSelectKeyCode === code && state.isLoadPageLoading"
+                  v-if="state.currSelectKeyCode === keyCode && state.isLoadPageLoading"
                   class="item__loading"
                 >
                   <eos-icons:loading />
@@ -340,24 +354,24 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                 <p
                   v-if="localConfig.bookmark.isCapKeyVisible"
                   class="item__key"
-                  :style="getKeycapTextStyle(code)"
+                  :style="getKeycapTextStyle(keyCode)"
                 >
-                  {{ getKeycapLabel(code) || '&nbsp;' }}
+                  {{ getKeycapLabel(keyCode) || '&nbsp;' }}
                 </p>
 
                 <!-- favicon -->
                 <div
                   class="item__img"
-                  :style="getKeycapIconStyle(code)"
+                  :style="getKeycapIconStyle(keyCode)"
                 >
                   <div
                     v-if="localConfig.bookmark.isFaviconVisible"
                     class="img__wrap"
                   >
                     <img
-                      v-if="getBookmarkConfigUrl(code)"
+                      v-if="getBookmarkConfigUrl(keyCode, getKeyIndexFromList(rowIndex, columnIndex))"
                       class="img__main"
-                      :src="getFaviconFromUrl(getBookmarkConfigUrl(code))"
+                      :src="getFaviconFromUrl(getBookmarkConfigUrl(keyCode, getKeyIndexFromList(rowIndex, columnIndex)))"
                       :draggable="false"
                     />
                   </div>
@@ -367,14 +381,14 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                 <p
                   v-if="localConfig.bookmark.isNameVisible"
                   class="item__name"
-                  :style="getKeycapTextStyle(code)"
+                  :style="getKeycapTextStyle(keyCode)"
                 >
-                  {{ getBookmarkConfigName(code) || '&nbsp;' }}
+                  {{ getBookmarkConfigName(keyCode, getKeyIndexFromList(rowIndex, columnIndex)) || '&nbsp;' }}
                 </p>
 
                 <!-- 按键触摸点F & J -->
                 <div
-                  v-if="localConfig.bookmark.isTactileBumpsVisible && ['KeyF', 'KeyJ'].includes(code)"
+                  v-if="localConfig.bookmark.isTactileBumpsVisible && ['KeyF', 'KeyJ'].includes(keyCode)"
                   class="item__tactile_bumps"
                 />
               </div>

@@ -74,6 +74,7 @@ export const defaultConfig = {
     isDblclickOpen: false,
     dblclickIntervalTime: 200, // ms
     isNewTabOpen: false,
+    isFromSystemSource: true,
     keymap: {
       KeyQ: {
         url: 'www.baidu.com',

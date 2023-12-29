@@ -2,7 +2,7 @@
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
 import { SECOND_MODAL_WIDTH } from '@/logic/const'
-import { getFaviconFromUrl } from '@/logic/bookmark'
+import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark'
 
 const props = defineProps({
   show: {
@@ -45,25 +45,13 @@ const handleUpdateShow = (value: boolean) => {
   onClose()
 }
 
-const onGetBookmark = (): Promise<chrome.bookmarks.BookmarkTreeNode[]> => {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.bookmarks.getTree((bookmarks) => {
-        resolve(bookmarks)
-      })
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
 const formatBookmark = (root: ChromeBookmarkItem[]) => {
   const res = [] as ChromeBookmarkItem[]
   for (const item of root) {
     const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
     const curr = {
       ...item,
-      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url) }), // favicon
+      prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url || '') }), // favicon
     }
     if (isFolder) {
       curr.children = formatBookmark(item.children)
@@ -75,8 +63,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
 }
 
 const onInitBookmarks = async () => {
-  const res = (await onGetBookmark()) as ChromeBookmarkItem[]
-  let root = res[0].children
+  let root = await getBrowserBookmark()
   root = formatBookmark(root)
   state.bookmarks = root
 }
