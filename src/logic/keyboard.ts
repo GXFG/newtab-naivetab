@@ -1306,11 +1306,3 @@ export const currKeyboardConfig = computed(() => {
 })
 
 export const keyboardCurrentModelAllKeyList = computed(() => currKeyboardConfig.value.list.flat(Infinity))
-
-export const getKeyIndexFromList = (rowIndex: number, columnIndex: number) => {
-  if (rowIndex === 0) {
-    return columnIndex
-  }
-  const index = currKeyboardConfig.value.list.slice(0, rowIndex).flat(Infinity).length + columnIndex
-  return index
-}

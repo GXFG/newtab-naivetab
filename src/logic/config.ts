@@ -173,9 +173,9 @@ export const defaultConfig = {
     keycapKeyFontSize: 12,
     isNameVisible: true,
     keycapBookmarkFontFamily: 'Arial',
-    keycapBookmarkFontSize: 11,
+    keycapBookmarkFontSize: 10,
     isFaviconVisible: true,
-    faviconSize: 1,
+    faviconSize: 0.85,
     isTactileBumpsVisible: true,
     // keycap color
     mainFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],

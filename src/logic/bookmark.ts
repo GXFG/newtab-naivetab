@@ -76,9 +76,10 @@ export const currFolderBookmarks = computed(() => {
   return findTargetFolerBookmark(state.systemBookmarks, state.selectedFolderTitleStack)
 })
 
-export const getBookmarkConfigName = (keyCode: string, keyIndex: number) => {
+export const getBookmarkConfigName = (keyCode: string) => {
   if (localConfig.bookmark.isFromSystemSource) {
-    return currFolderBookmarks.value[keyIndex]?.title || ''
+    const targetIndex = keyboardCurrentModelAllKeyList.value.indexOf(keyCode)
+    return currFolderBookmarks.value[targetIndex]?.title || ''
   }
   if (!localConfig.bookmark.keymap[keyCode]) {
     return ''
@@ -86,11 +87,10 @@ export const getBookmarkConfigName = (keyCode: string, keyIndex: number) => {
   return localConfig.bookmark.keymap[keyCode].name || getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[keyCode].url)
 }
 
-export const getBookmarkConfigUrl = (keyCode: string, keyIndex: number) => {
-  const targetIndex = keyboardCurrentModelAllKeyList.value.indexOf(keyCode)
-  console.log(keyCode, targetIndex)
+export const getBookmarkConfigUrl = (keyCode: string) => {
   if (localConfig.bookmark.isFromSystemSource) {
-    const bookmarkItem = currFolderBookmarks.value[keyIndex] || {}
+    const targetIndex = keyboardCurrentModelAllKeyList.value.indexOf(keyCode)
+    const bookmarkItem = currFolderBookmarks.value[targetIndex] || {}
     const isFolder = Object.prototype.hasOwnProperty.call(bookmarkItem, 'children')
     return isFolder ? 'type__folder' : bookmarkItem?.url || ''
   }

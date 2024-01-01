@@ -2,7 +2,7 @@
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/const'
-import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, SPACE_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList, getKeyIndexFromList } from '@/logic/keyboard'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_NOT_ALLOW_KEYCODE_LIST, SPACE_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
 import { addKeydownTask } from '@/logic/task'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
@@ -57,16 +57,17 @@ const openPage = (url: string, isBgOpen = false, isNewTabOpen = false) => {
   window.location.href = url
 }
 
-const onMouseDownKey = (e: MouseEvent, keyCode: string, keyIndex: number) => {
+const onMouseDownKey = (e: MouseEvent, keyCode: string) => {
   if (isDragMode.value) {
     return
   }
-  const url = getBookmarkConfigUrl(keyCode, keyIndex)
+  const url = getBookmarkConfigUrl(keyCode)
   if (url.length === 0) {
     return
   }
   if (url === 'type__folder') {
-    const bookmarkItem = currFolderBookmarks.value[keyIndex] || {}
+    const targetIndex = keyboardCurrentModelAllKeyList.value.indexOf(keyCode)
+    const bookmarkItem = currFolderBookmarks.value[targetIndex] || {}
     bookmarkState.selectedFolderTitleStack.push(bookmarkItem.title)
     return
   }
@@ -100,8 +101,7 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (!keyboardCurrentModelAllKeyList.value.includes(code)) {
     return
   }
-  // TODO
-  const url = getBookmarkConfigUrl(code, 1)
+  const url = getBookmarkConfigUrl(code)
   // shift + key 后台打开书签，alt + key 新标签页打开
   if (!localConfig.bookmark.isDblclickOpen) {
     state.currSelectKeyCode = code
@@ -308,7 +308,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
           class="bookmark__row"
         >
           <div
-            v-for="(keyCode, columnIndex) in rowItem"
+            v-for="keyCode in rowItem"
             :key="keyCode"
             class="row__keycap-wrap"
             :style="getKeycapWrapStyle(keyCode)"
@@ -330,9 +330,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                 'row__keycap--border': localConfig.bookmark.isKeycapBorderEnabled,
               }"
               :style="getKeycapStyle(keyCode)"
-              :title="getBookmarkConfigName(keyCode, getKeyIndexFromList(rowIndex, columnIndex)) ? getBookmarkConfigUrl(keyCode, getKeyIndexFromList(rowIndex, columnIndex)) : ''"
+              :title="getBookmarkConfigName(keyCode) ? getBookmarkConfigUrl(keyCode) : ''"
               :data-code="keyCode"
-              @mousedown="onMouseDownKey($event, keyCode, getKeyIndexFromList(rowIndex, columnIndex))"
+              @mousedown="onMouseDownKey($event, keyCode)"
             >
               <div
                 class="keycap__stage"
@@ -368,12 +368,20 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                     v-if="localConfig.bookmark.isFaviconVisible"
                     class="img__wrap"
                   >
-                    <img
-                      v-if="getBookmarkConfigUrl(keyCode, getKeyIndexFromList(rowIndex, columnIndex))"
-                      class="img__main"
-                      :src="getFaviconFromUrl(getBookmarkConfigUrl(keyCode, getKeyIndexFromList(rowIndex, columnIndex)))"
-                      :draggable="false"
-                    />
+                    <template v-if="getBookmarkConfigUrl(keyCode)">
+                      <div
+                        v-if="getBookmarkConfigUrl(keyCode) === 'type__folder'"
+                        class="img__folder"
+                      >
+                        <ic:outline-folder class="folder__icon" />
+                      </div>
+                      <img
+                        v-else
+                        class="img__icon"
+                        :src="getFaviconFromUrl(getBookmarkConfigUrl(keyCode))"
+                        :draggable="false"
+                      />
+                    </template>
                   </div>
                 </div>
 
@@ -383,7 +391,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                   class="item__name"
                   :style="getKeycapTextStyle(keyCode)"
                 >
-                  {{ getBookmarkConfigName(keyCode, getKeyIndexFromList(rowIndex, columnIndex)) || '&nbsp;' }}
+                  {{ getBookmarkConfigName(keyCode) || '&nbsp;' }}
                 </p>
 
                 <!-- 按键触摸点F & J -->
@@ -474,7 +482,14 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
               .img__wrap {
                 height: 100%;
                 transform: scale(v-bind(customBookmarkFaviconSize));
-                .img__main {
+                .img__folder {
+                  height: 100%;
+                  .folder__icon {
+                    width: 100%;
+                    height: 100%;
+                  }
+                }
+                .img__icon {
                   height: 100%;
                 }
               }
