@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { createTab } from '@/logic/util'
-import { URL_GITHUB_HOME, URL_NAIVETAB_DOC_HOME } from '@/logic/const'
-import { getStyleConst, localConfig, globalState } from '@/logic/store'
+import { isEdge } from '@/env'
+import { URL_NAIVETAB_DOC_HOME, URL_CHROME_STORE, URL_EDGE_STORE } from '@/logic/const'
+import { getStyleConst, localConfig, globalState, openSponsorModal } from '@/logic/store'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting/index.vue'
 import BookmarkSetting from './components/BookmarkSetting/index.vue'
@@ -135,7 +136,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
             <NButton
               text
               class="right__icon"
-              title="Guide"
+              :title="$t('rightMenu.userGuide')"
               @click="createTab(URL_NAIVETAB_DOC_HOME)"
             >
               <material-symbols:book-2-outline />
@@ -143,10 +144,18 @@ const bgBottomBar = getStyleConst('bgBottomBar')
             <NButton
               text
               class="right__icon"
-              title="GitHub"
-              @click="createTab(URL_GITHUB_HOME)"
+              :title="$t('rightMenu.buyACupOfCoffee')"
+              @click="openSponsorModal()"
             >
-              <carbon:logo-github />
+              <ci:coffee-togo />
+            </NButton>
+            <NButton
+              text
+              class="right__icon"
+              :title="$t('rightMenu.goodReview')"
+              @click="createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)"
+            >
+              <ph:thumbs-up-bold />
             </NButton>
           </div>
         </div>

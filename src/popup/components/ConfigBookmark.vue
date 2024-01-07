@@ -100,7 +100,7 @@ const onOpenBookmarkPicker = async () => {
 
 const onSelectBookmark = (payload: ChromeBookmarkItem) => {
   state.name = payload.title
-  state.url = payload.url
+  state.url = payload.url || ''
   onCommitConfigBookmark()
 }
 

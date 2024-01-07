@@ -1,8 +1,11 @@
 {
   "common": {
     "version": "Version",
+    "confirmation": "Confirmation",
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "allow": "Allow",
+    "deny": "Deny",
     "open": "Open",
     "close": "Close",
     "exit": "Exit",
@@ -84,6 +87,9 @@
   "form": {
     "applyToAppearance": "Apply to appearance",
     "photoOfTheDay": "Bing Photo of the day"
+  },
+  "permission": {
+    "bookmark": "To display your browser bookmarks, the Keyboard Bookmark Widget requires access permissions."
   },
   "prompts": {
     "linkTips": "Click on ? icon to access the link below",
@@ -176,13 +182,18 @@
     "apMark": "a.p./p.m."
   },
   "bookmark": {
+    "bookmarkSource": "Bookmarks source",
+    "systemBrowser": "Browser",
+    "thisExtension": "This extension",
+    "defaultDisplayFolderTitle": "Expand Folder",
+    "rootDirectory": "Root directory",
     "listenBackgroundKeystrokes": "Global shortcuts",
     "listenBackgroundKeystrokesTips": "Customize shortcut keys to quickly open specified bookmarks in the browser",
-    "newTabOpen": "Open in newtab",
     "dblclickKeyToOpen": "Dblclick open",
     "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
     "intervalTime": "Interval time",
     "intervalTimeTips": "The effective interval for double-clicking",
+    "newTabOpen": "Open in newtab",
     "configBookmark": "Config Bookmark",
     "keyboard": "Keyboard",
     "presetTheme": "Preset Theme",

@@ -69,11 +69,13 @@ export const defaultConfig = {
     ],
   },
   bookmark: {
-    enabled: false,
+    enabled: true,
+    source: 2, // 1browser, 2naivetab
     isListenBackgroundKeystrokes: true,
     isDblclickOpen: false,
     dblclickIntervalTime: 200, // ms
     isNewTabOpen: false,
+    defaultExpandFolder: null as null | string,
     keymap: {
       KeyQ: {
         url: 'www.baidu.com',
@@ -172,9 +174,9 @@ export const defaultConfig = {
     keycapKeyFontSize: 12,
     isNameVisible: true,
     keycapBookmarkFontFamily: 'Arial',
-    keycapBookmarkFontSize: 11,
+    keycapBookmarkFontSize: 10,
     isFaviconVisible: true,
-    faviconSize: 1,
+    faviconSize: 0.85,
     isTactileBumpsVisible: true,
     // keycap color
     mainFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
