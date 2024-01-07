@@ -294,6 +294,11 @@ export const handleAppUpdate = async () => {
       localConfig.bookmark.keyboardType = 'key61'
     }
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
+    const keymapLength = Object.keys(localConfig.bookmark.keymap).length
+    localConfig.bookmark.source = keymapLength === 0 ? 1 : 2
+    localConfig.bookmark.defaultExpandFolder = null
+  }
   // 更新local版本号
   localConfig.general.version = pkg.version
   // updateSuccess()

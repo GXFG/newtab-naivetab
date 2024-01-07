@@ -1,8 +1,11 @@
 {
   "common": {
     "version": "版本",
+    "confirmation": "确认",
     "confirm": "确定",
     "cancel": "取消",
+    "allow": "允许",
+    "deny": "拒绝",
     "open": "打开",
     "close": "关闭",
     "exit": "退出",
@@ -84,6 +87,9 @@
   "form": {
     "applyToAppearance": "应用于外观",
     "photoOfTheDay": "Bing每日一图"
+  },
+  "permission": {
+    "bookmark": "为了展示您的浏览器书签，键盘书签组件需获取访问权限。"
   },
   "prompts": {
     "linkTips": "点击 ? 图标，访问以下链接",
@@ -175,13 +181,18 @@
     "apMark": "a.p./p.m."
   },
   "bookmark": {
+    "bookmarkSource": "书签来源",
+    "systemBrowser": "浏览器",
+    "thisExtension": "本扩展程序",
+    "defaultDisplayFolderTitle": "默认展开文件夹",
+    "rootDirectory": "根目录",
     "listenBackgroundKeystrokes": "全局快捷键",
     "listenBackgroundKeystrokesTips": "自定义快捷键，实现在浏览器内快速打开指定书签",
-    "newTabOpen": "在新标签页打开",
     "dblclickKeyToOpen": "双击按键打开",
     "dblclickKeyToOpenTips": "双击键盘按键以打开书签，防止误触按键",
     "intervalTime": "最大间隔时间",
     "intervalTimeTips": "识别在多长时间内的双击操作",
+    "newTabOpen": "在新标签页打开",
     "configBookmark": "配置书签",
     "keyboard": "键盘",
     "presetTheme": "预设主题",

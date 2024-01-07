@@ -7,6 +7,7 @@ import { handleWatchLocalConfigChange, handleMissedUploadConfig, loadRemoteConfi
 import { handleFirstOpen } from '@/logic/guide'
 import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, handleStateResetAndUpdate, handleAppUpdate } from '@/logic/store'
 import { initBackgroundImage } from '@/logic/image'
+import { initBookmarkData } from '@/logic/bookmark'
 import { handleWatchNewsConfigChange } from '@/logic/news'
 import { handleWatchWeatherConfigChange } from '@/logic/weather'
 import { updatePoetry } from '@/logic/poetry'
@@ -47,6 +48,7 @@ onMounted(async () => {
   startTimer()
   startKeydown()
   handleWatchLocalConfigChange()
+  initBookmarkData()
   await handleMissedUploadConfig()
   await loadRemoteConfig()
   await nextTick()

@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { requestPermission } from '@/logic/storage'
 import { KEYBOARD_TYPE_OPTION, SPLIT_SPACE_OPTION, KEYCAP_TYPE_OPTION } from '@/logic/keyboard'
+import { state as bookmarkState, getBrowserBookmarkForKeyboard } from '@/logic/bookmark'
 import { availableFontOptions, fontSelectRenderLabel, localState, localConfig, openConfigShortcutsPage } from '@/logic/store'
 import BookmarkConfig from './BookmarkConfig.vue'
 import PresetThemeDrawer from './PresetThemeDrawer.vue'
@@ -9,14 +11,40 @@ const state = reactive({
   currImporKey: '',
 })
 
+const bookmarkSourceList = computed(() => [
+  { label: window.$t('bookmark.systemBrowser'), value: 1 },
+  { label: window.$t('bookmark.thisExtension'), value: 2 },
+])
+
+const handleBookmarkSourceChange = async (source: number) => {
+  if (source === 2) {
+    return
+  }
+  const granted = await requestPermission('bookmarks')
+  if (!granted) {
+    localConfig.bookmark.source = 2
+    return
+  }
+  getBrowserBookmarkForKeyboard()
+}
+
+const defaultFolderOptions = computed(() => {
+  return bookmarkState.systemBookmarks
+    .filter((item) => Object.prototype.hasOwnProperty.call(item, 'children'))
+    .map((item) => ({
+      label: item.title,
+      value: item.title,
+    }))
+})
+
+const handleDefaultFolderTitleChange = (value: string) => {
+  bookmarkState.selectedFolderTitleStack = value ? [value] : []
+}
+
 const onOpenPopup = () => {
   if (chrome.action.openPopup) {
     chrome.action.openPopup()
   }
-}
-
-const openPresetThemeDrawer = () => {
-  state.isPresetThemeDrawerVisible = true
 }
 </script>
 
@@ -30,6 +58,33 @@ const openPresetThemeDrawer = () => {
       :border-radius-range="[0, 40]"
     >
       <template #header>
+        <NFormItem :label="$t('bookmark.bookmarkSource')">
+          <NRadioGroup
+            v-model:value="localConfig.bookmark.source"
+            @update:value="handleBookmarkSourceChange"
+          >
+            <NRadioButton
+              v-for="item in bookmarkSourceList"
+              :key="item.value"
+              :value="item.value"
+            >
+              {{ item.label }}
+            </NRadioButton>
+          </NRadioGroup>
+        </NFormItem>
+        <NFormItem
+          v-if="localConfig.bookmark.source === 1"
+          :label="$t('bookmark.defaultDisplayFolderTitle')"
+        >
+          <NSelect
+            v-model:value="localConfig.bookmark.defaultExpandFolder"
+            :options="defaultFolderOptions"
+            :placeholder="$t('bookmark.rootDirectory')"
+            clearable
+            @update:value="handleDefaultFolderTitleChange"
+          />
+        </NFormItem>
+
         <NFormItem :label="$t('bookmark.listenBackgroundKeystrokes')">
           <div class="setting__input-wrap">
             <div class="setting__input_item">
@@ -133,7 +188,7 @@ const openPresetThemeDrawer = () => {
           <NButton
             type="primary"
             ghost
-            @click="openPresetThemeDrawer()"
+            @click="state.isPresetThemeDrawerVisible = true"
           >
             <mingcute:finger-press-line />&nbsp;{{ $t('common.select') }}
           </NButton>

@@ -69,12 +69,13 @@ export const defaultConfig = {
     ],
   },
   bookmark: {
-    enabled: false,
+    enabled: true,
+    source: 2, // 1browser, 2naivetab
     isListenBackgroundKeystrokes: true,
     isDblclickOpen: false,
     dblclickIntervalTime: 200, // ms
     isNewTabOpen: false,
-    isFromSystemSource: true,
+    defaultExpandFolder: null as null | string,
     keymap: {
       KeyQ: {
         url: 'www.baidu.com',

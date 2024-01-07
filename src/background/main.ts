@@ -1,5 +1,6 @@
-// !!background Cannot use import statement outside a module
+// ! background Cannot use import statement outside a module
 // import browser from 'webextension-polyfill'
+import { defaultConfig } from '@/logic/config'
 import { log, createTab, padUrlHttps } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
 
@@ -44,7 +45,7 @@ const ALL_COMMAND_KEYCODE = [
   'Period',
 ]
 
-let bookmarkConfig = null as any
+let bookmarkConfig = defaultConfig.bookmark
 
 const getBookmarkConfigData = async () =>
   new Promise((resolve) => {
@@ -60,14 +61,15 @@ let dblclickTimer: NodeJS.Timeout
 let laskCommand = ''
 
 const handleKeyboard = async (command: string) => {
-  await getBookmarkConfigData()
-  if (!bookmarkConfig.isListenBackgroundKeystrokes) {
-    return
-  }
   const keycode = command
   if (!ALL_COMMAND_KEYCODE.includes(keycode)) {
     return
   }
+  await getBookmarkConfigData()
+  if (!bookmarkConfig.isListenBackgroundKeystrokes) {
+    return
+  }
+  // TODO browset bookmark
   let url: string = bookmarkConfig.keymap[keycode] ? bookmarkConfig.keymap[keycode].url : ''
   if (url.length === 0) {
     return
