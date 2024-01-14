@@ -155,7 +155,7 @@
     "pageTitle": "Page title",
     "followSystem": "Follow system",
     "defaultFocus": "Default focus",
-    "focusBrowserDefault": "default",
+    "focusBrowserDefault": "default(Browser address bar)",
     "focusRoot": "root element",
     "loadPageAnimation": "Load animation",
     "fadeIn": "Fade in",

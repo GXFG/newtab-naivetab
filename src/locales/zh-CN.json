@@ -154,7 +154,7 @@
     "pageTitle": "页面标题",
     "followSystem": "跟随系统",
     "defaultFocus": "默认焦点",
-    "focusBrowserDefault": "默认",
+    "focusBrowserDefault": "默认（浏览器地址栏）",
     "focusRoot": "根元素",
     "loadPageAnimation": "载入动画",
     "fadeIn": "淡入",

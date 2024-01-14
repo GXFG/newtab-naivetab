@@ -238,8 +238,14 @@ const handleBackgroundImageCustomUrlBlur = () => {
   </NDrawer>
 </template>
 
-<style scoped>
+<style>
 .drawer__content {
+  .n-tabs .n-tabs-nav {
+    position: sticky;
+    top: -10px;
+    z-index: 1;
+    background-color: var(--n-tab-color-segment);
+  }
   .form__local {
     display: flex;
     flex-direction: column;

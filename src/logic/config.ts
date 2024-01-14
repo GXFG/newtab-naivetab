@@ -11,7 +11,7 @@ export const defaultConfig = {
     pageTitle: CURR_LANG === 'zh-CN' ? '新标签页' : 'NaiveTab',
     lang: CURR_LANG,
     drawerPlacement: 'right' as 'left' | 'right',
-    openPageFocusElement: 'root' as 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard',
+    openPageFocusElement: 'default' as 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard',
     isLoadPageAnimationEnabled: true,
     loadPageAnimationType: 'fade-in' as 'fade-in' | 'zoom-in',
     isBackgroundImageEnabled: true,

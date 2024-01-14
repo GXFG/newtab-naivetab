@@ -69,7 +69,7 @@ const handleKeyboard = async (command: string) => {
   if (!bookmarkConfig.isListenBackgroundKeystrokes) {
     return
   }
-  // TODO browset bookmark
+  // TODO browser bookmark
   let url: string = bookmarkConfig.keymap[keycode] ? bookmarkConfig.keymap[keycode].url : ''
   if (url.length === 0) {
     return
