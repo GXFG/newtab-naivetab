@@ -32,7 +32,7 @@ const onCloseModal = () => {
           <div class="item__img">
             <img
               class="img__main"
-              :src="`/assets/img/sponsor/${payment}.png`"
+              :src="`/assets/img/sponsor/${payment}.jpg`"
               alt=""
             />
           </div>
