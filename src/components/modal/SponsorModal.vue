@@ -17,9 +17,11 @@ const onCloseModal = () => {
       class="card__wrap"
       :title="`${$t('sponsor.title')} ☕️`"
     >
-      <p class="modal__content">
-        {{ $t('sponsor.content') }}
-      </p>
+      <div class="modal__content">
+        <p class="content__item">{{ $t('sponsor.content1') }}</p>
+        <p class="content__item">{{ $t('sponsor.content2') }}</p>
+        <p class="content__item">{{ $t('sponsor.content3') }}</p>
+      </div>
 
       <div class="modal__code">
         <div
@@ -62,22 +64,25 @@ const onCloseModal = () => {
 
 <style scoped>
 .card__wrap {
-  width: 500px;
+  width: 600px;
 }
 .modal__content {
   height: auto;
+  .content__item {
+    margin: 10px 0;
+  }
 }
 .modal__code {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  margin: 15px 0;
+  margin: 10px 30px;
   .code__item {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 40%;
+    width: 38%;
     .item__img {
       .img__main {
         width: 100%;
@@ -85,7 +90,7 @@ const onCloseModal = () => {
     }
     .item__title {
       text-align: center;
-      opacity: 0.7;
+      opacity: 0.8;
     }
   }
 }

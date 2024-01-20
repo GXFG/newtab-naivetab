@@ -40,6 +40,11 @@ const menuList = computed(() => {
       key: 'd1',
     },
     {
+      label: window.$t('rightMenu.buyACupOfCoffee'),
+      key: 'buyACupOfCoffee',
+      icon: renderIconFunc('ci:coffee-togo'),
+    },
+    {
       label: window.$t('rightMenu.userHelp'),
       key: 'userHelp',
       icon: renderIconFunc('ic:baseline-help-outline'),
@@ -62,23 +67,6 @@ const menuList = computed(() => {
       ],
     },
     {
-      label: window.$t('rightMenu.encourage'),
-      key: 'encourage',
-      icon: renderIconFunc('ph:heart-bold'),
-      children: [
-        {
-          label: window.$t('rightMenu.buyACupOfCoffee'),
-          key: 'buyACupOfCoffee',
-          icon: renderIconFunc('ci:coffee-togo'),
-        },
-        {
-          label: window.$t('rightMenu.goodReview'),
-          key: 'goodReview',
-          icon: renderIconFunc('ph:thumbs-up-bold'),
-        },
-      ],
-    },
-    {
       label: window.$t('rightMenu.feedback'),
       key: 'feedback',
       icon: renderIconFunc('bx:message-rounded-dots'),
@@ -92,6 +80,11 @@ const menuList = computed(() => {
           label: 'Email',
           key: 'feedbackEmail',
           icon: renderIconFunc('mdi:email-outline'),
+        },
+        {
+          label: window.$t('rightMenu.goodReview'),
+          key: 'goodReview',
+          icon: renderIconFunc('ph:thumbs-up-bold'),
         },
       ],
     },

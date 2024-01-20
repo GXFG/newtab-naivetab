@@ -27,6 +27,16 @@ const keycapName = computed(() => getKeycapName(props.keyCode))
 const keycapBookmarkUrl = computed(() => getKeycapUrl(props.keyCode))
 const keycapType = computed(() => getKeycapType(props.keyCode))
 
+const keycapTitle = computed(() => {
+  if (keycapName.value.length === 0) {
+    return ''
+  }
+  if (keycapBookmarkUrl.value.length === 0) {
+    return keycapName.value
+  }
+  return `${keycapName.value} · ${keycapBookmarkUrl.value}`
+})
+
 const onMouseDownKey = (event: MouseEvent, keyCode: string) => {
   if (isDragMode.value) {
     return
@@ -180,8 +190,8 @@ const keycapStageClassName = computed(() => {
     class="row__keycap"
     :class="rowKeycapClassName"
     :style="keycapStyle"
+    :title="keycapTitle"
     :data-code="keyCode"
-    :title="`${keycapName} ${keycapBookmarkUrl}`"
     @mousedown="onMouseDownKey($event, keyCode)"
   >
     <div
