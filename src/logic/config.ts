@@ -82,60 +82,16 @@ export const defaultConfig = {
         name: '',
       },
       KeyW: {
-        url: 'www.weibo.com',
-        name: 'weibo',
-      },
-      KeyE: {
-        url: 'www.toutiao.com',
-        name: '',
-      },
-      KeyR: {
-        url: 'www.draw.io',
-        name: '',
-      },
-      KeyT: {
-        url: 'stackblitz.com',
-        name: '',
-      },
-      KeyA: {
-        url: 'www.taobao.com',
-        name: '',
-      },
-      KeyS: {
-        url: 'www.jd.com',
-        name: '',
-      },
-      KeyD: {
-        url: 'www.douban.com',
-        name: '',
-      },
-      KeyG: {
         url: 'www.google.com',
         name: '',
       },
-      KeyZ: {
-        url: 'www.zhihu.com',
+      KeyE: {
+        url: 'www.bing.com',
         name: '',
       },
-      KeyX: {
-        url: 'www.v2ex.com',
-        name: '',
-      },
-      KeyC: {
-        url: 'www.douyin.com',
-        name: '',
-      },
-      KeyV: {
-        url: 'v.qq.com',
-        name: 'tencent',
-      },
-      KeyB: {
-        url: 'www.bilibili.com',
-        name: '',
-      },
-      KeyN: {
-        url: 'www.youku.com',
-        name: '',
+      KeyA: {
+        url: 'https://gxfg.github.io/naivetab-doc/',
+        name: 'Welcome',
       },
     },
     layout: {

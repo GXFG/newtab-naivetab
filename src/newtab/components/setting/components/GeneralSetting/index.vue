@@ -119,6 +119,7 @@ const onResetSetting = () => {
           v-model:value="localConfig.general.openPageFocusElement"
           :options="focusElementList"
         />
+        <Tips :content="$t('general.defaultFocusTips')" />
       </NFormItem>
 
       <NFormItem :label="$t('general.loadPageAnimation')">

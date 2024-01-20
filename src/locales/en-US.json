@@ -101,7 +101,6 @@
     "editLayout": "Edit layout",
     "doneEdit": "Done Edit",
     "fullscreen": "Fullscreen",
-    "encourage": "Encourage",
     "goodReview": "Give a good review",
     "buyACupOfCoffee": "Buy a cup of coffee",
     "userHelp": "User Help",
@@ -112,7 +111,9 @@
   },
   "sponsor": {
     "title": "Sponsor a coffee",
-    "content": "I am a personal developer, NaiveTab can not grow without your support and encouragement, if NaiveTab is helpful to you, you can sponsor it.",
+    "content1": "Welcome to join us and experience the convenience and allure of NaiveTab! ",
+    "content2": "As the independent developer behind this application, I am fully aware that every step forward for NaiveTab is inseparable from supporters and friends like you. Your encouragement is the driving force behind my progress and the key to the continuous improvement and upgrading of this application.",
+    "content3": "If NaiveTab has played a role in your daily life, please consider making a donation to show your support. Every contribution you make will be transformed into new energy for the app, making NaiveTab more powerful and more tailored to your needs.",
     "confirm": "Next time for sure",
     "alipay": "Alipay",
     "wechat": "Wechat"
@@ -155,6 +156,7 @@
     "pageTitle": "Page title",
     "followSystem": "Follow system",
     "defaultFocus": "Default focus",
+    "defaultFocusTips": "Note: Selecting options other than 'Default' will populate the browser address bar with 'chrome-extension://xxxx/index.html'",
     "focusBrowserDefault": "default(Browser address bar)",
     "focusRoot": "root element",
     "loadPageAnimation": "Load animation",
