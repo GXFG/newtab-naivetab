@@ -25,23 +25,22 @@
 
 ## 🚀开始
 
-https://gxfg.github.io/naivetab-doc
+[使用文档](https://gxfg.github.io/naivetab-doc)
+
+[买杯咖啡](https://github.com/GXFG/newtab-naivetab/blob/main/sponsor.md)
 
 ## 🛠️安装
 
 - [Chrome](https://chrome.google.com/webstore/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/hhfebdcoeoddbdhgcgflblcjcgogijem)
 - [Edge](https://microsoftedge.microsoft.com/addons/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/kejadmppkffccjopodhekdnmkofidmjl)
+- [本地](https://github.com/GXFG/newtab-naivetab/blob/main/extension.zip)
 
 ## 📜更新日志
 
 查看 [CHANGELOG.md](https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md)
 
-## 🏗开发
-
-- 欢迎 PR & issue
-
 ## 🌼感谢
 
-- [icones](https://icones.js.org)
 - [Naive UI](https://www.naiveui.com)
 - [Vitesse-webext](https://github.com/antfu/vitesse-webext)
+- [icones](https://icones.js.org)
