@@ -14,11 +14,12 @@ const onCloseModal = () => {
   >
     <NCard
       class="card__wrap"
-      :title="`✨${$t('rightMenu.changelog')}✨`"
+      :title="`🚀 ${$t('rightMenu.changelog')}`"
     >
       <div class="modal__content">
         <Currentlog />
       </div>
+
       <div class="card__footer">
         <NButton
           class="footer__btn"
@@ -30,10 +31,10 @@ const onCloseModal = () => {
         >
           <template #icon>
             <div class="icon__wrap">
-              <ri:close-circle-line />
+              <line-md:confirm-circle />
             </div>
           </template>
-          {{ $t('common.close') }}
+          {{ $t('common.confirm') }}
         </NButton>
       </div>
     </NCard>
@@ -42,13 +43,13 @@ const onCloseModal = () => {
 
 <style scoped>
 .card__wrap {
-  width: 500px;
+  width: 600px;
 }
 
 .card__footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 15px;
   .footer__btn {
     margin: 0 10px;
   }

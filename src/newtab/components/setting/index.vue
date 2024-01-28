@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { createTab } from '@/logic/util'
 import { isEdge } from '@/env'
-import { URL_NAIVETAB_DOC_HOME, URL_CHROME_STORE, URL_EDGE_STORE } from '@/logic/const'
-import { getStyleConst, localConfig, globalState, openSponsorModal } from '@/logic/store'
+import { URL_NAIVETAB_DOC_HOME, URL_CHROME_STORE, URL_EDGE_STORE, URL_GITHUB_HOME } from '@/logic/const'
+import { getStyleConst, localConfig, globalState, openChangelogModal, openSponsorModal } from '@/logic/store'
 import pkg from '../../../../package.json'
 import GeneralSetting from './components/GeneralSetting/index.vue'
 import BookmarkSetting from './components/BookmarkSetting/index.vue'
@@ -118,44 +118,62 @@ const bgBottomBar = getStyleConst('bgBottomBar')
           class="drawer__bottom"
           :style="`background-color: ${bgBottomBar};`"
         >
-          <div class="bottom__left">
+          <div class="bottom__content bottom__left">
             <NButton
-              class="left__item"
+              class="content__btn"
               size="small"
-              title="Preview"
+              :title="$t('common.preview')"
               @mouseenter="handlerPreviewEnter"
               @mouseleave="handlerPreviewLeave"
             >
               <fe:picture />&nbsp;{{ $t('common.preview') }}
             </NButton>
+            <NButton
+              class="content__btn"
+              size="small"
+              :title="$t('rightMenu.buyACupOfCoffee')"
+              @click="openSponsorModal()"
+            >
+              <ci:coffee-togo />&nbsp;{{ $t('rightMenu.buyACupOfCoffee') }}
+            </NButton>
           </div>
 
-          <p class="bottom__version">Ver. {{ `${pkg.version}` }}</p>
-
-          <div class="bottom__right">
+          <p class="bottom__content bottom__center">
             <NButton
               text
-              class="right__icon"
+              class="content__version"
+              size="small"
+              :title="$t('rightMenu.changelog')"
+              @click="openChangelogModal()"
+            >
+              Ver. {{ `${pkg.version}` }}
+            </NButton>
+          </p>
+
+          <div class="bottom__content bottom__right">
+            <NButton
+              class="content__btn"
+              size="small"
               :title="$t('rightMenu.userGuide')"
               @click="createTab(URL_NAIVETAB_DOC_HOME)"
             >
               <material-symbols:book-2-outline />
             </NButton>
             <NButton
-              text
-              class="right__icon"
-              :title="$t('rightMenu.buyACupOfCoffee')"
-              @click="openSponsorModal()"
-            >
-              <ci:coffee-togo />
-            </NButton>
-            <NButton
-              text
-              class="right__icon"
+              class="content__btn"
+              size="small"
               :title="$t('rightMenu.goodReview')"
               @click="createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)"
             >
               <ph:thumbs-up-bold />
+            </NButton>
+            <NButton
+              class="content__btn"
+              size="small"
+              title="GitHub"
+              @click="createTab(URL_GITHUB_HOME)"
+            >
+              <carbon:logo-github />
             </NButton>
           </div>
         </div>
@@ -218,31 +236,28 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       position: absolute;
       left: 0px;
       bottom: 0px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 5px 13px 5px 13px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 5px 15px;
       width: 100%;
-      .bottom__left {
+      .bottom__content {
         display: flex;
-        justify-content: center;
         align-items: center;
-        .left__item {
-          margin-right: 10px;
+        .content__btn {
+          margin: 0 4px;
+        }
+        .content__version {
+          opacity: 0.85;
         }
       }
-      .bottom__version {
-        opacity: 0.8;
-        font-size: 13px;
+      .bottom__left {
+        justify-content: flex-start;
+      }
+      .bottom__center {
+        justify-content: center;
       }
       .bottom__right {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        .right__icon {
-          margin-left: 12px;
-          font-size: 18px;
-        }
+        justify-content: flex-end;
       }
     }
   }

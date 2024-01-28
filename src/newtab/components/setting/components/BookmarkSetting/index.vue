@@ -41,6 +41,8 @@ const handleDefaultFolderTitleChange = (value: string) => {
   bookmarkState.selectedFolderTitleStack = value ? [value] : []
 }
 
+const isOpenPopupVisible = ref(!!chrome.action.openPopup)
+
 const onOpenPopup = () => {
   if (chrome.action.openPopup) {
     chrome.action.openPopup()
@@ -134,7 +136,10 @@ const onOpenPopup = () => {
           <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
         </NFormItem>
 
-        <NFormItem :label="$t('bookmark.configBookmark')">
+        <NFormItem
+          v-if="isOpenPopupVisible"
+          :label="$t('bookmark.configBookmark')"
+        >
           <NButton
             type="primary"
             ghost

@@ -91,7 +91,7 @@ export const defaultConfig = {
       },
       KeyA: {
         url: 'https://gxfg.github.io/naivetab-doc/',
-        name: 'Welcome',
+        name: 'welcome',
       },
     },
     layout: {
