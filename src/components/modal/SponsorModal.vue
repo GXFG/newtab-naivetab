@@ -76,13 +76,13 @@ const onCloseModal = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 30px;
+  margin: 10px 40px;
   .code__item {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 38%;
+    width: 35%;
     .item__img {
       .img__main {
         width: 100%;
@@ -98,7 +98,7 @@ const onCloseModal = () => {
 .card__footer {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 15px;
   .footer__btn {
     margin: 0 10px;
     .icon__wrap {

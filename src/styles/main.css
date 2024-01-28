@@ -84,7 +84,7 @@ body {
 
 /* modal scroll */
 .modal__content {
-  height: 33vh;
+  height: 40vh;
   white-space: pre-line;
   overflow-y: scroll;
   &::-webkit-scrollbar {
