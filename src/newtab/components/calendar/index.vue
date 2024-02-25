@@ -403,9 +403,14 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                   }"
                 >
                   <span
-                    v-if="item.type || item.isToday"
+                    v-if="item.type"
                     class="item__label"
-                    >{{ item.isToday ? $t('calendar.today') : holidayTypeToDesc[item.type as 1 | 2] }}</span
+                    >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span
+                  >
+                  <span
+                    v-if="item.isToday"
+                    class="item__label item__label--today"
+                    >{{ $t('calendar.today') }}</span
                   >
                   <!-- 日期 -->
                   <span class="item__day">{{ item.day }}</span>
@@ -614,7 +619,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
       .body__item--today {
         border-radius: 2px;
         background-color: v-bind(customTodayItemBackgroundColor);
-        .item__label {
+        .item__label--today {
           left: auto !important;
           right: -7% !important;
           color: v-bind(customTodayLabelFontColor);

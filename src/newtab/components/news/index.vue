@@ -190,7 +190,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
       /* segment */
       .n-tabs .n-tabs-rail {
         background-color: transparent !important;
-        .n-tabs-tab-wrapper .n-tabs-tab.n-tabs-tab--active {
+        .n-tabs-capsule {
           background-color: v-bind(customTabActiveBackgroundColor) !important;
         }
       }
