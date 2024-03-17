@@ -44,6 +44,7 @@ const onClick = () => {
 }
 .tips__btn {
   margin-left: 8px;
+  width: 30px;
   .btn__icon {
     font-size: 14px;
   }
