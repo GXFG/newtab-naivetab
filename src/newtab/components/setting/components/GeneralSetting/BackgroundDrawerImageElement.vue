@@ -210,7 +210,7 @@ const customPrimaryColor = getStyleField('general', 'primaryColor')
   border-radius: 2px;
   cursor: pointer;
   overflow: hidden;
-  border: 1px solid var(--n-divider-color);
+  outline: 1px solid var(--n-tab-border-color);
   &:hover {
     .image__toolbar {
       bottom: 0 !important;
