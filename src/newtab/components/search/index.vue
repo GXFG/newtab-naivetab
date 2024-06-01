@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { gaProxy } from '@/logic/gtag'
-import { createTab } from '@/logic/util'
+import { createTab, sleep } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig, globalState, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 import { getBaiduSugrec } from '@/api'
@@ -112,11 +112,12 @@ const handleSearchKeydown = (e: KeyboardEvent) => {
   }
 }
 
-const onClearValue = () => {
+const onClearValue = async () => {
   state.isSuggestVisible = false
   state.isSuggestSelecting = false
   state.currSuggestIndex = -1
   state.searchValue = ''
+  await sleep(150) // 等待关闭动画执行完成
   state.suggestList = []
 }
 
