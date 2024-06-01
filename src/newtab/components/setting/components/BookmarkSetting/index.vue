@@ -132,7 +132,7 @@ const onOpenPopup = () => {
           </div>
         </NFormItem>
 
-        <NFormItem :label="$t('bookmark.newTabOpen')">
+        <NFormItem :label="$t('general.newTabOpen')">
           <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
         </NFormItem>
 

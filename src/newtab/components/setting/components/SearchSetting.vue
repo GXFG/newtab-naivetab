@@ -59,6 +59,9 @@ const onChangeSearch = (value: string, option: SelectStringItem) => {
           :placeholder="localConfig.search.urlName"
         />
       </NFormItem>
+      <NFormItem :label="$t('general.newTabOpen')">
+        <NSwitch v-model:value="localConfig.search.isNewTabOpen" />
+      </NFormItem>
       <NFormItem :label="$t('search.icon')">
         <NSwitch v-model:value="localConfig.search.iconEnabled" />
       </NFormItem>
