@@ -299,6 +299,9 @@ export const handleAppUpdate = async () => {
     localConfig.bookmark.source = keymapLength === 0 ? 1 : 2
     localConfig.bookmark.defaultExpandFolder = null
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.21.0')) {
+    localConfig.search.isNewTabOpen = false
+  }
   // 更新local版本号
   localConfig.general.version = pkg.version
   // updateSuccess()

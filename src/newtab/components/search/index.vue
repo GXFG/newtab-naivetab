@@ -33,9 +33,14 @@ const onSearch = () => {
   const encodeText = encodeURIComponent(state.searchValue)
   const searchUrl = localConfig.search.urlValue.replace('{query}', encodeText)
   state.isSuggestVisible = false
-  createTab(searchUrl)
-  state.searchValue = ''
   gaProxy('click', ['search', 'onSearch'])
+  if (localConfig.search.isNewTabOpen) {
+    createTab(searchUrl)
+    state.searchValue = ''
+    return
+  }
+  // 当前标签页打开
+  window.location.href = searchUrl
 }
 
 const handleSelectSuggest = (key: string) => {
@@ -108,11 +113,11 @@ const handleSearchKeydown = (e: KeyboardEvent) => {
 }
 
 const onClearValue = () => {
-  state.searchValue = ''
-  state.suggestList = []
   state.isSuggestVisible = false
   state.isSuggestSelecting = false
   state.currSuggestIndex = -1
+  state.searchValue = ''
+  state.suggestList = []
 }
 
 const getBaiduSuggest = async () => {
@@ -198,11 +203,12 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
         <NInputGroup>
           <NDropdown
             class="search__dropdown"
-            :show="localConfig.search.suggestionEnabled && state.isSuggestVisible"
+            :show="localConfig.search.suggestionEnabled && state.isSuggestVisible && state.suggestList.length !== 0"
             :options="state.suggestList"
             :placement="state.placementValue"
             :show-arrow="true"
             :keyboard="false"
+            :style="`width: ${customWidth};`"
             @select="handleSelectSuggest"
             @clickoutside="handleSelectOutside"
           >

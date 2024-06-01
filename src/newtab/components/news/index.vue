@@ -134,6 +134,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                     <n-popover
                       :delay="500"
                       trigger="hover"
+                      :style="`width: ${customWidth}; line-height: 1.5;`"
                     >
                       <template #trigger>
                         <div

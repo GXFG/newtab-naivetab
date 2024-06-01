@@ -506,7 +506,7 @@ export const KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST = [
 ]
 
 export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
-  // 'Escape',
+  'Escape',
   // 'F1',
   // 'F2',
   // 'F3',

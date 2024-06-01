@@ -244,6 +244,7 @@ export const defaultConfig = {
   },
   search: {
     enabled: true,
+    isNewTabOpen: false,
     iconEnabled: true,
     suggestionEnabled: true,
     placeholder: '',
