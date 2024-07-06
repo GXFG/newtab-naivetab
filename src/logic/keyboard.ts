@@ -506,7 +506,7 @@ export const KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST = [
 ]
 
 export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
-  'Escape',
+  // 'Escape', 需要支持按esc返回上一层级的文件夹
   // 'F1',
   // 'F2',
   // 'F3',
