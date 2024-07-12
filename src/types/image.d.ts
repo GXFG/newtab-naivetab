@@ -19,7 +19,6 @@ declare namespace TImage {
     drk: number
     enddate: string // "20220103"
     fullstartdate: string // "202201021600"
-    hs: any[]
     hsh: string // "c1b40e3cedfe095004365a5d610cdd95"
     quiz: string // "/search?q=Bing+homepage+quiz&filters=WQOskey:%22HPQuiz_20220102_LickObservatory%22&FORM=HPQUIZ"
     startdate: string // "20220102"

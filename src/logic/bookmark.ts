@@ -155,14 +155,17 @@ export const getBookmarkConfigUrl = (keyCode: string) => {
 
 export const getKeycapType = (keyCode: string): KeycapType => {
   if (localConfig.bookmark.source !== 1) {
+    // 来源自扩展
     if (!localConfig.bookmark.keymap[keyCode]) {
       return 'none'
     }
     const url = localConfig.bookmark.keymap[keyCode].url
     return url.length === 0 ? 'none' : 'mark'
   }
+  // 来源自浏览器书签
   const targetIndex = keyboardCurrentModelAllKeyList.value.indexOf(keyCode)
   if (targetIndex === 0) {
+    // 第一个按键为返回
     return 'back'
   }
   const bookmarkItem = currFolderBookmarks.value[targetIndex - 1] || {}

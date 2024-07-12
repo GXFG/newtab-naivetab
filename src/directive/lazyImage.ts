@@ -1,8 +1,10 @@
+import { App, DirectiveBinding } from 'vue'
+
 /* eslint-disable no-param-reassign */
 export default {
-  install(app: any) {
+  install(app: App) {
     app.directive('lazy', {
-      mounted(el: any, bindings: any) {
+      mounted(el: HTMLImageElement, bindings: DirectiveBinding) {
         // el:dom元素, bindings:指令的值
         const observer = new IntersectionObserver(
           ([{ isIntersecting }]) => {

@@ -1,17 +1,26 @@
 // Add data types to window.navigator ambiently for implicit use in the entire project. See https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html#-reference-types- for more info.
 /// <reference types="user-agent-data-types" />
+/// <reference types="vite/client" />
+
+declare const __DEV__: boolean
+declare const __NAME__: string //  Extension name, defined in packageJson.name
+
 interface Window {
-  _gaq: any
-  dataLayer: any
-  $t: any // vue-i18n
-  $message: any
-  $notification: any
-  $dialog: any
-  $loadingBar: any
+  $t: (key: string) => string
+  $message: MessageApiInjection
+  $notification: NotificationApiInjection
+  $dialog: DialogApiInjection
+  $loadingBar: LoadingBarApiInjection
 }
 
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
 type DatabaseStore = 'localBackgroundImages' | 'currBackgroundImages'
+
+type DatabaseLocalBackgroundImages = {
+  appearanceCode: number
+  file: File
+  smallBase64: string
+}
 
 type OptionsPermission = 'bookmarks'
 

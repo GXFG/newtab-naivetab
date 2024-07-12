@@ -4,7 +4,12 @@ import { exportSetting, isUploadConfigLoading, importSetting, refreshSetting, re
 import { localConfig, localState, globalState } from '@/logic/store'
 import BackgroundDrawer from './BackgroundDrawer.vue'
 
-const { proxy }: any = getCurrentInstance()
+const instance = getCurrentInstance()
+const proxy = instance?.proxy
+
+if (!proxy) {
+  throw new Error('Failed to get component instance proxy')
+}
 
 const state = reactive({
   i18nList: i18n.global.availableLocales.map((locale: string) => ({
@@ -61,10 +66,13 @@ const syncTime = computed(() => {
   return dayjs(maxSyncTime).format('YYYY-MM-DD HH:mm:ss')
 })
 
-const importSettingInputEl = ref()
+const importSettingInputEl: Ref<HTMLInputElement | null> = ref(null)
 
 const onImportSetting = () => {
-  ;(importSettingInputEl as any).value.value = null
+  if (!importSettingInputEl.value) {
+    return
+  }
+  importSettingInputEl.value.value = ''
   importSettingInputEl.value.click()
 }
 

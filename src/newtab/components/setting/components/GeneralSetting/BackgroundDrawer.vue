@@ -35,15 +35,22 @@ watch(
   },
 )
 
-const bgImageFileInputEl = ref()
+const bgImageFileInputEl: Ref<HTMLInputElement | null> = ref(null)
 
 const onSelectBackgroundImage = () => {
-  ;(bgImageFileInputEl as any).value.value = null
+  if (!bgImageFileInputEl.value) {
+    return
+  }
+  bgImageFileInputEl.value.value = ''
   bgImageFileInputEl.value.click()
 }
 
 const onBackgroundImageFileChange = async (e: Event) => {
-  const file = (e.target as any).files[0]
+  const input = e.target as HTMLInputElement
+  if (!input.files || input.files.length <= 0) {
+    return
+  }
+  const file = input.files[0]
   if (file.size > LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M * 1024 * 1024) {
     window.$message.error(window.$t('prompts.imageTooLarge'))
     return

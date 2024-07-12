@@ -4,7 +4,7 @@ const DB_NAME = 'NaiveTabDatabase'
 const DB_VERSION = 2
 
 let isInitialized = false
-let DB: any = null
+let DB: IDBDatabase | null = null
 
 const databaseInit = (): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -13,9 +13,9 @@ const databaseInit = (): Promise<boolean> => {
     /**
      * 数据仓库升级事件（第一次新建库时也会触发）
      */
-    request.onupgradeneeded = (event: any) => {
+    request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
       log('IndexDB upgrade success', event)
-      DB = event.target.result
+      DB = (event.target as IDBOpenDBRequest).result
       if (!DB.objectStoreNames.contains('localBackgroundImages')) {
         // 存储本地背景图文件数据，包含浅色、深色外观两张图片
         DB.createObjectStore('localBackgroundImages', { keyPath: 'appearanceCode' })
@@ -28,9 +28,9 @@ const databaseInit = (): Promise<boolean> => {
       // dbTable.createIndex('indexName', 'name', { unique: false })
     }
 
-    request.onsuccess = (event: any) => {
+    request.onsuccess = (event: Event) => {
       // log('IndexDB open success', event)
-      DB = event.target.result
+      DB = (event.target as IDBOpenDBRequest).result
       isInitialized = true
       resolve(true)
     }
@@ -42,27 +42,36 @@ const databaseInit = (): Promise<boolean> => {
   })
 }
 
-export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHandleType, payload: unknown): Promise<any> => {
+export const databaseStore = async (storeName: DatabaseStore, type: DatabaseHandleType, payload: DatabaseLocalBackgroundImages | string | number): Promise<DatabaseLocalBackgroundImages | null> => {
   if (!isInitialized) {
     await databaseInit()
   }
+
   return new Promise((resolve, reject) => {
+    if (!DB) {
+      throw new Error('Database is not initialized')
+    }
+
     const store = DB.transaction([storeName], 'readwrite').objectStore(storeName)
-    let request: any = null
+    let request: IDBRequest<any> | null = null
     if (type === 'add') {
       request = store.add(payload)
     } else if (type === 'put') {
       // 更新，第一次使用add，后续修改使用put
       request = store.put(payload)
     } else if (type === 'get') {
-      request = store.get(payload)
+      request = store.get(payload as number | string)
     } else if (type === 'delete') {
-      request = store.delete(payload)
+      request = store.delete(payload as number | string)
     }
 
-    request.onsuccess = (event: any) => {
+    if (!request) {
+      throw new Error('db request is null')
+    }
+
+    request.onsuccess = (event: Event) => {
       // log(`IndexDB ${type} success`, event.target.result)
-      resolve(event.target.result)
+      resolve((event.target as IDBRequest).result)
     }
 
     request.onerror = (event: Event) => {
