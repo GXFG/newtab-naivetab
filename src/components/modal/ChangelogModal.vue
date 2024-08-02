@@ -24,8 +24,8 @@ const onCloseModal = () => {
         <NButton
           class="footer__btn"
           type="primary"
-          ghost
           size="small"
+          ghost
           :loading="globalState.isClearStorageLoading"
           @click="onCloseModal()"
         >

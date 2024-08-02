@@ -16,8 +16,10 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (isDragMode.value) {
     return
   }
-  // e.preventDefault()
   const { code, shiftKey, ctrlKey, altKey, metaKey } = e
+  if (code === 'Escape') {
+    e.preventDefault() // 阻止Esc默认事件，按esc会取消打开页面，表现为Esc的书签无法打开
+  }
   if (KEYBOARD_NOT_ALLOW_KEYCODE_LIST.includes(code)) {
     return
   }
@@ -38,16 +40,17 @@ const keyboardTask = (e: KeyboardEvent) => {
   if (!localConfig.bookmark.isDblclickOpen) {
     bookmarkState.currSelectKeyCode = code
     openPage(url, shiftKey, altKey)
+    return
+  }
+  // 双击打开书签
+  clearTimeout(keyboardTimer)
+  if (code === bookmarkState.currSelectKeyCode) {
+    openPage(url, shiftKey, altKey)
   } else {
-    clearTimeout(keyboardTimer)
-    if (code === bookmarkState.currSelectKeyCode) {
-      openPage(url, shiftKey, altKey)
-    } else {
-      bookmarkState.currSelectKeyCode = code
-      keyboardTimer = setTimeout(() => {
-        bookmarkState.currSelectKeyCode = ''
-      }, localConfig.bookmark.dblclickIntervalTime)
-    }
+    bookmarkState.currSelectKeyCode = code
+    keyboardTimer = setTimeout(() => {
+      bookmarkState.currSelectKeyCode = ''
+    }, localConfig.bookmark.dblclickIntervalTime)
   }
 }
 

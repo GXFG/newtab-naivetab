@@ -3,10 +3,16 @@ import { localConfig } from '@/logic/store'
 
 const modules = import.meta.glob('../locales/*')
 
-const getAllLangMessages = async (): Promise<{ [propsName: string]: string }> => {
-  const target = {}
+interface LangMessages {
+  [propsName: string]: {
+    [key: string]: string
+  }
+}
+
+const getAllLangMessages = async (): Promise<LangMessages> => {
+  const target: LangMessages = {}
   for await (const path of Object.keys(modules)) {
-    const module: any = await modules[path]()
+    const module = await (modules[path] as () => Promise<{ default: { [key: string]: string } }>)()
     if (!module.default) {
       return {}
     }
@@ -27,7 +33,7 @@ const getAllLangMessages = async (): Promise<{ [propsName: string]: string }> =>
   return target
 }
 
-const messages = await getAllLangMessages() as any
+const messages = await getAllLangMessages()
 
 const i18n = createI18n({
   legacy: false,
@@ -37,6 +43,6 @@ const i18n = createI18n({
   messages,
 })
 
-window.$t = i18n.global.t as any
+window.$t = i18n.global.t
 
 export default i18n

@@ -35,15 +35,22 @@ watch(
   },
 )
 
-const bgImageFileInputEl = ref()
+const bgImageFileInputEl: Ref<HTMLInputElement | null> = ref(null)
 
 const onSelectBackgroundImage = () => {
-  ;(bgImageFileInputEl as any).value.value = null
+  if (!bgImageFileInputEl.value) {
+    return
+  }
+  bgImageFileInputEl.value.value = ''
   bgImageFileInputEl.value.click()
 }
 
 const onBackgroundImageFileChange = async (e: Event) => {
-  const file = (e.target as any).files[0]
+  const input = e.target as HTMLInputElement
+  if (!input.files || input.files.length <= 0) {
+    return
+  }
+  const file = input.files[0]
   if (file.size > LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M * 1024 * 1024) {
     window.$message.error(window.$t('prompts.imageTooLarge'))
     return
@@ -122,6 +129,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
             <NFormItem :label="$t('common.origin')">
               <NRadioGroup
                 v-model:value="localConfig.general.backgroundImageSource"
+                size="small"
                 style="width: 100%"
               >
                 <NRadioButton
@@ -141,7 +149,15 @@ const handleBackgroundImageCustomUrlBlur = () => {
             >
               <div class="form__local">
                 <div>
-                  <NButton @click="onSelectBackgroundImage"> <uil:import />&nbsp;{{ $t('common.import') }} </NButton>
+                  <NButton
+                    type="primary"
+                    size="small"
+                    ghost
+                    style="margin-top: 3px"
+                    @click="onSelectBackgroundImage"
+                  >
+                    <uil:import />&nbsp;{{ $t('common.import') }}
+                  </NButton>
                   <Tips :content="$t('general.localBackgroundTips')" />
                 </div>
                 <p class="local__filename">
@@ -250,6 +266,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
     display: flex;
     flex-direction: column;
     .local__filename {
+      margin-top: 8px;
       width: 400px;
       overflow: hidden;
       white-space: nowrap;

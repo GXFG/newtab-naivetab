@@ -209,10 +209,10 @@ const detailInfo = reactive({
   solarFestivals: '',
   lunarFestivals: '',
   xingzuo: '',
-  yi: '',
-  ji: '',
-  jishen: '',
-  xiongsha: '',
+  yi: [] as string[],
+  ji: [] as string[],
+  jishen: [] as string[],
+  xiongsha: [] as string[],
 })
 
 const onToggleDetailPopover = (date?: string) => {
@@ -232,10 +232,10 @@ const onToggleDetailPopover = (date?: string) => {
   detailInfo.solarFestivals = `${solarEle.getFestivals().join(' ')} ${solarEle.getOtherFestivals().join(' ')}`
   detailInfo.lunarFestivals = `${lunarEle.getFestivals().join(' ')} ${lunarEle.getOtherFestivals().join(' ')}`
   detailInfo.xingzuo = `${solarEle.getXingZuo()}座`
-  detailInfo.yi = lunarEle.getDayYi().join(' ')
-  detailInfo.ji = lunarEle.getDayJi().join(' ')
-  detailInfo.jishen = lunarEle.getDayJiShen().join(' ')
-  detailInfo.xiongsha = lunarEle.getDayXiongSha().join(' ')
+  detailInfo.yi = lunarEle.getDayYi()
+  detailInfo.ji = lunarEle.getDayJi()
+  detailInfo.jishen = lunarEle.getDayJiShen()
+  detailInfo.xiongsha = lunarEle.getDayXiongSha()
 
   state.currDetailDate = date
   gaProxy('click', ['calendar', 'detail'])
@@ -383,7 +383,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
             @click="onToggleDetailPopover(item.date)"
           >
             <NPopover
-              style="max-width: 300px"
+              style="max-width: 350px"
               display-directive="if"
               :show="state.currDetailDate === item.date"
               :title="item.date"
@@ -439,27 +439,58 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                 </p>
                 <div class="detail__row">
                   <p class="row__tag row__tag--yi">易</p>
-                  <p class="row__value">
-                    {{ detailInfo.yi }}
-                  </p>
+                  <div class="row__value">
+                    <n-tag
+                      v-for="yiItem in detailInfo.yi"
+                      :key="yiItem"
+                      class="tag__item"
+                      type="success"
+                      size="small"
+                      :bordered="false"
+                      >{{ yiItem }}</n-tag
+                    >
+                  </div>
                 </div>
                 <div class="detail__row">
                   <p class="row__tag row__tag--ji">忌</p>
-                  <p class="row__value">
-                    {{ detailInfo.ji }}
-                  </p>
+                  <div class="row__value">
+                    <n-tag
+                      v-for="yiItem in detailInfo.ji"
+                      :key="yiItem"
+                      class="tag__item"
+                      type="error"
+                      size="small"
+                      :bordered="false"
+                      >{{ yiItem }}</n-tag
+                    >
+                  </div>
                 </div>
                 <div class="detail__row">
                   <p class="row__label">吉神</p>
-                  <p class="row__value">
-                    {{ detailInfo.jishen }}
-                  </p>
+                  <div class="row__value">
+                    <n-tag
+                      v-for="yiItem in detailInfo.jishen"
+                      :key="yiItem"
+                      class="tag__item"
+                      type="info"
+                      size="small"
+                      :bordered="false"
+                      >{{ yiItem }}</n-tag
+                    >
+                  </div>
                 </div>
                 <div class="detail__row">
                   <p class="row__label">凶煞</p>
-                  <p class="row__value">
-                    {{ detailInfo.xiongsha }}
-                  </p>
+                  <div class="row__value">
+                    <n-tag
+                      v-for="yiItem in detailInfo.xiongsha"
+                      :key="yiItem"
+                      class="tag__item"
+                      size="small"
+                      :bordered="false"
+                      >{{ yiItem }}</n-tag
+                    >
+                  </div>
                 </div>
               </div>
             </NPopover>
@@ -668,9 +699,10 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
   }
   .detail__row {
     display: flex;
+    margin: 5px 0;
     .row__tag {
       flex: 0 0 auto;
-      margin: 0 10px;
+      margin: 3px 10px;
       width: 20px;
       height: 20px;
       line-height: 20px;
@@ -691,6 +723,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
       text-align: center;
     }
     .row__value {
+      .tag__item {
+        margin: 2px 3px;
+      }
     }
   }
 }

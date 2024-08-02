@@ -166,7 +166,9 @@ const keyboardHandler = (e: KeyboardEvent) => {
   }
   const { code } = e
   if (code === 'Escape') {
-    toggleIsDragMode()
+    nextTick(() => {
+      toggleIsDragMode()
+    })
     return
   }
   if (['Delete', 'Backspace'].includes(code)) {
@@ -203,26 +205,29 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
       <!-- switch button -->
       <div
         class="drawer__switch"
-        :class="{ 'drawer__switch--hidden': isElementDrawerVisible }"
         @click="handleToggleIsElementDrawerVisible()"
       >
-        <ic:baseline-chevron-right
+        <ic:round-expand-less
           class="switch__icon"
           :class="{ 'switch__icon--active': isElementDrawerVisible }"
         />
       </div>
 
       <div class="drawer__header">
-        <NButton
-          class="header__exit"
-          strong
-          secondary
-          type="warning"
+        <div
+          class="header__done"
           @click="handleExitDragMode"
         >
-          <mdi:keyboard-esc class="exit__icon" />
-          <p>{{ $t('rightMenu.doneEdit') }}</p>
-        </NButton>
+          <div class="done__esc" />
+          <NButton
+            class="done__exit"
+            type="primary"
+            size="small"
+          >
+            <p>{{ $t('rightMenu.doneEdit') }}</p>
+          </NButton>
+        </div>
+        <p class="header__tips">{{ $t('prompts.elementDrawerTips') }}</p>
       </div>
 
       <div class="drawer__content">
@@ -267,7 +272,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
 
 <style>
 .moveable-tool--active {
-  left: 0 !important;
+  bottom: 0 !important;
 }
 .moveable-tool--shadow {
   box-shadow: 0 0 10px 3px #272727;
@@ -275,40 +280,45 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
 
 #moveable-tool {
   z-index: 20;
-  position: relative;
-  top: 0;
-  left: -360px;
-  width: 360px;
-  height: 100vh;
+  position: fixed;
+  bottom: -265px;
+  left: 25vw;
+  width: 50vw;
+  height: 265px;
   color: #fff;
   background-color: v-bind(bgMoveableToolDrawer);
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
   transition: all 300ms ease;
   .tool__drawer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    height: 100%;
     backdrop-filter: saturate(50%) blur(4px);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
     /* background-image: radial-gradient(transparent 1px, #000 1px);
     background-size: 4px 4px; */
     .drawer__switch {
       z-index: 30;
       position: absolute;
-      top: 28px;
-      right: -20px;
+      top: -25px;
+      left: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 20px;
-      height: 52px;
+      width: 5vw;
+      height: 25px;
       background-color: v-bind(bgMoveableToolDrawer);
+      border-top-left-radius: 5px;
       border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px;
-      transform: translate(0, -50%);
+      box-shadow: 0 0 5px 3px #272727;
+      transform: translate(-50%, 0);
       cursor: pointer;
       .switch__icon {
         flex: 0 0 auto;
-        font-size: 24px;
+        font-size: 26px;
         transition: all 400ms ease-in-out;
       }
       .switch__icon--active {
@@ -318,28 +328,36 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
     .drawer__switch:hover {
       color: v-bind(customPrimaryColor);
     }
-    .drawer__switch--hidden {
-      right: 0px !important;
-      background-color: transparent;
-    }
 
     .drawer__header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      padding: 10px;
+      height: 50px;
       width: 100%;
-      height: 55px;
       border-bottom: 1px solid v-bind(borderMoveableToolItem);
-      .header__exit {
+      .header__done {
         display: flex;
         align-items: center;
-        justify-content: center;
-        .exit__icon {
-          margin-top: -2px;
-          margin-right: 5px;
-          font-size: 22px;
+        cursor: pointer;
+        .done__exit {
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
+        .done__esc {
+          margin: 0 8px 0 1.5vw;
+          width: 37px;
+          height: 37px;
+          background-size: 100%;
+          background-image: url('/assets/img/keyboard/esc.png');
+        }
+      }
+      .header__tips {
+        margin-top: 10px;
+        margin-right: 2vw;
+        font-size: 12px;
+        opacity: 0.8;
       }
     }
 
@@ -347,22 +365,20 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
       flex: 1;
       display: flex;
       flex-wrap: wrap;
-      align-content: center;
-      padding: 10px 0;
-      width: 100%;
-      width: 100%;
+      align-content: flex-start;
+      padding: 0.5vw;
       .content__item {
         flex-shrink: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin: 10px 0 10px 33px;
-        width: 130px;
+        margin: 10px 0.9vw;
+        width: 8vw;
         height: 80px;
         font-size: 14px;
         border: 2px solid v-bind(borderMoveableToolItem);
-        border-radius: 5px;
+        border-radius: 8px;
         cursor: move;
         user-select: none;
         .item__icon {

@@ -238,24 +238,35 @@ export const handleAppUpdate = async () => {
     localConfig.calendar.restDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
     localConfig.calendar.workDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
     localConfig.calendar.workDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    delete (localConfig.calendar as any).backgroundActiveColor
+    const calendarConfig = localConfig.calendar as typeof localConfig.calendar & { backgroundActiveColor?: string }
+    delete calendarConfig.backgroundActiveColor
     localConfig.news.urlActiveColor = ['rgba(36, 64, 179, 1)', 'rgba(155, 177, 254, 1)']
     localConfig.news.tabActiveBackgroundColor = ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)']
-    delete (localConfig.news as any).fontActiveColor
-    delete (localConfig.news as any).backgroundActiveColor
+    const newsConfig = localConfig.news as typeof localConfig.news & {
+      fontActiveColor?: string
+      backgroundActiveColor?: string
+    }
+    delete newsConfig.fontActiveColor
+    delete newsConfig.backgroundActiveColor
   }
   if (compareLeftVersionLessThanRightVersions(version, '1.18.0')) {
     localConfig.bookmark.isCapKeyVisible = true
     localConfig.bookmark.isFaviconVisible = true
     localConfig.bookmark.faviconSize = 1
-    localConfig.bookmark.keycapBorderRadius = (localConfig.bookmark as any).borderRadius
-    localConfig.bookmark.isKeycapBorderEnabled = (localConfig.bookmark as any).isBorderEnabled
-    localConfig.bookmark.keycapBorderWidth = (localConfig.bookmark as any).borderWidth
-    localConfig.bookmark.keycapBorderColor = (localConfig.bookmark as any).borderColor
-    delete (localConfig.bookmark as any).borderRadius
-    delete (localConfig.bookmark as any).isBorderEnabled
-    delete (localConfig.bookmark as any).borderWidth
-    delete (localConfig.bookmark as any).borderColor
+    const bookmarkConfig = localConfig.bookmark as typeof localConfig.bookmark & {
+      borderRadius?: number
+      isBorderEnabled?: boolean
+      borderWidth?: number
+      borderColor?: string[]
+    }
+    localConfig.bookmark.keycapBorderRadius = bookmarkConfig.borderRadius ?? 5
+    localConfig.bookmark.isKeycapBorderEnabled = bookmarkConfig?.isBorderEnabled ?? false
+    localConfig.bookmark.keycapBorderWidth = bookmarkConfig.borderWidth ?? 1
+    localConfig.bookmark.keycapBorderColor = bookmarkConfig.borderColor ?? ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)']
+    delete bookmarkConfig.borderRadius
+    delete bookmarkConfig.isBorderEnabled
+    delete bookmarkConfig.borderWidth
+    delete bookmarkConfig.borderColor
   }
   if (compareLeftVersionLessThanRightVersions(version, '1.18.1')) {
     localConfig.bookmark.keyboardType = typeof localConfig.bookmark.keyboardType === 'number' ? `key${localConfig.bookmark.keyboardType}` : localConfig.bookmark.keyboardType
@@ -287,7 +298,10 @@ export const handleAppUpdate = async () => {
       networkSourceType: 1,
       name: item.name,
     }))
-    delete (localConfig.general as any).backgroundImageDescs
+    const generalConfig = localConfig.general as typeof localConfig.general & {
+      backgroundImageDescs?: string
+    }
+    delete generalConfig.backgroundImageDescs
   }
   if (compareLeftVersionLessThanRightVersions(version, '1.19.4')) {
     if (['key43', 'key57'].includes(localConfig.bookmark.keyboardType)) {
@@ -332,20 +346,28 @@ export const getStyleConst = (field: string) => {
  */
 export const getStyleField = (component: ConfigField, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
-    let style = field.split('.').reduce((r: any, c: string) => r[c], localConfig[component])
-    if (Array.isArray(style)) {
-      return style[localState.value.currAppearanceCode]
+    const fieldList = field.split('.')
+    let targetValue: any = fieldList.reduce((r, c) => r[c], localConfig[component])
+
+    if (Array.isArray(targetValue)) {
+      // color
+      return targetValue[localState.value.currAppearanceCode]
     }
+
+    if (typeof targetValue !== 'number') {
+      return targetValue
+    }
+
     if (ratio) {
-      style *= ratio
+      targetValue *= ratio
     }
     if (unit) {
       if (unit === 'vmin') {
-        style *= 0.1
+        targetValue *= 0.1
       }
-      style = `${style}${unit}`
+      targetValue = `${targetValue}${unit}`
     }
-    return style
+    return targetValue
   })
 }
 

@@ -154,6 +154,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
             <NButton
               class="content__btn"
               size="small"
+              ghost
               :title="$t('rightMenu.userGuide')"
               @click="createTab(URL_NAIVETAB_DOC_HOME)"
             >
@@ -162,6 +163,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
             <NButton
               class="content__btn"
               size="small"
+              ghost
               :title="$t('rightMenu.goodReview')"
               @click="createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)"
             >
@@ -170,6 +172,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
             <NButton
               class="content__btn"
               size="small"
+              ghost
               title="GitHub"
               @click="createTab(URL_GITHUB_HOME)"
             >
@@ -238,7 +241,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       bottom: 0px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      padding: 5px 15px;
+      padding: 8px 15px;
       width: 100%;
       .bottom__content {
         display: flex;

@@ -63,6 +63,7 @@ const onOpenPopup = () => {
         <NFormItem :label="$t('bookmark.bookmarkSource')">
           <NRadioGroup
             v-model:value="localConfig.bookmark.source"
+            size="small"
             @update:value="handleBookmarkSourceChange"
           >
             <NRadioButton
@@ -99,6 +100,7 @@ const onOpenPopup = () => {
             >
               <NButton
                 type="primary"
+                size="small"
                 ghost
                 @click="openConfigShortcutsPage()"
               >
@@ -142,6 +144,7 @@ const onOpenPopup = () => {
         >
           <NButton
             type="primary"
+            size="small"
             ghost
             @click="onOpenPopup()"
           >
@@ -157,7 +160,11 @@ const onOpenPopup = () => {
           {{ `${$t('bookmark.keyboard')}${$t('common.config')}` }}
         </p>
         <NFormItem :label="$t('bookmark.keyboardType')">
-          <NRadioGroup v-model:value="localConfig.bookmark.keyboardType">
+          <NRadioGroup
+            v-model:value="localConfig.bookmark.keyboardType"
+            size="small"
+            style="margin-top: 6px"
+          >
             <NRadio
               v-for="item in KEYBOARD_TYPE_OPTION"
               :key="item.value"
@@ -168,7 +175,10 @@ const onOpenPopup = () => {
           </NRadioGroup>
         </NFormItem>
         <NFormItem :label="$t('bookmark.keycapType')">
-          <NRadioGroup v-model:value="localConfig.bookmark.keycapType">
+          <NRadioGroup
+            v-model:value="localConfig.bookmark.keycapType"
+            size="small"
+          >
             <NRadioButton
               v-for="item in KEYCAP_TYPE_OPTION"
               :key="item.value"
@@ -179,7 +189,10 @@ const onOpenPopup = () => {
           </NRadioGroup>
         </NFormItem>
         <NFormItem :label="$t('bookmark.splitSpace')">
-          <NRadioGroup v-model:value="localConfig.bookmark.splitSpace">
+          <NRadioGroup
+            v-model:value="localConfig.bookmark.splitSpace"
+            size="small"
+          >
             <NRadioButton
               v-for="item in SPLIT_SPACE_OPTION"
               :key="item.value"
@@ -192,6 +205,7 @@ const onOpenPopup = () => {
         <NFormItem :label="`${$t('bookmark.presetTheme')}`">
           <NButton
             type="primary"
+            size="small"
             ghost
             @click="state.isPresetThemeDrawerVisible = true"
           >

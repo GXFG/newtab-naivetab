@@ -4,7 +4,12 @@ import { exportSetting, isUploadConfigLoading, importSetting, refreshSetting, re
 import { localConfig, localState, globalState } from '@/logic/store'
 import BackgroundDrawer from './BackgroundDrawer.vue'
 
-const { proxy }: any = getCurrentInstance()
+const instance = getCurrentInstance()
+const proxy = instance?.proxy
+
+if (!proxy) {
+  throw new Error('Failed to get component instance proxy')
+}
 
 const state = reactive({
   i18nList: i18n.global.availableLocales.map((locale: string) => ({
@@ -61,10 +66,13 @@ const syncTime = computed(() => {
   return dayjs(maxSyncTime).format('YYYY-MM-DD HH:mm:ss')
 })
 
-const importSettingInputEl = ref()
+const importSettingInputEl: Ref<HTMLInputElement | null> = ref(null)
 
 const onImportSetting = () => {
-  ;(importSettingInputEl as any).value.value = null
+  if (!importSettingInputEl.value) {
+    return
+  }
+  importSettingInputEl.value.value = ''
   importSettingInputEl.value.click()
 }
 
@@ -127,6 +135,7 @@ const onResetSetting = () => {
         <NRadioGroup
           v-if="localConfig.general.isLoadPageAnimationEnabled"
           v-model:value="localConfig.general.loadPageAnimationType"
+          size="small"
           class="setting__item-element"
         >
           <NRadioButton
@@ -140,7 +149,10 @@ const onResetSetting = () => {
       </NFormItem>
 
       <NFormItem :label="$t('common.drawerSite')">
-        <NRadioGroup v-model:value="localConfig.general.drawerPlacement">
+        <NRadioGroup
+          v-model:value="localConfig.general.drawerPlacement"
+          size="small"
+        >
           <NRadioButton
             v-for="item in drawerPlacementList"
             :key="item.value"
@@ -154,7 +166,10 @@ const onResetSetting = () => {
 
     <template #style>
       <NFormItem :label="$t('common.appearance')">
-        <NRadioGroup v-model:value="localConfig.general.appearance">
+        <NRadioGroup
+          v-model:value="localConfig.general.appearance"
+          size="small"
+        >
           <NRadioButton
             v-for="item in themeList"
             :key="item.value"
@@ -174,6 +189,7 @@ const onResetSetting = () => {
           v-if="localConfig.general.isBackgroundImageEnabled"
           class="setting__item-element"
           type="primary"
+          size="small"
           ghost
           @click="openBackgroundDrawer()"
         >
@@ -240,6 +256,7 @@ const onResetSetting = () => {
         <div>
           <NButton
             type="primary"
+            size="small"
             ghost
             :loading="globalState.isImportSettingLoading"
             @click="onImportSetting"
@@ -259,6 +276,7 @@ const onResetSetting = () => {
         <div style="margin-left: 30px">
           <NButton
             type="primary"
+            size="small"
             ghost
             @click="onExportSetting()"
           >
@@ -271,6 +289,7 @@ const onResetSetting = () => {
       <NFormItem :label="$t('general.clearStorageLabel')">
         <NButton
           type="primary"
+          size="small"
           ghost
           :loading="globalState.isClearStorageLoading"
           @click="refreshSetting()"
@@ -285,6 +304,7 @@ const onResetSetting = () => {
           <template #trigger>
             <NButton
               type="error"
+              size="small"
               ghost
             >
               <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}

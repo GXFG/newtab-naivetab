@@ -51,7 +51,7 @@ const onChangeCity = (label: string) => {
   onSearch()
 }
 
-const onSelectCity: any = (cityId: string) => {
+const onSelectCity = (cityId: string) => {
   const target = state.cityList.find((item) => item.value === cityId)
   const cityName = target ? target.label : state.keyword
   localConfig.weather.city.name = cityName

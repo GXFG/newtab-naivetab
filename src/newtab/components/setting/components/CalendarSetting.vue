@@ -11,7 +11,10 @@ const beginsList = computed(() => [
   <BaseComponentSetting cname="calendar">
     <template #header>
       <NFormItem :label="$t('calendar.weekBeginsOn')">
-        <NRadioGroup v-model:value="localConfig.calendar.weekBeginsOn">
+        <NRadioGroup
+          v-model:value="localConfig.calendar.weekBeginsOn"
+          size="small"
+        >
           <NRadioButton
             v-for="item in beginsList"
             :key="item.value"

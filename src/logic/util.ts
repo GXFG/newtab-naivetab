@@ -71,13 +71,12 @@ export const downloadJsonByTagA = (result: { [propName: string]: unknown }, file
 
 export const urlToFile = (url: string, fileName: string): Promise<File> => {
   return new Promise((resolve, reject) => {
-    let fileContent: any = null
     const xhr = new XMLHttpRequest()
     xhr.open('GET', url)
     xhr.setRequestHeader('Accept', 'image/jpeg')
     xhr.responseType = 'blob'
     xhr.onload = () => {
-      fileContent = xhr.response
+      const fileContent = xhr.response
       const targetFile = new File([fileContent], fileName, { type: 'image/jpeg' })
       resolve(targetFile)
     }
@@ -123,8 +122,8 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve) => {
     const reader = new FileReader()
     reader.readAsDataURL(blob)
-    reader.onload = (e: any) => {
-      resolve(e.target.result)
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      resolve((e.target?.result || '') as string)
     }
   })
 }

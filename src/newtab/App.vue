@@ -26,7 +26,7 @@ const handleFocusPage = () => {
     return
   }
   const selector = FOCUE_ELEMENT_SELECTOR_MAP[localConfig.general.openPageFocusElement]
-  const focusEle: any = document.querySelector(selector)
+  const focusEle = document.querySelector(selector) as HTMLElement | null
   if (focusEle && focusEle.focus) {
     focusEle.focus()
   }

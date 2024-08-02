@@ -518,7 +518,7 @@ export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST = [
   // 'F9',
   // 'F10',
   // 'F11',
-  'F12',
+  // 'F12',
   // 'F13',
   // 'F14',
   // 'F15',

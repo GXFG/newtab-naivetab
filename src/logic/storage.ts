@@ -255,7 +255,7 @@ export const handleMissedUploadConfig = async () => {
  *   `naive-tab-${field}`: '{
  *      syncTime: number
  *      syncId: md5
- *      data: {}
+ *      data: typeof defaultConfig[ConfigField]
  *   }'
  * }
  */
@@ -278,7 +278,7 @@ export const loadRemoteConfig = () => {
           const target: {
             syncTime: number
             syncId: string // md5
-            data: any
+            data: (typeof defaultConfig)[ConfigField]
           } = JSON.parse(data[`naive-tab-${field}`])
           const targetConfig = target.data
           const targetSyncTime = target.syncTime
@@ -297,7 +297,7 @@ export const loadRemoteConfig = () => {
             continue
           }
           log(`Config-${field} update`)
-          pendingConfig[field] = targetConfig
+          pendingConfig[field] = targetConfig as any
           localState.value.isUploadConfigStatusMap[field].syncTime = targetSyncTime
           localState.value.isUploadConfigStatusMap[field].syncId = targetSyncId
         }
@@ -351,7 +351,7 @@ export const importSetting = async (text: string) => {
     return
   }
   globalState.isImportSettingLoading = true
-  let fileContent = {} as any
+  let fileContent = null as typeof defaultConfig | null
   try {
     fileContent = JSON.parse(text)
   } catch (e) {
@@ -359,7 +359,7 @@ export const importSetting = async (text: string) => {
     window.$message.error(`${window.$t('common.import')}${window.$t('common.fail')}`)
     globalState.isImportSettingLoading = false
   }
-  if (Object.keys(fileContent).length === 0) {
+  if (!fileContent || (fileContent && Object.keys(fileContent).length === 0) || !fileContent?.general?.version) {
     globalState.isImportSettingLoading = false
     return
   }
@@ -374,14 +374,24 @@ export const importSetting = async (text: string) => {
           delete fileContent.bookmark.keymap[keyLabel]
         }
       }
-      delete fileContent.bookmark.margin
-      delete fileContent.bookmark.width
-      delete fileContent.bookmark.fontFamily
-      delete fileContent.bookmark.fontSize
-      delete fileContent.bookmark.backgroundColor
-      delete fileContent.bookmark.BackgroundActiveColor
-      delete fileContent.bookmark.isShadowEnabled
-      delete fileContent.bookmark.shadowColor
+      const oldBookmarkConfig = fileContent.bookmark as (typeof defaultConfig)['bookmark'] & {
+        margin?: number
+        width?: number
+        fontFamily?: string
+        fontSize?: number
+        backgroundColor?: string[]
+        BackgroundActiveColor?: string[]
+        isShadowEnabled?: boolean
+        shadowColor?: string[]
+      }
+      delete oldBookmarkConfig.margin
+      delete oldBookmarkConfig.width
+      delete oldBookmarkConfig.fontFamily
+      delete oldBookmarkConfig.fontSize
+      delete oldBookmarkConfig.backgroundColor
+      delete oldBookmarkConfig.BackgroundActiveColor
+      delete oldBookmarkConfig.isShadowEnabled
+      delete oldBookmarkConfig.shadowColor
     }
     log('FileContentTransform', fileContent)
     fileContent.general.version = pkg.version // 更新版本号

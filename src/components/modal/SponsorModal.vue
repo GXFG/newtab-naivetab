@@ -46,8 +46,8 @@ const onCloseModal = () => {
         <NButton
           class="footer__btn"
           type="primary"
-          ghost
           size="small"
+          ghost
           @click="onCloseModal()"
         >
           <template #icon>
