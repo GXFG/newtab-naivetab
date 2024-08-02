@@ -135,6 +135,7 @@ const onResetSetting = () => {
         <NRadioGroup
           v-if="localConfig.general.isLoadPageAnimationEnabled"
           v-model:value="localConfig.general.loadPageAnimationType"
+          size="small"
           class="setting__item-element"
         >
           <NRadioButton
@@ -148,7 +149,10 @@ const onResetSetting = () => {
       </NFormItem>
 
       <NFormItem :label="$t('common.drawerSite')">
-        <NRadioGroup v-model:value="localConfig.general.drawerPlacement">
+        <NRadioGroup
+          v-model:value="localConfig.general.drawerPlacement"
+          size="small"
+        >
           <NRadioButton
             v-for="item in drawerPlacementList"
             :key="item.value"
@@ -162,7 +166,10 @@ const onResetSetting = () => {
 
     <template #style>
       <NFormItem :label="$t('common.appearance')">
-        <NRadioGroup v-model:value="localConfig.general.appearance">
+        <NRadioGroup
+          v-model:value="localConfig.general.appearance"
+          size="small"
+        >
           <NRadioButton
             v-for="item in themeList"
             :key="item.value"
@@ -182,6 +189,7 @@ const onResetSetting = () => {
           v-if="localConfig.general.isBackgroundImageEnabled"
           class="setting__item-element"
           type="primary"
+          size="small"
           ghost
           @click="openBackgroundDrawer()"
         >
@@ -248,6 +256,7 @@ const onResetSetting = () => {
         <div>
           <NButton
             type="primary"
+            size="small"
             ghost
             :loading="globalState.isImportSettingLoading"
             @click="onImportSetting"
@@ -267,6 +276,7 @@ const onResetSetting = () => {
         <div style="margin-left: 30px">
           <NButton
             type="primary"
+            size="small"
             ghost
             @click="onExportSetting()"
           >
@@ -279,6 +289,7 @@ const onResetSetting = () => {
       <NFormItem :label="$t('general.clearStorageLabel')">
         <NButton
           type="primary"
+          size="small"
           ghost
           :loading="globalState.isClearStorageLoading"
           @click="refreshSetting()"
@@ -293,6 +304,7 @@ const onResetSetting = () => {
           <template #trigger>
             <NButton
               type="error"
+              size="small"
               ghost
             >
               <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}

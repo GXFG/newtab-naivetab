@@ -95,11 +95,12 @@
     "linkTips": "Click on ? icon to access the link below",
     "pleaseWait": "In progress, Please wait",
     "imageTooLarge": "Image too large",
-    "favoriteLimt": "The maximum number of favorites has been reached"
+    "favoriteLimt": "The maximum number of favorites has been reached",
+    "elementDrawerTips": "Drag the component to the desktop"
   },
   "rightMenu": {
     "editLayout": "Edit layout",
-    "doneEdit": "Done Edit",
+    "doneEdit": "Done",
     "fullscreen": "Fullscreen",
     "goodReview": "Give a good review",
     "buyACupOfCoffee": "Buy coffee",

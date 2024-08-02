@@ -129,6 +129,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
             <NFormItem :label="$t('common.origin')">
               <NRadioGroup
                 v-model:value="localConfig.general.backgroundImageSource"
+                size="small"
                 style="width: 100%"
               >
                 <NRadioButton
@@ -148,7 +149,15 @@ const handleBackgroundImageCustomUrlBlur = () => {
             >
               <div class="form__local">
                 <div>
-                  <NButton @click="onSelectBackgroundImage"> <uil:import />&nbsp;{{ $t('common.import') }} </NButton>
+                  <NButton
+                    type="primary"
+                    size="small"
+                    ghost
+                    style="margin-top: 3px"
+                    @click="onSelectBackgroundImage"
+                  >
+                    <uil:import />&nbsp;{{ $t('common.import') }}
+                  </NButton>
                   <Tips :content="$t('general.localBackgroundTips')" />
                 </div>
                 <p class="local__filename">
@@ -257,6 +266,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
     display: flex;
     flex-direction: column;
     .local__filename {
+      margin-top: 8px;
       width: 400px;
       overflow: hidden;
       white-space: nowrap;

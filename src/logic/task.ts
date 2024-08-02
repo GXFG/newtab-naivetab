@@ -17,8 +17,10 @@ export const startKeydown = () => {
     }
     // 在'搜索框'、'备忘录'、'设置抽屉'内时忽略按键事件
     if (globalState.isSettingDrawerVisible || globalState.isSearchFocused || globalState.isMemoFocused) {
-      if (e.key === 'Escape') {
-        switchSettingDrawerVisible(false)
+      if (e.code === 'Escape') {
+        nextTick(() => {
+          switchSettingDrawerVisible(false)
+        })
       }
       return
     }
