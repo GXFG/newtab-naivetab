@@ -3,7 +3,7 @@
 
 import { resolve } from 'node:path'
 import type { UserConfig } from 'vite'
-import { defineConfig, splitVendorChunkPlugin } from 'vite'
+import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import Icons from 'unplugin-icons/vite'
@@ -40,7 +40,6 @@ export const sharedConfig: UserConfig = {
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
-    splitVendorChunkPlugin(),
     VueI18nPlugin({
       include: resolve(__dirname, './src/locales/**'),
     }),
@@ -108,6 +107,29 @@ export default defineConfig(({ command }) => ({
       input: {
         newtab: r('src/newtab/index.html'),
         popup: r('src/popup/index.html'),
+      },
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('naive-ui')) {
+              return 'vendor-naive-ui'
+            }
+            if (id.includes('vue')) {
+              return 'vendor-vue'
+            }
+            return 'vendor'
+          }
+          if (id.includes('/src/popup')) {
+            return 'popup'
+          }
+          if (id.includes('/src/newtab')) {
+            return 'newtab'
+          }
+          if (id.includes('~icons')) {
+            return 'app-icons'
+          }
+          return 'app'
+        },
       },
     },
     chunkSizeWarningLimit: 2000,
