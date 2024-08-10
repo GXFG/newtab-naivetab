@@ -107,44 +107,12 @@ export default defineConfig(({ command }) => ({
         popup: r('src/popup/index.html'),
       },
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('naive-ui')) {
-              return 'vendor-naive-ui'
-            }
-            if (id.includes('vue')) {
-              return 'vendor-vue'
-            }
-            if (id.includes('axios')) {
-              return 'vendor-axios'
-            }
-            if (id.includes('dayjs')) {
-              return 'vendor-dayjs'
-            }
-            if (id.includes('lunar-typescript')) {
-              return 'vendor-lunar'
-            }
-            if (id.includes('cheerio')) {
-              return 'vendor-cheerio'
-            }
-            return 'vendor-default'
-          }
-          if (id.includes('/src/components')) {
-            return 'app-components'
-          }
-          if (id.includes('/src/newtab')) {
-            return 'app-newtab'
-          }
-          if (id.includes('/src/popup')) {
-            return 'app-popup'
-          }
-          if (id.includes('~icons')) {
-            return 'app-icons'
-          }
-          if (id.includes('.css')) {
-            return 'app-css'
-          }
-          return 'app-default'
+        manualChunks: {
+          'vendor-vue': ['vue', '@vueuse/core'],
+          'vendor-naive-ui': ['naive-ui'],
+          'vendor-lunar': ['lunar-typescript'],
+          'vendor-cheerio': ['cheerio'],
+          vendor: ['axios', 'dayjs', 'driver.js'],
         },
       },
     },
