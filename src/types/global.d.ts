@@ -6,6 +6,7 @@ declare const __DEV__: boolean
 declare const __NAME__: string //  Extension name, defined in packageJson.name
 
 interface Window {
+  appVersion: string
   $t: (key: string) => string
   $message: MessageApiInjection
   $notification: NotificationApiInjection

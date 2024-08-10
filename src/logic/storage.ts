@@ -4,7 +4,6 @@ import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MA
 import { defaultConfig } from '@/logic/config'
 import { compareLeftVersionLessThanRightVersions, log, downloadJsonByTagA, sleep } from '@/logic/util'
 import { localConfig, localState, globalState, switchSettingDrawerVisible } from '@/logic/store'
-import pkg from '../../package.json'
 
 export const getLocalVersion = () => {
   let version = localConfig.general.version
@@ -394,7 +393,7 @@ export const importSetting = async (text: string) => {
       delete oldBookmarkConfig.shadowColor
     }
     log('FileContentTransform', fileContent)
-    fileContent.general.version = pkg.version // 更新版本号
+    fileContent.general.version = window.appVersion // 更新版本号
     await updateSetting(fileContent)
     window.$message.success(`${window.$t('common.import')}${window.$t('common.success')}`)
     globalState.isImportSettingLoading = false
@@ -407,7 +406,7 @@ export const importSetting = async (text: string) => {
 }
 
 export const exportSetting = () => {
-  const filename = `naivetab-v${pkg.version}-${dayjs().format('YYYYMMDD-HHmmss')}.json`
+  const filename = `naivetab-v${window.appVersion}-${dayjs().format('YYYYMMDD-HHmmss')}.json`
   downloadJsonByTagA(localConfig, filename)
   window.$message.success(`${window.$t('common.export')}${window.$t('common.success')}`)
 }

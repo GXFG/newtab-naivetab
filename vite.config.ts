@@ -2,21 +2,20 @@
 /// <reference types="vitest" />
 
 import { resolve } from 'node:path'
-import type { UserConfig } from 'vite'
-import { defineConfig } from 'vite'
+import { defineConfig, type UserConfig, type PluginOption } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
+import UnoCSS from 'unocss/vite'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import Markdown from 'vite-plugin-md'
-import UnoCSS from 'unocss/vite'
 import postcssPresetEnv from 'postcss-preset-env'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { isDev, port, r } from './scripts/utils'
 import packageJson from './package.json'
-// import visualizer from 'rollup-plugin-visualizer'
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
@@ -62,8 +61,8 @@ export const sharedConfig: UserConfig = {
         NaiveUiResolver(),
       ],
     }),
-    Icons(), // https://github.com/antfu/unplugin-icons
     UnoCSS(), // https://github.com/unocss/unocss
+    Icons(), // https://github.com/antfu/unplugin-icons
 
     // html内引用的资源直接存储在/extension/assets, 无需转换
     // rewrite assets to use relative path
@@ -75,8 +74,6 @@ export const sharedConfig: UserConfig = {
     //     return html.replace(/"\/assets\//g, `"${relative(dirname(path), '/assets')}/`)
     //   },
     // },
-
-    // visualizer(),
   ],
   optimizeDeps: {
     include: ['vue', '@vueuse/core', 'webextension-polyfill'],
@@ -86,6 +83,7 @@ export const sharedConfig: UserConfig = {
 
 export default defineConfig(({ command }) => ({
   ...sharedConfig,
+  plugins: sharedConfig.plugins?.concat(visualizer() as PluginOption),
   base: command === 'serve' ? `http://localhost:${port}/` : '/dist/',
   server: {
     port,
@@ -117,22 +115,40 @@ export default defineConfig(({ command }) => ({
             if (id.includes('vue')) {
               return 'vendor-vue'
             }
-            return 'vendor'
+            if (id.includes('axios')) {
+              return 'vendor-axios'
+            }
+            if (id.includes('dayjs')) {
+              return 'vendor-dayjs'
+            }
+            if (id.includes('lunar-typescript')) {
+              return 'vendor-lunar'
+            }
+            if (id.includes('cheerio')) {
+              return 'vendor-cheerio'
+            }
+            return 'vendor-default'
           }
-          if (id.includes('/src/popup')) {
-            return 'popup'
+          if (id.includes('/src/components')) {
+            return 'app-components'
           }
           if (id.includes('/src/newtab')) {
-            return 'newtab'
+            return 'app-newtab'
+          }
+          if (id.includes('/src/popup')) {
+            return 'app-popup'
           }
           if (id.includes('~icons')) {
             return 'app-icons'
           }
-          return 'app'
+          if (id.includes('.css')) {
+            return 'app-css'
+          }
+          return 'app-default'
         },
       },
     },
-    chunkSizeWarningLimit: 2000,
+    chunkSizeWarningLimit: 1000,
   },
   test: {
     globals: true,

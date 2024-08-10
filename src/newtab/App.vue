@@ -12,7 +12,6 @@ import { handleWatchNewsConfigChange } from '@/logic/news'
 import { handleWatchWeatherConfigChange } from '@/logic/weather'
 import { updatePoetry } from '@/logic/poetry'
 import Content from '@/newtab/Content.vue'
-import pkg from '../../package.json'
 
 if (localConfig.general.openPageFocusElement !== 'default') {
   if (location.search !== '?focus') {
@@ -35,7 +34,7 @@ const handleFocusPage = () => {
 const onDot = () => {
   const [brand] = navigator.userAgentData?.brands.slice(-1) || []
   gaProxy('view', ['newtab'], {
-    version: pkg.version,
+    version: window.appVersion,
     userAgent: navigator.userAgent,
     platform: navigator.userAgentData?.platform,
     browser: `${brand.brand}_${brand.version}`,
