@@ -8,7 +8,6 @@ import { defaultConfig, defaultLocalState } from '@/logic/config'
 import { log, createTab, compareLeftVersionLessThanRightVersions } from '@/logic/util'
 import { updateSetting, getLocalVersion } from '@/logic/storage'
 import { resetBookmarkPending } from '@/logic/bookmark'
-import pkg from '../../package.json'
 
 export const localConfig = reactive({
   general: useStorageLocal('c-general', defaultConfig.general),
@@ -183,7 +182,7 @@ const updateSuccess = () => {
   window.$notification.success({
     duration: 5000,
     title: `${window.$t('common.update')}${window.$t('common.success')}`,
-    content: `${window.$t('common.version')} ${pkg.version}`,
+    content: `${window.$t('common.version')} ${window.appVersion}`,
     action: () =>
       h(
         NButton,
@@ -204,10 +203,10 @@ const updateSuccess = () => {
 export const handleAppUpdate = async () => {
   const version = getLocalVersion()
   log('Version', version)
-  if (!compareLeftVersionLessThanRightVersions(version, pkg.version)) {
+  if (!compareLeftVersionLessThanRightVersions(version, window.appVersion)) {
     return
   }
-  log('Get new version', pkg.version)
+  log('Get new version', window.appVersion)
   // TODO 每次更新均需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.17.3')) {
     localConfig.calendar.width = 50
@@ -317,7 +316,7 @@ export const handleAppUpdate = async () => {
     localConfig.search.isNewTabOpen = false
   }
   // 更新local版本号
-  localConfig.general.version = pkg.version
+  localConfig.general.version = window.appVersion
   // updateSuccess()
   // 刷新配置设置
   await updateSetting()
