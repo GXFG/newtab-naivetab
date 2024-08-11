@@ -12,7 +12,7 @@ import MemoSetting from './MemoSetting.vue'
 import WeatherSetting from './WeatherSetting.vue'
 import NewsSetting from './NewsSetting.vue'
 
-const appVersion = window.appVersion
+const appVersion = computed(() => window.appVersion)
 
 const tabPaneList = computed(() => [
   {

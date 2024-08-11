@@ -37,8 +37,8 @@ importers:
         version: 3.4.37(typescript@5.5.4)
     devDependencies:
       '@ffflorian/jszip-cli':
-        specifier: ^3.6.4
-        version: 3.6.4(typescript@5.5.4)
+        specifier: ^3.6.5
+        version: 3.6.5(typescript@5.5.4)
       '@iconify/json':
         specifier: ^2.2.235
         version: 2.2.235
@@ -903,8 +903,8 @@ packages:
     resolution: {integrity: sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@ffflorian/jszip-cli@3.6.4':
-    resolution: {integrity: sha512-KlZlvEomdlLzC4G/Ynlfi0ArlKP3CHRlQHTi2jpzV4fa3Rwa6fem83snKzzccWr3K9PUNTG/JfPNuJx+MPS8qQ==}
+  '@ffflorian/jszip-cli@3.6.5':
+    resolution: {integrity: sha512-uhuG67I9QcaNAuBN2qZWVIp5YulXuyxkaJvXDtZFeGWczDfKZRb6eQd1tw8VYGZ6i59oGp3/krBy0UUxZiVS/g==}
     engines: {node: '>= 10.9'}
     hasBin: true
 
@@ -5779,7 +5779,7 @@ snapshots:
 
   '@eslint/js@8.57.0': {}
 
-  '@ffflorian/jszip-cli@3.6.4(typescript@5.5.4)':
+  '@ffflorian/jszip-cli@3.6.5(typescript@5.5.4)':
     dependencies:
       commander: 12.1.0
       cosmiconfig: 9.0.0(typescript@5.5.4)

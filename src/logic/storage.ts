@@ -8,11 +8,11 @@ import { localConfig, localState, globalState, switchSettingDrawerVisible } from
 export const getLocalVersion = () => {
   let version = localConfig.general.version
   // handle old version 兼容小于0.9版本的旧数据结构
-  const settingGeneral = localStorage.getItem('setting-general')
+  const settingGeneral = localStorage.getItem('c-general')
   if (settingGeneral) {
-    version = JSON.parse(settingGeneral).version || 0
+    version = JSON.parse(settingGeneral).version
   }
-  return version
+  return version || '0'
 }
 
 export const isUploadConfigLoading = computed(() => {

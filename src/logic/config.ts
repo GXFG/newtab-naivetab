@@ -1,10 +1,12 @@
+import pkg from '../../package.json'
+
 const UI_LANGUAGE = chrome.i18n.getUILanguage()
 const CURR_LANG = UI_LANGUAGE || 'en-US'
 
 export const defaultConfig = {
   general: {
     isFirstOpen: true,
-    version: window.appVersion,
+    version: pkg.version,
     appearance: 'auto' as 'light' | 'dark' | 'auto',
     pageTitle: CURR_LANG === 'zh-CN' ? '新标签页' : 'NaiveTab',
     lang: CURR_LANG,
