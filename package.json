@@ -5,7 +5,7 @@
   "version": "1.22.3",
   "private": true,
   "packageManager": "pnpm@9.6.0",
-  "description": "一款简洁高效的浏览器新标签页扩展，可以高度自定义你的新标签页",
+  "description": "A simple and efficient browser new tab extension that allows you to highly customize your new tab page.",
   "scripts": {
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:*",
     "dev:prepare": "esno scripts/prepare.ts",
