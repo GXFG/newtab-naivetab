@@ -3,7 +3,7 @@
     "message": "NaiveTab - Newtab page"
   },
   "appDesc": {
-    "message": "A simple and efficient browser new tab extension that allows you to highly customize your new tab page. Includes keyboard bookmarks, clocks, date,, perpetual calendars, search bar, memo , weather, news and more."
+    "message": "A simple and efficient browser new tab extension that allows you to highly customize your new tab page."
   },
   "command1": {
     "message": "Open bookmark 1"
