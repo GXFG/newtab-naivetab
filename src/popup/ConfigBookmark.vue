@@ -136,6 +136,8 @@ const popupKeyboardActiveBg = getStyleConst('popupKeyboardActiveBg')
 
 const KEYCAP_BASE_SIZE = 45
 
+const keycapBaseSize = `${KEYCAP_BASE_SIZE}px`
+
 const getCustomKeycapWidth = (code: string) => {
   let value = KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].size
   const customSize = currKeyboardConfig.value.custom[code] && currKeyboardConfig.value.custom[code].size
@@ -417,7 +419,7 @@ const popupMainWidth = `${getContainerWidth()}px`
       display: flex;
       .row__keycap-wrap {
         padding: 1px;
-        height: v-bind(`${KEYCAP_BASE_SIZE}px`);
+        height: v-bind(keycapBaseSize);
         cursor: pointer;
         .row__keycap {
           display: flex;
@@ -428,7 +430,7 @@ const popupMainWidth = `${getContainerWidth()}px`
           padding: 2px;
           width: 100%;
           height: 100%;
-          border-radius: 3px;
+          border-radius: 5px;
           border: 1px solid v-bind(popupKeyboardBorder);
           user-select: none;
           transition: all 200ms ease-in-out;
@@ -454,6 +456,7 @@ const popupMainWidth = `${getContainerWidth()}px`
           .keycap__label {
             font-size: 12px;
             line-height: 1;
+            font-weight: 500;
           }
           .keycap__img {
             display: flex;
