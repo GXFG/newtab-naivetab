@@ -67,5 +67,6 @@
 }
 
 body {
-  font-family: 'Arial Rounded MT Bold', 'OpenCherry', 'KBD', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD', 'Pixel Lcd Machine';
+  font-family: 'Arial', 'Helvetica', 'sans-serif', 'Arial Rounded MT Bold', 'OpenCherry', 'KBD', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD',
+    'Pixel Lcd Machine';
 }

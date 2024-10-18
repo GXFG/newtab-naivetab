@@ -51,7 +51,16 @@ export const DAYJS_LANG_MAP = {
 export const FONT_LIST = [
   // common
   'Cascadia Code',
+  'Cascadia Mono',
   'Fira Code',
+  'HarmonyOS Sans',
+  'HarmonyOS Sans SC',
+  'HarmonyOS Sans TC',
+  'Sarasa Gothic SC',
+  'Sarasa Mono SC',
+  'LXGW WenKai Mono',
+  // macOS
+  'PingFang SC',
   // local
   'Arial Rounded MT Bold',
   'OpenCherry',
