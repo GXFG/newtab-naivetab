@@ -35,7 +35,7 @@ const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
 const customUnitFontSize = getStyleField(CNAME, 'unit.fontSize', 'vmin')
-const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
+const customWidth = getStyleField(CNAME, 'width', 'vmin')
 </script>
 
 <template>
@@ -56,7 +56,12 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
       >
         <div class="clock__time">
           <p class="time__text">
-            {{ state.time }}
+            <span
+              v-for="(item, index) in state.time.split('')"
+              :key="index"
+              class="text__digit"
+              >{{ item }}</span
+            >
           </p>
           <span
             v-if="localConfig.clockDigital.unitEnabled"
@@ -84,7 +89,10 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
       align-items: baseline;
       .time__text {
         font-size: v-bind(customFontSize);
-        letter-spacing: v-bind(customLetterSpacing);
+        .text__digit {
+          display: inline-block;
+          width: v-bind(customWidth);
+        }
       }
       .time__unit {
         font-size: v-bind(customUnitFontSize);

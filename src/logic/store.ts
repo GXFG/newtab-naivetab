@@ -315,6 +315,13 @@ export const handleAppUpdate = async () => {
   if (compareLeftVersionLessThanRightVersions(version, '1.21.0')) {
     localConfig.search.isNewTabOpen = false
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.23.1')) {
+    localConfig.clockDigital.width = localConfig.clockDigital.fontSize / 2 + 8
+    const clockDigitalConfig = localConfig.clockDigital as typeof localConfig.clockDigital & {
+      letterSpacing?: number
+    }
+    delete clockDigitalConfig.letterSpacing
+  }
   // 更新local版本号
   localConfig.general.version = window.appVersion
   // updateSuccess()
