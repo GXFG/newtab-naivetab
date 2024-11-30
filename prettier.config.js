@@ -1,4 +1,8 @@
-module.exports = {
+/**
+ * @type {import('prettier').Config}
+ * @see https://www.prettier.cn/docs/options.html
+ */
+export default {
   printWidth: 200,
   tabWidth: 2,
   semi: false,
@@ -9,5 +13,5 @@ module.exports = {
   bracketSpacing: true,
   jsxBracketSameLine: false,
   singleAttributePerLine: true,
-  endOfLine: 'auto'
+  endOfLine: 'auto',
 }

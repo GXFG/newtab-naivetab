@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { bgCyan, black } from 'kolorist'

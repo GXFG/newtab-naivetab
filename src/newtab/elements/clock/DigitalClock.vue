@@ -34,8 +34,12 @@ const customFontFamily = getStyleField(CNAME, 'fontFamily')
 const customFontColor = getStyleField(CNAME, 'fontColor')
 const customFontSize = getStyleField(CNAME, 'fontSize', 'vmin')
 const customShadowColor = getStyleField(CNAME, 'shadowColor')
+
+const customUnitMargin = getStyleField(CNAME, 'unit.fontSize', 'vmin', 0.2)
 const customUnitFontSize = getStyleField(CNAME, 'unit.fontSize', 'vmin')
-const customWidth = getStyleField(CNAME, 'width', 'vmin')
+
+const customDigitTextWidth = getStyleField(CNAME, 'width', 'vmin')
+const customDigitDivideWidth = getStyleField(CNAME, 'width', 'vmin', 0.5)
 </script>
 
 <template>
@@ -56,18 +60,17 @@ const customWidth = getStyleField(CNAME, 'width', 'vmin')
       >
         <div class="clock__time">
           <p class="time__text">
-            <span
+            <template
               v-for="(item, index) in state.time.split('')"
               :key="index"
-              class="text__digit"
-              >{{ item }}</span
             >
+              <span :class="Number.isNaN(+item) ? 'text__divide' : 'text__digit'">{{ item }}</span>
+            </template>
           </p>
           <span
             v-if="localConfig.clockDigital.unitEnabled"
             class="time__unit"
-            >{{ state.unit }}</span
-          >
+          >{{ state.unit }}</span>
         </div>
       </div>
     </div>
@@ -91,10 +94,17 @@ const customWidth = getStyleField(CNAME, 'width', 'vmin')
         font-size: v-bind(customFontSize);
         .text__digit {
           display: inline-block;
-          width: v-bind(customWidth);
+          width: v-bind(customDigitTextWidth);
+          text-align: center;
+        }
+        .text__divide {
+          display: inline-block;
+          width: v-bind(customDigitDivideWidth);
+          text-align: center;
         }
       }
       .time__unit {
+        margin-left: v-bind(customUnitMargin);
         font-size: v-bind(customUnitFontSize);
       }
     }

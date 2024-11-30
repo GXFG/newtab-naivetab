@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { defineConfig } from 'vite'
 import { sharedConfig } from './vite.config'
 import { isDev, r } from './scripts/utils'

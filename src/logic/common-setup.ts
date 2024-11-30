@@ -2,7 +2,6 @@ import type { App } from 'vue'
 
 export function setupApp(app: App) {
   // Inject a globally available `$app` object in template
-  // eslint-disable-next-line no-param-reassign
   app.config.globalProperties.$app = {
     context: '',
   }
