@@ -51,7 +51,6 @@ export const getTargetDataFromEvent = (
     while (!target.getAttribute('data-target-type')) {
       target = target.parentNode as HTMLInputElement
     }
-    // eslint-disable-next-line no-empty
   } catch (err) {
     // 忽略点击组件外其他区域的报错
   }

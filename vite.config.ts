@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 /// <reference types="vitest" />
 
 import { resolve } from 'node:path'

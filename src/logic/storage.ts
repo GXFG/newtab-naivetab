@@ -192,10 +192,10 @@ const mergeState = (state: unknown, acceptState: unknown) => {
   }
   // 特殊处理 bookmark.keymap 数据，直接返回acceptState
   if (
-    Object.prototype.hasOwnProperty.call(state, 'KeyQ') ||
-    Object.prototype.hasOwnProperty.call(state, 'KeyA') ||
-    Object.prototype.hasOwnProperty.call(state, 'KeyZ') ||
-    Object.prototype.hasOwnProperty.call(state, 'Digit1')
+    Object.prototype.hasOwnProperty.call(state, 'KeyQ')
+    || Object.prototype.hasOwnProperty.call(state, 'KeyA')
+    || Object.prototype.hasOwnProperty.call(state, 'KeyZ')
+    || Object.prototype.hasOwnProperty.call(state, 'Digit1')
   ) {
     return acceptState
   }

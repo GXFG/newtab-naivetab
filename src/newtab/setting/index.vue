@@ -267,4 +267,3 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   }
 }
 </style>
-./CalendarSetting.vue./SearchSetting.vue./MemoSetting.vue./WeatherSetting.vue./NewsSetting.vue

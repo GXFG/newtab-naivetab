@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { defineConfig } from 'unocss/vite'
 import { presetAttributify, presetIcons, presetUno, transformerDirectives } from 'unocss'
 

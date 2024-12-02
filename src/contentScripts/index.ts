@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { onMessage } from 'webext-bridge/content-script'
 import { createApp } from 'vue'
 import App from './views/App.vue'

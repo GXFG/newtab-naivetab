@@ -406,13 +406,11 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                   <span
                     v-if="item.type"
                     class="item__label"
-                    >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span
-                  >
+                  >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
                   <span
                     v-if="item.isToday"
                     class="item__label item__label--today"
-                    >{{ $t('calendar.today') }}</span
-                  >
+                  >{{ $t('calendar.today') }}</span>
                   <!-- 日期 -->
                   <span class="item__day">{{ item.day }}</span>
                   <!-- 描述 -->
@@ -421,8 +419,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                     :class="{
                       'item__desc--highlight': item.isFestival,
                     }"
-                    >{{ item.desc }}</span
-                  >
+                  >{{ item.desc }}</span>
                 </div>
               </template>
 
@@ -448,8 +445,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                       type="success"
                       size="small"
                       :bordered="false"
-                      >{{ yiItem }}</n-tag
                     >
+                      {{ yiItem }}
+                    </n-tag>
                   </div>
                 </div>
                 <div class="detail__row">
@@ -462,8 +460,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                       type="error"
                       size="small"
                       :bordered="false"
-                      >{{ yiItem }}</n-tag
                     >
+                      {{ yiItem }}
+                    </n-tag>
                   </div>
                 </div>
                 <div class="detail__row">
@@ -476,8 +475,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                       type="info"
                       size="small"
                       :bordered="false"
-                      >{{ yiItem }}</n-tag
                     >
+                      {{ yiItem }}
+                    </n-tag>
                   </div>
                 </div>
                 <div class="detail__row">
@@ -489,8 +489,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                       class="tag__item"
                       size="small"
                       :bordered="false"
-                      >{{ yiItem }}</n-tag
                     >
+                      {{ yiItem }}
+                    </n-tag>
                   </div>
                 </div>
               </div>
@@ -719,6 +720,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
     }
     .row__label {
       flex: 0 0 auto;
+      padding-top: 2px;
       width: 40px;
       font-weight: bold;
       text-align: center;
@@ -726,6 +728,9 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
     .row__value {
       .tag__item {
         margin: 2px 3px;
+      }
+      .n-tag {
+        border-radius: 5px;
       }
     }
   }

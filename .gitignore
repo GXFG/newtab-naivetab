@@ -2,6 +2,7 @@
 .idea/
 .vite-ssg-dist
 .vite-ssg-temp
+.eslintcache
 *.crx
 *.local
 *.log

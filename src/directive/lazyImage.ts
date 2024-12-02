@@ -1,6 +1,5 @@
 import { App, DirectiveBinding } from 'vue'
 
-/* eslint-disable no-param-reassign */
 export default {
   install(app: App) {
     app.directive('lazy', {
