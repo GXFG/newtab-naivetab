@@ -113,6 +113,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
               v-for="code of codeList"
               :key="code"
               class="bookmark__key"
+              size="small"
             >
               {{ KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].alias || KEYBOARD_CODE_TO_DEFAULT_CONFIG[code].label }}
             </NInputGroupLabel>
@@ -123,7 +124,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
         <div class="content__config">
           <transition-group
             v-for="codeList of currKeyboardConfig.list"
-            :key="codeList"
+            :key="codeList.toString()"
             name="flip-list"
             tag="div"
             class="bookmark__group"
@@ -145,6 +146,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                     v-model:value="localConfig.bookmark.keymap[code].url"
                     class="input__main"
                     type="text"
+                    size="small"
                     clearable
                     :placeholder="$t('bookmark.urlPlaceholder')"
                   />
@@ -153,12 +155,14 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                     v-model:value="localConfig.bookmark.keymap[code].name"
                     class="input__main"
                     type="text"
+                    size="small"
                     clearable
                     :placeholder="getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[code].url)"
                   />
                   <NInputGroupLabel
                     v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
                     class="item__shortcut"
+                    size="small"
                     :title="globalState.allCommandsMap[code]"
                     @click="openConfigShortcutsPage()"
                   >
@@ -172,26 +176,32 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
                 <!-- <NInputGroupLabel class="item__move" @mousedown="onBookmarkStartDrag" @mouseup="onBookmarkStopDrag"> -->
                 <NButton
                   class="item__move"
+                  size="small"
                   @mousedown="onBookmarkStartDrag"
                   @mouseup="onBookmarkStopDrag"
                 >
                   <cil:resize-height />
                 </NButton>
-                <NButton @click="onImportBookmark(code)">
+                <NButton
+                  size="small"
+                  @click="onImportBookmark(code)"
+                >
                   <lucide:bookmark-plus />
                 </NButton>
                 <NPopconfirm @positive-click="onDeleteKey(code)">
                   <template #trigger>
-                    <NButton>
+                    <NButton size="small">
                       <ri:delete-bin-6-line />
                     </NButton>
                   </template>
                   {{ $t('common.delete') }}?
                 </NPopconfirm>
               </template>
+
               <NButton
                 v-else
                 class="item__create"
+                size="small"
                 @click="onCreateKey(code)"
               >
                 <zondicons:add-solid />
@@ -240,6 +250,7 @@ const customNameInputWidth = computed(() => (localConfig.bookmark.isListenBackgr
       justify-content: center;
       margin-right: 5px;
       margin-bottom: 5px;
+      font-size: 13px;
     }
     .bookmark__group {
       padding-bottom: 10px;

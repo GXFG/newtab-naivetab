@@ -3,6 +3,7 @@ import pkg from '../../package.json'
 const UI_LANGUAGE = chrome.i18n.getUILanguage()
 const CURR_LANG = UI_LANGUAGE || 'en-US'
 
+// @@@@ add Components 6
 export const defaultConfig = {
   general: {
     isFirstOpen: true,
@@ -10,6 +11,7 @@ export const defaultConfig = {
     appearance: 'auto' as 'light' | 'dark' | 'auto',
     pageTitle: CURR_LANG === 'zh-CN' ? '新标签页' : 'NaiveTab',
     lang: CURR_LANG,
+    timeLang: CURR_LANG,
     drawerPlacement: 'right' as 'left' | 'right',
     openPageFocusElement: 'default' as 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard',
     isLoadPageAnimationEnabled: true,
@@ -242,6 +244,44 @@ export const defaultConfig = {
     workLabelBackgroundColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
     workItemBackgroundColor: ['rgba(255, 221, 221, 1)', 'rgba(218, 181, 181, 1)'],
   },
+  yearProgress: {
+    enabled: false,
+    layout: {
+      xOffsetKey: 'right',
+      xOffsetValue: 0,
+      xTranslateValue: 0,
+      yOffsetKey: 'top',
+      yOffsetValue: 0,
+      yTranslateValue: 0,
+    },
+    padding: 10,
+    width: 345,
+    height: 110,
+    borderRadius: 5.5,
+    fontFamily: 'Arial',
+    fontSize: 16,
+    fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+    isBorderEnabled: true,
+    borderWidth: 1,
+    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
+    isShadowEnabled: true,
+    shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
+    // text
+    isRealtime: false,
+    textLineHeight: 1.5,
+    textActiveColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
+    isPercentageEnabled: true,
+    percentageDecimal: 3,
+    isDateEnabled: true,
+    format: 'YYYY.MM.DD',
+    // block
+    blockMargin: 1.2,
+    blockSize: 4.5,
+    blockRadius: 1,
+    blockDefaultColor: ['rgba(200, 200, 200, 1)', 'rgba(200, 200, 200, 1)'],
+    blockActiveColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
+  },
   search: {
     enabled: true,
     isNewTabOpen: false,
@@ -351,59 +391,28 @@ export const defaultConfig = {
   },
 }
 
+export const defaultUploadStatusItem = {
+  loading: false,
+  syncTime: 0,
+  syncId: '',
+}
+
+export const genUploadConfigStatusMap = () => {
+  const statusMap = {} as {
+    [key in ConfigField]: {
+      loading: boolean
+      syncTime: number
+      syncId: string
+    }
+  }
+  for (const element in defaultConfig) {
+    statusMap[element] = defaultUploadStatusItem
+  }
+  return statusMap
+}
+
 export const defaultLocalState = {
   currAppearanceLabel: 'light' as 'light' | 'dark',
   currAppearanceCode: 0 as 0 | 1, // 0:light | 1:dark
-  isUploadConfigStatusMap: {
-    general: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    bookmark: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    clockDigital: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    clockAnalog: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    date: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    calendar: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    search: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    weather: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    memo: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-    news: {
-      loading: false,
-      syncTime: 0,
-      syncId: '',
-    },
-  },
+  isUploadConfigStatusMap: genUploadConfigStatusMap(),
 }

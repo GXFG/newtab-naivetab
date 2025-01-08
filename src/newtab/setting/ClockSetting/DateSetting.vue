@@ -9,7 +9,10 @@ import Tips from '@/newtab/components/form/Tips.vue'
   <BaseComponentSetting cname="date">
     <template #header>
       <NFormItem :label="$t('common.format')">
-        <NInput v-model:value="localConfig.date.format" />
+        <NInput
+          v-model:value="localConfig.date.format"
+          size="small"
+        />
         <Tips
           link
           :content="URL_DAYJS_FORMAT"

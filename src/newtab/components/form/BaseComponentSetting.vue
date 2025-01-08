@@ -67,6 +67,7 @@ const isRenderField = (field: string) => {
       <NInputNumber
         v-model:value="localConfig[props.cname].margin"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="0.1"
         :min="props.marginRange[0]"
         :max="props.marginRange[1]"
@@ -87,6 +88,7 @@ const isRenderField = (field: string) => {
       <NInputNumber
         v-model:value="localConfig[props.cname].padding"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="0.1"
         :min="props.paddingRange[0]"
         :max="props.paddingRange[1]"
@@ -107,6 +109,7 @@ const isRenderField = (field: string) => {
       <NInputNumber
         v-model:value="localConfig[props.cname].width"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="1"
         :min="props.widthRange[0]"
         :max="props.widthRange[1]"
@@ -127,6 +130,7 @@ const isRenderField = (field: string) => {
       <NInputNumber
         v-model:value="localConfig[props.cname].height"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="1"
         :min="props.heightRange[0]"
         :max="props.heightRange[1]"
@@ -147,6 +151,7 @@ const isRenderField = (field: string) => {
       <NInputNumber
         v-model:value="localConfig[props.cname].borderRadius"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="0.1"
         :min="props.borderRadiusRange[0]"
         :max="props.borderRadiusRange[1]"
@@ -161,6 +166,7 @@ const isRenderField = (field: string) => {
         v-model:value="localConfig[props.cname].fontFamily"
         :options="availableFontOptions"
         :render-label="fontSelectRenderLabel"
+        size="small"
       />
       <CustomColorPicker
         v-model:value="localConfig[props.cname].fontColor[localState.currAppearanceCode]"
@@ -169,6 +175,7 @@ const isRenderField = (field: string) => {
       <NInputNumber
         v-model:value="localConfig[props.cname].fontSize"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="1"
         :min="5"
         :max="200"
@@ -189,6 +196,7 @@ const isRenderField = (field: string) => {
       <NInputNumber
         v-model:value="localConfig[props.cname].letterSpacing"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="0.1"
         :min="0"
         :max="50"
@@ -220,7 +228,10 @@ const isRenderField = (field: string) => {
       :label="$t('common.border')"
       class="n-form-item--color"
     >
-      <NSwitch v-model:value="localConfig[props.cname].isBorderEnabled" />
+      <NSwitch
+        v-model:value="localConfig[props.cname].isBorderEnabled"
+        size="small"
+      />
       <CustomColorPicker
         v-if="isRenderField('isBorderEnabled')"
         v-model:value="localConfig[props.cname].borderColor[localState.currAppearanceCode]"
@@ -230,6 +241,7 @@ const isRenderField = (field: string) => {
         v-if="isRenderField('borderWidth')"
         v-model:value="localConfig[props.cname].borderWidth"
         class="setting__item-element setting__input-number"
+        size="small"
         :step="1"
         :min="1"
         :max="10"
@@ -241,7 +253,10 @@ const isRenderField = (field: string) => {
       :label="$t('common.shadow')"
       class="n-form-item--color"
     >
-      <NSwitch v-model:value="localConfig[props.cname].isShadowEnabled" />
+      <NSwitch
+        v-model:value="localConfig[props.cname].isShadowEnabled"
+        size="small"
+      />
       <CustomColorPicker
         v-if="isRenderField('isShadowEnabled')"
         v-model:value="localConfig[props.cname].shadowColor[localState.currAppearanceCode]"

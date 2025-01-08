@@ -1,6 +1,7 @@
 {
   "common": {
     "version": "Version",
+    "default": "Default",
     "confirmation": "Confirmation",
     "confirm": "Confirm",
     "cancel": "Cancel",
@@ -37,6 +38,7 @@
     "auto": "Auto",
     "light": "Light",
     "dark": "Dark",
+    "text": "Text",
     "font": "Font",
     "fontSize": "Font size",
     "letterSpacing": "Letter spacing",
@@ -48,6 +50,7 @@
     "source": "Source",
     "blur": "Blur",
     "opacity": "Opacity",
+    "active": "Active",
     "activeColor": "Active color",
     "shadow": "Shadow",
     "border": "Border",
@@ -63,6 +66,7 @@
     "size": "Size",
     "width": "Width",
     "height": "Height",
+    "lineHeight": "LineHeight",
     "borderRadius": "Radius",
     "icon": "Icon",
     "config": "Config",
@@ -145,8 +149,9 @@
     "clockDigital": "DigitalClock",
     "clockAnalog": "AnalogClock",
     "date": "Date",
-    "search": "Search",
     "calendar": "Calendar",
+    "yearProgress": "YearProgress",
+    "search": "Search",
     "weather": "Weather",
     "memo": "Memo",
     "news": "News"
@@ -178,7 +183,8 @@
     "clearStorageTips": "If there is an exception locally, you can try to clear the local cache, this operation will not lose the synced settings",
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
-    "language": "Language",
+    "language": "Main Language",
+    "timeLanguage": "Time Language",
     "saveCurrendImage": "Download",
     "localBackgroundTips": "Local file will not be synchronized"
   },
@@ -252,6 +258,12 @@
     "day": "Day",
     "desc": "Desc",
     "holiday": "Holiday"
+  },
+  "yearProgress": {
+    "isRealtime": "Realtime",
+    "percentage": "Percentage",
+    "decimal": "Decimal",
+    "block": "Block"
   },
   "weather": {
     "warning": "Warning",

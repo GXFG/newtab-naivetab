@@ -1,7 +1,7 @@
 import md5 from 'crypto-js/md5'
 import { useDebounceFn } from '@vueuse/core'
 import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/const'
-import { defaultConfig } from '@/logic/config'
+import { defaultConfig, defaultUploadStatusItem } from '@/logic/config'
 import { compareLeftVersionLessThanRightVersions, log, downloadJsonByTagA, sleep } from '@/logic/util'
 import { localConfig, localState, globalState, switchSettingDrawerVisible } from '@/logic/store'
 
@@ -35,6 +35,9 @@ export const isUploadConfigLoading = computed(() => {
  */
 const uploadConfigFn = (field: ConfigField) => {
   return new Promise((resolve) => {
+    if (!localState.value.isUploadConfigStatusMap[field]) {
+      localState.value.isUploadConfigStatusMap[field] = defaultUploadStatusItem
+    }
     localState.value.isUploadConfigStatusMap[field].loading = true
     log(`Upload config-${field} start`)
     const currTime = Date.now()
@@ -84,88 +87,18 @@ const genWathUploadConfigFn = (field: ConfigField) => {
   }
 }
 
-const uploadConfigGeneral = genWathUploadConfigFn('general')
-const uploadConfigBookmark = genWathUploadConfigFn('bookmark')
-const uploadConfigClockDigital = genWathUploadConfigFn('clockDigital')
-const uploadConfigClockAnalog = genWathUploadConfigFn('clockAnalog')
-const uploadConfigDate = genWathUploadConfigFn('date')
-const uploadConfigCalendar = genWathUploadConfigFn('calendar')
-const uploadConfigSearch = genWathUploadConfigFn('search')
-const uploadConfigWeather = genWathUploadConfigFn('weather')
-const uploadConfigMemo = genWathUploadConfigFn('memo')
-const uploadConfigNews = genWathUploadConfigFn('news')
-
 export const handleWatchLocalConfigChange = () => {
-  watch(
-    () => localConfig.general,
-    () => {
-      uploadConfigGeneral()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.bookmark,
-    () => {
-      uploadConfigBookmark()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.clockDigital,
-    () => {
-      uploadConfigClockDigital()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.clockAnalog,
-    () => {
-      uploadConfigClockAnalog()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.date,
-    () => {
-      uploadConfigDate()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.calendar,
-    () => {
-      uploadConfigCalendar()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.search,
-    () => {
-      uploadConfigSearch()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.weather,
-    () => {
-      uploadConfigWeather()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.memo,
-    () => {
-      uploadConfigMemo()
-    },
-    { deep: true },
-  )
-  watch(
-    () => localConfig.news,
-    () => {
-      uploadConfigNews()
-    },
-    { deep: true },
-  )
+  const fieldList = Object.keys(localConfig) as ConfigField[]
+  for (const field of fieldList) {
+    const uploadConfigFn = genWathUploadConfigFn(field)
+    watch(
+      () => localConfig[field],
+      () => {
+        uploadConfigFn()
+      },
+      { deep: true },
+    )
+  }
 }
 
 /**

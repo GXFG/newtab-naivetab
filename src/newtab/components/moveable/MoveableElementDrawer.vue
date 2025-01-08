@@ -9,6 +9,7 @@ const state = reactive({
   isCursorInElementDrawer: false,
 })
 
+// @@@@ add Components 4
 const elementList = computed(() => [
   {
     label: window.$t('setting.clockDigital'),
@@ -37,6 +38,13 @@ const elementList = computed(() => [
     iconName: 'uiw:date',
     iconSize: 30,
     disabled: localConfig.calendar.enabled,
+  },
+  {
+    label: window.$t('setting.yearProgress'),
+    componentName: 'yearProgress',
+    iconName: 'lets-icons:time-progress',
+    iconSize: 35,
+    disabled: localConfig.yearProgress.enabled,
   },
   {
     label: window.$t('setting.search'),

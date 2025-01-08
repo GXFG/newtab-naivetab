@@ -179,6 +179,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
               <NFormItem :label="`${$t('common.custom')}`">
                 <NSwitch
                   v-model:value="localConfig.general.isBackgroundImageCustomUrlEnabled"
+                  size="small"
                   @update:value="handleCustomUrlUpdate"
                 />
               </NFormItem>
@@ -200,7 +201,10 @@ const handleBackgroundImageCustomUrlBlur = () => {
               v-if="localConfig.general.backgroundImageSource !== 0 && !localConfig.general.isBackgroundImageCustomUrlEnabled"
               :label="$t('common.uhd')"
             >
-              <NSwitch v-model:value="localConfig.general.backgroundImageHighQuality" />
+              <NSwitch
+                v-model:value="localConfig.general.backgroundImageHighQuality"
+                size="small"
+              />
             </NFormItem>
 
             <!-- 当前背景图 -->

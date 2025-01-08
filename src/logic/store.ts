@@ -4,11 +4,12 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isEdge } from '@/env'
 import { styleConst } from '@/styles/const'
 import { URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/const'
-import { defaultConfig, defaultLocalState } from '@/logic/config'
+import { defaultConfig, defaultLocalState, genUploadConfigStatusMap } from '@/logic/config'
 import { log, createTab, compareLeftVersionLessThanRightVersions } from '@/logic/util'
 import { updateSetting, getLocalVersion } from '@/logic/storage'
 import { resetBookmarkPending } from '@/logic/bookmark'
 
+// @@@@ add Components 2
 export const localConfig = reactive({
   general: useStorageLocal('c-general', defaultConfig.general),
   bookmark: useStorageLocal('c-bookmark', defaultConfig.bookmark),
@@ -16,6 +17,7 @@ export const localConfig = reactive({
   clockAnalog: useStorageLocal('c-clockAnalog', defaultConfig.clockAnalog),
   date: useStorageLocal('c-date', defaultConfig.date),
   calendar: useStorageLocal('c-calendar', defaultConfig.calendar),
+  yearProgress: useStorageLocal('c-yearProgress', defaultConfig.yearProgress),
   search: useStorageLocal('c-search', defaultConfig.search),
   memo: useStorageLocal('c-memo', defaultConfig.memo),
   weather: useStorageLocal('c-weather', defaultConfig.weather),
@@ -160,7 +162,7 @@ export const switchSettingDrawerVisible = (status: boolean) => {
   }
 }
 
-export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localConfig.general.lang] || 'en')
+export const currDayjsLang = computed(() => DAYJS_LANG_MAP[localConfig.general.timeLang] || 'en')
 
 export const openChangelogModal = () => {
   globalState.isChangelogModalVisible = true
@@ -207,6 +209,7 @@ export const handleAppUpdate = async () => {
     return
   }
   log('Get new version', window.appVersion)
+  localState.value.isUploadConfigStatusMap = genUploadConfigStatusMap()
   // TODO 每次更新均需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.17.3')) {
     localConfig.calendar.width = 50
@@ -321,6 +324,10 @@ export const handleAppUpdate = async () => {
       letterSpacing?: number
     }
     delete clockDigitalConfig.letterSpacing
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.24.0')) {
+    localConfig.general.timeLang = localConfig.general.lang
+    localConfig.yearProgress = defaultConfig.yearProgress
   }
   // 更新local版本号
   localConfig.general.version = window.appVersion

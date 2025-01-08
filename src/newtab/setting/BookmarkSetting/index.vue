@@ -92,14 +92,17 @@ const onOpenPopup = () => {
         </NFormItem>
 
         <NFormItem :label="$t('bookmark.listenBackgroundKeystrokes')">
-          <div class="setting__input-wrap">
-            <div class="setting__input_item">
-              <NSwitch v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes" />
+          <div class="setting__item_wrap">
+            <div class="item__box">
+              <NSwitch
+                v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes"
+                size="small"
+              />
               <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
             </div>
             <div
               v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
-              class="setting__input_item"
+              class="item__box"
             >
               <NButton
                 type="primary"
@@ -114,19 +117,23 @@ const onOpenPopup = () => {
         </NFormItem>
 
         <NFormItem :label="$t('bookmark.dblclickKeyToOpen')">
-          <div class="setting__input-wrap">
-            <div class="setting__input_item">
-              <NSwitch v-model:value="localConfig.bookmark.isDblclickOpen" />
+          <div class="setting__item_wrap">
+            <div class="item__box">
+              <NSwitch
+                v-model:value="localConfig.bookmark.isDblclickOpen"
+                size="small"
+              />
               <Tips :content="$t('bookmark.dblclickKeyToOpenTips')" />
             </div>
             <div
               v-if="localConfig.bookmark.isDblclickOpen"
-              class="setting__input_item"
+              class="item__box"
             >
               <span class="setting__item-element">{{ $t('bookmark.intervalTime') }}</span>
               <NInputNumber
                 v-model:value="localConfig.bookmark.dblclickIntervalTime"
                 class="setting__item-element setting__input-number--unit"
+                size="small"
                 :min="0"
                 :step="1"
               >
@@ -138,7 +145,10 @@ const onOpenPopup = () => {
         </NFormItem>
 
         <NFormItem :label="$t('general.newTabOpen')">
-          <NSwitch v-model:value="localConfig.bookmark.isNewTabOpen" />
+          <NSwitch
+            v-model:value="localConfig.bookmark.isNewTabOpen"
+            size="small"
+          />
         </NFormItem>
 
         <NFormItem
@@ -220,7 +230,10 @@ const onOpenPopup = () => {
           {{ `${$t('bookmark.shell')}${$t('common.config')}` }}
         </p>
         <NFormItem :label="$t('bookmark.shell')">
-          <NSwitch v-model:value="localConfig.bookmark.isShellVisible" />
+          <NSwitch
+            v-model:value="localConfig.bookmark.isShellVisible"
+            size="small"
+          />
           <CustomColorPicker
             v-if="localConfig.bookmark.isShellVisible"
             v-model:value="localConfig.bookmark.shellColor[localState.currAppearanceCode]"
@@ -239,6 +252,7 @@ const onOpenPopup = () => {
             <NInputNumber
               v-model:value="localConfig.bookmark.shellVerticalPadding"
               class="setting__item-element setting__input-number"
+              size="small"
               :step="1"
               :min="0"
               :max="100"
@@ -255,6 +269,7 @@ const onOpenPopup = () => {
             <NInputNumber
               v-model:value="localConfig.bookmark.shellHorizontalPadding"
               class="setting__item-element setting__input-number"
+              size="small"
               :step="1"
               :min="0"
               :max="100"
@@ -271,6 +286,7 @@ const onOpenPopup = () => {
             <NInputNumber
               v-model:value="localConfig.bookmark.shellBorderRadius"
               class="setting__item-element setting__input-number"
+              size="small"
               :step="0.1"
               :min="0"
               :max="30"
@@ -280,7 +296,10 @@ const onOpenPopup = () => {
             :label="$t('common.shadow')"
             class="n-form-item--color"
           >
-            <NSwitch v-model:value="localConfig.bookmark.isShellShadowEnabled" />
+            <NSwitch
+              v-model:value="localConfig.bookmark.isShellShadowEnabled"
+              size="small"
+            />
             <CustomColorPicker
               v-model:value="localConfig.bookmark.shellShadowColor[localState.currAppearanceCode]"
               class="setting__item-element"
@@ -290,7 +309,10 @@ const onOpenPopup = () => {
             {{ `${$t('bookmark.plate')}${$t('common.config')}` }}
           </p>
           <NFormItem :label="$t('bookmark.plate')">
-            <NSwitch v-model:value="localConfig.bookmark.isPlateVisible" />
+            <NSwitch
+              v-model:value="localConfig.bookmark.isPlateVisible"
+              size="small"
+            />
             <CustomColorPicker
               v-if="localConfig.bookmark.isPlateVisible"
               v-model:value="localConfig.bookmark.plateColor[localState.currAppearanceCode]"
@@ -309,6 +331,7 @@ const onOpenPopup = () => {
               <NInputNumber
                 v-model:value="localConfig.bookmark.platePadding"
                 class="setting__item-element setting__input-number"
+                size="small"
                 :step="0.1"
                 :min="0"
                 :max="10"
@@ -325,6 +348,7 @@ const onOpenPopup = () => {
               <NInputNumber
                 v-model:value="localConfig.bookmark.plateBorderRadius"
                 class="setting__item-element setting__input-number"
+                size="small"
                 :step="0.1"
                 :min="0"
                 :max="10"
@@ -347,6 +371,7 @@ const onOpenPopup = () => {
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapPadding"
             class="setting__item-element setting__input-number"
+            size="small"
             :step="0.1"
             :min="0"
             :max="10"
@@ -364,6 +389,7 @@ const onOpenPopup = () => {
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapSize"
             class="setting__item-element setting__input-number"
+            size="small"
             :step="1"
             :min="40"
             :max="150"
@@ -381,6 +407,7 @@ const onOpenPopup = () => {
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapBorderRadius"
             class="setting__item-element setting__input-number"
+            size="small"
             :step="0.1"
             :min="0"
             :max="100"
@@ -391,7 +418,10 @@ const onOpenPopup = () => {
           :label="$t('common.border')"
           class="n-form-item--color"
         >
-          <NSwitch v-model:value="localConfig.bookmark.isKeycapBorderEnabled" />
+          <NSwitch
+            v-model:value="localConfig.bookmark.isKeycapBorderEnabled"
+            size="small"
+          />
           <CustomColorPicker
             v-model:value="localConfig.bookmark.keycapBorderColor[localState.currAppearanceCode]"
             class="setting__item-element"
@@ -399,6 +429,7 @@ const onOpenPopup = () => {
           <NInputNumber
             v-model:value="localConfig.bookmark.keycapBorderWidth"
             class="setting__item-element setting__input-number"
+            size="small"
             :step="1"
             :min="1"
             :max="10"
@@ -406,17 +437,22 @@ const onOpenPopup = () => {
         </NFormItem>
 
         <NFormItem :label="`${$t('bookmark.keycap')}${$t('common.font')}`">
-          <NSwitch v-model:value="localConfig.bookmark.isCapKeyVisible" />
+          <NSwitch
+            v-model:value="localConfig.bookmark.isCapKeyVisible"
+            size="small"
+          />
           <template v-if="localConfig.bookmark.isCapKeyVisible">
             <NSelect
               v-model:value="localConfig.bookmark.keycapKeyFontFamily"
               class="setting__item-ml"
+              size="small"
               :options="availableFontOptions"
               :render-label="fontSelectRenderLabel"
             />
             <NInputNumber
               v-model:value="localConfig.bookmark.keycapKeyFontSize"
               class="setting__item-element setting__input-number"
+              size="small"
               :step="1"
               :min="5"
               :max="50"
@@ -425,7 +461,10 @@ const onOpenPopup = () => {
         </NFormItem>
 
         <NFormItem :label="`${$t('common.icon')}${$t('common.size')}`">
-          <NSwitch v-model:value="localConfig.bookmark.isFaviconVisible" />
+          <NSwitch
+            v-model:value="localConfig.bookmark.isFaviconVisible"
+            size="small"
+          />
           <template v-if="localConfig.bookmark.isFaviconVisible">
             <NSlider
               v-model:value="localConfig.bookmark.faviconSize"
@@ -438,6 +477,7 @@ const onOpenPopup = () => {
             <NInputNumber
               v-model:value="localConfig.bookmark.faviconSize"
               class="setting__item-element setting__input-number"
+              size="small"
               :step="0.01"
               :min="0"
               :max="1"
@@ -446,17 +486,22 @@ const onOpenPopup = () => {
         </NFormItem>
 
         <NFormItem :label="`${$t('bookmark.nameLabel')}${$t('common.font')}`">
-          <NSwitch v-model:value="localConfig.bookmark.isNameVisible" />
+          <NSwitch
+            v-model:value="localConfig.bookmark.isNameVisible"
+            size="small"
+          />
           <template v-if="localConfig.bookmark.isNameVisible">
             <NSelect
               v-model:value="localConfig.bookmark.keycapBookmarkFontFamily"
               class="setting__item-ml"
+              size="small"
               :options="availableFontOptions"
               :render-label="fontSelectRenderLabel"
             />
             <NInputNumber
               v-model:value="localConfig.bookmark.keycapBookmarkFontSize"
               class="setting__item-element setting__input-number"
+              size="small"
               :step="1"
               :min="5"
               :max="50"
@@ -465,7 +510,10 @@ const onOpenPopup = () => {
         </NFormItem>
 
         <NFormItem :label="$t('bookmark.tactileBumps')">
-          <NSwitch v-model:value="localConfig.bookmark.isTactileBumpsVisible" />
+          <NSwitch
+            v-model:value="localConfig.bookmark.isTactileBumpsVisible"
+            size="small"
+          />
         </NFormItem>
 
         <NFormItem :label="`${$t('bookmark.keycap')}Qwerty`">
