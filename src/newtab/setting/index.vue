@@ -7,10 +7,12 @@ import GeneralSetting from './GeneralSetting/index.vue'
 import BookmarkSetting from './BookmarkSetting/index.vue'
 import ClockSetting from './ClockSetting/index.vue'
 import CalendarSetting from './CalendarSetting.vue'
+import YearProgressSetting from './YearProgressSetting.vue'
 import SearchSetting from './SearchSetting.vue'
 import MemoSetting from './MemoSetting.vue'
 import WeatherSetting from './WeatherSetting.vue'
 import NewsSetting from './NewsSetting.vue'
+// @@@@ add Components 5
 
 const appVersion = computed(() => window.appVersion)
 
@@ -34,6 +36,11 @@ const tabPaneList = computed(() => [
     name: 'calendar',
     label: window.$t('setting.calendar'),
     component: CalendarSetting,
+  },
+  {
+    name: 'yearProgress',
+    label: window.$t('setting.yearProgress'),
+    component: YearProgressSetting,
   },
   {
     name: 'search',
@@ -225,16 +232,20 @@ const bgBottomBar = getStyleConst('bgBottomBar')
         position: absolute;
         top: 0;
         left: 0;
-        padding: 5px 20px 0 20px;
+        padding: 5px 13px 0 13px;
         width: 100%;
         user-select: none;
         background-color: var(--n-color);
+      }
+      .n-tabs .n-tabs-tab-pad {
+        width: 26px !important;
       }
       .n-tab-pane {
         padding: 0;
         user-select: none;
       }
     }
+
     .drawer__bottom {
       z-index: 2000;
       position: absolute;

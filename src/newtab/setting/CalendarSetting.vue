@@ -34,6 +34,7 @@ const beginsList = computed(() => [
           v-model:value="localConfig.calendar.dayFontFamily"
           :options="availableFontOptions"
           :render-label="fontSelectRenderLabel"
+          size="small"
         />
         <CustomColorPicker
           v-model:value="localConfig.calendar.dayFontColor[localState.currAppearanceCode]"
@@ -42,6 +43,7 @@ const beginsList = computed(() => [
         <NInputNumber
           v-model:value="localConfig.calendar.dayFontSize"
           class="setting__item-element setting__input-number"
+          size="small"
           :step="1"
           :min="5"
           :max="50"
@@ -53,6 +55,7 @@ const beginsList = computed(() => [
           v-model:value="localConfig.calendar.descFontFamily"
           :options="availableFontOptions"
           :render-label="fontSelectRenderLabel"
+          size="small"
         />
         <CustomColorPicker
           v-model:value="localConfig.calendar.descFontColor[localState.currAppearanceCode]"
@@ -61,6 +64,7 @@ const beginsList = computed(() => [
         <NInputNumber
           v-model:value="localConfig.calendar.descFontSize"
           class="setting__item-element setting__input-number"
+          size="small"
           :step="1"
           :min="5"
           :max="50"
@@ -70,7 +74,7 @@ const beginsList = computed(() => [
       <p class="setting__label">
         {{ $t('calendar.holiday') }}
       </p>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`${$t('calendar.desc')}${$t('common.fontColor')}`"
           class="n-form-item--color"
@@ -82,7 +86,7 @@ const beginsList = computed(() => [
       <p class="setting__label">
         {{ $t('calendar.todayDesc') }}
       </p>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`${$t('common.label')}${$t('common.fontColor')}`"
           class="n-form-item--color"
@@ -96,7 +100,7 @@ const beginsList = computed(() => [
           <CustomColorPicker v-model:value="localConfig.calendar.todayLabelBackgroundColor[localState.currAppearanceCode]" />
         </NFormItem>
       </div>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`${$t('calendar.day')}${$t('common.fontColor')}`"
           class="n-form-item--color"
@@ -120,7 +124,7 @@ const beginsList = computed(() => [
       <p class="setting__label">
         {{ $t('calendar.restDesc') }}
       </p>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`${$t('common.label')}${$t('common.fontColor')}`"
           class="n-form-item--color"
@@ -134,7 +138,7 @@ const beginsList = computed(() => [
           <CustomColorPicker v-model:value="localConfig.calendar.restLabelBackgroundColor[localState.currAppearanceCode]" />
         </NFormItem>
       </div>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`${$t('calendar.day')}${$t('common.fontColor')}`"
           class="n-form-item--color"
@@ -158,7 +162,7 @@ const beginsList = computed(() => [
       <p class="setting__label">
         {{ $t('calendar.workDesc') }}
       </p>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`${$t('common.label')}${$t('common.fontColor')}`"
           class="n-form-item--color"
@@ -172,7 +176,7 @@ const beginsList = computed(() => [
           <CustomColorPicker v-model:value="localConfig.calendar.workLabelBackgroundColor[localState.currAppearanceCode]" />
         </NFormItem>
       </div>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`${$t('calendar.day')}${$t('common.fontColor')}`"
           class="n-form-item--color"

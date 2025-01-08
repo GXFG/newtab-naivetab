@@ -29,6 +29,7 @@ const handleUpdateValue = () => {
         <NSelect
           v-model:value="localConfig.news.sourceList"
           :options="newsSourceList"
+          size="small"
           max-tag-count="responsive"
           multiple
           clearable
@@ -39,6 +40,7 @@ const handleUpdateValue = () => {
         <NInputNumber
           v-model:value="localConfig.news.refreshIntervalTime"
           class="setting__input-number--unit"
+          size="small"
           :step="1"
           :min="30"
           :max="1000"
@@ -49,7 +51,7 @@ const handleUpdateValue = () => {
     </template>
 
     <template #color>
-      <div class="setting-form__wrap">
+      <div class="setting__form_wrap">
         <NFormItem
           :label="`URL${$t('common.activeColor')}`"
           class="n-form-item--color"

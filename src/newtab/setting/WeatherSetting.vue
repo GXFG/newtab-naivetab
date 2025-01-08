@@ -71,6 +71,7 @@ const onSelectCity = (cityId: string) => {
         <NInput
           v-if="!state.isEditCityModel"
           v-model:value="localConfig.weather.city.name"
+          size="small"
           :disabled="true"
         />
         <NAutoComplete
@@ -78,14 +79,16 @@ const onSelectCity = (cityId: string) => {
           v-model:value="state.keyword"
           :options="state.cityList"
           :loading="state.isSearchLoading"
+          size="small"
           @update:value="onChangeCity"
           @select="onSelectCity"
         />
 
         <NButton
           type="primary"
-          ghost
           class="setting__item-element"
+          size="small"
+          ghost
           @click="state.isEditCityModel = !state.isEditCityModel"
         >
           <template v-if="state.isEditCityModel">
@@ -98,7 +101,10 @@ const onSelectCity = (cityId: string) => {
       </NFormItem>
 
       <NFormItem label="API Key">
-        <NInput v-model:value="localConfig.weather.apiKey" />
+        <NInput
+          v-model:value="localConfig.weather.apiKey"
+          size="small"
+        />
         <Tips
           link
           :content="URL_QWEATHER_START"
@@ -113,17 +119,19 @@ const onSelectCity = (cityId: string) => {
       </NFormItem> -->
 
       <NFormItem :label="$t('weather.icon')">
-        <div class="setting__input-wrap">
-          <div class="setting__input_item">
-            <NSwitch v-model:value="localConfig.weather.iconEnabled" />
+        <div class="setting__item_wrap">
+          <div class="item__box">
+            <NSwitch
+              v-model:value="localConfig.weather.iconEnabled"
+              size="small"
+            />
           </div>
           <div
             v-if="localConfig.weather.iconEnabled"
-            class="setting__input_item"
+            class="item__box"
           >
             <NSlider
               v-model:value="localConfig.weather.iconSize"
-              class="item__grow"
               :step="1"
               :min="30"
               :max="200"
@@ -132,6 +140,7 @@ const onSelectCity = (cityId: string) => {
             <NInputNumber
               v-model:value="localConfig.weather.iconSize"
               class="setting__item-element setting__input-number"
+              size="small"
               :step="1"
               :min="30"
               :max="200"
@@ -141,7 +150,10 @@ const onSelectCity = (cityId: string) => {
       </NFormItem>
 
       <!-- <NFormItem :label="$t('weather.forecast')">
-        <NSwitch v-model:value="localConfig.weather.forecastEnabled" />
+        <NSwitch
+          v-model:value="localConfig.weather.forecastEnabled"
+          size="small"
+        />
       </NFormItem> -->
     </template>
   </BaseComponentSetting>

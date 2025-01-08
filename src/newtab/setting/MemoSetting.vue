@@ -11,7 +11,10 @@ import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.
   >
     <template #header>
       <NFormItem :label="$t('memo.wordCount')">
-        <NSwitch v-model:value="localConfig.memo.countEnabled" />
+        <NSwitch
+          v-model:value="localConfig.memo.countEnabled"
+          size="small"
+        />
       </NFormItem>
     </template>
   </BaseComponentSetting>

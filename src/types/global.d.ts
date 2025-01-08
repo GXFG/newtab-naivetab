@@ -14,6 +14,10 @@ interface Window {
   $loadingBar: LoadingBarApiInjection
 }
 
+// @@@@ add Components 1
+type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news'
+type ConfigField = Components | 'general'
+
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
 type DatabaseStore = 'localBackgroundImages' | 'currBackgroundImages'
 
@@ -26,8 +30,6 @@ type DatabaseLocalBackgroundImages = {
 type OptionsPermission = 'bookmarks'
 
 type TargetType = 1 | 2 // 1:component 2:element
-type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'search' | 'weather' | 'memo' | 'news'
-type ConfigField = Components | 'general'
 type Placement = 'top' | 'bottom' | 'left' | 'right'
 
 interface SelectStringItem {

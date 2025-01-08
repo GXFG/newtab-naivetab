@@ -113,14 +113,7 @@ const onResetSetting = () => {
         <NInput
           v-model:value="localConfig.general.pageTitle"
           type="text"
-        />
-      </NFormItem>
-
-      <NFormItem :label="$t('general.language')">
-        <NSelect
-          v-model:value="proxy.$i18n.locale"
-          :options="state.i18nList"
-          @update:value="onChangeLocale"
+          size="small"
         />
       </NFormItem>
 
@@ -128,12 +121,16 @@ const onResetSetting = () => {
         <NSelect
           v-model:value="localConfig.general.openPageFocusElement"
           :options="focusElementList"
+          size="small"
         />
         <Tips :content="$t('general.defaultFocusTips')" />
       </NFormItem>
 
       <NFormItem :label="$t('general.loadPageAnimation')">
-        <NSwitch v-model:value="localConfig.general.isLoadPageAnimationEnabled" />
+        <NSwitch
+          v-model:value="localConfig.general.isLoadPageAnimationEnabled"
+          size="small"
+        />
         <NRadioGroup
           v-if="localConfig.general.isLoadPageAnimationEnabled"
           v-model:value="localConfig.general.loadPageAnimationType"
@@ -164,6 +161,30 @@ const onResetSetting = () => {
           </NRadioButton>
         </NRadioGroup>
       </NFormItem>
+
+      <div class="setting__form_wrap">
+        <NFormItem
+          :label="$t('general.language')"
+          class="n-form-item--half"
+        >
+          <NSelect
+            v-model:value="proxy.$i18n.locale"
+            :options="state.i18nList"
+            size="small"
+            @update:value="onChangeLocale"
+          />
+        </NFormItem>
+        <NFormItem
+          :label="`${$t('general.timeLanguage')}`"
+          class="n-form-item--half"
+        >
+          <NSelect
+            v-model:value="localConfig.general.timeLang "
+            :options="state.i18nList"
+            size="small"
+          />
+        </NFormItem>
+      </div>
     </template>
 
     <template #style>
@@ -186,7 +207,10 @@ const onResetSetting = () => {
     <template #footer>
       <!-- backgroundImage -->
       <NFormItem :label="$t('common.backgroundImage')">
-        <NSwitch v-model:value="localConfig.general.isBackgroundImageEnabled" />
+        <NSwitch
+          v-model:value="localConfig.general.isBackgroundImageEnabled"
+          size="small"
+        />
         <NButton
           v-if="localConfig.general.isBackgroundImageEnabled"
           class="setting__item-element"
@@ -213,6 +237,7 @@ const onResetSetting = () => {
         <NInputNumber
           v-model:value="localConfig.general.bgBlur"
           class="setting__item-element setting__input-number"
+          size="small"
           :step="0.1"
           :min="0"
           :max="200"
@@ -233,6 +258,7 @@ const onResetSetting = () => {
         <NInputNumber
           v-model:value="localConfig.general.bgOpacity"
           class="setting__item-element setting__input-number"
+          size="small"
           :step="0.01"
           :min="0"
           :max="1"

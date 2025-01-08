@@ -9,15 +9,17 @@ import MoveableGuideLine from '@/newtab/components/moveable/MoveableGuideLine.vu
 import MoveableElementDrawer from '@/newtab/components/moveable/MoveableElementDrawer.vue'
 
 import Setting from '@/newtab/setting/index.vue'
-import News from '@/newtab/elements/news/index.vue'
-import Calendar from '@/newtab/elements/calendar/index.vue'
 import KeyboardBookmark from '@/newtab/elements/bookmark/keyboard.vue'
-import Memo from '@/newtab/elements/memo/index.vue'
 import DigitalClock from '@/newtab/elements/clock/DigitalClock.vue'
 import AnalogClock from '@/newtab/elements/clock/AnalogClock.vue'
 import Date from '@/newtab/elements/date/index.vue'
-import Weather from '@/newtab/elements/weather/index.vue'
+import Calendar from '@/newtab/elements/calendar/index.vue'
+import YearProgress from '@/newtab/elements/YearProgress/index.vue'
 import Search from '@/newtab/elements/search/index.vue'
+import Weather from '@/newtab/elements/weather/index.vue'
+import Memo from '@/newtab/elements/memo/index.vue'
+import News from '@/newtab/elements/news/index.vue'
+// @@@@ add Components 3
 
 window.$message = useMessage()
 window.$notification = useNotification()
@@ -33,6 +35,7 @@ window.$loadingBar = useLoadingBar()
   <SponsorModal />
   <MoveableGuideLine />
   <MoveableElementDrawer />
+
   <!-- element -->
   <Setting />
   <News />
@@ -42,6 +45,7 @@ window.$loadingBar = useLoadingBar()
   <DigitalClock />
   <AnalogClock />
   <Date />
+  <YearProgress />
   <Weather />
   <Search />
 </template>

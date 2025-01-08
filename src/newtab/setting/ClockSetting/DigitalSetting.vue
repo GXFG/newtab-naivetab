@@ -9,18 +9,25 @@ import Tips from '@/newtab/components/form/Tips.vue'
   <BaseComponentSetting cname="clockDigital">
     <template #header>
       <NFormItem :label="$t('common.format')">
-        <NInput v-model:value="localConfig.clockDigital.format" />
+        <NInput
+          v-model:value="localConfig.clockDigital.format"
+          size="small"
+        />
         <Tips
           link
           :content="URL_DAYJS_FORMAT"
         />
       </NFormItem>
+
       <NFormItem :label="$t('clock.apMark')">
-        <NSwitch v-model:value="localConfig.clockDigital.unitEnabled" />
+        <NSwitch
+          v-model:value="localConfig.clockDigital.unitEnabled"
+          size="small"
+        />
         <NSlider
           v-if="localConfig.clockDigital.unitEnabled"
           v-model:value="localConfig.clockDigital.unit.fontSize"
-          class="setting__item-element"
+          class="setting__item-ml"
           :step="1"
           :min="5"
           :max="200"
@@ -30,6 +37,7 @@ import Tips from '@/newtab/components/form/Tips.vue'
           v-if="localConfig.clockDigital.unitEnabled"
           v-model:value="localConfig.clockDigital.unit.fontSize"
           class="setting__item-element setting__input-number"
+          size="small"
           :min="5"
           :step="1"
         />

@@ -33,35 +33,40 @@ body {
 
 /* setting */
 .n-form-item {
-  margin: 13px 0;
+  margin: 12px 0;
 }
 .n-form-item--color {
-  margin: 3px 0 !important;
+  margin: 1px 0 !important;
+}
+.n-form-item--half {
+  margin: 0 !important;
+  width: 50%;
 }
 .n-base-select-option__content {
   width: 100% !important;
 }
-.setting-form__wrap {
+
+.setting__form_wrap {
   display: flex;
   flex-wrap: wrap;
 }
 .setting__label {
   opacity: 0.6;
 }
-.setting__input-wrap {
+.setting__item_wrap {
   flex: 1;
   display: flex;
   justify-content: space-between;
-  .setting__input_item {
+  .item__box {
     display: flex;
     align-items: center;
     &:nth-of-type(2) {
       flex: 1;
-      justify-content: flex-end;
       margin-left: 10px;
     }
   }
 }
+
 .setting__item-ml {
   margin-left: 10px;
 }
