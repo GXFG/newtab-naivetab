@@ -174,9 +174,9 @@ export const openSponsorModal = () => {
 
 export const handleStateResetAndUpdate = () => {
   resetBookmarkPending()
-  // handle old version
-  if (!localState.value.isUploadConfigStatusMap) {
+  if (Object.keys(defaultLocalState.isUploadConfigStatusMap).length !== Object.keys(localState.value.isUploadConfigStatusMap).length) {
     localState.value.isUploadConfigStatusMap = defaultLocalState.isUploadConfigStatusMap
+    log('isUploadConfigStatusMap update')
   }
 }
 
@@ -209,7 +209,6 @@ export const handleAppUpdate = async () => {
     return
   }
   log('Get new version', window.appVersion)
-  localState.value.isUploadConfigStatusMap = genUploadConfigStatusMap()
   // TODO 每次更新均需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.17.3')) {
     localConfig.calendar.width = 50
