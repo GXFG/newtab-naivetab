@@ -64,7 +64,7 @@ onUnmounted(() => {
   stopTimer()
 })
 
-const animationClassName = computed(() => {
+const pageAnimationClass = computed(() => {
   if (!localConfig.general.isLoadPageAnimationEnabled) {
     return ''
   }
@@ -79,7 +79,7 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 <template>
   <NConfigProvider
     id="container"
-    :class="animationClassName"
+    :class="pageAnimationClass"
     :locale="nativeUILang"
     :theme="currTheme"
     :theme-overrides="themeOverrides"
@@ -104,7 +104,13 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
 
 <style>
 #container {
+  width: 100vw;
+  height: 100vh;
   font-size: v-bind(customFontSize);
   font-family: v-bind(customFontFamily);
+  #container__main {
+    width: 100vw;
+    height: 100vh;
+  }
 }
 </style>
