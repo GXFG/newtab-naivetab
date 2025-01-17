@@ -328,6 +328,9 @@ export const handleAppUpdate = async () => {
     localConfig.general.timeLang = localConfig.general.lang
     localConfig.yearProgress = defaultConfig.yearProgress
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.24.3')) {
+    localConfig.general.backgroundColor = structuredClone(defaultConfig.general.backgroundColor)
+  }
   // 更新local版本号
   localConfig.general.version = window.appVersion
   // updateSuccess()

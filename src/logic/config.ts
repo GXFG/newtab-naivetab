@@ -52,7 +52,7 @@ export const defaultConfig = {
     fontSize: 14,
     fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
     primaryColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
-    backgroundColor: ['rgba(53, 54, 58, 1)', 'rgba(53, 54, 58, 1)'],
+    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
     bgOpacity: 1,
     bgBlur: 0,
     swatcheColors: [
