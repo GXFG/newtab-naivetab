@@ -7,8 +7,10 @@ import { localConfig, globalState } from '@/logic/store'
 
 const startGuide = () => {
   const driverConfig = driver({
-    allowClose: true,
     showProgress: true,
+    allowClose: false,
+    allowKeyboardControl: false,
+    disableActiveInteraction: true, // 高亮区域不可点击
     prevBtnText: window.$t('guide.prevStep'),
     nextBtnText: window.$t('guide.nextStep'),
     doneBtnText: window.$t('guide.doneStep'),
@@ -32,7 +34,7 @@ const startGuide = () => {
         },
       },
       {
-        element: '#moveable-tool .drawer__header .header__exit',
+        element: '#moveable-tool .drawer__header .header__done',
         popover: {
           title: window.$t('guide.stepTitle3'),
           description: window.$t('guide.stepDescription3'),
