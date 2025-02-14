@@ -167,6 +167,9 @@ const openMenu = async (e: MouseEvent) => {
 
 const handleContextMenu = async (e: MouseEvent) => {
   e.preventDefault()
+  if (globalState.isGuideMode) {
+    return
+  }
   if (isDragMode.value) {
     toggleIsDragMode(false)
   }
