@@ -211,7 +211,7 @@ export const getV2exNews = async () => {
   }
 }
 
-const newsSourceFuncMap = {
+const NEWS_SOURCE_FUNC_MAP = {
   toutiao: getToutiaoNews,
   baidu: getBaiduNews,
   zhihu: getZhihuNews,
@@ -224,39 +224,28 @@ const newsSourceFuncMap = {
 export const onRetryNews = (value: NewsSources) => {
   // 部分网站需要先打开页面登录后才可访问
   createTab(NEWS_SOURCE_MAP[value], true)
-  const func = newsSourceFuncMap[value]
+  const func = NEWS_SOURCE_FUNC_MAP[value]
   if (func) {
     func()
   }
 }
 
-export const updateNews = () => {
+export const updateNews = async () => {
   if (!localConfig.news.enabled) {
     return
   }
   const currTS = dayjs().valueOf()
   const intervalTime = localConfig.news.refreshIntervalTime * 60000
-  if (localConfig.news.sourceList.includes('toutiao') && (currTS - newsLocalState.value.toutiao.syncTime >= intervalTime || newsLocalState.value.toutiao.list.length === 0)) {
-    getToutiaoNews()
-  }
-  if (localConfig.news.sourceList.includes('baidu') && (currTS - newsLocalState.value.baidu.syncTime >= intervalTime || newsLocalState.value.baidu.list.length === 0)) {
-    getBaiduNews()
-  }
-  if (localConfig.news.sourceList.includes('zhihu') && (currTS - newsLocalState.value.zhihu.syncTime >= intervalTime || newsLocalState.value.zhihu.list.length === 0)) {
-    getZhihuNews()
-  }
-  if (localConfig.news.sourceList.includes('weibo') && (currTS - newsLocalState.value.weibo.syncTime >= intervalTime || newsLocalState.value.weibo.list.length === 0)) {
-    getWeiboNews()
-  }
-  if (localConfig.news.sourceList.includes('kr36') && (currTS - newsLocalState.value.kr36.syncTime >= intervalTime || newsLocalState.value.kr36.list.length === 0)) {
-    getKr36News()
-  }
-  if (localConfig.news.sourceList.includes('bilibili') && (currTS - newsLocalState.value.bilibili.syncTime >= intervalTime || newsLocalState.value.bilibili.list.length === 0)) {
-    getBilibiliNews()
-  }
-  if (localConfig.news.sourceList.includes('v2ex') && (currTS - newsLocalState.value.v2ex.syncTime >= intervalTime || newsLocalState.value.v2ex.list.length === 0)) {
-    getV2exNews()
-  }
+
+  const promises = localConfig.news.sourceList
+    .filter((source) => {
+      const state = newsLocalState.value[source]
+      return currTS - state.syncTime >= intervalTime || state.list.length === 0
+    })
+    .map((source) => NEWS_SOURCE_FUNC_MAP[source]())
+
+  await Promise.allSettled(promises)
+  log('All news sources updated')
 }
 
 export const handleWatchNewsConfigChange = () => {
