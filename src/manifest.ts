@@ -180,25 +180,23 @@ export async function getManifest() {
     //   },
     // ],
     content_security_policy: {
-      extension_pages: isDev // this is required on dev for Vite script to load
+      // this is required on dev for Vite script to load
+      extension_pages: isDev
         ? `script-src 'self' http://localhost:${port}; object-src 'self'`
-        : 'script-src \'self\'; object-src \'self\'',
+        : `script-src 'self'; object-src 'self'`,
     },
   }
 
-  // not work in MV3
-  // if (isDev) {
-  //   // for content script, as browsers will cache them for each reload,
-  //   // we use a background script to always inject the latest version
-  //   // see src/background/contentScriptHMR.ts
-
-  //   // delete manifest.content_scripts
-  //   // manifest.permissions?.push('webNavigation')
-
-  //   // this is required on dev for Vite script to load
-
-  //   // manifest.content_security_policy = `script-src \'self\' https://ssl.google-analytics.com http://localhost:${port}; object-src \'self\'`
-  // }
-
+  if (process.env.BROWSER === 'firefox') {
+    manifest.background = {
+      scripts: ['./dist/background/index.mjs'],
+    }
+    manifest.browser_specific_settings = {
+      gecko: {
+        id: 'gxfgim@outlook.com',
+        strict_min_version: '130.0',
+      },
+    }
+  }
   return manifest
 }

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { createTab } from '@/logic/util'
-import { isEdge } from '@/env'
-import { URL_NAIVETAB_DOC_HOME, URL_CHROME_STORE, URL_EDGE_STORE, URL_GITHUB_HOME } from '@/logic/const'
-import { getStyleConst, localConfig, globalState, openChangelogModal, openSponsorModal } from '@/logic/store'
+import { URL_NAIVETAB_DOC_HOME, URL_GITHUB_HOME } from '@/logic/const'
+import { getStyleConst, localConfig, globalState, openChangelogModal, openSponsorModal, openExtensionsStorePage } from '@/logic/store'
 import GeneralSetting from './GeneralSetting/index.vue'
 import BookmarkSetting from './BookmarkSetting/index.vue'
 import ClockSetting from './ClockSetting/index.vue'
@@ -173,7 +172,7 @@ const bgBottomBar = getStyleConst('bgBottomBar')
               size="small"
               ghost
               :title="$t('rightMenu.goodReview')"
-              @click="createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)"
+              @click="openExtensionsStorePage()"
             >
               <ph:thumbs-up-bold />
             </NButton>

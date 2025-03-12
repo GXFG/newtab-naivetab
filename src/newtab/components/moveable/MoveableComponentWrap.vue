@@ -41,9 +41,8 @@ const offsetData = reactive({
   yTranslateValue: -1,
 })
 
-const getPercentageInWidth = (currWidth: number) => +((currWidth / window.innerWidth) * 100).toFixed(5)
-
-const getPercentageInHeight = (currHeight: number) => +((currHeight / window.innerHeight) * 100).toFixed(5)
+const getPercentageInWidth = (currWidth: number) => +((currWidth / moveState.width) * 100).toFixed(5)
+const getPercentageInHeight = (currHeight: number) => +((currHeight / moveState.height) * 100).toFixed(5)
 
 /**
  * @param e
@@ -115,9 +114,8 @@ const onDragging = (e: MouseEvent) => {
   offsetData.xTranslateValue = 0
   offsetData.yTranslateValue = 0
 
-  const { innerWidth, innerHeight } = window
-  const xCenterLine = innerWidth / 2
-  const yCenterLine = innerHeight / 2
+  const xCenterLine = moveState.width / 2
+  const yCenterLine = moveState.height / 2
   const targetCenterX = offsetData.xOffsetValue + state.startState.width / 2
   const targetCenterY = offsetData.yOffsetValue + state.startState.height / 2
 
@@ -126,14 +124,14 @@ const onDragging = (e: MouseEvent) => {
     offsetData.xOffsetValue = getPercentageInWidth(offsetData.xOffsetValue)
   } else {
     offsetData.xOffsetKey = 'right'
-    offsetData.xOffsetValue = getPercentageInWidth(innerWidth - state.startState.width - offsetData.xOffsetValue)
+    offsetData.xOffsetValue = getPercentageInWidth(moveState.width - state.startState.width - offsetData.xOffsetValue)
   }
   if (offsetData.yOffsetValue <= yCenterLine) {
     offsetData.yOffsetKey = 'top'
     offsetData.yOffsetValue = getPercentageInHeight(offsetData.yOffsetValue)
   } else {
     offsetData.yOffsetKey = 'bottom'
-    offsetData.yOffsetValue = getPercentageInHeight(innerHeight - state.startState.height - offsetData.yOffsetValue)
+    offsetData.yOffsetValue = getPercentageInHeight(moveState.height - state.startState.height - offsetData.yOffsetValue)
   }
 
   // 水平/垂直居中 & 对应辅助线
@@ -194,11 +192,14 @@ onMounted(() => {
   initComponentMouseTask()
 })
 
+const isEnabled = computed(() => localConfig[props.componentName as Components].enabled)
 const isCurrentActive = computed(() => props.componentName === moveState.currDragTarget.name)
 
 const modifyMoveableWrapClass = async (isAdd: boolean, ...classList: string[]) => {
   await nextTick()
-  state.targetContainerEle = document.querySelector(`.${props.componentName}__container`)
+  if (!state.targetContainerEle) {
+    state.targetContainerEle = document.querySelector(`.${props.componentName}__container`)
+  }
   if (!state.targetContainerEle) {
     return
   }
@@ -213,8 +214,11 @@ const modifyMoveableWrapClass = async (isAdd: boolean, ...classList: string[]) =
   }
 }
 
-// 开启/关闭DragMode时，为所有组件添加或移除对应样式
+// 开启/关闭DragMode时，添加或移除默认样式
 watch(isDragMode, (value) => {
+  if (!isEnabled.value) {
+    return
+  }
   if (value) {
     modifyMoveableWrapClass(true, 'element-auxiliary-line', 'element-bg-hover')
   } else {
@@ -222,23 +226,18 @@ watch(isDragMode, (value) => {
   }
 })
 
-// 拖拽/放下任意组件时，移除/添加所有组件的hover样式
+// 编辑布局状态下，启用当前组件时添加active样式
 watch(
-  () => moveState.isComponentDraging,
-  (value) => {
-    modifyMoveableWrapClass(!value, 'element-bg-hover')
-  },
-)
-
-// 编辑布局时，启用当前组件时添加active样式
-watch(
-  () => localConfig[props.componentName].enabled,
+  () => localConfig[props.componentName as Components].enabled,
   (value) => {
     if (!isDragMode.value) {
       return
     }
     if (value) {
       modifyMoveableWrapClass(true, 'element-auxiliary-line', 'element-bg-hover', 'element-active')
+    } else {
+      // 移除组件
+      state.targetContainerEle = null
     }
   },
 )
@@ -248,11 +247,21 @@ watch(isCurrentActive, (value) => {
   modifyMoveableWrapClass(value, 'element-active')
 })
 
+// 拖拽/放下组件时，移除/添加组件的hover样式
+watch(
+  () => moveState.isComponentDraging,
+  (value) => {
+    if (isCurrentActive.value && isEnabled.value) {
+      modifyMoveableWrapClass(!value, 'element-bg-hover')
+    }
+  },
+)
+
 // 为当前组件添加delete样式
 watch(
   () => moveState.isDeleteHover,
   (value) => {
-    if (isCurrentActive.value) {
+    if (isCurrentActive.value && isEnabled.value) {
       modifyMoveableWrapClass(value, 'element-delete')
     }
   },
@@ -276,6 +285,9 @@ const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
 </template>
 
 <style>
+.moveable__wrap {
+}
+
 .element-auxiliary-line {
   outline: 2px dashed v-bind(auxiliaryLineElement) !important;
 }

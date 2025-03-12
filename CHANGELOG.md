@@ -2,6 +2,12 @@
 
 「+」新增  「-」删除  「^」升级  「#」修复  「!」重要
 
+## 🌟V1.25.x
+- ^: 支持Firefox https://addons.mozilla.org/zh-CN/firefox/addon/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/
+- ^: 编辑布局性能优化，辅助线样式优化
+- ^: 依赖库升级
+- #: 修复Edge的Favicon展示问题
+
 ## 🌟V1.24.x
 - ^: 新增“今年进度”组件
 - ^: 丰富配置项
