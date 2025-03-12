@@ -75,6 +75,9 @@ export const getFaviconFromUrl = (url: string) => {
   if (isChrome) {
     return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=128`
   }
+  if (url.slice(-1) === '/') {
+    return `${url}favicon.ico`
+  }
   return `${url}/favicon.ico`
 }
 

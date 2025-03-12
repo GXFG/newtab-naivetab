@@ -397,7 +397,7 @@ export const defaultUploadStatusItem = {
   syncId: '',
 }
 
-export const genUploadConfigStatusMap = () => {
+const genUploadConfigStatusMap = () => {
   const statusMap = {} as {
     [key in ConfigField]: {
       loading: boolean

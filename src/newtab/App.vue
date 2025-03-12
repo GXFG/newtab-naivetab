@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
+import { log } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
 import { FOCUE_ELEMENT_SELECTOR_MAP } from '@/logic/const'
 import { startKeydown, startTimer, stopTimer, onPageFocus } from '@/logic/task'
 import { handleWatchLocalConfigChange, handleMissedUploadConfig, loadRemoteConfig } from '@/logic/storage'
 import { handleFirstOpen } from '@/logic/guide'
-import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, handleStateResetAndUpdate, handleAppUpdate } from '@/logic/store'
+import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, handleStateResetAndUpdate, handleAppUpdate, setEdgeFavicon } from '@/logic/store'
 import { initBackgroundImage } from '@/logic/image'
 import { initBookmarkData } from '@/logic/bookmark'
 import { handleWatchNewsConfigChange } from '@/logic/news'
@@ -32,17 +33,40 @@ const handleFocusPage = () => {
 }
 
 const onDot = () => {
-  const [brand] = navigator.userAgentData?.brands.slice(-1) || []
+  const browserPlatform = navigator.userAgentData?.platform || navigator.platform || 'unknown'
+  let browserBrand = 'unknown'
+  let browserVersion = 'unknown'
+  if (navigator.userAgentData?.brands?.length) {
+    const [brand] = navigator.userAgentData.brands.slice(-1)
+    browserBrand = brand.brand
+    browserVersion = brand.version
+  } else {
+    const ua = navigator.userAgent
+    const firefoxMatch = ua.match(/Firefox\/(\d+\.\d+)/)
+    if (firefoxMatch) {
+      browserBrand = 'Firefox'
+      browserVersion = firefoxMatch[1]
+    } else {
+      const chromeMatch = ua.match(/(Chrome|Edg)\/(\d+\.\d+)/)
+      if (chromeMatch) {
+        browserBrand = chromeMatch[1].replace('Edg', 'Microsoft Edge')
+        browserVersion = chromeMatch[2]
+      }
+    }
+  }
+
   gaProxy('view', ['newtab'], {
     version: window.appVersion,
     userAgent: navigator.userAgent,
-    platform: navigator.userAgentData?.platform,
-    browser: `${brand.brand}_${brand.version}`,
+    platform: browserPlatform,
+    browser: `${browserBrand}_${browserVersion}`,
   })
+  log('platform', `${browserPlatform}_${browserBrand}_${browserVersion}`)
 }
 
 onMounted(async () => {
   initBackgroundImage()
+  setEdgeFavicon()
   handleStateResetAndUpdate()
   startTimer()
   startKeydown()

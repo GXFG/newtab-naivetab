@@ -1,10 +1,10 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { isEdge } from '@/env'
+import { isEdge, isFirefox } from '@/env'
 import { styleConst } from '@/styles/const'
-import { URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/const'
-import { defaultConfig, defaultLocalState, genUploadConfigStatusMap } from '@/logic/config'
+import { URL_CHROME_STORE, URL_EDGE_STORE, URL_FIREFOX_STORE, URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, URL_FIREFOX_EXTENSIONS_SHORTCUTS, APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/const'
+import { defaultConfig, defaultLocalState } from '@/logic/config'
 import { log, createTab, compareLeftVersionLessThanRightVersions } from '@/logic/util'
 import { updateSetting, getLocalVersion } from '@/logic/storage'
 import { resetBookmarkPending } from '@/logic/bookmark'
@@ -101,7 +101,25 @@ export const getAllCommandsConfig = () => {
   })
 }
 
-export const openConfigShortcutsPage = () => createTab(isEdge ? URL_EDGE_EXTENSIONS_SHORTCUTS : URL_CHROME_EXTENSIONS_SHORTCUTS)
+export const openConfigShortcutsPage = () => {
+  let shortcutUrl = URL_CHROME_EXTENSIONS_SHORTCUTS
+  if (isEdge) {
+    shortcutUrl = URL_EDGE_EXTENSIONS_SHORTCUTS
+  } else if (isFirefox) {
+    shortcutUrl = URL_FIREFOX_EXTENSIONS_SHORTCUTS
+  }
+  createTab(shortcutUrl)
+}
+
+export const openExtensionsStorePage = () => {
+  let storeUrl = URL_CHROME_STORE
+  if (isEdge) {
+    storeUrl = URL_EDGE_STORE
+  } else if (isFirefox) {
+    storeUrl = URL_FIREFOX_STORE
+  }
+  createTab(storeUrl)
+}
 
 const initAvailableFontList = async () => {
   const fontCheck = new Set(FONT_LIST.sort())
@@ -416,3 +434,16 @@ watch(
     deep: true, // color is array
   },
 )
+
+/**
+ * 针对Edge 设置为黑白色favicon，避免展示为纯色方块
+ */
+export const setEdgeFavicon = () => {
+  if (!isEdge) {
+    return
+  }
+  const link = document.createElement('link')
+  link.setAttribute('rel', 'icon')
+  link.setAttribute('href', '/assets/favicon-edge.svg')
+  document.getElementsByTagName('head')[0].appendChild(link)
+}

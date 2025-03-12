@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { isEdge } from '@/env'
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
-import { URL_NAIVETAB_DOC_HOME, URL_FEEDBACK_EMAIL, URL_GITHUB_ISSUSE, URL_CHROME_STORE, URL_EDGE_STORE } from '@/logic/const'
+import { URL_NAIVETAB_DOC_HOME, URL_FEEDBACK_EMAIL, URL_GITHUB_ISSUSE } from '@/logic/const'
 import { openUserGuide } from '@/logic/guide'
 import { isDragMode, toggleIsDragMode, getTargetDataFromEvent } from '@/logic/moveable'
-import { toggleFullscreen, switchSettingDrawerVisible, globalState, openChangelogModal, openSponsorModal } from '@/logic/store'
+import { toggleFullscreen, switchSettingDrawerVisible, globalState, openChangelogModal, openSponsorModal, openExtensionsStorePage } from '@/logic/store'
 
 const state = reactive({
   isMenuVisible: false,
@@ -134,7 +133,7 @@ const menuActionMap = {
     gaProxy('click', ['rightMenu', 'feedbackEmail'])
   },
   goodReview: () => {
-    createTab(isEdge ? URL_EDGE_STORE : URL_CHROME_STORE)
+    openExtensionsStorePage()
     gaProxy('click', ['rightMenu', 'goodReview'])
   },
   buyACupOfCoffee: () => {

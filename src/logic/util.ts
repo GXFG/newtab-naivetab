@@ -96,26 +96,48 @@ export const urlToImage = (url: string): Promise<HTMLImageElement> => {
     imageEle.onerror = () => {
       reject(imageEle)
     }
+    imageEle.crossOrigin = 'anonymous'
     imageEle.src = url
   })
 }
 
-export const compressedImageToBlob = (image: HTMLImageElement, quality = 0.5, width = 1366, type = 'image/jpeg'): Promise<Blob> => {
-  return new Promise((resolve) => {
+export const compressedImageToBlob = async (
+  image: HTMLImageElement,
+  quality = 0.5,
+  width = 1366,
+  type = 'image/jpeg',
+): Promise<Blob> => {
+  if (!image.complete || image.naturalWidth === 0) {
+    throw new Error('Image not loaded or corrupted')
+  }
+
+  try {
     const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-    const widthHightRatio = +(image.naturalWidth / image.naturalHeight).toFixed(2)
+    const ctx = canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D
+    const widthHeightRatio = image.naturalWidth / image.naturalHeight
     canvas.width = width
-    canvas.height = Math.ceil(width / widthHightRatio)
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
-    canvas.toBlob(
-      (blob) => {
-        resolve(blob as Blob)
-      },
-      type,
-      quality,
-    )
-  })
+    canvas.height = Math.ceil(width / widthHeightRatio)
+    try {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+    } catch (error) {
+      throw new Error(`Canvas drawing failed （可能被污染或资源无效）: ${error}`)
+    }
+    return await new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error(`create Blob failed（格式不支持或跨域污染）: ${type}`))
+            return
+          }
+          resolve(blob)
+        },
+        type,
+        quality,
+      )
+    })
+  } catch (error) {
+    throw new Error(`图片压缩失败: ${error}`)
+  }
 }
 
 export const blobToBase64 = (blob: Blob): Promise<string> => {

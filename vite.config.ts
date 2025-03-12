@@ -116,6 +116,7 @@ export default defineConfig(({ command }) => ({
       },
     },
     chunkSizeWarningLimit: 1000,
+    // minify: false, // 关闭压缩混淆（同时禁用 terser），debug时使用
   },
   test: {
     globals: true,
