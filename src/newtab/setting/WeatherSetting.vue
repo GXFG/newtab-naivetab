@@ -3,6 +3,7 @@ import { useDebounceFn } from '@vueuse/core'
 import { getCityLookup } from '@/api'
 import { URL_QWEATHER_START } from '@/logic/const'
 import { localConfig } from '@/logic/store'
+import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 import Tips from '@/newtab/components/form/Tips.vue'
 
@@ -62,6 +63,8 @@ const onSelectCity = (cityId: string) => {
 </script>
 
 <template>
+  <BaseComponentCardTitle :title="$t('setting.weather')" />
+
   <BaseComponentSetting
     id="weather__setting"
     cname="weather"

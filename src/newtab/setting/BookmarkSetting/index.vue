@@ -3,6 +3,7 @@ import { requestPermission } from '@/logic/storage'
 import { KEYBOARD_TYPE_OPTION, SPLIT_SPACE_OPTION, KEYCAP_TYPE_OPTION } from '@/logic/keyboard'
 import { state as bookmarkState, getBrowserBookmarkForKeyboard } from '@/logic/bookmark'
 import { availableFontOptions, fontSelectRenderLabel, localState, localConfig, openConfigShortcutsPage } from '@/logic/store'
+import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 import CustomColorPicker from '@/newtab/components/form/CustomColorPicker.vue'
 import Tips from '@/newtab/components/form/Tips.vue'
@@ -57,6 +58,8 @@ const onOpenPopup = () => {
   <PresetThemeDrawer v-model:show="state.isPresetThemeDrawerVisible" />
 
   <NCollapse display-directive="show">
+    <BaseComponentCardTitle :title="$t('setting.bookmark')" />
+
     <BaseComponentSetting
       cname="bookmark"
       :margin-range="[0, 20]"

@@ -155,7 +155,11 @@ export const fontSelectRenderLabel = (option: SelectStringItem) => {
         },
       },
       [
-        h('span', {}, option.label),
+        h('span', {
+          style: {
+            maxWidth: '120px',
+          },
+        }, option.label),
         h(
           'span',
           {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SEARCH_ENGINE_LIST } from '@/logic/const'
 import { localConfig } from '@/logic/store'
+import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 
 const state = reactive({
@@ -79,6 +80,8 @@ const searchSelectRenderLabel = (option: typeof SEARCH_ENGINE_LIST[0]) => {
 </script>
 
 <template>
+  <BaseComponentCardTitle :title="$t('setting.search')" />
+
   <BaseComponentSetting
     cname="search"
     :width-range="[200, 1000]"

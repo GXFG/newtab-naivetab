@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { createTab } from '@/logic/util'
-import { URL_NAIVETAB_DOC_HOME, URL_GITHUB_HOME } from '@/logic/const'
-import { getStyleConst, localConfig, globalState, openChangelogModal, openSponsorModal, openExtensionsStorePage } from '@/logic/store'
+import { Icon } from '@iconify/vue'
+import { getStyleConst, localConfig, globalState } from '@/logic/store'
 import GeneralSetting from './GeneralSetting/index.vue'
 import BookmarkSetting from './BookmarkSetting/index.vue'
 import ClockSetting from './ClockSetting/index.vue'
@@ -11,55 +10,69 @@ import SearchSetting from './SearchSetting.vue'
 import MemoSetting from './MemoSetting.vue'
 import WeatherSetting from './WeatherSetting.vue'
 import NewsSetting from './NewsSetting.vue'
+import About from './About.vue'
 // @@@@ add Components 5
-
-const appVersion = computed(() => window.appVersion)
 
 const tabPaneList = computed(() => [
   {
     name: 'general',
     label: window.$t('setting.general'),
     component: GeneralSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'bookmark',
     label: window.$t('setting.bookmark'),
     component: BookmarkSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'clockDate',
     label: `${window.$t('setting.clock')}/${window.$t('setting.date')}`,
     component: ClockSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'calendar',
     label: window.$t('setting.calendar'),
     component: CalendarSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'yearProgress',
     label: window.$t('setting.yearProgress'),
     component: YearProgressSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'search',
     label: window.$t('setting.search'),
     component: SearchSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'memo',
     label: window.$t('setting.memo'),
     component: MemoSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'weather',
     label: window.$t('setting.weather'),
     component: WeatherSetting,
+    iconName: 'mdi:clock-digital',
   },
   {
     name: 'news',
     label: window.$t('setting.news'),
     component: NewsSetting,
+    iconName: 'mdi:clock-digital',
+  },
+  {
+    name: 'about',
+    label: window.$t('setting.about'),
+    component: About,
+    iconName: 'mdi:clock-digital',
   },
 ])
 
@@ -91,102 +104,50 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   <div id="preset-theme__drawer" />
 
   <div id="setting">
+    <NButton
+      class="content__btn"
+      size="small"
+      :title="$t('common.preview')"
+      @mouseenter="handlerPreviewEnter"
+      @mouseleave="handlerPreviewLeave"
+    >
+      <fe:picture />&nbsp;{{ $t('common.preview') }}
+    </NButton>
+
     <!-- Drawer: height仅在位置是 top 和 bottom 时生效 -->
     <NDrawer
       v-model:show="globalState.isSettingDrawerVisible"
       class="drawer-wrap"
       :style="drawerStyle"
-      :width="610"
+      :width="650"
       :height="400"
       :placement="localConfig.general.drawerPlacement"
       show-mask="transparent"
       to="#setting"
     >
       <NDrawerContent>
-        <div class="drawer__content">
-          <NTabs
-            type="line"
-            :value="globalState.currSettingTabValue"
-            @update:value="onTabsChange"
-          >
-            <NTabPane
-              v-for="item of tabPaneList"
-              :key="item.name"
-              :name="item.name"
-              :tab="item.label"
-            >
-              <component :is="item.component" />
-            </NTabPane>
-          </NTabs>
-        </div>
-
-        <!-- bottom -->
-        <div
-          class="drawer__bottom"
-          :style="`background-color: ${bgBottomBar};`"
+        <NTabs
+          type="line"
+          :value="globalState.currSettingTabValue"
+          placement="left"
+          animated
+          @update:value="onTabsChange"
         >
-          <div class="bottom__content bottom__left">
-            <NButton
-              class="content__btn"
-              size="small"
-              :title="$t('common.preview')"
-              @mouseenter="handlerPreviewEnter"
-              @mouseleave="handlerPreviewLeave"
-            >
-              <fe:picture />&nbsp;{{ $t('common.preview') }}
-            </NButton>
-            <NButton
-              class="content__btn"
-              size="small"
-              :title="$t('rightMenu.buyACupOfCoffee')"
-              @click="openSponsorModal()"
-            >
-              <ci:coffee-togo />&nbsp;{{ $t('rightMenu.buyACupOfCoffee') }}
-            </NButton>
-          </div>
-
-          <p class="bottom__content bottom__center">
-            <NButton
-              text
-              class="content__version"
-              size="small"
-              :title="$t('rightMenu.changelog')"
-              @click="openChangelogModal()"
-            >
-              Ver. {{ `${appVersion}` }}
-            </NButton>
-          </p>
-
-          <div class="bottom__content bottom__right">
-            <NButton
-              class="content__btn"
-              size="small"
-              ghost
-              :title="$t('rightMenu.userGuide')"
-              @click="createTab(URL_NAIVETAB_DOC_HOME)"
-            >
-              <material-symbols:book-2-outline />
-            </NButton>
-            <NButton
-              class="content__btn"
-              size="small"
-              ghost
-              :title="$t('rightMenu.goodReview')"
-              @click="openExtensionsStorePage()"
-            >
-              <ph:thumbs-up-bold />
-            </NButton>
-            <NButton
-              class="content__btn"
-              size="small"
-              ghost
-              title="GitHub"
-              @click="createTab(URL_GITHUB_HOME)"
-            >
-              <carbon:logo-github />
-            </NButton>
-          </div>
-        </div>
+          <NTabPane
+            v-for="item of tabPaneList"
+            :key="item.name"
+            :name="item.name"
+            :tab="item.label"
+          >
+            <template #tab>
+              <div class="tab__title">
+                <Icon :icon="item.iconName" />
+                <span>{{ item.label }}</span>
+              </div>
+            </template>
+            <component :is="item.component" />
+          </NTabPane>
+        </NTabs>
       </NDrawerContent>
     </NDrawer>
   </div>
@@ -194,11 +155,6 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 
 <style>
 #setting {
-  .n-drawer .n-drawer-content.n-drawer-content--native-scrollbar .n-drawer-body-content-wrapper {
-    margin-top: 50px;
-    padding: 0 var(--n-body-padding);
-    padding-bottom: 94px;
-  }
   .n-radio-group {
     width: 100%;
   }
@@ -218,41 +174,28 @@ const bgBottomBar = getStyleConst('bgBottomBar')
     font-size: 15px !important;
   }
 
+  .n-drawer .n-drawer-content.n-drawer-content--native-scrollbar .n-drawer-body-content-wrapper {
+    padding: 0 !important;
+  }
   .drawer-wrap {
     transition: all 0.3s ease;
-    .drawer__content {
-      padding-bottom: 80px;
-      .n-tabs-tab__label {
-        user-select: none;
-      }
-      .n-tabs-nav {
-        /* 抽屉的z-index为2000 */
-        z-index: 2000;
-        position: absolute;
-        top: 0;
-        left: 0;
-        padding: 5px 13px 0 13px;
-        width: 100%;
-        user-select: none;
-        background-color: var(--n-color);
-      }
-      .n-tabs .n-tabs-tab-pad {
-        width: 26px !important;
-      }
-      .n-tab-pane {
-        padding: 0;
-        user-select: none;
-      }
+    /* nav */
+    .n-tabs-nav-scroll-wrapper {
+      padding: 12px 5px;
+    }
+    /* content */
+    .n-tab-pane {
+      padding: 0 15px 15px 15px !important;
+      overflow: auto;
+      user-select: none;
+      box-sizing: border-box;
     }
 
     .drawer__bottom {
-      z-index: 2000;
-      position: absolute;
-      left: 0px;
-      bottom: 0px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       padding: 8px 15px;
+      box-sizing: border-box;
       width: 100%;
       .bottom__content {
         display: flex;

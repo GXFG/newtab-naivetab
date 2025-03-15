@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { localConfig, localState, availableFontOptions, fontSelectRenderLabel } from '@/logic/store'
+import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 import CustomColorPicker from '@/newtab/components/form/CustomColorPicker.vue'
 
@@ -10,6 +11,8 @@ const beginsList = computed(() => [
 </script>
 
 <template>
+  <BaseComponentCardTitle :title="$t('setting.calendar')" />
+
   <BaseComponentSetting cname="calendar">
     <template #header>
       <NFormItem :label="$t('calendar.weekBeginsOn')">

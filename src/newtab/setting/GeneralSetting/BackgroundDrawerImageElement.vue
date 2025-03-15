@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { FAVORITE_IMAGE_MAX_COUNT } from '@/logic/const'
 import { createTab, downloadImageByUrl } from '@/logic/util'
-import { getStyleField, localConfig, localState } from '@/logic/store'
+import { customPrimaryColor, localConfig, localState } from '@/logic/store'
 import { isImageLoading, getImageUrlFromName } from '@/logic/image'
 
 const props = defineProps({
@@ -108,8 +108,6 @@ const onUnFavoriteImage = () => {
   const index = localConfig.general.favoriteImageList.findIndex((item) => item.name === props.data.name)
   localConfig.general.favoriteImageList.splice(index, 1)
 }
-
-const customPrimaryColor = getStyleField('general', 'primaryColor')
 </script>
 
 <template>

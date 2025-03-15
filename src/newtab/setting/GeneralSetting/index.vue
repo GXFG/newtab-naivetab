@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
 import i18n from '@/lib/i18n'
 import { exportSetting, isUploadConfigLoading, importSetting, refreshSetting, resetSetting } from '@/logic/storage'
-import { localConfig, localState, globalState } from '@/logic/store'
+import { localConfig, localState, globalState, customPrimaryColor } from '@/logic/store'
+import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 import Tips from '@/newtab/components/form/Tips.vue'
 import BackgroundDrawer from './BackgroundDrawer.vue'
@@ -27,12 +29,12 @@ const themeList = computed(() => [
   { label: window.$t('common.dark'), value: 'dark' },
 ])
 
-const drawerPlacementList = computed(() => [
-  { label: window.$t('common.left'), value: 'left' },
-  { label: window.$t('common.right'), value: 'right' },
-  { label: window.$t('common.top'), value: 'top' },
-  { label: window.$t('common.bottom'), value: 'bottom' },
-])
+const drawerPlacementList = [
+  { value: 'left', icon: 'material-symbols:dock-to-left', style: { transform: 'rotate(180deg)' } },
+  { value: 'top', icon: 'material-symbols:dock-to-bottom', style: { transform: 'rotate(180deg)' } },
+  { value: 'bottom', icon: 'material-symbols:dock-to-bottom', style: {} },
+  { value: 'right', icon: 'material-symbols:dock-to-left', style: {} },
+] as { value: TDrawerPlacement | 'right', icon: string, style: Record<string, string> }[]
 
 const focusElementList = computed(() => [
   { label: window.$t('general.focusBrowserDefault'), value: 'default' },
@@ -78,10 +80,15 @@ const onImportSetting = () => {
   importSettingInputEl.value.click()
 }
 
-const onImportFileChange = (e) => {
-  const file = e.target.files[0]
+const onImportFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  if (!target || !target.files || target.files.length === 0) {
+    console.warn('No file selected')
+    return
+  }
+  const file = target.files[0]
   if (!file.name.includes('.json')) {
-    e.target.value = null
+    target.value = ''
     return
   }
   const reader = new FileReader()
@@ -103,7 +110,8 @@ const onResetSetting = () => {
 <template>
   <BackgroundDrawer v-model:show="state.isBackgroundDrawerVisible" />
 
-  <!-- main -->
+  <BaseComponentCardTitle :title="$t('setting.general')" />
+
   <BaseComponentSetting
     cname="general"
     :divider-name="$t('general.globalStyle')"
@@ -135,7 +143,7 @@ const onResetSetting = () => {
           v-if="localConfig.general.isLoadPageAnimationEnabled"
           v-model:value="localConfig.general.loadPageAnimationType"
           size="small"
-          class="setting__item-element"
+          class="setting__item-ml"
         >
           <NRadioButton
             v-for="item in loadPageAnimationTypeList"
@@ -147,19 +155,22 @@ const onResetSetting = () => {
         </NRadioGroup>
       </NFormItem>
 
-      <NFormItem :label="$t('common.drawerSite')">
-        <NRadioGroup
-          v-model:value="localConfig.general.drawerPlacement"
-          size="small"
-        >
-          <NRadioButton
-            v-for="item in drawerPlacementList"
-            :key="item.value"
-            :value="item.value"
+      <NFormItem
+        class="drawer__site_wrap"
+        :label="$t('common.drawerSite')"
+      >
+        <div class="drawer__site">
+          <div
+            v-for="(item, index) in drawerPlacementList"
+            :key="index"
+            class="site__item"
+            :class="{ 'site__item--active': localConfig.general.drawerPlacement === item.value }"
+            :style="item.style"
+            @click="localConfig.general.drawerPlacement = item.value"
           >
-            {{ item.label }}
-          </NRadioButton>
-        </NRadioGroup>
+            <Icon :icon="item.icon" />
+          </div>
+        </div>
       </NFormItem>
 
       <div class="setting__form_wrap">
@@ -179,7 +190,7 @@ const onResetSetting = () => {
           class="n-form-item--half"
         >
           <NSelect
-            v-model:value="localConfig.general.timeLang "
+            v-model:value="localConfig.general.timeLang"
             :options="state.i18nList"
             size="small"
           />
@@ -344,3 +355,47 @@ const onResetSetting = () => {
     </template>
   </BaseComponentSetting>
 </template>
+
+<style>
+.drawer__site_wrap {
+  margin-bottom: -9px;
+  .n-form-item-label {
+    margin-top: 17px;
+  }
+  .drawer__site {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    .site__item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 23px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      &:hover {
+        opacity: 0.6;
+      }
+      &:nth-child(1) {
+        grid-column: 1;
+        grid-row: 2;
+      }
+      &:nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+      }
+      &:nth-child(3) {
+        grid-column: 2;
+        grid-row: 3;
+      }
+      &:nth-child(4) {
+        grid-column: 3;
+        grid-row: 2;
+      }
+    }
+    .site__item--active {
+      color: v-bind(customPrimaryColor);
+    }
+  }
+}
+</style>
