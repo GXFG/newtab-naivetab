@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { useDebounceFn } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
-import { getStyleConst, localConfig, globalState } from '@/logic/store'
+import { localConfig, globalState } from '@/logic/store'
 import GeneralSetting from './GeneralSetting/index.vue'
 import BookmarkSetting from './BookmarkSetting/index.vue'
 import ClockSetting from './ClockSetting/index.vue'
@@ -18,61 +19,71 @@ const tabPaneList = computed(() => [
     name: 'general',
     label: window.$t('setting.general'),
     component: GeneralSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'ion:settings-outline',
+    iconSize: 18,
   },
   {
     name: 'bookmark',
     label: window.$t('setting.bookmark'),
     component: BookmarkSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'ic:outline-keyboard-alt',
+    iconSize: 18,
   },
   {
     name: 'clockDate',
     label: `${window.$t('setting.clock')}/${window.$t('setting.date')}`,
     component: ClockSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'grommet-icons:clock',
+    iconSize: 18,
   },
   {
     name: 'calendar',
     label: window.$t('setting.calendar'),
     component: CalendarSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'uiw:date',
+    iconSize: 16,
   },
   {
     name: 'yearProgress',
     label: window.$t('setting.yearProgress'),
     component: YearProgressSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'lets-icons:time-progress',
+    iconSize: 18,
   },
   {
     name: 'search',
     label: window.$t('setting.search'),
     component: SearchSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'fluent:search-square-24-regular',
+    iconSize: 18,
   },
   {
     name: 'memo',
     label: window.$t('setting.memo'),
     component: MemoSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'material-symbols:note-alt-outline',
+    iconSize: 18,
   },
   {
     name: 'weather',
     label: window.$t('setting.weather'),
     component: WeatherSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'mdi:weather-cloudy',
+    iconSize: 18,
   },
   {
     name: 'news',
     label: window.$t('setting.news'),
     component: NewsSetting,
-    iconName: 'mdi:clock-digital',
+    iconName: 'majesticons:newspaper-line',
+    iconSize: 18,
   },
   {
     name: 'about',
     label: window.$t('setting.about'),
     component: About,
-    iconName: 'mdi:clock-digital',
+    iconName: 'ix:about',
+    iconSize: 18,
   },
 ])
 
@@ -94,8 +105,37 @@ const handlerPreviewLeave = () => {
   mask.style.backgroundColor = ''
 }
 
+const settingContentHeight = ref(0)
+
+const updateSettingContentHeightFunc = useDebounceFn((entries: ResizeObserverEntry[]) => {
+  if (entries.length === 0) {
+    return
+  }
+  const height = entries[0].contentRect.height
+  settingContentHeight.value = height
+}, 200)
+
+const settingContentObserver = new ResizeObserver(updateSettingContentHeightFunc)
+
+watch(
+  () => globalState.isSettingDrawerVisible,
+  async () => {
+    if (!globalState.isSettingDrawerVisible) {
+      settingContentObserver.disconnect()
+      return
+    }
+    await nextTick()
+    const targetEl = document.querySelector('#setting .setting__content') as HTMLElement
+    if (targetEl) {
+      settingContentObserver.observe(targetEl)
+    } else {
+      console.error('setting__content Target element not found!')
+    }
+  },
+)
+
 const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
-const bgBottomBar = getStyleConst('bgBottomBar')
+const settingContentHeightStyle = computed(() => `${settingContentHeight.value}px`)
 </script>
 
 <template>
@@ -104,28 +144,18 @@ const bgBottomBar = getStyleConst('bgBottomBar')
   <div id="preset-theme__drawer" />
 
   <div id="setting">
-    <NButton
-      class="content__btn"
-      size="small"
-      :title="$t('common.preview')"
-      @mouseenter="handlerPreviewEnter"
-      @mouseleave="handlerPreviewLeave"
-    >
-      <fe:picture />&nbsp;{{ $t('common.preview') }}
-    </NButton>
-
     <!-- Drawer: height仅在位置是 top 和 bottom 时生效 -->
     <NDrawer
       v-model:show="globalState.isSettingDrawerVisible"
       class="drawer-wrap"
       :style="drawerStyle"
       :width="650"
-      :height="400"
+      :height="500"
       :placement="localConfig.general.drawerPlacement"
       show-mask="transparent"
       to="#setting"
     >
-      <NDrawerContent>
+      <NDrawerContent class="setting__content">
         <NTabs
           type="line"
           :value="globalState.currSettingTabValue"
@@ -141,12 +171,32 @@ const bgBottomBar = getStyleConst('bgBottomBar')
           >
             <template #tab>
               <div class="tab__title">
-                <Icon :icon="item.iconName" />
+                <div
+                  class="title__icon"
+                  :style="`font-size: ${item.iconSize}px`"
+                >
+                  <Icon :icon="item.iconName" />
+                </div>
                 <span>{{ item.label }}</span>
               </div>
             </template>
-            <component :is="item.component" />
+
+            <template #default>
+              <component :is="item.component" />
+            </template>
           </NTabPane>
+          <template #suffix>
+            <div class="suffix__item">
+              <NButton
+                size="small"
+                :title="$t('common.preview')"
+                @mouseenter="handlerPreviewEnter"
+                @mouseleave="handlerPreviewLeave"
+              >
+                <fe:picture />&nbsp;{{ $t('common.preview') }}
+              </NButton>
+            </div>
+          </template>
         </NTabs>
       </NDrawerContent>
     </NDrawer>
@@ -182,40 +232,34 @@ const bgBottomBar = getStyleConst('bgBottomBar')
     /* nav */
     .n-tabs-nav-scroll-wrapper {
       padding: 12px 5px;
+      height: v-bind(settingContentHeightStyle);
+      .tab__title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .title__icon {
+          margin-right: 5px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
     }
+
     /* content */
     .n-tab-pane {
       padding: 0 15px 15px 15px !important;
+      height: v-bind(settingContentHeightStyle);
       overflow: auto;
       user-select: none;
       box-sizing: border-box;
     }
 
-    .drawer__bottom {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      padding: 8px 15px;
-      box-sizing: border-box;
+    .suffix__item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100%;
-      .bottom__content {
-        display: flex;
-        align-items: center;
-        .content__btn {
-          margin: 0 4px;
-        }
-        .content__version {
-          opacity: 0.85;
-        }
-      }
-      .bottom__left {
-        justify-content: flex-start;
-      }
-      .bottom__center {
-        justify-content: center;
-      }
-      .bottom__right {
-        justify-content: flex-end;
-      }
     }
   }
 }

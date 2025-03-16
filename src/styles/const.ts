@@ -3,8 +3,6 @@
  * 其中darkColor未定义时默认取lightColor的值
  */
 export const styleConst = ref({
-  // setting
-  bgBottomBar: ['#eceff1', '#424247'],
   // moveable
   auxiliaryLineMain: ['#40a9ff', ''],
   auxiliaryLineBound: ['#ff7875', ''],
