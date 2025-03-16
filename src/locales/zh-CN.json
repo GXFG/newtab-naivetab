@@ -150,10 +150,11 @@
     "date": "日期",
     "calendar": "万年历",
     "yearProgress": "今年进度",
-    "search": "搜索",
+    "search": "搜索栏",
     "weather": "天气",
     "memo": "备忘录",
-    "news": "资讯"
+    "news": "资讯",
+    "about": "关于"
   },
   "general": {
     "globalStyle": "全局样式",

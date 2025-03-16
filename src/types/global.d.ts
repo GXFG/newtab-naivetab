@@ -30,7 +30,8 @@ type DatabaseLocalBackgroundImages = {
 type OptionsPermission = 'bookmarks'
 
 type TargetType = 1 | 2 // 1:component 2:element
-type Placement = 'top' | 'bottom' | 'left' | 'right'
+type TDrawerPlacement = 'top' | 'bottom' | 'left' | 'right'
+type TPageFocusElement = 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard'
 
 interface SelectStringItem {
   label: string

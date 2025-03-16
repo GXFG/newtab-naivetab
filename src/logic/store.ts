@@ -147,15 +147,24 @@ export const fontSelectRenderLabel = (option: SelectStringItem) => {
     h(
       'div',
       {
+        title: option.label,
         style: {
           width: '100%',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          fontSize: '13px',
         },
       },
       [
-        h('span', {}, option.label),
+        h('span', {
+          style: {
+            maxWidth: '110px',
+            'overflow': 'hidden',
+            'whiteSpace': 'nowrap',
+            'textOverflow': 'ellipsis',
+          },
+        }, option.label),
         h(
           'span',
           {
@@ -163,7 +172,7 @@ export const fontSelectRenderLabel = (option: SelectStringItem) => {
               fontFamily: option.label,
             },
           },
-          'abc-ABC-0123',
+          'abc-ABC-123',
         ),
       ],
     ),

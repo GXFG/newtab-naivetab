@@ -2,11 +2,14 @@
 import { URL_DAYJS_FORMAT } from '@/logic/const'
 import { localConfig, localState } from '@/logic/store'
 import Tips from '@/newtab/components/form/Tips.vue'
+import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 import CustomColorPicker from '@/newtab/components/form/CustomColorPicker.vue'
 </script>
 
 <template>
+  <BaseComponentCardTitle :title="$t('setting.yearProgress')" />
+
   <BaseComponentSetting
     cname="yearProgress"
     :width-range="[100, 1000]"

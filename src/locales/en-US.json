@@ -154,7 +154,8 @@
     "search": "Search",
     "weather": "Weather",
     "memo": "Memo",
-    "news": "News"
+    "news": "News",
+    "about": "About"
   },
   "general": {
     "globalStyle": "Global style",

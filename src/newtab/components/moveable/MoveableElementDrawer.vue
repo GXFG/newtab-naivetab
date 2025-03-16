@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue'
 import { gaProxy } from '@/logic/gtag'
 import { addKeydownTask } from '@/logic/task'
 import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, moveState } from '@/logic/moveable'
-import { getStyleConst, getStyleField, localConfig, globalState } from '@/logic/store'
+import { getStyleConst, customPrimaryColor, localConfig, globalState } from '@/logic/store'
 
 const state = reactive({
   isCursorInElementDrawer: false,
@@ -189,7 +189,6 @@ const keyboardHandler = (e: KeyboardEvent) => {
 
 addKeydownTask('moveable-tool', keyboardHandler)
 
-const customPrimaryColor = getStyleField('general', 'primaryColor')
 const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 const bgMoveableComponentDelete = getStyleConst('bgMoveableComponentDelete')
 const bgMoveableToolDrawer = getStyleConst('bgMoveableToolDrawer')

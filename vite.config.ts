@@ -10,7 +10,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
-import Markdown from 'vite-plugin-md'
+import Markdown from 'unplugin-vue-markdown/vite'
 import postcssPresetEnv from 'postcss-preset-env'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { isDev, port, r } from './scripts/utils'
@@ -41,7 +41,7 @@ export const sharedConfig: UserConfig = {
     VueI18nPlugin({
       include: resolve(__dirname, './src/locales/**'),
     }),
-    Markdown(),
+    Markdown({}),
     AutoImport({
       imports: ['vue', { 'webextension-polyfill': [['*', 'browser']] }, { dayjs: [['default', 'dayjs']] }],
       dts: r('src/auto-imports.d.ts'),

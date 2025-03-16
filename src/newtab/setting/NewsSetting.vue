@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { globalState, localConfig, localState } from '@/logic/store'
+import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 import CustomColorPicker from '@/newtab/components/form/CustomColorPicker.vue'
 
@@ -19,6 +20,8 @@ const handleUpdateValue = () => {
 </script>
 
 <template>
+  <BaseComponentCardTitle :title="$t('setting.news')" />
+
   <BaseComponentSetting
     cname="news"
     :width-range="[200, 1000]"

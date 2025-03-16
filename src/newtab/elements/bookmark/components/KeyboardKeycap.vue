@@ -3,7 +3,7 @@ import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/const'
 import { isDragMode } from '@/logic/moveable'
 import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, SPACE_KEYCODE_LIST, currKeyboardConfig } from '@/logic/keyboard'
 import { state as bookmarkState, openPage, getFaviconFromUrl, handleSpecialKeycapExec, getKeycapType, getKeycapName, getKeycapUrl, getCustomKeycapWidth } from '@/logic/bookmark'
-import { localConfig, getStyleField } from '@/logic/store'
+import { localConfig, getStyleField, customPrimaryColor } from '@/logic/store'
 
 const CNAME = 'bookmark'
 
@@ -63,7 +63,6 @@ const onMouseDownKey = (event: MouseEvent, keyCode: string) => {
     openPage(url, true)
   }
 }
-const customPrimaryColor = getStyleField('general', 'primaryColor')
 
 const customKeycapKeyFontFamily = getStyleField(CNAME, 'keycapKeyFontFamily')
 const customKeycapKeyFontSize = getStyleField(CNAME, 'keycapKeyFontSize', 'vmin')

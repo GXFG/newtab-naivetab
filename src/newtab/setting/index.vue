@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { createTab } from '@/logic/util'
-import { URL_NAIVETAB_DOC_HOME, URL_GITHUB_HOME } from '@/logic/const'
-import { getStyleConst, localConfig, globalState, openChangelogModal, openSponsorModal, openExtensionsStorePage } from '@/logic/store'
+import { useDebounceFn } from '@vueuse/core'
+import { Icon } from '@iconify/vue'
+import { localConfig, globalState } from '@/logic/store'
 import GeneralSetting from './GeneralSetting/index.vue'
 import BookmarkSetting from './BookmarkSetting/index.vue'
 import ClockSetting from './ClockSetting/index.vue'
@@ -11,55 +11,79 @@ import SearchSetting from './SearchSetting.vue'
 import MemoSetting from './MemoSetting.vue'
 import WeatherSetting from './WeatherSetting.vue'
 import NewsSetting from './NewsSetting.vue'
+import About from './About.vue'
 // @@@@ add Components 5
-
-const appVersion = computed(() => window.appVersion)
 
 const tabPaneList = computed(() => [
   {
     name: 'general',
     label: window.$t('setting.general'),
     component: GeneralSetting,
+    iconName: 'ion:settings-outline',
+    iconSize: 18,
   },
   {
     name: 'bookmark',
     label: window.$t('setting.bookmark'),
     component: BookmarkSetting,
+    iconName: 'ic:outline-keyboard-alt',
+    iconSize: 18,
   },
   {
     name: 'clockDate',
     label: `${window.$t('setting.clock')}/${window.$t('setting.date')}`,
     component: ClockSetting,
+    iconName: 'grommet-icons:clock',
+    iconSize: 18,
   },
   {
     name: 'calendar',
     label: window.$t('setting.calendar'),
     component: CalendarSetting,
+    iconName: 'uiw:date',
+    iconSize: 16,
   },
   {
     name: 'yearProgress',
     label: window.$t('setting.yearProgress'),
     component: YearProgressSetting,
+    iconName: 'lets-icons:time-progress',
+    iconSize: 18,
   },
   {
     name: 'search',
     label: window.$t('setting.search'),
     component: SearchSetting,
+    iconName: 'fluent:search-square-24-regular',
+    iconSize: 18,
   },
   {
     name: 'memo',
     label: window.$t('setting.memo'),
     component: MemoSetting,
+    iconName: 'material-symbols:note-alt-outline',
+    iconSize: 18,
   },
   {
     name: 'weather',
     label: window.$t('setting.weather'),
     component: WeatherSetting,
+    iconName: 'mdi:weather-cloudy',
+    iconSize: 18,
   },
   {
     name: 'news',
     label: window.$t('setting.news'),
     component: NewsSetting,
+    iconName: 'majesticons:newspaper-line',
+    iconSize: 18,
+  },
+  {
+    name: 'about',
+    label: window.$t('setting.about'),
+    component: About,
+    iconName: 'ix:about',
+    iconSize: 18,
   },
 ])
 
@@ -81,8 +105,37 @@ const handlerPreviewLeave = () => {
   mask.style.backgroundColor = ''
 }
 
+const settingContentHeight = ref(0)
+
+const updateSettingContentHeightFunc = useDebounceFn((entries: ResizeObserverEntry[]) => {
+  if (entries.length === 0) {
+    return
+  }
+  const height = entries[0].contentRect.height
+  settingContentHeight.value = height
+}, 200)
+
+const settingContentObserver = new ResizeObserver(updateSettingContentHeightFunc)
+
+watch(
+  () => globalState.isSettingDrawerVisible,
+  async () => {
+    if (!globalState.isSettingDrawerVisible) {
+      settingContentObserver.disconnect()
+      return
+    }
+    await nextTick()
+    const targetEl = document.querySelector('#setting .setting__content') as HTMLElement
+    if (targetEl) {
+      settingContentObserver.observe(targetEl)
+    } else {
+      console.error('setting__content Target element not found!')
+    }
+  },
+)
+
 const drawerStyle = computed(() => `opacity:${drawerOpacity.value};`)
-const bgBottomBar = getStyleConst('bgBottomBar')
+const settingContentHeightStyle = computed(() => `${settingContentHeight.value}px`)
 </script>
 
 <template>
@@ -96,97 +149,55 @@ const bgBottomBar = getStyleConst('bgBottomBar')
       v-model:show="globalState.isSettingDrawerVisible"
       class="drawer-wrap"
       :style="drawerStyle"
-      :width="610"
-      :height="400"
+      :width="650"
+      :height="500"
       :placement="localConfig.general.drawerPlacement"
       show-mask="transparent"
       to="#setting"
     >
-      <NDrawerContent>
-        <div class="drawer__content">
-          <NTabs
-            type="line"
-            :value="globalState.currSettingTabValue"
-            @update:value="onTabsChange"
-          >
-            <NTabPane
-              v-for="item of tabPaneList"
-              :key="item.name"
-              :name="item.name"
-              :tab="item.label"
-            >
-              <component :is="item.component" />
-            </NTabPane>
-          </NTabs>
-        </div>
-
-        <!-- bottom -->
-        <div
-          class="drawer__bottom"
-          :style="`background-color: ${bgBottomBar};`"
+      <NDrawerContent class="setting__content">
+        <NTabs
+          type="line"
+          :value="globalState.currSettingTabValue"
+          placement="left"
+          animated
+          @update:value="onTabsChange"
         >
-          <div class="bottom__content bottom__left">
-            <NButton
-              class="content__btn"
-              size="small"
-              :title="$t('common.preview')"
-              @mouseenter="handlerPreviewEnter"
-              @mouseleave="handlerPreviewLeave"
-            >
-              <fe:picture />&nbsp;{{ $t('common.preview') }}
-            </NButton>
-            <NButton
-              class="content__btn"
-              size="small"
-              :title="$t('rightMenu.buyACupOfCoffee')"
-              @click="openSponsorModal()"
-            >
-              <ci:coffee-togo />&nbsp;{{ $t('rightMenu.buyACupOfCoffee') }}
-            </NButton>
-          </div>
+          <NTabPane
+            v-for="item of tabPaneList"
+            :key="item.name"
+            :name="item.name"
+            :tab="item.label"
+          >
+            <template #tab>
+              <div class="tab__title">
+                <div
+                  class="title__icon"
+                  :style="`font-size: ${item.iconSize}px`"
+                >
+                  <Icon :icon="item.iconName" />
+                </div>
+                <span>{{ item.label }}</span>
+              </div>
+            </template>
 
-          <p class="bottom__content bottom__center">
-            <NButton
-              text
-              class="content__version"
-              size="small"
-              :title="$t('rightMenu.changelog')"
-              @click="openChangelogModal()"
-            >
-              Ver. {{ `${appVersion}` }}
-            </NButton>
-          </p>
-
-          <div class="bottom__content bottom__right">
-            <NButton
-              class="content__btn"
-              size="small"
-              ghost
-              :title="$t('rightMenu.userGuide')"
-              @click="createTab(URL_NAIVETAB_DOC_HOME)"
-            >
-              <material-symbols:book-2-outline />
-            </NButton>
-            <NButton
-              class="content__btn"
-              size="small"
-              ghost
-              :title="$t('rightMenu.goodReview')"
-              @click="openExtensionsStorePage()"
-            >
-              <ph:thumbs-up-bold />
-            </NButton>
-            <NButton
-              class="content__btn"
-              size="small"
-              ghost
-              title="GitHub"
-              @click="createTab(URL_GITHUB_HOME)"
-            >
-              <carbon:logo-github />
-            </NButton>
-          </div>
-        </div>
+            <template #default>
+              <component :is="item.component" />
+            </template>
+          </NTabPane>
+          <template #suffix>
+            <div class="suffix__item">
+              <NButton
+                size="small"
+                :title="$t('common.preview')"
+                @mouseenter="handlerPreviewEnter"
+                @mouseleave="handlerPreviewLeave"
+              >
+                <fe:picture />&nbsp;{{ $t('common.preview') }}
+              </NButton>
+            </div>
+          </template>
+        </NTabs>
       </NDrawerContent>
     </NDrawer>
   </div>
@@ -194,11 +205,6 @@ const bgBottomBar = getStyleConst('bgBottomBar')
 
 <style>
 #setting {
-  .n-drawer .n-drawer-content.n-drawer-content--native-scrollbar .n-drawer-body-content-wrapper {
-    margin-top: 50px;
-    padding: 0 var(--n-body-padding);
-    padding-bottom: 94px;
-  }
   .n-radio-group {
     width: 100%;
   }
@@ -218,61 +224,42 @@ const bgBottomBar = getStyleConst('bgBottomBar')
     font-size: 15px !important;
   }
 
+  .n-drawer .n-drawer-content.n-drawer-content--native-scrollbar .n-drawer-body-content-wrapper {
+    padding: 0 !important;
+  }
   .drawer-wrap {
     transition: all 0.3s ease;
-    .drawer__content {
-      padding-bottom: 80px;
-      .n-tabs-tab__label {
-        user-select: none;
-      }
-      .n-tabs-nav {
-        /* 抽屉的z-index为2000 */
-        z-index: 2000;
-        position: absolute;
-        top: 0;
-        left: 0;
-        padding: 5px 13px 0 13px;
-        width: 100%;
-        user-select: none;
-        background-color: var(--n-color);
-      }
-      .n-tabs .n-tabs-tab-pad {
-        width: 26px !important;
-      }
-      .n-tab-pane {
-        padding: 0;
-        user-select: none;
+    /* nav */
+    .n-tabs-nav-scroll-wrapper {
+      padding: 12px 5px;
+      height: v-bind(settingContentHeightStyle);
+      .tab__title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .title__icon {
+          margin-right: 5px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
     }
 
-    .drawer__bottom {
-      z-index: 2000;
-      position: absolute;
-      left: 0px;
-      bottom: 0px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      padding: 8px 15px;
+    /* content */
+    .n-tab-pane {
+      padding: 0 15px 15px 15px !important;
+      height: v-bind(settingContentHeightStyle);
+      overflow: auto;
+      user-select: none;
+      box-sizing: border-box;
+    }
+
+    .suffix__item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100%;
-      .bottom__content {
-        display: flex;
-        align-items: center;
-        .content__btn {
-          margin: 0 4px;
-        }
-        .content__version {
-          opacity: 0.85;
-        }
-      }
-      .bottom__left {
-        justify-content: flex-start;
-      }
-      .bottom__center {
-        justify-content: center;
-      }
-      .bottom__right {
-        justify-content: flex-end;
-      }
     }
   }
 }
