@@ -26,9 +26,8 @@
 
 ## 🚀Get started
 
-[Document](https://gxfg.github.io/naivetab-doc)
-
-[Buy me a coffee](https://github.com/GXFG/newtab-naivetab/blob/main/sponsor.md)
+- [Document](https://gxfg.github.io/naivetab-doc)
+- [Buy me a coffee](https://github.com/GXFG/newtab-naivetab/blob/main/sponsor.md)
 
 ## 🛠️Install
 

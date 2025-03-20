@@ -26,9 +26,8 @@
 
 ## 🚀快速开始
 
-[文档](https://gxfg.github.io/naivetab-doc)
-
-[请我喝咖啡](https://github.com/GXFG/newtab-naivetab/blob/main/sponsor.md)
+- [文档站](https://gxfg.github.io/naivetab-doc)
+- [给作者买杯咖啡吧](https://github.com/GXFG/newtab-naivetab/blob/main/sponsor.md)
 
 ## 🛠️安装
 
@@ -38,10 +37,11 @@
 
 ## 📜更新日志
 
-[查看更新日志](https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md)
+[Changelog](https://github.com/GXFG/newtab-naivetab/blob/main/CHANGELOG.md)
 
 ## 🌼致谢
 
 - [Naive UI](https://www.naiveui.com)
 - [Vitesse-webext](https://github.com/antfu/vitesse-webext)
 - [icones](https://icones.js.org)
+- ..
