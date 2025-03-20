@@ -3,6 +3,8 @@ import { globalState } from '@/logic/store'
 
 const paymentList = ['wechat', 'alipay']
 
+const groupList = ['wechat', 'qq']
+
 const onCloseModal = () => {
   globalState.isSponsorModalVisible = false
 }
@@ -15,12 +17,15 @@ const onCloseModal = () => {
   >
     <NCard
       class="card__wrap"
-      :title="`${$t('sponsor.title')} ☕️`"
+      :title="`${$t('sponsor.title')}`"
     >
       <div class="modal__content">
         <p class="content__item">{{ $t('sponsor.content1') }}</p>
         <p class="content__item">{{ $t('sponsor.content2') }}</p>
         <p class="content__item">{{ $t('sponsor.content3') }}</p>
+        <p class="content__item">{{ $t('sponsor.content4') }}</p>
+        <p class="content__item">{{ $t('sponsor.content5') }}</p>
+        <p class="content__item content__item--center">{{ $t('sponsor.content6') }}</p>
       </div>
 
       <div class="modal__code">
@@ -38,6 +43,30 @@ const onCloseModal = () => {
           </div>
           <p class="item__title">
             {{ $t(`sponsor.${payment}`) }}
+          </p>
+        </div>
+      </div>
+
+      <div class="modal__content">
+        <p class="content__item">{{ `${$t('sponsor.contact1')}` }}</p>
+        <p class="content__item content__item--center">{{ `${$t('sponsor.contact2')}` }}</p>
+      </div>
+
+      <div class="modal__code">
+        <div
+          v-for="group in groupList"
+          :key="group"
+          class="code__item"
+        >
+          <div class="item__img">
+            <img
+              class="img__main"
+              :src="`https://github.com/GXFG/newtab-naivetab/blob/main/assets/img/sponsor/${group}-group.jpg?raw=true`"
+              alt=""
+            />
+          </div>
+          <p class="item__title">
+            {{ $t(`sponsor.${group}`) }}
           </p>
         </div>
       </div>
@@ -64,12 +93,15 @@ const onCloseModal = () => {
 
 <style scoped>
 .card__wrap {
-  width: 600px;
+  width: 650px;
 }
 .modal__content {
   height: auto;
   .content__item {
     margin: 10px 0;
+  }
+  .content__item--center {
+    text-align: center;
   }
 }
 .modal__code {
@@ -84,6 +116,8 @@ const onCloseModal = () => {
     align-items: center;
     width: 35%;
     .item__img {
+      width: 165px;
+      min-height: 165px;
       .img__main {
         width: 100%;
       }
