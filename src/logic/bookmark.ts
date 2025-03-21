@@ -224,6 +224,17 @@ export const openPage = (url: string, isBgOpen = false, isNewTabOpen = false) =>
     delayResetPressKey()
     return
   }
+  if (url.startsWith('https://closeCurrentTab')) {
+    delayResetPressKey()
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs.length > 0) {
+        chrome.tabs.remove(tabs[0].id, () => {
+          console.log(`标签页 ID ${tabs[0].id} 已关闭`);
+        });
+      }
+    });
+    return
+  }
   if (isNewTabOpen || localConfig.bookmark.isNewTabOpen || !/http/.test(url)) {
     // 以新标签页打开，其中非http协议只能以新标签页打开
     createTab(url)
