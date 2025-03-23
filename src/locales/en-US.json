@@ -2,7 +2,6 @@
   "common": {
     "version": "Version",
     "default": "Default",
-    "confirmation": "Confirmation",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "allow": "Allow",
@@ -16,7 +15,7 @@
     "success": "Success",
     "fail": "Fail",
     "main": "Main",
-    "emphasis": "Emphasis",
+    "emphasis": "Highlight",
     "more": "More",
     "origin": "Origin",
     "custom": "Custom",
@@ -42,7 +41,7 @@
     "font": "Font",
     "fontSize": "Font size",
     "letterSpacing": "Letter spacing",
-    "color": "color",
+    "color": "Color",
     "primaryColor": "Primary color",
     "fontColor": "Font color",
     "backgroundColor": "Bg color",
@@ -54,7 +53,7 @@
     "activeColor": "Active color",
     "shadow": "Shadow",
     "border": "Border",
-    "drawerSite": "Drawer Site",
+    "drawerSite": "Component Library",
     "local": "Local",
     "network": "Network",
     "uhd": "UHD source",
@@ -90,43 +89,40 @@
   },
   "form": {
     "applyToAppearance": "Apply to appearance",
-    "photoOfTheDay": "Bing Photo of the day"
+    "photoOfTheDay": "Daily Bing Wallpaper"
   },
   "permission": {
-    "bookmark": "To display your browser bookmarks, the Keyboard Bookmark Widget requires access permissions."
+    "bookmark": "Keyboard Bookmark requires browser permissions to access your bookmarks"
+  },
+  "popup": {
+    "browserBookmark": "Browser Bookmark",
+    "commitBtnTips": "Drag to reorder bookmarks"
   },
   "prompts": {
-    "linkTips": "Click on ? icon to access the link below",
+    "linkTips": "Click the (?) icon for quick links",
     "pleaseWait": "In progress, Please wait",
     "imageTooLarge": "Image too large",
-    "favoriteLimt": "The maximum number of favorites has been reached",
-    "elementDrawerTips": "Drag the component to the desktop"
+    "favoriteLimt": "Favorites limit reached",
+    "elementDrawerTips": "Drag components to workspace"
   },
   "rightMenu": {
     "editLayout": "Edit layout",
     "doneEdit": "Done",
-    "fullscreen": "Fullscreen",
-    "goodReview": "Give a good review",
-    "buyACupOfCoffee": "Buy coffee",
-    "userHelp": "User Help",
-    "userGuide": "User Guide",
-    "userDocs": "User Docs",
-    "changelog": "Changelog",
-    "feedback": "Feedback"
+    "fullscreen": "Fullscreen"
   },
   "sponsor": {
-    "title": "🔥「Survival Mode Activated! Today's Code is Caffeinated ☕️」 Next Feature Loading... ███▒ 70%",
-    "content1": "🎉 Hey! Welcome to the NaiveTab Crew~",
-    "content2": "Every time you open a new tab, feel the warmth behind this tool – forged through my countless late-night coding marathons and co-raised by productivity-obsessed comrades like you 🐱✨",
-    "content3": "🐱 If NaiveTab saved you 3 mouse clicks...",
-    "content4": "Would you fuel my coding engine with coffee☕️/boba🧋?",
-    "content5": "Funds Breakdown: 50% Feature Development / 50% Cat Food Reserves (My code-review feline partner needs treats!)",
-    "content6": "👉 Scan to Fuel the Mission 👈",
-    "contact1": "🐱 No pressure! Join our procrastination-friendly zone for cat pics/feature voting",
+    "title": "🔥「Caffeinated Commit: Code Brewed with 200% ☕️ Power」",
+    "content1": "🎉 Hey! Finally have you aboard the NaiveTab~",
+    "content2": "Every time you click 'new tab', feel the warmth behind this tiny tool – forged through my late-night coding marathons and co-crafted by efficiency warriors like you 🐱✨",
+    "content3": "🐱 If NaiveTab saved your fingers a few clicks 🖱...",
+    "content4": "Care to fuel my code engine with coffee☕️ / boba🧋?",
+    "content5": "Funds💰 breakdown: 50% wild new features 🧠 / 50% cat food reserves 🐱🥫 (my code-review partner needs snacks!)",
+    "content6": "👉 Scan to Refuel 👈",
+    "contact1": "🐱 No pressure! Join our chill zone for cat pics / co-pilot the roadmap",
     "contact2": "👉 Scan to Enter the Meowtrix 👈",
-    "confirm": "Next time for sure",
-    "alipay": "Alipay",
+    "confirm": "⏳ Maybe after my next paycheck",
     "qq": "QQ",
+    "alipay": "Alipay",
     "wechat": "Wechat"
   },
   "guide": {
@@ -135,13 +131,13 @@
     "doneStep": "Done",
     "tipsTitle": "Tips",
     "stepTitle1": "Add components",
-    "stepDescription1": "After the first installation, the 'Edit layout' is turned on by default, at this time the components in the left drawer are selected, and dragged to the screen to complete the addition and layout of the components",
+    "stepDescription1": "After installation, enter Edit Mode to drag components from the left panel to customize your layout",
     "stepTitle2": "Remove components",
-    "stepDescription2": "selected component in the screen, drag to the trash can in the upper-right corner, or press Delete/Backspace to remove the component",
+    "stepDescription2": "Drag components to the trash icon or press Delete to remove",
     "stepTitle3": "Done Edit layout",
-    "stepDescription3": "Click the close button in the upper left corner or press the Esc key to exit 'Edit layout'; From the right mouse button menu, you can enter the 'Component Settings', 'Edit layout' again",
+    "stepDescription3": "Click Close or press Esc to exit edit mode. Right-click any component to access settings",
     "stepTitle4": "Right-click menu",
-    "stepDescription4": "For all components: hover over the component, right-click to bring up the settings menu, click 'Component Settings', you can modify the function and style",
+    "stepDescription4": "Right-click any component to customize functionality and appearance",
     "stepTitle5": "Complete the tutorial",
     "stepDescription5": "Start customizing your NaiveTab"
   },
@@ -161,7 +157,8 @@
     "weather": "Weather",
     "memo": "Memo",
     "news": "News",
-    "about": "About"
+    "aboutIndex": "About",
+    "aboutSponsor": "Sponsor"
   },
   "general": {
     "globalStyle": "Global style",
@@ -169,7 +166,7 @@
     "pageTitle": "Page title",
     "followSystem": "Follow system",
     "defaultFocus": "Default focus",
-    "defaultFocusTips": "Note: Selecting options other than 'Default' will populate the browser address bar with 'chrome-extension://xxxx/index.html'",
+    "defaultFocusTips": "Note: Non-default options may show extension URL in address bar",
     "focusBrowserDefault": "Default(Browser address bar)",
     "focusRoot": "Root element",
     "loadPageAnimation": "Load animation",
@@ -179,15 +176,15 @@
     "newTabOpen": "Open in newtab",
     "settingDividerSetting": "Setting",
     "syncTime": "Sync time",
-    "syncTimeTips": "Multi-device sync settings, effective only after you sign in to your browser account",
+    "syncTimeTips": "Requires browser account login for cross-device sync",
     "importExportSettingsLabel": "Import/Export",
     "importSettingsValue": "Import",
-    "importSettingsTips": "Import settings from a local file. If you encounter problems, please click the export configuration below to compare and merge the differences with the local files currently to be imported, and finally re import",
+    "importSettingsTips": "Import local settings file. Compare with current config if issues occur",
     "exportSettingValue": "Export",
-    "exportSettingTips": "It is recommended that you export your app settings regularly to prevent the loss of important data",
+    "exportSettingTips": "Regularly backup your settings to prevent data loss",
     "clearStorageLabel": "Clear cache",
     "clearStorageValue": "Clear",
-    "clearStorageTips": "If there is an exception locally, you can try to clear the local cache, this operation will not lose the synced settings",
+    "clearStorageTips": "Clear local cache without affecting synced settings",
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
     "language": "Main Language",
@@ -196,7 +193,7 @@
     "localBackgroundTips": "Local file will not be synchronized"
   },
   "clock": {
-    "apMark": "a.p./p.m."
+    "apMark": "a.m./p.m."
   },
   "bookmark": {
     "bookmarkSource": "Bookmarks source",
@@ -204,12 +201,12 @@
     "thisExtension": "This extension",
     "defaultDisplayFolderTitle": "Expand Folder",
     "rootDirectory": "Root directory",
-    "listenBackgroundKeystrokes": "Global shortcuts",
-    "listenBackgroundKeystrokesTips": "Customize shortcut keys to quickly open specified bookmarks in the browser",
-    "dblclickKeyToOpen": "Dblclick open",
-    "dblclickKeyToOpenTips": "Double-click the keyboard keys to open the bookmark",
-    "intervalTime": "Interval time",
-    "intervalTimeTips": "The effective interval for double-clicking",
+    "listenBackgroundKeystrokes": "Global Hotkeys",
+    "listenBackgroundKeystrokesTips": "Set keyboard shortcuts for quick bookmark access",
+    "dblclickKeyToOpen": "Double-click to Open",
+    "dblclickKeyToOpenTips": "Double-click keyboard keys to launch bookmarks",
+    "intervalTime": "Double-click Interval",
+    "intervalTimeTips": "Maximum time between clicks to register as double-click",
     "configBookmark": "Config Bookmark",
     "keyboard": "Keyboard",
     "presetTheme": "Preset Theme",
@@ -233,7 +230,7 @@
     "customEngine": "Custom engine",
     "placeholder": "Placeholder",
     "icon": "Icon",
-    "suggestion": "Suggestion"
+    "suggestion": "Search Suggestions"
   },
   "calendar": {
     "january": "January",
@@ -259,8 +256,8 @@
     "work": "W",
     "rest": "R",
     "todayDesc": "Today",
-    "restDesc": "Rest day",
-    "workDesc": "Work day",
+    "restDesc": "Day off",
+    "workDesc": "Workday",
     "weekBeginsOn": "Week Begins",
     "day": "Day",
     "desc": "Desc",
@@ -276,7 +273,7 @@
     "warning": "Warning",
     "city": "City",
     "temperatureUnit": "TEMP unit",
-    "speedUnit": "Speed unit",
+    "speedUnit": "Wind Speed Unit",
     "forecast": "Forecast",
     "icon": "Weather icon"
   },
@@ -285,7 +282,7 @@
   },
   "news": {
     "source": "News Source",
-    "refreshInterval": "Refresh Interval",
+    "refreshInterval": "Auto-refresh Interval",
     "toutiao": "Toutiao",
     "baidu": "Baidu",
     "zhihu": "Zhihu",
@@ -294,8 +291,13 @@
     "bilibili": "Bilibili",
     "v2ex": "V2EX"
   },
-  "popup": {
-    "browserBookmark": "Browser Bookmark",
-    "commitBtnTips": "Drag bookmarks to sort"
+  "about": {
+    "userHelp": "Help Center",
+    "userGuide": "User Guide",
+    "userDocs": "User Docs",
+    "changelog": "Changelog",
+    "feedback": "Feedback",
+    "goodReview": "Rate Us",
+    "cannedHope": "Canned Hope"
   }
 }

@@ -11,7 +11,8 @@ import SearchSetting from './SearchSetting.vue'
 import MemoSetting from './MemoSetting.vue'
 import WeatherSetting from './WeatherSetting.vue'
 import NewsSetting from './NewsSetting.vue'
-import About from './About.vue'
+import AboutIndex from './AboutIndex.vue'
+import AboutSponsor from './AboutSponsor.vue'
 // @@@@ add Components 5
 
 const tabPaneList = computed(() => [
@@ -34,7 +35,7 @@ const tabPaneList = computed(() => [
     label: `${window.$t('setting.clock')}/${window.$t('setting.date')}`,
     component: ClockSetting,
     iconName: 'grommet-icons:clock',
-    iconSize: 18,
+    iconSize: 17,
   },
   {
     name: 'calendar',
@@ -55,7 +56,7 @@ const tabPaneList = computed(() => [
     label: window.$t('setting.search'),
     component: SearchSetting,
     iconName: 'fluent:search-square-24-regular',
-    iconSize: 18,
+    iconSize: 19,
   },
   {
     name: 'memo',
@@ -69,7 +70,7 @@ const tabPaneList = computed(() => [
     label: window.$t('setting.weather'),
     component: WeatherSetting,
     iconName: 'mdi:weather-cloudy',
-    iconSize: 18,
+    iconSize: 19,
   },
   {
     name: 'news',
@@ -79,11 +80,18 @@ const tabPaneList = computed(() => [
     iconSize: 18,
   },
   {
-    name: 'about',
-    label: window.$t('setting.about'),
-    component: About,
+    name: 'aboutSponsor',
+    label: window.$t('setting.aboutSponsor'),
+    component: AboutSponsor,
+    iconName: 'ci:coffee-togo',
+    iconSize: 19,
+  },
+  {
+    name: 'aboutIndex',
+    label: window.$t('setting.aboutIndex'),
+    component: AboutIndex,
     iconName: 'ix:about',
-    iconSize: 18,
+    iconSize: 19,
   },
 ])
 
@@ -230,18 +238,20 @@ const settingContentHeightStyle = computed(() => `${settingContentHeight.value}p
   .drawer-wrap {
     transition: all 0.3s ease;
     /* nav */
-    .n-tabs-nav-scroll-wrapper {
-      padding: 12px 5px;
-      height: v-bind(settingContentHeightStyle);
-      .tab__title {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        .title__icon {
-          margin-right: 5px;
+    .n-tabs .n-tabs-nav {
+      padding: 10px 5px 3px 5px;
+      .n-tabs-nav-scroll-wrapper {
+        height: v-bind(settingContentHeightStyle);
+        .tab__title {
           display: flex;
           justify-content: center;
           align-items: center;
+          .title__icon {
+            margin-right: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
         }
       }
     }

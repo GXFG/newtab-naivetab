@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMessage, useNotification, useDialog, useLoadingBar } from 'naive-ui'
 import ChangelogModal from '@/components/ChangelogModal.vue'
-import SponsorModal from '@/components/SponsorModal.vue'
 
 import BackgroundImg from '@/newtab/components/BackgroundImg.vue'
 import RightClickMenu from '@/newtab/components/RightClickMenu.vue'
@@ -32,7 +31,6 @@ window.$loadingBar = useLoadingBar()
   <BackgroundImg />
   <RightClickMenu />
   <ChangelogModal />
-  <SponsorModal />
   <MoveableGuideLine />
   <MoveableElementDrawer />
 

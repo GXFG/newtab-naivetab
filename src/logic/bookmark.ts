@@ -45,7 +45,7 @@ export const getBrowserBookmarkForKeyboard = async () => {
   } catch (e) {
     console.warn(e)
     window.$dialog.create({
-      title: window.$t('common.confirmation'),
+      title: window.$t('common.confirm'),
       content: window.$t('permission.bookmark'),
       closable: false,
       closeOnEsc: false,

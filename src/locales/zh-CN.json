@@ -16,7 +16,7 @@
     "success": "成功",
     "fail": "失败",
     "main": "主要",
-    "emphasis": "强调",
+    "emphasis": "高亮",
     "more": "更多",
     "origin": "来源",
     "custom": "自定义",
@@ -54,7 +54,7 @@
     "activeColor": "激活色",
     "shadow": "阴影",
     "border": "边框",
-    "drawerSite": "抽屉位置",
+    "drawerSite": "侧边栏位置",
     "local": "本地",
     "network": "网络",
     "uhd": "UHD分辨率",
@@ -90,43 +90,40 @@
   },
   "form": {
     "applyToAppearance": "应用于外观",
-    "photoOfTheDay": "Bing每日一图"
+    "photoOfTheDay": "Bing每日壁纸"
   },
   "permission": {
-    "bookmark": "为了展示您的浏览器书签，键盘书签组件需获取访问权限。"
+    "bookmark": "键盘书签需要浏览器权限访问您的书签"
+  },
+  "popup": {
+    "browserBookmark": "浏览器书签",
+    "commitBtnTips": "拖拽书签调整顺序"
   },
   "prompts": {
-    "linkTips": "点击 ? 图标，访问以下链接",
+    "linkTips": "点击(?)图标，访问以下链接",
     "pleaseWait": "执行中，请稍等",
     "imageTooLarge": "图片体积过大",
     "favoriteLimt": "收藏已达上限",
-    "elementDrawerTips": "拖移组件放至桌面"
+    "elementDrawerTips": "将组件拖到工作区"
   },
   "rightMenu": {
     "editLayout": "编辑布局",
     "doneEdit": "完成",
-    "fullscreen": "全屏模式",
-    "goodReview": "给个好评",
-    "buyACupOfCoffee": "买杯咖啡",
-    "userHelp": "使用帮助",
-    "userGuide": "操作指南",
-    "userDocs": "用户文档",
-    "changelog": "更新日志",
-    "feedback": "反馈建议"
+    "fullscreen": "全屏模式"
   },
   "sponsor": {
-    "title": "🔥「续命成功！今日代码已注入咖啡因 ☕️」下一功能加载中... ███▒ 70%",
+    "title": "🔥「续命模式激活！今日代码含 ☕️ 量 200%」",
     "content1": "🎉 嘿！终于等到你加入NaiveTab~",
-    "content2": "每天按下「新建标签页」时，希望你能感受到这个小工具背后的温度——它是我这个码农深夜爆肝的成果，更是和你一样追求效率的小伙伴们共同抚养的🐱✨",
-    "content3": "🐱如果NaiveTab让你少点击了3次鼠标...",
-    "content4": "要不要考虑请我喝杯咖啡☕️/奶茶🧋续命？",
-    "content5": "资金流向透明：50%续命开发新脑洞 / 50%给我的猫买罐罐 (code-review伙伴需要零食!)",
+    "content2": "每天按下「新建标签页」时，希望你能感受到这个小工具背后的温度——它是我这个码农深夜爆肝的成果，更是和你一样的效率控们共同打磨的浏览器搭档✨",
+    "content3": "🐱如果NaiveTab让你少点击了那么几次鼠标🖱...",
+    "content4": "要不要考虑请我喝杯咖啡☕️ / 奶茶🧋续命？",
+    "content5": "资金💰流向透明：50%续命开发新脑洞🧠 / 50%给我的猫🐱买罐罐🥫 (code-review伙伴需要零食！)",
     "content6": "👉 扫码投喂 👈",
-    "contact1": "🐱 不投喂也完全OK！欢迎来摸鱼唠嗑群云吸猫/下阶段优先开发什么",
+    "contact1": "🐱 不投喂也完全OK！欢迎来摸鱼唠嗑群云吸猫 / 一起制定下阶段开发什么",
     "contact2": "👉 扫码加入喵星人基地 👈",
     "confirm": "下次一定",
-    "alipay": "支付宝",
     "qq": "QQ",
+    "alipay": "支付宝",
     "wechat": "微信"
   },
   "guide": {
@@ -134,13 +131,13 @@
     "nextStep": "下一步",
     "doneStep": "开始",
     "stepTitle1": "添加组件",
-    "stepDescription1": "首次安装后，默认会触发“编辑布局”，此时选中左侧抽屉内的组件，拖动至屏幕内任意位置以完成对组件的添加和布局。",
+    "stepDescription1": "安装后自动进入编辑模式，从左侧组件库拖拽元素到工作区即可布局",
     "stepTitle2": "移除组件",
-    "stepDescription2": "选中屏幕内的组件后，拖动至右上角的垃圾桶，或按Delete/Backspace键以移除组件。",
+    "stepDescription2": "拖拽组件到垃圾桶图标或按Delete/Backspace键删除",
     "stepTitle3": "完成编辑",
-    "stepDescription3": "点击左上角完成按钮或按Esc键，完成编辑；通过鼠标右键菜单可再次进入“编辑布局”。",
+    "stepDescription3": "点击完成或按Esc退出编辑，右键组件可再次调整",
     "stepTitle4": "右键菜单",
-    "stepDescription4": "鼠标悬浮在组件上，点击鼠标右键唤出设置菜单，点击“组件设置”，可进行组件功能、样式的修改。",
+    "stepDescription4": "右键点击组件，随时修改功能与样式",
     "stepTitle5": "完成教程",
     "stepDescription5": "开始自定义你的 NaiveTab 吧。"
   },
@@ -160,7 +157,8 @@
     "weather": "天气",
     "memo": "备忘录",
     "news": "资讯",
-    "about": "关于"
+    "aboutIndex": "关于",
+    "aboutSponsor": "买杯咖啡"
   },
   "general": {
     "globalStyle": "全局样式",
@@ -168,7 +166,7 @@
     "pageTitle": "页面标题",
     "followSystem": "跟随系统",
     "defaultFocus": "载入时聚焦",
-    "defaultFocusTips": "选择“默认”外的其他选项会让浏览器地址栏被填充上“chrome-extension://xxxx/index.html”",
+    "defaultFocusTips": "非默认选项可能在地址栏显示插件URL",
     "focusBrowserDefault": "默认（浏览器地址栏）",
     "focusRoot": "根元素",
     "loadPageAnimation": "载入动画",
@@ -178,15 +176,15 @@
     "newTabOpen": "在新标签页打开",
     "settingDividerSetting": "设置",
     "syncTime": "同步时间",
-    "syncTimeTips": "支持多设备同步设置，仅在登录浏览器账号且开启数据同步后生效",
+    "syncTimeTips": "需登录浏览器账号开启数据同步",
     "importExportSettingsLabel": "导入/导出",
     "importSettingsValue": "导入",
-    "importSettingsTips": "从本地文件导入设置。如果遇到问题，请点击导出配置，与当前准备导入的本地文件进行差异比对、合并，最后重新导入",
+    "importSettingsTips": "导入本地设置文件，遇到问题可导出当前配置对比差异",
     "exportSettingValue": "导出",
-    "exportSettingTips": "建议定期导出应用设置，防止丢失重要数据",
+    "exportSettingTips": "定期备份设置防止数据丢失",
     "clearStorageLabel": "清除缓存",
     "clearStorageValue": "清除",
-    "clearStorageTips": "如果本地出现异常可尝试清除本地缓存，此操作不会清除已同步的设置",
+    "clearStorageTips": "清除本地缓存不影响已同步设置",
     "resetSettingLabel": "重置设置",
     "resetSettingValue": "重置",
     "language": "主语言",
@@ -195,7 +193,7 @@
     "localBackgroundTips": "本地背景图不会进行云同步，仅在当前设备生效"
   },
   "clock": {
-    "apMark": "a.p./p.m."
+    "apMark": "a.m./p.m."
   },
   "bookmark": {
     "bookmarkSource": "书签来源",
@@ -204,11 +202,11 @@
     "defaultDisplayFolderTitle": "默认展开文件夹",
     "rootDirectory": "根目录",
     "listenBackgroundKeystrokes": "全局快捷键",
-    "listenBackgroundKeystrokesTips": "自定义快捷键，实现在浏览器内快速打开指定书签",
+    "listenBackgroundKeystrokesTips": "设置快捷键快速打开书签",
     "dblclickKeyToOpen": "双击按键打开",
-    "dblclickKeyToOpenTips": "双击键盘按键以打开书签，防止误触按键",
+    "dblclickKeyToOpenTips": "双击按键防误触",
     "intervalTime": "最大间隔时间",
-    "intervalTimeTips": "识别在多长时间内的双击操作",
+    "intervalTimeTips": "双击操作有效时间间隔",
     "configBookmark": "配置书签",
     "keyboard": "键盘",
     "presetTheme": "预设主题",
@@ -259,7 +257,7 @@
     "rest": "休",
     "todayDesc": "今日",
     "restDesc": "休息日",
-    "workDesc": "调班日",
+    "workDesc": "工作日",
     "weekBeginsOn": "一周开始于",
     "day": "日期",
     "desc": "描述",
@@ -293,8 +291,13 @@
     "bilibili": "B站",
     "v2ex": "V2EX"
   },
-  "popup": {
-    "browserBookmark": "浏览器书签",
-    "commitBtnTips": "拖动书签可以进行排序"
+  "about": {
+    "userHelp": "使用帮助",
+    "userDocs": "用户文档",
+    "userGuide": "操作指南",
+    "changelog": "更新日志",
+    "feedback": "反馈建议",
+    "goodReview": "评价打分",
+    "cannedHope": "猫罐头期待值"
   }
 }
