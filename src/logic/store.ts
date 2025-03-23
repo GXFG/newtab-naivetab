@@ -36,7 +36,6 @@ export const globalState = reactive({
   isImportSettingLoading: false,
   isClearStorageLoading: false,
   isChangelogModalVisible: false,
-  isSponsorModalVisible: false,
   isSearchFocused: false,
   isMemoFocused: false,
   currSettingTabValue: 'general',
@@ -195,10 +194,6 @@ export const openChangelogModal = () => {
   globalState.isChangelogModalVisible = true
 }
 
-export const openSponsorModal = () => {
-  globalState.isSponsorModalVisible = true
-}
-
 export const handleStateResetAndUpdate = () => {
   resetBookmarkPending()
   if (Object.keys(defaultLocalState.isUploadConfigStatusMap).length !== Object.keys(localState.value.isUploadConfigStatusMap).length) {
@@ -223,7 +218,7 @@ const updateSuccess = () => {
           },
         },
         {
-          default: () => window.$t('rightMenu.changelog'),
+          default: () => window.$t('about.changelog'),
         },
       ),
   })

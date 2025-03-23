@@ -15,7 +15,7 @@ const props = defineProps({
 
 <style scoped>
 .base_setting__title {
-  padding: 16px 25px 10px 25px;
+  padding: 16px 0 10px 0;
   z-index: 2000;
   position: sticky;
   top: 0;

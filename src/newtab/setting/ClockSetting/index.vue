@@ -6,7 +6,7 @@ import DateSetting from './DateSetting.vue'
 </script>
 
 <template>
-  <BaseComponentCardTitle :title="$t('setting.clock')" />
+  <BaseComponentCardTitle :title="`${$t('setting.clock')}/${$t('setting.date')}`" />
 
   <p
     class="setting__label"

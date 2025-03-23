@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { gaProxy } from '@/logic/gtag'
-import { createTab } from '@/logic/util'
-import { URL_NAIVETAB_DOC_HOME, URL_FEEDBACK_EMAIL, URL_GITHUB_ISSUSE } from '@/logic/const'
-import { openUserGuide } from '@/logic/guide'
 import { isDragMode, toggleIsDragMode, getTargetDataFromEvent } from '@/logic/moveable'
-import { toggleFullscreen, switchSettingDrawerVisible, globalState, openChangelogModal, openSponsorModal, openExtensionsStorePage } from '@/logic/store'
+import { toggleFullscreen, switchSettingDrawerVisible, globalState } from '@/logic/store'
 
 const state = reactive({
   isMenuVisible: false,
   posX: 0,
   posY: 0,
-  currComponentName: '',
+  currComponentName: '' as settingPanes,
 })
 
 const renderIconFunc = (icon: string) => () => h(Icon, { icon })
@@ -39,57 +36,24 @@ const menuList = computed(() => {
       key: 'd1',
     },
     {
-      label: window.$t('rightMenu.buyACupOfCoffee'),
-      key: 'buyACupOfCoffee',
+      label: window.$t('setting.aboutSponsor'),
+      key: 'aboutSponsor',
       icon: renderIconFunc('ci:coffee-togo'),
     },
     {
-      label: window.$t('rightMenu.userHelp'),
-      key: 'userHelp',
-      icon: renderIconFunc('ic:baseline-help-outline'),
-      children: [
-        {
-          label: window.$t('rightMenu.userGuide'),
-          key: 'userGuide',
-          icon: renderIconFunc('material-symbols:developer-guide-outline-rounded'),
-        },
-        {
-          label: window.$t('rightMenu.userDocs'),
-          key: 'userDocs',
-          icon: renderIconFunc('material-symbols:book-2-outline'),
-        },
-        {
-          label: window.$t('rightMenu.changelog'),
-          key: 'changelog',
-          icon: renderIconFunc('ic:outline-new-releases'),
-        },
-      ],
-    },
-    {
-      label: window.$t('rightMenu.feedback'),
-      key: 'feedback',
-      icon: renderIconFunc('bx:message-rounded-dots'),
-      children: [
-        {
-          label: 'GitHub',
-          key: 'feedbackGithub',
-          icon: renderIconFunc('carbon:logo-github'),
-        },
-        {
-          label: 'Email',
-          key: 'feedbackEmail',
-          icon: renderIconFunc('mdi:email-outline'),
-        },
-        {
-          label: window.$t('rightMenu.goodReview'),
-          key: 'goodReview',
-          icon: renderIconFunc('ph:thumbs-up-bold'),
-        },
-      ],
+      label: window.$t('setting.aboutIndex'),
+      key: 'aboutIndex',
+      icon: renderIconFunc('ix:about'),
     },
   ]
   return resList
 })
+
+const openSettingPane = (tabValue: settingPanes) => {
+  globalState.currSettingTabValue = tabValue
+  switchSettingDrawerVisible(true)
+  gaProxy('click', ['rightMenu', tabValue])
+}
 
 const menuActionMap = {
   setting: () => {
@@ -99,9 +63,7 @@ const menuActionMap = {
       settingDrawerTabName = 'clockDate'
     }
     const tabValue = settingDrawerTabName.length === 0 ? 'general' : settingDrawerTabName
-    globalState.currSettingTabValue = tabValue
-    switchSettingDrawerVisible(true)
-    gaProxy('click', ['rightMenu', tabValue])
+    openSettingPane(tabValue)
   },
   editLayout: () => {
     switchSettingDrawerVisible(false)
@@ -112,33 +74,11 @@ const menuActionMap = {
     toggleFullscreen()
     gaProxy('click', ['rightMenu', 'fullscreen'])
   },
-  userDocs: () => {
-    createTab(URL_NAIVETAB_DOC_HOME)
-    gaProxy('click', ['rightMenu', 'userDocs'])
+  aboutSponsor: () => {
+    openSettingPane('aboutSponsor')
   },
-  userGuide: () => {
-    openUserGuide()
-    gaProxy('click', ['rightMenu', 'userGuide'])
-  },
-  changelog: () => {
-    openChangelogModal()
-    gaProxy('click', ['rightMenu', 'changelog'])
-  },
-  feedbackGithub: () => {
-    createTab(URL_GITHUB_ISSUSE)
-    gaProxy('click', ['rightMenu', 'feedbackGithub'])
-  },
-  feedbackEmail: () => {
-    createTab(URL_FEEDBACK_EMAIL)
-    gaProxy('click', ['rightMenu', 'feedbackEmail'])
-  },
-  goodReview: () => {
-    openExtensionsStorePage()
-    gaProxy('click', ['rightMenu', 'goodReview'])
-  },
-  buyACupOfCoffee: () => {
-    openSponsorModal()
-    gaProxy('click', ['rightMenu', 'buyACupOfCoffee'])
+  aboutIndex: () => {
+    openSettingPane('aboutIndex')
   },
 }
 
@@ -160,7 +100,7 @@ const openMenu = async (e: MouseEvent) => {
   state.posX = e.clientX
   state.posY = e.clientY
   const targetData = getTargetDataFromEvent(e)
-  state.currComponentName = targetData.name
+  state.currComponentName = targetData.name as settingPanes
   state.isMenuVisible = true
 }
 

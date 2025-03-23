@@ -76,6 +76,7 @@ const startGuide = () => {
 }
 
 export const openUserGuide = async () => {
+  globalState.isSettingDrawerVisible = false
   globalState.isGuideMode = true
   // 打开编辑布局 & 用户引导
   toggleIsDragMode(true)
