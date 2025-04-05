@@ -6,6 +6,7 @@
 - +: 🚀支持Firefox [Firefox addon](https://addons.mozilla.org/zh-CN/firefox/addon/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/)
 - ^: 设置抽屉样式优化
 - ^: 编辑布局性能优化
+- ^: bing本地壁纸丰富
 - ^: 依赖库升级
 - #: 修复Edge的Favicon展示问题
 
