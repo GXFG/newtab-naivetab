@@ -146,9 +146,7 @@ const getPexelsImageList = async () => {
 }
 
 export const updateBingImages = async () => {
-  setTimeout(() => {
-    getLocalBingList()
-  }, 2000)
+  getLocalBingList()
   const currTS = dayjs().valueOf()
   // 最小刷新间隔为3小时
   if (currTS - imageLocalState.value.bing.syncTime <= 3600000 * 3) {
