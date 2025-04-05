@@ -237,6 +237,9 @@ const onUnFavoriteImage = () => {
       justify-content: center;
       align-items: center;
       color: #fff;
+      &:hover {
+        opacity: 0.7;
+      }
     }
   }
   .image__current-mask {

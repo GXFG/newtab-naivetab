@@ -53,9 +53,49 @@ export const imageState = reactive({
   currBackgroundImageFileObjectURL: '',
 })
 
+const localBingList = ref<TImage.BaseImageItem[]>([])
+
+const getLocalBingList = async () => {
+  try {
+    const response = await fetch('/assets/bing-wallpaper.md')
+    const text = await response.text()
+
+    const lines = text.split('\n')
+    const batchSize = 100
+    let index = 0
+
+    const processBatch = () => {
+      const batch = lines.slice(index, index + batchSize)
+      const processedBatch = batch
+        .filter((line) => /^\d{4}-\d{2}-\d{2} \|/.test(line.trim()))
+        .map((line) => {
+          const nameMatch = line.match(/th\?id=OHR\.(.*?)_UHD\.jpg/)
+          const name = nameMatch ? nameMatch[1] : ''
+          const descMatch = line.match(/\[(.*?)\s*\(/)
+          const desc = descMatch ? descMatch[1] : ''
+          return {
+            name,
+            desc,
+          }
+        })
+        .filter((item) => item.name && item.desc)
+
+      localBingList.value.push(...processedBatch)
+      index += batchSize
+      if (index < lines.length) {
+        requestIdleCallback(processBatch)
+      }
+    }
+
+    requestIdleCallback(processBatch)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 export const previewImageListMap = computed(() => ({
   favorite: localConfig.general.favoriteImageList,
-  bing: imageLocalState.value.bing.list.map((item) => ({
+  bing: [...imageLocalState.value.bing.list, ...localBingList.value].map((item) => ({
     ...item,
     networkSourceType: 1,
   })),
@@ -106,6 +146,9 @@ const getPexelsImageList = async () => {
 }
 
 export const updateBingImages = async () => {
+  setTimeout(() => {
+    getLocalBingList()
+  }, 2000)
   const currTS = dayjs().valueOf()
   // 最小刷新间隔为3小时
   if (currTS - imageLocalState.value.bing.syncTime <= 3600000 * 3) {
