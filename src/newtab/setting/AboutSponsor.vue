@@ -58,30 +58,6 @@ const removeToast = (id: string) => {
     </div>
   </div>
 
-  <div class="sponsor__content">
-    <p class="content__item">{{ `${$t('sponsor.contact1')}` }}</p>
-    <p class="content__item content__item--center">{{ `${$t('sponsor.contact2')}` }}</p>
-  </div>
-
-  <div class="sponsor__code">
-    <div
-      v-for="group in groupList"
-      :key="group"
-      class="code__item"
-    >
-      <div class="item__img">
-        <img
-          class="img__main"
-          :src="`https://github.com/GXFG/newtab-naivetab/blob/main/assets/img/sponsor/${group}-group.jpg?raw=true`"
-          alt=""
-        />
-      </div>
-      <p class="item__title">
-        {{ $t(`sponsor.${group}`) }}
-      </p>
-    </div>
-  </div>
-
   <div class="sponsor__footer">
     <div class="footer__toast">
       <div class="toast__wrapper">
