@@ -24,20 +24,3 @@
     </td>
   </tr>
 </table>
-
-🐱 不投喂也完全OK！欢迎来摸鱼唠嗑群云吸猫 / 下阶段优先开发什么
-
-👉 扫码加入喵星人基地 👈
-
-<table>
-  <tr>
-    <td>
-      <img  src="./assets/img/sponsor/wechat-group.jpg" alt="微信/wechat" width="200px">
-      <p style="text-align: center;">微信/wechat</p>
-    </td>
-    <td>
-      <img  src="./assets/img/sponsor/qq-group.jpg" alt="QQ" width="200px">
-      <p style="text-align: center;">QQ</p>
-    </td>
-  </tr>
-</table>
