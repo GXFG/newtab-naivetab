@@ -353,6 +353,9 @@ export const handleAppUpdate = async () => {
   if (compareLeftVersionLessThanRightVersions(version, '1.24.3')) {
     localConfig.general.backgroundColor = structuredClone(defaultConfig.general.backgroundColor)
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.25.9')) {
+    localConfig.calendar.festivalCountdown = true
+  }
   // 更新local版本号
   localConfig.general.version = window.appVersion
   // updateSuccess()

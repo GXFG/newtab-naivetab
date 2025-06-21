@@ -82,6 +82,7 @@
     "update": "更新",
     "upload": "上传",
     "load": "载入",
+    "day": "天",
     "setting": "设置",
     "general": "通用",
     "other": "其他",
@@ -257,6 +258,7 @@
     "restDesc": "休息日",
     "workDesc": "工作日",
     "weekBeginsOn": "一周开始于",
+    "festivalCountdown": "节日倒数",
     "day": "日期",
     "desc": "描述",
     "holiday": "节日"

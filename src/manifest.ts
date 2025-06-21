@@ -13,22 +13,22 @@ export async function getManifest() {
     description: '__MSG_appDesc__',
     default_locale: 'zh_CN',
     action: {
-      default_icon: './assets/img/icon/icon.png',
-      default_popup: './dist/popup/index.html',
+      default_icon: '/assets/img/icon/icon.png',
+      default_popup: '/dist/popup/index.html',
     },
     icons: {
-      16: './assets/img/icon/icon-16x16.png',
-      48: './assets/img/icon/icon-48x48.png',
-      128: './assets/img/icon/icon-128x128.png',
+      16: '/assets/img/icon/icon-16x16.png',
+      48: '/assets/img/icon/icon-48x48.png',
+      128: '/assets/img/icon/icon-128x128.png',
     },
     permissions: ['storage', 'favicon', 'tabs'],
     host_permissions: ['*://*/*'],
     optional_permissions: ['bookmarks'],
     chrome_url_overrides: {
-      newtab: './dist/newtab/index.html',
+      newtab: '/dist/newtab/index.html',
     },
     background: {
-      service_worker: './dist/background/index.mjs',
+      service_worker: '/dist/background/index.mjs',
     },
     // 一个扩展可以有很多命令，但只能指定 4 个建议的键。
     commands: {
@@ -160,7 +160,7 @@ export async function getManifest() {
       },
     },
     // options_ui: {
-    //   page: './dist/options/index.html',
+    //   page: '/dist/options/index.html',
     //   open_in_tab: true,
     // },
     // content_scripts: [
@@ -189,7 +189,7 @@ export async function getManifest() {
 
   if (process.env.BROWSER === 'firefox') {
     manifest.background = {
-      scripts: ['./dist/background/index.mjs'],
+      scripts: ['/dist/background/index.mjs'],
     }
     manifest.browser_specific_settings = {
       gecko: {

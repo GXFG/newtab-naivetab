@@ -81,6 +81,7 @@
     "update": "Update",
     "upload": "Upload",
     "load": "Load",
+    "day": "day",
     "setting": "Setting",
     "general": "General",
     "other": "Other",
@@ -257,6 +258,7 @@
     "restDesc": "Day off",
     "workDesc": "Workday",
     "weekBeginsOn": "Week Begins",
+    "festivalCountdown": "Festival Countdown",
     "day": "Day",
     "desc": "Desc",
     "holiday": "Holiday"
