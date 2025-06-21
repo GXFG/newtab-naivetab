@@ -199,6 +199,7 @@ export const defaultConfig = {
   calendar: {
     enabled: true,
     weekBeginsOn: 1, // 1 monday, 7 sunday
+    festivalCountdown: true,
     layout: {
       xOffsetKey: 'left',
       xOffsetValue: 0,

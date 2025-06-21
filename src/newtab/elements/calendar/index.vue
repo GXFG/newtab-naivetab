@@ -8,24 +8,34 @@ import MoveableComponentWrap from '@/newtab/components/moveable/MoveableComponen
 const CNAME = 'calendar'
 const isRender = getIsComponentRender(CNAME)
 
+const todayDayjs = dayjs()
+
 const state = reactive({
-  today: dayjs().format('YYYY-MM-DD'),
-  currYear: dayjs().get('year'),
-  currMonth: dayjs().get('month') + 1,
-  currDay: dayjs().get('date'),
+  today: todayDayjs.format('YYYY-MM-DD'),
+  currYear: todayDayjs.get('year'),
+  currMonth: todayDayjs.get('month') + 1,
+  currDay: todayDayjs.get('date'),
   yearList: Array.from(Array(101), (v, i) => ({ label: `${2000 + i}`, value: 2000 + i })),
   dateList: [] as {
     date: string // YYYY-MM-DD
+    shortDate: string // MM.DD
     day: number // D
     desc: string // 节日
     type: number // 0不展示，1休，2班
     isToday: boolean
     isWeekend: boolean
     isFestival: boolean
+    festivalCountdownDay: number
     isNotCurrMonth: boolean
   }[],
   currDetailDate: '',
 })
+
+const festivalList = computed(() =>
+  state.dateList.filter((item) => {
+    return item.isFestival && item.festivalCountdownDay >= 0
+  }),
+)
 
 const monthsList = computed(() => [
   { label: window.$t('calendar.january'), value: 1 },
@@ -71,17 +81,21 @@ const holidayTypeToDesc = computed(() => ({
  */
 const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
+  const shortDate = dateEle.format('MM.DD')
   const targetDateEle = new Date(formatDate)
   const solarEle = Solar.fromDate(targetDateEle)
   const lunarEle = Lunar.fromDate(targetDateEle)
   const holidayEle = HolidayUtil.getHoliday(dateEle.get('year'), dateEle.get('month') + 1, dateEle.get('date'))
 
-  // desc优先级：阳历节日, 阴历节日, 节气, 阴历月份, 阴历日期
-  let desc = solarEle.getFestivals()[0] || lunarEle.getFestivals()[0] || lunarEle.getJieQi() || ''
+  // desc展示优先级：阴历节日, 阳历节日, 节气, 阴历月份, 阴历日期
+  let desc = lunarEle.getFestivals()[0] || solarEle.getFestivals()[0] || lunarEle.getJieQi() || ''
   let isFestival = true
+  let festivalCountdownDay = 0
   if (desc.length === 0) {
     isFestival = false
     desc = lunarEle.getDay() === 1 ? `${lunarEle.getMonthInChinese()}月` : lunarEle.getDayInChinese()
+  } else {
+    festivalCountdownDay = dateEle.diff(todayDayjs, 'day')
   }
 
   let dayType = 0
@@ -93,12 +107,14 @@ const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
 
   const param = {
     date: formatDate,
+    shortDate,
     day: dateEle.get('date'),
     desc,
     type: dayType,
     isToday: state.today === formatDate,
     isWeekend: [6, 0].includes(dateEle.get('day')),
     isFestival,
+    festivalCountdownDay,
     isNotCurrMonth: type !== 'main',
   }
   if (type === 'start') {
@@ -194,12 +210,12 @@ const onDateChange = (type: 'year' | 'month') => {
   onRender()
 }
 
-const isResetBtnVisible = computed(() => state.currYear !== dayjs().get('year') || state.currMonth !== dayjs().get('month') + 1)
+const isResetBtnVisible = computed(() => state.currYear !== todayDayjs.get('year') || state.currMonth !== todayDayjs.get('month') + 1)
 
 const onReset = () => {
-  state.currYear = dayjs().get('year')
-  state.currMonth = dayjs().get('month') + 1
-  state.currDay = dayjs().get('date')
+  state.currYear = todayDayjs.get('year')
+  state.currMonth = todayDayjs.get('month') + 1
+  state.currDay = todayDayjs.get('date')
   onRender()
   gaProxy('click', ['calendar', 'resetToady'])
 }
@@ -282,6 +298,10 @@ const customWorkDescFontColor = getStyleField(CNAME, 'workDescFontColor')
 const customWorkLabelBackgroundColor = getStyleField(CNAME, 'workLabelBackgroundColor')
 const customWorkLabelFontColor = getStyleField(CNAME, 'workLabelFontColor')
 const customWorkItemBackgroundColor = getStyleField(CNAME, 'workItemBackgroundColor')
+
+const customDestivalCountdownItemHeight = getStyleField(CNAME, 'width', 'vmin', 1.4)
+const customDestivalCountdownFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 0.95)
+const customDestivalCountdownRestFontSize = getStyleField(CNAME, 'fontSize', 'vmin', 0.65)
 
 const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 </script>
@@ -433,7 +453,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
                   {{ detailInfo.lunar }}
                 </p>
                 <p class="detail__festival">
-                  {{ `${detailInfo.solarFestivals} ${detailInfo.lunarFestivals}` }}
+                  {{ `${detailInfo.lunarFestivals} ${detailInfo.solarFestivals}` }}
                 </p>
                 <div class="detail__row">
                   <p class="row__tag row__tag--yi">易</p>
@@ -498,6 +518,36 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
             </NPopover>
           </li>
         </ul>
+
+        <div
+          v-if="localConfig.calendar.festivalCountdown"
+          class="calendar__festival__list"
+        >
+          <div
+            v-for="item in festivalList"
+            :key="item.date"
+            :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('common.day')}`"
+            class="festival__item"
+          >
+            <div class="item__left">
+              <p class="left__date">{{ item.shortDate }}</p>
+              <p
+                v-if="item.type === 1"
+                class="left__rest"
+              >
+                {{ $t('calendar.rest') }}
+              </p>
+              <p class="left__desc">
+                {{ item.desc }}
+              </p>
+            </div>
+
+            <div class="item__right">
+              <p class="right__count">{{ item.festivalCountdownDay }}</p>
+              <p class="right__unit">{{ $t('common.day') }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </MoveableComponentWrap>
@@ -613,7 +663,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
           padding: 7%;
           font-size: v-bind(customFontSize);
           transform: scale(0.8);
-          border-radius: 2px;
+          border-radius: 4px;
         }
       }
       .body__item--hover:hover {
@@ -650,7 +700,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
         color: v-bind(customHolidayFontColor);
       }
       .body__item--today {
-        border-radius: 2px;
+        border-radius: 4px;
         background-color: v-bind(customTodayItemBackgroundColor);
         .item__label--today {
           left: auto !important;
@@ -731,6 +781,72 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
       }
       .n-tag {
         border-radius: 5px;
+      }
+    }
+  }
+}
+
+.calendar__festival__list {
+  padding: 1.5% 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  max-height: v-bind(customDestivalCountdownItemHeight);
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  .festival__item {
+    padding: 0.2% 3.5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+    font-size: v-bind(customDestivalCountdownFontSize);
+    .item__left {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 70%;
+      .left__date {
+        margin-right: 3px;
+        flex: 0 0 auto;
+        opacity: 0.8;
+      }
+      .left__rest {
+        margin-right: 2px;
+        padding: 2%;
+        flex: 0 0 auto;
+        color: v-bind(customRestLabelFontColor);
+        background-color: v-bind(customRestLabelBackgroundColor);
+        font-size: v-bind(customDestivalCountdownRestFontSize);
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      .left__desc {
+        flex: 1;
+        width: 100%;
+        text-align: start;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+    .item__right {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      width: 30%;
+      .right__count {
+        font-size: v-bind(customDayFontSize);
+        font-family: v-bind(customDayFontFamily);
+        font-weight: 500;
+      }
+      .right__unit {
+        margin-left: 2px;
+        font-size: v-bind(customDescFontSize);
+        font-family: v-bind(customDescFontFamily);
+        opacity: 0.8;
       }
     }
   }

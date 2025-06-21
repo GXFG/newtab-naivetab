@@ -31,6 +31,8 @@ type DatabaseLocalBackgroundImages = {
 
 type OptionsPermission = 'bookmarks'
 
+type Placement = 'top-start' | 'top' | 'top-end' | 'right-start' | 'right' | 'right-end' | 'bottom-start' | 'bottom' | 'bottom-end' | 'left-start' | 'left' | 'left-end'
+
 type TargetType = 1 | 2 // 1:component 2:element
 type TDrawerPlacement = 'top' | 'bottom' | 'left' | 'right'
 type TPageFocusElement = 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard'

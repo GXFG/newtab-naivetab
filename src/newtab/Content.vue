@@ -36,14 +36,14 @@ window.$loadingBar = useLoadingBar()
 
   <!-- element -->
   <Setting />
+  <Weather />
   <News />
+  <YearProgress />
   <Calendar />
   <KeyboardBookmark />
-  <Memo />
   <DigitalClock />
   <AnalogClock />
   <Date />
-  <YearProgress />
-  <Weather />
+  <Memo />
   <Search />
 </template>

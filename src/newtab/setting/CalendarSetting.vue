@@ -29,6 +29,13 @@ const beginsList = computed(() => [
           </NRadioButton>
         </NRadioGroup>
       </NFormItem>
+
+      <NFormItem :label="$t('calendar.festivalCountdown')">
+        <NSwitch
+          v-model:value="localConfig.calendar.festivalCountdown"
+          size="small"
+        />
+      </NFormItem>
     </template>
 
     <template #color>
