@@ -6,7 +6,7 @@ import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST, c
 import { getDefaultBookmarkNameFromUrl, getFaviconFromUrl, getBookmarkConfigUrl, getBookmarkConfigName } from '@/logic/bookmark'
 import { globalState, localConfig, customPrimaryColor, getStyleConst, getAllCommandsConfig, openConfigShortcutsPage } from '@/logic/store'
 import BookmarkPicker from '@/components/BookmarkPicker.vue'
-import Tips from '@/newtab/components/form/Tips.vue'
+import Tips from '~/components/Tips.vue'
 
 const state = reactive({
   isBookmarkModalVisible: false,

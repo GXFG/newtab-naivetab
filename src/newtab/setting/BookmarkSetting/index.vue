@@ -6,7 +6,7 @@ import { availableFontOptions, fontSelectRenderLabel, localState, localConfig, o
 import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
 import CustomColorPicker from '@/newtab/components/form/CustomColorPicker.vue'
-import Tips from '@/newtab/components/form/Tips.vue'
+import Tips from '@/components/Tips.vue'
 import BookmarkConfig from './BookmarkConfig.vue'
 import PresetThemeDrawer from './PresetThemeDrawer.vue'
 

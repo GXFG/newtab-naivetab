@@ -2,7 +2,7 @@
 import { URL_DAYJS_FORMAT } from '@/logic/const'
 import { localConfig } from '@/logic/store'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
-import Tips from '@/newtab/components/form/Tips.vue'
+import Tips from '@/components/Tips.vue'
 </script>
 
 <template>
