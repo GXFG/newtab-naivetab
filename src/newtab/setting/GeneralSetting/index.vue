@@ -5,7 +5,7 @@ import { exportSetting, isUploadConfigLoading, importSetting, refreshSetting, re
 import { localConfig, localState, globalState, customPrimaryColor } from '@/logic/store'
 import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
 import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
-import Tips from '@/newtab/components/form/Tips.vue'
+import Tips from '@/components/Tips.vue'
 import BackgroundDrawer from './BackgroundDrawer.vue'
 
 const instance = getCurrentInstance()

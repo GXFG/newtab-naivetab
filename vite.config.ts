@@ -106,12 +106,28 @@ export default defineConfig(({ command }) => ({
         popup: r('src/popup/index.html'),
       },
       output: {
-        manualChunks: {
-          'vendor-vue': ['vue', '@vueuse/core'],
-          'vendor-naive-ui': ['naive-ui'],
-          'vendor-lunar': ['lunar-typescript'],
-          'vendor-cheerio': ['cheerio'],
-          vendor: ['axios', 'dayjs', 'driver.js'],
+        manualChunks(id) {
+          // vendor 分包规则
+          if (id.includes('node_modules')) {
+            if (id.includes('naive-ui')) {
+              return 'vendor-naive-ui'
+            }
+            if (id.includes('lunar-typescript')) {
+              return 'vendor-lunar'
+            }
+            if (['vue', '@vueuse/core', 'lodash-es', 'cheerio', 'axios', 'dayjs', 'driver.js'].some((pkg) => id.includes(pkg))) {
+              return 'vendor-libs'
+            }
+            return 'vendor-other'
+          }
+
+          if (id.includes('vite/modulepreload-polyfill')) {
+            return 'vendor-libs'
+          }
+
+          if (['src/components', 'src/logic', 'src/lib', '~icon'].some((pkg) => id.includes(pkg))) {
+            return 'main'
+          }
         },
       },
     },

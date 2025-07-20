@@ -9,7 +9,7 @@
     "allowSyntheticDefaultImports": true,
     "incremental": false,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noUnusedLocals": false,
     "forceConsistentCasingInFileNames": true,

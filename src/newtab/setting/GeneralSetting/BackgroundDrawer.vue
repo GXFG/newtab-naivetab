@@ -4,7 +4,7 @@ import { databaseStore } from '@/logic/database'
 import { compressedImageUrlToBase64 } from '@/logic/util'
 import { localConfig, localState } from '@/logic/store'
 import { previewImageListMap, imageState, isImageLoading, isImageListLoading, updateBingImages, updatePexelsImages } from '@/logic/image'
-import Tips from '@/newtab/components/form/Tips.vue'
+import Tips from '@/components/Tips.vue'
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
 
 const props = defineProps({
