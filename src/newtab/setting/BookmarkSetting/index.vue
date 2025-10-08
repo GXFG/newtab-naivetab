@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { isFirefox } from '@/env'
+import { URL_FIREFOX_EXTENSIONS_SHORTCUTS } from '@/logic/const'
 import { requestPermission } from '@/logic/storage'
 import { KEYBOARD_TYPE_OPTION, SPLIT_SPACE_OPTION, KEYCAP_TYPE_OPTION } from '@/logic/keyboard'
 import { state as bookmarkState, getBrowserBookmarkForKeyboard } from '@/logic/bookmark'
@@ -101,10 +103,10 @@ const onOpenPopup = () => {
                 v-model:value="localConfig.bookmark.isListenBackgroundKeystrokes"
                 size="small"
               />
-              <Tips :content="$t('bookmark.listenBackgroundKeystrokesTips')" />
+              <Tips :content="`${$t('bookmark.listenBackgroundKeystrokesTips')} ${isFirefox ? URL_FIREFOX_EXTENSIONS_SHORTCUTS : ''}`" />
             </div>
             <div
-              v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
+              v-if="localConfig.bookmark.isListenBackgroundKeystrokes && !isFirefox"
               class="item__box"
             >
               <NButton

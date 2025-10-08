@@ -185,7 +185,7 @@ const settingContentHeightStyle = computed(() => `${settingContentHeight.value}p
                 >
                   <Icon :icon="item.iconName" />
                 </div>
-                <span>{{ item.label }}</span>
+                <span class="title__text">{{ item.label }}</span>
               </div>
             </template>
 
@@ -251,6 +251,9 @@ const settingContentHeightStyle = computed(() => `${settingContentHeight.value}p
             display: flex;
             justify-content: center;
             align-items: center;
+          }
+          .title__text {
+            user-select: none;
           }
         }
       }

@@ -5,10 +5,18 @@ import { URL_NAIVETAB_DOC_STARTED } from '@/logic/const'
 import { toggleIsDragMode } from '@/logic/moveable'
 import { localConfig, globalState } from '@/logic/store'
 
+const onCloseGuide = () => {
+  localConfig.general.isFirstOpen = false
+  globalState.isGuideMode = false
+  globalState.isSettingDrawerVisible = false
+  toggleIsDragMode(false)
+}
+
+// https://driverjs.com/docs/configuration
 const startGuide = () => {
   const driverConfig = driver({
     showProgress: true,
-    allowClose: false,
+    allowClose: true,
     allowKeyboardControl: false,
     disableActiveInteraction: true, // 高亮区域不可点击
     prevBtnText: window.$t('guide.prevStep'),
@@ -56,8 +64,7 @@ const startGuide = () => {
           title: window.$t('guide.stepTitle5'),
           description: window.$t('guide.stepDescription5'),
           onNextClick: () => {
-            localConfig.general.isFirstOpen = false
-            globalState.isGuideMode = false
+            onCloseGuide()
             driverConfig.moveNext()
             driverConfig.destroy()
           },
@@ -65,8 +72,7 @@ const startGuide = () => {
       },
     ],
     onCloseClick: () => {
-      localConfig.general.isFirstOpen = false
-      globalState.isGuideMode = false
+      onCloseGuide()
       driverConfig.moveNext()
       driverConfig.destroy()
     },

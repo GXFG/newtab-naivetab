@@ -349,8 +349,9 @@ const onResetSetting = () => {
               <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}
             </NButton>
           </template>
-          {{ $t('common.confirm') }}?
+          {{ `${$t('common.confirm')} ${$t('general.resetSettingLabel')}` }}?
         </NPopconfirm>
+        <Tips :content="$t('general.resetSettingTips')" />
       </NFormItem>
     </template>
   </BaseComponentSetting>

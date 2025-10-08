@@ -186,6 +186,7 @@
     "clearStorageTips": "Clear local cache without affecting synced settings",
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
+    "resetSettingTips": "If you encounter an unsolvable problem, try resetting the settings and back up the current configuration",
     "language": "Main Language",
     "timeLanguage": "Time Language",
     "saveCurrendImage": "Download",

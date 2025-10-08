@@ -357,6 +357,15 @@ const popupMainWidth = `${getContainerWidth()}px`
 #popup {
   padding-right: 0;
   width: v-bind(popupMainWidth);
+  font-family:
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    PingFang SC,
+    Heiti SC,
+    Hiragino Sans GB,
+    Microsoft YaHei,
+    sans-serif;
   border-radius: 0 !important;
   overflow: hidden;
   .n-card-header {

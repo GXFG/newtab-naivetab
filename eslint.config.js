@@ -1,11 +1,12 @@
 import eslint from '@eslint/js'
 import globals from 'globals'
-import typescriptEslint from 'typescript-eslint'
+import { defineConfig } from 'eslint/config'
 import eslintPluginVue from 'eslint-plugin-vue'
+import typescriptEslint from 'typescript-eslint'
 import stylistic from '@stylistic/eslint-plugin'
 // import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
-export default typescriptEslint.config(
+export default defineConfig(
   {
     ignores: ['node_modules', 'extension', 'assets', 'public', 'lib', 'src/auto-imports.d.ts', 'src/components.d.ts'],
   },
@@ -62,6 +63,7 @@ export default typescriptEslint.config(
       'vue/singleline-html-element-content-newline': 'off',
       'vue/multi-word-component-names': 'off',
       'vue/attribute-hyphenation': 'off',
+      'vue/no-required-prop-with-default': 'off',
       '@stylistic/quote-props': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',

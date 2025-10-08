@@ -1,5 +1,5 @@
 import { gaProxy } from '@/logic/gtag'
-import { isChrome } from '@/env'
+import { isChrome, isFirefox } from '@/env'
 import { requestPermission } from '@/logic/storage'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { createTab, padUrlHttps, log } from '@/logic/util'
@@ -71,14 +71,18 @@ export const initBookmarkData = () => {
   state.selectedFolderTitleStack = localConfig.bookmark.defaultExpandFolder ? [localConfig.bookmark.defaultExpandFolder] : []
 }
 
-export const getFaviconFromUrl = (url: string) => {
-  if (isChrome) {
-    return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=128`
+export const getFaviconFromUrl = (url: string, size = 128) => {
+  try {
+    if (isChrome) {
+      return `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=${size}`
+    }
+    const urlEle = new URL(url)
+    return `https://www.google.com/s2/favicons?domain=${urlEle.origin}&sz=${size}`
+    // return `${urlEle.origin}/favicon.ico`;
+  } catch (e) {
+    console.warn(e)
+    return ''
   }
-  if (url.slice(-1) === '/') {
-    return `${url}favicon.ico`
-  }
-  return `${url}/favicon.ico`
 }
 
 export const getDefaultBookmarkNameFromUrl = (url: string) => {
@@ -142,7 +146,7 @@ export const getBookmarkConfigName = (keyCode: string) => {
   if (!localConfig.bookmark.keymap[keyCode]) {
     return ''
   }
-  return localConfig.bookmark.keymap[keyCode].name || getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[keyCode].url)
+  return localConfig.bookmark.keymap[keyCode].name as string || getDefaultBookmarkNameFromUrl(localConfig.bookmark.keymap[keyCode].url)
 }
 
 export const getBookmarkConfigUrl = (keyCode: string) => {
