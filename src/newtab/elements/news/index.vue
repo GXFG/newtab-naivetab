@@ -37,6 +37,10 @@ const onMouseDownKey = (e: MouseEvent, url: string) => {
   if (isDragMode.value) {
     return
   }
+  // 阻止事件冒泡
+  e.stopPropagation()
+  // 阻止默认行为
+  e.preventDefault()
   createTab(url, false)
 }
 
