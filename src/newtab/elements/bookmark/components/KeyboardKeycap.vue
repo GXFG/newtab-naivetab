@@ -38,6 +38,10 @@ const keycapTitle = computed(() => {
 })
 
 const onMouseDownKey = (event: MouseEvent, keyCode: string) => {
+  // 阻止默认行为（例如浏览器中键的滚轮模式切换）
+  event.preventDefault()
+  // 阻止事件冒泡
+  event.stopPropagation()
   if (isDragMode.value) {
     return
   }

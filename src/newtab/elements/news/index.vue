@@ -29,8 +29,12 @@ const onOpenPage = (url: string) => {
   gaProxy('click', ['news', 'openPage'])
 }
 
-const onMouseDownKey = (e: MouseEvent, url: string) => {
-  if (e.button !== 1) {
+const onMouseDownKey = (event: MouseEvent, url: string) => {
+  // 阻止默认行为（例如浏览器中键的滚轮模式切换）
+  event.preventDefault()
+  // 阻止事件冒泡
+  event.stopPropagation()
+  if (event.button !== 1) {
     return
   }
   // 按下鼠标中键
