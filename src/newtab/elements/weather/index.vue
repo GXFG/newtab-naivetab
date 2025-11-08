@@ -35,7 +35,7 @@ const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
     <div
       v-if="isRender"
       id="weather"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="weather"
     >
       <div

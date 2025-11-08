@@ -30,6 +30,16 @@ const state = reactive({
     clientX: 0,
     clientY: 0,
   },
+  // 使用CSS变量存储位置信息，减少样式计算和DOM操作
+  cssVars: {
+    xOffset: '0',
+    yOffset: '0',
+    xTranslate: '0',
+    yTranslate: '0',
+  },
+  // 缓存上一次的OffsetKey，用于优化style更新
+  lastXOffsetKey: '',
+  lastYOffsetKey: '',
 })
 
 const offsetData = reactive({
@@ -100,8 +110,10 @@ const stopDrag = () => {
   if (offsetData.yTranslateValue !== -1) {
     localConfig[props.componentName as Components].layout.yTranslateValue = offsetData.yTranslateValue
   }
-  // 重置dragStyle，避免覆盖组件containerStyle属性（:style="dragStyle || containerStyle"），导致导入设置文件不会刷新布局
+  // 重置dragStyle，避免覆盖组件真正的配置containerStyle属性（:style="dragStyle || containerStyle"），导致导入设置文件不会刷新布局
   emit('update:dragStyle', '')
+  state.lastXOffsetKey = ''
+  state.lastYOffsetKey = ''
 }
 
 const onDragging = (e: MouseEvent) => {
@@ -178,18 +190,31 @@ const onDragging = (e: MouseEvent) => {
     moveState.isBottomBoundVisible = false
   }
 
-  const style = `${offsetData.xOffsetKey}:${offsetData.xOffsetValue}vw; ${offsetData.yOffsetKey}:${offsetData.yOffsetValue}vh; transform:translate(${offsetData.xTranslateValue}%, ${offsetData.yTranslateValue}%)`
-  emit('update:dragStyle', style)
-}
+  // 使用CSS变量更新样式，减少DOM操作
+  state.cssVars.xOffset = `${offsetData.xOffsetValue}vw`
+  state.cssVars.yOffset = `${offsetData.yOffsetValue}vh`
+  state.cssVars.xTranslate = `${offsetData.xTranslateValue}%`
+  state.cssVars.yTranslate = `${offsetData.yTranslateValue}%`
 
-const initComponentMouseTask = () => {
-  moveState.MouseDownTaskMap.set(props.componentName, startDrag)
-  moveState.MouseMoveTaskMap.set(props.componentName, onDragging)
-  moveState.MouseUpTaskMap.set(props.componentName, stopDrag)
+  // 只在 xOffsetKey 或 yOffsetKey 值变化时才触发 update:dragStyle 事件
+  if (!state.lastXOffsetKey || !state.lastYOffsetKey || state.lastXOffsetKey !== offsetData.xOffsetKey || state.lastYOffsetKey !== offsetData.yOffsetKey) {
+    const style = `${offsetData.xOffsetKey}:var(--x-offset); ${offsetData.yOffsetKey}:var(--y-offset); transform:translate(var(--x-translate), var(--y-translate))`
+    emit('update:dragStyle', style)
+    // 更新缓存的值
+    state.lastXOffsetKey = offsetData.xOffsetKey
+    state.lastYOffsetKey = offsetData.yOffsetKey
+  }
 }
-
 onMounted(() => {
-  initComponentMouseTask()
+  moveState.mouseDownTaskMap.set(props.componentName, startDrag)
+  moveState.mouseMoveTaskMap.set(props.componentName, onDragging)
+  moveState.mouseUpTaskMap.set(props.componentName, stopDrag)
+})
+
+onUnmounted(() => {
+  moveState.mouseDownTaskMap.delete(props.componentName)
+  moveState.mouseMoveTaskMap.delete(props.componentName)
+  moveState.mouseUpTaskMap.delete(props.componentName)
 })
 
 const isEnabled = computed(() => localConfig[props.componentName as Components].enabled)
@@ -274,18 +299,20 @@ const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
 </script>
 
 <template>
-  <div>
-    <div
-      :style="moveableWrapStyle"
-      class="moveable__wrap"
-    >
-      <slot />
-    </div>
+  <div
+    :style="moveableWrapStyle"
+    class="moveable__wrap"
+  >
+    <slot />
   </div>
 </template>
 
 <style>
 .moveable__wrap {
+  --x-offset: v-bind(state.cssVars.xOffset);
+  --y-offset: v-bind(state.cssVars.yOffset);
+  --x-translate: v-bind(state.cssVars.xTranslate);
+  --y-translate: v-bind(state.cssVars.yTranslate);
 }
 
 .element-auxiliary-line {

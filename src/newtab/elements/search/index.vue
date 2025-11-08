@@ -190,7 +190,7 @@ const customShadowColor = getStyleField(CNAME, 'shadowColor')
     <div
       v-if="isRender"
       id="search"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="search"
     >
       <div

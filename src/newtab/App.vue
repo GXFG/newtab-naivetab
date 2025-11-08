@@ -3,7 +3,7 @@ import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarPr
 import { log } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
 import { FOCUE_ELEMENT_SELECTOR_MAP } from '@/logic/const'
-import { startKeydown, startTimer, stopTimer, onPageFocus } from '@/logic/task'
+import { startKeydown, startTimer, stopTimer, onPageFocus, stopKeydown } from '@/logic/task'
 import { handleWatchLocalConfigChange, handleMissedUploadConfig, loadRemoteConfig } from '@/logic/storage'
 import { handleFirstOpen } from '@/logic/guide'
 import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, handleStateResetAndUpdate, handleAppUpdate, setEdgeFavicon } from '@/logic/store'
@@ -12,6 +12,7 @@ import { initBookmarkData } from '@/logic/bookmark'
 import { handleWatchNewsConfigChange } from '@/logic/news'
 import { handleWatchWeatherConfigChange } from '@/logic/weather'
 import { updatePoetry } from '@/logic/poetry'
+import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'
 import Content from '@/newtab/Content.vue'
 
 if (localConfig.general.openPageFocusElement !== 'default') {
@@ -86,6 +87,9 @@ onMounted(async () => {
 
 onUnmounted(() => {
   stopTimer()
+  stopKeydown()
+  cleanupEvents()
+  cleanupResizeObserver()
 })
 
 const pageAnimationClass = computed(() => {

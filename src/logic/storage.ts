@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 import md5 from 'crypto-js/md5'
 import { useDebounceFn } from '@vueuse/core'
 import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/const'
@@ -31,7 +32,12 @@ export const isUploadConfigLoading = computed(() => {
 
 /**
  * https://developer.chrome.com/docs/extensions/reference/storage/
- * 注意单个配置不可超过8k chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192
+ * 注意单个配置不可超过 8KB chrome.storage.sync.QUOTA_BYTES_PER_ITEM = 8192
+ * 最大项目数量 (MAX_ITEMS)​​                        ​​512个​​      在sync存储区中最多能保存的键值对数量 。
+ * ​​总存储容量 (QUOTA_BYTES)​​ ​                       ​约100 KB​​   所有同步数据（包括键和值的JSON字符串）的总大小上限 。
+ * ​单个项目大小（QUOTA_BYTES_PER_ITEM）​​            ​约8 KB​​     每个键值对经过JSON序列化后的大小限制 。
+ * ​写入操作频率 (MAX_WRITE_OPERATIONS_PER_HOUR)​​    ​​1800次​​     每小时所有set, remove, clear操作的总次数限制 。
+ * ​写入操作频率 (MAX_WRITE_OPERATIONS_PER_MINUTE)​​  ​​120次​​      每分钟所有set, remove, clear操作的总次数限制 。
  */
 const uploadConfigFn = (field: ConfigField) => {
   return new Promise((resolve) => {
@@ -151,17 +157,27 @@ export const updateSetting = (acceptRawState = localConfig): Promise<boolean> =>
   const acceptState = acceptRawState
   return new Promise((resolve) => {
     try {
-      for (const configField of Object.keys(defaultConfig) as ConfigField[]) {
-        // 只遍历 acceptState 内存在的 configField
-        if (!Object.prototype.hasOwnProperty.call(acceptState, configField)) {
-          // console.log(`!${configField}`)
-          continue
-        }
-        for (const subField of Object.keys(defaultConfig[configField])) {
-          localConfig[configField][subField] = mergeState(defaultConfig[configField][subField], acceptState[configField][subField])
-          // console.log(`${configField}-${subField}`, localConfig[configField][subField], '=', defaultConfig[configField][subField], '<-', acceptState[configField][subField])
+      // 只处理存在于acceptState中的配置字段，减少不必要的处理
+      const configFields = Object.keys(defaultConfig).filter((field) =>
+        Object.prototype.hasOwnProperty.call(acceptState, field),
+      ) as ConfigField[]
+
+      for (const configField of configFields) {
+        // 获取需要更新的子字段
+        const subFields = Object.keys(defaultConfig[configField])
+
+        // 批量处理子字段，减少循环内的操作
+        for (const subField of subFields) {
+          if (acceptState[configField][subField] !== undefined) {
+            localConfig[configField][subField] = mergeState(
+              defaultConfig[configField][subField],
+              acceptState[configField][subField],
+            )
+            // console.log(`${configField}-${subField}`, localConfig[configField][subField], '=', defaultConfig[configField][subField], '<-', acceptState[configField][subField])
+          }
         }
       }
+
       log('UpdateSetting', localConfig)
       resolve(true)
     } catch (e) {
@@ -199,49 +215,62 @@ export const loadRemoteConfig = () => {
       const error = chrome.runtime.lastError
       if (error) {
         log('Load config error', error)
+        window.$message.error(`${window.$t('common.sync')}${window.$t('common.setting')}${window.$t('common.fail')}`)
+        resolve(false)
+        console.timeEnd('loadRemoteConfig')
         return
       }
-      const pendingConfig = {} as typeof defaultConfig
-      for (const field of Object.keys(defaultConfig) as ConfigField[]) {
-        if (!Object.prototype.hasOwnProperty.call(data, `naive-tab-${field}`)) {
-          log(`Config-${field} initialize`)
-          uploadConfigFn(field)
-        } else {
-          const target: {
-            syncTime: number
-            syncId: string // md5
-            data: (typeof defaultConfig)[ConfigField]
-          } = JSON.parse(data[`naive-tab-${field}`])
-          const targetConfig = target.data
-          const targetSyncTime = target.syncTime
-          const targetSyncId = target.syncId
-          const localSyncTime = localState.value.isUploadConfigStatusMap[field].syncTime
-          const localSyncId = localState.value.isUploadConfigStatusMap[field].syncId
-          // syncId(md5)一致时无需更新
-          if (targetSyncId === localSyncId) {
-            log(`Config-${field} no update`)
-            continue
-          }
-          // 云端配置过期时直接上传本地配置
-          if (targetSyncTime < localSyncTime) {
-            log(`Config-${field} is overdue, reupload`)
+      try {
+        const pendingConfig = {} as typeof defaultConfig
+        for (const field of Object.keys(defaultConfig) as ConfigField[]) {
+          if (!Object.prototype.hasOwnProperty.call(data, `naive-tab-${field}`)) {
+            log(`Config-${field} initialize`)
             uploadConfigFn(field)
-            continue
+          } else {
+            const target: {
+              syncTime: number
+              syncId: string // md5
+              data: (typeof defaultConfig)[ConfigField]
+            } = JSON.parse(data[`naive-tab-${field}`])
+            const targetConfig = target.data
+            const targetSyncTime = target.syncTime
+            const targetSyncId = target.syncId
+            const localSyncTime = localState.value.isUploadConfigStatusMap[field].syncTime
+            const localSyncId = localState.value.isUploadConfigStatusMap[field].syncId
+            chrome.storage.sync.getBytesInUse(`naive-tab-${field}`).then((bytesInUse) => {
+              log(`naive-tab-${field}`, `${bytesInUse} byte`)
+            })
+            // syncId(md5)一致时无需更新
+            if (targetSyncId === localSyncId) {
+              log(`Config-${field} no update`)
+              continue
+            }
+            // 云端配置过期时直接上传本地配置
+            if (targetSyncTime < localSyncTime) {
+              log(`Config-${field} is overdue, reupload`)
+              uploadConfigFn(field)
+              continue
+            }
+            log(`Config-${field} update`)
+            pendingConfig[field] = targetConfig as any
+            localState.value.isUploadConfigStatusMap[field].syncTime = targetSyncTime
+            localState.value.isUploadConfigStatusMap[field].syncId = targetSyncId
           }
-          log(`Config-${field} update`)
-          pendingConfig[field] = targetConfig as any
-          localState.value.isUploadConfigStatusMap[field].syncTime = targetSyncTime
-          localState.value.isUploadConfigStatusMap[field].syncId = targetSyncId
         }
-      }
-      console.timeEnd('loadRemoteConfig')
-      if (Object.keys(pendingConfig).length === 0) {
+        console.timeEnd('loadRemoteConfig')
+        if (Object.keys(pendingConfig).length === 0) {
+          resolve(true)
+          return
+        }
+        log('Load config done', pendingConfig)
+        await updateSetting(pendingConfig)
         resolve(true)
-        return
+      } catch (e) {
+        log('Process remote config error', e)
+        window.$message.error(`${window.$t('common.process')}${window.$t('common.setting')}${window.$t('common.fail')}`)
+        console.timeEnd('loadRemoteConfig')
+        resolve(false)
       }
-      log('Load config done', pendingConfig)
-      await updateSetting(pendingConfig)
-      resolve(true)
     })
   })
 }

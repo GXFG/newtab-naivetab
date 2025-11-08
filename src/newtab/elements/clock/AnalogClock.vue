@@ -44,7 +44,7 @@ const initClockImage = async () => {
 
 initClockImage()
 
-const DISABLE_ANIMATION_DELAY_TIME = 350 // 需要大于动画执行时间300ms
+const DISABLE_ANIMATION_DELAY_TIME = 350 // 需要大于动画执行时间300ms .clock__base--animation
 const ENABLE_ANIMATION_DELAY_TIME = 500
 
 const updateTime = () => {
@@ -52,12 +52,31 @@ const updateTime = () => {
   const h = date.getHours()
   const m = date.getMinutes()
   const s = date.getSeconds()
-  if (s !== 0) {
-    state.secondDeg = s * 6
-    state.minuteDeg = m * 6
-    state.hourDeg = h * 30 + m * 0.5
-    return
+
+  // 只在值变化时更新状态，减少不必要的渲染
+  const newSecondDeg = s * 6
+  const newMinuteDeg = m * 6
+  const newHourDeg = h * 30 + m * 0.5
+
+  if (state.secondDeg !== newSecondDeg) {
+    state.secondDeg = newSecondDeg
   }
+  if (state.minuteDeg !== newMinuteDeg) {
+    state.minuteDeg = newMinuteDeg
+  }
+  if (state.hourDeg !== newHourDeg) {
+    state.hourDeg = newHourDeg
+  }
+
+  // 特殊情况处理：当秒针到达60秒时
+  if (s === 0) {
+    handleFullRotation(m)
+  }
+}
+
+// 处理指针完成一圈的特殊动画效果
+const handleFullRotation = (m: number) => {
+  // 秒针完成一圈
   state.secondDeg = 360
   setTimeout(() => {
     state.isSecondAnimationEnable = false
@@ -67,31 +86,30 @@ const updateTime = () => {
     state.isSecondAnimationEnable = true
   }, ENABLE_ANIMATION_DELAY_TIME)
 
-  if (m !== 0) {
-    state.minuteDeg = m * 6
-    return
-  }
-  state.minuteDeg = 360
-  setTimeout(() => {
-    state.isMinuteAnimationEnable = false
-    state.minuteDeg = 0
-  }, DISABLE_ANIMATION_DELAY_TIME)
-  setTimeout(() => {
-    state.isMinuteAnimationEnable = true
-  }, ENABLE_ANIMATION_DELAY_TIME)
+  // 分钟为0时，分针也完成一圈
+  if (m === 0) {
+    state.minuteDeg = 360
+    setTimeout(() => {
+      state.isMinuteAnimationEnable = false
+      state.minuteDeg = 0
+    }, DISABLE_ANIMATION_DELAY_TIME)
+    setTimeout(() => {
+      state.isMinuteAnimationEnable = true
+    }, ENABLE_ANIMATION_DELAY_TIME)
 
-  if (h !== 0) {
-    state.hourDeg = h * 30
-    return
+    // 小时为0时，时针也完成一圈
+    const h = new Date().getHours()
+    if (h === 0) {
+      state.hourDeg = 360
+      setTimeout(() => {
+        state.isHourAnimationEnable = false
+        state.hourDeg = 0
+      }, DISABLE_ANIMATION_DELAY_TIME)
+      setTimeout(() => {
+        state.isHourAnimationEnable = true
+      }, ENABLE_ANIMATION_DELAY_TIME)
+    }
   }
-  state.hourDeg = 360
-  setTimeout(() => {
-    state.isHourAnimationEnable = false
-    state.hourDeg = 0
-  }, DISABLE_ANIMATION_DELAY_TIME)
-  setTimeout(() => {
-    state.isHourAnimationEnable = true
-  }, ENABLE_ANIMATION_DELAY_TIME)
 }
 
 watch(
@@ -133,7 +151,7 @@ const secondDeg = computed(() => `${state.secondDeg}deg`)
     <div
       v-if="isRender"
       id="analog-clock"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="clockAnalog"
     >
       <div

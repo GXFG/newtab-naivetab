@@ -43,7 +43,7 @@ const customLetterSpacing = getStyleField(CNAME, 'letterSpacing', 'vmin')
     <div
       v-if="isRender"
       id="date"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="date"
     >
       <div

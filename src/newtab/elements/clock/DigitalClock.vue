@@ -2,6 +2,7 @@
 import { addTimerTask, removeTimerTask } from '@/logic/task'
 import { localConfig, getIsComponentRender, getLayoutStyle, getStyleField } from '@/logic/store'
 import MoveableComponentWrap from '@/newtab/components/moveable/MoveableComponentWrap.vue'
+import { useDebounceFn } from '@vueuse/core'
 
 const CNAME = 'clockDigital'
 const isRender = getIsComponentRender(CNAME)
@@ -11,11 +12,23 @@ const state = reactive({
   unit: '',
 })
 
+// 只在时间格式真正变化时才更新状态，避免不必要的重新渲染
 const updateTime = () => {
-  state.time = dayjs().format(localConfig.clockDigital.format)
-  state.unit = dayjs().format('a')
+  const now = dayjs()
+  const newTime = now.format(localConfig.clockDigital.format)
+  const newUnit = now.format('a')
+
+  if (state.time !== newTime) {
+    state.time = newTime
+  }
+  if (state.unit !== newUnit) {
+    state.unit = newUnit
+  }
 }
 
+const debouncedUpdateTime = useDebounceFn(updateTime, 50)
+
+// 监听组件是否渲染
 watch(
   isRender,
   (value) => {
@@ -23,7 +36,10 @@ watch(
       removeTimerTask(CNAME)
       return
     }
-    addTimerTask(CNAME, updateTime)
+    // 初始化时立即更新一次
+    updateTime()
+    // 添加定时任务，使用防抖函数
+    addTimerTask(CNAME, debouncedUpdateTime)
   },
   { immediate: true },
 )
@@ -50,7 +66,7 @@ const customDigitDivideWidth = getStyleField(CNAME, 'width', 'vmin', 0.5)
     <div
       v-if="isRender"
       id="digital-clock"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="clockDigital"
     >
       <div

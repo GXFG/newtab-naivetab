@@ -314,7 +314,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
     <div
       v-if="isRender"
       id="calendar"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="calendar"
     >
       <div

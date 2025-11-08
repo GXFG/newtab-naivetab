@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { gaProxy } from '@/logic/gtag'
-import { addKeydownTask } from '@/logic/task'
+import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import { isDragMode, toggleIsDragMode, isElementDrawerVisible, handleToggleIsElementDrawerVisible, moveState } from '@/logic/moveable'
 import { getStyleConst, customPrimaryColor, localConfig, globalState } from '@/logic/store'
 
@@ -104,26 +104,26 @@ const handleElementMouseDown = async (e: MouseEvent) => {
   localConfig[moveState.currDragTarget.name].enabled = true
   await nextTick()
   // 以光标位置为组件的中心开始拖拽
-  const mouseDownTask = moveState.MouseDownTaskMap.get(moveState.currDragTarget.name)
+  const mouseDownTask = moveState.mouseDownTaskMap.get(moveState.currDragTarget.name)
   if (mouseDownTask) {
     mouseDownTask(e, true) // startDrag(e: MouseEvent, resite: boolean)
   }
   // 执行一次 onDragging，为消除首次启用组件时会展示上次存储的布局
-  const mouseMoveTask = moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)
+  const mouseMoveTask = moveState.mouseMoveTaskMap.get(moveState.currDragTarget.name)
   if (mouseMoveTask) {
     mouseMoveTask(e)
   }
 }
 
 const handleElementMouseMove = async (e: MouseEvent) => {
-  const mouseMoveTask = moveState.MouseMoveTaskMap.get(moveState.currDragTarget.name)
+  const mouseMoveTask = moveState.mouseMoveTaskMap.get(moveState.currDragTarget.name)
   if (mouseMoveTask) {
     mouseMoveTask(e)
   }
 }
 
 const handleElementMouseUp = (e: MouseEvent) => {
-  const mouseUpTask = moveState.MouseUpTaskMap.get(moveState.currDragTarget.name)
+  const mouseUpTask = moveState.mouseUpTaskMap.get(moveState.currDragTarget.name)
   if (mouseUpTask) {
     mouseUpTask(e)
   }
@@ -135,36 +135,6 @@ const handleElementMouseUp = (e: MouseEvent) => {
   gaProxy('move', ['element', moveState.currDragTarget.name], {
     enabled: true,
   })
-}
-
-const initElementMouseTask = () => {
-  moveState.MouseDownTaskMap.set('element-general', handleElementMouseDown)
-  moveState.MouseMoveTaskMap.set('element-general', handleElementMouseMove)
-  moveState.MouseUpTaskMap.set('element-general', handleElementMouseUp)
-}
-
-onMounted(() => {
-  initElementMouseTask()
-})
-
-const onDeleteComponent = () => {
-  localConfig[moveState.currDragTarget.name].enabled = false
-  gaProxy('move', ['element', moveState.currDragTarget.name], {
-    enabled: false,
-  })
-}
-
-const handlerDeleteMouseEnter = () => {
-  moveState.isDeleteHover = true
-}
-
-const handlerDeleteMouseLeave = () => {
-  moveState.isDeleteHover = false
-}
-
-const handlerDeleteMouseUp = () => {
-  onDeleteComponent()
-  moveState.isDeleteHover = false
 }
 
 // keyboard listener
@@ -187,7 +157,39 @@ const keyboardHandler = (e: KeyboardEvent) => {
   }
 }
 
-addKeydownTask('moveable-tool', keyboardHandler)
+onMounted(() => {
+  moveState.mouseDownTaskMap.set('element-general', handleElementMouseDown)
+  moveState.mouseMoveTaskMap.set('element-general', handleElementMouseMove)
+  moveState.mouseUpTaskMap.set('element-general', handleElementMouseUp)
+  addKeydownTask('moveable-tool', keyboardHandler)
+})
+
+onUnmounted(() => {
+  moveState.mouseDownTaskMap.delete('element-general')
+  moveState.mouseMoveTaskMap.delete('element-general')
+  moveState.mouseUpTaskMap.delete('element-general')
+  removeKeydownTask('moveable-tool')
+})
+
+const onDeleteComponent = () => {
+  localConfig[moveState.currDragTarget.name].enabled = false
+  gaProxy('move', ['element', moveState.currDragTarget.name], {
+    enabled: false,
+  })
+}
+
+const handlerDeleteMouseEnter = () => {
+  moveState.isDeleteHover = true
+}
+
+const handlerDeleteMouseLeave = () => {
+  moveState.isDeleteHover = false
+}
+
+const handlerDeleteMouseUp = () => {
+  onDeleteComponent()
+  moveState.isDeleteHover = false
+}
 
 const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
 const bgMoveableComponentDelete = getStyleConst('bgMoveableComponentDelete')
@@ -243,7 +245,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
           v-show="!item.disabled"
           :key="item.label"
           class="content__item"
-          data-target-type="2"
+          data-target-type="element"
           :data-target-name="item.componentName"
         >
           <div

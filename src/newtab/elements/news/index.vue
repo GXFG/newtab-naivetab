@@ -83,7 +83,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
     <div
       v-if="isRender"
       id="news"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="news"
     >
       <div

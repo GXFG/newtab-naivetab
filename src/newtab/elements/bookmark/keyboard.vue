@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { addKeydownTask } from '@/logic/task'
+import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import { isDragMode } from '@/logic/moveable'
 import { KEYBOARD_NOT_ALLOW_KEYCODE_LIST, currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
 import { state as bookmarkState, openPage, handleSpecialKeycapExec, getKeycapType, getKeycapUrl, handlePressKeycap, getCustomKeycapWidth } from '@/logic/bookmark'
@@ -11,7 +11,7 @@ const CNAME = 'bookmark'
 const isRender = getIsComponentRender(CNAME)
 
 // keyboard listener
-let keyboardTimer: NodeJS.Timeout
+let keyboardTimer: ReturnType<typeof setTimeout>
 
 const keyboardTask = (e: KeyboardEvent) => {
   if (isDragMode.value) {
@@ -57,6 +57,10 @@ const keyboardTask = (e: KeyboardEvent) => {
 
 onMounted(() => {
   addKeydownTask(CNAME, keyboardTask)
+})
+
+onUnmounted(() => {
+  removeKeydownTask(CNAME)
 })
 
 const dragStyle = ref('')
@@ -113,7 +117,7 @@ const bgMoveableComponentMain = getStyleConst('bgMoveableComponentMain')
     <div
       v-if="isRender"
       id="bookmark"
-      data-target-type="1"
+      data-target-type="component"
       data-target-name="bookmark"
     >
       <div

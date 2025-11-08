@@ -2,11 +2,11 @@ import { globalState, switchSettingDrawerVisible } from '@/logic/store'
 
 const keydownTaskMap = new Map()
 
-export const addKeydownTask = (key: string, task: (e: KeyboardEvent) => void) => {
+export const addKeydownTask = (key: KeydownTaskKey, task: (e: KeyboardEvent) => void) => {
   keydownTaskMap.set(key, task)
 }
 
-export const removeKeydownTask = (key: string) => {
+export const removeKeydownTask = (key: KeydownTaskKey) => {
   keydownTaskMap.delete(key)
 }
 
@@ -30,7 +30,11 @@ export const startKeydown = () => {
   }
 }
 
-let timer: NodeJS.Timeout
+export const stopKeydown = () => {
+  document.onkeydown = null
+}
+
+let timer: ReturnType<typeof setInterval>
 const tasks = new Map()
 
 export const addTimerTask = (key: string, task: () => void) => {

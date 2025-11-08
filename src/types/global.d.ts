@@ -18,6 +18,11 @@ interface Window {
 type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news'
 type ConfigField = Components | 'general'
 
+type TargetType = 'component' | 'element'
+type TargetName = Components | 'element-general'
+
+type KeydownTaskKey = 'bookmark' | 'moveable-tool'
+
 type settingPanes = 'general' | 'bookmark' | 'clockDate' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news' | 'aboutIndex' | 'aboutSponsor'
 
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
@@ -33,7 +38,6 @@ type OptionsPermission = 'bookmarks'
 
 type Placement = 'top-start' | 'top' | 'top-end' | 'right-start' | 'right' | 'right-end' | 'bottom-start' | 'bottom' | 'bottom-end' | 'left-start' | 'left' | 'left-end'
 
-type TargetType = 1 | 2 // 1:component 2:element
 type TDrawerPlacement = 'top' | 'bottom' | 'left' | 'right'
 type TPageFocusElement = 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard'
 

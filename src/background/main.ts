@@ -56,9 +56,9 @@ const getBookmarkConfigData = async () =>
     })
   })
 
-let dblclickTimer: NodeJS.Timeout
+let dblclickTimer: ReturnType<typeof setTimeout>
 
-let laskCommand = ''
+let lastCommand = ''
 
 const handleKeyboard = async (command: string) => {
   const keycode = command
@@ -80,12 +80,12 @@ const handleKeyboard = async (command: string) => {
     return
   }
   clearTimeout(dblclickTimer)
-  if (laskCommand === keycode) {
+  if (lastCommand === keycode) {
     createTab(url)
   } else {
-    laskCommand = keycode
+    lastCommand = keycode
     dblclickTimer = setTimeout(() => {
-      laskCommand = ''
+      lastCommand = ''
     }, bookmarkConfig.dblclickIntervalTime)
   }
 }
