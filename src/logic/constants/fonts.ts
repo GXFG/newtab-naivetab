@@ -1,4 +1,3 @@
-// 字体列表常量
 export const FONT_LIST = [
   // common
   'Cascadia Code',

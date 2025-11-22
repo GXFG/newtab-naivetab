@@ -3,7 +3,7 @@
 
 import type { Ref, UnwrapRef } from 'vue'
 
-export const useStorageLocal: <T>(key: string, defaultValue: T) => Ref<UnwrapRef<T>> = (key, defaultValue) => {
+export const useStorageLocal = <T>(key: string, defaultValue: T): Ref<UnwrapRef<T>> => {
   const localItem = localStorage.getItem(key)
   let value = defaultValue
   if (localItem) {
@@ -35,5 +35,5 @@ export const useStorageLocal: <T>(key: string, defaultValue: T) => Ref<UnwrapRef
       deep: true,
     },
   )
-  return target
+  return target as Ref<UnwrapRef<T>>
 }

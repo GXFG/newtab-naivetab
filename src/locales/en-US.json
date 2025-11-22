@@ -104,12 +104,14 @@
     "pleaseWait": "In progress, Please wait",
     "imageTooLarge": "Image too large",
     "favoriteLimt": "Favorites limit reached",
-    "elementDrawerTips": "Drag components to workspace"
+    "widgetDrawerTips": "Drag widgets to workspace"
   },
   "rightMenu": {
     "editLayout": "Edit layout",
     "doneEdit": "Done",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "focusMode": "Focus Mode",
+    "editFocusMode": "Edit Focus Mode"
   },
   "sponsor": {
     "title": "🔥「Caffeinated Commit: Code Brewed with 200% ☕️ Power」",
@@ -129,22 +131,23 @@
     "nextStep": "Next Step",
     "doneStep": "Done",
     "tipsTitle": "Tips",
-    "stepTitle1": "Add components",
-    "stepDescription1": "After installation, enter Edit Mode to drag components from the left panel to customize your layout",
-    "stepTitle2": "Remove components",
-    "stepDescription2": "Drag components to the trash icon or press Delete to remove",
+    "stepTitle1": "Add widgets",
+    "stepDescription1": "After installation, enter Edit Mode to drag widgets from the left panel to customize your layout",
+    "stepTitle2": "Remove widgets",
+    "stepDescription2": "Drag widgets to the trash icon or press Delete to remove",
     "stepTitle3": "Done Edit layout",
-    "stepDescription3": "Click Close or press Esc to exit edit mode. Right-click any component to access settings",
+    "stepDescription3": "Click Close or press Esc to exit edit mode. Right-click any widget to access settings",
     "stepTitle4": "Right-click menu",
-    "stepDescription4": "Right-click any component to customize functionality and appearance",
+    "stepDescription4": "Right-click any widget to customize functionality and appearance",
     "stepTitle5": "Complete the tutorial",
     "stepDescription5": "Start customizing your NaiveTab"
   },
   "setting": {
     "general": "General",
     "mainLabel": "Setting",
+    "focusMode": "Focus Mode",
     "bookmark": "Bookmark",
-    "bookmarkKeyboard": "KeyboardBookmark",
+    "keyboard": "Keyboard",
     "bookmarkConfig": "BookmarkConfig",
     "clock": "Clock",
     "clockDigital": "DigitalClock",
@@ -190,12 +193,13 @@
     "language": "Main Language",
     "timeLanguage": "Time Language",
     "saveCurrendImage": "Download",
-    "localBackgroundTips": "Local file will not be synchronized"
+    "localBackgroundTips": "Local file will not be synchronized",
+    "focusModeTips": "In Focus Mode, only selected widgets are visible"
   },
   "clock": {
     "apMark": "a.m./p.m."
   },
-  "bookmark": {
+  "keyboard": {
     "bookmarkSource": "Bookmarks source",
     "systemBrowser": "Browser",
     "thisExtension": "This extension",

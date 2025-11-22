@@ -3,10 +3,11 @@ import { Icon } from '@iconify/vue'
 import i18n from '@/lib/i18n'
 import { exportSetting, isUploadConfigLoading, importSetting, refreshSetting, resetSetting } from '@/logic/storage'
 import { localConfig, localState, globalState, customPrimaryColor } from '@/logic/store'
-import BaseComponentCardTitle from '@/newtab/components/form/BaseComponentCardTitle.vue'
-import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
+import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
+import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
 import Tips from '@/components/Tips.vue'
 import BackgroundDrawer from './BackgroundDrawer.vue'
+import { ICONS } from '@/logic/icons'
 
 const instance = getCurrentInstance()
 const proxy = instance?.proxy
@@ -30,10 +31,10 @@ const themeList = computed(() => [
 ])
 
 const drawerPlacementList = [
-  { value: 'left', icon: 'material-symbols:dock-to-left', style: { transform: 'rotate(180deg)' } },
-  { value: 'top', icon: 'material-symbols:dock-to-bottom', style: { transform: 'rotate(180deg)' } },
-  { value: 'bottom', icon: 'material-symbols:dock-to-bottom', style: {} },
-  { value: 'right', icon: 'material-symbols:dock-to-left', style: {} },
+  { value: 'left', icon: ICONS.dockLeft, style: { transform: 'rotate(180deg)' } },
+  { value: 'top', icon: ICONS.dockBottom, style: { transform: 'rotate(180deg)' } },
+  { value: 'bottom', icon: ICONS.dockBottom, style: {} },
+  { value: 'right', icon: ICONS.dockLeft, style: {} },
 ] as { value: TDrawerPlacement | 'right', icon: string, style: Record<string, string> }[]
 
 const focusElementList = computed(() => [
@@ -41,7 +42,7 @@ const focusElementList = computed(() => [
   { label: window.$t('general.focusRoot'), value: 'root' },
   { label: window.$t('setting.search'), value: 'search' },
   { label: window.$t('setting.memo'), value: 'memo' },
-  { label: window.$t('setting.bookmarkKeyboard'), value: 'bookmarkKeyboard' },
+  { label: window.$t('setting.keyboard'), value: 'keyboard' },
 ])
 
 const loadPageAnimationTypeList = computed(() => [
@@ -110,10 +111,10 @@ const onResetSetting = () => {
 <template>
   <BackgroundDrawer v-model:show="state.isBackgroundDrawerVisible" />
 
-  <BaseComponentCardTitle :title="$t('setting.general')" />
+  <SettingPaneTitle :title="$t('setting.general')" />
 
-  <BaseComponentSetting
-    cname="general"
+  <SettingPaneWrap
+    widget-code="general"
     :divider-name="$t('general.globalStyle')"
   >
     <template #header>
@@ -224,13 +225,13 @@ const onResetSetting = () => {
         />
         <NButton
           v-if="localConfig.general.isBackgroundImageEnabled"
-          class="setting__item-element"
+          class="setting__item-ele"
           type="primary"
           size="small"
           ghost
           @click="openBackgroundDrawer()"
         >
-          <mingcute:finger-press-line />&nbsp;{{ $t('common.select') }}
+          <Icon :icon="ICONS.selectFinger" />&nbsp;{{ $t('common.select') }}
         </NButton>
       </NFormItem>
 
@@ -247,7 +248,7 @@ const onResetSetting = () => {
         />
         <NInputNumber
           v-model:value="localConfig.general.bgBlur"
-          class="setting__item-element setting__input-number"
+          class="setting__item-ele setting__input-number"
           size="small"
           :step="0.1"
           :min="0"
@@ -268,7 +269,7 @@ const onResetSetting = () => {
         />
         <NInputNumber
           v-model:value="localConfig.general.bgOpacity"
-          class="setting__item-element setting__input-number"
+          class="setting__item-ele setting__input-number"
           size="small"
           :step="0.01"
           :min="0"
@@ -300,7 +301,7 @@ const onResetSetting = () => {
             :loading="globalState.isImportSettingLoading"
             @click="onImportSetting"
           >
-            <uil:import />&nbsp;{{ $t('general.importSettingsValue') }}
+            <Icon :icon="ICONS.importFile" />&nbsp;{{ $t('general.importSettingsValue') }}
           </NButton>
           <input
             ref="importSettingInputEl"
@@ -319,7 +320,7 @@ const onResetSetting = () => {
             ghost
             @click="onExportSetting()"
           >
-            <uil:export />&nbsp;{{ $t('general.exportSettingValue') }}
+            <Icon :icon="ICONS.exportFile" />&nbsp;{{ $t('general.exportSettingValue') }}
           </NButton>
           <Tips :content="$t('general.exportSettingTips')" />
         </div>
@@ -333,7 +334,7 @@ const onResetSetting = () => {
           :loading="globalState.isClearStorageLoading"
           @click="refreshSetting()"
         >
-          <ant-design:clear-outlined />&nbsp;{{ $t('general.clearStorageValue') }}
+          <Icon :icon="ICONS.clearOutlined" />&nbsp;{{ $t('general.clearStorageValue') }}
         </NButton>
         <Tips :content="$t('general.clearStorageTips')" />
       </NFormItem>
@@ -346,7 +347,7 @@ const onResetSetting = () => {
               size="small"
               ghost
             >
-              <ic:twotone-restore />&nbsp;{{ $t('general.resetSettingValue') }}
+              <Icon :icon="ICONS.restoreTwotone" />&nbsp;{{ $t('general.resetSettingValue') }}
             </NButton>
           </template>
           {{ `${$t('common.confirm')} ${$t('general.resetSettingLabel')}` }}?
@@ -354,7 +355,7 @@ const onResetSetting = () => {
         <Tips :content="$t('general.resetSettingTips')" />
       </NFormItem>
     </template>
-  </BaseComponentSetting>
+  </SettingPaneWrap>
 </template>
 
 <style>

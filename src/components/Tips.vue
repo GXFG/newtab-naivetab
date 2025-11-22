@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+import { ICONS } from '@/logic/icons'
 import { createTab } from '@/logic/util'
 
 const props = defineProps({
@@ -28,7 +30,10 @@ const onClick = () => {
         class="tips__btn"
         @click="onClick()"
       >
-        <ph:question-bold class="btn__icon" />
+        <Icon
+          :icon="ICONS.questionBold"
+          class="btn__icon"
+        />
       </NButton>
     </template>
 

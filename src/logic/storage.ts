@@ -1,20 +1,10 @@
 /* eslint-disable no-irregular-whitespace */
 import md5 from 'crypto-js/md5'
 import { useDebounceFn } from '@vueuse/core'
-import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/const'
+import { MERGE_CONFIG_DELAY, MERGE_CONFIG_MAX_DELAY, KEYBOARD_OLD_TO_NEW_CODE_MAP } from '@/logic/constants/index'
 import { defaultConfig, defaultUploadStatusItem } from '@/logic/config'
 import { compareLeftVersionLessThanRightVersions, log, downloadJsonByTagA, sleep } from '@/logic/util'
-import { localConfig, localState, globalState, switchSettingDrawerVisible } from '@/logic/store'
-
-export const getLocalVersion = () => {
-  let version = localConfig.general.version
-  // handle old version 兼容小于0.9版本的旧数据结构
-  const settingGeneral = localStorage.getItem('c-general')
-  if (settingGeneral) {
-    version = JSON.parse(settingGeneral).version
-  }
-  return version || '0'
-}
+import { localConfig, localState, globalState, switchSettingDrawerVisible, updateSetting } from '@/logic/store'
 
 export const isUploadConfigLoading = computed(() => {
   if (!Object.prototype.hasOwnProperty.call(localState.value, 'isUploadConfigStatusMap')) {
@@ -29,6 +19,26 @@ export const isUploadConfigLoading = computed(() => {
   }
   return isLoading
 })
+
+const getUploadConfigData = (field: ConfigField) => {
+  // 处理 keyboard的bookmark配置，删除空url，空name，最小化配置
+  if (field === 'keyboard') {
+    const src = localConfig.keyboard
+    const newKeymap: Record<string, { url: string, name?: string }> = {}
+    for (const code of Object.keys(src.keymap)) {
+      const item = src.keymap[code] as { url?: string, name?: string }
+      if (!item) continue
+      const url = (item.url || '').replaceAll(' ', '')
+      if (url.length === 0) continue
+      const name = (item.name || '').trim()
+      const next: { url: string, name?: string } = { url }
+      if (name.length > 0) next.name = name
+      newKeymap[code] = next
+    }
+    return { ...src, keymap: newKeymap }
+  }
+  return localConfig[field]
+}
 
 /**
  * https://developer.chrome.com/docs/extensions/reference/storage/
@@ -47,14 +57,15 @@ const uploadConfigFn = (field: ConfigField) => {
     localState.value.isUploadConfigStatusMap[field].loading = true
     log(`Upload config-${field} start`)
     const currTime = Date.now()
-    const currConfigMd5 = md5(JSON.stringify(localConfig[field])).toString()
+    const uploadData = getUploadConfigData(field)
+    const currConfigMd5 = md5(JSON.stringify(uploadData)).toString()
     localState.value.isUploadConfigStatusMap[field].syncTime = currTime
     localState.value.isUploadConfigStatusMap[field].syncId = currConfigMd5
     const payload = {
       [`naive-tab-${field}`]: JSON.stringify({
         syncTime: currTime,
         syncId: currConfigMd5,
-        data: localConfig[field],
+        data: uploadData,
       }),
     }
     chrome.storage.sync.set(payload, async () => {
@@ -110,82 +121,6 @@ export const handleWatchLocalConfigChange = () => {
 /**
  * 以 state 为基础模板与 acceptState 进行递归去重合并
  */
-const mergeState = (state: unknown, acceptState: unknown) => {
-  if (acceptState === undefined || acceptState === null) {
-    return state
-  }
-  // 二者类型不同时，直接返回state，为处理新增state的情况
-  if (Object.prototype.toString.call(state) !== Object.prototype.toString.call(acceptState)) {
-    return state
-  }
-  if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
-    return acceptState
-  }
-  // 只处理纯Object类型，其余如Array等对象类型均直接返回acceptState
-  if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
-    return acceptState
-  }
-  // 二者均为Object，且state为空Object时，返回acceptState
-  if (Object.keys(state as object).length === 0) {
-    return acceptState
-  }
-  // 特殊处理 bookmark.keymap 数据，直接返回acceptState
-  if (
-    Object.prototype.hasOwnProperty.call(state, 'KeyQ')
-    || Object.prototype.hasOwnProperty.call(state, 'KeyA')
-    || Object.prototype.hasOwnProperty.call(state, 'KeyZ')
-    || Object.prototype.hasOwnProperty.call(state, 'Digit1')
-  ) {
-    return acceptState
-  }
-  const filterState = {} as { [propName: string]: unknown }
-  const fieldList = Object.keys(acceptState)
-  for (const field of fieldList) {
-    // 递归合并，只合并state内存在的字段
-    if (Object.prototype.hasOwnProperty.call(state, field)) {
-      filterState[field] = mergeState((state as object)[field], acceptState[field])
-    }
-  }
-  return { ...(state as object), ...filterState }
-}
-
-/**
- * 处理新增配置，并删除无用旧配置。默认acceptState不传递时为刷新配置数据结构
- * 以 defaultConfig 为模板与 acceptState 进行去重合并
- */
-export const updateSetting = (acceptRawState = localConfig): Promise<boolean> => {
-  const acceptState = acceptRawState
-  return new Promise((resolve) => {
-    try {
-      // 只处理存在于acceptState中的配置字段，减少不必要的处理
-      const configFields = Object.keys(defaultConfig).filter((field) =>
-        Object.prototype.hasOwnProperty.call(acceptState, field),
-      ) as ConfigField[]
-
-      for (const configField of configFields) {
-        // 获取需要更新的子字段
-        const subFields = Object.keys(defaultConfig[configField])
-
-        // 批量处理子字段，减少循环内的操作
-        for (const subField of subFields) {
-          if (acceptState[configField][subField] !== undefined) {
-            localConfig[configField][subField] = mergeState(
-              defaultConfig[configField][subField],
-              acceptState[configField][subField],
-            )
-            // console.log(`${configField}-${subField}`, localConfig[configField][subField], '=', defaultConfig[configField][subField], '<-', acceptState[configField][subField])
-          }
-        }
-      }
-
-      log('UpdateSetting', localConfig)
-      resolve(true)
-    } catch (e) {
-      log('updateSetting error', e)
-      resolve(false)
-    }
-  })
-}
 
 export const handleMissedUploadConfig = async () => {
   for (const field of Object.keys(localState.value.isUploadConfigStatusMap) as ConfigField[]) {
@@ -232,13 +167,14 @@ export const loadRemoteConfig = () => {
               syncId: string // md5
               data: (typeof defaultConfig)[ConfigField]
             } = JSON.parse(data[`naive-tab-${field}`])
+            // console.log(`naive-tab-config-${field}`, target)
             const targetConfig = target.data
             const targetSyncTime = target.syncTime
             const targetSyncId = target.syncId
             const localSyncTime = localState.value.isUploadConfigStatusMap[field].syncTime
             const localSyncId = localState.value.isUploadConfigStatusMap[field].syncId
             chrome.storage.sync.getBytesInUse(`naive-tab-${field}`).then((bytesInUse) => {
-              log(`naive-tab-${field}`, `${bytesInUse} byte`)
+              log(`naive-tab-config-size-${field}`, `${bytesInUse} byte`)
             })
             // syncId(md5)一致时无需更新
             if (targetSyncId === localSyncId) {
@@ -326,33 +262,11 @@ export const importSetting = async (text: string) => {
   }
   log('FileContent', fileContent)
   try {
-    // handle old version 兼容小于1.9.0版本的旧bookmark keymap结构
-    if (compareLeftVersionLessThanRightVersions(fileContent.general.version, '1.9.0')) {
-      for (const keyLabel of Object.keys(fileContent.bookmark.keymap)) {
-        const newKeycode = KEYBOARD_OLD_TO_NEW_CODE_MAP[keyLabel]
-        if (newKeycode) {
-          fileContent.bookmark.keymap[newKeycode] = fileContent.bookmark.keymap[keyLabel]
-          delete fileContent.bookmark.keymap[keyLabel]
-        }
+    // handle old version 兼容小于1.27.0版本的旧bookmark结构
+    if (compareLeftVersionLessThanRightVersions(fileContent.general.version, '1.27.0')) {
+      if ((fileContent as any).bookmark) {
+        fileContent.keyboard = (fileContent as any).bookmark
       }
-      const oldBookmarkConfig = fileContent.bookmark as (typeof defaultConfig)['bookmark'] & {
-        margin?: number
-        width?: number
-        fontFamily?: string
-        fontSize?: number
-        backgroundColor?: string[]
-        BackgroundActiveColor?: string[]
-        isShadowEnabled?: boolean
-        shadowColor?: string[]
-      }
-      delete oldBookmarkConfig.margin
-      delete oldBookmarkConfig.width
-      delete oldBookmarkConfig.fontFamily
-      delete oldBookmarkConfig.fontSize
-      delete oldBookmarkConfig.backgroundColor
-      delete oldBookmarkConfig.BackgroundActiveColor
-      delete oldBookmarkConfig.isShadowEnabled
-      delete oldBookmarkConfig.shadowColor
     }
     log('FileContentTransform', fileContent)
     fileContent.general.version = window.appVersion // 更新版本号

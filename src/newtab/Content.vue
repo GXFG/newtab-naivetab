@@ -2,23 +2,14 @@
 import { useMessage, useNotification, useDialog, useLoadingBar } from 'naive-ui'
 import ChangelogModal from '@/components/ChangelogModal.vue'
 
-import BackgroundImg from '@/newtab/components/BackgroundImg.vue'
-import RightClickMenu from '@/newtab/components/RightClickMenu.vue'
-import MoveableGuideLine from '@/newtab/components/moveable/MoveableGuideLine.vue'
-import MoveableElementDrawer from '@/newtab/components/moveable/MoveableElementDrawer.vue'
+import BackgroundImg from '~/newtab/content/BackgroundImg.vue'
+import RightClickMenu from '~/newtab/content/RightClickMenu.vue'
+
+import DraftGuideLine from '@/newtab/draft/DraftGuideLine.vue'
+import DraftDrawer from '@/newtab/draft/DraftDrawer.vue'
 
 import Setting from '@/newtab/setting/index.vue'
-import KeyboardBookmark from '@/newtab/elements/bookmark/keyboard.vue'
-import DigitalClock from '@/newtab/elements/clock/DigitalClock.vue'
-import AnalogClock from '@/newtab/elements/clock/AnalogClock.vue'
-import Date from '@/newtab/elements/date/index.vue'
-import Calendar from '@/newtab/elements/calendar/index.vue'
-import YearProgress from '@/newtab/elements/YearProgress/index.vue'
-import Search from '@/newtab/elements/search/index.vue'
-import Weather from '@/newtab/elements/weather/index.vue'
-import Memo from '@/newtab/elements/memo/index.vue'
-import News from '@/newtab/elements/news/index.vue'
-// @@@@ add Components 3
+import { widgetsList } from '@/newtab/widgets/registry'
 
 window.$message = useMessage()
 window.$notification = useNotification()
@@ -30,20 +21,18 @@ window.$loadingBar = useLoadingBar()
   <!-- component -->
   <BackgroundImg />
   <RightClickMenu />
-  <ChangelogModal />
-  <MoveableGuideLine />
-  <MoveableElementDrawer />
 
-  <!-- element -->
+  <ChangelogModal />
+
+  <DraftGuideLine />
+  <DraftDrawer />
+
   <Setting />
-  <Weather />
-  <News />
-  <YearProgress />
-  <Calendar />
-  <KeyboardBookmark />
-  <DigitalClock />
-  <AnalogClock />
-  <Date />
-  <Memo />
-  <Search />
+
+  <!-- widget -->
+  <component
+    :is="item.component"
+    v-for="item in widgetsList"
+    :key="item.code"
+  />
 </template>

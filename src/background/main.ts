@@ -1,57 +1,21 @@
 // ! background Cannot use import statement outside a module
 // import browser from 'webextension-polyfill'
-import { defaultConfig } from '@/logic/config'
+import { WIDGET_CONFIG } from '~/newtab/widgets/keyboard/config'
 import { log, createTab, padUrlHttps } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
+import { ALL_COMMAND_KEYCODE } from './config'
 
-const ALL_COMMAND_KEYCODE = [
-  'Digit1',
-  'Digit2',
-  'Digit3',
-  'Digit4',
-  'Digit5',
-  'Digit6',
-  'Digit7',
-  'Digit8',
-  'Digit9',
-  'Digit0',
-  'KeyQ',
-  'KeyW',
-  'KeyE',
-  'KeyR',
-  'KeyT',
-  'KeyY',
-  'KeyU',
-  'KeyI',
-  'KeyO',
-  'KeyP',
-  'KeyA',
-  'KeyS',
-  'KeyD',
-  'KeyF',
-  'KeyG',
-  'KeyH',
-  'KeyJ',
-  'KeyK',
-  'KeyL',
-  'KeyZ',
-  'KeyX',
-  'KeyC',
-  'KeyV',
-  'KeyB',
-  'KeyN',
-  'KeyM',
-  'Comma',
-  'Period',
-]
+let keyboardConfig = WIDGET_CONFIG
 
-let bookmarkConfig = defaultConfig.bookmark
-
-const getBookmarkConfigData = async () =>
+const getKeyboardConfigData = async () =>
   new Promise((resolve) => {
     chrome.storage.sync.get(null, (data) => {
-      const config = data['naive-tab-bookmark']
-      bookmarkConfig = JSON.parse(config).data
+      const config = data['naive-tab-keyboard']
+      if (!config || config.length === 0) {
+        resolve(true)
+        return
+      }
+      keyboardConfig = JSON.parse(config).data
       resolve(true)
     })
   })
@@ -65,17 +29,17 @@ const handleKeyboard = async (command: string) => {
   if (!ALL_COMMAND_KEYCODE.includes(keycode)) {
     return
   }
-  await getBookmarkConfigData()
-  if (!bookmarkConfig.isListenBackgroundKeystrokes) {
+  await getKeyboardConfigData()
+  if (!keyboardConfig.isListenBackgroundKeystrokes) {
     return
   }
-  // TODO browser bookmark
-  let url: string = bookmarkConfig.keymap[keycode] ? bookmarkConfig.keymap[keycode].url : ''
+
+  let url: string = keyboardConfig.keymap[keycode] ? keyboardConfig.keymap[keycode].url : ''
   if (url.length === 0) {
     return
   }
   url = padUrlHttps(url)
-  if (!bookmarkConfig.isDblclickOpen) {
+  if (!keyboardConfig.isDblclickOpen) {
     createTab(url)
     return
   }
@@ -86,7 +50,7 @@ const handleKeyboard = async (command: string) => {
     lastCommand = keycode
     dblclickTimer = setTimeout(() => {
       lastCommand = ''
-    }, bookmarkConfig.dblclickIntervalTime)
+    }, keyboardConfig.dblclickIntervalTime)
   }
 }
 

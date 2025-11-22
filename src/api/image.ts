@@ -1,5 +1,5 @@
 import request from '@/lib/request'
-import { PEXELS_API } from '@/logic/const'
+import { PEXELS_API } from '@/logic/constants/index'
 import { localConfig } from '@/logic/store'
 
 // https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=10

@@ -2,11 +2,15 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { gaProxy } from '@/logic/gtag'
 import { requestPermission } from '@/logic/storage'
-import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST, currKeyboardConfig } from '@/logic/keyboard'
-import { getDefaultBookmarkNameFromUrl, getFaviconFromUrl, getBookmarkConfigUrl, getBookmarkConfigName } from '@/logic/bookmark'
+import { getFaviconFromUrl } from '@/logic/bookmark'
+import { KEYBOARD_CODE_TO_DEFAULT_CONFIG, KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST } from '@/logic/constants/keyboard'
+import { currKeyboardConfig } from '@/logic/keyboard'
+import { getDefaultBookmarkNameFromUrl, getBookmarkConfigUrl, getBookmarkConfigName } from '~/newtab/widgets/keyboard/logic'
 import { globalState, localConfig, customPrimaryColor, getStyleConst, getAllCommandsConfig, openConfigShortcutsPage } from '@/logic/store'
 import BookmarkPicker from '@/components/BookmarkPicker.vue'
-import Tips from '~/components/Tips.vue'
+import Tips from '@/components/Tips.vue'
+import { Icon } from '@iconify/vue'
+import { ICONS } from '@/logic/icons'
 
 const state = reactive({
   isBookmarkModalVisible: false,
@@ -20,7 +24,7 @@ const state = reactive({
 })
 
 // 为实现page切换前台时刷新通过pupop修改的书签
-const bookmarkPendingData = useStorageLocal('data-bookmark-pending', {
+const keyboardPendingData = useStorageLocal('data-keyboard-pending', {
   isPending: false,
 })
 
@@ -44,9 +48,9 @@ const loadCurrKeyConfig = () => {
   if (state.keyCode.length === 0) {
     return
   }
-  if (localConfig.bookmark.keymap[state.keyCode] && localConfig.bookmark.keymap[state.keyCode].url) {
-    state.url = localConfig.bookmark.keymap[state.keyCode].url
-    state.name = localConfig.bookmark.keymap[state.keyCode].name
+  if (localConfig.keyboard.keymap[state.keyCode] && localConfig.keyboard.keymap[state.keyCode].url) {
+    state.url = localConfig.keyboard.keymap[state.keyCode].url
+    state.name = localConfig.keyboard.keymap[state.keyCode].name
   }
 }
 
@@ -61,7 +65,7 @@ const isCommitBtnDisabled = computed(() => {
 
 const handleCommit = (callback: () => void) => {
   state.isCommitLoading = true
-  bookmarkPendingData.value.isPending = true
+  keyboardPendingData.value.isPending = true
   callback()
   setTimeout(() => {
     state.isCommitLoading = false
@@ -74,16 +78,16 @@ const onDeleteKey = () => {
     return
   }
   handleCommit(() => {
-    delete localConfig.bookmark.keymap[state.keyCode]
+    delete localConfig.keyboard.keymap[state.keyCode]
   })
 }
 
 const onCommitConfigBookmark = () => {
   handleCommit(() => {
     if (state.url.length === 0) {
-      delete localConfig.bookmark.keymap[state.keyCode]
+      delete localConfig.keyboard.keymap[state.keyCode]
     } else {
-      localConfig.bookmark.keymap[state.keyCode] = {
+      localConfig.keyboard.keymap[state.keyCode] = {
         url: state.url,
         name: state.name,
       }
@@ -119,13 +123,13 @@ const handleDragEnd = () => {
     return
   }
   // 忽略空书签
-  if (!localConfig.bookmark.keymap[state.currDragKeyCode]) {
+  if (!localConfig.keyboard.keymap[state.currDragKeyCode]) {
     return
   }
   handleCommit(() => {
-    const targetData = localConfig.bookmark.keymap[state.targetDragKeyCode]
-    localConfig.bookmark.keymap[state.targetDragKeyCode] = localConfig.bookmark.keymap[state.currDragKeyCode]
-    localConfig.bookmark.keymap[state.currDragKeyCode] = targetData
+    const targetData = localConfig.keyboard.keymap[state.targetDragKeyCode]
+    localConfig.keyboard.keymap[state.targetDragKeyCode] = localConfig.keyboard.keymap[state.currDragKeyCode]
+    localConfig.keyboard.keymap[state.currDragKeyCode] = targetData
     state.keyCode = state.targetDragKeyCode
   })
 }
@@ -209,13 +213,13 @@ const popupMainWidth = `${getContainerWidth()}px`
     >
       <NFormItem
         class="form__url"
-        :label="$t('bookmark.urlLabel')"
+        :label="$t('keyboard.urlLabel')"
         path="url"
         :rule="{ required: true }"
       >
         <NInput
           v-model:value="state.url"
-          :placeholder="$t('bookmark.urlPlaceholder')"
+          :placeholder="$t('keyboard.urlPlaceholder')"
           clearable
           @input="state.url = state.url.replaceAll(' ', '')"
         />
@@ -226,7 +230,10 @@ const popupMainWidth = `${getContainerWidth()}px`
             class="operation__btn"
             @click="setCurrentTabUrl()"
           >
-            <tabler:current-location class="btn__icon" />
+            <Icon
+              :icon="ICONS.currentLocation"
+              class="btn__icon"
+            />
           </NButton>
           <NButton
             text
@@ -234,7 +241,10 @@ const popupMainWidth = `${getContainerWidth()}px`
             :disabled="state.keyCode.length === 0"
             @click="onOpenBookmarkPicker()"
           >
-            <lucide:bookmark-plus class="btn__icon" />
+            <Icon
+              :icon="ICONS.bookmarkPlus"
+              class="btn__icon"
+            />
           </NButton>
           <NPopconfirm @positive-click="onDeleteKey()">
             <template #trigger>
@@ -243,7 +253,10 @@ const popupMainWidth = `${getContainerWidth()}px`
                 class="operation__btn"
                 :disabled="state.keyCode.length === 0 || getBookmarkConfigUrl(state.keyCode).length === 0"
               >
-                <ri:delete-bin-6-line class="btn__icon" />
+                <Icon
+                  :icon="ICONS.deleteBin"
+                  class="btn__icon"
+                />
               </NButton>
             </template>
             {{ `${$t('common.delete')} ${KEYBOARD_CODE_TO_DEFAULT_CONFIG[state.keyCode].label}` }} ？
@@ -254,7 +267,7 @@ const popupMainWidth = `${getContainerWidth()}px`
       <div class="popup__form_wrap">
         <NFormItem
           class="form__name"
-          :label="$t('bookmark.nameLabel')"
+          :label="$t('keyboard.nameLabel')"
         >
           <NInput
             v-model:value="state.name"
@@ -265,11 +278,11 @@ const popupMainWidth = `${getContainerWidth()}px`
         </NFormItem>
 
         <NFormItem
-          :label="$t('bookmark.shortcutLabel')"
+          :label="$t('keyboard.shortcutLabel')"
           class="form__shortcut"
         >
           <NInputGroupLabel
-            v-if="localConfig.bookmark.isListenBackgroundKeystrokes"
+            v-if="localConfig.keyboard.isListenBackgroundKeystrokes"
             class="shortcut__main"
             :title="globalState.allCommandsMap[state.keyCode]"
             @click="openConfigShortcutsPage()"
@@ -277,14 +290,20 @@ const popupMainWidth = `${getContainerWidth()}px`
             <template v-if="globalState.allCommandsMap[state.keyCode]">
               {{ globalState.allCommandsMap[state.keyCode] }}
             </template>
-            <ic:outline-add v-else-if="KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST.includes(state.keyCode)" />
-            <ion:ban v-else />
+            <Icon
+              v-else-if="KEYBOARD_COMMAND_ALLOW_KEYCODE_LIST.includes(state.keyCode)"
+              :icon="ICONS.add"
+            />
+            <Icon
+              v-else
+              :icon="ICONS.ban"
+            />
           </NInputGroupLabel>
         </NFormItem>
       </div>
 
       <NFormItem
-        :label="$t('bookmark.keyLabel')"
+        :label="$t('keyboard.keyLabel')"
         path="key"
         :rule="{ required: true }"
       >
@@ -313,7 +332,7 @@ const popupMainWidth = `${getContainerWidth()}px`
                     v-if="code === state.keyCode"
                     class="keycap__select"
                   >
-                    <ic:outline-check-circle />
+                    <Icon :icon="ICONS.checkCircle" />
                   </div>
 
                   <p class="keycap__label">
@@ -345,7 +364,7 @@ const popupMainWidth = `${getContainerWidth()}px`
         :disabled="isCommitBtnDisabled || state.isCommitLoading"
         @click="onCommitConfigBookmark()"
       >
-        <mingcute:save-2-line />&nbsp;{{ $t('common.save') }}
+        <Icon :icon="ICONS.save" />&nbsp;{{ $t('common.save') }}
       </NButton>
 
       <Tips :content="$t('popup.commitBtnTips')" />

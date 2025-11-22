@@ -1,6 +1,6 @@
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { log } from '@/logic/util'
 import { getPoetryTokenData, getTodayPoetryData } from '@/api'
+import { log } from '@/logic/util'
 
 export const poetryState = useStorageLocal('data-poetry', {
   token: '',

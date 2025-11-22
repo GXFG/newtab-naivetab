@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { SECOND_MODAL_WIDTH } from '@/logic/const'
+import { SECOND_MODAL_WIDTH } from '@/logic/constants/index'
 import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark'
 
 const props = defineProps({

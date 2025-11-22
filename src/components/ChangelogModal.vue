@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+import { ICONS } from '@/logic/icons'
+import { defineAsyncComponent } from 'vue'
 import { globalState } from '@/logic/store'
-import ChangeLogMd from '../../CHANGELOG.md'
+
+const modules = import.meta.glob('../../CHANGELOG.md')
+const ChangeLogMd = modules['../../CHANGELOG.md'] ? defineAsyncComponent(modules['../../CHANGELOG.md'] as any) : null
 
 const onCloseModal = () => {
   globalState.isChangelogModalVisible = false
@@ -17,7 +22,8 @@ const onCloseModal = () => {
       :title="`🚀 ${$t('about.changelog')}`"
     >
       <div class="modal__content changelog__content">
-        <ChangeLogMd />
+        <ChangeLogMd v-if="ChangeLogMd" />
+        <p v-else> - </p>
       </div>
 
       <div class="card__footer">
@@ -30,7 +36,7 @@ const onCloseModal = () => {
         >
           <template #icon>
             <div class="icon__wrap">
-              <line-md:confirm-circle />
+              <Icon :icon="ICONS.checkCircle" />
             </div>
           </template>
           {{ $t('common.confirm') }}

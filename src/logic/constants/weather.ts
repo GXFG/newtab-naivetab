@@ -1,6 +1,3 @@
-// 天气相关常量
-export const PEXELS_API = 'Ao3fG3suWGpoXTKYLycwrSLHSITran9E3MoHxxsTVT5z1aHjCDxZcr3m'
-
 export const WEATHER_LANG_MAP = {
   'zh-CN': 'zh',
   'en-US': 'en',

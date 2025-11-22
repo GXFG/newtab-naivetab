@@ -2,17 +2,17 @@
 import { NConfigProvider, NMessageProvider, NNotificationProvider, NLoadingBarProvider } from 'naive-ui'
 import { log } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
-import { FOCUE_ELEMENT_SELECTOR_MAP } from '@/logic/const'
+import { FOCUE_ELEMENT_SELECTOR_MAP } from '@/logic/constants/index'
 import { startKeydown, startTimer, stopTimer, onPageFocus, stopKeydown } from '@/logic/task'
 import { handleWatchLocalConfigChange, handleMissedUploadConfig, loadRemoteConfig } from '@/logic/storage'
 import { handleFirstOpen } from '@/logic/guide'
 import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, handleStateResetAndUpdate, handleAppUpdate, setEdgeFavicon } from '@/logic/store'
 import { initBackgroundImage } from '@/logic/image'
-import { initBookmarkData } from '@/logic/bookmark'
-import { handleWatchNewsConfigChange } from '@/logic/news'
-import { handleWatchWeatherConfigChange } from '@/logic/weather'
-import { updatePoetry } from '@/logic/poetry'
 import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'
+import { initKeyboardData, resetKeyboardPending } from '~/newtab/widgets/keyboard/logic'
+import { handleWatchNewsConfigChange } from '@/newtab/widgets/news/logic'
+import { handleWatchWeatherConfigChange } from '@/newtab/widgets/weather/logic'
+import { updatePoetry } from '@/logic/poetry'
 import Content from '@/newtab/Content.vue'
 
 if (localConfig.general.openPageFocusElement !== 'default') {
@@ -68,11 +68,12 @@ const onDot = () => {
 onMounted(async () => {
   initBackgroundImage()
   setEdgeFavicon()
+  resetKeyboardPending()
   handleStateResetAndUpdate()
   startTimer()
   startKeydown()
   handleWatchLocalConfigChange()
-  initBookmarkData()
+  initKeyboardData()
   await handleMissedUploadConfig()
   await loadRemoteConfig()
   await nextTick()
@@ -99,9 +100,9 @@ const pageAnimationClass = computed(() => {
   return `animation--${localConfig.general.loadPageAnimationType}`
 })
 
-const CNAME = 'general'
-const customFontFamily = getStyleField(CNAME, 'fontFamily')
-const customFontSize = getStyleField(CNAME, 'fontSize', 'px')
+const WIDGET_CODE = 'general'
+const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
+const customFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'px')
 </script>
 
 <template>

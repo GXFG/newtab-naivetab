@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
+import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
 </script>
 
 <template>
-  <BaseComponentSetting
-    cname="clockAnalog"
+  <SettingPaneWrap
+    widget-code="clockAnalog"
     :width-range="[20, 300]"
   />
 </template>

@@ -1,4 +1,3 @@
-// 搜索引擎列表常量
 export const SEARCH_ENGINE_LIST = [
   {
     label: 'Baidu',

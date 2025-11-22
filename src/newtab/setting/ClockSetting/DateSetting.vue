@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { URL_DAYJS_FORMAT } from '@/logic/const'
+import { URL_DAYJS_FORMAT } from '@/logic/constants/index'
 import { localConfig } from '@/logic/store'
-import BaseComponentSetting from '@/newtab/components/form/BaseComponentSetting.vue'
+import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
 import Tips from '@/components/Tips.vue'
 </script>
 
 <template>
-  <BaseComponentSetting cname="date">
+  <SettingPaneWrap widget-code="date">
     <template #header>
       <NFormItem :label="$t('common.format')">
         <NInput
@@ -19,5 +19,5 @@ import Tips from '@/components/Tips.vue'
         />
       </NFormItem>
     </template>
-  </BaseComponentSetting>
+  </SettingPaneWrap>
 </template>

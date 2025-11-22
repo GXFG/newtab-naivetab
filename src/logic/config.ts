@@ -1,395 +1,99 @@
+import type { WidgetConfigByCode } from '@/newtab/widgets/registry'
+import { WIDGET_CODE_LIST } from '@/newtab/widgets/codes'
 import pkg from '../../package.json'
 
 const UI_LANGUAGE = chrome.i18n.getUILanguage()
 const CURR_LANG = UI_LANGUAGE || 'en-US'
 
-// @@@@ add Components 6
+export const defaultFocusVisibleWidgetMap = {
+  ...Object.fromEntries(WIDGET_CODE_LIST.map((code) => [code, false])) as Record<WidgetCodes, boolean>,
+  clockDigital: true,
+  date: true,
+}
+
+const generalConfig = {
+  isFirstOpen: true,
+  version: pkg.version,
+  appearance: 'auto' as 'light' | 'dark' | 'auto',
+  pageTitle: CURR_LANG === 'zh-CN' ? '新标签页' : 'NaiveTab',
+  lang: CURR_LANG,
+  timeLang: CURR_LANG,
+  drawerPlacement: 'right' as TDrawerPlacement,
+  openPageFocusElement: 'default' as TPageFocusElement,
+  isLoadPageAnimationEnabled: true,
+  loadPageAnimationType: 'fade-in' as 'fade-in' | 'zoom-in',
+  isFocusMode: false,
+  focusVisibleWidgetMap: defaultFocusVisibleWidgetMap,
+  isBackgroundImageEnabled: true,
+  backgroundImageSource: 1 as 0 | 1 | 2, // 0 localFile, 1 network, 2 bing Photo of the Day
+  backgroundNetworkSourceType: 1 as 1 | 2, // 1 Bing, 2 Pexels
+  backgroundImageHighQuality: false,
+  backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'DolomitesMW_ZH-CN3307894335'],
+  isBackgroundImageCustomUrlEnabled: false,
+  backgroundImageCustomUrls: ['https://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'https://cn.bing.com/th?id=OHR.DolomitesMW_ZH-CN3307894335_1920x1080.jpg'],
+  favoriteImageList: [
+    { networkSourceType: 1, name: 'ChukchiSea_ZH-CN7218471261' },
+    { networkSourceType: 1, name: 'DolomitesMW_ZH-CN3307894335' },
+    { networkSourceType: 1, name: 'YosemiteNightSky_ZH-CN5864740024' },
+    { networkSourceType: 1, name: 'LavaTube_ZH-CN5458469336' },
+    { networkSourceType: 1, name: 'YurisNight_ZH-CN5738817931' },
+    { networkSourceType: 1, name: 'PrathameshJaju_ZH-CN2207606082' },
+    { networkSourceType: 1, name: 'AthensAcropolis_ZH-CN9942357439' },
+    { networkSourceType: 1, name: 'Balsamroot_ZH-CN9456182640' },
+    { networkSourceType: 1, name: 'DarwinsArch_ZH-CN9740478501' },
+    { networkSourceType: 1, name: 'ChurchillBears_ZH-CN1430090934' },
+    { networkSourceType: 1, name: 'WinterHalo_ZH-CN0666553211' },
+    { networkSourceType: 2, name: '19161535' },
+  ] as {
+    networkSourceType: 1 | 2
+    name: string
+  }[],
+  layout: {
+    xOffsetKey: 'right',
+    xOffsetValue: 1,
+    xTranslateValue: 0,
+    yOffsetKey: 'top',
+    yOffsetValue: 50,
+    yTranslateValue: -50,
+  },
+  fontFamily: 'Arial',
+  fontSize: 14,
+  fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+  primaryColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
+  backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
+  bgOpacity: 1,
+  bgBlur: 0,
+  swatcheColors: [
+    'rgba(255, 255, 255, 1)',
+    'rgba(16, 152, 173, 1)',
+    'rgba(159, 214, 255, 1)',
+    'rgba(213, 255, 203, 0.8)',
+    'rgba(255, 110, 110, 0.4)',
+    'rgba(250, 82, 82, 1)',
+    'rgba(101, 101, 101, 0.28)',
+    'rgba(122, 122, 122, 0.5)',
+    'rgba(209, 213, 219, 1)',
+    'rgba(73, 73, 77, 1)',
+    'rgba(44, 62, 80, 1)',
+    'rgba(15, 23, 42, 1)',
+  ],
+}
+
+const widgetsDefaultConfig = (() => {
+  const modules = import.meta.glob('../newtab/widgets/**/config.ts', { eager: true }) as Record<string, any>
+  const map: Record<string, any> = {}
+  for (const key in modules) {
+    const m = modules[key]
+    if (m && m.WIDGET_CODE && m.WIDGET_CONFIG) {
+      map[m.WIDGET_CODE] = m.WIDGET_CONFIG
+    }
+  }
+  return map as WidgetConfigByCode
+})()
+
 export const defaultConfig = {
-  general: {
-    isFirstOpen: true,
-    version: pkg.version,
-    appearance: 'auto' as 'light' | 'dark' | 'auto',
-    pageTitle: CURR_LANG === 'zh-CN' ? '新标签页' : 'NaiveTab',
-    lang: CURR_LANG,
-    timeLang: CURR_LANG,
-    drawerPlacement: 'right' as TDrawerPlacement,
-    openPageFocusElement: 'default' as TPageFocusElement,
-    isLoadPageAnimationEnabled: true,
-    loadPageAnimationType: 'fade-in' as 'fade-in' | 'zoom-in',
-    isBackgroundImageEnabled: true,
-    backgroundImageSource: 1 as 0 | 1 | 2, // 0 localFile, 1 network, 2 bing Photo of the Day
-    backgroundNetworkSourceType: 1 as 1 | 2, // 1 Bing, 2 Pexels
-    backgroundImageHighQuality: false,
-    backgroundImageNames: ['ChukchiSea_ZH-CN7218471261', 'DolomitesMW_ZH-CN3307894335'],
-    isBackgroundImageCustomUrlEnabled: false,
-    backgroundImageCustomUrls: ['https://cn.bing.com/th?id=OHR.ChukchiSea_ZH-CN7218471261_1920x1080.jpg', 'https://cn.bing.com/th?id=OHR.DolomitesMW_ZH-CN3307894335_1920x1080.jpg'],
-    favoriteImageList: [
-      { networkSourceType: 1, name: 'ChukchiSea_ZH-CN7218471261' },
-      { networkSourceType: 1, name: 'DolomitesMW_ZH-CN3307894335' },
-      { networkSourceType: 1, name: 'YosemiteNightSky_ZH-CN5864740024' },
-      { networkSourceType: 1, name: 'LavaTube_ZH-CN5458469336' },
-      { networkSourceType: 1, name: 'YurisNight_ZH-CN5738817931' },
-      { networkSourceType: 1, name: 'PrathameshJaju_ZH-CN2207606082' },
-      { networkSourceType: 1, name: 'AthensAcropolis_ZH-CN9942357439' },
-      { networkSourceType: 1, name: 'Balsamroot_ZH-CN9456182640' },
-      { networkSourceType: 1, name: 'DarwinsArch_ZH-CN9740478501' },
-      { networkSourceType: 1, name: 'ChurchillBears_ZH-CN1430090934' },
-      { networkSourceType: 1, name: 'WinterHalo_ZH-CN0666553211' },
-      { networkSourceType: 2, name: '19161535' },
-    ] as {
-      networkSourceType: 1 | 2
-      name: string
-    }[],
-    layout: {
-      xOffsetKey: 'right',
-      xOffsetValue: 1,
-      xTranslateValue: 0,
-      yOffsetKey: 'top',
-      yOffsetValue: 50,
-      yTranslateValue: -50,
-    },
-    fontFamily: 'Arial',
-    fontSize: 14,
-    fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    primaryColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(53, 54, 58, 1)'],
-    bgOpacity: 1,
-    bgBlur: 0,
-    swatcheColors: [
-      'rgba(255, 255, 255, 1)',
-      'rgba(16, 152, 173, 1)',
-      'rgba(159, 214, 255, 1)',
-      'rgba(213, 255, 203, 0.8)',
-      'rgba(255, 110, 110, 0.4)',
-      'rgba(250, 82, 82, 1)',
-      'rgba(101, 101, 101, 0.28)',
-      'rgba(122, 122, 122, 0.5)',
-      'rgba(209, 213, 219, 1)',
-      'rgba(73, 73, 77, 1)',
-      'rgba(44, 62, 80, 1)',
-      'rgba(15, 23, 42, 1)',
-    ],
-  },
-  bookmark: {
-    enabled: true,
-    source: 2, // 1browser, 2naivetab
-    isListenBackgroundKeystrokes: true,
-    isDblclickOpen: false,
-    dblclickIntervalTime: 200, // ms
-    isNewTabOpen: false,
-    defaultExpandFolder: null as null | string,
-    keymap: {
-      KeyQ: {
-        url: 'www.baidu.com',
-        name: '',
-      },
-      KeyW: {
-        url: 'www.google.com',
-        name: '',
-      },
-      KeyE: {
-        url: 'www.bing.com',
-        name: '',
-      },
-      KeyA: {
-        url: 'https://gxfg.github.io/naivetab-doc/',
-        name: 'welcome',
-      },
-    },
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 50,
-      xTranslateValue: -50,
-      yOffsetKey: 'top',
-      yOffsetValue: 1,
-      yTranslateValue: 0,
-    },
-    keyboardType: 'key61',
-    splitSpace: 'space1' as 'space1' | 'space2' | 'space3',
-    keycapType: 'gmk',
-    keycapPadding: 1.5,
-    keycapSize: 62,
-    keycapBorderRadius: 5,
-    isKeycapBorderEnabled: false,
-    keycapBorderWidth: 1,
-    keycapBorderColor: ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)'],
-    // shell
-    isShellVisible: true,
-    shellVerticalPadding: 15,
-    shellHorizontalPadding: 15,
-    shellBorderRadius: 10,
-    shellColor: ['rgba(255, 255, 255, 1.0)', 'rgba(66, 66, 70, 1.0)'],
-    isShellShadowEnabled: true,
-    shellShadowColor: ['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.4)'],
-    // plate
-    isPlateVisible: true,
-    platePadding: 3,
-    plateBorderRadius: 5,
-    plateColor: ['rgba(119, 119, 119,1.0)', 'rgba(119, 119, 119,1.0)'],
-    // keycap
-    isCapKeyVisible: true,
-    keycapKeyFontFamily: 'OpenCherry',
-    keycapKeyFontSize: 12,
-    isNameVisible: true,
-    keycapBookmarkFontFamily: 'Arial',
-    keycapBookmarkFontSize: 10,
-    isFaviconVisible: true,
-    faviconSize: 0.85,
-    isTactileBumpsVisible: true,
-    // keycap color
-    mainFontColor: ['rgba(34,34,34,1.0)', 'rgba(228,222,221,1.0)'],
-    mainBackgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(95,92,82,1.0)'],
-    emphasisOneFontColor: ['rgba(255, 255, 255, 0.9)', 'rgba(228,222,221,1.0)'],
-    emphasisOneBackgroundColor: ['rgba(55,54,52,1.0)', 'rgba(51,52,48,1.0)'],
-    emphasisTwoFontColor: ['rgba(255, 255, 255, 0.9)', 'rgba(228,222,221,1.0)'],
-    emphasisTwoBackgroundColor: ['rgba(34, 34, 34, 1)', 'rgba(51,52,48,1.0)'],
-  },
-  clockDigital: {
-    enabled: true,
-    format: 'HH:mm:ss',
-    unitEnabled: false,
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 50,
-      xTranslateValue: -50,
-      yOffsetKey: 'top',
-      yOffsetValue: 50,
-      yTranslateValue: -50,
-    },
-    width: 60,
-    fontFamily: 'LESLIEB',
-    fontSize: 100,
-    fontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(33, 33, 33, 1)', 'rgba(33, 33, 33, 1)'],
-    unit: {
-      fontSize: 35,
-    },
-  },
-  clockAnalog: {
-    enabled: false,
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 50,
-      xTranslateValue: -50,
-      yOffsetKey: 'top',
-      yOffsetValue: 25,
-      yTranslateValue: 0,
-    },
-    width: 150,
-  },
-  date: {
-    enabled: true,
-    format: 'YYYY-MM-DD dddd',
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 50,
-      xTranslateValue: -50,
-      yOffsetKey: 'top',
-      yOffsetValue: 57,
-      yTranslateValue: 0,
-    },
-    fontFamily: 'LESLIEB',
-    fontSize: 30,
-    letterSpacing: 1,
-    fontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(33, 33, 33, 1)', 'rgba(33, 33, 33, 1)'],
-  },
-  calendar: {
-    enabled: true,
-    weekBeginsOn: 1, // 1 monday, 7 sunday
-    festivalCountdown: true,
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 0,
-      xTranslateValue: 0,
-      yOffsetKey: 'bottom',
-      yOffsetValue: 0,
-      yTranslateValue: 0,
-    },
-    width: 50,
-    borderRadius: 4,
-    fontFamily: 'Arial',
-    fontSize: 14,
-    fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    dayFontFamily: 'Arial',
-    dayFontSize: 16,
-    dayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    descFontFamily: 'Arial',
-    descFontSize: 10,
-    descFontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    isBorderEnabled: false,
-    borderWidth: 1,
-    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-    holidayFontColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
-    // today
-    todayDayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
-    todayDescFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
-    todayLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-    todayLabelBackgroundColor: ['rgba(22, 144, 231, 1)', 'rgba(22, 144, 231, 1)'],
-    todayItemBackgroundColor: ['rgba(159, 214, 255, 1)', 'rgba(106, 173, 224, 1)'],
-    // restDay
-    restDayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
-    restDescFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
-    restLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-    restLabelBackgroundColor: ['rgba(32, 146, 0, 1)', 'rgba(32, 146, 0, 1)'],
-    restItemBackgroundColor: ['rgba(213, 255, 203, 0.8)', 'rgba(169, 180, 156, 1)'],
-    // workDay
-    workDayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
-    workDescFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
-    workLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-    workLabelBackgroundColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
-    workItemBackgroundColor: ['rgba(255, 221, 221, 1)', 'rgba(218, 181, 181, 1)'],
-  },
-  yearProgress: {
-    enabled: false,
-    layout: {
-      xOffsetKey: 'right',
-      xOffsetValue: 0,
-      xTranslateValue: 0,
-      yOffsetKey: 'top',
-      yOffsetValue: 0,
-      yTranslateValue: 0,
-    },
-    padding: 10,
-    width: 345,
-    height: 110,
-    borderRadius: 5.5,
-    fontFamily: 'Arial',
-    fontSize: 16,
-    fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
-    isBorderEnabled: true,
-    borderWidth: 1,
-    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-    // text
-    isRealtime: false,
-    textLineHeight: 1.5,
-    textActiveColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
-    isPercentageEnabled: true,
-    percentageDecimal: 3,
-    isDateEnabled: true,
-    format: 'YYYY.MM.DD',
-    // block
-    blockMargin: 1.2,
-    blockSize: 4.5,
-    blockRadius: 1,
-    blockDefaultColor: ['rgba(200, 200, 200, 1)', 'rgba(200, 200, 200, 1)'],
-    blockActiveColor: ['rgba(16, 152, 173, 1)', 'rgba(16, 152, 173, 1)'],
-  },
-  search: {
-    enabled: true,
-    isNewTabOpen: false,
-    iconEnabled: true,
-    suggestionEnabled: true,
-    placeholder: '',
-    urlName: 'Baidu',
-    urlValue: 'https://www.baidu.com/s?word={query}',
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 50,
-      xTranslateValue: -50,
-      yOffsetKey: 'bottom',
-      yOffsetValue: 30,
-      yTranslateValue: 0,
-    },
-    padding: 25,
-    width: 400,
-    height: 45,
-    borderRadius: 5.5,
-    fontFamily: 'Arial',
-    fontSize: 18,
-    fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-    isBorderEnabled: true,
-    borderWidth: 1,
-    borderColor: ['rgba(101, 101, 101, 0.28)', 'rgba(71,85,105, 1)'],
-    backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(74, 74, 74, 0.1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
-  },
-  memo: {
-    enabled: false,
-    countEnabled: true,
-    content: '',
-    layout: {
-      xOffsetKey: 'right',
-      xOffsetValue: 20,
-      xTranslateValue: 0,
-      yOffsetKey: 'top',
-      yOffsetValue: 20,
-      yTranslateValue: 0,
-    },
-    width: 200,
-    height: 200,
-    borderRadius: 4,
-    fontFamily: 'Arial',
-    fontSize: 14,
-    fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-    isBorderEnabled: true,
-    borderWidth: 1,
-    borderColor: ['rgba(101, 101, 101, 0.28)', 'rgba(71,85,105, 1)'],
-    backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(24, 24, 24, 0.3)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
-  },
-  weather: {
-    enabled: false,
-    apiKey: '72db57326f9f494ab04d1d431bc127e9',
-    city: {
-      id: '101010300', // 101010300
-      name: '中国-北京市-北京-朝阳', // "中国-北京市-北京-朝阳"
-    },
-    temperatureUnit: 'c', // 'c' | 'f'
-    speedUnit: 'kph', // 'kph' | 'mph'
-    iconEnabled: true,
-    forecastEnabled: false,
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 50,
-      xTranslateValue: -50,
-      yOffsetKey: 'bottom',
-      yOffsetValue: 5,
-      yTranslateValue: 0,
-    },
-    fontFamily: 'Arial Rounded MT Bold',
-    fontSize: 14,
-    fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-    iconSize: 50,
-  },
-  news: {
-    enabled: false,
-    sourceList: ['toutiao', 'baidu'] as NewsSources[],
-    refreshIntervalTime: 90,
-    layout: {
-      xOffsetKey: 'left',
-      xOffsetValue: 0,
-      xTranslateValue: 0,
-      yOffsetKey: 'bottom',
-      yOffsetValue: 0,
-      yTranslateValue: 0,
-    },
-    margin: 6,
-    width: 370,
-    height: 340,
-    borderRadius: 4,
-    fontFamily: 'Arial',
-    fontSize: 14,
-    fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
-    backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-    isBorderEnabled: true,
-    borderWidth: 1,
-    borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
-    isShadowEnabled: true,
-    shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-    tabActiveBackgroundColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
-    urlActiveColor: ['rgba(36, 64, 179, 1)', 'rgba(155, 177, 254, 1)'],
-  },
+  general: generalConfig,
+  ...widgetsDefaultConfig,
 }
 
 export const defaultUploadStatusItem = {
@@ -406,8 +110,8 @@ const genUploadConfigStatusMap = () => {
       syncId: string
     }
   }
-  for (const element in defaultConfig) {
-    statusMap[element] = defaultUploadStatusItem
+  for (const widget in defaultConfig) {
+    statusMap[widget] = defaultUploadStatusItem
   }
   return statusMap
 }

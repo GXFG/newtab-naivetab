@@ -14,16 +14,15 @@ interface Window {
   $loadingBar: LoadingBarApiInjection
 }
 
-// @@@@ add Components 1
-type Components = 'bookmark' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news'
-type ConfigField = Components | 'general'
+// @@@@ add widget type
+type WidgetCodes = 'keyboard' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news'
+type ConfigField = WidgetCodes | 'general'
+type EleTargetCode = WidgetCodes | 'draft-common'
+type EleTargetType = 'widget' | 'draft'
 
-type TargetType = 'component' | 'element'
-type TargetName = Components | 'element-general'
+type settingPanes = 'general' | 'focusMode' | 'keyboard' | 'clockDate' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news' | 'aboutIndex' | 'aboutSponsor'
 
-type KeydownTaskKey = 'bookmark' | 'moveable-tool'
-
-type settingPanes = 'general' | 'bookmark' | 'clockDate' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news' | 'aboutIndex' | 'aboutSponsor'
+type KeydownTaskKey = 'keyboard' | 'draft-tool'
 
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
 type DatabaseStore = 'localBackgroundImages' | 'currBackgroundImages'
@@ -39,7 +38,7 @@ type OptionsPermission = 'bookmarks'
 type Placement = 'top-start' | 'top' | 'top-end' | 'right-start' | 'right' | 'right-end' | 'bottom-start' | 'bottom' | 'bottom-end' | 'left-start' | 'left' | 'left-end'
 
 type TDrawerPlacement = 'top' | 'bottom' | 'left' | 'right'
-type TPageFocusElement = 'default' | 'root' | 'search' | 'memo' | 'bookmarkKeyboard'
+type TPageFocusElement = 'default' | 'root' | 'search' | 'memo' | 'keyboard'
 
 interface SelectStringItem {
   label: string

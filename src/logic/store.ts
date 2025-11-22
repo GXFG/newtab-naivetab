@@ -3,26 +3,33 @@ import { enUS, zhCN, darkTheme, useOsTheme, NButton } from 'naive-ui'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isEdge, isFirefox } from '@/env'
 import { styleConst } from '@/styles/const'
-import { URL_CHROME_STORE, URL_EDGE_STORE, URL_FIREFOX_STORE, URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, URL_FIREFOX_EXTENSIONS_SHORTCUTS, APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST } from '@/logic/const'
-import { defaultConfig, defaultLocalState } from '@/logic/config'
+import { URL_CHROME_STORE, URL_EDGE_STORE, URL_FIREFOX_STORE, URL_CHROME_EXTENSIONS_SHORTCUTS, URL_EDGE_EXTENSIONS_SHORTCUTS, URL_FIREFOX_EXTENSIONS_SHORTCUTS, APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP, FONT_LIST } from '@/logic/constants/index'
+import { defaultConfig, defaultLocalState, defaultFocusVisibleWidgetMap } from '@/logic/config'
+import type { WidgetConfigByCode } from '@/newtab/widgets/registry'
 import { log, createTab, compareLeftVersionLessThanRightVersions } from '@/logic/util'
-import { updateSetting, getLocalVersion } from '@/logic/storage'
-import { resetBookmarkPending } from '@/logic/bookmark'
+import { WIDGET_CODE_LIST } from '@/newtab/widgets/codes'
 
-// @@@@ add Components 2
-export const localConfig = reactive({
-  general: useStorageLocal('c-general', defaultConfig.general),
-  bookmark: useStorageLocal('c-bookmark', defaultConfig.bookmark),
-  clockDigital: useStorageLocal('c-clockDigital', defaultConfig.clockDigital),
-  clockAnalog: useStorageLocal('c-clockAnalog', defaultConfig.clockAnalog),
-  date: useStorageLocal('c-date', defaultConfig.date),
-  calendar: useStorageLocal('c-calendar', defaultConfig.calendar),
-  yearProgress: useStorageLocal('c-yearProgress', defaultConfig.yearProgress),
-  search: useStorageLocal('c-search', defaultConfig.search),
-  memo: useStorageLocal('c-memo', defaultConfig.memo),
-  weather: useStorageLocal('c-weather', defaultConfig.weather),
-  news: useStorageLocal('c-news', defaultConfig.news),
-})
+type LocalConfigRefs = {
+  general: ReturnType<typeof useStorageLocal<typeof defaultConfig['general']>>
+} & {
+  [K in keyof WidgetConfigByCode]: ReturnType<typeof useStorageLocal<WidgetConfigByCode[K]>>
+}
+
+const useWidgetStorageLocal = <K extends keyof WidgetConfigByCode>(key: K) => {
+  return useStorageLocal(`c-${key}`, defaultConfig[key])
+}
+
+const createLocalConfig = (): LocalConfigRefs => {
+  const res: any = {}
+  res.general = useStorageLocal('c-general', defaultConfig.general)
+  const widgetNames = WIDGET_CODE_LIST as (keyof WidgetConfigByCode)[]
+  for (const key of widgetNames) {
+    res[key] = useWidgetStorageLocal(key)
+  }
+  return res as LocalConfigRefs
+}
+
+export const localConfig: typeof defaultConfig = reactive(createLocalConfig())
 
 export const localState = useStorageLocal('l-state', defaultLocalState)
 
@@ -31,15 +38,14 @@ export const globalState = reactive({
   isGuideMode: false,
   isFullScreen: !!document.fullscreenElement,
   availableFontList: [] as string[],
-  allCommandsMap: {},
+  allCommandsMap: {} as Record<string, string | undefined>,
   isUploadSettingLoading: false,
   isImportSettingLoading: false,
   isClearStorageLoading: false,
   isChangelogModalVisible: false,
   isSearchFocused: false,
   isMemoFocused: false,
-  currSettingTabValue: 'general',
-  currNewsTabValue: localConfig.news.sourceList[0] || '',
+  currSettingTabCode: 'general',
 })
 
 document.addEventListener('fullscreenchange', () => {
@@ -195,7 +201,6 @@ export const openChangelogModal = () => {
 }
 
 export const handleStateResetAndUpdate = () => {
-  resetBookmarkPending()
   if (Object.keys(defaultLocalState.isUploadConfigStatusMap).length !== Object.keys(localState.value.isUploadConfigStatusMap).length) {
     localState.value.isUploadConfigStatusMap = defaultLocalState.isUploadConfigStatusMap
     log('isUploadConfigStatusMap update')
@@ -224,148 +229,9 @@ const updateSuccess = () => {
   })
 }
 
-export const handleAppUpdate = async () => {
-  const version = getLocalVersion()
-  log('Version', version)
-  if (!compareLeftVersionLessThanRightVersions(version, window.appVersion)) {
-    return
-  }
-  log('Get new version', window.appVersion)
-  // TODO 每次更新均需要手动处理新版本变更的本地数据结构
-  if (compareLeftVersionLessThanRightVersions(version, '1.17.3')) {
-    localConfig.calendar.width = 50
-    localConfig.calendar.isBorderEnabled = false
-    localConfig.calendar.restDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    localConfig.calendar.restItemBackgroundColor = ['rgba(213, 255, 203, 0.8)', 'rgba(169, 180, 156, 1)']
-    localConfig.calendar.restLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
-    localConfig.calendar.restLabelBackgroundColor = ['rgba(32, 146, 0, 1)', 'rgba(32, 146, 0, 1)']
-    localConfig.calendar.workDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    localConfig.calendar.workItemBackgroundColor = ['rgba(255, 221, 221, 1)', 'rgba(218, 181, 181, 1)']
-    localConfig.calendar.workLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
-    localConfig.calendar.workLabelBackgroundColor = ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)']
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.17.12')) {
-    localConfig.bookmark.keycapBookmarkFontSize = 11
-    localConfig.calendar.dayFontFamily = 'Arial'
-    localConfig.calendar.dayFontSize = 14
-    localConfig.calendar.dayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)']
-    localConfig.calendar.descFontFamily = 'Arial'
-    localConfig.calendar.descFontSize = 10
-    localConfig.calendar.descFontColor = ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)']
-    localConfig.calendar.todayDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    localConfig.calendar.todayDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    localConfig.calendar.todayLabelFontColor = ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)']
-    localConfig.calendar.todayLabelBackgroundColor = ['rgba(22, 144, 231, 1)', 'rgba(22, 144, 231, 1)']
-    localConfig.calendar.todayItemBackgroundColor = ['rgba(159, 214, 255, 1)', 'rgba(106, 173, 224, 1)']
-    localConfig.calendar.restDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    localConfig.calendar.restDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    localConfig.calendar.workDayFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    localConfig.calendar.workDescFontColor = ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)']
-    const calendarConfig = localConfig.calendar as typeof localConfig.calendar & { backgroundActiveColor?: string }
-    delete calendarConfig.backgroundActiveColor
-    localConfig.news.urlActiveColor = ['rgba(36, 64, 179, 1)', 'rgba(155, 177, 254, 1)']
-    localConfig.news.tabActiveBackgroundColor = ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)']
-    const newsConfig = localConfig.news as typeof localConfig.news & {
-      fontActiveColor?: string
-      backgroundActiveColor?: string
-    }
-    delete newsConfig.fontActiveColor
-    delete newsConfig.backgroundActiveColor
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.18.0')) {
-    localConfig.bookmark.isCapKeyVisible = true
-    localConfig.bookmark.isFaviconVisible = true
-    localConfig.bookmark.faviconSize = 1
-    const bookmarkConfig = localConfig.bookmark as typeof localConfig.bookmark & {
-      borderRadius?: number
-      isBorderEnabled?: boolean
-      borderWidth?: number
-      borderColor?: string[]
-    }
-    localConfig.bookmark.keycapBorderRadius = bookmarkConfig.borderRadius ?? 5
-    localConfig.bookmark.isKeycapBorderEnabled = bookmarkConfig?.isBorderEnabled ?? false
-    localConfig.bookmark.keycapBorderWidth = bookmarkConfig.borderWidth ?? 1
-    localConfig.bookmark.keycapBorderColor = bookmarkConfig.borderColor ?? ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)']
-    delete bookmarkConfig.borderRadius
-    delete bookmarkConfig.isBorderEnabled
-    delete bookmarkConfig.borderWidth
-    delete bookmarkConfig.borderColor
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.18.1')) {
-    localConfig.bookmark.keyboardType = typeof localConfig.bookmark.keyboardType === 'number' ? `key${localConfig.bookmark.keyboardType}` : localConfig.bookmark.keyboardType
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.18.2')) {
-    localConfig.bookmark.splitSpace = defaultConfig.bookmark.splitSpace
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.19.0')) {
-    localConfig.bookmark.isShellVisible = defaultConfig.bookmark.isShellVisible
-    localConfig.bookmark.shellVerticalPadding = defaultConfig.bookmark.shellVerticalPadding
-    localConfig.bookmark.shellHorizontalPadding = defaultConfig.bookmark.shellHorizontalPadding
-    localConfig.bookmark.shellBorderRadius = defaultConfig.bookmark.shellBorderRadius
-    localConfig.bookmark.shellColor = defaultConfig.bookmark.shellColor
-    localConfig.bookmark.isShellShadowEnabled = defaultConfig.bookmark.isShellShadowEnabled
-    localConfig.bookmark.shellShadowColor = defaultConfig.bookmark.shellShadowColor
-    localConfig.bookmark.isPlateVisible = defaultConfig.bookmark.isPlateVisible
-    localConfig.bookmark.platePadding = defaultConfig.bookmark.platePadding
-    localConfig.bookmark.plateBorderRadius = defaultConfig.bookmark.plateBorderRadius
-    localConfig.bookmark.plateColor = defaultConfig.bookmark.plateColor
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.19.1')) {
-    localConfig.general.isLoadPageAnimationEnabled = defaultConfig.general.isLoadPageAnimationEnabled
-    localConfig.general.loadPageAnimationType = defaultConfig.general.loadPageAnimationType
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.19.3')) {
-    localConfig.bookmark.isTactileBumpsVisible = defaultConfig.bookmark.isTactileBumpsVisible
-    localConfig.general.backgroundNetworkSourceType = defaultConfig.general.backgroundNetworkSourceType
-    localConfig.general.favoriteImageList = localConfig.general.favoriteImageList.map((item) => ({
-      networkSourceType: 1,
-      name: item.name,
-    }))
-    const generalConfig = localConfig.general as typeof localConfig.general & {
-      backgroundImageDescs?: string
-    }
-    delete generalConfig.backgroundImageDescs
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.19.4')) {
-    if (['key43', 'key57'].includes(localConfig.bookmark.keyboardType)) {
-      localConfig.bookmark.keyboardType = 'key61'
-    }
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
-    const keymapLength = Object.keys(localConfig.bookmark.keymap).length
-    localConfig.bookmark.source = keymapLength === 0 ? 1 : 2
-    localConfig.bookmark.defaultExpandFolder = null
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.21.0')) {
-    localConfig.search.isNewTabOpen = false
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.23.1')) {
-    localConfig.clockDigital.width = localConfig.clockDigital.fontSize / 2 + 8
-    const clockDigitalConfig = localConfig.clockDigital as typeof localConfig.clockDigital & {
-      letterSpacing?: number
-    }
-    delete clockDigitalConfig.letterSpacing
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.24.0')) {
-    localConfig.general.timeLang = localConfig.general.lang
-    localConfig.yearProgress = defaultConfig.yearProgress
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.24.3')) {
-    localConfig.general.backgroundColor = structuredClone(defaultConfig.general.backgroundColor)
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.25.9')) {
-    localConfig.calendar.festivalCountdown = true
-  }
-  // 更新local版本号
-  localConfig.general.version = window.appVersion
-  // updateSuccess()
-  // 刷新配置设置
-  await updateSetting()
-}
+export const getIsWidgetRender = (widgetName: WidgetCodes) => computed(() => localConfig[widgetName].enabled)
 
-export const getIsComponentRender = (componentName: Components) => computed(() => localConfig[componentName].enabled)
-
-export const getLayoutStyle = (name: string) => {
+export const getLayoutStyle = (name: ConfigField) => {
   return computed(() => {
     let style = `${localConfig[name].layout.xOffsetKey}:${localConfig[name].layout.xOffsetValue}vw;`
     style += `${localConfig[name].layout.yOffsetKey}:${localConfig[name].layout.yOffsetValue}vh;`
@@ -453,4 +319,148 @@ export const setEdgeFavicon = () => {
   link.setAttribute('rel', 'icon')
   link.setAttribute('href', '/assets/favicon-edge.svg')
   document.getElementsByTagName('head')[0].appendChild(link)
+}
+
+export const getLocalVersion = () => {
+  let version = localConfig.general.version
+  const settingGeneral = localStorage.getItem('c-general')
+  if (settingGeneral) {
+    version = JSON.parse(settingGeneral).version
+  }
+  return version || '0'
+}
+
+const mergeState = (state: unknown, acceptState: unknown) => {
+  if (acceptState === undefined || acceptState === null) {
+    return state
+  }
+  // 二者类型不同时，直接返回state，为处理新增state的情况
+  if (Object.prototype.toString.call(state) !== Object.prototype.toString.call(acceptState)) {
+    return state
+  }
+  if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
+    return acceptState
+  }
+  // 只处理纯Object类型，其余如Array等对象类型均直接返回acceptState
+  if (Object.prototype.toString.call(acceptState) !== '[object Object]') {
+    return acceptState
+  }
+  // 二者均为Object，且state为空Object时，返回acceptState
+  if (Object.keys(state as object).length === 0) {
+    return acceptState
+  }
+  // 特殊处理 keyboard.keymap 数据，直接返回acceptState
+  if (
+    Object.prototype.hasOwnProperty.call(state, 'KeyQ')
+    || Object.prototype.hasOwnProperty.call(state, 'KeyA')
+    || Object.prototype.hasOwnProperty.call(state, 'KeyZ')
+    || Object.prototype.hasOwnProperty.call(state, 'Digit1')
+  ) {
+    return acceptState
+  }
+  const filterState = {} as { [propName: string]: unknown }
+  const fieldList = Object.keys(acceptState)
+  for (const field of fieldList) {
+    // 递归合并，只合并state内存在的字段
+    if (Object.prototype.hasOwnProperty.call(state, field)) {
+      filterState[field] = mergeState((state as object)[field], acceptState[field])
+    }
+  }
+  return { ...(state as object), ...filterState }
+}
+
+/**
+ * 处理新增配置，并删除无用旧配置。默认acceptState不传递时为刷新配置数据结构
+ * 以 defaultConfig 为模板与 acceptState 进行去重合并
+ */
+export const updateSetting = (acceptRawState = localConfig): Promise<boolean> => {
+  const acceptState = acceptRawState
+  return new Promise((resolve) => {
+    try {
+      // 只处理存在于acceptState中的配置字段，减少不必要的处理
+      const configFields = Object.keys(defaultConfig).filter((field) =>
+        Object.prototype.hasOwnProperty.call(acceptState, field),
+      ) as ConfigField[]
+
+      for (const configField of configFields) {
+        // 获取需要更新的子字段
+        const subFields = Object.keys(defaultConfig[configField])
+
+        // 批量处理子字段，减少循环内的操作
+        for (const subField of subFields) {
+          if (acceptState[configField][subField] !== undefined) {
+            localConfig[configField][subField] = mergeState(
+              defaultConfig[configField][subField],
+              acceptState[configField][subField],
+            )
+            // console.log(`${configField}-${subField}`, localConfig[configField][subField], '=', defaultConfig[configField][subField], '<-', acceptState[configField][subField])
+          }
+        }
+      }
+
+      log('UpdateSetting', localConfig)
+      resolve(true)
+    } catch (e) {
+      log('updateSetting error', e)
+      resolve(false)
+    }
+  })
+}
+
+export const handleAppUpdate = async () => {
+  const version = getLocalVersion()
+  log('Version', version)
+  if (!compareLeftVersionLessThanRightVersions(version, window.appVersion)) {
+    return
+  }
+  log('Get new version', window.appVersion)
+  // @@@@ 每次更新localConfig后均需要手动处理新版本变更的本地数据结构
+  if (compareLeftVersionLessThanRightVersions(version, '1.19.4')) {
+    if (['key43', 'key57'].includes(localConfig.keyboard.keyboardType)) {
+      localConfig.keyboard.keyboardType = 'key61'
+    }
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
+    const keymapLength = Object.keys(localConfig.keyboard.keymap).length
+    localConfig.keyboard.source = keymapLength === 0 ? 1 : 2
+    localConfig.keyboard.defaultExpandFolder = null
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.21.0')) {
+    localConfig.search.isNewTabOpen = false
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.23.1')) {
+    localConfig.clockDigital.width = localConfig.clockDigital.fontSize / 2 + 8
+    const clockDigitalConfig = localConfig.clockDigital as typeof localConfig.clockDigital & {
+      letterSpacing?: number
+    }
+    delete clockDigitalConfig.letterSpacing
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.24.0')) {
+    localConfig.general.timeLang = localConfig.general.lang
+    localConfig.yearProgress = defaultConfig.yearProgress
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.24.3')) {
+    localConfig.general.backgroundColor = structuredClone(defaultConfig.general.backgroundColor)
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.25.9')) {
+    localConfig.calendar.festivalCountdown = true
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '1.27.0')) {
+    localConfig.general.isFocusMode = false
+    localConfig.general.focusVisibleWidgetMap = defaultFocusVisibleWidgetMap
+    if ((localConfig.general.openPageFocusElement as any) === 'bookmarkKeyboard') {
+      localConfig.general.openPageFocusElement = 'keyboard'
+    }
+    const oldBookmark = useStorageLocal('c-bookmark', defaultConfig.keyboard)
+    for (const key of Object.keys(defaultConfig.keyboard)) {
+      if (oldBookmark.value[key]) {
+        localConfig.keyboard[key] = oldBookmark.value[key]
+      }
+    }
+  }
+  // 更新local版本号
+  localConfig.general.version = window.appVersion
+  // updateSuccess()
+  // 刷新配置设置
+  await updateSetting()
 }

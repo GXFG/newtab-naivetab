@@ -1,4 +1,3 @@
-// 应用通用常量
 export const MERGE_CONFIG_DELAY = 2000
 export const MERGE_CONFIG_MAX_DELAY = 5000
 
@@ -32,5 +31,7 @@ export const FOCUE_ELEMENT_SELECTOR_MAP = {
   root: '#app',
   search: '#search .n-input__input-el',
   memo: '#memo .n-input__textarea-el',
-  bookmarkKeyboard: '#bookmark',
+  keyboard: '#keyboard',
 }
+
+export const PEXELS_API = 'Ao3fG3suWGpoXTKYLycwrSLHSITran9E3MoHxxsTVT5z1aHjCDxZcr3m'

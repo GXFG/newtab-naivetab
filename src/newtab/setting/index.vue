@@ -2,101 +2,13 @@
 import { useDebounceFn } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { localConfig, globalState } from '@/logic/store'
-import GeneralSetting from './GeneralSetting/index.vue'
-import BookmarkSetting from './BookmarkSetting/index.vue'
-import ClockSetting from './ClockSetting/index.vue'
-import CalendarSetting from './CalendarSetting.vue'
-import YearProgressSetting from './YearProgressSetting.vue'
-import SearchSetting from './SearchSetting.vue'
-import MemoSetting from './MemoSetting.vue'
-import WeatherSetting from './WeatherSetting.vue'
-import NewsSetting from './NewsSetting.vue'
-import AboutIndex from './AboutIndex.vue'
-import AboutSponsor from './AboutSponsor.vue'
-// @@@@ add Components 5
+import { settingsList } from './registry'
+import { ICONS } from '@/logic/icons'
 
-const tabPaneList = computed(() => [
-  {
-    name: 'general',
-    label: window.$t('setting.general'),
-    component: GeneralSetting,
-    iconName: 'ion:settings-outline',
-    iconSize: 18,
-  },
-  {
-    name: 'bookmark',
-    label: window.$t('setting.bookmark'),
-    component: BookmarkSetting,
-    iconName: 'ic:outline-keyboard-alt',
-    iconSize: 18,
-  },
-  {
-    name: 'clockDate',
-    label: `${window.$t('setting.clock')}/${window.$t('setting.date')}`,
-    component: ClockSetting,
-    iconName: 'grommet-icons:clock',
-    iconSize: 17,
-  },
-  {
-    name: 'calendar',
-    label: window.$t('setting.calendar'),
-    component: CalendarSetting,
-    iconName: 'uiw:date',
-    iconSize: 16,
-  },
-  {
-    name: 'yearProgress',
-    label: window.$t('setting.yearProgress'),
-    component: YearProgressSetting,
-    iconName: 'lets-icons:time-progress',
-    iconSize: 18,
-  },
-  {
-    name: 'search',
-    label: window.$t('setting.search'),
-    component: SearchSetting,
-    iconName: 'fluent:search-square-24-regular',
-    iconSize: 19,
-  },
-  {
-    name: 'memo',
-    label: window.$t('setting.memo'),
-    component: MemoSetting,
-    iconName: 'material-symbols:note-alt-outline',
-    iconSize: 18,
-  },
-  {
-    name: 'weather',
-    label: window.$t('setting.weather'),
-    component: WeatherSetting,
-    iconName: 'mdi:weather-cloudy',
-    iconSize: 19,
-  },
-  {
-    name: 'news',
-    label: window.$t('setting.news'),
-    component: NewsSetting,
-    iconName: 'majesticons:newspaper-line',
-    iconSize: 18,
-  },
-  {
-    name: 'aboutSponsor',
-    label: window.$t('setting.aboutSponsor'),
-    component: AboutSponsor,
-    iconName: 'ci:coffee-togo',
-    iconSize: 19,
-  },
-  {
-    name: 'aboutIndex',
-    label: window.$t('setting.aboutIndex'),
-    component: AboutIndex,
-    iconName: 'ix:about',
-    iconSize: 19,
-  },
-])
+const tabPaneList = computed(() => settingsList)
 
-const onTabsChange = (tabName: string) => {
-  globalState.currSettingTabValue = tabName
+const onTabsChange = (tabCode: string) => {
+  globalState.currSettingTabCode = tabCode
 }
 
 const drawerOpacity = ref(1)
@@ -137,7 +49,7 @@ watch(
     if (targetEl) {
       settingContentObserver.observe(targetEl)
     } else {
-      console.error('setting__content Target element not found!')
+      console.error('setting__content Target not found!')
     }
   },
 )
@@ -166,16 +78,16 @@ const settingContentHeightStyle = computed(() => `${settingContentHeight.value}p
       <NDrawerContent class="setting__content">
         <NTabs
           type="line"
-          :value="globalState.currSettingTabValue"
+          :value="globalState.currSettingTabCode"
           placement="left"
           animated
           @update:value="onTabsChange"
         >
           <NTabPane
             v-for="item of tabPaneList"
-            :key="item.name"
-            :name="item.name"
-            :tab="item.label"
+            :key="item.code"
+            :name="item.code"
+            :tab="item.labelKeys ? `${$t(item.labelKeys[0])} / ${$t(item.labelKeys[1])}` : $t(item.labelKey || '')"
           >
             <template #tab>
               <div class="tab__title">
@@ -185,7 +97,7 @@ const settingContentHeightStyle = computed(() => `${settingContentHeight.value}p
                 >
                   <Icon :icon="item.iconName" />
                 </div>
-                <span class="title__text">{{ item.label }}</span>
+                <span class="title__text">{{ item.labelKeys ? `${$t(item.labelKeys[0])} / ${$t(item.labelKeys[1])}` : $t(item.labelKey || '') }}</span>
               </div>
             </template>
 
@@ -201,7 +113,7 @@ const settingContentHeightStyle = computed(() => `${settingContentHeight.value}p
                 @mouseenter="handlerPreviewEnter"
                 @mouseleave="handlerPreviewLeave"
               >
-                <fe:picture />&nbsp;{{ $t('common.preview') }}
+                <Icon :icon="ICONS.preview" />&nbsp;{{ $t('common.preview') }}
               </NButton>
             </div>
           </template>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M, SECOND_MODAL_WIDTH } from '@/logic/const'
+import { Icon } from '@iconify/vue'
+import { ICONS } from '@/logic/icons'
+import { LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M, SECOND_MODAL_WIDTH } from '@/logic/constants/index'
 import { databaseStore } from '@/logic/database'
 import { compressedImageUrlToBase64 } from '@/logic/util'
 import { localConfig, localState } from '@/logic/store'
@@ -157,7 +159,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
                     style="margin-top: 3px"
                     @click="onSelectBackgroundImage"
                   >
-                    <uil:import />&nbsp;{{ $t('common.import') }}
+                    <Icon :icon="ICONS.importFile" />&nbsp;{{ $t('common.import') }}
                   </NButton>
                   <Tips :content="$t('general.localBackgroundTips')" />
                 </div>
@@ -189,7 +191,7 @@ const handleBackgroundImageCustomUrlBlur = () => {
               >
                 <NInput
                   v-model:value="localConfig.general.backgroundImageCustomUrls[localState.currAppearanceCode]"
-                  class="setting__item-element"
+                  class="setting__item-ele"
                   type="text"
                   placeholder="https://"
                   @blur="handleBackgroundImageCustomUrlBlur"

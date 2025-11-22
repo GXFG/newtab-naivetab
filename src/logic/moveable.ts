@@ -2,7 +2,7 @@ import { useToggle, useThrottleFn } from '@vueuse/core'
 import { globalState } from '@/logic/store'
 
 export const [isDragMode, toggleIsDragMode] = useToggle(false)
-export const [isElementDrawerVisible, toggleIsElementDrawerVisible] = useToggle(true)
+export const [isDraftDrawerVisible, toggleIsDraftDrawerVisible] = useToggle(true)
 
 export const moveState = reactive({
   width: window.innerWidth,
@@ -11,7 +11,7 @@ export const moveState = reactive({
   mouseDownTaskMap: new Map() as Map<string, (e: MouseEvent, resite?: boolean) => unknown>,
   mouseMoveTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
   mouseUpTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
-  isComponentDraging: false, // 是否正在拖动组件，拖动组件时动弹悬浮删除icon
+  isWidgetDraging: false, // 是否正在拖动组件，拖动组件时动弹悬浮删除icon
   isDeleteHover: false,
   // 辅助线
   isXAxisCenterVisible: false,
@@ -22,20 +22,20 @@ export const moveState = reactive({
   isRightBoundVisible: false,
   // 当前点击组件的属性
   currDragTarget: {
-    type: '' as TargetType | '',
-    name: '' as TargetName | '',
+    type: '' as EleTargetType | '',
+    code: '' as EleTargetCode | '',
   },
 })
 
-let lastIsElementDrawerVisible: null | boolean = null
+let lastIsDraftDrawerVisible: null | boolean = null
 let lastFrameId: number | null = null
 
 const onResetMoveState = () => {
-  moveState.isComponentDraging = false
+  moveState.isWidgetDraging = false
   moveState.isDeleteHover = false
   moveState.currDragTarget.type = ''
-  moveState.currDragTarget.name = ''
-  lastIsElementDrawerVisible = null
+  moveState.currDragTarget.code = ''
+  lastIsDraftDrawerVisible = null
   // 清除可能存在的动画帧
   if (lastFrameId !== null) {
     cancelAnimationFrame(lastFrameId)
@@ -43,14 +43,14 @@ const onResetMoveState = () => {
   }
 }
 
-export const handleToggleIsElementDrawerVisible = () => {
-  toggleIsElementDrawerVisible()
-  lastIsElementDrawerVisible = null
+export const handleToggleIsDraftDrawerVisible = () => {
+  toggleIsDraftDrawerVisible()
+  lastIsDraftDrawerVisible = null
 }
 
 export const getTargetDataFromEvent = (e: MouseEvent): {
-  type: TargetType | ''
-  name: TargetName | ''
+  type: EleTargetType | ''
+  code: EleTargetCode | ''
 } => {
   let target = e.target as HTMLInputElement
   try {
@@ -61,28 +61,28 @@ export const getTargetDataFromEvent = (e: MouseEvent): {
     // 忽略点击组件外其他区域的报错
     return {
       type: '',
-      name: '',
+      code: '',
     }
   }
   if (!target || !target.getAttribute) {
     return {
       type: '',
-      name: '',
+      code: '',
     }
   }
-  const type = target.getAttribute('data-target-type') as TargetType | ''
-  const name = (target.getAttribute('data-target-name') as TargetName) || ''
-  return { type, name }
+  const type = target.getAttribute('data-target-type') as EleTargetType | ''
+  const code = (target.getAttribute('data-target-code') as EleTargetCode) || ''
+  return { type, code }
 }
 
 const currMouseTaskKey = computed(() => {
   let taskKey = ''
-  if (moveState.currDragTarget.type === 'component') {
-    taskKey = moveState.currDragTarget.name
-  } else if (moveState.currDragTarget.type === 'element') {
-    taskKey = 'element-general'
+  if (moveState.currDragTarget.type === 'widget') {
+    taskKey = moveState.currDragTarget.code
+  } else if (moveState.currDragTarget.type === 'draft') {
+    taskKey = 'draft-common'
   }
-  return taskKey as TargetName
+  return taskKey as EleTargetCode
 })
 
 const handleMousedown = (e: MouseEvent) => {
@@ -91,7 +91,7 @@ const handleMousedown = (e: MouseEvent) => {
   }
   const targetData = getTargetDataFromEvent(e)
   moveState.currDragTarget.type = targetData.type
-  moveState.currDragTarget.name = targetData.name
+  moveState.currDragTarget.code = targetData.code
   if (!moveState.currDragTarget.type) {
     return
   }
@@ -115,11 +115,11 @@ const handleMousemove = (e: MouseEvent) => {
     if (task) {
       task(e)
     }
-    // 鼠标移动时隐藏Element抽屉
-    if (lastIsElementDrawerVisible === null) {
-      lastIsElementDrawerVisible = isElementDrawerVisible.value
-      if (lastIsElementDrawerVisible) {
-        toggleIsElementDrawerVisible(false)
+    // 鼠标移动时隐藏draft抽屉
+    if (lastIsDraftDrawerVisible === null) {
+      lastIsDraftDrawerVisible = isDraftDrawerVisible.value
+      if (lastIsDraftDrawerVisible) {
+        toggleIsDraftDrawerVisible(false)
       }
     }
 
@@ -142,9 +142,9 @@ const handleMouseup = (e: MouseEvent) => {
     task(e)
   }
   // 鼠标抬起时根据上一次状态决定是否打开Element抽屉
-  if (lastIsElementDrawerVisible) {
-    toggleIsElementDrawerVisible(true)
-    lastIsElementDrawerVisible = null
+  if (lastIsDraftDrawerVisible) {
+    toggleIsDraftDrawerVisible(true)
+    lastIsDraftDrawerVisible = null
   }
 }
 
@@ -174,8 +174,8 @@ watch(
       onResetMoveState()
       return
     }
-    // 开启编辑布局时默认打开Element抽屉
-    toggleIsElementDrawerVisible(true)
+    // 开启编辑布局时默认打开draft抽屉
+    toggleIsDraftDrawerVisible(true)
     nextTick(() => {
       handleMouseTaskListener(true)
     })

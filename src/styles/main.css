@@ -51,7 +51,18 @@ body {
   flex-wrap: wrap;
 }
 .setting__label {
-  opacity: 0.6;
+  margin: 18px 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  opacity: 0.75;
+  letter-spacing: 0.2px;
+  .label__icon {
+    display: inline-flex;
+    align-items: center;
+    font-size: 16px;
+  }
 }
 .setting__item_wrap {
   flex: 1;
@@ -70,7 +81,8 @@ body {
 .setting__item-ml {
   margin-left: 10px;
 }
-.setting__item-element {
+
+.setting__item-ele {
   flex: 0 0 auto;
   margin-left: 10px;
 }

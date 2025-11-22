@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { FAVORITE_IMAGE_MAX_COUNT } from '@/logic/const'
+import { FAVORITE_IMAGE_MAX_COUNT } from '@/logic/constants/index'
 import { createTab, downloadImageByUrl } from '@/logic/util'
 import { customPrimaryColor, localConfig, localState } from '@/logic/store'
 import { isImageLoading, getImageUrlFromName } from '@/logic/image'
+import { Icon } from '@iconify/vue'
+import { ICONS } from '@/logic/icons'
 
 const props = defineProps({
   data: {
@@ -120,7 +122,7 @@ const onUnFavoriteImage = () => {
         v-if="!isHasImage"
         class="image__empty"
       >
-        <ph:image-square />
+        <Icon :icon="ICONS.imageSquare" />
       </div>
 
       <!-- 懒加载的img不支持reactive变量 -->
@@ -142,7 +144,7 @@ const onUnFavoriteImage = () => {
       v-if="isCurrSelectedImage"
       class="image__current-mask"
     >
-      <ic:outline-check-circle />
+      <Icon :icon="ICONS.checkCircle" />
     </div>
 
     <!-- toolbar -->
@@ -156,7 +158,7 @@ const onUnFavoriteImage = () => {
       >
         <template #trigger>
           <div class="toolbar__icon">
-            <ic:outline-info />
+            <Icon :icon="ICONS.info" />
           </div>
         </template>
         <p>{{ props.data.desc }}</p>
@@ -166,14 +168,14 @@ const onUnFavoriteImage = () => {
         class="toolbar__icon"
         @click="onViewImage()"
       >
-        <tdesign:zoom-in />
+        <Icon :icon="ICONS.zoomIn" />
       </div>
 
       <div
         class="toolbar__icon"
         @click="onSaveImage()"
       >
-        <ri:download-2-fill />
+        <Icon :icon="ICONS.downloadFill" />
       </div>
 
       <div
@@ -181,7 +183,7 @@ const onUnFavoriteImage = () => {
         class="toolbar__icon"
         @click="onFavoriteImage()"
       >
-        <mi:favorite />
+        <Icon :icon="ICONS.favorite" />
       </div>
 
       <!-- delete -->
@@ -191,7 +193,7 @@ const onUnFavoriteImage = () => {
       >
         <template #trigger>
           <div class="toolbar__icon">
-            <ri:delete-bin-6-line />
+            <Icon :icon="ICONS.deleteBin" />
           </div>
         </template>
         {{ $t('common.confirm') }}?

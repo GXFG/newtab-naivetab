@@ -1,0 +1,347 @@
+<!-- 最外层div的style会被用来存放v-bind的css变量，不能再进行:style绑定操作 -->
+<!-- 第二层div用来统一控制编辑布局下的cursor样式 -->
+<script setup lang="ts">
+import { DRAG_TRIGGER_DISTANCE } from '@/logic/constants/index'
+import { moveState, isDragMode } from '@/logic/moveable'
+import { getStyleConst, localConfig } from '@/logic/store'
+
+const props = defineProps({
+  dragStyle: {
+    type: String,
+    required: true,
+  },
+  widgetCode: {
+    type: String,
+    required: true,
+  },
+})
+
+const emit = defineEmits(['update:dragStyle'])
+
+const moveableWrapStyle = computed(() => (isDragMode.value ? 'cursor: move !important;' : ''))
+
+const state = reactive({
+  targetContainerEle: null as null | Element,
+  startState: {
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    clientX: 0,
+    clientY: 0,
+  },
+  // 使用CSS变量存储位置信息，减少样式计算和DOM操作
+  cssVars: {
+    xOffset: '0',
+    yOffset: '0',
+    xTranslate: '0',
+    yTranslate: '0',
+  },
+  // 缓存上一次的OffsetKey，用于优化style更新
+  lastXOffsetKey: '',
+  lastYOffsetKey: '',
+})
+
+const offsetData = reactive({
+  xOffsetKey: '',
+  xOffsetValue: -1,
+  xTranslateValue: -1,
+  yOffsetKey: '',
+  yOffsetValue: -1,
+  yTranslateValue: -1,
+})
+
+const getPercentageInWidth = (currWidth: number) => +((currWidth / moveState.width) * 100).toFixed(5)
+const getPercentageInHeight = (currHeight: number) => +((currHeight / moveState.height) * 100).toFixed(5)
+
+/**
+ * @param e
+ * @param resite 是否重置位置（以光标位置为组件的中心），DraftDrawer使用以光标位置为组件的中心开始拖拽
+ */
+const startDrag = async (e: MouseEvent, resite = false) => {
+  await nextTick() // 确保可以获取到 targetContainerEle
+  if (!state.targetContainerEle) {
+    return
+  }
+  const { top, left, width, height } = state.targetContainerEle.getBoundingClientRect()
+  state.startState = {
+    top,
+    left,
+    width,
+    height,
+    clientX: e.clientX,
+    clientY: e.clientY,
+  }
+  if (resite) {
+    // 默认光标位置为component的中心
+    const offsetTop = e.clientY - height / 2
+    const offsetLeft = e.clientX - width / 2
+    localConfig[props.widgetCode as WidgetCodes].layout.xOffsetValue = getPercentageInWidth(offsetLeft)
+    localConfig[props.widgetCode as WidgetCodes].layout.yOffsetValue = getPercentageInHeight(offsetTop)
+    state.startState.top = offsetTop
+    state.startState.left = offsetLeft
+  }
+  moveState.isWidgetDraging = true
+}
+
+const stopDrag = () => {
+  moveState.isWidgetDraging = false
+  moveState.isXAxisCenterVisible = false
+  moveState.isYAxisCenterVisible = false
+  moveState.isTopBoundVisible = false
+  moveState.isBottomBoundVisible = false
+  moveState.isLeftBoundVisible = false
+  moveState.isRightBoundVisible = false
+  if (offsetData.xOffsetKey.length !== 0) {
+    localConfig[props.widgetCode as WidgetCodes].layout.xOffsetKey = offsetData.xOffsetKey
+  }
+  if (offsetData.yOffsetKey.length !== 0) {
+    localConfig[props.widgetCode as WidgetCodes].layout.yOffsetKey = offsetData.yOffsetKey
+  }
+  if (offsetData.xOffsetValue !== -1) {
+    localConfig[props.widgetCode as WidgetCodes].layout.xOffsetValue = offsetData.xOffsetValue
+  }
+  if (offsetData.yOffsetValue !== -1) {
+    localConfig[props.widgetCode as WidgetCodes].layout.yOffsetValue = offsetData.yOffsetValue
+  }
+  if (offsetData.xTranslateValue !== -1) {
+    localConfig[props.widgetCode as WidgetCodes].layout.xTranslateValue = offsetData.xTranslateValue
+  }
+  if (offsetData.yTranslateValue !== -1) {
+    localConfig[props.widgetCode as WidgetCodes].layout.yTranslateValue = offsetData.yTranslateValue
+  }
+  // 重置dragStyle，避免覆盖组件真正的配置containerStyle属性（:style="dragStyle || containerStyle"），导致导入设置文件不会刷新布局
+  emit('update:dragStyle', '')
+  state.lastXOffsetKey = ''
+  state.lastYOffsetKey = ''
+}
+
+const onDragging = (e: MouseEvent) => {
+  const mouseDiffX = e.clientX - state.startState.clientX
+  const mouseDiffY = e.clientY - state.startState.clientY
+  offsetData.xOffsetKey = ''
+  offsetData.yOffsetKey = ''
+  offsetData.xOffsetValue = state.startState.left + mouseDiffX
+  offsetData.yOffsetValue = state.startState.top + mouseDiffY
+  offsetData.xTranslateValue = 0
+  offsetData.yTranslateValue = 0
+
+  const xCenterLine = moveState.width / 2
+  const yCenterLine = moveState.height / 2
+  const targetCenterX = offsetData.xOffsetValue + state.startState.width / 2
+  const targetCenterY = offsetData.yOffsetValue + state.startState.height / 2
+
+  if (offsetData.xOffsetValue <= xCenterLine) {
+    offsetData.xOffsetKey = 'left'
+    offsetData.xOffsetValue = getPercentageInWidth(offsetData.xOffsetValue)
+  } else {
+    offsetData.xOffsetKey = 'right'
+    offsetData.xOffsetValue = getPercentageInWidth(moveState.width - state.startState.width - offsetData.xOffsetValue)
+  }
+  if (offsetData.yOffsetValue <= yCenterLine) {
+    offsetData.yOffsetKey = 'top'
+    offsetData.yOffsetValue = getPercentageInHeight(offsetData.yOffsetValue)
+  } else {
+    offsetData.yOffsetKey = 'bottom'
+    offsetData.yOffsetValue = getPercentageInHeight(moveState.height - state.startState.height - offsetData.yOffsetValue)
+  }
+
+  // 水平/垂直居中 & 对应辅助线
+  if (Math.abs(targetCenterX - xCenterLine) <= DRAG_TRIGGER_DISTANCE) {
+    moveState.isXAxisCenterVisible = true
+    offsetData.xOffsetKey = 'left'
+    offsetData.xOffsetValue = 50
+    offsetData.xTranslateValue = -50
+  } else {
+    moveState.isXAxisCenterVisible = false
+    offsetData.xTranslateValue = 0
+  }
+  if (Math.abs(targetCenterY - yCenterLine) <= DRAG_TRIGGER_DISTANCE) {
+    moveState.isYAxisCenterVisible = true
+    offsetData.yOffsetKey = 'top'
+    offsetData.yOffsetValue = 50
+    offsetData.yTranslateValue = -50
+  } else {
+    moveState.isYAxisCenterVisible = false
+    offsetData.yTranslateValue = 0
+  }
+
+  // 画布边界限制 & 对应辅助线
+  if (offsetData.xOffsetValue < 0) {
+    offsetData.xOffsetValue = 0
+    if (offsetData.xOffsetKey === 'left') {
+      moveState.isLeftBoundVisible = true
+    } else {
+      moveState.isRightBoundVisible = true
+    }
+  } else {
+    moveState.isLeftBoundVisible = false
+    moveState.isRightBoundVisible = false
+  }
+  if (offsetData.yOffsetValue < 0) {
+    offsetData.yOffsetValue = 0
+    if (offsetData.yOffsetKey === 'top') {
+      moveState.isTopBoundVisible = true
+    } else {
+      moveState.isBottomBoundVisible = true
+    }
+  } else {
+    moveState.isTopBoundVisible = false
+    moveState.isBottomBoundVisible = false
+  }
+
+  // 使用CSS变量更新样式，减少DOM操作
+  state.cssVars.xOffset = `${offsetData.xOffsetValue}vw`
+  state.cssVars.yOffset = `${offsetData.yOffsetValue}vh`
+  state.cssVars.xTranslate = `${offsetData.xTranslateValue}%`
+  state.cssVars.yTranslate = `${offsetData.yTranslateValue}%`
+
+  // 只在 xOffsetKey 或 yOffsetKey 值变化时才触发 update:dragStyle 事件
+  if (!state.lastXOffsetKey || !state.lastYOffsetKey || state.lastXOffsetKey !== offsetData.xOffsetKey || state.lastYOffsetKey !== offsetData.yOffsetKey) {
+    const style = `${offsetData.xOffsetKey}:var(--x-offset); ${offsetData.yOffsetKey}:var(--y-offset); transform:translate(var(--x-translate), var(--y-translate))`
+    emit('update:dragStyle', style)
+    // 更新缓存的值
+    state.lastXOffsetKey = offsetData.xOffsetKey
+    state.lastYOffsetKey = offsetData.yOffsetKey
+  }
+}
+onMounted(() => {
+  moveState.mouseDownTaskMap.set(props.widgetCode, startDrag)
+  moveState.mouseMoveTaskMap.set(props.widgetCode, onDragging)
+  moveState.mouseUpTaskMap.set(props.widgetCode, stopDrag)
+})
+
+onUnmounted(() => {
+  moveState.mouseDownTaskMap.delete(props.widgetCode)
+  moveState.mouseMoveTaskMap.delete(props.widgetCode)
+  moveState.mouseUpTaskMap.delete(props.widgetCode)
+})
+
+const isEnabled = computed(() => localConfig[props.widgetCode as WidgetCodes].enabled)
+const isCurrentActive = computed(() => props.widgetCode === moveState.currDragTarget.code)
+
+const isFocusVisible = computed(() => {
+  if (!localConfig.general.isFocusMode) {
+    return true
+  }
+  return !!localConfig.general.focusVisibleWidgetMap[props.widgetCode as WidgetCodes]
+})
+
+const modifyMoveableWrapClass = async (isAdd: boolean, ...classList: string[]) => {
+  await nextTick()
+  if (!state.targetContainerEle) {
+    state.targetContainerEle = document.querySelector(`.${props.widgetCode}__container`)
+  }
+  if (!state.targetContainerEle) {
+    return
+  }
+  const targetClassList = state.targetContainerEle.classList
+  if (targetClassList === undefined) {
+    return
+  }
+  if (isAdd) {
+    targetClassList.add(...classList)
+  } else {
+    targetClassList.remove(...classList)
+  }
+}
+
+// 开启/关闭DragMode时，添加或移除默认样式
+watch(isDragMode, (value) => {
+  if (!isEnabled.value) {
+    return
+  }
+  if (value) {
+    modifyMoveableWrapClass(true, 'widget-auxiliary-line', 'widget-bg-hover')
+  } else {
+    modifyMoveableWrapClass(false, 'widget-auxiliary-line', 'widget-bg-hover', 'widget-active', 'widget-delete')
+  }
+})
+
+// 编辑布局状态下，启用当前组件时添加active样式
+watch(
+  () => localConfig[props.widgetCode as WidgetCodes].enabled,
+  (value) => {
+    if (!isDragMode.value) {
+      return
+    }
+    if (value) {
+      modifyMoveableWrapClass(true, 'widget-auxiliary-line', 'widget-bg-hover', 'widget-active')
+    } else {
+      // 移除组件
+      state.targetContainerEle = null
+    }
+  },
+)
+
+// 选中当前组件时添加active样式
+watch(isCurrentActive, (value) => {
+  modifyMoveableWrapClass(value, 'widget-active')
+})
+
+// 拖拽/放下组件时，移除/添加组件的hover样式
+watch(
+  () => moveState.isWidgetDraging,
+  (value) => {
+    if (isCurrentActive.value && isEnabled.value) {
+      modifyMoveableWrapClass(!value, 'widget-bg-hover')
+    }
+  },
+)
+
+// 为当前组件添加delete样式
+watch(
+  () => moveState.isDeleteHover,
+  (value) => {
+    if (isCurrentActive.value && isEnabled.value) {
+      modifyMoveableWrapClass(value, 'widget-delete')
+    }
+  },
+)
+
+const auxiliaryLineWidget = getStyleConst('auxiliaryLineWidget')
+const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
+const bgMoveableWidgetActive = getStyleConst('bgMoveableWidgetActive')
+const moveableToolDeleteBtnColor = getStyleConst('moveableToolDeleteBtnColor')
+</script>
+
+<template>
+  <div
+    :style="moveableWrapStyle"
+    class="moveable__wrap"
+    :class="{ 'moveable__wrap--hidden': !isFocusVisible }"
+  >
+    <slot />
+  </div>
+</template>
+
+<style>
+.moveable__wrap {
+  --x-offset: v-bind(state.cssVars.xOffset);
+  --y-offset: v-bind(state.cssVars.yOffset);
+  --x-translate: v-bind(state.cssVars.xTranslate);
+  --y-translate: v-bind(state.cssVars.yTranslate);
+  transition: opacity 0.25s ease;
+}
+
+.widget-auxiliary-line {
+  outline: 2px dashed v-bind(auxiliaryLineWidget) !important;
+}
+
+.widget-bg-hover:hover {
+  background-color: v-bind(bgMoveableWidgetMain) !important;
+}
+
+.widget-active {
+  background-color: v-bind(bgMoveableWidgetActive) !important;
+}
+
+.widget-delete {
+  background-color: v-bind(moveableToolDeleteBtnColor) !important;
+}
+
+.moveable__wrap--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+</style>

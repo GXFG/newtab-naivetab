@@ -11,7 +11,7 @@ import { setupApp } from '~/logic/common-setup'
 
   // communication example: send previous tab title from background page
   onMessage('tab-prev', ({ data }) => {
-    console.log(`[vitesse-webext] Navigate from page "${data.title}"`)
+    console.log(`[vitesse-webext] Navigate from page "${data}"`)
   })
 
   // mount component to context window

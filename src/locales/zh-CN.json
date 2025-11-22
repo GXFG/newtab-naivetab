@@ -105,12 +105,14 @@
     "pleaseWait": "执行中，请稍等",
     "imageTooLarge": "图片体积过大",
     "favoriteLimt": "收藏已达上限",
-    "elementDrawerTips": "将组件拖到工作区"
+    "widgetDrawerTips": "将组件拖到工作区"
   },
   "rightMenu": {
     "editLayout": "编辑布局",
     "doneEdit": "完成",
-    "fullscreen": "全屏模式"
+    "fullscreen": "全屏模式",
+    "focusMode": "专注模式",
+    "editFocusMode": "编辑专注模式"
   },
   "sponsor": {
     "title": "🔥「续命模式激活！今日代码含 ☕️ 量 200%」",
@@ -143,8 +145,9 @@
   "setting": {
     "general": "通用",
     "mainLabel": "设置",
+    "focusMode": "专注模式",
     "bookmark": "书签",
-    "bookmarkKeyboard": "键盘书签",
+    "keyboard": "键盘书签",
     "bookmarkConfig": "书签配置",
     "clock": "时钟",
     "clockDigital": "数字时钟",
@@ -190,12 +193,13 @@
     "language": "主语言",
     "timeLanguage": "日期语言",
     "saveCurrendImage": "保存当前背景",
-    "localBackgroundTips": "本地背景图不会进行云同步，仅在当前设备生效"
+    "localBackgroundTips": "本地背景图不会进行云同步，仅在当前设备生效",
+    "focusModeTips": "在专注模式下，仅显示你选择的组件"
   },
   "clock": {
     "apMark": "a.m./p.m."
   },
-  "bookmark": {
+  "keyboard": {
     "bookmarkSource": "书签来源",
     "systemBrowser": "浏览器",
     "thisExtension": "本扩展程序",
