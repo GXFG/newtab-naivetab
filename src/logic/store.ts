@@ -458,6 +458,17 @@ export const handleAppUpdate = async () => {
       }
     }
   }
+  if (compareLeftVersionLessThanRightVersions(version, '1.27.0')) {
+    localConfig.keyboard.shellBackgroundBlur = defaultConfig.keyboard.shellBackgroundBlur
+    localConfig.keyboard.plateBackgroundBlur = defaultConfig.keyboard.plateBackgroundBlur
+    localConfig.keyboard.keycapBackgroundBlur = defaultConfig.keyboard.keycapBackgroundBlur
+    localConfig.bookmarkFolder.backgroundBlur = defaultConfig.bookmarkFolder.backgroundBlur
+    localConfig.calendar.backgroundBlur = defaultConfig.calendar.backgroundBlur
+    localConfig.memo.backgroundBlur = defaultConfig.memo.backgroundBlur
+    localConfig.news.backgroundBlur = defaultConfig.news.backgroundBlur
+    localConfig.search.backgroundBlur = defaultConfig.search.backgroundBlur
+    localConfig.yearProgress.backgroundBlur = defaultConfig.yearProgress.backgroundBlur
+  }
   // 更新local版本号
   localConfig.general.version = window.appVersion
   // updateSuccess()

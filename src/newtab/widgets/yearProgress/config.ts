@@ -21,6 +21,7 @@ export const WIDGET_CONFIG = {
   borderWidth: 1,
   borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
   backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
+  backgroundBlur: 5,
   isShadowEnabled: true,
   shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
   isRealtime: false,

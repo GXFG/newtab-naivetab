@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { measureMountedPerf } from '@/logic/util'
 import { addTimerTask, removeTimerTask } from '@/logic/task'
 import { currDayjsLang, localConfig, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
@@ -26,10 +25,6 @@ watch(
   },
   { immediate: true },
 )
-
-onMounted(() => {
-  measureMountedPerf(WIDGET_CODE)
-})
 
 const dragStyle = ref('')
 const containerStyle = getLayoutStyle(WIDGET_CODE)

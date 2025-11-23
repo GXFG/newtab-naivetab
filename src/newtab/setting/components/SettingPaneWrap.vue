@@ -159,6 +159,34 @@ const isRenderField = (field: string) => {
     </NFormItem>
 
     <NFormItem
+      v-if="isRenderField('backgroundBlur')"
+      :label="$t('common.blur')"
+    >
+      <div class="setting__item_wrap">
+        <div
+          class="item__box"
+          style="width: 100%"
+        >
+          <NSlider
+            v-model:value="localConfig[props.widgetCode].backgroundBlur"
+            :step="0.1"
+            :min="0"
+            :max="30"
+            :tooltip="false"
+          />
+          <NInputNumber
+            v-model:value="localConfig[props.widgetCode].backgroundBlur"
+            class="setting__item-ele setting__input-number"
+            size="small"
+            :step="0.1"
+            :min="0"
+            :max="30"
+          />
+        </div>
+      </div>
+    </NFormItem>
+
+    <NFormItem
       v-if="isRenderField('fontFamily')"
       :label="$t('common.font')"
     >

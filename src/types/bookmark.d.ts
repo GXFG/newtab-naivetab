@@ -73,3 +73,5 @@ interface BookmarkItem {
   url: string
   name?: string
 }
+
+type BookmarkNode = chrome.bookmarks.BookmarkTreeNode

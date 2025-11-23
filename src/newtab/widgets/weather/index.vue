@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { measureMountedPerf } from '@/logic/util'
 import { getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
 import { updateWeather, refreshWeather } from '@/newtab/widgets/weather/logic'
 import WidgetWrap from '../WidgetWrap.vue'
@@ -11,7 +10,6 @@ const isRender = getIsWidgetRender(WIDGET_CODE)
 
 onMounted(() => {
   updateWeather()
-  measureMountedPerf(WIDGET_CODE)
 })
 
 // 开启主开关后立即更新数据

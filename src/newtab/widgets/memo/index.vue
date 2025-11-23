@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { measureMountedPerf } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
 import { globalState, localConfig, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
@@ -24,10 +23,6 @@ const handleMemoInput = () => {
   }
 }
 
-onMounted(() => {
-  measureMountedPerf(WIDGET_CODE)
-})
-
 watch(
   () => isDragMode.value,
   (data) => {
@@ -51,6 +46,7 @@ const customBorderRadius = getStyleField(WIDGET_CODE, 'borderRadius', 'vmin')
 const customBorderColor = getStyleField(WIDGET_CODE, 'borderColor')
 const customBackgroundColor = getStyleField(WIDGET_CODE, 'backgroundColor')
 const customShadowColor = getStyleField(WIDGET_CODE, 'shadowColor')
+const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
 </script>
 
 <template>
@@ -100,6 +96,7 @@ const customShadowColor = getStyleField(WIDGET_CODE, 'shadowColor')
     position: absolute;
     border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
+    backdrop-filter: blur(v-bind(customBackgroundBlur));
     .n-input__border {
       border: 0 !important;
     }

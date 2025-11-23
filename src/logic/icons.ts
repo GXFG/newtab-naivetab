@@ -111,12 +111,14 @@ export const WIDGET_ICON_META: Record<WidgetCodes, WidgetIconMeta> = {
   weather: { iconName: ICONS.weather, widgetSize: 35 },
   memo: { iconName: ICONS.memo, widgetSize: 35 },
   news: { iconName: ICONS.news, widgetSize: 30 },
+  bookmarkFolder: { iconName: ICONS.folderOutline, widgetSize: 30 },
 }
 
 export const SETTING_ICON_META: Record<settingPanes, SettingIconMeta> = {
   general: { iconName: ICONS.settings, settingSize: 18 },
   focusMode: { iconName: ICONS.focus, settingSize: 18 },
   keyboard: { iconName: ICONS.keyboard, settingSize: 18 },
+  bookmarkFolder: { iconName: ICONS.folderOutline, settingSize: 17 },
   clockDate: { iconName: ICONS.clockAnalog, settingSize: 17 },
   calendar: { iconName: ICONS.calendar, settingSize: 16 },
   yearProgress: { iconName: ICONS.yearProgress, settingSize: 18 },

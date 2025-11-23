@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { measureMountedPerf } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
@@ -47,7 +46,6 @@ const onMouseDownKey = (event: MouseEvent, url: string) => {
 
 onMounted(() => {
   updateNews()
-  measureMountedPerf(WIDGET_CODE)
 })
 
 // 开启主开关后立即更新数据
@@ -73,6 +71,7 @@ const customUrlActiveColor = getStyleField(WIDGET_CODE, 'urlActiveColor')
 const customTabActiveBackgroundColor = getStyleField(WIDGET_CODE, 'tabActiveBackgroundColor')
 const customBackgroundColor = getStyleField(WIDGET_CODE, 'backgroundColor')
 const customShadowColor = getStyleField(WIDGET_CODE, 'shadowColor')
+const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
 
 const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
 </script>
@@ -190,6 +189,7 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
     position: absolute;
     border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
+    backdrop-filter: blur(v-bind(customBackgroundBlur));
     .news__wrap {
       width: v-bind(customWidth);
       .n-tabs .n-tab-pane {

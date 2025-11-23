@@ -8,5 +8,6 @@ export const WIDGET_CODE_LIST = [
   'clockAnalog',
   'date',
   'memo',
+  'bookmarkFolder',
   'search',
 ] as WidgetCodes[]

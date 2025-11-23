@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { measureMountedPerf } from '@/logic/util'
 import { addVisibilityTask, addTimerTask, removeTimerTask } from '@/logic/task'
 import { localState, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
@@ -134,10 +133,6 @@ addVisibilityTask(WIDGET_CODE, (hidden) => {
       state.isAnimationEnable = true
     }, ENABLE_ANIMATION_DELAY_TIME)
   }
-})
-
-onMounted(() => {
-  measureMountedPerf(WIDGET_CODE)
 })
 
 const dragStyle = ref('')

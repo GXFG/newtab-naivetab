@@ -24,6 +24,7 @@ export const WIDGET_CONFIG = {
   descFontSize: 10,
   descFontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
   backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
+  backgroundBlur: 5,
   isBorderEnabled: false,
   borderWidth: 1,
   borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],

@@ -148,6 +148,7 @@
     "focusMode": "Focus Mode",
     "bookmark": "Bookmark",
     "keyboard": "Keyboard",
+    "bookmarkFolder": "Folder Bookmark",
     "bookmarkConfig": "BookmarkConfig",
     "clock": "Clock",
     "clockDigital": "DigitalClock",
@@ -228,6 +229,18 @@
     "nameLabel": "Name",
     "namePlaceholder": "Optional",
     "shortcutLabel": "Shortcut"
+  },
+  "bookmarkFolder": {
+    "defaultDisplayFolderTitle": "Expand Folder",
+    "rootDirectory": "Root directory",
+    "layoutInline": "Layout (columns × rows)",
+    "layoutColumns": "Columns",
+    "hideIcon": "Hide icon",
+    "hideName": "Hide name",
+    "iconSize": "Icon size",
+    "itemHeight": "Item height",
+    "itemGap": "Item gap",
+    "itemBorderRadius": "Item radius"
   },
   "search": {
     "searchEngine": "Search engine",

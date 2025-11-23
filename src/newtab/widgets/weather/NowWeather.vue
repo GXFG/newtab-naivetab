@@ -16,7 +16,7 @@ const state = reactive({
 const isWeatherWarning = computed(() => weatherState.value.warning.list.length > 0)
 
 const warningVisible = computed(() => {
-  if (isDragMode.value) {
+  if (isDragMode.value || localConfig.general.isFocusMode) {
     return false
   }
   return state.isWarningVisible || weatherState.value.state.isWarningVisible

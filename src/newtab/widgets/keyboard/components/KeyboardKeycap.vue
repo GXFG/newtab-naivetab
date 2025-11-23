@@ -41,13 +41,14 @@ const keycapTitle = computed(() => {
 })
 
 const onMouseDownKey = (event: MouseEvent, keyCode: string) => {
+  if (isDragMode.value) {
+    return
+  }
+  // 避免拖拽模式下页面级的拖拽监听拿不到事件，无法进入拖动流程
   // 阻止默认行为（例如浏览器中键的滚轮模式切换）
   event.preventDefault()
   // 阻止事件冒泡
   event.stopPropagation()
-  if (isDragMode.value) {
-    return
-  }
   const { button, shiftKey, altKey } = event
   // 忽略鼠标右键
   if (button === 2) {
@@ -79,6 +80,8 @@ const customBookmarkFaviconSize = getStyleField(WIDGET_CODE, 'faviconSize')
 const customKeycapBorderRadius = getStyleField(WIDGET_CODE, 'keycapBorderRadius', 'vmin')
 const customKeycapTextPadding = getStyleField(WIDGET_CODE, 'keycapSize', 'vmin', 0.08)
 const customKeycapIconPadding = getStyleField(WIDGET_CODE, 'keycapSize', 'vmin', 0.08)
+const customKeycapBackgroundBlur = getStyleField(WIDGET_CODE, 'keycapBackgroundBlur', 'px')
+
 // keycap-flat
 const customKeycapStageFlatPadding = getStyleField(WIDGET_CODE, 'keycapSize', 'vmin', 0.08)
 // keycap-gmk
@@ -281,6 +284,7 @@ const keycapStageClassName = computed(() => {
   height: 100%;
   color: v-bind(customMainFontColor);
   background-color: v-bind(customMainBackgroundColor);
+  backdrop-filter: blur(v-bind(customKeycapBackgroundBlur));
   border-radius: v-bind(customKeycapBorderRadius);
   border-style: solid;
   box-sizing: border-box;

@@ -13,6 +13,7 @@ const SETTING_ORDER: settingPanes[] = [
   'general',
   'focusMode',
   'keyboard',
+  'bookmarkFolder',
   'clockDate',
   'calendar',
   'yearProgress',

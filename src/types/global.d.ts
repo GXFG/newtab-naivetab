@@ -15,12 +15,12 @@ interface Window {
 }
 
 // @@@@ add widget type
-type WidgetCodes = 'keyboard' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news'
+type WidgetCodes = 'keyboard' | 'bookmarkFolder' | 'clockDigital' | 'clockAnalog' | 'date' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news'
 type ConfigField = WidgetCodes | 'general'
 type EleTargetCode = WidgetCodes | 'draft-common'
 type EleTargetType = 'widget' | 'draft'
 
-type settingPanes = 'general' | 'focusMode' | 'keyboard' | 'clockDate' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news' | 'aboutIndex' | 'aboutSponsor'
+type settingPanes = 'general' | 'focusMode' | 'keyboard' | 'bookmarkFolder' | 'clockDate' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news' | 'aboutIndex' | 'aboutSponsor'
 
 type KeydownTaskKey = 'keyboard' | 'draft-tool'
 

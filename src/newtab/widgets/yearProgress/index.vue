@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { measureMountedPerf } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
 import { addTimerTask, removeTimerTask } from '@/logic/task'
 import { currDayjsLang, localConfig, getIsWidgetRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
@@ -52,10 +51,6 @@ const onRender = () => {
   calculateProgress()
   updateDate()
 }
-
-onMounted(() => {
-  measureMountedPerf(WIDGET_CODE)
-})
 
 watch(
   [
@@ -110,6 +105,7 @@ const customBorderWidth = getStyleField(WIDGET_CODE, 'borderWidth', 'px')
 const customBorderColor = getStyleField(WIDGET_CODE, 'borderColor')
 const customBackgroundColor = getStyleField(WIDGET_CODE, 'backgroundColor')
 const customShadowColor = getStyleField(WIDGET_CODE, 'shadowColor')
+const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
 
 const customTextActiveColor = getStyleField(WIDGET_CODE, 'textActiveColor')
 const customTextLineHeight = getStyleField(WIDGET_CODE, 'textLineHeight')
@@ -195,6 +191,7 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
     height: v-bind(customHeight);
     border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
+    backdrop-filter: blur(v-bind(customBackgroundBlur));
     .progress__text {
       flex: 0 0 auto;
       width: 30%;

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
-import { measureMountedPerf } from '@/logic/util'
 import { useDebounceFn } from '@vueuse/core'
 import { gaProxy } from '@/logic/gtag'
 import { createTab, sleep } from '@/logic/util'
@@ -125,10 +124,6 @@ const onClearValue = async () => {
   state.suggestList = []
 }
 
-onMounted(() => {
-  measureMountedPerf(WIDGET_CODE)
-})
-
 const getBaiduSuggest = async () => {
   if (state.searchValue.length === 0 || state.isSuggestSelecting) {
     return
@@ -187,6 +182,7 @@ const customBorderWidth = getStyleField(WIDGET_CODE, 'borderWidth', 'px')
 const customBorderColor = getStyleField(WIDGET_CODE, 'borderColor')
 const customBackgroundColor = getStyleField(WIDGET_CODE, 'backgroundColor')
 const customShadowColor = getStyleField(WIDGET_CODE, 'shadowColor')
+const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
 </script>
 
 <template>
@@ -267,6 +263,7 @@ const customShadowColor = getStyleField(WIDGET_CODE, 'shadowColor')
     align-items: center;
     border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
+    backdrop-filter: blur(v-bind(customBackgroundBlur));
     .n-input__border,
     .n-input__state-border {
       border: 0 !important;

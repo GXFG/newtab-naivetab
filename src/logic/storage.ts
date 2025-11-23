@@ -131,6 +131,7 @@ export const handleMissedUploadConfig = async () => {
   }
 }
 
+// Todo 本地localStorage清空时会导致本地部分配置丢失，并重新上传覆盖了云端配置
 /**
  * 载入远程配置信息
  * chrome.storage 格式示例：

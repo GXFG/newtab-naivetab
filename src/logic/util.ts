@@ -156,14 +156,3 @@ export const compressedImageUrlToBase64 = async (imageUrl: string): Promise<stri
   const smallBase64 = await blobToBase64(smallBlob)
   return smallBase64
 }
-
-export const measureMountedPerf = (widgetCode: string) => {
-  try {
-    performance.measure(`widget:${widgetCode}:load->mounted`, `widget:${widgetCode}:load:start`, `widget:${widgetCode}:mounted`)
-    const list = performance.getEntriesByName(`widget:${widgetCode}:load->mounted`, 'measure')
-    const m = list[0]
-    if (m) {
-      log(`perf mounted ${widgetCode}`, `${Math.round(m.duration)} ms`)
-    }
-  } catch { void 0 }
-}

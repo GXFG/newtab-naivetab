@@ -148,6 +148,7 @@
     "focusMode": "专注模式",
     "bookmark": "书签",
     "keyboard": "键盘书签",
+    "bookmarkFolder": "文件夹书签",
     "bookmarkConfig": "书签配置",
     "clock": "时钟",
     "clockDigital": "数字时钟",
@@ -228,6 +229,18 @@
     "nameLabel": "书签",
     "namePlaceholder": "可选",
     "shortcutLabel": "快捷键"
+  },
+  "bookmarkFolder": {
+    "defaultDisplayFolderTitle": "默认展开文件夹",
+    "rootDirectory": "根目录",
+    "layoutInline": "布局（列 × 行）",
+    "layoutColumns": "布局列数",
+    "hideIcon": "隐藏图标",
+    "hideName": "隐藏名称",
+    "iconSize": "图标大小",
+    "itemHeight": "书签项高度",
+    "itemGap": "项目间距",
+    "itemBorderRadius": "项目圆角"
   },
   "search": {
     "searchEngine": "搜索引擎",

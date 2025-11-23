@@ -243,7 +243,7 @@ const onResetSetting = () => {
           v-model:value="localConfig.general.bgBlur"
           :step="0.1"
           :min="0"
-          :max="200"
+          :max="30"
           :tooltip="false"
         />
         <NInputNumber
@@ -252,7 +252,7 @@ const onResetSetting = () => {
           size="small"
           :step="0.1"
           :min="0"
-          :max="200"
+          :max="30"
         />
       </NFormItem>
 

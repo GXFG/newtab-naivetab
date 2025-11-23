@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
-import { measureMountedPerf } from '@/logic/util'
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
 import { gaProxy } from '@/logic/gtag'
 import { isDragMode } from '@/logic/moveable'
@@ -176,10 +175,6 @@ const onRender = () => {
 }
 
 onMounted(() => {
-  measureMountedPerf(WIDGET_CODE)
-})
-
-onMounted(() => {
   onRender()
 })
 
@@ -282,6 +277,7 @@ const customDescFontColor = getStyleField(WIDGET_CODE, 'descFontColor')
 const customHolidayFontColor = getStyleField(WIDGET_CODE, 'holidayFontColor')
 
 const customBackgroundColor = getStyleField(WIDGET_CODE, 'backgroundColor')
+const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
 const customBorderWidth = getStyleField(WIDGET_CODE, 'borderWidth', 'px')
 const customBorderColor = getStyleField(WIDGET_CODE, 'borderColor')
 const customShadowColor = getStyleField(WIDGET_CODE, 'shadowColor')
@@ -581,6 +577,7 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
     text-align: center;
     border-radius: v-bind(customBorderRadius);
     background-color: v-bind(customBackgroundColor);
+    backdrop-filter: blur(v-bind(customBackgroundBlur));
     user-select: none;
     overflow: hidden;
     .calendar__options {

@@ -307,6 +307,23 @@ const onOpenPopup = () => {
               :max="30"
             />
           </NFormItem>
+          <NFormItem :label="$t('common.blur')">
+            <NSlider
+              v-model:value="localConfig.keyboard.shellBackgroundBlur"
+              :step="0.1"
+              :min="0"
+              :max="30"
+              :tooltip="false"
+            />
+            <NInputNumber
+              v-model:value="localConfig.keyboard.shellBackgroundBlur"
+              class="setting__item-ele setting__input-number"
+              size="small"
+              :step="0.1"
+              :min="0"
+              :max="30"
+            />
+          </NFormItem>
           <NFormItem
             :label="$t('common.shadow')"
             class="n-form-item--color"
@@ -373,6 +390,23 @@ const onOpenPopup = () => {
                 :max="10"
               />
             </NFormItem>
+            <NFormItem :label="$t('common.blur')">
+              <NSlider
+                v-model:value="localConfig.keyboard.plateBackgroundBlur"
+                :step="0.1"
+                :min="0"
+                :max="30"
+                :tooltip="false"
+              />
+              <NInputNumber
+                v-model:value="localConfig.keyboard.plateBackgroundBlur"
+                class="setting__item-ele setting__input-number"
+                size="small"
+                :step="0.1"
+                :min="0"
+                :max="30"
+              />
+            </NFormItem>
           </template>
         </template>
 
@@ -434,6 +468,24 @@ const onOpenPopup = () => {
             :step="0.1"
             :min="0"
             :max="100"
+          />
+        </NFormItem>
+
+        <NFormItem :label="$t('common.blur')">
+          <NSlider
+            v-model:value="localConfig.keyboard.keycapBackgroundBlur"
+            :step="0.1"
+            :min="0"
+            :max="30"
+            :tooltip="false"
+          />
+          <NInputNumber
+            v-model:value="localConfig.keyboard.keycapBackgroundBlur"
+            class="setting__item-ele setting__input-number"
+            size="small"
+            :step="0.1"
+            :min="0"
+            :max="30"
           />
         </NFormItem>
 

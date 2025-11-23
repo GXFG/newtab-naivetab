@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { measureMountedPerf } from '@/logic/util'
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import { isDragMode } from '@/logic/moveable'
 import { KEYBOARD_NOT_ALLOW_KEYCODE_LIST } from '@/logic/constants/keyboard'
@@ -59,7 +58,6 @@ const keyboardTask = (e: KeyboardEvent) => {
 
 onMounted(() => {
   addKeydownTask(WIDGET_CODE, keyboardTask)
-  measureMountedPerf(WIDGET_CODE)
 })
 
 onUnmounted(() => {
@@ -75,6 +73,7 @@ const customShellHorizontalPadding = getStyleField(WIDGET_CODE, 'shellHorizontal
 const customShellBorderRadius = getStyleField(WIDGET_CODE, 'shellBorderRadius', 'px')
 const customShellColor = getStyleField(WIDGET_CODE, 'shellColor')
 const customShellShadowColor = getStyleField(WIDGET_CODE, 'shellShadowColor')
+const customShellBackgroundBlur = getStyleField(WIDGET_CODE, 'shellBackgroundBlur', 'px')
 
 const customPlateSinglePadding = getStyleField(WIDGET_CODE, 'platePadding', 'vmin')
 const customPlateDoublePadding = getStyleField(WIDGET_CODE, 'platePadding', 'vmin', 2)
@@ -82,6 +81,7 @@ const customPlateEdge = computed(() => `-${customPlateSinglePadding.value}`)
 const customPlateSize = computed(() => `${customPlateDoublePadding.value}`)
 const customPlateBorderRadius = getStyleField(WIDGET_CODE, 'plateBorderRadius', 'px')
 const customPlateColor = getStyleField(WIDGET_CODE, 'plateColor')
+const customPlateBackgroundBlur = getStyleField(WIDGET_CODE, 'plateBackgroundBlur', 'px')
 
 const customKeyboardKeyFontFamily = getStyleField(WIDGET_CODE, 'keycapBookmarkFontFamily')
 const customKeyboardKeyFontSize = getStyleField(WIDGET_CODE, 'keycapBookmarkFontSize', 'vmin')
@@ -182,6 +182,7 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
           height: calc(100% + v-bind(customPlateSize));
           background: v-bind(customPlateColor);
           border-radius: v-bind(customPlateBorderRadius);
+          backdrop-filter: blur(v-bind(customPlateBackgroundBlur));
         }
       }
     }
@@ -190,6 +191,7 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
     padding: v-bind(customShellVerticalPadding) v-bind(customShellHorizontalPadding);
     border-radius: v-bind(customShellBorderRadius);
     background-color: v-bind(customShellColor) !important;
+    backdrop-filter: blur(v-bind(customShellBackgroundBlur));
   }
   .keyboard__container-shell--shadow {
     background: linear-gradient(110deg, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.15) 100%),
