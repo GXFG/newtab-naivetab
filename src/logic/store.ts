@@ -229,16 +229,7 @@ const updateSuccess = () => {
   })
 }
 
-export const getIsWidgetRender = (widgetName: WidgetCodes) => computed(() => localConfig[widgetName].enabled)
-
-export const getLayoutStyle = (name: ConfigField) => {
-  return computed(() => {
-    let style = `${localConfig[name].layout.xOffsetKey}:${localConfig[name].layout.xOffsetValue}vw;`
-    style += `${localConfig[name].layout.yOffsetKey}:${localConfig[name].layout.yOffsetValue}vh;`
-    style += `transform:translate(${localConfig[name].layout.xTranslateValue}%, ${localConfig[name].layout.yTranslateValue}%);`
-    return style
-  })
-}
+export const getIsWidgetRender = (widgetCode: WidgetCodes) => computed(() => localConfig[widgetCode].enabled)
 
 export const getStyleConst = (field: string) => {
   return computed(() => {
@@ -250,10 +241,10 @@ export const getStyleConst = (field: string) => {
  * e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)
  * 当unit为vmin时会自动将 ratio * 0.1
  */
-export const getStyleField = (component: ConfigField, field: string, unit?: string, ratio?: number) => {
+export const getStyleField = (configCode: ConfigField, field: string, unit?: string, ratio?: number) => {
   return computed(() => {
     const fieldList = field.split('.')
-    let targetValue: any = fieldList.reduce((r, c) => r[c], localConfig[component])
+    let targetValue: any = fieldList.reduce((r, c) => r[c], localConfig[configCode])
 
     if (Array.isArray(targetValue)) {
       // color
@@ -414,12 +405,7 @@ export const handleAppUpdate = async () => {
     return
   }
   log('Get new version', window.appVersion)
-  // @@@@ 每次更新localConfig后均需要手动处理新版本变更的本地数据结构
-  if (compareLeftVersionLessThanRightVersions(version, '1.19.4')) {
-    if (['key43', 'key57'].includes(localConfig.keyboard.keyboardType)) {
-      localConfig.keyboard.keyboardType = 'key61'
-    }
-  }
+  // @@@@ 更新localConfig后需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
     const keymapLength = Object.keys(localConfig.keyboard.keymap).length
     localConfig.keyboard.source = keymapLength === 0 ? 1 : 2
@@ -451,23 +437,20 @@ export const handleAppUpdate = async () => {
     if ((localConfig.general.openPageFocusElement as any) === 'bookmarkKeyboard') {
       localConfig.general.openPageFocusElement = 'keyboard'
     }
+    localConfig.calendar.backgroundBlur = defaultConfig.calendar.backgroundBlur
+    localConfig.memo.backgroundBlur = defaultConfig.memo.backgroundBlur
+    localConfig.news.backgroundBlur = defaultConfig.news.backgroundBlur
+    localConfig.search.backgroundBlur = defaultConfig.search.backgroundBlur
+    localConfig.yearProgress.backgroundBlur = defaultConfig.yearProgress.backgroundBlur
+    localConfig.keyboard.shellBackgroundBlur = defaultConfig.keyboard.shellBackgroundBlur
+    localConfig.keyboard.plateBackgroundBlur = defaultConfig.keyboard.plateBackgroundBlur
+    localConfig.keyboard.keycapBackgroundBlur = defaultConfig.keyboard.keycapBackgroundBlur
     const oldBookmark = useStorageLocal('c-bookmark', defaultConfig.keyboard)
     for (const key of Object.keys(defaultConfig.keyboard)) {
       if (oldBookmark.value[key]) {
         localConfig.keyboard[key] = oldBookmark.value[key]
       }
     }
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.27.0')) {
-    localConfig.keyboard.shellBackgroundBlur = defaultConfig.keyboard.shellBackgroundBlur
-    localConfig.keyboard.plateBackgroundBlur = defaultConfig.keyboard.plateBackgroundBlur
-    localConfig.keyboard.keycapBackgroundBlur = defaultConfig.keyboard.keycapBackgroundBlur
-    localConfig.bookmarkFolder.backgroundBlur = defaultConfig.bookmarkFolder.backgroundBlur
-    localConfig.calendar.backgroundBlur = defaultConfig.calendar.backgroundBlur
-    localConfig.memo.backgroundBlur = defaultConfig.memo.backgroundBlur
-    localConfig.news.backgroundBlur = defaultConfig.news.backgroundBlur
-    localConfig.search.backgroundBlur = defaultConfig.search.backgroundBlur
-    localConfig.yearProgress.backgroundBlur = defaultConfig.yearProgress.backgroundBlur
   }
   // 更新local版本号
   localConfig.general.version = window.appVersion

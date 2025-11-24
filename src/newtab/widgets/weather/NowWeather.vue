@@ -4,7 +4,7 @@ import { ICONS } from '@/logic/icons'
 import { URL_QWEATHER_HOME, WEATHER_TEMPERATURE_UNIT_MAP, WEATHER_SPEED_UNIT_MAP } from '@/logic/constants/index'
 import { createTab } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
-import { localConfig, getStyleField } from '@/logic/store'
+import { localConfig, getStyleField, globalState } from '@/logic/store'
 import { weatherState, weatherIndicesInfo, weatherWarningInfo } from '@/newtab/widgets/weather/logic'
 import { WIDGET_CODE } from './config'
 
@@ -13,10 +13,21 @@ const state = reactive({
   isIndicesVisible: false,
 })
 
+// 挂载完成后，才显示warningPopover，避免位置定位错误
+const isMounted = ref(false)
+
+onMounted(() => {
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      isMounted.value = true
+    })
+  })
+})
+
 const isWeatherWarning = computed(() => weatherState.value.warning.list.length > 0)
 
 const warningVisible = computed(() => {
-  if (isDragMode.value || localConfig.general.isFocusMode) {
+  if (isDragMode.value || localConfig.general.isFocusMode || globalState.isSettingDrawerVisible) {
     return false
   }
   return state.isWarningVisible || weatherState.value.state.isWarningVisible
@@ -104,7 +115,7 @@ const customXLargeFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'vmin', 2)
             <div v-if="isWeatherWarning">
               <NPopover
                 :style="{ width: '500px' }"
-                :show="warningVisible"
+                :show="isMounted && warningVisible"
                 trigger="manual"
               >
                 <template #trigger>

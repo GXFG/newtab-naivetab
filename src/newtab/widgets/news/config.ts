@@ -19,14 +19,14 @@ export const WIDGET_CONFIG = {
   fontFamily: 'Arial',
   fontSize: 14,
   fontColor: ['rgba(15, 23, 42, 1)', 'rgba(255, 255, 255, 1)'],
-  backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 1)'],
-  isBorderEnabled: true,
+  backgroundColor: ['rgba(255, 255, 255, 0.7)', 'rgba(52, 52, 57, 0.7)'],
+  isBorderEnabled: false,
   borderWidth: 1,
   borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
   backgroundBlur: 5,
   isShadowEnabled: true,
   shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
-  tabActiveBackgroundColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
+  tabActiveBackgroundColor: ['rgba(239, 239, 245, 0.8)', 'rgba(73, 73, 77, 0.8)'],
   urlActiveColor: ['rgba(36, 64, 179, 1)', 'rgba(155, 177, 254, 1)'],
 }
 

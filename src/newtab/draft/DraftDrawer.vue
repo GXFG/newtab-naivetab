@@ -111,7 +111,7 @@ onUnmounted(() => {
 
 const onDeleteComponent = () => {
   localConfig[moveState.currDragTarget.code].enabled = false
-  gaProxy('move', ['widget', moveState.currDragTarget.code], {
+  gaProxy('delete', ['widget', moveState.currDragTarget.code], {
     enabled: false,
   })
 }
@@ -178,7 +178,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
         <p class="header__tips">{{ $t('prompts.widgetDrawerTips') }}</p>
       </div>
 
-      <div class="drawer__content">
+      <div class="draft__content">
         <div
           v-for="item in widgets"
           v-show="!item.disabled"
@@ -201,7 +201,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
     <div
       v-if="isDragMode"
       class="tool__delete"
-      :class="{ 'tool__delete--active': isDragMode && moveState.isWidgetDraging }"
+      :class="{ 'tool__delete--active': isDragMode && moveState.isWidgetStartDrag }"
       @mouseenter="handlerDeleteMouseEnter"
       @mouseleave="handlerDeleteMouseLeave"
       @mouseup="handlerDeleteMouseUp"
@@ -311,7 +311,7 @@ const borderMoveableToolItem = getStyleConst('borderMoveableToolItem')
       }
     }
 
-    .drawer__content {
+    .draft__content {
       flex: 1;
       display: flex;
       flex-wrap: wrap;

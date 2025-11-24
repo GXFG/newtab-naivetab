@@ -6,11 +6,9 @@ import { gaProxy } from '@/logic/gtag'
 import { createTab, sleep } from '@/logic/util'
 import { getBaiduSugrec } from '@/api'
 import { isDragMode } from '@/logic/moveable'
-import { localConfig, globalState, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { localConfig, globalState, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
-
-const isRender = getIsWidgetRender(WIDGET_CODE)
 
 const state = reactive({
   placementValue: 'bottom' as Placement,
@@ -169,8 +167,6 @@ watch(isDragMode, () => {
   onClearValue()
 })
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')
 const customFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'vmin')
@@ -186,67 +182,56 @@ const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="search"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="search"
-      data-target-type="widget"
-      data-target-code="search"
+      class="search__container"
+      :class="{
+        'search__container--focus': localConfig.search.isBorderEnabled && globalState.isSearchFocused,
+        'search__container--border': localConfig.search.isBorderEnabled,
+        'search__container--shadow': localConfig.search.isShadowEnabled,
+      }"
     >
-      <div
-        class="search__container"
-        :style="dragStyle || containerStyle"
-        :class="{
-          'search__container--focus': localConfig.search.isBorderEnabled && globalState.isSearchFocused,
-          'search__container--border': localConfig.search.isBorderEnabled,
-          'search__container--shadow': localConfig.search.isShadowEnabled,
-        }"
-      >
-        <NInputGroup>
-          <NDropdown
-            class="search__dropdown"
-            :show="localConfig.search.suggestionEnabled && state.isSuggestVisible && state.suggestList.length !== 0"
-            :options="state.suggestList"
-            :placement="state.placementValue"
-            :show-arrow="true"
-            :keyboard="false"
-            :style="`width: ${customWidth};`"
-            @select="handleSelectSuggest"
-            @clickoutside="handleSelectOutside"
-          >
-            <NInput
-              v-model:value="state.searchValue"
-              type="text"
-              size="large"
-              class="input__main"
-              :class="{ 'input__main--move': isDragMode }"
-              :placeholder="localConfig.search.placeholder || localConfig.search.urlName"
-              :loading="state.isSuggestLoading"
-              clearable
-              @focus="handleSearchFocus"
-              @blur="handleSearchBlur"
-              @input="handleSearchInput"
-              @keydown="handleSearchKeydown"
-            />
-          </NDropdown>
-          <NButton
-            v-if="localConfig.search.iconEnabled"
-            class="input__search"
-            :class="{ 'input__search--move': isDragMode }"
+      <NInputGroup>
+        <NDropdown
+          class="search__dropdown"
+          :show="localConfig.search.suggestionEnabled && state.isSuggestVisible && state.suggestList.length !== 0"
+          :options="state.suggestList"
+          :placement="state.placementValue"
+          :show-arrow="true"
+          :keyboard="false"
+          :style="`width: ${customWidth};`"
+          @select="handleSelectSuggest"
+          @clickoutside="handleSelectOutside"
+        >
+          <NInput
+            v-model:value="state.searchValue"
+            type="text"
             size="large"
-            text
-            @click="onSearch"
-          >
-            <Icon
-              :icon="ICONS.searchAction"
-              class="search__icon"
-            />
-          </NButton>
-        </NInputGroup>
-      </div>
+            class="input__main"
+            :class="{ 'input__main--move': isDragMode }"
+            :placeholder="localConfig.search.placeholder || localConfig.search.urlName"
+            :loading="state.isSuggestLoading"
+            clearable
+            @focus="handleSearchFocus"
+            @blur="handleSearchBlur"
+            @input="handleSearchInput"
+            @keydown="handleSearchKeydown"
+          />
+        </NDropdown>
+        <NButton
+          v-if="localConfig.search.iconEnabled"
+          class="input__search"
+          :class="{ 'input__search--move': isDragMode }"
+          size="large"
+          text
+          @click="onSearch"
+        >
+          <Icon
+            :icon="ICONS.searchAction"
+            class="search__icon"
+          />
+        </NButton>
+      </NInputGroup>
     </div>
   </WidgetWrap>
 </template>

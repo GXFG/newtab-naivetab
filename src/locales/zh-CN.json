@@ -94,7 +94,7 @@
     "photoOfTheDay": "Bing每日壁纸"
   },
   "permission": {
-    "bookmark": "键盘书签需要浏览器权限访问您的书签"
+    "bookmark": "需要浏览器权限访问您的书签"
   },
   "popup": {
     "browserBookmark": "浏览器书签",

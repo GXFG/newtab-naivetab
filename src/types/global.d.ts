@@ -22,7 +22,7 @@ type EleTargetType = 'widget' | 'draft'
 
 type settingPanes = 'general' | 'focusMode' | 'keyboard' | 'bookmarkFolder' | 'clockDate' | 'calendar' | 'yearProgress' | 'search' | 'weather' | 'memo' | 'news' | 'aboutIndex' | 'aboutSponsor'
 
-type KeydownTaskKey = 'keyboard' | 'draft-tool'
+type KeydownTaskKey = 'draft-tool' | 'keyboard' | 'bookmarkFolder'
 
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
 type DatabaseStore = 'localBackgroundImages' | 'currBackgroundImages'

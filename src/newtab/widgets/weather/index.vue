@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { getIsWidgetRender, getStyleField } from '@/logic/store'
 import { updateWeather, refreshWeather } from '@/newtab/widgets/weather/logic'
 import WidgetWrap from '../WidgetWrap.vue'
 import NowWeather from './NowWeather.vue'
@@ -20,31 +20,18 @@ watch(isRender, (value) => {
   refreshWeather()
 })
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')
 const customFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'px')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="weather"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="weather"
-      data-target-type="widget"
-      data-target-code="weather"
+      class="weather__container"
     >
-      <div
-        class="weather__container"
-        :style="dragStyle || containerStyle"
-      >
-        <NowWeather />
-        <ForecastWeather />
-      </div>
+      <NowWeather />
+      <ForecastWeather />
     </div>
   </WidgetWrap>
 </template>

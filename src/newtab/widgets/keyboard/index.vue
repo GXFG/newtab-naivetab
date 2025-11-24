@@ -4,12 +4,10 @@ import { isDragMode } from '@/logic/moveable'
 import { KEYBOARD_NOT_ALLOW_KEYCODE_LIST } from '@/logic/constants/keyboard'
 import { currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
 import { state as keyboardState, openPage, handleSpecialKeycapExec, getKeycapType, getKeycapUrl, handlePressKeycap, getCustomKeycapWidth } from '~/newtab/widgets/keyboard/logic'
-import { localConfig, getIsWidgetRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
+import { localConfig, getStyleField, getStyleConst } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import KeyboardKeycap from './components/KeyboardKeycap.vue'
 import { WIDGET_CODE } from './config'
-
-const isRender = getIsWidgetRender(WIDGET_CODE)
 
 // keyboard listener
 let keyboardTimer: ReturnType<typeof setTimeout>
@@ -64,10 +62,6 @@ onUnmounted(() => {
   removeKeydownTask(WIDGET_CODE)
 })
 
-const dragStyle = ref('')
-
-const containerStyle = getLayoutStyle(WIDGET_CODE)
-
 const customShellVerticalPadding = getStyleField(WIDGET_CODE, 'shellVerticalPadding', 'vmin')
 const customShellHorizontalPadding = getStyleField(WIDGET_CODE, 'shellHorizontalPadding', 'vmin')
 const customShellBorderRadius = getStyleField(WIDGET_CODE, 'shellBorderRadius', 'px')
@@ -113,50 +107,39 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="keyboard"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="keyboard"
-      data-target-type="widget"
-      data-target-code="keyboard"
+      class="keyboard__container"
+      :class="{
+        'keyboard__container--drag': isDragMode,
+        'keyboard__container--hover': !isDragMode,
+        'keyboard__container-shell': localConfig.keyboard.isShellVisible,
+        'keyboard__container-shell--shadow': localConfig.keyboard.isShellVisible && localConfig.keyboard.isShellShadowEnabled,
+      }"
     >
       <div
-        class="keyboard__container"
-        :style="dragStyle || containerStyle"
-        :class="{
-          'keyboard__container--drag': isDragMode,
-          'keyboard__container--hover': !isDragMode,
-          'keyboard__container-shell': localConfig.keyboard.isShellVisible,
-          'keyboard__container-shell--shadow': localConfig.keyboard.isShellVisible && localConfig.keyboard.isShellShadowEnabled,
-        }"
+        v-for="(rowItem, rowIndex) in currKeyboardConfig.list"
+        :key="rowIndex"
+        class="keyboard__row"
       >
         <div
-          v-for="(rowItem, rowIndex) in currKeyboardConfig.list"
-          :key="rowIndex"
-          class="keyboard__row"
+          v-for="keyCode in rowItem"
+          :key="keyCode"
+          class="row__keycap-wrap"
+          :style="getKeycapWrapStyle(keyCode)"
         >
           <div
-            v-for="keyCode in rowItem"
-            :key="keyCode"
-            class="row__keycap-wrap"
-            :style="getKeycapWrapStyle(keyCode)"
-          >
-            <div
-              v-if="localConfig.keyboard.isShellVisible && localConfig.keyboard.isPlateVisible"
-              class="row__keycap-plate"
-            />
-            <KeyboardKeycap :key-code="keyCode" />
-          </div>
+            v-if="localConfig.keyboard.isShellVisible && localConfig.keyboard.isPlateVisible"
+            class="row__keycap-plate"
+          />
+          <KeyboardKeycap :key-code="keyCode" />
         </div>
       </div>
     </div>
   </WidgetWrap>
 </template>
 
-<style scoped>
+<style>
 #keyboard {
   font-family: v-bind(customKeyboardKeyFontFamily);
   font-size: v-bind(customKeyboardKeyFontSize);

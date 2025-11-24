@@ -45,7 +45,7 @@ const MEASUREMENT_ID = 'G-83GHS69B9N'
 const API_SECRET = '4LhaOjgsQ4WK1zz5mkAmSQ'
 const DEFAULT_ENGAGEMENT_TIME_IN_MSEC = 100
 
-type TGaProxyType = 'view' | 'click' | 'move' | 'press' | 'error'
+type TGaProxyType = 'view' | 'click' | 'move' | 'delete' | 'press' | 'error'
 
 export const gaProxy = async (type: TGaProxyType, names: string[], payload = {}) => {
   const params = {

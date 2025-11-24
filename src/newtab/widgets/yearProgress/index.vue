@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isDragMode } from '@/logic/moveable'
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import { currDayjsLang, localConfig, getIsWidgetRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
+import { currDayjsLang, localConfig, getIsWidgetRender, getStyleField, getStyleConst } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -88,9 +88,6 @@ onMounted(() => {
   onRender()
 })
 
-const dragStyle = ref('')
-
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customPadding = getStyleField(WIDGET_CODE, 'padding', 'vmin')
 const customWidth = getStyleField(WIDGET_CODE, 'width', 'vmin')
 const customHeight = getStyleField(WIDGET_CODE, 'height', 'vmin')
@@ -120,56 +117,45 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="yearProgress"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="yearProgress"
-      data-target-type="widget"
-      data-target-code="yearProgress"
+      class="yearProgress__container"
+      :class="{
+        'yearProgress__container--drag': isDragMode,
+        'yearProgress__container--shadow': localConfig.yearProgress.isShadowEnabled,
+        'yearProgress__container--border': localConfig.yearProgress.isBorderEnabled,
+      }"
     >
-      <div
-        class="yearProgress__container"
-        :style="dragStyle || containerStyle"
-        :class="{
-          'yearProgress__container--drag': isDragMode,
-          'yearProgress__container--shadow': localConfig.yearProgress.isShadowEnabled,
-          'yearProgress__container--border': localConfig.yearProgress.isBorderEnabled,
-        }"
-      >
-        <div class="progress__text">
-          <p class="text__day">
-            <span class="text__active">{{ state.passDay }}</span>
-            <span class="text__blur"> / {{ state.totalDay }}</span>
-          </p>
-          <p
-            v-if="localConfig.yearProgress.isPercentageEnabled"
-            class="text__percent"
-          >
-            <span class="text__active">{{ state.percent }}</span>
-            <span class="text__blur"> %</span>
-          </p>
-          <p
-            v-if="localConfig.yearProgress.isDateEnabled"
-            class="text__date"
-          >
-            <span class="text__blur">{{ state.date }}</span>
-          </p>
-        </div>
+      <div class="progress__text">
+        <p class="text__day">
+          <span class="text__active">{{ state.passDay }}</span>
+          <span class="text__blur"> / {{ state.totalDay }}</span>
+        </p>
+        <p
+          v-if="localConfig.yearProgress.isPercentageEnabled"
+          class="text__percent"
+        >
+          <span class="text__active">{{ state.percent }}</span>
+          <span class="text__blur"> %</span>
+        </p>
+        <p
+          v-if="localConfig.yearProgress.isDateEnabled"
+          class="text__date"
+        >
+          <span class="text__blur">{{ state.date }}</span>
+        </p>
+      </div>
 
-        <div class="progress__table">
-          <div
-            v-for="item in state.tableList"
-            :key="item.dayNum"
-            :title="`${item.dayNum} @ ${item.date}`"
-            class="table__block"
-            :class="{
-              'table__block--active': item.dayNum <= state.passDay,
-            }"
-          />
-        </div>
+      <div class="progress__table">
+        <div
+          v-for="item in state.tableList"
+          :key="item.dayNum"
+          :title="`${item.dayNum} @ ${item.date}`"
+          class="table__block"
+          :class="{
+            'table__block--active': item.dayNum <= state.passDay,
+          }"
+        />
       </div>
     </div>
   </WidgetWrap>

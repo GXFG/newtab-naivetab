@@ -3,7 +3,7 @@ import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
 import { state, newsLocalState, updateNews, onRetryNews } from '@/newtab/widgets/news/logic'
-import { localConfig, getIsWidgetRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
+import { localConfig, getIsWidgetRender, getStyleField, getStyleConst } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -56,8 +56,6 @@ watch(isRender, (value) => {
   updateNews()
 })
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customMargin = getStyleField(WIDGET_CODE, 'margin', 'vmin')
 const customWidth = getStyleField(WIDGET_CODE, 'width', 'vmin')
 const customHeight = getStyleField(WIDGET_CODE, 'height', 'vmin')
@@ -77,104 +75,93 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="news"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="news"
-      data-target-type="widget"
-      data-target-code="news"
+      class="news__container"
+      :class="{
+        'news__container--drag': isDragMode,
+        'news__container--border': localConfig.news.isBorderEnabled,
+        'news__container--shadow': localConfig.news.isShadowEnabled,
+      }"
     >
-      <div
-        class="news__container"
-        :style="dragStyle || containerStyle"
-        :class="{
-          'news__container--drag': isDragMode,
-          'news__container--border': localConfig.news.isBorderEnabled,
-          'news__container--shadow': localConfig.news.isShadowEnabled,
-        }"
-      >
-        <div class="news__wrap">
-          <NTabs
-            :value="state.currNewsTabValue"
-            type="segment"
-            animated
-            justify-content="space-evenly"
-            @before-leave="() => !isDragMode"
-            @update:value="handleChangeCurrTab"
+      <div class="news__wrap">
+        <NTabs
+          :value="state.currNewsTabValue"
+          type="segment"
+          animated
+          justify-content="space-evenly"
+          @before-leave="() => !isDragMode"
+          @update:value="handleChangeCurrTab"
+        >
+          <NTabPane
+            v-for="source in selectNewsSourceList"
+            :key="source.value"
+            :name="source.value"
+            :tab="source.label"
           >
-            <NTabPane
-              v-for="source in selectNewsSourceList"
-              :key="source.value"
-              :name="source.value"
-              :tab="source.label"
+            <div
+              class="news__content"
+              :class="{
+                'news__content--hover': !isDragMode,
+              }"
             >
-              <div
-                class="news__content"
-                :class="{
-                  'news__content--hover': !isDragMode,
-                }"
-              >
-                <template v-if="newsLocalState[source.value] && newsLocalState[source.value].list.length !== 0">
-                  <div
-                    v-for="(item, index) in newsLocalState[source.value] && newsLocalState[source.value].list"
-                    :key="item.desc"
-                    class="content__item"
+              <template v-if="newsLocalState[source.value] && newsLocalState[source.value].list.length !== 0">
+                <div
+                  v-for="(item, index) in newsLocalState[source.value] && newsLocalState[source.value].list"
+                  :key="item.desc"
+                  class="content__item"
+                  :class="{
+                    'content__item--hover': !isDragMode,
+                  }"
+                >
+                  <p
+                    class="row__index"
                     :class="{
-                      'content__item--hover': !isDragMode,
+                      row__index__1: index === 0,
+                      row__index__2: index === 1,
+                      row__index__3: index === 2,
                     }"
                   >
-                    <p
-                      class="row__index"
-                      :class="{
-                        row__index__1: index === 0,
-                        row__index__2: index === 1,
-                        row__index__3: index === 2,
-                      }"
-                    >
-                      {{ index + 1 }}
-                    </p>
+                    {{ index + 1 }}
+                  </p>
 
-                    <n-popover
-                      :delay="500"
-                      trigger="hover"
-                      :style="`width: ${customWidth}; line-height: 1.5;`"
-                    >
-                      <template #trigger>
-                        <div
-                          class="row__content"
-                          @click="onOpenPage(item.url)"
-                          @mousedown="onMouseDownKey($event, item.url)"
-                        >
-                          <p class="content__desc">
-                            {{ item.desc }}
-                          </p>
-                          <p class="content__hot">
-                            {{ item.hot }}
-                          </p>
-                        </div>
-                      </template>
-                      <span>{{ item.desc }}</span>
-                    </n-popover>
-                  </div>
-                </template>
-                <div
-                  v-else
-                  class="content__empty"
-                >
-                  <NButton
-                    ghost
-                    @click="onRetryNews(source.value)"
+                  <n-popover
+                    :delay="500"
+                    trigger="hover"
+                    :style="`width: ${customWidth}; line-height: 1.5;`"
                   >
-                    {{ `${$t('common.login')} / ${$t('common.refresh')}` }}
-                  </NButton>
+                    <template #trigger>
+                      <div
+                        class="row__content"
+                        @click="onOpenPage(item.url)"
+                        @mousedown="onMouseDownKey($event, item.url)"
+                      >
+                        <p class="content__desc">
+                          {{ item.desc }}
+                        </p>
+                        <p class="content__hot">
+                          {{ item.hot }}
+                        </p>
+                      </div>
+                    </template>
+                    <span>{{ item.desc }}</span>
+                  </n-popover>
                 </div>
+              </template>
+              <div
+                v-else
+                class="content__empty"
+              >
+                <NButton
+                  ghost
+                  @click="onRetryNews(source.value)"
+                >
+                  {{ `${$t('common.login')} / ${$t('common.refresh')}` }}
+                </NButton>
               </div>
-            </NTabPane>
-          </NTabs>
-        </div>
+            </div>
+          </NTabPane>
+        </NTabs>
       </div>
     </div>
   </WidgetWrap>

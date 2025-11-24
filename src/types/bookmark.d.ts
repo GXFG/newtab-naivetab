@@ -58,6 +58,8 @@ interface KeyboardConfigItem {
   marginBottom?: number // default 0
 }
 
+type BookmarkNode = chrome.bookmarks.BookmarkTreeNode
+
 interface ChromeBookmarkItem {
   dateAdded: number // 1618456881151
   id: string // "130"
@@ -73,5 +75,3 @@ interface BookmarkItem {
   url: string
   name?: string
 }
-
-type BookmarkNode = chrome.bookmarks.BookmarkTreeNode

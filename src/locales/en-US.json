@@ -93,7 +93,7 @@
     "photoOfTheDay": "Daily Bing Wallpaper"
   },
   "permission": {
-    "bookmark": "Keyboard Bookmark requires browser permissions to access your bookmarks"
+    "bookmark": "Requires browser permissions to access your bookmarks"
   },
   "popup": {
     "browserBookmark": "Browser Bookmark",

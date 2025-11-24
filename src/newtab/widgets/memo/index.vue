@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { isDragMode } from '@/logic/moveable'
-import { globalState, localConfig, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { globalState, localConfig, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
-
-const isRender = getIsWidgetRender(WIDGET_CODE)
 
 const onFocus = () => {
   globalState.isMemoFocused = true
@@ -34,8 +32,6 @@ watch(
   },
 )
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customWidth = getStyleField(WIDGET_CODE, 'width', 'vmin')
 const customHeight = getStyleField(WIDGET_CODE, 'height', 'vmin')
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
@@ -50,39 +46,28 @@ const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="memo"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="memo"
-      data-target-type="widget"
-      data-target-code="memo"
+      class="memo__container"
+      :class="{
+        'memo__container--border': localConfig.memo.isBorderEnabled,
+        'memo__container--shadow': localConfig.memo.isShadowEnabled,
+      }"
     >
-      <div
-        class="memo__container"
-        :style="dragStyle || containerStyle"
-        :class="{
-          'memo__container--border': localConfig.memo.isBorderEnabled,
-          'memo__container--shadow': localConfig.memo.isShadowEnabled,
-        }"
-      >
-        <div class="memo_wrap">
-          <NInput
-            v-model:value="localConfig.memo.content"
-            class="memo__input"
-            :class="{ 'memo__input--move': isDragMode }"
-            type="textarea"
-            placeholder=" "
-            autosize
-            :style="isDragMode ? 'cursor: move;' : ''"
-            :show-count="localConfig.memo.countEnabled"
-            @focus="onFocus"
-            @blur="onBlur"
-            @input="handleMemoInput"
-          />
-        </div>
+      <div class="memo_wrap">
+        <NInput
+          v-model:value="localConfig.memo.content"
+          class="memo__input"
+          :class="{ 'memo__input--move': isDragMode }"
+          type="textarea"
+          placeholder=" "
+          autosize
+          :style="isDragMode ? 'cursor: move;' : ''"
+          :show-count="localConfig.memo.countEnabled"
+          @focus="onFocus"
+          @blur="onBlur"
+          @input="handleMemoInput"
+        />
       </div>
     </div>
   </WidgetWrap>

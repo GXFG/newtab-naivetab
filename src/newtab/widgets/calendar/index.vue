@@ -4,11 +4,9 @@ import { ICONS } from '@/logic/icons'
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
 import { gaProxy } from '@/logic/gtag'
 import { isDragMode } from '@/logic/moveable'
-import { localConfig, getIsWidgetRender, getLayoutStyle, getStyleField, getStyleConst } from '@/logic/store'
+import { localConfig, getStyleField, getStyleConst } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
-
-const isRender = getIsWidgetRender(WIDGET_CODE)
 
 const todayDayjs = dayjs()
 
@@ -260,8 +258,6 @@ const onToggleDetailPopover = (date?: string) => {
   gaProxy('click', ['calendar', 'detail'])
 }
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customContainerWidth = getStyleField(WIDGET_CODE, 'width', 'vmin', 7.3)
 
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
@@ -310,254 +306,243 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="calendar"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="calendar"
-      data-target-type="widget"
-      data-target-code="calendar"
+      class="calendar__container"
+      :class="{
+        'calendar__container--drag': isDragMode,
+        'calendar__container--shadow': localConfig.calendar.isShadowEnabled,
+        'calendar__container--border': localConfig.calendar.isBorderEnabled,
+      }"
     >
-      <div
-        class="calendar__container"
-        :style="dragStyle || containerStyle"
+      <div class="calendar__options">
+        <div class="options__item">
+          <NSelect
+            v-model:value="state.currYear"
+            class="item__select_year"
+            size="small"
+            :options="state.yearList"
+            :disabled="isDragMode"
+            @update:value="onDateChange('year')"
+          />
+        </div>
+        <div class="options__item">
+          <NButton
+            class="item__btn"
+            text
+            :disabled="isDragMode"
+            :style="isDragMode ? 'cursor: move;' : ''"
+            @click="onPrevMonth()"
+          >
+            <Icon
+              :icon="ICONS.angleLeft"
+              class="btn__icon"
+            />
+          </NButton>
+          <NSelect
+            v-model:value="state.currMonth"
+            class="item__select_month"
+            size="small"
+            :options="monthsList"
+            :disabled="isDragMode"
+            @update:value="onDateChange('month')"
+          />
+          <NButton
+            class="item__btn"
+            text
+            :disabled="isDragMode"
+            :style="isDragMode ? 'cursor: move;' : ''"
+            @click="onNextMonth()"
+          >
+            <Icon
+              :icon="ICONS.angleRight"
+              class="btn__icon"
+            />
+          </NButton>
+        </div>
+        <div class="options__item options__reset">
+          <NButton
+            v-show="isResetBtnVisible"
+            class="item__btn"
+            text
+            :disabled="isDragMode"
+            :style="isDragMode ? 'cursor: move;' : ''"
+            @click="onReset()"
+          >
+            <Icon
+              :icon="ICONS.arrowBackward"
+              class="btn__icon"
+            />
+          </NButton>
+        </div>
+      </div>
+
+      <!-- header -->
+      <ul class="calendar__header">
+        <li
+          v-for="item in weekList"
+          :key="item.value"
+          class="header__item"
+          :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
+        >
+          {{ item.label }}
+        </li>
+      </ul>
+
+      <!-- body -->
+      <ul
+        class="calendar__body"
         :class="{
-          'calendar__container--drag': isDragMode,
-          'calendar__container--shadow': localConfig.calendar.isShadowEnabled,
-          'calendar__container--border': localConfig.calendar.isBorderEnabled,
+          'calendar__body--hover': !isDragMode,
         }"
       >
-        <div class="calendar__options">
-          <div class="options__item">
-            <NSelect
-              v-model:value="state.currYear"
-              class="item__select_year"
-              size="small"
-              :options="state.yearList"
-              :disabled="isDragMode"
-              @update:value="onDateChange('year')"
-            />
-          </div>
-          <div class="options__item">
-            <NButton
-              class="item__btn"
-              text
-              :disabled="isDragMode"
-              :style="isDragMode ? 'cursor: move;' : ''"
-              @click="onPrevMonth()"
-            >
-              <Icon
-                :icon="ICONS.angleLeft"
-                class="btn__icon"
-              />
-            </NButton>
-            <NSelect
-              v-model:value="state.currMonth"
-              class="item__select_month"
-              size="small"
-              :options="monthsList"
-              :disabled="isDragMode"
-              @update:value="onDateChange('month')"
-            />
-            <NButton
-              class="item__btn"
-              text
-              :disabled="isDragMode"
-              :style="isDragMode ? 'cursor: move;' : ''"
-              @click="onNextMonth()"
-            >
-              <Icon
-                :icon="ICONS.angleRight"
-                class="btn__icon"
-              />
-            </NButton>
-          </div>
-          <div class="options__item options__reset">
-            <NButton
-              v-show="isResetBtnVisible"
-              class="item__btn"
-              text
-              :disabled="isDragMode"
-              :style="isDragMode ? 'cursor: move;' : ''"
-              @click="onReset()"
-            >
-              <Icon
-                :icon="ICONS.arrowBackward"
-                class="btn__icon"
-              />
-            </NButton>
-          </div>
-        </div>
-
-        <!-- header -->
-        <ul class="calendar__header">
-          <li
-            v-for="item in weekList"
-            :key="item.value"
-            class="header__item"
-            :class="{ 'header__item--weekend': [6, 7].includes(item.value) }"
-          >
-            {{ item.label }}
-          </li>
-        </ul>
-
-        <!-- body -->
-        <ul
-          class="calendar__body"
-          :class="{
-            'calendar__body--hover': !isDragMode,
-          }"
+        <li
+          v-for="item in state.dateList"
+          :key="item.date"
+          @click="onToggleDetailPopover(item.date)"
         >
-          <li
-            v-for="item in state.dateList"
-            :key="item.date"
-            @click="onToggleDetailPopover(item.date)"
+          <NPopover
+            style="max-width: 350px"
+            display-directive="if"
+            :show="state.currDetailDate === item.date"
+            :title="item.date"
+            trigger="manual"
+            @clickoutside="onToggleDetailPopover()"
           >
-            <NPopover
-              style="max-width: 350px"
-              display-directive="if"
-              :show="state.currDetailDate === item.date"
-              :title="item.date"
-              trigger="manual"
-              @clickoutside="onToggleDetailPopover()"
-            >
-              <template #trigger>
-                <div
-                  class="body__item"
+            <template #trigger>
+              <div
+                class="body__item"
+                :class="{
+                  'body__item--hover': !isDragMode,
+                  'body__item--blur': item.isNotCurrMonth,
+                  'body__item--weekend': item.isWeekend,
+                  'body__item--today': item.isToday,
+                  'body__item--rest': item.type === 1,
+                  'body__item--work': item.type === 2,
+                }"
+              >
+                <span
+                  v-if="item.type"
+                  class="item__label"
+                >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
+                <span
+                  v-if="item.isToday"
+                  class="item__label item__label--today"
+                >{{ $t('calendar.today') }}</span>
+                <!-- 日期 -->
+                <span class="item__day">{{ item.day }}</span>
+                <!-- 描述 -->
+                <span
+                  class="item__desc"
                   :class="{
-                    'body__item--hover': !isDragMode,
-                    'body__item--blur': item.isNotCurrMonth,
-                    'body__item--weekend': item.isWeekend,
-                    'body__item--today': item.isToday,
-                    'body__item--rest': item.type === 1,
-                    'body__item--work': item.type === 2,
+                    'item__desc--highlight': item.isFestival,
                   }"
-                >
-                  <span
-                    v-if="item.type"
-                    class="item__label"
-                  >{{ holidayTypeToDesc[item.type as 1 | 2] }}</span>
-                  <span
-                    v-if="item.isToday"
-                    class="item__label item__label--today"
-                  >{{ $t('calendar.today') }}</span>
-                  <!-- 日期 -->
-                  <span class="item__day">{{ item.day }}</span>
-                  <!-- 描述 -->
-                  <span
-                    class="item__desc"
-                    :class="{
-                      'item__desc--highlight': item.isFestival,
-                    }"
-                  >{{ item.desc }}</span>
-                </div>
-              </template>
+                >{{ item.desc }}</span>
+              </div>
+            </template>
 
-              <!-- detail -->
-              <div class="calendar__detail">
-                <p class="detail__date">
-                  {{ detailInfo.date }}
-                  {{ detailInfo.xingzuo }}
-                </p>
-                <p class="detail__date">
-                  {{ detailInfo.lunar }}
-                </p>
-                <p class="detail__festival">
-                  {{ `${detailInfo.lunarFestivals} ${detailInfo.solarFestivals}` }}
-                </p>
-                <div class="detail__row">
-                  <p class="row__tag row__tag--yi">易</p>
-                  <div class="row__value">
-                    <n-tag
-                      v-for="yiItem in detailInfo.yi"
-                      :key="yiItem"
-                      class="tag__item"
-                      type="success"
-                      size="small"
-                      :bordered="false"
-                    >
-                      {{ yiItem }}
-                    </n-tag>
-                  </div>
-                </div>
-                <div class="detail__row">
-                  <p class="row__tag row__tag--ji">忌</p>
-                  <div class="row__value">
-                    <n-tag
-                      v-for="yiItem in detailInfo.ji"
-                      :key="yiItem"
-                      class="tag__item"
-                      type="error"
-                      size="small"
-                      :bordered="false"
-                    >
-                      {{ yiItem }}
-                    </n-tag>
-                  </div>
-                </div>
-                <div class="detail__row">
-                  <p class="row__label">吉神</p>
-                  <div class="row__value">
-                    <n-tag
-                      v-for="yiItem in detailInfo.jishen"
-                      :key="yiItem"
-                      class="tag__item"
-                      type="info"
-                      size="small"
-                      :bordered="false"
-                    >
-                      {{ yiItem }}
-                    </n-tag>
-                  </div>
-                </div>
-                <div class="detail__row">
-                  <p class="row__label">凶煞</p>
-                  <div class="row__value">
-                    <n-tag
-                      v-for="yiItem in detailInfo.xiongsha"
-                      :key="yiItem"
-                      class="tag__item"
-                      size="small"
-                      :bordered="false"
-                    >
-                      {{ yiItem }}
-                    </n-tag>
-                  </div>
+            <!-- detail -->
+            <div class="calendar__detail">
+              <p class="detail__date">
+                {{ detailInfo.date }}
+                {{ detailInfo.xingzuo }}
+              </p>
+              <p class="detail__date">
+                {{ detailInfo.lunar }}
+              </p>
+              <p class="detail__festival">
+                {{ `${detailInfo.lunarFestivals} ${detailInfo.solarFestivals}` }}
+              </p>
+              <div class="detail__row">
+                <p class="row__tag row__tag--yi">易</p>
+                <div class="row__value">
+                  <n-tag
+                    v-for="yiItem in detailInfo.yi"
+                    :key="yiItem"
+                    class="tag__item"
+                    type="success"
+                    size="small"
+                    :bordered="false"
+                  >
+                    {{ yiItem }}
+                  </n-tag>
                 </div>
               </div>
-            </NPopover>
-          </li>
-        </ul>
+              <div class="detail__row">
+                <p class="row__tag row__tag--ji">忌</p>
+                <div class="row__value">
+                  <n-tag
+                    v-for="yiItem in detailInfo.ji"
+                    :key="yiItem"
+                    class="tag__item"
+                    type="error"
+                    size="small"
+                    :bordered="false"
+                  >
+                    {{ yiItem }}
+                  </n-tag>
+                </div>
+              </div>
+              <div class="detail__row">
+                <p class="row__label">吉神</p>
+                <div class="row__value">
+                  <n-tag
+                    v-for="yiItem in detailInfo.jishen"
+                    :key="yiItem"
+                    class="tag__item"
+                    type="info"
+                    size="small"
+                    :bordered="false"
+                  >
+                    {{ yiItem }}
+                  </n-tag>
+                </div>
+              </div>
+              <div class="detail__row">
+                <p class="row__label">凶煞</p>
+                <div class="row__value">
+                  <n-tag
+                    v-for="yiItem in detailInfo.xiongsha"
+                    :key="yiItem"
+                    class="tag__item"
+                    size="small"
+                    :bordered="false"
+                  >
+                    {{ yiItem }}
+                  </n-tag>
+                </div>
+              </div>
+            </div>
+          </NPopover>
+        </li>
+      </ul>
 
+      <div
+        v-if="localConfig.calendar.festivalCountdown"
+        class="calendar__festival__list"
+      >
         <div
-          v-if="localConfig.calendar.festivalCountdown"
-          class="calendar__festival__list"
+          v-for="item in festivalList"
+          :key="item.date"
+          :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('common.day')}`"
+          class="festival__item"
         >
-          <div
-            v-for="item in festivalList"
-            :key="item.date"
-            :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('common.day')}`"
-            class="festival__item"
-          >
-            <div class="item__left">
-              <p class="left__date">{{ item.shortDate }}</p>
-              <p
-                v-if="item.type === 1"
-                class="left__rest"
-              >
-                {{ $t('calendar.rest') }}
-              </p>
-              <p class="left__desc">
-                {{ item.desc }}
-              </p>
-            </div>
+          <div class="item__left">
+            <p class="left__date">{{ item.shortDate }}</p>
+            <p
+              v-if="item.type === 1"
+              class="left__rest"
+            >
+              {{ $t('calendar.rest') }}
+            </p>
+            <p class="left__desc">
+              {{ item.desc }}
+            </p>
+          </div>
 
-            <div class="item__right">
-              <p class="right__count">{{ item.festivalCountdownDay }}</p>
-              <p class="right__unit">{{ $t('common.day') }}</p>
-            </div>
+          <div class="item__right">
+            <p class="right__count">{{ item.festivalCountdownDay }}</p>
+            <p class="right__unit">{{ $t('common.day') }}</p>
           </div>
         </div>
       </div>
@@ -600,6 +585,7 @@ const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
           cursor: pointer;
           .btn__icon {
             font-size: v-bind(customFontSize);
+            color: v-bind(customFontColor);
           }
         }
         .n-base-selection-input__content {

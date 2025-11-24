@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import { localConfig, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { localConfig, getIsWidgetRender, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { WIDGET_CODE } from './config'
@@ -44,8 +44,6 @@ watch(
   { immediate: true },
 )
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')
 const customFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'vmin')
@@ -59,42 +57,31 @@ const customDigitDivideWidth = getStyleField(WIDGET_CODE, 'width', 'vmin', 0.5)
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="clockDigital"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="digital-clock"
-      data-target-type="widget"
-      data-target-code="clockDigital"
+      class="clockDigital__container"
+      :class="{ 'clockDigital__container--shadow': localConfig.clockDigital.isShadowEnabled }"
     >
-      <div
-        class="clockDigital__container"
-        :style="dragStyle || containerStyle"
-        :class="{ 'clockDigital__container--shadow': localConfig.clockDigital.isShadowEnabled }"
-      >
-        <div class="clock__time">
-          <p class="time__text">
-            <template
-              v-for="(item, index) in state.time.split('')"
-              :key="index"
-            >
-              <span :class="Number.isNaN(+item) ? 'text__divide' : 'text__digit'">{{ item }}</span>
-            </template>
-          </p>
-          <span
-            v-if="localConfig.clockDigital.unitEnabled"
-            class="time__unit"
-          >{{ state.unit }}</span>
-        </div>
+      <div class="clock__time">
+        <p class="time__text">
+          <template
+            v-for="(item, index) in state.time.split('')"
+            :key="index"
+          >
+            <span :class="Number.isNaN(+item) ? 'text__divide' : 'text__digit'">{{ item }}</span>
+          </template>
+        </p>
+        <span
+          v-if="localConfig.clockDigital.unitEnabled"
+          class="time__unit"
+        >{{ state.unit }}</span>
       </div>
     </div>
   </WidgetWrap>
 </template>
 
-<style scoped>
-#digital-clock {
+<style>
+#clockDigital {
   font-family: v-bind(customFontFamily);
   color: v-bind(customFontColor);
   user-select: none;

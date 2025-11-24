@@ -1,6 +1,7 @@
 export const ICONS = {
   // widget icons
   keyboard: 'ic:outline-keyboard-alt',
+  bookmarkFolder: 'akar-icons:grid',
   clockDigital: 'fluent-emoji-high-contrast:input-numbers',
   clockAnalog: 'grommet-icons:clock',
   date: 'system-uicons:calendar-date',
@@ -102,6 +103,7 @@ export type SettingIconMeta = {
 
 export const WIDGET_ICON_META: Record<WidgetCodes, WidgetIconMeta> = {
   keyboard: { iconName: ICONS.keyboard, widgetSize: 33 },
+  bookmarkFolder: { iconName: ICONS.bookmarkFolder, widgetSize: 30 },
   clockDigital: { iconName: ICONS.clockDigital, widgetSize: 32 },
   clockAnalog: { iconName: ICONS.clockAnalog, widgetSize: 30 },
   date: { iconName: ICONS.date, widgetSize: 35 },
@@ -111,14 +113,13 @@ export const WIDGET_ICON_META: Record<WidgetCodes, WidgetIconMeta> = {
   weather: { iconName: ICONS.weather, widgetSize: 35 },
   memo: { iconName: ICONS.memo, widgetSize: 35 },
   news: { iconName: ICONS.news, widgetSize: 30 },
-  bookmarkFolder: { iconName: ICONS.folderOutline, widgetSize: 30 },
 }
 
 export const SETTING_ICON_META: Record<settingPanes, SettingIconMeta> = {
   general: { iconName: ICONS.settings, settingSize: 18 },
   focusMode: { iconName: ICONS.focus, settingSize: 18 },
   keyboard: { iconName: ICONS.keyboard, settingSize: 18 },
-  bookmarkFolder: { iconName: ICONS.folderOutline, settingSize: 17 },
+  bookmarkFolder: { iconName: ICONS.bookmarkFolder, settingSize: 18 },
   clockDate: { iconName: ICONS.clockAnalog, settingSize: 17 },
   calendar: { iconName: ICONS.calendar, settingSize: 16 },
   yearProgress: { iconName: ICONS.yearProgress, settingSize: 18 },

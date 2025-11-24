@@ -11,7 +11,7 @@ export const moveState = reactive({
   mouseDownTaskMap: new Map() as Map<string, (e: MouseEvent, resite?: boolean) => unknown>,
   mouseMoveTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
   mouseUpTaskMap: new Map() as Map<string, (e: MouseEvent) => unknown>,
-  isWidgetDraging: false, // 是否正在拖动组件，拖动组件时动弹悬浮删除icon
+  isWidgetStartDrag: false, // 是否开始拖动组件，拖动组件时动态悬浮删除icon
   isDeleteHover: false,
   // 辅助线
   isXAxisCenterVisible: false,
@@ -31,7 +31,7 @@ let lastIsDraftDrawerVisible: null | boolean = null
 let lastFrameId: number | null = null
 
 const onResetMoveState = () => {
-  moveState.isWidgetDraging = false
+  moveState.isWidgetStartDrag = false
   moveState.isDeleteHover = false
   moveState.currDragTarget.type = ''
   moveState.currDragTarget.code = ''

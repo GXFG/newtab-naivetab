@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { addVisibilityTask, addTimerTask, removeTimerTask } from '@/logic/task'
-import { localState, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { localState, getIsWidgetRender, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -135,8 +135,6 @@ addVisibilityTask(WIDGET_CODE, (hidden) => {
   }
 })
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customWidth = getStyleField(WIDGET_CODE, 'width', 'vmin')
 const hourDeg = computed(() => `${state.hourDeg}deg`)
 const minuteDeg = computed(() => `${state.minuteDeg}deg`)
@@ -144,53 +142,42 @@ const secondDeg = computed(() => `${state.secondDeg}deg`)
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="clockAnalog"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="analog-clock"
-      data-target-type="widget"
-      data-target-code="clockAnalog"
+      class="clockAnalog__container"
     >
       <div
-        class="clockAnalog__container"
-        :style="dragStyle || containerStyle"
+        v-show="state.isClockVisible"
+        class="container__clock"
+        :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`"
       >
         <div
-          v-show="state.isClockVisible"
-          class="container__clock"
-          :style="`background-image: url(/assets/img/clock/${currTheme}/background.png);`"
-        >
-          <div
-            class="clock__base clock__base--animation"
-            :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"
-          />
-          <div
-            class="clock__base clock__hour"
-            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isHourAnimationEnable }"
-            :style="`background-image: url(/assets/img/clock/${currTheme}/hour.png);`"
-          />
-          <div
-            class="clock__base clock__minute"
-            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isMinuteAnimationEnable }"
-            :style="`background-image: url(/assets/img/clock/${currTheme}/minute.png);`"
-          />
-          <div
-            class="clock__base clock__second"
-            :class="{ 'clock__base--animation': state.isAnimationEnable && state.isSecondAnimationEnable }"
-            :style="`background-image: url(/assets/img/clock/${currTheme}/second.png);`"
-          />
-        </div>
+          class="clock__base clock__base--animation"
+          :style="`background-image: url(/assets/img/clock/${currTheme}/marker.png);`"
+        />
+        <div
+          class="clock__base clock__hour"
+          :class="{ 'clock__base--animation': state.isAnimationEnable && state.isHourAnimationEnable }"
+          :style="`background-image: url(/assets/img/clock/${currTheme}/hour.png);`"
+        />
+        <div
+          class="clock__base clock__minute"
+          :class="{ 'clock__base--animation': state.isAnimationEnable && state.isMinuteAnimationEnable }"
+          :style="`background-image: url(/assets/img/clock/${currTheme}/minute.png);`"
+        />
+        <div
+          class="clock__base clock__second"
+          :class="{ 'clock__base--animation': state.isAnimationEnable && state.isSecondAnimationEnable }"
+          :style="`background-image: url(/assets/img/clock/${currTheme}/second.png);`"
+        />
       </div>
     </div>
   </WidgetWrap>
 </template>
 
-<style scoped>
+<style>
 /* https://cssanimation.rocks/clocks/ */
-#analog-clock {
+#clockAnalog {
   user-select: none;
   .clockAnalog__container {
     z-index: 10;

@@ -18,11 +18,11 @@ export const WIDGET_CONFIG = {
   fontFamily: 'Arial',
   fontSize: 14,
   fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
-  isBorderEnabled: true,
+  isBorderEnabled: false,
   borderWidth: 1,
   borderColor: ['rgba(101, 101, 101, 0.28)', 'rgba(71,85,105, 1)'],
   backgroundColor: ['rgba(152, 152, 152, 0.2)', 'rgba(24, 24, 24, 0.3)'],
-  backgroundBlur: 5,
+  backgroundBlur: 10,
   isShadowEnabled: true,
   shadowColor: ['rgba(31, 31, 31, 0.5)', 'rgba(31, 31, 31, 0.5)'],
 }

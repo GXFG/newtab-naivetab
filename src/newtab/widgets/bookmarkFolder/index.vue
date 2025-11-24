@@ -4,47 +4,49 @@ import { ICONS } from '@/logic/icons'
 import { createTab } from '@/logic/util'
 import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark'
 import { requestPermission } from '@/logic/storage'
-import { localConfig, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { localConfig, getStyleField } from '@/logic/store'
 import { isDragMode } from '@/logic/moveable'
+import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
-
-const isRender = getIsWidgetRender(WIDGET_CODE)
-
-type BookmarkNode = chrome.bookmarks.BookmarkTreeNode
 
 const state = reactive({
   systemBookmarks: [] as BookmarkNode[],
   selectedFolderTitles: [] as string[],
-  loading: false,
-  noPermission: false,
+  isGetBookmarkLoading: false,
+  isNoPermission: false,
 })
 
 const initData = async () => {
-  if (state.loading) {
+  if (state.isGetBookmarkLoading) {
     return
   }
-  state.loading = true
+  state.isGetBookmarkLoading = true
   try {
     const root = (await getBrowserBookmark()) as BookmarkNode[]
     const base = (root?.[0]?.children || root || []) as BookmarkNode[]
     state.systemBookmarks = base
-    state.selectedFolderTitles = (localConfig.bookmarkFolder.selectedFolderTitles || []) as string[]
-    state.noPermission = false
+    state.selectedFolderTitles = JSON.parse(JSON.stringify(localConfig.bookmarkFolder.selectedFolderTitles)) || []
+    state.isNoPermission = false
   } catch (e) {
-    state.noPermission = true
+    console.error(e)
+    state.isNoPermission = true
   }
-  state.loading = false
+  state.isGetBookmarkLoading = false
 }
 
 const requestBookmarkAccess = async () => {
   const granted = await requestPermission('bookmarks')
-  if (granted) initData()
+  if (granted) {
+    initData()
+  }
 }
 
 const findTargetFolder = (folder: BookmarkNode[], stack: string[]): BookmarkNode[] => {
   try {
-    if (stack.length === 0) return folder
+    if (stack.length === 0) {
+      return folder
+    }
     const target = folder.find((i) => i.title === stack[0])?.children as BookmarkNode[]
     return findTargetFolder(target || [], stack.slice(1))
   } catch {
@@ -53,15 +55,19 @@ const findTargetFolder = (folder: BookmarkNode[], stack: string[]): BookmarkNode
 }
 
 const currFolderBookmarks = computed(() => {
-  if (state.systemBookmarks.length === 0) return [] as BookmarkNode[]
-  if (state.selectedFolderTitles.length === 0) return state.systemBookmarks
+  if (state.systemBookmarks.length === 0) {
+    return [] as BookmarkNode[]
+  }
+  if (state.selectedFolderTitles.length === 0) {
+    return state.systemBookmarks
+  }
   return findTargetFolder(state.systemBookmarks, state.selectedFolderTitles) || []
 })
 
-const columns = computed(() => localConfig.bookmarkFolder.gridColumns)
-
 const openBookmark = (url: string) => {
-  if (!url) return
+  if (!url) {
+    return
+  }
   if (localConfig.bookmarkFolder.isNewTabOpen) {
     createTab(url)
     return
@@ -90,10 +96,17 @@ const onBack = () => {
 
 onMounted(() => {
   initData()
+  addKeydownTask(WIDGET_CODE, (e: KeyboardEvent) => {
+    if (e.code === 'Escape') {
+      onBack()
+    }
+  })
 })
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
+onUnmounted(() => {
+  removeKeydownTask(WIDGET_CODE)
+})
+
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')
 const customFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'vmin')
@@ -113,92 +126,88 @@ const customIconSize = getStyleField(WIDGET_CODE, 'iconSize', 'px')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="bookmarkFolder"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="bookmarkFolder"
-      data-target-type="widget"
-      data-target-code="bookmarkFolder"
+      class="bookmarkFolder__container"
+      :class="{
+        'bookmarkFolder__container--border': localConfig.bookmarkFolder.isBorderEnabled,
+        'bookmarkFolder__container--shadow': localConfig.bookmarkFolder.isShadowEnabled,
+      }"
     >
+      <!-- loading -->
       <div
-        class="bookmarkFolder__container"
-        :style="dragStyle || containerStyle"
-        :class="{
-          'bookmarkFolder__container--border': localConfig.bookmarkFolder.isBorderEnabled,
-          'bookmarkFolder__container--shadow': localConfig.bookmarkFolder.isShadowEnabled,
-        }"
+        v-if="state.isGetBookmarkLoading"
+        class="folder__loading"
       >
-        <div
-          v-if="state.loading"
-          class="folder__loading"
+        <Icon
+          :icon="ICONS.loading"
+          class="folder__loading-icon"
+        />
+      </div>
+      <!-- permission -->
+      <div
+        v-else-if="state.isNoPermission"
+        class="folder__permission"
+      >
+        <div class="folder__permission-text">{{ $t('permission.bookmark') }}</div>
+        <button
+          class="folder__permission-btn"
+          @click="requestBookmarkAccess"
         >
-          <Icon
-            :icon="ICONS.loading"
-            class="folder__loading-icon"
-          />
+          {{ $t('common.allow') }}
+        </button>
+      </div>
+      <!-- grid -->
+      <div
+        v-else
+        class="folder__grid"
+        :style="{ gridTemplateColumns: `repeat(${localConfig.bookmarkFolder.gridColumns}, 1fr)` }"
+      >
+        <!-- back -->
+        <div
+          v-if="state.selectedFolderTitles.length > 0"
+          class="folder__item"
+          :class="{
+            'folder__item--pointer': !isDragMode,
+            'folder__item--hover': !isDragMode,
+          }"
+          @click="onBack"
+        >
+          <div class="folder__icon">
+            <Icon :icon="ICONS.arrowBackRounded" />
+          </div>
+          <div class="folder__label">{{ state.selectedFolderTitles[state.selectedFolderTitles.length - 1] }}</div>
         </div>
+
         <div
-          v-else-if="state.noPermission"
-          class="folder__permission"
+          v-for="(item, idx) in currFolderBookmarks"
+          :key="`${item.id}-${idx}`"
+          class="folder__item"
+          :class="{
+            'folder__item--pointer': !isDragMode,
+            'folder__item--hover': !isDragMode,
+          }"
+          :title="`${item.title} · ${item.url}`"
+          @click="onClickItem(item)"
         >
-          <div class="folder__permission-text">{{ $t('permission.bookmark') }}</div>
-          <button
-            class="folder__permission-btn"
-            @click="requestBookmarkAccess"
-          >
-            {{ $t('common.allow') }}
-          </button>
-        </div>
-        <div
-          v-else
-          class="folder__grid"
-          :style="{ gridTemplateColumns: `repeat(${columns}, 1fr)` }"
-        >
-          <div
-            v-if="state.selectedFolderTitles.length > 0"
-            class="folder__item"
-            :class="{
-              'folder__item--pointer': !isDragMode,
-              'folder__item--hover': !isDragMode,
-            }"
-            @click="onBack"
-          >
-            <div class="folder__icon">
-              <Icon :icon="ICONS.arrowBackRounded" />
-            </div>
-            <div class="folder__label">{{ state.selectedFolderTitles[state.selectedFolderTitles.length - 1] }}</div>
+          <div class="folder__icon">
+            <Icon
+              v-if="item.children && localConfig.bookmarkFolder.isIconVisible"
+              :icon="ICONS.folderOutline"
+            />
+            <img
+              v-else-if="localConfig.bookmarkFolder.isIconVisible"
+              :src="getFaviconFromUrl((item as any).url || '')"
+              :draggable="false"
+              alt=""
+            />
           </div>
 
           <div
-            v-for="(item, idx) in currFolderBookmarks"
-            :key="`${item.id}-${idx}`"
-            class="folder__item"
-            :class="{
-              'folder__item--pointer': !isDragMode,
-              'folder__item--hover': !isDragMode,
-            }"
-            @click="onClickItem(item)"
+            v-if="localConfig.bookmarkFolder.isNameVisible"
+            class="folder__label"
           >
-            <div class="folder__icon">
-              <Icon
-                v-if="item.children && localConfig.bookmarkFolder.isIconVisible"
-                :icon="ICONS.folderOutline"
-              />
-              <img
-                v-else-if="localConfig.bookmarkFolder.isIconVisible"
-                :src="getFaviconFromUrl((item as any).url || '')"
-                alt=""
-              />
-            </div>
-            <div
-              v-if="localConfig.bookmarkFolder.isNameVisible"
-              class="folder__label"
-            >
-              {{ item.title }}
-            </div>
+            {{ item.title }}
           </div>
         </div>
       </div>
@@ -206,7 +215,7 @@ const customIconSize = getStyleField(WIDGET_CODE, 'iconSize', 'px')
   </WidgetWrap>
 </template>
 
-<style scoped>
+<style>
 #bookmarkFolder {
   user-select: none;
   .bookmarkFolder__container {
@@ -221,37 +230,37 @@ const customIconSize = getStyleField(WIDGET_CODE, 'iconSize', 'px')
     padding: v-bind(customPadding);
     width: v-bind(customWidth);
     height: v-bind(customHeight);
-    border-radius: v-bind(customBorderRadius);
-    border-width: v-bind(customBorderWidth);
-    border-style: solid;
-    border-color: v-bind(customBorderColor);
     background: v-bind(customBackgroundColor);
+    border-radius: v-bind(customBorderRadius);
     backdrop-filter: blur(v-bind(customBackgroundBlur));
-    box-shadow: 0 1px 6px v-bind(customShadowColor);
     overflow: hidden;
   }
   .bookmarkFolder__container--border {
+    border-style: solid;
+    border-width: v-bind(customBorderWidth);
     border-color: v-bind(customBorderColor);
   }
   .bookmarkFolder__container--shadow {
     box-shadow: 0 1px 6px v-bind(customShadowColor);
   }
+
   .folder__grid {
     display: grid;
     gap: v-bind(customItemGap);
+    grid-auto-rows: v-bind(customItemHeight);
     width: 100%;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    grid-auto-rows: v-bind(customItemHeight);
   }
   .folder__grid::-webkit-scrollbar {
     width: 0;
     height: 0;
     display: none;
   }
+
   .folder__item {
     display: flex;
     flex-direction: column;
@@ -279,17 +288,17 @@ const customIconSize = getStyleField(WIDGET_CODE, 'iconSize', 'px')
     align-items: center;
     justify-content: center;
     overflow: hidden;
-  }
-  .folder__icon img {
-    width: 100%;
-    height: 100%;
-    border-radius: 4px;
-  }
-  .folder__icon svg,
-  .folder__icon .iconify {
-    width: 100%;
-    height: 100%;
-    display: block;
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+    }
+    svg,
+    .iconify {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
   }
   .folder__label {
     margin-top: 4px;
@@ -299,6 +308,7 @@ const customIconSize = getStyleField(WIDGET_CODE, 'iconSize', 'px')
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .folder__loading {
     display: flex;
     align-items: center;
@@ -309,6 +319,7 @@ const customIconSize = getStyleField(WIDGET_CODE, 'iconSize', 'px')
   .folder__loading-icon {
     font-size: 22px;
   }
+
   .folder__permission {
     display: flex;
     flex-direction: column;
@@ -324,6 +335,7 @@ const customIconSize = getStyleField(WIDGET_CODE, 'iconSize', 'px')
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: rgba(0, 0, 0, 0.15);
     color: inherit;
+    cursor: pointer;
   }
 }
 </style>

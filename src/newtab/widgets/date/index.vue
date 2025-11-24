@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import { currDayjsLang, localConfig, getIsWidgetRender, getLayoutStyle, getStyleField } from '@/logic/store'
+import { currDayjsLang, localConfig, getIsWidgetRender, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -26,8 +26,6 @@ watch(
   { immediate: true },
 )
 
-const dragStyle = ref('')
-const containerStyle = getLayoutStyle(WIDGET_CODE)
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')
 const customFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'vmin')
@@ -36,30 +34,19 @@ const customLetterSpacing = getStyleField(WIDGET_CODE, 'letterSpacing', 'vmin')
 </script>
 
 <template>
-  <WidgetWrap
-    v-model:dragStyle="dragStyle"
-    widget-code="date"
-  >
+  <WidgetWrap :widget-code="WIDGET_CODE">
     <div
-      v-if="isRender"
-      id="date"
-      data-target-type="widget"
-      data-target-code="date"
+      class="date__container"
+      :class="{ 'date__container--shadow': localConfig.date.isShadowEnabled }"
     >
-      <div
-        class="date__container"
-        :style="dragStyle || containerStyle"
-        :class="{ 'date__container--shadow': localConfig.date.isShadowEnabled }"
-      >
-        <p class="date__text">
-          {{ state.date }}
-        </p>
-      </div>
+      <p class="date__text">
+        {{ state.date }}
+      </p>
     </div>
   </WidgetWrap>
 </template>
 
-<style scoped>
+<style>
 #date {
   font-family: v-bind(customFontFamily);
   color: v-bind(customFontColor);
