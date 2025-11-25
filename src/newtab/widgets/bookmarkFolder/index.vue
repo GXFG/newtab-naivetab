@@ -4,12 +4,14 @@ import { ICONS } from '@/logic/icons'
 import { createTab } from '@/logic/util'
 import { getFaviconFromUrl } from '@/logic/bookmark'
 import { requestPermission } from '@/logic/storage'
-import { localConfig, getStyleField } from '@/logic/store'
+import { localConfig, getStyleField, getIsWidgetRender } from '@/logic/store'
 import { isDragMode } from '@/logic/moveable'
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 import { initData, state } from './logic'
+
+const isRender = getIsWidgetRender(WIDGET_CODE)
 
 const requestBookmarkAccess = async () => {
   const granted = await requestPermission('bookmarks')
@@ -70,18 +72,24 @@ const onBack = () => {
   state.selectedFolderTitles.pop()
 }
 
-onMounted(() => {
-  initData()
-  addKeydownTask(WIDGET_CODE, (e: KeyboardEvent) => {
-    if (e.code === 'Escape') {
-      onBack()
-    }
-  })
-})
+const keyboardTask = (e: KeyboardEvent) => {
+  if (e.code === 'Escape') {
+    onBack()
+  }
+}
 
-onUnmounted(() => {
-  removeKeydownTask(WIDGET_CODE)
-})
+watch(
+  isRender,
+  (value) => {
+    if (!value) {
+      removeKeydownTask(WIDGET_CODE)
+      return
+    }
+    initData()
+    addKeydownTask(WIDGET_CODE, keyboardTask)
+  },
+  { immediate: true },
+)
 
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')

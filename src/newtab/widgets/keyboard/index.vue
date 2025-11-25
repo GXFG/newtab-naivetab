@@ -4,10 +4,12 @@ import { isDragMode } from '@/logic/moveable'
 import { KEYBOARD_NOT_ALLOW_KEYCODE_LIST } from '@/logic/constants/keyboard'
 import { currKeyboardConfig, keyboardCurrentModelAllKeyList } from '@/logic/keyboard'
 import { state as keyboardState, openPage, handleSpecialKeycapExec, getKeycapType, getKeycapUrl, handlePressKeycap, getCustomKeycapWidth } from '~/newtab/widgets/keyboard/logic'
-import { localConfig, getStyleField, getStyleConst } from '@/logic/store'
+import { localConfig, getStyleField, getStyleConst, getIsWidgetRender } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import KeyboardKeycap from './components/KeyboardKeycap.vue'
 import { WIDGET_CODE } from './config'
+
+const isRender = getIsWidgetRender(WIDGET_CODE)
 
 // keyboard listener
 let keyboardTimer: ReturnType<typeof setTimeout>
@@ -54,13 +56,17 @@ const keyboardTask = (e: KeyboardEvent) => {
   }
 }
 
-onMounted(() => {
-  addKeydownTask(WIDGET_CODE, keyboardTask)
-})
-
-onUnmounted(() => {
-  removeKeydownTask(WIDGET_CODE)
-})
+watch(
+  isRender,
+  (value) => {
+    if (!value) {
+      removeKeydownTask(WIDGET_CODE)
+      return
+    }
+    addKeydownTask(WIDGET_CODE, keyboardTask)
+  },
+  { immediate: true },
+)
 
 const customShellVerticalPadding = getStyleField(WIDGET_CODE, 'shellVerticalPadding', 'vmin')
 const customShellHorizontalPadding = getStyleField(WIDGET_CODE, 'shellHorizontalPadding', 'vmin')
