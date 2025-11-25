@@ -9,24 +9,26 @@
 
 1. Includes the following components:
    1. **Bookmarks**: Displays bookmarks in the form of a physical keyboard, allowing you to quickly access corresponding links. You can also set global shortcut keys to open bookmarks from any browser interface, enhancing efficiency.
-   2. **Time and date**: Digital clock, analog clock, and date display.
-   3. **Perpetual calendar**: Includes lunar calendar, holidays, and statutory holidays, making it convenient to check working days and arrange personal schedules effectively.
-   4. **This Year's Progress**: Helps you track your progress throughout the year by displaying the current day count, percentage, and dot plots.
-   5. **Search bar**: Customizable search engine for quick searches.
-   6. **Memos**: Editable notes or to-do lists, allowing you to temporarily record information.
-   7. **Weather**: Displays temperature, wind, humidity, daily index, and other information. Abnormal weather conditions will trigger an alarm prompt. Data is sourced from Zephyr Weather.
-   8. **Information**: Provides access to trending news from platforms like Toutiao, Baidu, Zhihu, Sina Weibo, V2EX, and more.
-2. The above components can be dragged and dropped anywhere on the screen, are fully customizable, and compatible with various screen resolutions.
-3. The above components allow you to customize most styles, including font, size, color, background color, border, shadow, blur, and more.
-4. Supports custom background images (e.g., Bing daily image or local pictures). If you prefer a simple style, you can also set a single background image.
-5. Supports automatic appearance switching (light mode, dark mode) based on the system settings, ensuring the page is not too bright at night.
-6. The above settings can be synchronized across multiple devices (this feature relies on browser synchronization; you need to log in to your browser's personal account). You can also export files to create backups.
-7. Supports multiple languages (zh-CN, en-US).
-8. The source code is open-source, and no private or operational information is collected. All your information remains private.
+   2. **Folder Bookmarks**: Browse native bookmark folders in a grid. Navigate into/return from folders, toggle icon/name visibility, and adjust layout (columns, gap, radius, item height). Open links in a new tab.
+   3. **Time and date**: Digital clock, analog clock, and date display.
+   4. **Perpetual calendar**: Includes lunar calendar, holidays, and statutory holidays, making it convenient to check working days and arrange personal schedules effectively.
+   5. **This Year's Progress**: Helps you track your progress throughout the year by displaying the current day count, percentage, and dot plots.
+   6. **Search bar**: Customizable search engine for quick searches.
+   7. **Memos**: Editable notes or to-do lists, allowing you to temporarily record information.
+   8. **Weather**: Displays temperature, wind, humidity, daily indices, and more. Abnormal conditions trigger warnings. Data is sourced from QWeather.
+   9. **News**: Access trending content from Toutiao, Baidu, Zhihu, Sina Weibo, V2EX, and more.
+2. Drag-and-drop anywhere, fully customizable, works across screen resolutions.
+3. Most styles are customizable: font, size, color, background, border, shadow, blur.
+4. Custom backgrounds (Bing Photo of the Day or local images); single-image setup supported.
+5. Auto theme switching (light/dark) based on system appearance.
+6. Focus Mode: Show only the widgets you select under "Settings → Focus Mode". Toggle from the right-click menu for distraction-free use.
+7. Settings sync across devices (requires browser sync; sign in). Export files for backups.
+8. Multi-language support (zh-CN, en-US).
+9. Open source; no private or operational data is collected.
 
 ## 🚀Get started
 
-- [Document](https://gxfg.github.io/naivetab-doc)
+- [Documentation](https://gxfg.github.io/naivetab-doc)
 - [Buy me a coffee](https://github.com/GXFG/newtab-naivetab/blob/main/sponsor.md)
 
 ## 🛠️Install
