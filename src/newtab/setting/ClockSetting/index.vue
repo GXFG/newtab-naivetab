@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
 import AnalogSetting from './AnalogSetting.vue'
 import DigitalSetting from './DigitalSetting.vue'
 import DateSetting from './DateSetting.vue'

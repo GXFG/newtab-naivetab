@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
 </script>
 
 <template>

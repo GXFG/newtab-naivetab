@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { localConfig, localState } from '@/logic/store'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
-import CustomColorPicker from '@/newtab/setting/components/CustomColorPicker.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
+import CustomColorPicker from '~/components/CustomColorPicker.vue'
 import { state } from '@/newtab/widgets/news/logic'
 
 const newsSourceList = computed(() => [

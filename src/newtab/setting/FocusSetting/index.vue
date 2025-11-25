@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
 import Tips from '@/components/Tips.vue'
 import { localConfig } from '@/logic/store'
 import { widgetsList } from '@/newtab/widgets/registry'

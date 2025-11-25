@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { URL_DAYJS_FORMAT } from '@/logic/constants/index'
 import { localConfig } from '@/logic/store'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
 import Tips from '@/components/Tips.vue'
 </script>
 

@@ -4,9 +4,10 @@ import { ICONS } from '@/logic/icons'
 import { localConfig } from '@/logic/store'
 import { getBrowserBookmark } from '@/logic/bookmark'
 import { requestPermission } from '@/logic/storage'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
 import BookmarkPicker from '@/components/BookmarkPicker.vue'
+import { refreshSelectedFolderTitles } from '@/newtab/widgets/bookmarkFolder/logic'
 
 const state = reactive({
   showPicker: false,
@@ -30,9 +31,10 @@ const findPathById = (root: BookmarkNode[], id: string): string[] => {
 }
 
 const ensureBookmarkRoot = async () => {
-  if (state.rootBookmarks.length > 0) return
-  const root = (await getBrowserBookmark()) as any
-  const base = (root?.[0]?.children || root || []) as BookmarkNode[]
+  if (state.rootBookmarks.length > 0) {
+    return
+  }
+  const base = await getBrowserBookmark()
   state.rootBookmarks = base
 }
 
@@ -55,8 +57,8 @@ const onSelectBookmark = async (option: any) => {
   try {
     await ensureBookmarkRoot()
     const path = findPathById(state.rootBookmarks, option.id)
-    if (path.length > 0) path.pop() // remove bookmark itself, keep folder path
     localConfig.bookmarkFolder.selectedFolderTitles = path
+    refreshSelectedFolderTitles()
   } catch (e) {
     console.warn('Select bookmark failed', e)
   }
@@ -64,6 +66,7 @@ const onSelectBookmark = async (option: any) => {
 
 const onResetFolder = () => {
   localConfig.bookmarkFolder.selectedFolderTitles = []
+  refreshSelectedFolderTitles()
 }
 </script>
 
@@ -122,19 +125,6 @@ const onResetFolder = () => {
           </div>
         </div>
       </NFormItem>
-
-      <!-- <div class="layout__preview">
-        <div
-          class="preview__grid"
-          :style="{ gridTemplateColumns: `repeat(${localConfig.bookmarkFolder.gridColumns}, 1fr)` }"
-        >
-          <div
-            v-for="idx in localConfig.bookmarkFolder.gridColumns * 3"
-            :key="idx"
-            class="preview__item"
-          />
-        </div>
-      </div> -->
 
       <NFormItem :label="$t('general.newTabOpen')">
         <NSwitch
@@ -261,6 +251,7 @@ const onResetFolder = () => {
 
   <BookmarkPicker
     v-model:show="state.showPicker"
+    select-type="folder"
     @select="onSelectBookmark"
   />
 </template>

@@ -13,6 +13,10 @@ const props = defineProps({
     type: String,
     default: `${SECOND_MODAL_WIDTH}`,
   },
+  selectType: {
+    type: String as PropType<'bookmark' | 'folder'>,
+    default: 'bookmark',
+  },
 })
 
 const emit = defineEmits(['update:show', 'select'])
@@ -23,16 +27,27 @@ const onClose = () => {
 
 const state = reactive({
   treePattern: '',
-  bookmarks: [] as ChromeBookmarkItem[],
+  bookmarks: [] as BookmarkNode[],
   defaultExpandedKeys: ['1'], // 默认展开书签栏
   nodeProps: ({ option }: { option: TreeOption }) => {
     return {
       onClick() {
-        if (Object.prototype.hasOwnProperty.call(option, 'children')) {
+        const isFolder = Object.prototype.hasOwnProperty.call(option, 'children')
+        if (props.selectType === 'bookmark') {
+          if (isFolder) {
+            return
+          }
+          emit('select', option)
+          onClose()
           return
         }
-        emit('select', option)
-        onClose()
+        if (props.selectType === 'folder') {
+          if (!isFolder) {
+            return
+          }
+          emit('select', option)
+          onClose()
+        }
       },
     }
   },
@@ -45,8 +60,8 @@ const handleUpdateShow = (value: boolean) => {
   onClose()
 }
 
-const formatBookmark = (root: ChromeBookmarkItem[]) => {
-  const res = [] as ChromeBookmarkItem[]
+const formatBookmark = (root: BookmarkNode[]) => {
+  const res = [] as BookmarkNode[]
   for (const item of root) {
     const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
     const curr = {
@@ -54,7 +69,7 @@ const formatBookmark = (root: ChromeBookmarkItem[]) => {
       prefix: () => h('img', { style: 'width: 14px; height: 14px', src: getFaviconFromUrl(item.url || '') }), // favicon
     }
     if (isFolder) {
-      curr.children = formatBookmark(item.children)
+      curr.children = formatBookmark(item.children as BookmarkNode[])
       curr.prefix = () => h('div', { style: 'margin-top: 3px;font-size: 16px;' }, h(Icon, { icon: 'ion:folder-outline' })) // folder
     }
     res.push(curr)

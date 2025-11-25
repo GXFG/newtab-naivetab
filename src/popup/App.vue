@@ -15,3 +15,17 @@ import Content from '@/popup/Content.vue'
     </NMessageProvider>
   </NConfigProvider>
 </template>
+
+<style>
+body {
+  font-family:
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    PingFang SC,
+    Heiti SC,
+    Hiragino Sans GB,
+    Microsoft YaHei,
+    sans-serif;
+}
+</style>

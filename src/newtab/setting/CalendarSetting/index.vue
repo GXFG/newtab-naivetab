@@ -2,9 +2,9 @@
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
 import { localConfig, localState, availableFontOptions, fontSelectRenderLabel } from '@/logic/store'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
-import CustomColorPicker from '@/newtab/setting/components/CustomColorPicker.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
+import CustomColorPicker from '~/components/CustomColorPicker.vue'
 
 const beginsList = computed(() => [
   { label: window.$t('calendar.monday'), value: 1 },

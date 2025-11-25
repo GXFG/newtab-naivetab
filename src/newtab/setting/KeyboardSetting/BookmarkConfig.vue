@@ -65,7 +65,7 @@ const onImportBookmark = async (code: string) => {
   state.isBookmarkModalVisible = true
 }
 
-const onSelectBookmark = (payload: ChromeBookmarkItem) => {
+const onSelectBookmark = (payload: BookmarkNode) => {
   localConfig.keyboard.keymap[state.currImporKey] = {
     url: payload.url,
     name: payload.title,

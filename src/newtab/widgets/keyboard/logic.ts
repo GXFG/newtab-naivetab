@@ -11,17 +11,17 @@ import { globalState, localConfig, getAllCommandsConfig, getStyleField } from '@
 import { WIDGET_CODE } from './config'
 
 export const state = reactive({
-  systemBookmarks: [] as ChromeBookmarkItem[],
+  systemBookmarks: [] as BookmarkNode[],
   selectedFolderTitleStack: [] as string[],
   isLoadPageLoading: false,
   currSelectKeyCode: '',
 })
 
-export const getBrowserBookmarkForKeyboard = async () => {
+export const getSystemBookmarkForKeyboard = async () => {
   if (localConfig.keyboard.source !== 1) return
   try {
-    const root = await getBrowserBookmark()
-    state.systemBookmarks = root[0].children
+    const base = await getBrowserBookmark()
+    state.systemBookmarks = base
   } catch (e) {
     console.warn(e)
     window.$dialog.create({
@@ -35,7 +35,7 @@ export const getBrowserBookmarkForKeyboard = async () => {
       onPositiveClick: async () => {
         const granted = await requestPermission('bookmarks')
         if (!granted) return
-        getBrowserBookmarkForKeyboard()
+        getSystemBookmarkForKeyboard()
       },
       onNegativeClick: () => {
         localConfig.keyboard.source = 2
@@ -45,7 +45,7 @@ export const getBrowserBookmarkForKeyboard = async () => {
 }
 
 export const initKeyboardData = () => {
-  getBrowserBookmarkForKeyboard()
+  getSystemBookmarkForKeyboard()
   state.selectedFolderTitleStack = localConfig.keyboard.defaultExpandFolder ? [localConfig.keyboard.defaultExpandFolder] : []
 }
 
@@ -59,10 +59,10 @@ export const getDefaultBookmarkNameFromUrl = (url: string) => {
   return tempSplitList.includes('www') ? tempSplitList[1] : tempSplitList[0]
 }
 
-const findTargetFolderBookmark = (folderBookmark: ChromeBookmarkItem[], folderTitleStack: string[]) => {
+const findTargetFolderBookmark = (folderBookmark: BookmarkNode[], folderTitleStack: string[]) => {
   try {
     if (folderTitleStack.length === 0) return folderBookmark
-    const targetFolder = folderBookmark.find((item) => item.title === folderTitleStack[0])?.children as ChromeBookmarkItem[]
+    const targetFolder = folderBookmark.find((item) => item.title === folderTitleStack[0])?.children as BookmarkNode[]
     return findTargetFolderBookmark(targetFolder, folderTitleStack.slice(1))
   } catch (e) {
     console.error(e)
@@ -195,13 +195,13 @@ const refreshKeyboardConfig = () => {
 
 addPageFocusTask('keyboard', () => {
   refreshKeyboardConfig()
-  getBrowserBookmarkForKeyboard()
+  getSystemBookmarkForKeyboard()
 })
 
 addVisibilityTask('keyboard', (hidden) => {
   if (hidden) return
   refreshKeyboardConfig()
-  getBrowserBookmarkForKeyboard()
+  getSystemBookmarkForKeyboard()
 })
 
 export const getCustomKeycapWidth = (code: string, addRatio = 0) => {

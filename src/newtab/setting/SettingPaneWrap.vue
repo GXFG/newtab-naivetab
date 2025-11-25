@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { localConfig, localState, availableFontOptions, fontSelectRenderLabel } from '@/logic/store'
-import CustomColorPicker from '@/newtab/setting/components/CustomColorPicker.vue'
+import CustomColorPicker from '~/components/CustomColorPicker.vue'
 import Tips from '@/components/Tips.vue'
 
 const props = defineProps({

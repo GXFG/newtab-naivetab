@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { localConfig } from '@/logic/store'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
 </script>
 
 <template>

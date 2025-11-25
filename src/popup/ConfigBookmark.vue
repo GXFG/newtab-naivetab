@@ -103,7 +103,7 @@ const onOpenBookmarkPicker = async () => {
   state.isBookmarkModalVisible = true
 }
 
-const onSelectBookmark = (payload: ChromeBookmarkItem) => {
+const onSelectBookmark = (payload: BookmarkNode) => {
   state.name = payload.title
   state.url = payload.url || ''
   onCommitConfigBookmark()
@@ -376,15 +376,6 @@ const popupMainWidth = `${getContainerWidth()}px`
 #popup {
   padding-right: 0;
   width: v-bind(popupMainWidth);
-  font-family:
-    Helvetica Neue,
-    Helvetica,
-    Arial,
-    PingFang SC,
-    Heiti SC,
-    Hiragino Sans GB,
-    Microsoft YaHei,
-    sans-serif;
   border-radius: 0 !important;
   overflow: hidden;
   .n-card-header {

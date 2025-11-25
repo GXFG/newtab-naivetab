@@ -5,7 +5,7 @@ import { createTab } from '@/logic/util'
 import { URL_NAIVETAB_DOC_HOME, URL_GITHUB_HOME, URL_FEEDBACK_EMAIL } from '@/logic/constants/index'
 import { openUserGuide } from '@/logic/guide'
 import { openChangelogModal, openExtensionsStorePage } from '@/logic/store'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
 
 const appVersion = computed(() => window.appVersion)
 </script>

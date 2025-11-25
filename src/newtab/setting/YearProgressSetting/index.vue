@@ -4,9 +4,9 @@ import { ICONS } from '@/logic/icons'
 import { URL_DAYJS_FORMAT } from '@/logic/constants/index'
 import { localConfig, localState } from '@/logic/store'
 import Tips from '@/components/Tips.vue'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
-import CustomColorPicker from '@/newtab/setting/components/CustomColorPicker.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
+import CustomColorPicker from '~/components/CustomColorPicker.vue'
 </script>
 
 <template>

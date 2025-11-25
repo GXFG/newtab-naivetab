@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid'
 import { useStorage } from '@vueuse/core'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
 import SponsorToastItem from './SponsorToastItem.vue'
 
 const paymentList = ['wechat', 'alipay']

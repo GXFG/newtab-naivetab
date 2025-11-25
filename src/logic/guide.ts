@@ -98,7 +98,7 @@ export const handleFirstOpen = () => {
     return
   }
   openUserGuide()
-  setTimeout(() => {
-    createTab(URL_NAIVETAB_DOC_STARTED)
-  }, 300)
+  // setTimeout(() => {
+  //   createTab(URL_NAIVETAB_DOC_STARTED)
+  // }, 300)
 }

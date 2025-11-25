@@ -5,11 +5,11 @@ import { isFirefox } from '@/env'
 import { URL_FIREFOX_EXTENSIONS_SHORTCUTS } from '@/logic/constants/index'
 import { requestPermission } from '@/logic/storage'
 import { KEYBOARD_TYPE_OPTION, SPLIT_SPACE_OPTION, KEYCAP_TYPE_OPTION } from '@/logic/constants/keyboard'
-import { state as keyboardState, getBrowserBookmarkForKeyboard } from '~/newtab/widgets/keyboard/logic'
+import { state as keyboardState, getSystemBookmarkForKeyboard } from '~/newtab/widgets/keyboard/logic'
 import { availableFontOptions, fontSelectRenderLabel, localState, localConfig, openConfigShortcutsPage } from '@/logic/store'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
-import CustomColorPicker from '@/newtab/setting/components/CustomColorPicker.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
+import CustomColorPicker from '~/components/CustomColorPicker.vue'
 import Tips from '@/components/Tips.vue'
 import BookmarkConfig from './BookmarkConfig.vue'
 import PresetThemeDrawer from './PresetThemeDrawer.vue'
@@ -33,7 +33,7 @@ const handleBookmarkSourceChange = async (source: number) => {
     localConfig.keyboard.source = 2
     return
   }
-  getBrowserBookmarkForKeyboard()
+  getSystemBookmarkForKeyboard()
 }
 
 const defaultFolderOptions = computed(() => {

@@ -451,6 +451,7 @@ export const handleAppUpdate = async () => {
         localConfig.keyboard[key] = oldBookmark.value[key]
       }
     }
+    localConfig.bookmarkFolder.enabled = false
   }
   // 更新local版本号
   localConfig.general.version = window.appVersion

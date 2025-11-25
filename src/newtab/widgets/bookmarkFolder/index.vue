@@ -2,38 +2,14 @@
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
 import { createTab } from '@/logic/util'
-import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark'
+import { getFaviconFromUrl } from '@/logic/bookmark'
 import { requestPermission } from '@/logic/storage'
 import { localConfig, getStyleField } from '@/logic/store'
 import { isDragMode } from '@/logic/moveable'
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
-
-const state = reactive({
-  systemBookmarks: [] as BookmarkNode[],
-  selectedFolderTitles: [] as string[],
-  isGetBookmarkLoading: false,
-  isNoPermission: false,
-})
-
-const initData = async () => {
-  if (state.isGetBookmarkLoading) {
-    return
-  }
-  state.isGetBookmarkLoading = true
-  try {
-    const root = (await getBrowserBookmark()) as BookmarkNode[]
-    const base = (root?.[0]?.children || root || []) as BookmarkNode[]
-    state.systemBookmarks = base
-    state.selectedFolderTitles = JSON.parse(JSON.stringify(localConfig.bookmarkFolder.selectedFolderTitles)) || []
-    state.isNoPermission = false
-  } catch (e) {
-    console.error(e)
-    state.isNoPermission = true
-  }
-  state.isGetBookmarkLoading = false
-}
+import { initData, state } from './logic'
 
 const requestBookmarkAccess = async () => {
   const granted = await requestPermission('bookmarks')

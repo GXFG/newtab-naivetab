@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { SEARCH_ENGINE_LIST } from '@/logic/constants/index'
 import { localConfig } from '@/logic/store'
-import SettingPaneTitle from '@/newtab/setting/components/SettingPaneTitle.vue'
-import SettingPaneWrap from '@/newtab/setting/components/SettingPaneWrap.vue'
+import SettingPaneTitle from '~/newtab/setting/SettingPaneTitle.vue'
+import SettingPaneWrap from '~/newtab/setting/SettingPaneWrap.vue'
 
 const state = reactive({
   searchEngine: '',
