@@ -2,7 +2,7 @@
   "name": "newtab-naivetab",
   "displayName": "NaiveTab - Newtab page",
   "type": "module",
-  "version": "1.27.2",
+  "version": "1.27.3",
   "private": true,
   "packageManager": "pnpm@10.13.1",
   "description": "A simple and efficient browser new tab extension that allows you to highly customize your new tab page.",
