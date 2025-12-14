@@ -199,7 +199,9 @@ addPageFocusTask('keyboard', () => {
 })
 
 addVisibilityTask('keyboard', (hidden) => {
-  if (hidden) return
+  if (hidden) {
+    return
+  }
   refreshKeyboardConfig()
   getSystemBookmarkForKeyboard()
 })

@@ -23,6 +23,7 @@ const getNowData = async () => {
   weatherState.value.now = { syncTime: dayjs().valueOf(), ...data.now }
   log('Weather update now')
 }
+
 const getForecastData = async () => {
   const data = await getWeatherForecast()
   if (data.code !== '200') return
@@ -30,12 +31,14 @@ const getForecastData = async () => {
   weatherState.value.forecast.syncTime = dayjs().valueOf()
   log('Weather update forecast')
 }
+
 const getAirData = async () => {
   const data = await getWeatherAirNow()
   if (data.code !== '200') return
   weatherState.value.air = { syncTime: dayjs().valueOf(), ...data.now }
   log('Weather update air')
 }
+
 const getWarningData = async () => {
   const data = await getWeatherWarning()
   if (data.code !== '200') return
@@ -52,12 +55,17 @@ export const updateWeather = () => {
   if (currTS - weatherState.value.warning.syncTime >= 3600000 * 1) getWarningData()
   if (currTS - weatherState.value.forecast.syncTime >= 3600000 * 4) getForecastData()
 }
+
 export const refreshWeather = () => {
+  if (!localConfig.weather.enabled) {
+    return
+  }
   getNowData()
   getAirData()
   getWarningData()
   getForecastData()
 }
+
 export const handleWatchWeatherConfigChange = () => {
-  watch([() => localConfig.weather.city.id, () => localConfig.general.lang], () => refreshWeather())
+  return watch([() => localConfig.weather.city.id, () => localConfig.general.lang], () => refreshWeather())
 }

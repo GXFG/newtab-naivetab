@@ -184,7 +184,9 @@ export const onRetryNews = (value: NewsSources) => {
 }
 
 export const updateNews = async () => {
-  if (!localConfig.news.enabled) return
+  if (!localConfig.news.enabled) {
+    return
+  }
   const currTS = dayjs().valueOf()
   const intervalTime = localConfig.news.refreshIntervalTime * 60000
   const promises = localConfig.news.sourceList
@@ -198,5 +200,5 @@ export const updateNews = async () => {
 }
 
 export const handleWatchNewsConfigChange = () => {
-  watch(() => localConfig.news.sourceList, () => updateNews())
+  return watch(() => localConfig.news.sourceList, () => updateNews())
 }

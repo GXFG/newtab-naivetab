@@ -111,7 +111,7 @@ const genUploadConfigStatusMap = () => {
     }
   }
   for (const widget in defaultConfig) {
-    statusMap[widget] = defaultUploadStatusItem
+    statusMap[widget as ConfigField] = { ...defaultUploadStatusItem }
   }
   return statusMap
 }

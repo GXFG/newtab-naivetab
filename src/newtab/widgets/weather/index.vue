@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getIsWidgetRender, getStyleField } from '@/logic/store'
-import { updateWeather, refreshWeather } from '@/newtab/widgets/weather/logic'
+import { updateWeather, refreshWeather, handleWatchWeatherConfigChange } from '@/newtab/widgets/weather/logic'
 import WidgetWrap from '../WidgetWrap.vue'
 import NowWeather from './NowWeather.vue'
 import ForecastWeather from './ForecastWeather.vue'
@@ -8,8 +8,17 @@ import { WIDGET_CODE } from './config'
 
 const isRender = getIsWidgetRender(WIDGET_CODE)
 
+let weatherConfigChangeHandle: ReturnType<typeof handleWatchWeatherConfigChange> | null = null
+
 onMounted(() => {
   updateWeather()
+  weatherConfigChangeHandle = handleWatchWeatherConfigChange()
+})
+
+onUnmounted(() => {
+  if (weatherConfigChangeHandle) {
+    weatherConfigChangeHandle()
+  }
 })
 
 // 开启主开关后立即更新数据

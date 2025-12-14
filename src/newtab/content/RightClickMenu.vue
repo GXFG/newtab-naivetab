@@ -3,7 +3,9 @@ import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
 import { gaProxy } from '@/logic/gtag'
 import { isDragMode, toggleIsDragMode, getTargetDataFromEvent } from '@/logic/moveable'
-import { toggleFullscreen, switchSettingDrawerVisible, globalState, localConfig } from '@/logic/store'
+import { toggleFullscreen, switchSettingDrawerVisible, globalState, localConfig, localState } from '@/logic/store'
+import { imageState, imageLocalState, getImageUrlFromName } from '@/logic/image'
+import { downloadImageByUrl } from '@/logic/util'
 import { WIDGET_CODE_LIST } from '@/newtab/widgets/codes'
 
 const state = reactive({
@@ -18,9 +20,11 @@ const renderIconFunc = (icon: string) => () => h(Icon, { icon })
 const menuList = computed(() => {
   const isFocusMode = localConfig.general.isFocusMode
   const isHoverWidget = state.currTargetCode.length !== 0
+  const isDownloadVisible = !isDragMode.value && localConfig.general.isBackgroundImageEnabled
+  const targetLabel = isHoverWidget ? window.$t(`setting.${state.currTargetCode}`) : window.$t('setting.general')
   const list = [
     {
-      label: (isHoverWidget ? window.$t(`setting.${state.currTargetCode}`) : window.$t('setting.general')) + window.$t('common.setting'),
+      label: targetLabel + window.$t('common.setting'),
       key: 'setting',
       icon: renderIconFunc(ICONS.settings),
       disabled: isDragMode.value,
@@ -36,24 +40,19 @@ const menuList = computed(() => {
       key: 'focusMode',
       icon: renderIconFunc(ICONS.focus),
     },
-    ...(
-      isFocusMode
-        ? [{ label: window.$t('rightMenu.editFocusMode'), key: 'editFocusMode', icon: renderIconFunc('mdi:tune'), disabled: isDragMode.value }]
-        : []
-    ),
-    {
-      label: `${globalState.isFullScreen ? window.$t('common.exit') : ''}${window.$t('rightMenu.fullscreen')}`,
-      key: 'fullscreen',
-      icon: renderIconFunc(ICONS.fullscreen),
-    },
-    ...(
-      !isFocusMode
-        ? [{ type: 'divider', key: 'd2' },
-            { label: window.$t('setting.aboutSponsor'), key: 'aboutSponsor', icon: renderIconFunc(ICONS.sponsor) }]
-        : []
-    ),
   ]
+  if (isFocusMode) {
+    list.push({ label: window.$t('rightMenu.editFocusMode'), key: 'editFocusMode', icon: renderIconFunc('mdi:tune'), disabled: isDragMode.value })
+  }
+  list.push({ label: `${globalState.isFullScreen ? window.$t('common.exit') : ''}${window.$t('rightMenu.fullscreen')}`, key: 'fullscreen', icon: renderIconFunc(ICONS.fullscreen) })
+  if (isDownloadVisible) {
+    list.push({ label: window.$t('rightMenu.downloadWallpaper'), key: 'downloadWallpaper', icon: renderIconFunc(ICONS.downloadFill) })
+  }
   if (!isFocusMode) {
+    list.push(
+      { type: 'divider', key: 'd2' },
+      { label: window.$t('setting.aboutSponsor'), key: 'aboutSponsor', icon: renderIconFunc(ICONS.sponsor) },
+    )
     if (isHoverWidget) {
       list.push({ type: 'divider', key: 'd3' })
       list.push({ label: window.$t('common.delete'), key: 'deleteWidget', icon: renderIconFunc(ICONS.deleteBin) })
@@ -96,6 +95,64 @@ const menuActionMap = {
   },
   editFocusMode: () => {
     openSettingPane('focusMode')
+  },
+  downloadWallpaper: async () => {
+    if (!localConfig.general.isBackgroundImageEnabled) {
+      return
+    }
+    try {
+      if (localConfig.general.backgroundImageSource === 0) {
+        const objectUrl = imageState.currBackgroundImageFileObjectURL
+        const filename = imageState.currBackgroundImageFileName || 'wallpaper.jpg'
+        if (!objectUrl) {
+          return
+        }
+        const link = document.createElement('a')
+        link.href = objectUrl
+        link.download = filename
+        link.click()
+      } else {
+        const quality: TImage.quality = localConfig.general.backgroundImageHighQuality ? 'high' : 'medium'
+        const appearanceCode = localState.value.currAppearanceCode
+        let url = ''
+        if (localConfig.general.backgroundImageSource === 1) {
+          if (localConfig.general.isBackgroundImageCustomUrlEnabled) {
+            url = localConfig.general.backgroundImageCustomUrls[appearanceCode]
+          } else {
+            const name = localConfig.general.backgroundImageNames && localConfig.general.backgroundImageNames[appearanceCode]
+            url = getImageUrlFromName(
+              localConfig.general.backgroundNetworkSourceType,
+              name,
+              quality,
+            )
+          }
+        } else if (localConfig.general.backgroundImageSource === 2) {
+          const todayImage = imageLocalState.value.bing.list[0]
+          const name = todayImage && todayImage.name
+          url = name ? getImageUrlFromName(1, name, quality) : ''
+        }
+        if (!url) {
+          return
+        }
+        let filename = 'wallpaper.jpg'
+        try {
+          const u = new URL(url)
+          const idParam = u.searchParams.get('id')
+          if (idParam) {
+            filename = idParam
+          } else {
+            const pathName = u.pathname.split('/').pop() || ''
+            filename = pathName.split('?')[0] || 'wallpaper.jpg'
+          }
+        } catch (e) {
+          // noop
+        }
+        await downloadImageByUrl(url, filename)
+      }
+      gaProxy('click', ['rightMenu', 'downloadWallpaper'])
+    } catch (e) {
+      // noop
+    }
   },
   aboutSponsor: () => {
     openSettingPane('aboutSponsor')
