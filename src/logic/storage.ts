@@ -52,13 +52,21 @@ const getUploadConfigData = (field: ConfigField) => {
 const uploadConfigFn = (field: ConfigField) => {
   return new Promise((resolve) => {
     if (!localState.value.isUploadConfigStatusMap[field]) {
-      localState.value.isUploadConfigStatusMap[field] = defaultUploadStatusItem
+      localState.value.isUploadConfigStatusMap[field] = { ...defaultUploadStatusItem }
     }
     localState.value.isUploadConfigStatusMap[field].loading = true
     log(`Upload config-${field} start`)
-    const currTime = Date.now()
     const uploadData = getUploadConfigData(field)
     const currConfigMd5 = md5(JSON.stringify(uploadData)).toString()
+    const prevSyncId = localState.value.isUploadConfigStatusMap[field].syncId
+    if (prevSyncId === currConfigMd5) {
+      setTimeout(() => {
+        localState.value.isUploadConfigStatusMap[field].loading = false
+        resolve(true)
+      }, 100)
+      return
+    }
+    const currTime = Date.now()
     localState.value.isUploadConfigStatusMap[field].syncTime = currTime
     localState.value.isUploadConfigStatusMap[field].syncId = currConfigMd5
     const payload = {
@@ -131,7 +139,6 @@ export const handleMissedUploadConfig = async () => {
   }
 }
 
-// Todo 本地localStorage清空时会导致本地部分配置丢失，并重新上传覆盖了云端配置
 /**
  * 载入远程配置信息
  * chrome.storage 格式示例：

@@ -10,8 +10,6 @@ import { getStyleField, localConfig, nativeUILang, currTheme, themeOverrides, ha
 import { initBackgroundImage } from '@/logic/image'
 import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'
 import { initKeyboardData, resetKeyboardPending } from '~/newtab/widgets/keyboard/logic'
-import { handleWatchNewsConfigChange } from '@/newtab/widgets/news/logic'
-import { handleWatchWeatherConfigChange } from '@/newtab/widgets/weather/logic'
 import { updatePoetry } from '@/logic/poetry'
 import Content from '@/newtab/Content.vue'
 
@@ -72,15 +70,14 @@ onMounted(async () => {
   handleStateResetAndUpdate()
   startTimer()
   startKeydown()
+  // 先加载远程配置，再处理缺失的上传配置
+  await loadRemoteConfig()
+  await handleMissedUploadConfig()
   handleWatchLocalConfigChange()
   initKeyboardData()
-  await handleMissedUploadConfig()
-  await loadRemoteConfig()
   await nextTick()
   handleFirstOpen()
   handleAppUpdate()
-  handleWatchNewsConfigChange()
-  handleWatchWeatherConfigChange()
   handleFocusPage()
   updatePoetry()
   onDot()

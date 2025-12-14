@@ -455,7 +455,7 @@ export const handleAppUpdate = async () => {
   }
   // 更新local版本号
   localConfig.general.version = window.appVersion
-  // updateSuccess()
+  updateSuccess()
   // 刷新配置设置
   await updateSetting()
 }

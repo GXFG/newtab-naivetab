@@ -2,7 +2,7 @@
 import { gaProxy } from '@/logic/gtag'
 import { createTab } from '@/logic/util'
 import { isDragMode } from '@/logic/moveable'
-import { state, newsLocalState, updateNews, onRetryNews } from '@/newtab/widgets/news/logic'
+import { state, newsLocalState, updateNews, onRetryNews, handleWatchNewsConfigChange } from '@/newtab/widgets/news/logic'
 import { localConfig, getIsWidgetRender, getStyleField, getStyleConst } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
@@ -44,8 +44,17 @@ const onMouseDownKey = (event: MouseEvent, url: string) => {
   createTab(url, false)
 }
 
+let newsConfigChangeHandle: ReturnType<typeof handleWatchNewsConfigChange> | null = null
+
 onMounted(() => {
   updateNews()
+  newsConfigChangeHandle = handleWatchNewsConfigChange()
+})
+
+onUnmounted(() => {
+  if (newsConfigChangeHandle) {
+    newsConfigChangeHandle()
+  }
 })
 
 // 开启主开关后立即更新数据
