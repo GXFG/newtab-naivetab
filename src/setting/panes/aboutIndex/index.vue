@@ -13,7 +13,7 @@ import {
   openExtensionsStorePage,
   globalState,
 } from '@/logic/store'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
+import { SettingHeaderBar } from '@/setting/components'
 
 const appVersion = computed(() => window.appVersion)
 
@@ -29,7 +29,7 @@ const handleOpenUserGuide = () => {
 <template>
   <SettingHeaderBar :title="$t('setting.aboutIndex')" />
 
-  <div class="setting__pane__content">
+  <div class="setting__pane-content">
     <!-- Hero 区域 -->
     <div class="about__hero">
       <div class="hero__bg-pattern" />
@@ -137,6 +137,7 @@ const handleOpenUserGuide = () => {
               class="card__icon"
             />
           </span>
+          <!-- GitHub 为全球通用品牌名称，无需 i18n -->
           <span class="card__label">GitHub</span>
         </button>
 
@@ -151,12 +152,13 @@ const handleOpenUserGuide = () => {
               class="card__icon"
             />
           </span>
+          <!-- Email 为通用通讯方式名称，无需 i18n -->
           <span class="card__label">Email</span>
         </button>
       </div>
     </div>
 
-    <!-- 版权 -->
+    <!-- 版权声明为品牌展示需要，无需 i18n -->
     <p class="about__copyright">
       © {{ new Date().getFullYear() }} NaiveTab · All rights reserved.
     </p>

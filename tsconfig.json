@@ -22,16 +22,18 @@
     ],
     "types": [
       "vite/client",
-      "chrome"
+      "chrome",
+      "node",
     ],
     "paths": {
       "@/*": ["src/*"],
     }
   },
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["dist", "node_modules", "src/**/__tests__"],
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.vue",
+    "scripts/**/*.ts"
   ]
 }

@@ -282,8 +282,8 @@ const handlerDeleteMouseUp = () => {
 }
 .draft-tool--shadow {
   box-shadow:
-    0 -4px 24px rgba(0, 0, 0, 0.55),
-    0 -1px 6px rgba(0, 0, 0, 0.3);
+    0 -4px 24px var(--gray-alpha-55),
+    0 -1px 6px var(--gray-alpha-35);
 }
 
 #draft-tool {
@@ -309,9 +309,9 @@ const handlerDeleteMouseUp = () => {
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.18) 30%,
-      rgba(255, 255, 255, 0.28) 50%,
-      rgba(255, 255, 255, 0.18) 70%,
+      var(--gray-alpha-18) 30%,
+      var(--gray-alpha-28) 50%,
+      var(--gray-alpha-18) 70%,
       transparent
     );
     border-top-left-radius: 16px;
@@ -342,8 +342,8 @@ const handlerDeleteMouseUp = () => {
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       box-shadow:
-        -3px -4px 10px rgba(0, 0, 0, 0.4),
-        3px -4px 10px rgba(0, 0, 0, 0.4);
+        -3px -4px 10px var(--gray-alpha-40),
+        3px -4px 10px var(--gray-alpha-40);
       transform: translate(-50%, 0);
       cursor: pointer;
       transition: color 200ms ease;
@@ -358,7 +358,7 @@ const handlerDeleteMouseUp = () => {
         background: linear-gradient(
           90deg,
           transparent,
-          rgba(255, 255, 255, 0.3) 50%,
+          var(--gray-alpha-30) 50%,
           transparent
         );
         border-radius: 50%;
@@ -387,10 +387,10 @@ const handlerDeleteMouseUp = () => {
       align-items: center;
       height: 52px;
       width: 100%;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid var(--gray-alpha-08);
       background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.04) 0%,
+        var(--gray-alpha-04) 0%,
         transparent 100%
       );
       border-top-left-radius: 16px;
@@ -415,7 +415,7 @@ const handlerDeleteMouseUp = () => {
           background-size: 100%;
           background-image: url('/assets/img/keyboard/esc.png');
           opacity: 0.85;
-          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+          filter: drop-shadow(0 1px 2px var(--gray-alpha-40));
         }
       }
       .header__tips {
@@ -435,7 +435,7 @@ const handlerDeleteMouseUp = () => {
       overflow-y: auto;
       /* 自定义滚动条 */
       scrollbar-width: thin;
-      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+      scrollbar-color: var(--gray-alpha-15) transparent;
       &::-webkit-scrollbar {
         width: 4px;
       }
@@ -443,7 +443,7 @@ const handlerDeleteMouseUp = () => {
         background: transparent;
       }
       &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
+        background: var(--gray-alpha-15);
         border-radius: 2px;
       }
       .content__group {
@@ -478,11 +478,11 @@ const handlerDeleteMouseUp = () => {
         width: 8vw;
         height: 78px;
         font-size: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 10px;
+        border: 1px solid var(--gray-alpha-12);
+        border-radius: var(--radius-xl);
         cursor: move;
         user-select: none;
-        background: rgba(255, 255, 255, 0.04);
+        background: var(--gray-alpha-04);
         transition:
           background 180ms ease,
           border-color 180ms ease,
@@ -500,7 +500,7 @@ const handlerDeleteMouseUp = () => {
           height: 40%;
           background: linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.07) 0%,
+            var(--gray-alpha-07) 0%,
             transparent 100%
           );
           pointer-events: none;
@@ -522,7 +522,7 @@ const handlerDeleteMouseUp = () => {
           height: 20px;
           line-height: 20px;
           text-align: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          border-top: 1px solid var(--gray-alpha-08);
           opacity: 0.8;
           letter-spacing: 0.02em;
           font-size: 11px;
@@ -534,7 +534,7 @@ const handlerDeleteMouseUp = () => {
         border-color: rgba(100, 181, 246, 0.45);
         box-shadow:
           0 2px 12px rgba(100, 181, 246, 0.2),
-          inset 0 1px 0 rgba(255, 255, 255, 0.12);
+          inset 0 1px 0 var(--gray-alpha-12);
         transform: translateY(-1px);
         .item__icon {
           opacity: 1;
@@ -576,7 +576,7 @@ const handlerDeleteMouseUp = () => {
       font-size: 36px;
       color: #fff;
       transform: rotate(-45deg);
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      filter: drop-shadow(0 2px 4px var(--gray-alpha-35));
       transition:
         transform 250ms cubic-bezier(0.34, 1.06, 0.64, 1),
         filter 250ms ease;
@@ -595,7 +595,7 @@ const handlerDeleteMouseUp = () => {
       -6px 6px 40px rgba(220, 38, 38, 0.8),
       0 0 60px rgba(255, 80, 80, 0.35);
     .delete__icon {
-      filter: drop-shadow(0 2px 12px rgba(255, 255, 255, 0.5));
+      filter: drop-shadow(0 2px 12px var(--gray-alpha-55));
       transform: rotate(-45deg) scale(1.15);
     }
   }

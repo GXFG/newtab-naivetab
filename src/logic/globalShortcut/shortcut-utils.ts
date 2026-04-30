@@ -5,17 +5,33 @@
  * 示例: "ctrl+shift+keyk", "alt+digit1", "meta+keya"
  *
  * 修饰键顺序: ctrl → shift → alt → meta
- * 必须至少包含一个修饰键
+ * 默认必须至少包含一个修饰键；noModifierMode 开启后只需单个主键即可匹配。
  */
 
 import { isMacOS } from '@/env'
 
 /**
+ * 清理并标准化域名：去掉协议、路径、端口、www 前缀，统一转小写。
+ * 用于黑名单输入的规范化处理，保证匹配一致性。
+ */
+export function normalizeDomain(input: string): string {
+  return input
+    .trim()
+    .replace(/^https?:\/\//i, '') // 去掉协议前缀
+    .replace(/[/:?#].*$/, '') // 去掉端口、路径、参数、锚点
+    .replace(/^www\./i, '') // 去掉 www. 前缀
+    .toLowerCase() // 域名不区分大小写
+}
+
+/**
  * 检查 URL 是否在黑名单中
  *
- * 支持两种格式：
+ * 支持三种格式：
  * - 完整域名：'google.com' — 匹配 google.com 及所有子域名
- * - 通配符模式：'*.google.com' — 仅匹配子域名（不匹配 google.com 本身）
+ * - 通配符模式：'*.google.com' — 匹配 google.com 及所有子域名（与上一种等价）
+ * - 全量通配符：'*' — 匹配所有域名
+ *
+ * 内部对 pattern 自动做 normalize 处理，保证与输入端的清理逻辑一致。
  *
  * @param hostname 当前页面 hostname（如 'docs.google.com'）
  * @param blacklist 黑名单数组
@@ -26,16 +42,23 @@ export function isUrlInBlacklist(
 ): boolean {
   if (!blacklist || blacklist.length === 0) return false
 
+  const normalizedHostname = normalizeDomain(hostname)
+
   for (const pattern of blacklist) {
     if (!pattern) continue
-    if (pattern.startsWith('*.')) {
-      // '*.google.com' 匹配 'docs.google.com' 但不匹配 'google.com'
-      const suffix = pattern.slice(1) // '.google.com'
-      if (hostname.endsWith(suffix)) return true
-    } else {
-      // 'google.com' 精确匹配或子域名匹配
-      if (hostname === pattern || hostname.endsWith('.' + pattern)) return true
-    }
+    const domain = pattern.startsWith('*.')
+      ? pattern.slice(2)
+      : normalizeDomain(pattern)
+
+    // '*' 匹配所有域名
+    if (domain === '*') return true
+
+    // 精确匹配或子域名匹配
+    if (
+      normalizedHostname === domain ||
+      normalizedHostname.endsWith('.' + domain)
+    )
+      return true
   }
   return false
 }
@@ -236,13 +259,14 @@ export function isInInputElement(): boolean {
 /**
  * 全局快捷键匹配公共函数（纯匹配，无副作用）
  *
- * 封装核心匹配逻辑：输入元素检查 → 黑名单检查 → 修饰键匹配 → 主键检查
+ * 封装核心匹配逻辑：输入元素检查 → 黑名单检查 → 修饰键/无修饰键匹配 → 主键检查
  * Content Script 和 newtab 页面复用此函数，避免逻辑重复
  *
  * 修饰键比较采用位掩码方式（ctrl=1, shift=2, alt=4, meta=8），
  * 一次整数相等判断即完成集合匹配，O(1) 且零分配。
- * 从根本上消除了bug（字符串 'alt+shift' ≠ 'shift+alt'）。
+ * 从根本上消除了 bug（字符串 'alt+shift' ≠ 'shift+alt'）。
  *
+ * @param noModifierMode 无修饰键模式，开启后只需按单个主键即可匹配（有修饰键按下时不匹配）
  * @returns 匹配成功返回 event.code，失败返回 null
  */
 export function matchShortcut(
@@ -252,6 +276,7 @@ export function matchShortcut(
   shortcutInInputElement: boolean,
   urlBlacklist?: string[],
   hostname?: string,
+  noModifierMode?: boolean,
 ): string | null {
   if (e.repeat) return null
   if (!isEnabled) return null
@@ -267,6 +292,14 @@ export function matchShortcut(
     isUrlInBlacklist(hostname, urlBlacklist)
   )
     return null
+
+  // 无修饰键模式：跳过修饰键检查，直接匹配主键
+  if (noModifierMode) {
+    if (!ALLOWED_SET.has(e.code)) return null
+    // 有修饰键按下时不匹配，防止劫持 Ctrl+C 等系统快捷键
+    if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return null
+    return e.code
+  }
 
   // 配置修饰键为空或未配置时不匹配
   if (!globalShortcutModifiers || globalShortcutModifiers.length === 0) {
@@ -296,8 +329,9 @@ export function matchShortcut(
    *   - 命令： 4 !== 6  → 不匹配
    * 因此同一主键不会在两套系统中同时触发。
    *
-   * 冲突仅发生在用户手动将两套系统的修饰键改为相同时，
-   * 此时 contentScripts/index.ts 的 hasModifierConflict 会拦截（书签优先）。
+   * 冲突场景：
+   * 1. 用户手动将两套系统的修饰键改为相同 → contentScripts/index.ts 的 hasModifierConflict 拦截（命令优先）
+   * 2. 两者同时开启 noModifierMode → 同键同时匹配 → CS 侧 hasModifierConflict 拦截（命令优先）
    */
 
   // 检查主键是否在允许列表中

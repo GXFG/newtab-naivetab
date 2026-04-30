@@ -195,7 +195,6 @@ const EMPTY_PLACEHOLDER = ' '
   height: 100%;
   color: var(--nt-kb-main-font-color);
   background-color: var(--nt-kb-main-bg-color);
-  backdrop-filter: blur(var(--nt-kb-background-blur));
   border-radius: var(--nt-kb-border-radius);
   border-style: solid;
   box-sizing: border-box;
@@ -357,9 +356,10 @@ const EMPTY_PLACEHOLDER = ' '
       border-radius: 99px;
       background: var(--nt-kb-main-font-color);
       opacity: 0.45;
+      /* 键盘组件的 box-shadow 不使用全局 token，避免 tokens.css 变化影响键帽质感 */
       box-shadow:
-        inset 0 1px 1px var(--gray-alpha-35),
-        0 1px 0 var(--gray-alpha-15);
+        inset 0 1px 1px rgba(255, 255, 255, 0.35),
+        0 1px 0 rgba(255, 255, 255, 0.15);
     }
   }
 }
@@ -556,11 +556,7 @@ const EMPTY_PLACEHOLDER = ' '
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* 预览模式（设置面板使用）：禁用 backdrop-filter，hover 不触发 filter / box-shadow 变化 */
-.row__keycap--preview {
-  backdrop-filter: none;
-}
-
+/* 预览模式（设置面板使用）：hover 不触发 filter / box-shadow 变化 */
 .row__keycap--preview:hover {
   transform: translate3d(0px, -1px, 0);
   filter: none !important;

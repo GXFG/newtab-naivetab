@@ -263,6 +263,66 @@ describe('importSetting migrations', () => {
     await importSetting(JSON.stringify(oldFormat))
     expect(getMock().localConfig.general.version).toBe('2.2.5')
   })
+
+  it('skips keyboard migration when keyboardBookmark already exists', async () => {
+    // keyboard → keyboardBookmark 迁移仅在 keyboardBookmark 不存在时触发
+    const oldFormat = {
+      general: { version: '2.2.0' },
+      keyboardBookmark: { keymap: { KeyA: { url: 'https://existing.com' } } },
+      keyboard: { keymap: { KeyB: { url: 'https://migrated.com' } } },
+    }
+    await importSetting(JSON.stringify(oldFormat))
+    // keyboardBookmark 已存在，keyboard 不会被迁移
+    expect(getMock().localConfig.keyboardBookmark.keymap).toHaveProperty('KeyA')
+    expect(getMock().localConfig.keyboardBookmark.keymap).not.toHaveProperty('KeyB')
+  })
+
+  it('preserves existing new keys in focusVisibleWidgetMap during migration', async () => {
+    // 当旧数据同时包含旧 key (keyboard) 和新 key (keyboardBookmark) 时
+    // 迁移逻辑应该不覆盖已存在的新 key
+    const oldFormat = {
+      general: {
+        version: '2.2.0',
+        focusVisibleWidgetMap: {
+          keyboard: true, // 旧 key，会被改为 keyboardBookmark
+          keyboardBookmark: true, // 新 key，已存在
+          search: true, // 其他正常 key
+        },
+      },
+    }
+    await importSetting(JSON.stringify(oldFormat))
+    const fvm = getMock().localConfig.general.focusVisibleWidgetMap
+    expect(fvm.keyboardBookmark).toBe(true)
+    expect(fvm.search).toBe(true)
+  })
+
+  it('imports full nested config with deep structure', async () => {
+    // 使用接近真实结构的配置导入，验证多层嵌套不被破坏
+    const fullConfig = {
+      general: {
+        version: '2.1.0',
+        lang: 'zh-CN',
+        appearance: 'auto',
+        focusVisibleWidgetMap: { search: true, clockDigital: true },
+      },
+      keyboardBookmark: {
+        keymap: {
+          KeyA: { url: 'https://google.com', name: 'Google' },
+          Digit1: { url: 'https://github.com', name: 'GitHub' },
+        },
+        source: 2,
+        defaultExpandFolder: 'work',
+      },
+      search: { isNewTabOpen: true, isVoiceEnabled: true },
+    }
+    await importSetting(JSON.stringify(fullConfig))
+    const m = getMock().localConfig
+    expect(m.general.lang).toBe('zh-CN')
+    expect(m.keyboardBookmark.keymap.KeyA.name).toBe('Google')
+    expect(m.keyboardBookmark.source).toBe(2)
+    expect(m.keyboardBookmark.defaultExpandFolder).toBe('work')
+    expect(m.search.isNewTabOpen).toBe(true)
+  })
 })
 
 describe('importSetting error handling', () => {

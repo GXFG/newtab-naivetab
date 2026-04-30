@@ -1,0 +1,180 @@
+/* ============================================================
+   Setting Panel — Global Shared Styles
+   仅保留被多个 pane 直接使用的公共样式。
+   组件专属样式已移至对应 .vue 的 <style scoped> 中。
+
+   命名规范：
+   - setting__section-title      分组标题行（图标+文字）
+   - setting__pane-content       面板内容容器
+   - setting__num-input          定宽数字输入框（含间距）
+   - setting__btn                操作按钮
+   ============================================================ */
+
+/* ——— 面板结构：标题与内容 ——— */
+
+.setting__section-title {
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 500;
+  opacity: var(--opacity-secondary);
+  letter-spacing: 0.2px;
+  /* Do not set font-size, inherit from context */
+  .title__icon {
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--text-lg);
+  }
+}
+
+/* 面板内容容器，统一内边距 */
+.setting__pane-content {
+  padding: var(--space-4);
+  padding-top: var(--space-2);
+}
+
+/* ——— 布局组合：高频模式简化 ——— */
+
+/* 填充型输入框：NInput / NSelect 等，占据剩余空间 */
+.setting__fill-input {
+  margin-left: var(--space-2);
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/* 定宽数字输入框：NInputNumber，含前缀间距 */
+.setting__num-input {
+  margin-left: var(--space-2);
+  width: 110px;
+  flex-shrink: 0;
+}
+
+/* 定宽单位输入框：含前缀文本的 NInputNumber */
+.setting__num-input--unit {
+  margin-left: var(--space-2);
+  width: 150px;
+  flex-shrink: 0;
+}
+
+/* 控制组容器：NRadioGroup / NSegmented 等同行控件，含左侧间距 */
+.setting__control-group {
+  margin-left: var(--space-2);
+  display: inline-flex;
+}
+
+/* ——— 过渡动画 ——— */
+
+/* 开关/颜色选择等附加控件的控制行容器 */
+.setting__toggle-extra {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+/* Transition 动画元素，防止 max-height 动画期间高度抖动 */
+/* 注意：overflow 不在基类上，避免动画完成后持续裁切内容 */
+
+/* 水平缩放展开动画，适合同行内联元素（如开关旁边的输入框） */
+.setting-expand-enter-active,
+.setting-expand-leave-active {
+  transition: opacity var(--transition-base), transform var(--transition-base);
+  transform-origin: left center;
+}
+.setting-expand-enter-from,
+.setting-expand-leave-to {
+  opacity: 0;
+  transform: scaleX(0.85);
+}
+.setting-expand-enter-to,
+.setting-expand-leave-from {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* 垂直滑动展开动画，适合整块垂直展开 */
+.setting-slide-enter-active,
+.setting-slide-leave-active {
+  transition: opacity var(--transition-base), max-height var(--transition-base);
+  overflow: hidden !important;
+  max-height: 200px;
+}
+.setting-slide-enter-from,
+.setting-slide-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+.setting-slide-enter-to,
+.setting-slide-leave-from {
+  opacity: 1;
+  max-height: 200px;
+}
+
+/* ——— 交互：操作按钮 ——— */
+
+.setting__btn {
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: box-shadow var(--transition-base), transform var(--transition-fast) !important;
+
+  &:not(.n-button--loading):hover {
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+    box-shadow: none !important;
+  }
+}
+
+.setting__btn--primary {
+  box-shadow: 0 1px 3px rgba(24, 160, 88, 0.18),
+              0 1px 1px rgba(24, 160, 88, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  &:hover {
+    box-shadow: 0 3px 8px rgba(24, 160, 88, 0.24),
+                0 1px 2px rgba(24, 160, 88, 0.14),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+.setting__btn--warning {
+  box-shadow: 0 1px 3px rgba(240, 160, 32, 0.2),
+              0 1px 1px rgba(240, 160, 32, 0.12),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  &:hover {
+    box-shadow: 0 3px 8px rgba(240, 160, 32, 0.28),
+                0 1px 2px rgba(240, 160, 32, 0.16),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+.setting__btn--error {
+  box-shadow: 0 1px 3px rgba(208, 48, 80, 0.2),
+              0 1px 1px rgba(208, 48, 80, 0.12),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  &:hover {
+    box-shadow: 0 3px 8px rgba(208, 48, 80, 0.28),
+                0 1px 2px rgba(208, 48, 80, 0.16),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+.setting__btn--default {
+  box-shadow: 0 1px 3px var(--gray-alpha-15),
+              0 1px 1px var(--gray-alpha-08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  &:hover {
+    box-shadow: 0 3px 8px var(--gray-alpha-20),
+                0 1px 2px var(--gray-alpha-12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* ——— 第三方覆盖 ——— */
+
+/* 下拉选项内容撑满 */
+.n-base-select-option__content {
+  width: 100% !important;
+}

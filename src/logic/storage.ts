@@ -121,6 +121,26 @@ export const isUploadConfigLoading = computed(() => {
 })
 
 /**
+ * 最近一次成功同步的时间（取各字段 syncTime 的最大值）
+ */
+export const lastSyncTime = computed(() => {
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      localState.value,
+      'isUploadConfigStatusMap',
+    )
+  ) {
+    return '0'
+  }
+  let maxTime = 0
+  for (const key of Object.keys(localState.value.isUploadConfigStatusMap)) {
+    const t = localState.value.isUploadConfigStatusMap[key].syncTime
+    if (t > maxTime) maxTime = t
+  }
+  return maxTime ? dayjs(maxTime).format('YYYY-MM-DD HH:mm:ss') : '0'
+})
+
+/**
  * 各 field 在 chrome.storage.sync 中的实际占用字节数（通过 getBytesInUse 获取）
  * key: ConfigField, value: bytes
  */
@@ -566,7 +586,7 @@ export const setupLocalStorageSyncListener = () => {
  * @param remoteVersion 远程版本
  * @returns 合并后的配置数据
  */
-const mergeConfigWithVersionAwareness = (
+export const mergeConfigWithVersionAwareness = (
   localData: Record<string, any>,
   remoteData: Record<string, any>,
   localVersion: string,

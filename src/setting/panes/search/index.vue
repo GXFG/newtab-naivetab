@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { SEARCH_ENGINE_LIST } from '@/logic/constants/search'
 import { localConfig } from '@/logic/store'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
+import { ICONS } from '@/logic/icons'
 import {
-  SliderField,
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormItem,
+  SettingFormSection,
+  SettingFormInlineRow,
+} from '@/setting/components'
+import {
+  NumberField,
   SwitchField,
   FontField,
   ToggleColorField,
@@ -82,21 +88,15 @@ const searchSelectRenderLabel = (option: {
 </script>
 
 <template>
-  <SettingHeaderBar
-    :title="$t('setting.search')"
-    widget-code="search"
-  />
+  <SettingHeaderBar :title="$t('setting.search')" />
 
-  <SettingFormWrap
-    widget-code="search"
-    :sections="[
-      { slot: 'searchBar', label: $t('search.searchBar') },
-      { slot: 'dropdown', label: $t('search.suggestion') },
-    ]"
-  >
-    <!-- 功能配置 -->
-    <template #behavior>
-      <NFormItem :label="$t('search.searchEngine')">
+  <SettingFormWrap widget-code="search">
+    <!-- 搜索引擎 -->
+    <SettingFormSection
+      :title="$t('search.searchBar')"
+      :icon="ICONS.searchAction"
+    >
+      <SettingFormItem :label="$t('search.searchEngine')">
         <NSelect
           v-model:value="state.searchEngine"
           :options="searchEngineList"
@@ -104,93 +104,133 @@ const searchSelectRenderLabel = (option: {
           size="small"
           @update:value="onChangeSearch"
         />
-      </NFormItem>
+      </SettingFormItem>
+
       <Transition name="setting-slide">
-        <NFormItem
+        <SettingFormItem
           v-if="localConfig.search.urlName === 'custom'"
           :label="$t('search.customEngine')"
         >
+          <!-- 自定义搜索引擎 URL 示例，无需 i18n -->
           <NInput
             v-model:value="localConfig.search.urlValue"
             type="text"
             size="small"
             placeholder="https://example/search?q={query}"
           />
-        </NFormItem>
+        </SettingFormItem>
       </Transition>
-      <NFormItem :label="$t('search.placeholder')">
+
+      <SettingFormItem :label="$t('search.placeholder')">
         <NInput
           v-model:value="localConfig.search.placeholder"
           type="text"
           size="small"
           :placeholder="localConfig.search.urlName"
         />
-      </NFormItem>
+      </SettingFormItem>
+
       <SwitchField
         v-model="localConfig.search.isNewTabOpen"
         :label="$t('generalSetting.newTabOpen')"
       />
-      <SwitchField
-        v-model="localConfig.search.iconEnabled"
-        :label="$t('search.icon')"
-      />
-      <NFormItem :label="$t('search.searchEngineIcon')">
-        <NSwitch
-          v-model:value="localConfig.search.isSearchEngineIconVisible"
-          size="small"
+
+      <SettingFormInlineRow>
+        <SwitchField
+          v-model="localConfig.search.iconEnabled"
+          :label="$t('search.icon')"
         />
-        <Transition name="setting-expand">
-          <div
-            v-if="localConfig.search.isSearchEngineIconVisible"
-            class="setting__item_wrap"
-          >
-            <NInput
-              v-model:value="localConfig.search.searchEngineIconUrl"
-              class="setting__item-ele setting__item-ml"
-              size="small"
-              :placeholder="`${$t('search.searchEngineIconUrl')} ${$t('search.searchEngineIconUrlPlaceholder')}`"
-            />
-          </div>
-        </Transition>
-      </NFormItem>
+
+        <SwitchField
+          v-model="localConfig.search.suggestionEnabled"
+          :label="$t('search.suggestion')"
+        />
+      </SettingFormInlineRow>
+
       <SwitchField
-        v-model="localConfig.search.suggestionEnabled"
-        :label="$t('search.suggestion')"
-      />
-    </template>
-    <!-- 搜索栏 -->
-    <template #searchBar>
-      <SliderField
-        v-model="localConfig.search.width"
-        :label="$t('common.width')"
-        :min="1"
-        :max="1000"
-        :step="1"
-      />
+        v-model="localConfig.search.isSearchEngineIconVisible"
+        :label="$t('search.searchEngineIcon')"
+      >
+        <template #extra>
+          <NInput
+            v-model:value="localConfig.search.searchEngineIconUrl"
+            size="small"
+            :placeholder="$t('search.searchEngineIconUrlPlaceholder')"
+          />
+        </template>
+      </SwitchField>
+    </SettingFormSection>
 
-      <SliderField
-        v-model="localConfig.search.height"
-        :label="$t('common.height')"
-        :min="1"
-        :max="500"
-        :step="1"
-      />
+    <!-- 搜索栏外观 -->
+    <SettingFormSection
+      :title="$t('search.searchBarStyle')"
+      :icon="ICONS.preview"
+    >
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.search.width"
+          :label="$t('common.width')"
+          :min="1"
+          :max="1000"
+          :step="1"
+        />
 
-      <SliderField
-        v-model="localConfig.search.padding"
-        :label="$t('common.padding')"
-        :min="0"
-        :max="100"
-        :step="0.1"
-      />
+        <NumberField
+          v-model="localConfig.search.height"
+          :label="$t('common.height')"
+          :min="1"
+          :max="500"
+          :step="1"
+        />
+      </SettingFormInlineRow>
 
-      <SliderField
-        v-model="localConfig.search.borderRadius"
-        :label="$t('common.borderRadius')"
-        :min="0"
-        :max="100"
-        :step="1"
-      />
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.search.padding"
+          :label="$t('common.padding')"
+          :min="0"
+          :max="100"
+          :step="0.1"
+        />
+
+        <NumberField
+          v-model="localConfig.search.borderRadius"
+          :label="$t('common.borderRadius')"
+          :min="0"
+          :max="100"
+          :step="1"
+        />
+      </SettingFormInlineRow>
+
+      <SettingFormInlineRow>
+        <ColorField
+          v-model="localConfig.search.backgroundColor"
+          :label="$t('common.backgroundColor')"
+        />
+
+        <NumberField
+          v-model="localConfig.search.backgroundBlur"
+          :label="$t('common.blur')"
+          :min="0"
+          :max="30"
+          :step="0.1"
+        />
+      </SettingFormInlineRow>
+
+      <SettingFormInlineRow>
+        <ToggleColorField
+          v-model:enable="localConfig.search.isBorderEnabled"
+          v-model:color="localConfig.search.borderColor"
+          v-model:width="localConfig.search.borderWidth"
+          :label="$t('common.border')"
+        />
+
+        <ToggleColorField
+          v-model:enable="localConfig.search.isShadowEnabled"
+          v-model:color="localConfig.search.shadowColor"
+          :label="$t('common.shadow')"
+        />
+      </SettingFormInlineRow>
 
       <FontField
         v-model:font-family="localConfig.search.fontFamily"
@@ -198,50 +238,34 @@ const searchSelectRenderLabel = (option: {
         v-model:font-size="localConfig.search.fontSize"
         :label="$t('common.font')"
       />
-
-      <ColorField
-        v-model="localConfig.search.backgroundColor"
-        :label="$t('common.backgroundColor')"
-      />
-
-      <SliderField
-        v-model="localConfig.search.backgroundBlur"
-        :label="$t('common.blur')"
-        :min="0"
-        :max="30"
-        :step="0.1"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.search.isBorderEnabled"
-        v-model:color="localConfig.search.borderColor"
-        v-model:width="localConfig.search.borderWidth"
-        :label="$t('common.border')"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.search.isShadowEnabled"
-        v-model:color="localConfig.search.shadowColor"
-        :label="$t('common.shadow')"
-      />
-    </template>
+    </SettingFormSection>
 
     <!-- 建议列表 -->
-    <template #dropdown>
-      <SliderField
-        v-model="localConfig.search.dropdownBorderRadius"
-        :label="$t('common.borderRadius')"
-        :min="0"
-        :max="100"
-        :step="1"
-      />
+    <SettingFormSection
+      :title="$t('search.suggestion')"
+      :icon="ICONS.info"
+    >
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.search.dropdownMaxItems"
+          :label="$t('common.maxItems')"
+          :min="2"
+          :max="15"
+          :step="1"
+        />
 
-      <SliderField
-        v-model="localConfig.search.dropdownMaxItems"
-        :label="$t('common.maxItems')"
-        :min="2"
-        :max="15"
-        :step="1"
+        <NumberField
+          v-model="localConfig.search.dropdownBorderRadius"
+          :label="$t('common.borderRadius')"
+          :min="0"
+          :max="100"
+          :step="1"
+        />
+      </SettingFormInlineRow>
+
+      <ColorField
+        v-model="localConfig.search.dropdownBackgroundColor"
+        :label="$t('common.backgroundColor')"
       />
 
       <FontField
@@ -250,11 +274,6 @@ const searchSelectRenderLabel = (option: {
         v-model:font-size="localConfig.search.dropdownFontSize"
         :label="$t('common.font')"
       />
-
-      <ColorField
-        v-model="localConfig.search.dropdownBackgroundColor"
-        :label="$t('common.backgroundColor')"
-      />
-    </template>
+    </SettingFormSection>
   </SettingFormWrap>
 </template>

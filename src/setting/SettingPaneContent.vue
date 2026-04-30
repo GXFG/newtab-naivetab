@@ -33,6 +33,9 @@ const onTabsChange = (tabCode: string) => {
 }
 
 // ── 分组逻辑 ──
+// SETTING_GROUPS 定义了 5 个分组（global / keyboardAndBookmark / timeAndDate / tool / other）。
+// NTabs 的左侧 nav 中，从第二个分组开始，其首个 tab 上方显示分组标题分隔线。
+// groupStartSet 用于给 tab 添加 CSS class，groupWithFirstItem 提供对应的 labelKey。
 const groupsWithFirstItem = computed(() => {
   const result: Array<{ firstCode: settingPanes; labelKey: string }> = []
   SETTING_GROUPS.forEach((group, index) => {
@@ -114,14 +117,8 @@ const getGroupLabel = (code: settingPanes): string => {
    通用样式：两种模式共用（通过 .setting-tabs 类匹配）
    ============================================================ */
 .setting-tabs {
-  .n-radio-group {
-    width: 100%;
-  }
   .n-radio {
-    width: 20%;
-  }
-  .n-collapse-item__header-main {
-    font-weight: 500 !important;
+    width: auto;
   }
   .n-divider:not(.n-divider--vertical) {
     margin-top: var(--space-4);
@@ -166,6 +163,73 @@ const getGroupLabel = (code: settingPanes): string => {
       opacity: 1;
     }
   }
+
+  /* ——— 分组分隔线（两种模式共用） ——— */
+  .n-tabs .n-tabs-nav {
+    .n-tabs-nav-scroll-wrapper {
+      .n-tabs-tab:has(.tab__title--group-start) {
+        margin-top: 20px;
+        position: relative;
+      }
+
+      .tab__title--group-start .group-divider {
+        position: absolute;
+        top: -18px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        background: var(--n-color);
+        padding: 0 4px;
+
+        .group-divider__text {
+          display: inline-block;
+          padding: 0 10px;
+          font-size: 10px;
+          font-weight: 500;
+          color: var(--n-text-color-3);
+          background: var(--n-color);
+          opacity: 0.45;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 8px;
+          right: 8px;
+          height: 1px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            var(--n-tab-border-color) 20%,
+            var(--n-tab-border-color) 80%,
+            transparent
+          );
+          opacity: 1;
+          z-index: 0;
+        }
+      }
+    }
+  }
+
+  /* ——— 滚动条样式（两种模式共用） ——— */
+  .n-tab-pane {
+    user-select: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--n-tab-border-color) transparent;
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--n-tab-border-color);
+      border-radius: var(--radius-pill);
+    }
+  }
 }
 
 /* 抽屉 NDrawerContent 的 header 样式 */
@@ -193,52 +257,6 @@ const getGroupLabel = (code: settingPanes): string => {
   .n-tabs .n-tabs-nav {
     .n-tabs-nav-scroll-wrapper {
       height: var(--nt-setting-content-height);
-
-      /* 分组分隔线 */
-      .n-tabs-tab:has(.tab__title--group-start) {
-        margin-top: 20px;
-        position: relative;
-      }
-
-      .tab__title--group-start .group-divider {
-        position: absolute;
-        top: -18px;
-        left: 0;
-        right: 0;
-        text-align: center;
-        background: var(--n-color);
-        padding: 0 4px;
-
-        .group-divider__text {
-          display: inline-block;
-          padding: 0 10px;
-          font-size: 10px;
-          font-weight: 500;
-          color: var(--n-text-color-3);
-          background: var(--n-color);
-          opacity: 0.45;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-        }
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 8px;
-          right: 8px;
-          height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            var(--n-tab-border-color) 20%,
-            var(--n-tab-border-color) 80%,
-            transparent
-          );
-          opacity: 1;
-          z-index: 0;
-        }
-      }
     }
   }
 
@@ -246,20 +264,7 @@ const getGroupLabel = (code: settingPanes): string => {
     padding: 0;
     height: var(--nt-setting-content-height);
     overflow: auto;
-    user-select: none;
     box-sizing: border-box;
-    scrollbar-width: thin;
-    scrollbar-color: var(--n-tab-border-color) transparent;
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: var(--n-tab-border-color);
-      border-radius: var(--radius-pill);
-    }
   }
 }
 
@@ -277,72 +282,13 @@ const getGroupLabel = (code: settingPanes): string => {
     .n-tabs-nav-scroll-wrapper {
       max-height: calc(100vh - 124px);
       overflow-y: auto;
-
-      /* 分组分隔线 */
-      .n-tabs-tab:has(.tab__title--group-start) {
-        margin-top: 20px;
-        position: relative;
-      }
-
-      .tab__title--group-start .group-divider {
-        position: absolute;
-        top: -18px;
-        left: 0;
-        right: 0;
-        text-align: center;
-        background: var(--n-color);
-        padding: 0 4px;
-
-        .group-divider__text {
-          display: inline-block;
-          padding: 0 10px;
-          font-size: 10px;
-          font-weight: 500;
-          color: var(--n-text-color-3);
-          background: var(--n-color);
-          opacity: 0.45;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-        }
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 8px;
-          right: 8px;
-          height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            var(--n-tab-border-color) 20%,
-            var(--n-tab-border-color) 80%,
-            transparent
-          );
-          opacity: 1;
-          z-index: 0;
-        }
-      }
     }
   }
 
   .n-tab-pane {
     padding: 0 16px 50px 16px !important;
     overflow-y: auto;
-    user-select: none;
     box-sizing: border-box;
-    scrollbar-width: thin;
-    scrollbar-color: var(--n-tab-border-color) transparent;
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: var(--n-tab-border-color);
-      border-radius: var(--radius-pill);
-    }
   }
 }
 </style>

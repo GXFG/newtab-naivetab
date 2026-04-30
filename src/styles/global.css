@@ -11,8 +11,6 @@ body {
   font-size: 14px;
   color: var(--nt-text-color-main) !important;
   background-color: var(--nt-bg-main) !important;
-  /* GPU acceleration for smoother animations */
-  transform: translateZ(0);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -32,208 +30,6 @@ svg[aria-hidden="true"] {
   outline: none;
 }
 
-/* ============================================================
-   Setting Panel — Global Form Styles
-   ============================================================ */
-
-/* 表单项默认间距 */
-.n-form-item {
-  margin: 10px 0;
-}
-/* 颜色类表单项：压缩上下间距 */
-.n-form-item--color {
-  margin: 1px 0 !important;
-}
-/* 半宽表单项：占 50% 宽度 */
-.n-form-item--half {
-  margin: 0 !important;
-  width: 50%;
-}
-
-/* 下拉选项内容撑满 */
-.n-base-select-option__content {
-  width: 100% !important;
-}
-
-/* NFormItem 标签加粗 */
-.n-form-item-label {
-  font-weight: 500;
-  letter-spacing: 0.15px;
-}
-
-.setting__form_wrap {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.setting__pane__content {
-  padding: var(--space-4);
-  padding-top: var(--space-2);
-}
-
-/* Setting 面板分组标题行（图标 + 文字） */
-.setting__label {
-  margin-top: 3px;
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-weight: 500;
-  opacity: var(--opacity-secondary);
-  letter-spacing: 0.2px;
-  /* Do not set font-size, inherit from context */
-  .label__icon {
-    display: inline-flex;
-    align-items: center;
-    font-size: var(--text-lg);
-  }
-}
-
-/* 表单项容器：flex: 1 占满左侧 label 外的空间，内部 flex 布局用于同行放置多个元素 */
-.setting__item_wrap {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  .item__box {
-    display: flex;
-    align-items: center;
-    &:nth-of-type(2) {
-      flex: 1;
-      margin-left: 10px;
-    }
-  }
-}
-
-/* Slider 右侧追加元素容器（与输入框同行） */
-.setting__slider-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-/* 表单项内追加的元素：不参与 flex 拉伸，保持自身尺寸 */
-.setting__item-ele {
-  flex: 0 0 auto;
-}
-
-/* 表单项内追加的元素：加左间距 */
-.setting__item-ml {
-  margin-left: var(--space-2);
-}
-
-/* 同行内联布局：用于开关 + 输入框并列 */
-.setting__inline-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-/* 固定宽度的数字输入框 */
-.setting__input-number {
-  width: 103px;
-}
-/* 带单位的数字输入框 */
-.setting__input-number--unit {
-  width: 150px;
-}
-
-/* 开关展开子选项 — scaleX 缩放动画（适合同行内联元素，如开关旁边的输入框） */
-.setting-expand-enter-active,
-.setting-expand-leave-active {
-  transition: opacity var(--transition-base), transform var(--transition-base);
-  transform-origin: left center;
-}
-.setting-expand-enter-from,
-.setting-expand-leave-to {
-  opacity: 0;
-  transform: scaleX(0.85);
-}
-.setting-expand-enter-to,
-.setting-expand-leave-from {
-  opacity: 1;
-  transform: scaleX(1);
-}
-
-/* 开关展开块内容 — max-height 滑动动画（适合整块 NFormItem 垂直展开） */
-.setting-slide-enter-active,
-.setting-slide-leave-active {
-  transition: opacity var(--transition-base), max-height var(--transition-base);
-  overflow: hidden;
-  max-height: 200px;
-}
-.setting-slide-enter-from,
-.setting-slide-leave-to {
-  opacity: 0;
-  max-height: 0;
-}
-.setting-slide-enter-to,
-.setting-slide-leave-from {
-  opacity: 1;
-  max-height: 200px;
-}
-
-/* ============================================================
-   Setting Panel — Action Buttons
-   统一质感样式：在 NButton 上加 secondary 属性 + class="action-btn action-btn--{type}"
-   ============================================================ */
-.action-btn {
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  transition: box-shadow var(--transition-base), transform var(--transition-fast) !important;
-
-  &:not(.n-button--loading):hover {
-    transform: translateY(-1px);
-  }
-  &:active {
-    transform: translateY(0);
-    box-shadow: none !important;
-  }
-}
-
-.action-btn--primary {
-  box-shadow: 0 1px 3px rgba(24, 160, 88, 0.18),
-              0 1px 1px rgba(24, 160, 88, 0.1),
-              inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  &:hover {
-    box-shadow: 0 3px 8px rgba(24, 160, 88, 0.24),
-                0 1px 2px rgba(24, 160, 88, 0.14),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-}
-
-.action-btn--warning {
-  box-shadow: 0 1px 3px rgba(240, 160, 32, 0.2),
-              0 1px 1px rgba(240, 160, 32, 0.12),
-              inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  &:hover {
-    box-shadow: 0 3px 8px rgba(240, 160, 32, 0.28),
-                0 1px 2px rgba(240, 160, 32, 0.16),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-}
-
-.action-btn--error {
-  box-shadow: 0 1px 3px rgba(208, 48, 80, 0.2),
-              0 1px 1px rgba(208, 48, 80, 0.12),
-              inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  &:hover {
-    box-shadow: 0 3px 8px rgba(208, 48, 80, 0.28),
-                0 1px 2px rgba(208, 48, 80, 0.16),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-}
-
-.action-btn--default {
-  box-shadow: 0 1px 3px var(--gray-alpha-15),
-              0 1px 1px var(--gray-alpha-08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  &:hover {
-    box-shadow: 0 3px 8px var(--gray-alpha-20),
-                0 1px 2px var(--gray-alpha-12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-}
-
 /* Drag mode disabled input */
 .n-input.n-input--disabled .n-input__input-el,
 .n-input.n-input--disabled .n-input__textarea-el {
@@ -248,4 +44,15 @@ svg[aria-hidden="true"] {
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Setting preview mode: hover preview button to make drawer transparent */
+body.setting-preview-active #setting .drawer-wrap {
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+body.setting-preview-active .n-drawer-mask {
+  transition: background-color 0.3s ease;
+  background-color: transparent;
 }

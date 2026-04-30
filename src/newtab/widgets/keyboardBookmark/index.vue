@@ -6,6 +6,7 @@ import {
   currKeyboardConfig,
   keyboardCurrentModelAllKeyList,
 } from '@/logic/keyboard/keyboard-layout'
+import { localConfig } from '@/logic/store'
 import {
   state as keyboardState,
   openPage,
@@ -42,6 +43,14 @@ const keyboardTask = (e: KeyboardEvent) => {
   }
   // 过滤非当前配置下的按键
   if (!keyboardCurrentModelAllKeyList.value.includes(code)) {
+    return
+  }
+  // 命令快捷键开启无修饰键模式时，命令优先，键盘书签不响应
+  // 与 CS 端 hasModifierConflict 和 newtab globalShortcutTask 命令优先逻辑保持一致
+  if (
+    localConfig.keyboardCommand.isEnabled &&
+    localConfig.keyboardCommand.noModifierMode
+  ) {
     return
   }
   const isHandled = handleSpecialKeycapExec(code, getKeycapBookmarkType(code))

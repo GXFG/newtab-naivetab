@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid'
 import { useStorage } from '@vueuse/core'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
+import { SettingHeaderBar } from '@/setting/components'
 import SponsorToastItem from './SponsorToastItem.vue'
 
 const paymentList = ['wechat', 'alipay']
@@ -30,7 +30,7 @@ const removeToast = (id: string) => {
 <template>
   <SettingHeaderBar :title="$t('sponsor.title')" />
 
-  <div class="setting__pane__content">
+  <div class="setting__pane-content">
     <!-- 文案卡片 -->
     <div class="sponsor__intro">
       <div class="intro__lines">
@@ -79,9 +79,9 @@ const removeToast = (id: string) => {
         </div>
 
         <NButton
-          class="footer__skip-btn action-btn action-btn--primary"
+          class="footer__skip-btn setting__btn setting__btn--primary"
           type="primary"
-          size="small"
+          size="tiny"
           secondary
           @click="onNextTime"
         >

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ICONS } from '@/logic/icons'
 import { localConfig } from '@/logic/store'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
-import SettingIconGroup from '@/setting/components/SettingIconGroup.vue'
 import {
-  SliderField,
+  SettingFormWrap,
+  SettingFormSection,
+  SettingFormInlineRow,
+} from '@/setting/components'
+import {
+  NumberField,
   SwitchField,
   FontField,
   ToggleColorField,
@@ -14,40 +17,39 @@ import {
 
 <template>
   <SettingFormWrap widget-code="clockNeon">
-    <template #behavior>
-      <SwitchField
-        v-model="localConfig.clockNeon.showSeconds"
-        :label="$t('clock.showSeconds')"
-      />
+    <!-- 功能配置 -->
+    <SettingFormSection section-key="common.behavior">
+      <SettingFormInlineRow>
+        <SwitchField
+          v-model="localConfig.clockNeon.showSeconds"
+          :label="$t('clock.showSeconds')"
+        />
 
-      <SwitchField
-        v-model="localConfig.clockNeon.is24Hour"
-        :label="$t('clock.24hour')"
-      />
+        <SwitchField
+          v-model="localConfig.clockNeon.is24Hour"
+          :label="$t('clock.24hour')"
+        />
+      </SettingFormInlineRow>
 
-      <SliderField
-        v-model="localConfig.clockNeon.glowIntensity"
-        :label="$t('clock.glowIntensity')"
-        :min="0"
-        :max="50"
-        :step="0.1"
-      />
-
-      <SwitchField
-        v-model="localConfig.clockNeon.showFrame"
-        :label="$t('clock.showFrame')"
-      />
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.clockNeon.glowIntensity"
+          :label="$t('clock.glowIntensity')"
+          :min="0"
+          :max="50"
+          :step="0.1"
+        />
+        <SwitchField
+          v-model="localConfig.clockNeon.showFrame"
+          :label="$t('clock.showFrame')"
+        />
+      </SettingFormInlineRow>
 
       <SwitchField
         v-model="localConfig.clockNeon.showLabel"
         :label="$t('clock.showLabel')"
-      />
-
-      <Transition name="setting-slide">
-        <NFormItem
-          v-if="localConfig.clockNeon.showLabel"
-          :label="$t('clock.labelText')"
-        >
+      >
+        <template #extra>
           <NInput
             v-model:value="localConfig.clockNeon.labelLeft"
             size="small"
@@ -58,65 +60,72 @@ import {
             size="small"
             :placeholder="$t('clock.labelRightPlaceholder')"
           />
-        </NFormItem>
-      </Transition>
-    </template>
+        </template>
+      </SwitchField>
+    </SettingFormSection>
 
     <!-- 尺寸样式 -->
-    <template #size>
-      <SliderField
-        v-model="localConfig.clockNeon.paddingVertical"
-        :label="$t('common.paddingVertical')"
-        :min="0"
-        :max="100"
-        :step="0.1"
-      />
+    <SettingFormSection section-key="common.size">
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.clockNeon.paddingVertical"
+          :label="$t('common.paddingVertical')"
+          :min="0"
+          :max="100"
+          :step="0.1"
+        />
 
-      <SliderField
-        v-model="localConfig.clockNeon.paddingHorizontal"
-        :label="$t('common.paddingHorizontal')"
-        :min="0"
-        :max="100"
-        :step="0.1"
-      />
+        <NumberField
+          v-model="localConfig.clockNeon.paddingHorizontal"
+          :label="$t('common.paddingHorizontal')"
+          :min="0"
+          :max="100"
+          :step="0.1"
+        />
+      </SettingFormInlineRow>
 
-      <SliderField
+      <NumberField
         v-model="localConfig.clockNeon.borderRadius"
         :label="$t('common.borderRadius')"
         :min="0"
         :max="100"
         :step="0.1"
       />
-    </template>
+    </SettingFormSection>
 
     <!-- 文字排版 -->
-    <template #typography>
+    <SettingFormSection section-key="common.typography">
       <FontField
         v-model:font-family="localConfig.clockNeon.fontFamily"
         v-model:font-color="localConfig.clockNeon.fontColor"
         v-model:font-size="localConfig.clockNeon.fontSize"
         :label="$t('common.font')"
       />
-    </template>
+    </SettingFormSection>
 
     <!-- 色彩外观 -->
-    <template #appearance>
-      <ColorField
-        v-model="localConfig.clockNeon.backgroundColor"
-        :label="$t('common.backgroundColor')"
-      />
+    <SettingFormSection section-key="common.appearance">
+      <SettingFormInlineRow>
+        <ColorField
+          v-model="localConfig.clockNeon.backgroundColor"
+          :label="$t('common.backgroundColor')"
+        />
 
-      <ToggleColorField
-        v-model:enable="localConfig.clockNeon.isBorderEnabled"
-        v-model:color="localConfig.clockNeon.borderColor"
-        v-model:width="localConfig.clockNeon.borderWidth"
-        :label="$t('common.border')"
-      />
+        <ToggleColorField
+          v-model:enable="localConfig.clockNeon.isBorderEnabled"
+          v-model:color="localConfig.clockNeon.borderColor"
+          v-model:width="localConfig.clockNeon.borderWidth"
+          :label="$t('common.border')"
+        />
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
-      <SettingIconGroup
-        :icon="ICONS.neonTimeColors"
-        :label="$t('clock.neonTimeColorsLabel')"
-      >
+    <!-- 霓虹时间色 -->
+    <SettingFormSection
+      :icon="ICONS.neonTimeColors"
+      :title="$t('clock.neonTimeColorsLabel')"
+    >
+      <SettingFormInlineRow>
         <ColorField
           v-model="localConfig.clockNeon.fontColor"
           :label="$t('clock.neonColor')"
@@ -129,17 +138,18 @@ import {
           v-model="localConfig.clockNeon.accentColor"
           :label="$t('clock.neonAccentColor')"
         />
-      </SettingIconGroup>
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
-      <SettingIconGroup
-        :icon="ICONS.neonFrameColors"
-        :label="$t('clock.neonFrameColorsLabel')"
-      >
-        <ColorField
-          v-model="localConfig.clockNeon.frameColor"
-          :label="$t('clock.frameColor')"
-        />
-      </SettingIconGroup>
-    </template>
+    <!-- 霓虹外框色 -->
+    <SettingFormSection
+      :icon="ICONS.neonFrameColors"
+      :title="$t('clock.neonFrameColorsLabel')"
+    >
+      <ColorField
+        v-model="localConfig.clockNeon.frameColor"
+        :label="$t('clock.frameColor')"
+      />
+    </SettingFormSection>
   </SettingFormWrap>
 </template>

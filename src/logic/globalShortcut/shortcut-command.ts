@@ -306,10 +306,16 @@ export function getCommandExecEnv(command: TCommandName): TCommandExecEnv {
 
 export const COMMAND_SHORTCUT_CODE = 'keyboardCommand'
 
-export const PRESERVE_FIELDS = ['isEnabled', 'modifiers', 'keymap']
+export const PRESERVE_FIELDS = [
+  'isEnabled',
+  'noModifierMode',
+  'modifiers',
+  'keymap',
+]
 
 export const KEYBOARD_COMMAND_CONFIG = {
   isEnabled: true,
+  noModifierMode: false,
   shortcutInInputElement: true,
   urlBlacklist: [] as string[],
   modifiers: ['shift', 'alt'] as TShortcutModifier[],

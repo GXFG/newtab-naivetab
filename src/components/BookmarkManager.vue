@@ -398,7 +398,7 @@ const onHandleInputBlur = () => {
                   <NButton
                     quaternary
                     size="small"
-                    class="action-btn"
+                    class="setting__btn"
                   >
                     <Icon
                       :icon="ICONS.currentLocation"
@@ -507,7 +507,7 @@ const onHandleInputBlur = () => {
         flex-direction: column;
         gap: 6px;
 
-        .action-btn {
+        .setting__btn {
           display: flex;
           justify-content: center;
           align-items: center;

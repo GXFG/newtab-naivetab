@@ -67,6 +67,11 @@
   --gray-alpha-75: rgba(128, 128, 128, 0.75);
   --gray-alpha-85: rgba(128, 128, 128, 0.85);
 
+  /* --- Semantic Colors ---
+     错误/警告色，用于录制中、重置按钮、关闭按钮等场景
+  */
+  --color-error: #d03050;
+
 }
 
 /* --- Neutral Gray Alpha Tokens (Dark Mode Override) ---
@@ -88,4 +93,7 @@
   --gray-alpha-70: rgba(255, 255, 255, 0.70);
   --gray-alpha-75: rgba(255, 255, 255, 0.75);
   --gray-alpha-85: rgba(255, 255, 255, 0.85);
+
+  /* --- Semantic Colors (Dark Mode) --- */
+  --color-error: rgba(208, 48, 80, 0.9);
 }

@@ -121,5 +121,31 @@ describe('mergeState', () => {
         layout: { x: 5, y: 0, z: 0 },
       })
     })
+
+    it('uses default state when nested value type mismatches', () => {
+      const state = { config: { mode: 'dark', size: 14 } }
+      const accept = { config: 'legacy-string' } // type changed from object to string
+      expect(mergeState(state, accept)).toEqual({
+        config: { mode: 'dark', size: 14 },
+      })
+    })
+
+    it('detects keymap pattern in nested objects and replaces wholesale', () => {
+      const state = {
+        keymap: {
+          KeyA: { url: 'https://old.com', name: 'Old' },
+          KeyB: { url: 'https://old2.com' },
+        },
+      }
+      const accept = {
+        keymap: {
+          KeyA: { url: 'https://new.com' },
+          // KeyB removed in acceptState → should NOT be restored (keymap wholesale replace)
+        },
+      }
+      expect(mergeState(state, accept)).toEqual({
+        keymap: { KeyA: { url: 'https://new.com' } },
+      })
+    })
   })
 })

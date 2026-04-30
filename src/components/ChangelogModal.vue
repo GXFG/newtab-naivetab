@@ -28,7 +28,7 @@ const onConfirm = () => {
   >
     <NCard
       class="card__wrap"
-      :title="`🚀 ${$t('about.changelog')}`"
+      :title="$t('about.changelogTitle')"
     >
       <div
         v-if="showBreakingChangeNotice"
@@ -50,7 +50,7 @@ const onConfirm = () => {
 
       <div class="card__footer">
         <NButton
-          class="footer__btn action-btn action-btn--primary"
+          class="footer__btn setting__btn setting__btn--primary"
           type="primary"
           size="small"
           secondary
@@ -72,10 +72,10 @@ const onConfirm = () => {
 .card__wrap {
   width: 600px;
   .changelog__content {
-    ::v-deep(h1) {
+    :deep(h1) {
       display: none;
     }
-    ::v-deep(h2) {
+    :deep(h2) {
       margin: 15px 0 2px 0;
       font-size: 15px;
       font-weight: bold;
@@ -91,7 +91,7 @@ const onConfirm = () => {
   margin-bottom: 12px;
   background-color: rgba(250, 173, 20, 0.08);
   border: 1px solid rgba(250, 173, 20, 0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
 }
 
 .notice__icon {

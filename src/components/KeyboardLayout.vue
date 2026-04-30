@@ -135,7 +135,6 @@ const containerHeightCss = computed(() => {
       height: calc(100% + var(--nt-kb-plate-padding) * 2);
       background: var(--nt-kb-plate-color);
       border-radius: var(--nt-kb-plate-radius);
-      backdrop-filter: blur(var(--nt-kb-plate-blur));
       /* 顶部内发光，模拟哑光金属/PCB 定位板的物理质感 */
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }

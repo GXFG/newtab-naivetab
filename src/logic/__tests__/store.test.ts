@@ -13,6 +13,7 @@ describe('store (isolated exports)', () => {
   let getSettingKeyboardSize: (typeof import('@/logic/store'))['getSettingKeyboardSize']
   let getStyleField: (typeof import('@/logic/store'))['getStyleField']
   let getIsWidgetRender: (typeof import('@/logic/store'))['getIsWidgetRender']
+  let getStyleConst: (typeof import('@/logic/store'))['getStyleConst']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -113,11 +114,22 @@ describe('store (isolated exports)', () => {
       configurable: true,
     })
 
+    // Mock document.fonts for initAvailableFontList
+    Object.defineProperty(document, 'fonts', {
+      value: {
+        ready: Promise.resolve([]),
+        check: vi.fn().mockReturnValue(true),
+      },
+      configurable: true,
+      writable: true,
+    })
+
     const mod = await import('@/logic/store')
     colorMixWithAlpha = mod.colorMixWithAlpha
     getSettingKeyboardSize = mod.getSettingKeyboardSize
     getStyleField = mod.getStyleField
     getIsWidgetRender = mod.getIsWidgetRender
+    getStyleConst = mod.getStyleConst
   })
 
   describe('colorMixWithAlpha', () => {
@@ -240,6 +252,68 @@ describe('store (isolated exports)', () => {
 
       localConfig.search.enabled = false
       expect(isRender.value).toBe(false)
+    })
+  })
+
+  describe('switchSettingDrawerVisible', () => {
+    it('sets isSettingDrawerVisible to true', async () => {
+      const mod = await import('@/logic/store')
+      mod.switchSettingDrawerVisible(true)
+      expect(mod.globalState.isSettingDrawerVisible).toBe(true)
+    })
+
+    it('sets isSettingDrawerVisible to false', async () => {
+      const mod = await import('@/logic/store')
+      mod.switchSettingDrawerVisible(false)
+      expect(mod.globalState.isSettingDrawerVisible).toBe(false)
+    })
+  })
+
+  describe('openChangelogModal', () => {
+    it('sets isChangelogModalVisible to true', async () => {
+      const mod = await import('@/logic/store')
+      mod.openChangelogModal()
+      expect(mod.globalState.isChangelogModalVisible).toBe(true)
+    })
+  })
+
+  describe('currDayjsLang', () => {
+    it('returns lang based on timeLang config', async () => {
+      const { localConfig, currDayjsLang } = await import('@/logic/store')
+      localConfig.general.timeLang = 'zh-CN'
+      expect(currDayjsLang.value).toBe('zh-cn')
+
+      localConfig.general.timeLang = 'en-US'
+      expect(currDayjsLang.value).toBe('en')
+    })
+
+    it('falls back to en for unknown lang', async () => {
+      const { localConfig, currDayjsLang } = await import('@/logic/store')
+      localConfig.general.timeLang = 'unknown'
+      expect(currDayjsLang.value).toBe('en')
+    })
+  })
+
+  describe('getStyleConst', () => {
+    it('returns computed ref for style constant at current appearance', async () => {
+      const { localState, getStyleConst } = await import('@/logic/store')
+      localState.value.currAppearanceCode = 0
+      const result = getStyleConst('gap')
+      expect(result.value).toBe('8px')
+
+      localState.value.currAppearanceCode = 1
+      expect(result.value).toBe('10px')
+    })
+
+    it('falls back to index 0 when appearance index not available', async () => {
+      const { localState, getStyleConst } = await import('@/logic/store')
+      // styleConst only has gap with 2 values, accessing a field with only index 0
+      // should fall back correctly
+      localState.value.currAppearanceCode = 99
+      // This tests the fallback behavior of getStyleConst
+      const result = getStyleConst('gap')
+      // Should return index 0 since 99 doesn't exist
+      expect(result.value).toBe('8px')
     })
   })
 })

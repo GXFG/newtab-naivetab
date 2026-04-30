@@ -2,12 +2,18 @@ export const WIDGET_CODE = 'keyboardBookmark'
 
 import type { TShortcutModifier } from '@/logic/globalShortcut/shortcut-utils'
 
-export const PRESERVE_FIELDS = ['source', 'globalShortcutModifiers', 'keymap']
+export const PRESERVE_FIELDS = [
+  'source',
+  'globalShortcutModifiers',
+  'noModifierMode',
+  'keymap',
+]
 
 export const WIDGET_CONFIG = {
   enabled: true,
   source: 2,
   isGlobalShortcutEnabled: true,
+  noModifierMode: false,
   shortcutInInputElement: true,
   globalShortcutModifiers: ['alt'] as TShortcutModifier[],
   urlBlacklist: [] as string[],

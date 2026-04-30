@@ -3,7 +3,7 @@
 这是NaiveTab，一个浏览器新标签页扩展项目。本文档定义了项目的开发规范，所有 AI 辅助开发必须遵守。AI阅读此文档后在回复前输出 "(-.-)已阅读CLAUDE.md"。
 
 **强制必须遵循 MUST**：
-- 所有 AI 的输出要方便中文用户理解，例如：思考过程、与用户的沟通、代码注释、文档编写、等等，都**必须使用中文**，只有关键的技术名词保持英文。
+- 所有 AI 的输出（与用户对话、工具调用描述、代码注释、文档编写）**必须使用中文**，仅保留关键技术名词为英文。这是强制规则，不是建议——禁止任何形式的英文输出（包括回复总结、分析、解释等）。
 - 编程是一个严肃场景，遇到不清楚的点**不要猜测**，及时与用户确认。最终修改代码前要先给出具体的实施方案让用户审阅。
 - 本文件须持续维护：代码改动涉及的新规律/约定/坑点要及时补充；更新后须检查重复、冲突和错位，保持整洁；发现过时描述要及时修正或删除。
 
@@ -17,7 +17,7 @@
 
 # 设计文档
 
-项目架构和技术决策的详细文档存放在 `./docs` 目录下。做相关开发前应先查阅对应文档，避免重复造轮子或违背既有设计。有新增或修改要及时维护对应文档。
+项目架构和技术决策的详细文档存放在 `./docs` 目录下。做相关开发时**必须先查阅对应文档**，确认既有设计后再动手，禁止重复造轮子或违背既有架构。有新增或修改**必须同步更新**对应文档。
 
 | 文档 | 主题 |
 |------|------|
@@ -26,12 +26,13 @@
 | [testing.md](docs/architecture/testing.md) | 测试架构：Vitest 配置、Mock 策略、Pre-commit Hook、新增测试指南 |
 | [messaging.md](docs/architecture/messaging.md) | 背景脚本消息传递架构 |
 | [background-image.md](docs/features/background-image.md) | 背景图系统架构、文件索引、核心流程 |
-| [global-shortcut.md](docs/features/global-shortcut.md) | 全局命令快捷键设计与实现 |
+| [global-shortcut.md](docs/features/global-shortcut.md) | 全局命令快捷键设计与实现、无修饰键模式 |
 | [bookmark.md](docs/features/bookmark.md) | 书签系统架构、双模式运行、同步机制、权限处理 |
 | [keyboard.md](docs/features/keyboard.md) | 键盘布局系统、键帽渲染、拖拽定位、主题预设 |
 | [widget-dev.md](docs/widgets/widget-dev.md) | Widget 生命周期、WidgetWrap 解析、拖拽系统、定时任务、快速上手 |
 | [keyboard-bookmark-widget.md](docs/widgets/keyboard-bookmark-widget.md) | KeyboardBookmark Widget：书签绑定、双模式、事件处理 |
 | [search-widget.md](docs/widgets/search-widget.md) | Search Widget 架构、设计决策、错误处理、踩坑点 |
+| [setting.md](docs/architecture/setting.md) | Setting 面板架构：双模式、注册机制、组件层级、字段组件、重置机制 |
 
 ---
 
@@ -48,22 +49,55 @@
 
 ### BEM 命名
 
-**必须采用BEM命名规范：`block__element--modifier`，使用双下划线分隔元素、双连字符分隔修饰符。**
+**必须采用 BEM 命名规范：`block__element--modifier`，使用双下划线分隔元素、双连字符分隔修饰符。**
 
-- `block`：组件级名称，使用 camelCase（如 `clockDigital`、`bookmarkFolder`）
+- `block`：组件级名称，使用 camelCase（如 `clockDigital`、`bookmarkFolder`、`settingCollapseSection`）
 - `block__element`：子元素使用双下划线连接（如 `time__text`、`text__digit`）
 - `block__element--modifier`：状态/变体使用双连字符（如 `text__divide--dim`）
-- 不使用 BEM 中的 block--modifier 形式，修饰符只作用于元素级别
-- 全局公共类使用单下划线前缀（如 `.setting__label`、`.label__icon`）
+- `block--modifier`：状态/变体也可作用于 block 级别（如 `.draft-tool--active`、`.animation--fade-in`）
+- 全局公共类定义在 `src/styles/setting-utils.css`，使用 `setting__` 前缀（如 `.setting__section-title`、`.setting__num-input`）
 
-### PostCSS 嵌套
+**子元素允许使用简短前缀（Reblock 模式）：** 嵌套结构下，子元素的 BEM block 可简化为语义缩写，但**必须嵌套在父级选择器内部书写**，不得平铺到根级。
 
-**必须使用 PostCSS 嵌套语法，选择器直接写在父级花括号内，不使用 `&` 拼接类名。**
+```scss
+/* ✅ 正确：子元素嵌套在 block 内部，使用简短前缀 */
+.setting-collapse-section {
+  .section__header {
+    .header__title { ... }
+    .header__chevron { ... }
+  }
+  .section__body { ... }
+}
+
+/* ❌ 错误：子元素平铺到根级，失去层级关系 */
+.setting-collapse-section__header { ... }
+.header__title { ... }
+.header__chevron { ... }
+.setting-collapse-section__body { ... }
+```
+
+**为什么禁止 `&--modifier` 拼接：** `postcss-preset-env` 的 `nesting-rules` 不支持 `&--xxx` 这种 BEM 拼接语法，会错误编译为 `--pending:is(...)` 而非 `.block__element--pending`，导致样式完全不生效。`&` 只允许用于伪类/伪元素（`&:hover`、`&::before`）或嵌套完整类名（`&.parent-class`）。modifier 必须写完整类名。
+
+```scss
+/* ✅ 正确：modifier 使用完整类名 */
+.setting-collapse-section {
+  .section__header {
+    &.setting-collapse-section__header--expanded { ... }
+  }
+}
+
+/* ❌ 错误：&-- 拼接，编译结果不可预期 */
+.setting-collapse-section {
+  &__header--expanded { ... }
+}
+```
 
 - Widget 样式外层使用 `#widgetCode` 作为最外层选择器（由 `WidgetWrap` 自动设置 id）
-- 嵌套层级不超过 4 层，过深时拆分为独立类
-- `v-bind()` 用于绑定响应式配置，返回值来自 `getStyleField()`
-- `widget__wrap` div 的 style 被 `v-bind` 用于存放 CSS 变量，不可再对其进行 `:style` 绑定
+- 嵌套层级不强制限制，但过深时建议拆分以提升可读性
+- **禁止在 CSS `<style>` 中使用 `v-bind()`**
+- 需要动态值时，通过 `:style` + `computed` 注入 CSS 自定义变量：`const cssVars = computed(() => ({ '--nt-xxx': value }))`，CSS 中用 `var()` 引用
+- `var()` 可引用全局 token（`--gray-alpha-xx`、`--n-primary-color` 等）或自定义注入变量
+- `widget__wrap` div 的 style 由 `WidgetWrap` 自动注入配置变量，不可再对其进行 `:style` 绑定
 
 ## Vue 组件
 
@@ -180,13 +214,13 @@ Chrome API 回调统一包装为 Promise，不使用裸回调。
 
 ## UI 组件使用规范
 
-**功能实现优先使用 Naive UI 已有组件，避免重复造轮子。**
+**功能实现必须使用 Naive UI 已有组件，禁止重复造轮子。**
 
 常见映射关系（先在 [Naive UI 文档](https://www.naiveui.com/zh-CN/) 中确认存在再使用）：
 | 需求场景 | 应使用的 Naive UI 组件 |
 |----------|----------------------|
 | 开关切换 | `n-switch` |
-| 滑块输入 | `n-slider` + `n-input-number`，或项目封装的 `SliderInput` |
+| 滑块输入 | `n-slider` + `n-input-number` |
 | 颜色选择 | `n-color-picker` |
 | 下拉选择 | `n-select` |
 | 数字输入 | `n-input-number` |
@@ -201,6 +235,12 @@ Chrome API 回调统一包装为 Promise，不使用裸回调。
 | 按钮 | `n-button` |
 
 **禁止自行实现可用 Naive UI 组件完成的 UI 功能**（如自定义 toggle、手写 slider 等）。
+
+## 开发 & 验证
+
+**不要启动 dev server（pnpm dev, npm start, vite serve 等）来验证 UI 效果。**
+
+本项目是浏览器扩展，CLI 环境无法打开浏览器查看页面，启动 dev server 纯属浪费时间。涉及 UI 的改动，type-check 通过后直接完成即可，如需验证由用户自行确认。
 
 ## 图标使用规范
 
@@ -224,8 +264,9 @@ import { ICONS } from '@/logic/icons'
 - 所有图标需先在 `src/logic/icons.ts` 的 `ICONS` 对象中定义
 - **新增 setting 面板必须同时在 `SETTING_ICON_META` 中注册图标**
 - 图标名称必须在 [Iconify](https://icon-sets.iconify.design/) 上验证存在
-- `Icon` 组件不是全局注册，使用前必须手动 import
+- `Icon` 组件来自 `@iconify/vue`，**不是全局注册**，使用前必须手动 import
 - 通过 `class` + `font-size` 控制尺寸（SVG 尺寸继承 `font-size`）
+- **为什么禁止硬编码：** 硬编码字符串绕过 ICONS 常量难以维护，且未 import 时会导致 `Icon 'xxx' not found` 报错
 
 ```css
 /* ✅ 正确：用 font-size 控制 Icon 尺寸 */
@@ -348,7 +389,7 @@ fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)']
 
 ## CSS 变量 / Naive UI 主题变量
 
-优先使用 Naive UI CSS 变量（`--n-text-color`、`--n-color`、`--n-border-color` 等），自动跟随主题切换。
+**必须使用** Naive UI CSS 变量（`--n-text-color`、`--n-color`、`--n-border-color` 等），自动跟随主题切换。
 
 常用变量见 [tokens.css](src/styles/tokens.css) 和 Naive UI 文档。
 
@@ -369,20 +410,38 @@ fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)']
 - Widget 的样式块外层 selector 为 `#widgetCode`（由 `WidgetWrap` 自动设置 id）
 - Widget 容器（`.xxx__container`）必须设置 `position: absolute`，配合拖拽定位系统
 - 使用 `v-bind(cssVar)` 将响应式配置注入 CSS，`cssVar` 由 `getStyleField()` 生成
-- 尺寸单位优先使用 `vmin`（`getStyleField` 传 `'vmin'` 时会自动乘以 `0.1`）
-- 优先使用全局 token 变量，不要写魔法数字（token 定义在 `src/styles/tokens.css` 顶部 `:root` 中）
+- 尺寸单位必须使用 `vmin`（`getStyleField` 传 `'vmin'` 时会自动乘以 `0.1`）；CSS 中的数值必须使用全局 token 变量，禁止写魔法数字（token 定义在 `src/styles/tokens.css` 顶部 `:root` 中）
 - `rgba()` 的 alpha 通道不支持 `var()`，需写字面量（如 `rgba(0,0,0,0.85)`）
 - 不要给 Naive UI 组件覆盖字号，让它继承上下文即可
 
-全局公共 CSS 类（定义在 `src/styles/global.css`，可直接使用）：
+全局公共 CSS 类（定义在 `src/styles/setting-utils.css`，可直接使用）：
 | 类名 | 用途 |
 |------|------|
-| `.setting__label` | Setting 面板中的分组标题行（含图标 + 文字） |
-| `.label__icon` | `.setting__label` 内的图标 |
-| `.setting__item-ele setting__item-ml` | 表单项内追加的元素（加左 margin） |
-| `.setting__input-number` | 数字输入框固定宽度（103px） |
-| `.setting__input-number--unit` | 带单位的数字输入框（150px） |
-| `.n-form-item--color` | 颜色类表单项（压缩 margin） |
+| `.setting__section-title` | Setting 面板中的分组标题行（含图标 + 文字） |
+| `.setting__section-title--compact` | 紧凑模式标题（配合 NCollapse 使用） |
+| `.setting__pane-content` | 面板内容容器（统一内边距） |
+| `.setting__extra` | 表单项控制区附加元素 |
+| `.setting__extra--gap` | 附加元素左侧间距 |
+| `.setting__toggle-extra` | 开关联动附加控件行（颜色选择器、数字输入等） |
+| `.setting__num-input` | 数字输入框固定宽度（110px） |
+| `.setting__num-input--unit` | 带单位的数字输入框（150px） |
+| `.setting__inline-row` | 多字段同行容器 |
+| `.setting__action-btn` | 操作按钮基础样式 |
+| `.setting__action-btn--primary` | 主操作按钮 |
+| `.setting__action-btn--warning` | 警告操作按钮 |
+| `.setting__action-btn--error` | 危险操作按钮 |
+| `.setting__action-btn--default` | 默认操作按钮 |
+
+## Setting Flexbox 布局踩坑
+
+**使用 `.setting__fill-input` 等 flex 子元素时，如果同布局中多个元素宽度不一致（因内容文本长度不同导致），需确保 flex 链路上每一层都有 `min-width: 0`。**
+
+根因：flex 子元素默认的 `min-width: auto` 会以内容的固有最小宽度作为收缩底线，`flex-basis: 0%` 只改变分配起点但不改变收缩底线。链路上缺一层 `min-width: 0`，浏览器就会以较长内容的宽度为底线，导致其他同类元素无法等宽。
+
+```css
+/* ✅ .setting__fill-input 和 .setting__toggle-extra 已内置 min-width: 0，直接使用即可 */
+/* ❌ 若自定义 flex 容器包裹输入控件，手动添加 min-width: 0 */
+```
 
 ## getStyleField 用法速查
 
@@ -434,21 +493,25 @@ NaiveTab 的 Widget 统一使用"玻璃光感"设计语言，已在 `bookmarkFol
 ```
 src/setting/
 ├── components/          # 通用组件
-│   ├── SettingIconGroup.vue
+│   ├── SettingHeaderBar.vue
 │   ├── SettingFormWrap.vue
-│   └── SettingHeaderBar.vue
+│   ├── SettingFormItem.vue
+│   ├── SettingFormSection.vue
+│   ├── SettingFormInlineRow.vue
+│   ├── SettingCollapseSection.vue
+│   └── index.ts
 ├── fields/              # 表单原子组件
 │   ├── ColorField.vue
 │   ├── FontField.vue
-│   ├── SliderField.vue
+│   ├── NumberField.vue
 │   ├── SwitchField.vue
 │   ├── ToggleColorField.vue
+│   ├── useDualThemeColor.ts
 │   └── index.ts
 ├── panes/               # 设置面板（按功能分组）
-│   ├── GeneralSetting/
-│   ├── ClockSetting/
-│   ├── KeyboardSetting/
-│   ├── CountdownSetting/
+│   ├── general/
+│   ├── focusMode/
+│   ├── clockDate/
 │   └── ... 其他面板
 └── registry.ts          # 设置面板注册表（自动注册）
 ```
@@ -477,7 +540,7 @@ src/setting/
 |------|------|
 | `ColorField` | 颜色选择 |
 | `FontField` | 字体设置（字体+颜色+字号） |
-| `SliderField` | 滑块输入 |
+| `NumberField` | 数字输入（可选附带滑块） |
 | `SwitchField` | 布尔开关 |
 | `ToggleColorField` | 开关+颜色（支持附加宽度输入） |
 

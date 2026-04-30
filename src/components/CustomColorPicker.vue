@@ -113,9 +113,10 @@ const removeFavoriteColor = () => {
 
 <style>
 .color-picker__entry {
-  width: 20px;
-  height: 20px;
-  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
   border: 1px solid #ccc;
   background-color: var(--nt-color-picker-entry-bg);
   cursor: pointer;
@@ -135,7 +136,6 @@ const removeFavoriteColor = () => {
   .color-picker__container {
     position: relative;
     width: 240px;
-    /* height: 394px; */
     height: 399px;
     .n-color-picker {
       position: absolute;

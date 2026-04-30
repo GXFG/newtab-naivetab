@@ -3,53 +3,31 @@ import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
 import { globalState } from '@/logic/store'
 
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  widgetCode: {
-    type: String,
-    default: '',
-  },
-})
+const props = defineProps<{
+  title: string
+}>()
 
 const isDrawerMode = computed(() => globalState.settingMode === 'drawer')
 
-// ——— 预览逻辑（hover 时透明化抽屉）———
+/**
+ * 预览模式：鼠标悬停时让抽屉透明化，用户可实时看到下方 newtab 页面的效果。
+ * 通过切换 body.setting-preview-active CSS 类实现，对应样式在 styles/global.css 中：
+ * - 抽屉透明度设为 0
+ * - 遮罩背景变为透明
+ * 鼠标离开后自动恢复，不影响任何配置数据。
+ */
 const isPreviewing = ref(false)
 
 const handlerPreviewEnter = () => {
   isPreviewing.value = true
-  const drawer = document.querySelector('#setting .drawer-wrap') as HTMLElement
-  if (drawer) {
-    drawer.style.transition = 'opacity 0.3s ease'
-    drawer.style.opacity = '0'
-  }
-  const mask = document.querySelector('.n-drawer-mask') as HTMLElement
-  if (mask) {
-    mask.setAttribute(
-      'style',
-      'transition: all 0.3s ease;background-color: transparent;',
-    )
-  }
+  document.body.classList.add('setting-preview-active')
 }
 
 const handlerPreviewLeave = () => {
   isPreviewing.value = false
-  const drawer = document.querySelector('#setting .drawer-wrap') as HTMLElement
-  if (drawer) {
-    drawer.style.opacity = ''
-    // 等待 opacity 过渡完成后再移除 transition，避免干扰下次打开的滑入动画
-    setTimeout(() => {
-      drawer.style.transition = ''
-    }, 300)
-  }
-  const mask = document.querySelector('.n-drawer-mask') as HTMLElement
-  if (mask) {
-    mask.style.backgroundColor = ''
-  }
+  document.body.classList.remove('setting-preview-active')
 }
+
 const openInNewTab = () => {
   const params = new URLSearchParams()
   const { currSettingTabCode, currSettingAnchor } = globalState
@@ -67,15 +45,15 @@ const openInNewTab = () => {
 </script>
 
 <template>
-  <div class="base_setting__title">
+  <div class="setting-header-bar">
     <!-- 左侧：标题 + 预览/新标签页按钮 -->
-    <div class="title__left">
-      <p class="title__main">{{ props.title }}</p>
+    <div class="header-bar__left">
+      <p class="header-bar__title">{{ props.title }}</p>
 
       <div
         v-if="isDrawerMode"
-        class="action__btn"
-        :class="{ 'action__btn--active': isPreviewing }"
+        class="header-bar__action"
+        :class="{ 'header-bar__action--active': isPreviewing }"
         @mouseenter="handlerPreviewEnter"
         @mouseleave="handlerPreviewLeave"
       >
@@ -88,7 +66,7 @@ const openInNewTab = () => {
 
       <template v-if="isDrawerMode">
         <div
-          class="action__btn"
+          class="header-bar__action"
           @click="openInNewTab"
         >
           <Icon
@@ -103,7 +81,7 @@ const openInNewTab = () => {
     <!-- 右侧：关闭按钮（仅抽屉模式） -->
     <div
       v-if="isDrawerMode"
-      class="action__btn action__btn--close"
+      class="header-bar__action header-bar__action--close"
       @click="globalState.isSettingDrawerVisible = false"
     >
       <Icon
@@ -115,13 +93,12 @@ const openInNewTab = () => {
 </template>
 
 <style scoped>
-.base_setting__title {
+.setting-header-bar {
   padding: var(--space-3) var(--space-4);
   z-index: 2000;
   position: sticky;
   top: 0;
   width: 100%;
-  /* 毛玻璃粘性标题 */
   background-color: var(--n-color);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--n-tab-border-color);
@@ -129,14 +106,14 @@ const openInNewTab = () => {
   align-items: center;
   justify-content: space-between;
 
-  .title__left {
+  .header-bar__left {
     display: flex;
     align-items: center;
     gap: var(--space-2);
     min-width: 0;
   }
 
-  .title__main {
+  .header-bar__title {
     font-size: var(--text-md);
     font-weight: 600;
     line-height: 1;
@@ -144,7 +121,7 @@ const openInNewTab = () => {
     letter-spacing: -0.1px;
   }
 
-  .action__btn {
+  .header-bar__action {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
@@ -179,11 +156,36 @@ const openInNewTab = () => {
       box-shadow: var(--shadow-sm);
     }
 
-    &.action__btn--active {
+    &.header-bar__action--active {
       background-color: rgba(16, 152, 173, 0.1);
       border-color: rgba(16, 152, 173, 0.4);
       color: var(--n-primary-color, #1098ad);
       box-shadow: 0 0 0 2px rgba(16, 152, 173, 0.12);
+      :root[data-theme='dark'] & {
+        background-color: rgba(16, 152, 173, 0.15);
+        border-color: rgba(16, 152, 173, 0.45);
+        box-shadow: 0 0 0 2px rgba(16, 152, 173, 0.18);
+      }
+    }
+
+    &.header-bar__action--close {
+      &:hover {
+        background-color: color-mix(
+          in srgb,
+          var(--color-error) 8%,
+          transparent
+        );
+        border-color: color-mix(in srgb, var(--color-error) 35%, transparent);
+        color: var(--color-error);
+        :root[data-theme='dark'] & {
+          background-color: color-mix(
+            in srgb,
+            var(--color-error) 15%,
+            transparent
+          );
+          border-color: color-mix(in srgb, var(--color-error) 45%, transparent);
+        }
+      }
     }
   }
 }

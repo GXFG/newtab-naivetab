@@ -25,7 +25,7 @@ import {
 } from '@/logic/image'
 import { getPexelsImagesData } from '@/api/image'
 import { log } from '@/logic/util'
-import Tips from '@/components/Tips.vue'
+import { SettingFormItem, SettingFormSection } from '@/setting/components'
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
 
 /**
@@ -254,142 +254,144 @@ const loadMorePexels = async () => {
     @update:show="onCloseModal()"
   >
     <NDrawerContent
-      :title="`${$t('common.select')}${$t('common.backgroundImage')}`"
+      :title="$t('generalSetting.selectBackgroundImageLabel')"
       closable
     >
       <div class="drawer__content">
         <!-- current -->
         <div class="content__config-section">
-          <NForm
-            class="content__config"
-            label-placement="left"
-            :label-width="100"
-            :show-feedback="false"
-          >
-            <NFormItem :label="$t('common.origin')">
-              <NRadioGroup
-                v-model:value="localConfig.general.backgroundImageSource"
-                size="small"
-                style="width: 100%"
-              >
-                <NRadioButton
-                  v-for="item in backgroundImageSourceList"
-                  :key="item.value"
-                  :value="item.value"
-                >
-                  {{ item.label }}
-                </NRadioButton>
-              </NRadioGroup>
-            </NFormItem>
-
-            <!-- local -->
-            <NFormItem
-              v-if="
-                localConfig.general.backgroundImageSource ===
-                BACKGROUND_IMAGE_SOURCE.LOCAL
-              "
-              :label="$t('common.select')"
+          <div class="content__config">
+            <SettingFormSection
+              :title="$t('keyboardCommon.backgroundPicker')"
+              :icon="ICONS.imageSquare"
             >
-              <div class="form__local">
-                <div class="local__actions">
-                  <NButton
-                    type="primary"
-                    size="small"
-                    secondary
-                    class="action-btn action-btn--primary"
-                    @click="onSelectBackgroundImage"
-                  >
-                    <template #icon>
-                      <Icon :icon="ICONS.importFile" />
-                    </template>
-                    {{ $t('common.import') }}
-                  </NButton>
-                  <Tips :content="$t('generalSetting.localBackgroundTips')" />
-                </div>
-                <p
-                  v-if="imageState.currBackgroundImageFileName"
-                  class="local__filename"
-                >
-                  <Icon
-                    :icon="ICONS.imageSquare"
-                    class="filename__icon"
-                  />
-                  {{ imageState.currBackgroundImageFileName }}
-                </p>
-                <input
-                  ref="bgImageFileInputEl"
-                  style="display: none"
-                  type="file"
-                  accept="image/*"
-                  @change="onBackgroundImageFileChange"
-                />
-              </div>
-            </NFormItem>
-
-            <!-- network -->
-            <template
-              v-else-if="
-                localConfig.general.backgroundImageSource ===
-                BACKGROUND_IMAGE_SOURCE.NETWORK
-              "
-            >
-              <NFormItem :label="`${$t('common.custom')}`">
-                <NSwitch
-                  v-model:value="
-                    localConfig.general.isBackgroundImageCustomUrlEnabled
-                  "
+              <!-- origin -->
+              <SettingFormItem :label="$t('common.origin')">
+                <NRadioGroup
+                  v-model:value="localConfig.general.backgroundImageSource"
                   size="small"
-                  @update:value="handleCustomUrlUpdate"
-                />
-              </NFormItem>
-              <NFormItem
-                v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
-                label="URL"
-              >
-                <NInput
-                  v-model:value="
-                    localConfig.general.backgroundImageCustomUrls[
-                      localState.currAppearanceCode
-                    ]
-                  "
-                  class="setting__item-ele setting__item-ml"
-                  type="text"
-                  placeholder="https://"
-                  @blur="handleBackgroundImageCustomUrlBlur"
-                />
-              </NFormItem>
-            </template>
-            <!-- 网络（未开启自定义），每日一图时展示 -->
-            <NFormItem
-              v-if="
-                localConfig.general.backgroundImageSource !==
-                  BACKGROUND_IMAGE_SOURCE.LOCAL &&
-                !localConfig.general.isBackgroundImageCustomUrlEnabled
-              "
-              :label="$t('common.uhd')"
-            >
-              <NSwitch
-                v-model:value="localConfig.general.backgroundImageHighQuality"
-                size="small"
-              />
-            </NFormItem>
+                  direction="horizontal"
+                >
+                  <NRadio
+                    v-for="item in backgroundImageSourceList"
+                    :key="item.value"
+                    :value="item.value"
+                  >
+                    {{ item.label }}
+                  </NRadio>
+                </NRadioGroup>
+              </SettingFormItem>
 
-            <!-- 当前背景图 -->
-            <NFormItem
-              :label="`${$t('common.current')}${$t('common.backgroundImage')}`"
-            >
-              <div class="current__image">
-                <NSpin :show="isImageLoading">
-                  <BackgroundDrawerImageElement
-                    :lazy="false"
-                    :data="{
-                      url: currentBackgroundPreviewUrl,
-                    }"
+              <!-- local -->
+              <SettingFormItem
+                v-if="
+                  localConfig.general.backgroundImageSource ===
+                  BACKGROUND_IMAGE_SOURCE.LOCAL
+                "
+                :label="$t('common.select')"
+                :tip-content="$t('generalSetting.localBackgroundTips')"
+              >
+                <div class="form__local">
+                  <div class="local__actions">
+                    <NButton
+                      type="primary"
+                      size="tiny"
+                      secondary
+                      class="setting__btn setting__btn--primary"
+                      @click="onSelectBackgroundImage"
+                    >
+                      <template #icon>
+                        <Icon :icon="ICONS.importFile" />
+                      </template>
+                      {{ $t('common.import') }}
+                    </NButton>
+                  </div>
+                  <p
+                    v-if="imageState.currBackgroundImageFileName"
+                    class="local__filename"
+                  >
+                    <Icon
+                      :icon="ICONS.imageSquare"
+                      class="filename__icon"
+                    />
+                    {{ imageState.currBackgroundImageFileName }}
+                  </p>
+                  <input
+                    ref="bgImageFileInputEl"
+                    style="display: none"
+                    type="file"
+                    accept="image/*"
+                    @change="onBackgroundImageFileChange"
                   />
-                </NSpin>
-              </div>
-            </NFormItem>
-          </NForm>
+                </div>
+              </SettingFormItem>
+
+              <!-- network -->
+              <template
+                v-else-if="
+                  localConfig.general.backgroundImageSource ===
+                  BACKGROUND_IMAGE_SOURCE.NETWORK
+                "
+              >
+                <SettingFormItem :label="$t('common.custom')">
+                  <NSwitch
+                    v-model:value="
+                      localConfig.general.isBackgroundImageCustomUrlEnabled
+                    "
+                    size="small"
+                    @update:value="handleCustomUrlUpdate"
+                  />
+                </SettingFormItem>
+                <SettingFormItem
+                  v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
+                  label="URL"
+                >
+                  <!-- URL 协议前缀为通用格式，无需 i18n -->
+                  <NInput
+                    v-model:value="
+                      localConfig.general.backgroundImageCustomUrls[
+                        localState.currAppearanceCode
+                      ]
+                    "
+                    class="setting__fill-input"
+                    type="text"
+                    placeholder="https://"
+                    @blur="handleBackgroundImageCustomUrlBlur"
+                  />
+                </SettingFormItem>
+              </template>
+              <!-- 网络（未开启自定义），每日一图时展示 -->
+              <SettingFormItem
+                v-if="
+                  localConfig.general.backgroundImageSource !==
+                    BACKGROUND_IMAGE_SOURCE.LOCAL &&
+                  !localConfig.general.isBackgroundImageCustomUrlEnabled
+                "
+                :label="$t('common.uhd')"
+              >
+                <NSwitch
+                  v-model:value="localConfig.general.backgroundImageHighQuality"
+                  size="small"
+                />
+              </SettingFormItem>
+
+              <!-- 当前背景图 -->
+              <SettingFormItem
+                :label="$t('generalSetting.currentBackgroundImageLabel')"
+              >
+                <div class="current__image">
+                  <NSpin :show="isImageLoading">
+                    <BackgroundDrawerImageElement
+                      :lazy="false"
+                      :data="{
+                        url: currentBackgroundPreviewUrl,
+                      }"
+                    />
+                  </NSpin>
+                </div>
+              </SettingFormItem>
+            </SettingFormSection>
+          </div>
         </div>
 
         <!-- list 仅来源为网络 且 非定制Url时展示 -->
@@ -425,7 +427,8 @@ const loadMorePexels = async () => {
                     class="pexels__load-more"
                   >
                     <NButton
-                      size="small"
+                      size="tiny"
+                      round
                       :loading="isPexelsLoadingMore"
                       :disabled="
                         (imageLocalState.pexels.currentPage || 1) > 100

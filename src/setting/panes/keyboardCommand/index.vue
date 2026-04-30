@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
+import { NPopconfirm } from 'naive-ui'
 import { localConfig, getSettingKeyboardSize } from '@/logic/store'
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
 import {
@@ -17,11 +18,14 @@ import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
 import KeyboardKeycapDisplay from '@/components/KeyboardKeycapDisplay.vue'
 import GlobalShortcutRecorder from '@/components/GlobalShortcutRecorder.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import { SwitchField } from '@/setting/fields'
-import { NFormItem, NPopconfirm } from 'naive-ui'
 import UrlBlacklistInput from '@/components/UrlBlacklistInput.vue'
+import {
+  SettingFormWrap,
+  SettingHeaderBar,
+  SettingFormSection,
+  SettingFormItem,
+} from '@/setting/components'
+import { SwitchField } from '@/setting/fields'
 
 const keyboardBaseSize = computed(() => getSettingKeyboardSize())
 
@@ -64,6 +68,9 @@ const commandCategories = computed(() => {
  * 格式化修饰键 + 主键为可读形式
  */
 const formatBinding = (code: string): string => {
+  if (localConfig.keyboardCommand.noModifierMode) {
+    return getCustomLabel(code)
+  }
   const modifier = formatModifierKeys(localConfig.keyboardCommand.modifiers)
   const key = getCustomLabel(code)
   return `${modifier} + ${key}`
@@ -127,6 +134,39 @@ const modifierConflictWarning = computed(() => {
 })
 
 /**
+ * 无修饰键冲突警告：两者都开无修饰键模式 + 当前选中的键同时被双方绑定
+ */
+const noModifierConflictWarning = computed(() => {
+  if (
+    !selectedKeyCode.value ||
+    !localConfig.keyboardCommand.noModifierMode ||
+    !localConfig.keyboardBookmark.noModifierMode
+  ) {
+    return ''
+  }
+  const bookmarkKeymap = localConfig.keyboardBookmark.keymap || {}
+  if (bookmarkKeymap[selectedKeyCode.value]?.url) {
+    return window
+      .$t('keyboardCommand.noModifierConflict')
+      .replace('__key__', getCustomLabel(selectedKeyCode.value))
+  }
+  return ''
+})
+
+/**
+ * 无修饰键模式 + 输入框中触发：建议关闭输入框触发
+ */
+const noModifierInInputWarning = computed(() => {
+  if (
+    !localConfig.keyboardCommand.noModifierMode ||
+    !localConfig.keyboardCommand.shortcutInInputElement
+  ) {
+    return ''
+  }
+  return window.$t('keyboardCommand.noModifierInInputWarning')
+})
+
+/**
  * 选中/取消选中按键
  */
 const toggleSelectKey = (code: string) => {
@@ -163,155 +203,196 @@ const handleCommandSelect = (cmd: TCommandName) => {
 </script>
 
 <template>
-  <SettingHeaderBar
-    :title="$t('setting.keyboardCommand')"
-    widget-code="keyboardCommand"
-  />
+  <SettingHeaderBar :title="$t('setting.keyboardCommand')" />
 
   <SettingFormWrap widget-code="keyboardCommand">
     <!-- 基础设置 -->
-    <template #behavior>
+    <SettingFormSection
+      :title="$t('keyboardCommand.sectionBasic')"
+      :icon="ICONS.keyboardCmdKey"
+    >
       <SwitchField
         v-model="localConfig.keyboardCommand.isEnabled"
         :label="$t('keyboardCommand.enabled')"
       />
 
+      <SettingFormItem
+        v-if="noModifierInInputWarning"
+        class="modifier-conflict-card"
+      >
+        <span class="modifier-conflict-warning">
+          <Icon
+            :icon="ICONS.warning"
+            class="warning__icon"
+          />
+          {{ noModifierInInputWarning }}
+        </span>
+      </SettingFormItem>
+
       <SwitchField
         v-model="localConfig.keyboardCommand.shortcutInInputElement"
         :label="$t('keyboardCommand.shortcutInInputElement')"
+        :tip-content="$t('keyboardCommand.shortcutInInputElementTips')"
       />
 
-      <NFormItem :label="$t('keyboardCommand.urlBlacklist')">
+      <SettingFormItem
+        :label="$t('keyboardCommand.urlBlacklist')"
+        :tip-content="$t('generalSetting.urlBlacklistTips')"
+      >
         <UrlBlacklistInput v-model="localConfig.keyboardCommand.urlBlacklist" />
-      </NFormItem>
+      </SettingFormItem>
 
-      <NFormItem :label="$t('keyboardCommand.globalModifier')">
+      <SwitchField
+        v-model="localConfig.keyboardCommand.noModifierMode"
+        :label="$t('keyboardCommand.noModifierMode')"
+        :tip-content="$t('keyboardCommand.noModifierModeDesc')"
+      />
+
+      <SettingFormItem :label="$t('keyboardCommand.globalModifier')">
         <GlobalShortcutRecorder
           v-model="localConfig.keyboardCommand.modifiers"
+          :disabled="localConfig.keyboardCommand.noModifierMode"
         />
-      </NFormItem>
+      </SettingFormItem>
 
-      <NFormItem
+      <SettingFormItem
         v-if="modifierConflictWarning"
-        :show-label="false"
+        class="modifier-conflict-card"
       >
-        <span class="modifier-conflict-warning"
-          >⚠️ {{ modifierConflictWarning }}</span
-        >
-      </NFormItem>
+        <span class="modifier-conflict-warning">
+          <Icon
+            :icon="ICONS.warning"
+            class="warning__icon"
+          />
+          {{ modifierConflictWarning }}
+        </span>
+      </SettingFormItem>
 
-      <!-- 可视化键盘绑定区域 -->
-      <div class="command-binding">
-        <div class="command-binding__keyboard-wrap">
-          <KeyboardLayout
-            unit="px"
-            :base-size="keyboardBaseSize"
-            :keys="currKeyboardConfig.keys"
-          >
-            <template #keycap="{ code }">
-              <div
-                class="command-binding__keycap-wrap"
-                @click="toggleSelectKey(code)"
-              >
-                <KeyboardKeycapDisplay
-                  :key-code="code"
-                  :label="getCustomLabel(code)"
-                  :name="getBoundLabel(code)"
-                  :command-icon="getBoundCommandIcon(code)"
-                  :visual-type="keycapVisualType"
-                  :stage-style="getKeycapStageStyle(code)"
-                  :text-style="getKeycapTextStyle(code)"
-                  :show-cap-key="isCapKeyVisible"
-                  :show-name="isNameVisible"
-                  :show-favicon="false"
-                  :show-tactile-bumps="false"
-                  :is-selected="selectedKeyCode === code"
-                  :is-border-enabled="boundKeySet.has(code)"
-                  :style="[keycapCssVars, getEmphasisStyle(code)]"
-                />
-              </div>
-            </template>
-          </KeyboardLayout>
+      <SettingFormItem
+        v-if="noModifierConflictWarning"
+        class="modifier-conflict-card"
+      >
+        <span class="modifier-conflict-warning">
+          <Icon
+            :icon="ICONS.warning"
+            class="warning__icon"
+          />
+          {{ noModifierConflictWarning }}
+        </span>
+      </SettingFormItem>
+    </SettingFormSection>
+
+    <!-- 可视化键盘绑定区域 -->
+    <div class="command-binding">
+      <div class="command-binding__keyboard-wrap">
+        <KeyboardLayout
+          unit="px"
+          :base-size="keyboardBaseSize"
+          :keys="currKeyboardConfig.keys"
+        >
+          <template #keycap="{ code }">
+            <div
+              class="command-binding__keycap-wrap"
+              @click="toggleSelectKey(code)"
+            >
+              <KeyboardKeycapDisplay
+                :key-code="code"
+                :label="getCustomLabel(code)"
+                :name="getBoundLabel(code)"
+                :command-icon="getBoundCommandIcon(code)"
+                :visual-type="keycapVisualType"
+                :stage-style="getKeycapStageStyle(code)"
+                :text-style="getKeycapTextStyle(code)"
+                :show-cap-key="isCapKeyVisible"
+                :show-name="isNameVisible"
+                :show-favicon="false"
+                :show-tactile-bumps="false"
+                :is-selected="selectedKeyCode === code"
+                :is-border-enabled="boundKeySet.has(code)"
+                :style="[keycapCssVars, getEmphasisStyle(code)]"
+              />
+            </div>
+          </template>
+        </KeyboardLayout>
+      </div>
+
+      <!-- 底部区域：tips 或命令选择面板 -->
+      <div class="command-binding__footer">
+        <div
+          v-if="!selectedKeyCode"
+          class="command-binding__tip"
+        >
+          {{ $t('keyboardCommand.bindingTip') }}
         </div>
 
-        <!-- 底部区域：tips 或命令选择面板 -->
-        <div class="command-binding__footer">
-          <div
-            v-if="!selectedKeyCode"
-            class="command-binding__tip"
-          >
-            {{ $t('keyboardCommand.bindingTip') }}
+        <!-- 命令选择面板 -->
+        <div
+          v-else
+          class="command-binding__selector"
+        >
+          <div class="selector__header">
+            <span class="selector__key">{{
+              getCustomLabel(selectedKeyCode)
+            }}</span>
+            <span class="selector__binding">{{
+              formatBinding(selectedKeyCode)
+            }}</span>
+            <NPopconfirm @positive-click="handleDeleteBinding">
+              <template #trigger>
+                <NButton
+                  quaternary
+                  size="tiny"
+                  class="selector__close"
+                >
+                  <Icon
+                    :icon="ICONS.deleteBin"
+                    class="close__icon"
+                  />
+                </NButton>
+              </template>
+              {{
+                $t('keyboardCommand.confirmDelete').replace(
+                  '__key__',
+                  getCustomLabel(selectedKeyCode),
+                )
+              }}
+            </NPopconfirm>
           </div>
 
-          <!-- 命令选择面板 -->
-          <div
-            v-else
-            class="command-binding__selector"
-          >
-            <div class="selector__header">
-              <span class="selector__key">{{
-                getCustomLabel(selectedKeyCode)
-              }}</span>
-              <span class="selector__binding">{{
-                formatBinding(selectedKeyCode)
-              }}</span>
-              <NPopconfirm @positive-click="handleDeleteBinding">
-                <template #trigger>
-                  <NButton
-                    quaternary
-                    size="tiny"
-                    class="selector__close"
-                  >
-                    <Icon
-                      :icon="ICONS.deleteBin"
-                      class="close__icon"
-                    />
-                  </NButton>
-                </template>
-                {{
-                  $t('keyboardCommand.confirmDelete').replace(
-                    '__key__',
-                    getCustomLabel(selectedKeyCode),
-                  )
-                }}
-              </NPopconfirm>
-            </div>
-
-            <div class="selector__categories">
-              <div
-                v-for="cat in commandCategories"
-                :key="cat.categoryKey"
-                class="category-group"
-              >
-                <div class="category-group__label">
-                  {{ $t(cat.categoryKey) }}
-                </div>
-                <NRadioGroup
-                  :value="getBoundCommand(selectedKeyCode)"
-                  class="category-group__options"
-                  @update:value="handleCommandSelect"
-                >
-                  <NRadio
-                    v-for="cmd in cat.commands"
-                    :key="cmd.value"
-                    :value="cmd.value"
-                    size="small"
-                  >
-                    <p class="cmd-label-wrap">
-                      <Icon
-                        :icon="cmd.icon"
-                        class="cmd__icon"
-                      />
-                      <span>{{ cmd.label }}</span>
-                    </p>
-                  </NRadio>
-                </NRadioGroup>
+          <div class="selector__categories">
+            <div
+              v-for="cat in commandCategories"
+              :key="cat.categoryKey"
+              class="category-group"
+            >
+              <div class="category-group__label">
+                {{ $t(cat.categoryKey) }}
               </div>
+              <NRadioGroup
+                :value="getBoundCommand(selectedKeyCode)"
+                class="category-group__options"
+                @update:value="handleCommandSelect"
+              >
+                <NRadio
+                  v-for="cmd in cat.commands"
+                  :key="cmd.value"
+                  :value="cmd.value"
+                  size="small"
+                >
+                  <p class="cmd-label-wrap">
+                    <Icon
+                      :icon="cmd.icon"
+                      class="cmd__icon"
+                    />
+                    <span>{{ cmd.label }}</span>
+                  </p>
+                </NRadio>
+              </NRadioGroup>
             </div>
           </div>
         </div>
       </div>
-    </template>
+    </div>
   </SettingFormWrap>
 </template>
 
@@ -384,10 +465,9 @@ const handleCommandSelect = (cmd: TCommandName) => {
   margin-bottom: 4px;
 }
 
-/* 覆盖 setting/index.vue 全局的 .n-radio { width: 20% } 规则，
-   命令选择器使用 2 列网格，radio 撑满每个格子 */
+/* 命令选择器中的 radio 使用 auto 宽度，配合 2 列网格布局 */
 :deep(.category-group__options .n-radio) {
-  width: auto !important;
+  width: auto;
 }
 
 .category-group__options {
@@ -472,5 +552,17 @@ const handleCommandSelect = (cmd: TCommandName) => {
   font-size: 12px;
   color: rgba(208, 48, 80, 0.9);
   padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.warning__icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.modifier-conflict-card :deep(.form-item__control) {
+  justify-content: flex-start;
 }
 </style>

@@ -12,6 +12,7 @@
 dist
 dist-ssr
 node_modules
+coverage
 extension
 extension-chrome
 extension-firefox

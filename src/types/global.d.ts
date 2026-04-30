@@ -51,8 +51,7 @@ type KeydownTaskKey =
   | 'draft-tool'
   | 'keyboardBookmark'
   | 'bookmarkFolder'
-  | 'globalShortcutForBookmark'
-  | 'globalShortcutForCommand'
+  | 'globalShortcut'
 
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
 type DatabaseStore = 'localBackgroundImages' | 'currBackgroundImages'

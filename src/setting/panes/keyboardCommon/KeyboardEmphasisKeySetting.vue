@@ -148,6 +148,7 @@ const hasOverrides = computed(
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  padding: 0 8px;
 }
 
 /* ── 标题行 ── */
