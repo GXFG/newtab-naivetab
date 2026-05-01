@@ -694,7 +694,7 @@ const onToggleDetailPopover = (date?: string) => {
         <div
           v-for="item in festivalList"
           :key="item.date"
-          :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('common.day')}`"
+          :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('calendar.festivalCountdownDaySuffix')}`"
           class="festival__item"
         >
           <div class="item__left">

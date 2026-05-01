@@ -1,85 +1,56 @@
 <script setup lang="ts">
-import { localState } from '@/logic/store'
+import SettingFormItem from '@/setting/components/SettingFormItem.vue'
 import CustomColorPicker from '@/components/CustomColorPicker.vue'
+import { useDualThemeColor } from './useDualThemeColor'
 
-const props = defineProps<{
-  // 是否启用
-  enable: boolean
-  // 颜色值（字符串或字符串数组）
-  color: string | string[]
-  // 边框宽度（仅边框场景使用）
-  width?: number
-  // 标签文本
+defineProps<{
   label?: string
-  // 是否禁用
   disabled?: boolean
 }>()
 
-const emit = defineEmits<{
-  'update:enable': [value: boolean]
-  'update:color': [value: string | string[]]
-  'update:width': [value: number]
-}>()
+const enable = defineModel<boolean>('enable')
+const color = defineModel<string | string[]>('color')
+const width = defineModel<number>('width')
 
-// 判断是否为数组类型
-const isArrayValue = computed(() => Array.isArray(props.color))
+const { currentValue, updateValue } = useDualThemeColor(
+  computed(() => color.value as string | string[]),
+  (v) => {
+    color.value = v
+  },
+)
 
-// 计算当前外观的颜色值
-const currentColor = computed(() => {
-  if (isArrayValue.value) {
-    return props.color[localState.value.currAppearanceCode]
-  }
-  return props.color as string
-})
-
-// 处理颜色更新
-const handleColorUpdate = (value: string) => {
-  if (isArrayValue.value) {
-    const newArray = [...(props.color as string[])]
-    newArray[localState.value.currAppearanceCode] = value
-    emit('update:color', newArray)
-  } else {
-    emit('update:color', value)
-  }
-}
-
-// 判断是否显示宽度输入
-const showWidthInput = computed(() => props.width !== undefined)
+const showWidthInput = computed(() => width.value !== undefined)
 </script>
 
 <template>
-  <NFormItem
-    :label="label"
-    :disabled="disabled"
-  >
-    <NSwitch
-      :value="enable"
-      size="small"
-      :disabled="disabled"
-      @update:value="emit('update:enable', $event)"
-    />
-    <Transition name="setting-expand">
+  <!-- 注意：不传 :disabled 给 SettingFormItem（div 不支持 disabled 属性），
+       禁用状态由子组件（NSwitch / CustomColorPicker / NInputNumber）各自处理 -->
+  <SettingFormItem :label="label">
+    <Transition name="setting-slide">
       <div
         v-if="enable"
-        class="setting__slider-wrap"
+        class="setting__toggle-extra"
       >
         <CustomColorPicker
-          :value="currentColor"
-          class="setting__item-ele setting__item-ml"
+          :value="currentValue"
           :disabled="disabled"
-          @update:value="handleColorUpdate"
+          @update:value="updateValue"
         />
         <NInputNumber
           v-if="showWidthInput"
-          :value="width"
-          class="setting__item-ele setting__item-ml setting__input-number"
+          v-model:value="width"
+          class="setting__num-input"
           size="small"
           :step="1"
           :min="1"
           :max="1000"
-          @update:value="emit('update:width', $event || 1)"
         />
       </div>
     </Transition>
-  </NFormItem>
+    <NSwitch
+      v-model:value="enable"
+      size="small"
+      :disabled="disabled"
+    />
+  </SettingFormItem>
 </template>

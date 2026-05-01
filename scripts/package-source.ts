@@ -15,8 +15,8 @@ if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true })
 }
 
-// 排除的目录和文件
-const EXCLUDE_PATTERNS = [
+// 排除的目录
+const EXCLUDE_DIRS = [
   'docs',
   'site',
   'node_modules',
@@ -29,40 +29,37 @@ const EXCLUDE_PATTERNS = [
   '.vscode',
   '.idea',
   '.qoder',
+  'test',
+]
+
+// 排除的文件（支持 glob 模式）
+const EXCLUDE_FILES = [
   '.DS_Store',
   '*.log',
   '*.local',
   '*.crx',
   '*.xpi',
-  'src/**/__tests__',
+  '__tests__',
   'src/auto-imports.d.ts',
   'src/components.d.ts',
   'stats.html',
   '.eslintcache',
-  'test',
 ]
 
-// 使用 zip 命令打包（macOS 自带）
-const command = `cd "${ROOT}" && zip -r "${OUTPUT}" . \
-  -x './.git/*' \
-  -x './node_modules/*' \
-  -x './dist/*' \
-  -x './extension-chrome/*' \
-  -x './extension-firefox/*' \
-  -x './docs/*' \
-  -x './site/*' \
-  -x './.claude/*' \
-  -x './.github/*' \
-  -x './.vscode/*' \
-  -x './.idea/*' \
-  -x './.qoder/*' \
-  -x '*.DS_Store' \
-  -x './src/auto-imports.d.ts' \
-  -x './src/components.d.ts' \
-  -x './stats.html' \
-  -x './.eslintcache' \
-  -x './test/*' \
-  -x '*/__tests__/*'`
+// 从 EXCLUDE_* 动态生成 zip -x 参数，保持单一数据源
+// 目录：匹配根级 ./{dir}/* 和任意层级 ./*/{dir}/*
+// 文件：匹配根级 ./{file} 和任意层级 ./*/{file}
+const excludes = [
+  ...EXCLUDE_DIRS.flatMap((d) => [`-x './${d}/*'`, `-x './*/${d}/*'`]),
+  ...EXCLUDE_FILES.flatMap((f) => {
+    // 目录类型（无扩展名）：排除目录及其内容
+    if (!/\.[^.]+$/.test(f)) {
+      return [`-x './${f}/*'`, `-x './*/${f}/*'`]
+    }
+    return [`-x './${f}'`, `-x './*/${f}'`]
+  }),
+].join(' ')
+const command = `cd "${ROOT}" && zip -rq "${OUTPUT}" . ${excludes}`
 
 console.log('📦 Creating source zip for Firefox store submission...')
 

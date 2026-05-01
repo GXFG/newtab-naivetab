@@ -11,12 +11,14 @@ export default defineConfig(
     ignores: [
       'node_modules',
       'extension',
+      'site',
       'assets',
       'public',
       'lib',
+      'test',
+      '**/__tests__/**',
       'src/auto-imports.d.ts',
       'src/components.d.ts',
-      'site',
     ],
   },
 

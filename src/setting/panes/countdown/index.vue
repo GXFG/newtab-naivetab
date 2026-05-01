@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import { localConfig, localState } from '@/logic/store'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
+import { localConfig } from '@/logic/store'
+import { ICONS } from '@/logic/icons'
 import {
-  SliderField,
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormItem,
+  SettingFormSection,
+  SettingFormInlineRow,
+} from '@/setting/components'
+import {
+  NumberField,
   ColorField,
   FontField,
   SwitchField,
   ToggleColorField,
 } from '@/setting/fields'
 
-// 将总秒数拆为 h/m/s 供分项输入
 const durationHours = computed({
   get: () => Math.floor(localConfig.countdown.defaultDuration / 3600),
   set: (h: number) => {
@@ -40,139 +45,134 @@ const durationSeconds = computed({
 </script>
 
 <template>
-  <SettingHeaderBar
-    :title="$t('setting.countdown')"
-    widget-code="countdown"
-  />
+  <SettingHeaderBar :title="$t('setting.countdown')" />
 
   <SettingFormWrap widget-code="countdown">
-    <!-- 行为设置 -->
-    <template #behavior>
+    <!-- 计时器显示 -->
+    <SettingFormSection
+      :title="$t('countdown.timerDisplay')"
+      :icon="ICONS.countdown"
+    >
       <SwitchField
         v-model="localConfig.countdown.showHours"
         :label="$t('countdown.showHours')"
       />
 
-      <NFormItem :label="$t('countdown.defaultDuration')">
+      <SettingFormItem :label="$t('countdown.defaultDuration')">
         <div class="duration__inputs">
           <NInputNumber
             v-if="localConfig.countdown.showHours"
             v-model:value="durationHours"
-            class="setting__input-number"
+            class="setting__num-input"
             size="small"
             :min="0"
             :max="99"
             :step="1"
           >
+            <!-- 时间单位后缀为国际通用符号，无需 i18n -->
             <template #suffix> h </template>
           </NInputNumber>
           <NInputNumber
             v-model:value="durationMinutes"
-            class="setting__input-number"
+            class="setting__num-input"
             size="small"
             :min="0"
             :max="59"
             :step="1"
           >
+            <!-- 时间单位后缀为国际通用符号，无需 i18n -->
             <template #suffix> m </template>
           </NInputNumber>
           <NInputNumber
             v-model:value="durationSeconds"
-            class="setting__input-number"
+            class="setting__num-input"
             size="small"
             :min="0"
             :max="59"
             :step="1"
           >
+            <!-- 时间单位后缀为国际通用符号，无需 i18n -->
             <template #suffix> s </template>
           </NInputNumber>
         </div>
-      </NFormItem>
+      </SettingFormItem>
 
-      <NFormItem :label="$t('countdown.label')">
+      <SettingFormItem :label="$t('countdown.label')">
         <NInput
           v-model:value="localConfig.countdown.label"
           size="small"
           clearable
         />
-      </NFormItem>
-    </template>
+      </SettingFormItem>
+    </SettingFormSection>
 
-    <!-- 尺寸样式 -->
-    <template #size>
-      <SliderField
-        v-model="localConfig.countdown.size"
-        :label="$t('common.size')"
-        :min="1"
-        :max="1000"
-        :step="1"
-      />
+    <!-- 进度环样式 -->
+    <SettingFormSection
+      :title="$t('countdown.ringStyle')"
+      :icon="ICONS.countdownPause"
+    >
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.countdown.size"
+          :label="$t('common.size')"
+          :min="1"
+          :max="1000"
+          :step="1"
+        />
 
-      <SliderField
-        v-model="localConfig.countdown.strokeWidth"
-        :label="$t('countdown.strokeWidth')"
-        :min="0"
-        :max="50"
-        :step="0.1"
-      />
-    </template>
+        <NumberField
+          v-model="localConfig.countdown.strokeWidth"
+          :label="$t('countdown.strokeWidth')"
+          :min="0"
+          :max="50"
+          :step="0.1"
+        />
+      </SettingFormInlineRow>
+
+      <SettingFormInlineRow>
+        <ColorField
+          v-model="localConfig.countdown.progressColor"
+          :label="$t('countdown.progressColor')"
+        />
+
+        <ColorField
+          v-model="localConfig.countdown.trackColor"
+          :label="$t('countdown.trackColor')"
+        />
+      </SettingFormInlineRow>
+
+      <SettingFormInlineRow>
+        <ToggleColorField
+          v-model:enable="localConfig.countdown.isBorderEnabled"
+          v-model:color="localConfig.countdown.borderColor"
+          v-model:width="localConfig.countdown.borderWidth"
+          :label="$t('common.border')"
+        />
+
+        <ToggleColorField
+          v-model:enable="localConfig.countdown.isShadowEnabled"
+          v-model:color="localConfig.countdown.shadowColor"
+          :label="$t('common.shadow')"
+        />
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
     <!-- 文字排版 -->
-    <template #typography>
-      <!-- 时钟字体 -->
+    <SettingFormSection section-key="common.typography">
       <FontField
         v-model:font-family="localConfig.countdown.clockFontFamily"
         v-model:font-color="localConfig.countdown.clockFontColor"
         v-model:font-size="localConfig.countdown.clockFontSize"
-        :label="`${$t('countdown.clockStyle')}${$t('common.font')}`"
+        :label="$t('countdown.clockStyleFontLabel')"
       />
-      <!-- 标签字体 -->
+
       <FontField
         v-model:font-family="localConfig.countdown.labelFontFamily"
         v-model:font-color="localConfig.countdown.labelFontColor"
         v-model:font-size="localConfig.countdown.labelFontSize"
-        :label="`${$t('countdown.label')}${$t('common.font')}`"
+        :label="$t('countdown.labelFontLabel')"
       />
-    </template>
-
-    <!-- 色彩外观 -->
-    <template #appearance>
-      <ColorField
-        v-model="localConfig.countdown.backgroundColor"
-        :label="$t('common.backgroundColor')"
-      />
-
-      <SliderField
-        v-model="localConfig.countdown.backgroundBlur"
-        :label="$t('common.blur')"
-        :min="0"
-        :max="30"
-        :step="0.1"
-      />
-
-      <ColorField
-        v-model="localConfig.countdown.progressColor"
-        :label="$t('countdown.progressColor')"
-      />
-
-      <ColorField
-        v-model="localConfig.countdown.trackColor"
-        :label="$t('countdown.trackColor')"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.countdown.isBorderEnabled"
-        v-model:color="localConfig.countdown.borderColor"
-        v-model:width="localConfig.countdown.borderWidth"
-        :label="$t('common.border')"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.countdown.isShadowEnabled"
-        v-model:color="localConfig.countdown.shadowColor"
-        :label="$t('common.shadow')"
-      />
-    </template>
+    </SettingFormSection>
   </SettingFormWrap>
 </template>
 

@@ -1,132 +1,95 @@
 <script setup lang="ts">
-import { localConfig, localState } from '@/logic/store'
-import CustomColorPicker from '@/components/CustomColorPicker.vue'
-import SliderInput from '@/components/SliderInput.vue'
+import { SettingFormSection, SettingFormInlineRow } from '@/setting/components'
+import { localConfig } from '@/logic/store'
+import { ICONS } from '@/logic/icons'
+import { NumberField, ToggleColorField } from '@/setting/fields'
 </script>
 
 <template>
-  <NForm
-    label-placement="left"
-    :label-width="120"
-    :show-feedback="false"
+  <SettingFormSection
+    :title="$t('keyboardCommon.shell')"
+    :icon="ICONS.keyboardShellLabel"
   >
-    <!-- Shell -->
-    <NFormItem :label="$t('keyboardCommon.shell')">
-      <NSwitch
-        v-model:value="localConfig.keyboardCommon.isShellVisible"
-        size="small"
-      />
-      <CustomColorPicker
-        v-if="localConfig.keyboardCommon.isShellVisible"
-        v-model:value="
-          localConfig.keyboardCommon.shellColor[localState.currAppearanceCode]
-        "
-        class="setting__item-ele setting__item-ml"
-      />
-    </NFormItem>
+    <ToggleColorField
+      v-model:enable="localConfig.keyboardCommon.isShellVisible"
+      v-model:color="localConfig.keyboardCommon.shellColor"
+      :label="$t('keyboardCommon.shell')"
+    />
+
+    <ToggleColorField
+      v-model:enable="localConfig.keyboardCommon.isShellShadowEnabled"
+      v-model:color="localConfig.keyboardCommon.shellShadowColor"
+      :label="$t('common.shadow')"
+    />
 
     <template v-if="localConfig.keyboardCommon.isShellVisible">
-      <NFormItem :label="`${$t('common.vertical')}${$t('common.margin')}`">
-        <SliderInput
+      <SettingFormInlineRow>
+        <NumberField
           v-model="localConfig.keyboardCommon.shellVerticalPadding"
+          :label="$t('keyboardCommon.verticalMarginLabel')"
           :step="1"
           :min="0"
           :max="100"
         />
-      </NFormItem>
 
-      <NFormItem :label="`${$t('common.horizontal')}${$t('common.margin')}`">
-        <SliderInput
+        <NumberField
           v-model="localConfig.keyboardCommon.shellHorizontalPadding"
+          :label="$t('keyboardCommon.horizontalMarginLabel')"
           :step="1"
           :min="0"
           :max="100"
         />
-      </NFormItem>
+      </SettingFormInlineRow>
 
-      <NFormItem :label="$t('common.borderRadius')">
-        <SliderInput
+      <SettingFormInlineRow>
+        <NumberField
           v-model="localConfig.keyboardCommon.shellBorderRadius"
+          :label="$t('common.borderRadius')"
           :step="0.1"
           :min="0"
           :max="30"
         />
-      </NFormItem>
 
-      <NFormItem :label="$t('common.blur')">
-        <SliderInput
+        <NumberField
           v-model="localConfig.keyboardCommon.shellBackgroundBlur"
+          :label="$t('common.blur')"
           :step="0.1"
           :min="0"
           :max="30"
         />
-      </NFormItem>
-
-      <NFormItem
-        :label="$t('common.shadow')"
-        class="n-form-item--color"
-      >
-        <NSwitch
-          v-model:value="localConfig.keyboardCommon.isShellShadowEnabled"
-          size="small"
-        />
-        <CustomColorPicker
-          v-model:value="
-            localConfig.keyboardCommon.shellShadowColor[
-              localState.currAppearanceCode
-            ]
-          "
-          class="setting__item-ele setting__item-ml"
-        />
-      </NFormItem>
+      </SettingFormInlineRow>
     </template>
+  </SettingFormSection>
 
-    <!-- Plate -->
-    <NDivider title-placement="left">
-      {{ $t('keyboardCommon.plate') }}
-    </NDivider>
-
-    <NFormItem :label="$t('keyboardCommon.plate')">
-      <NSwitch
-        v-model:value="localConfig.keyboardCommon.isPlateVisible"
-        size="small"
-      />
-      <CustomColorPicker
-        v-if="localConfig.keyboardCommon.isPlateVisible"
-        v-model:value="
-          localConfig.keyboardCommon.plateColor[localState.currAppearanceCode]
-        "
-        class="setting__item-ele setting__item-ml"
-      />
-    </NFormItem>
+  <!-- Plate -->
+  <SettingFormSection
+    :title="$t('keyboardCommon.plate')"
+    :icon="ICONS.keyboardPlateLabel"
+  >
+    <ToggleColorField
+      v-model:enable="localConfig.keyboardCommon.isPlateVisible"
+      v-model:color="localConfig.keyboardCommon.plateColor"
+      :label="$t('keyboardCommon.plate')"
+    />
 
     <template v-if="localConfig.keyboardCommon.isPlateVisible">
-      <NFormItem :label="`${$t('common.margin')}`">
-        <SliderInput
+      <SettingFormInlineRow>
+        <NumberField
           v-model="localConfig.keyboardCommon.platePadding"
+          :label="$t('common.margin')"
           :step="0.1"
           :min="0"
           :max="10"
         />
-      </NFormItem>
 
-      <NFormItem :label="$t('common.borderRadius')">
-        <SliderInput
+        <NumberField
           v-model="localConfig.keyboardCommon.plateBorderRadius"
+          :label="$t('common.borderRadius')"
           :step="0.1"
           :min="0"
           :max="10"
         />
-      </NFormItem>
-
-      <NFormItem :label="$t('common.blur')">
-        <SliderInput
-          v-model="localConfig.keyboardCommon.plateBackgroundBlur"
-          :step="0.1"
-          :min="0"
-          :max="30"
-        />
-      </NFormItem>
+      </SettingFormInlineRow>
     </template>
-  </NForm>
+  </SettingFormSection>
 </template>

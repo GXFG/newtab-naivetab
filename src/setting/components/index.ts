@@ -1,0 +1,6 @@
+export { default as SettingHeaderBar } from './SettingHeaderBar.vue'
+export { default as SettingFormWrap } from './SettingFormWrap.vue'
+export { default as SettingFormSection } from './SettingFormSection.vue'
+export { default as SettingFormItem } from './SettingFormItem.vue'
+export { default as SettingFormInlineRow } from './SettingFormInlineRow.vue'
+export { default as SettingCollapseSection } from './SettingCollapseSection.vue'

@@ -107,7 +107,7 @@ const getKeycapStyle = (themeKey: string, type: 'main' | 'e1' | 'e2') => {
     @update:show="onCloseModal()"
   >
     <NDrawerContent
-      :title="`${$t('common.select')}${$t('keyboardCommon.presetTheme')}`"
+      :title="$t('keyboardCommon.selectPresetThemeLabel')"
       closable
     >
       <div class="theme__sections">

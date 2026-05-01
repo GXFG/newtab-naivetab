@@ -34,14 +34,8 @@ export type {
   TNewtabCommandName,
 } from './shortcut-command'
 
-// 命令快捷键任务管理（newtab 页面）
+// 书签 + 命令快捷键统一任务管理（newtab 页面）
 export {
-  setupNewtabGlobalShortcutForCommand,
-  cleanupNewtabGlobalShortcutForCommand,
+  setupNewtabGlobalShortcut,
+  cleanupNewtabGlobalShortcut,
 } from './shortcut-executor'
-
-// 书签快捷键任务管理（newtab 页面）
-export {
-  setupNewtabGlobalShortcutForBookmark,
-  cleanupNewtabGlobalShortcutForBookmark,
-} from './shortcut-bookmark'

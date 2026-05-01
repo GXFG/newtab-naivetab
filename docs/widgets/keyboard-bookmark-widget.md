@@ -17,6 +17,7 @@
   enabled: true,                              // Widget 是否启用
   source: 2,                                  // 1=浏览器书签, 2=自定义 keymap
   isGlobalShortcutEnabled: true,              // 全局快捷键开关
+  noModifierMode: false,                      // 无修饰键模式
   shortcutInInputElement: true,               // 输入框内是否触发全局快捷键
   globalShortcutModifiers: ['alt'],           // 全局快捷键修饰键
   urlBlacklist: string[],                     // URL 黑名单
@@ -27,7 +28,7 @@
 }
 ```
 
-**PRESERVE_FIELDS** = `['source', 'globalShortcutModifiers', 'keymap']` — 快速重置时保护用户数据。
+**PRESERVE_FIELDS** = `['source', 'globalShortcutModifiers', 'noModifierMode', 'keymap']` — 快速重置时保护用户数据。
 
 ---
 
@@ -82,8 +83,9 @@ KeyboardBookmark (Widget 入口)
 1. `isDragMode` 时提前返回
 2. 屏蔽修饰键组合
 3. 过滤不在当前布局中的按键
-4. folder/back 类型：调用 `handleSpecialKeycapExec` 导航书签树
-5. 其他：通过 `openPage()` 打开 URL，设置 `currSelectKeyCode` 做视觉反馈
+4. **命令快捷键开启无修饰键模式时静默跳过**（`keyboardCommand.noModifierMode` 为 true 时返回，避免与命令快捷键冲突）
+5. folder/back 类型：调用 `handleSpecialKeycapExec` 导航书签树
+6. 其他：通过 `openPage()` 打开 URL，设置 `currSelectKeyCode` 做视觉反馈
 
 ### 鼠标交互
 
@@ -132,3 +134,4 @@ KeyboardBookmark (Widget 入口)
 - popup 修改书签后必须在 `handleCommit` 中调用 `flushConfigSync` 强制同步
 - `isDragMode` 激活时，keydown handler 提前返回，防止拖拽 Widget 时误触书签打开
 - 全局快捷键 `source=2` 时从 `keymap` 读取 URL 执行，详情见 [global-shortcut.md](../features/global-shortcut.md)
+- 命令快捷键开启无修饰键模式（`noModifierMode`）时，键盘 Widget 的 keydown handler 会被短路，按键由命令快捷键独占处理

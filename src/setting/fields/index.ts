@@ -1,5 +1,5 @@
 export { default as ColorField } from './ColorField.vue'
 export { default as FontField } from './FontField.vue'
-export { default as SliderField } from './SliderField.vue'
+export { default as NumberField } from './NumberField.vue'
 export { default as SwitchField } from './SwitchField.vue'
 export { default as ToggleColorField } from './ToggleColorField.vue'

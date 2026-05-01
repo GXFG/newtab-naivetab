@@ -4,12 +4,17 @@ import { ICONS } from '@/logic/icons'
 import { localConfig } from '@/logic/store'
 import { getBrowserBookmark } from '@/logic/bookmark'
 import { requestPermission } from '@/logic/storage'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
+import {
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormItem,
+  SettingFormSection,
+  SettingFormInlineRow,
+} from '@/setting/components'
 import BrowserBookmarkPicker from '@/components/BrowserBookmarkPicker.vue'
 import { refreshSelectedFolderTitles } from '@/newtab/widgets/bookmarkFolder/logic'
 import {
-  SliderField,
+  NumberField,
   SwitchField,
   ColorField,
   FontField,
@@ -80,182 +85,199 @@ const onResetFolder = () => {
 </script>
 
 <template>
-  <SettingHeaderBar
-    :title="$t('setting.bookmarkFolder')"
-    widget-code="bookmarkFolder"
-  />
+  <SettingHeaderBar :title="$t('setting.bookmarkFolder')" />
 
   <SettingFormWrap
     id="bookmarkFolder__setting"
     widget-code="bookmarkFolder"
   >
-    <!-- 功能配置 -->
-    <template #behavior>
-      <NFormItem :label="$t('bookmarkFolder.defaultDisplayFolderTitle')">
-        <div class="setting__item_wrap">
-          <div class="item__box folder__crumb">
-            <Icon
-              :icon="ICONS.folderOutline"
-              class="crumb__icon"
-            />
-            <span class="crumb__text">{{ folderCrumb }}</span>
-          </div>
-          <div class="item__box">
-            <NButton
-              type="primary"
-              size="small"
-              secondary
-              class="setting__item-ele setting__item-ml action-btn action-btn--primary"
-              @click="onOpenPicker"
-            >
-              <Icon :icon="ICONS.bookmarkPlus" />&nbsp;{{ $t('common.select') }}
-            </NButton>
-            <NButton
-              size="small"
-              secondary
-              class="setting__item-ele setting__item-ml action-btn action-btn--default"
-              @click="onResetFolder"
-            >
-              <Icon :icon="ICONS.restoreTwotone" />&nbsp;{{
-                $t('generalSetting.resetSettingValue')
-              }}
-            </NButton>
-          </div>
+    <!-- 书签配置 -->
+    <SettingFormSection
+      :title="$t('bookmarkFolder.sectionBookmark')"
+      :icon="ICONS.folderOutline"
+    >
+      <SettingFormItem :label="$t('bookmarkFolder.defaultDisplayFolderTitle')">
+        <div class="folder__crumb">
+          <Icon
+            :icon="ICONS.folderOutline"
+            class="crumb__icon"
+          />
+          <span class="crumb__text">{{ folderCrumb }}</span>
         </div>
-      </NFormItem>
+        <NButton
+          type="primary"
+          size="tiny"
+          secondary
+          class="setting__btn setting__btn--primary"
+          @click="onOpenPicker"
+        >
+          <Icon :icon="ICONS.bookmarkPlus" />&nbsp;{{ $t('common.select') }}
+        </NButton>
+        <NButton
+          size="tiny"
+          secondary
+          round
+          class="setting__btn setting__btn--default"
+          @click="onResetFolder"
+        >
+          <Icon :icon="ICONS.restoreTwotone" />&nbsp;{{
+            $t('generalSetting.resetSettingValue')
+          }}
+        </NButton>
+      </SettingFormItem>
 
-      <NFormItem :label="$t('bookmarkFolder.layoutColumns')">
+      <SettingFormItem :label="$t('bookmarkFolder.layoutColumns')">
         <NInputNumber
           v-model:value="localConfig.bookmarkFolder.gridColumns"
-          class="setting__input-number"
+          class="setting__num-input"
           size="small"
           :step="1"
           :min="1"
           :max="50"
         />
-      </NFormItem>
+      </SettingFormItem>
 
       <SwitchField
         v-model="localConfig.bookmarkFolder.isNewTabOpen"
         :label="$t('generalSetting.newTabOpen')"
       />
 
-      <SwitchField
-        v-model="localConfig.bookmarkFolder.isIconVisible"
-        :label="$t('bookmarkFolder.showIcon')"
-      />
+      <SettingFormInlineRow>
+        <SwitchField
+          v-model="localConfig.bookmarkFolder.isIconVisible"
+          :label="$t('bookmarkFolder.showIcon')"
+        />
 
-      <SwitchField
-        v-model="localConfig.bookmarkFolder.isNameVisible"
-        :label="$t('bookmarkFolder.showName')"
-      />
-    </template>
+        <SwitchField
+          v-model="localConfig.bookmarkFolder.isNameVisible"
+          :label="$t('bookmarkFolder.showName')"
+        />
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
-    <!-- 尺寸样式 -->
-    <template #size>
-      <SliderField
-        v-model="localConfig.bookmarkFolder.padding"
-        :label="$t('common.padding')"
-        :min="0"
-        :max="50"
-        :step="1"
-      />
+    <!-- 容器外观 -->
+    <SettingFormSection
+      :title="$t('bookmarkFolder.containerAppearance')"
+      :icon="ICONS.palette"
+    >
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.bookmarkFolder.padding"
+          :label="$t('common.padding')"
+          :min="0"
+          :max="50"
+          :step="1"
+        />
 
-      <SliderField
-        v-model="localConfig.bookmarkFolder.width"
-        :label="$t('common.width')"
-        :min="1"
-        :max="1000"
-        :step="1"
-      />
+        <NumberField
+          v-model="localConfig.bookmarkFolder.borderRadius"
+          :label="$t('common.borderRadius')"
+          :min="0"
+          :max="100"
+          :step="1"
+        />
+      </SettingFormInlineRow>
 
-      <SliderField
-        v-model="localConfig.bookmarkFolder.height"
-        :label="$t('common.height')"
-        :min="1"
-        :max="1000"
-        :step="1"
-      />
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.bookmarkFolder.width"
+          :label="$t('common.width')"
+          :min="1"
+          :max="1000"
+          :step="1"
+        />
 
-      <SliderField
-        v-model="localConfig.bookmarkFolder.borderRadius"
-        :label="$t('common.borderRadius')"
-        :min="0"
-        :max="100"
-        :step="1"
-      />
+        <NumberField
+          v-model="localConfig.bookmarkFolder.height"
+          :label="$t('common.height')"
+          :min="1"
+          :max="1000"
+          :step="1"
+        />
+      </SettingFormInlineRow>
 
-      <SliderField
-        v-model="localConfig.bookmarkFolder.iconSize"
-        :label="$t('bookmarkFolder.iconSize')"
-        :min="0"
-        :max="100"
-        :step="1"
-      />
+      <SettingFormInlineRow>
+        <ColorField
+          v-model="localConfig.bookmarkFolder.backgroundColor"
+          :label="$t('common.backgroundColor')"
+        />
 
-      <SliderField
-        v-model="localConfig.bookmarkFolder.itemHeight"
-        :label="$t('bookmarkFolder.itemHeight')"
-        :min="1"
-        :max="100"
-        :step="1"
-      />
+        <NumberField
+          v-model="localConfig.bookmarkFolder.backgroundBlur"
+          :label="$t('common.blur')"
+          :min="0"
+          :max="50"
+          :step="0.1"
+        />
+      </SettingFormInlineRow>
 
-      <SliderField
-        v-model="localConfig.bookmarkFolder.itemGap"
-        :label="$t('bookmarkFolder.itemGap')"
-        :min="0"
-        :max="50"
-        :step="0.1"
-      />
+      <SettingFormInlineRow>
+        <ToggleColorField
+          v-model:enable="localConfig.bookmarkFolder.isBorderEnabled"
+          v-model:color="localConfig.bookmarkFolder.borderColor"
+          v-model:width="localConfig.bookmarkFolder.borderWidth"
+          :label="$t('common.border')"
+        />
 
-      <SliderField
-        v-model="localConfig.bookmarkFolder.itemBorderRadius"
-        :label="$t('bookmarkFolder.itemBorderRadius')"
-        :min="0"
-        :max="50"
-        :step="1"
-      />
-    </template>
+        <ToggleColorField
+          v-model:enable="localConfig.bookmarkFolder.isShadowEnabled"
+          v-model:color="localConfig.bookmarkFolder.shadowColor"
+          :label="$t('common.shadow')"
+        />
+      </SettingFormInlineRow>
+    </SettingFormSection>
+
+    <!-- 项目样式 -->
+    <SettingFormSection
+      :title="$t('bookmarkFolder.itemStyle')"
+      :icon="ICONS.bookmarkPlus"
+    >
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.bookmarkFolder.iconSize"
+          :label="$t('bookmarkFolder.iconSize')"
+          :min="0"
+          :max="100"
+          :step="1"
+        />
+
+        <NumberField
+          v-model="localConfig.bookmarkFolder.itemHeight"
+          :label="$t('bookmarkFolder.itemHeight')"
+          :min="1"
+          :max="100"
+          :step="1"
+        />
+      </SettingFormInlineRow>
+
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.bookmarkFolder.itemGap"
+          :label="$t('bookmarkFolder.itemGap')"
+          :min="0"
+          :max="50"
+          :step="0.1"
+        />
+
+        <NumberField
+          v-model="localConfig.bookmarkFolder.itemBorderRadius"
+          :label="$t('bookmarkFolder.itemBorderRadius')"
+          :min="0"
+          :max="50"
+          :step="1"
+        />
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
     <!-- 文字排版 -->
-    <template #typography>
+    <SettingFormSection section-key="common.typography">
       <FontField
         v-model:font-family="localConfig.bookmarkFolder.fontFamily"
         v-model:font-color="localConfig.bookmarkFolder.fontColor"
         v-model:font-size="localConfig.bookmarkFolder.fontSize"
         :label="$t('common.font')"
       />
-    </template>
-
-    <!-- 色彩外观 -->
-    <template #appearance>
-      <ColorField
-        v-model="localConfig.bookmarkFolder.backgroundColor"
-        :label="$t('common.backgroundColor')"
-      />
-
-      <SliderField
-        v-model="localConfig.bookmarkFolder.backgroundBlur"
-        :label="$t('common.blur')"
-        :min="0"
-        :max="50"
-        :step="0.1"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.bookmarkFolder.isBorderEnabled"
-        v-model:color="localConfig.bookmarkFolder.borderColor"
-        v-model:width="localConfig.bookmarkFolder.borderWidth"
-        :label="$t('common.border')"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.bookmarkFolder.isShadowEnabled"
-        v-model:color="localConfig.bookmarkFolder.shadowColor"
-        :label="$t('common.shadow')"
-      />
-    </template>
+    </SettingFormSection>
   </SettingFormWrap>
 
   <BrowserBookmarkPicker
@@ -265,50 +287,21 @@ const onResetFolder = () => {
   />
 </template>
 
-<style>
-#bookmarkFolder__setting .folder__crumb {
+<style scoped>
+.folder__crumb {
   display: flex;
   align-items: center;
   gap: 6px;
-  min-height: 24px;
-  padding: 6px 10px;
+  min-height: 25px;
+  padding: 0 10px;
   border-radius: 6px;
-  background-color: rgba(127, 140, 141, 0.08);
+  background-color: var(--gray-alpha-08);
 }
-#bookmarkFolder__setting .crumb__icon {
+.crumb__icon {
   font-size: 16px;
 }
-#bookmarkFolder__setting .crumb__text {
+.crumb__text {
   font-size: 13px;
   user-select: text;
-}
-
-#bookmarkFolder__setting .layout__inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-#bookmarkFolder__setting .layout__multiply {
-  margin-left: 10px;
-  font-size: 18px;
-  opacity: 0.7;
-}
-#bookmarkFolder__setting .layout__preview {
-  margin-top: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-#bookmarkFolder__setting .preview__grid {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  height: 100px;
-}
-#bookmarkFolder__setting .preview__item {
-  aspect-ratio: 1 / 1;
-  border-radius: 6px;
-  background-color: rgba(127, 140, 141, 0.15);
-  max-width: 30px;
 }
 </style>

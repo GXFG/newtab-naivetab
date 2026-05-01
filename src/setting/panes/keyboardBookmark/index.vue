@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { requestPermission } from '@/logic/storage'
+import { Icon } from '@iconify/vue'
+import { ICONS } from '@/logic/icons'
 import {
   state as keyboardState,
   getSystemBookmarkForKeyboard,
 } from '@/newtab/widgets/keyboardBookmark/logic'
 import { localConfig, getSettingKeyboardSize } from '@/logic/store'
 import { toModifierMask } from '@/logic/globalShortcut/shortcut-utils'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
 import BookmarkManager from '@/components/BookmarkManager.vue'
 import GlobalShortcutRecorder from '@/components/GlobalShortcutRecorder.vue'
 import UrlBlacklistInput from '@/components/UrlBlacklistInput.vue'
+import { NRadioGroup, NSelect } from 'naive-ui'
+import {
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormItem,
+  SettingFormSection,
+} from '@/setting/components'
+import { SwitchField } from '@/setting/fields'
 
 const bookmarkSourceList = computed(() => [
   { label: window.$t('keyboardBookmark.thisExtension'), value: 2 },
@@ -60,35 +68,61 @@ const modifierConflictWarning = computed(() => {
   }
   return ''
 })
+
+/**
+ * 无修饰键冲突警告：两者都开时提示
+ */
+const noModifierConflictWarning = computed(() => {
+  if (
+    !localConfig.keyboardBookmark.noModifierMode ||
+    !localConfig.keyboardCommand.noModifierMode
+  ) {
+    return ''
+  }
+  return window.$t('keyboardBookmark.noModifierConflictGeneral')
+})
+
+/**
+ * 无修饰键模式 + 输入框中触发：建议关闭输入框触发
+ */
+const noModifierInInputWarning = computed(() => {
+  if (
+    !localConfig.keyboardBookmark.noModifierMode ||
+    !localConfig.keyboardBookmark.shortcutInInputElement
+  ) {
+    return ''
+  }
+  return window.$t('keyboardBookmark.noModifierInInputWarning')
+})
 </script>
 
 <template>
-  <SettingHeaderBar
-    :title="$t('setting.keyboardBookmark')"
-    widget-code="keyboardBookmark"
-  />
+  <SettingHeaderBar :title="$t('setting.keyboardBookmark')" />
 
   <SettingFormWrap widget-code="keyboardBookmark">
     <!-- 功能配置 -->
-    <template #behavior>
-      <!-- 书签数据源 -->
-      <NFormItem :label="$t('keyboardBookmark.bookmarkSource')">
+    <SettingFormSection
+      :title="$t('bookmarkFolder.sectionBookmark')"
+      :icon="ICONS.folderOutline"
+    >
+      <SettingFormItem :label="$t('keyboardBookmark.bookmarkSource')">
         <NRadioGroup
           v-model:value="localConfig.keyboardBookmark.source"
           size="small"
+          direction="horizontal"
           @update:value="handleBookmarkSourceChange"
         >
-          <NRadioButton
+          <NRadio
             v-for="item in bookmarkSourceList"
             :key="item.value"
             :value="item.value"
           >
             {{ item.label }}
-          </NRadioButton>
+          </NRadio>
         </NRadioGroup>
-      </NFormItem>
+      </SettingFormItem>
 
-      <NFormItem
+      <SettingFormItem
         v-if="localConfig.keyboardBookmark.source === 1"
         :label="$t('keyboardBookmark.defaultDisplayFolderTitle')"
       >
@@ -99,74 +133,96 @@ const modifierConflictWarning = computed(() => {
           clearable
           @update:value="handleDefaultFolderTitleChange"
         />
-      </NFormItem>
+      </SettingFormItem>
 
-      <NFormItem :label="$t('generalSetting.newTabOpen')">
-        <NSwitch
-          v-model:value="localConfig.keyboardBookmark.isNewTabOpen"
-          size="small"
-        />
-      </NFormItem>
+      <SwitchField
+        v-model="localConfig.keyboardBookmark.isNewTabOpen"
+        :label="$t('generalSetting.newTabOpen')"
+      />
+    </SettingFormSection>
 
-      <NFormItem :label="$t('keyboardBookmark.listenBackgroundKeystrokes')">
-        <div class="setting__item_wrap">
-          <div class="item__box">
-            <NSwitch
-              v-model:value="
-                localConfig.keyboardBookmark.isGlobalShortcutEnabled
-              "
-              size="small"
-            />
-            <Tips :content="`${$t('keyboardBookmark.shortcutNote')}`" />
-          </div>
-        </div>
-      </NFormItem>
+    <SettingFormSection
+      :title="$t('bookmarkFolder.sectionShortcut')"
+      :icon="ICONS.keyboardCmdKey"
+    >
+      <SwitchField
+        v-model="localConfig.keyboardBookmark.isGlobalShortcutEnabled"
+        :label="$t('keyboardBookmark.listenBackgroundKeystrokes')"
+        :tip-content="$t('keyboardBookmark.shortcutNote')"
+      />
 
       <template v-if="localConfig.keyboardBookmark.isGlobalShortcutEnabled">
-        <!-- 输入框中触发快捷键 -->
-        <NFormItem :label="$t('keyboardBookmark.shortcutInInputElement')">
-          <div class="setting__item_wrap">
-            <div class="item__box">
-              <NSwitch
-                v-model:value="
-                  localConfig.keyboardBookmark.shortcutInInputElement
-                "
-                size="small"
-              />
-              <Tips
-                :content="`${$t('keyboardBookmark.shortcutInInputElementNote')}`"
-              />
-            </div>
-          </div>
-        </NFormItem>
+        <SettingFormItem
+          v-if="noModifierInInputWarning"
+          class="modifier-conflict-card"
+        >
+          <span class="modifier-conflict-warning">
+            <Icon
+              :icon="ICONS.warning"
+              class="warning__icon"
+            />
+            {{ noModifierInInputWarning }}
+          </span>
+        </SettingFormItem>
 
-        <!-- 域名黑名单 -->
-        <NFormItem :label="$t('keyboardBookmark.urlBlacklist')">
+        <SwitchField
+          v-model="localConfig.keyboardBookmark.shortcutInInputElement"
+          :label="$t('keyboardBookmark.shortcutInInputElement')"
+          :tip-content="$t('keyboardBookmark.shortcutInInputElementTips')"
+        />
+
+        <SettingFormItem
+          :label="$t('keyboardBookmark.urlBlacklist')"
+          :tip-content="$t('generalSetting.urlBlacklistTips')"
+          align-items="flex-start"
+        >
           <UrlBlacklistInput
             v-model="localConfig.keyboardBookmark.urlBlacklist"
           />
-        </NFormItem>
+        </SettingFormItem>
 
-        <!-- 全局快捷键修饰键 -->
-        <NFormItem :label="$t('keyboardBookmark.globalModifier')">
+        <SwitchField
+          v-model="localConfig.keyboardBookmark.noModifierMode"
+          :label="$t('keyboardBookmark.noModifierMode')"
+          :tip-content="$t('keyboardBookmark.noModifierModeDesc')"
+        />
+
+        <SettingFormItem :label="$t('keyboardBookmark.globalModifier')">
           <GlobalShortcutRecorder
             v-model="localConfig.keyboardBookmark.globalShortcutModifiers"
+            :disabled="localConfig.keyboardBookmark.noModifierMode"
           />
-        </NFormItem>
+        </SettingFormItem>
 
-        <NFormItem
+        <SettingFormItem
           v-if="modifierConflictWarning"
-          :show-label="false"
+          class="modifier-conflict-card"
         >
-          <span class="modifier-conflict-warning"
-            >⚠️ {{ modifierConflictWarning }}</span
-          >
-        </NFormItem>
-      </template>
+          <span class="modifier-conflict-warning">
+            <Icon
+              :icon="ICONS.warning"
+              class="warning__icon"
+            />
+            {{ modifierConflictWarning }}
+          </span>
+        </SettingFormItem>
 
-      <!-- 全局快捷键/书签管理 -->
-      <BookmarkManager :base-size="keyboardBaseSize" />
-    </template>
+        <SettingFormItem
+          v-if="noModifierConflictWarning"
+          class="modifier-conflict-card"
+        >
+          <span class="modifier-conflict-warning">
+            <Icon
+              :icon="ICONS.warning"
+              class="warning__icon"
+            />
+            {{ noModifierConflictWarning }}
+          </span>
+        </SettingFormItem>
+      </template>
+    </SettingFormSection>
+
+    <BookmarkManager :base-size="keyboardBaseSize" />
   </SettingFormWrap>
 </template>
 
@@ -179,5 +235,17 @@ const modifierConflictWarning = computed(() => {
   font-size: 12px;
   color: rgba(208, 48, 80, 0.9);
   padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.warning__icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.modifier-conflict-card :deep(.form-item__control) {
+  justify-content: flex-start;
 }
 </style>

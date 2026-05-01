@@ -76,6 +76,7 @@ const initMain = () => {
   let globalShortcutModifiers: TShortcutModifier[] = []
   let shortcutInInputElement = false
   let urlBlacklist: string[] = []
+  let bookmarkNoModifierMode = false
 
   // -- 命令快捷键运行时状态 --
   let commandKeymap: Record<string, TCommandEntry> = {}
@@ -83,6 +84,7 @@ const initMain = () => {
   let commandModifiers: TShortcutModifier[] = []
   let keyboardCommandInInputElement = false
   let commandUrlBlacklist: string[] = []
+  let commandNoModifierMode = false
 
   /**
    * 更新本地配置缓存（书签快捷键）
@@ -93,6 +95,7 @@ const initMain = () => {
     shortcutInInputElement?: boolean
     keymap?: Record<string, TBookmarkEntry>
     urlBlacklist?: string[]
+    noModifierMode?: boolean
   }) => {
     if (cfg.isEnabled !== undefined) isEnabled = cfg.isEnabled
     if (cfg.globalShortcutModifiers !== undefined)
@@ -101,6 +104,8 @@ const initMain = () => {
       shortcutInInputElement = cfg.shortcutInInputElement
     if (cfg.keymap !== undefined) keymap = cfg.keymap
     if (cfg.urlBlacklist !== undefined) urlBlacklist = cfg.urlBlacklist
+    if (cfg.noModifierMode !== undefined)
+      bookmarkNoModifierMode = cfg.noModifierMode
     debug('bookmark config updated', {
       isEnabled,
       globalShortcutModifiers,
@@ -117,6 +122,7 @@ const initMain = () => {
     shortcutInInputElement?: boolean
     keymap?: Record<string, TCommandEntry>
     urlBlacklist?: string[]
+    noModifierMode?: boolean
   }) => {
     if (cfg.isEnabled !== undefined) commandIsEnabled = cfg.isEnabled
     if (cfg.modifiers !== undefined) commandModifiers = cfg.modifiers
@@ -124,6 +130,8 @@ const initMain = () => {
       keyboardCommandInInputElement = cfg.shortcutInInputElement
     if (cfg.keymap !== undefined) commandKeymap = cfg.keymap
     if (cfg.urlBlacklist !== undefined) commandUrlBlacklist = cfg.urlBlacklist
+    if (cfg.noModifierMode !== undefined)
+      commandNoModifierMode = cfg.noModifierMode
     debug('command config updated', {
       isEnabled: commandIsEnabled,
       modifiers: commandModifiers,
@@ -155,6 +163,7 @@ const initMain = () => {
           shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
           keymap: parsed.data.keymap ?? {},
           urlBlacklist: parsed.data.urlBlacklist ?? [],
+          noModifierMode: parsed.data.noModifierMode ?? false,
         })
         debug('bookmark config loaded from storage', {
           isEnabled,
@@ -182,6 +191,7 @@ const initMain = () => {
           shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
           keymap: parsed.data.keymap ?? {},
           urlBlacklist: parsed.data.urlBlacklist ?? [],
+          noModifierMode: parsed.data.noModifierMode ?? false,
         })
         debug('command config loaded from storage', {
           isEnabled: commandIsEnabled,
@@ -224,6 +234,7 @@ const initMain = () => {
             shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
             keymap: parsed.data.keymap ?? {},
             urlBlacklist: parsed.data.urlBlacklist ?? [],
+            noModifierMode: parsed.data.noModifierMode ?? false,
           })
         })
         .catch((e) => {
@@ -237,6 +248,7 @@ const initMain = () => {
         shortcutInInputElement: false,
         keymap: {},
         urlBlacklist: [],
+        noModifierMode: false,
       })
       debug('bookmark config removed, reset to defaults')
     }
@@ -254,6 +266,7 @@ const initMain = () => {
             shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
             keymap: parsed.data.keymap ?? {},
             urlBlacklist: parsed.data.urlBlacklist ?? [],
+            noModifierMode: parsed.data.noModifierMode ?? false,
           })
         })
         .catch((e) => {
@@ -267,6 +280,7 @@ const initMain = () => {
         shortcutInInputElement: false,
         keymap: {},
         urlBlacklist: [],
+        noModifierMode: false,
       })
       debug('command config removed, reset to defaults')
     }
@@ -409,14 +423,14 @@ const initMain = () => {
   /**
    * 键盘事件处理
    *
-   * 匹配修饰键后，通过 Port 将按键事件发送到 SW 统一处理。
+   * 匹配修饰键（或无修饰键模式下单键）后，通过 Port 将按键事件发送到 SW 统一处理。
    * SW 负责查 keymap 并分发执行（书签打开 URL / 命令路由到 SW 或 CS）。
    * 使用 capture phase (true) 确保在页面脚本之前捕获事件。
    *
-   * 两套快捷键共享同一个 handler，根据匹配的修饰键决定 source：
-   * - 匹配书签修饰键 → source: 'bookmark'
-   * - 匹配命令修饰键 → source: 'command'
-   * - 两者修饰键相同时 → 书签优先（老功能），只发送一条消息，避免双重执行
+   * 两套快捷键共享同一个 handler，根据匹配结果决定 source：
+   * - 匹配书签快捷键 → source: 'bookmark'
+   * - 匹配命令快捷键 → source: 'command'
+   * - 两者修饰键相同或同时开启无修饰键模式 → 书签优先（老功能），只发送一条消息
    */
   const handleKeydown = (e: KeyboardEvent) => {
     if (e.repeat) return
@@ -432,6 +446,7 @@ const initMain = () => {
       shortcutInInputElement,
       urlBlacklist,
       hostname,
+      bookmarkNoModifierMode,
     )
     const commandCode = matchShortcut(
       e,
@@ -440,16 +455,24 @@ const initMain = () => {
       keyboardCommandInInputElement,
       commandUrlBlacklist,
       hostname,
+      commandNoModifierMode,
     )
 
     if (!bookmarkCode && !commandCode) return
 
-    // 修饰键冲突互斥：当书签和命令使用相同修饰键时，只发送书签消息
-    // （书签是老功能，优先保留；用户看到 Setting 面板的冲突警告后可自行调整）
+    // 修饰键冲突互斥：当书签和命令使用相同修饰键或同时开启无修饰键模式时，
+    // 只发送命令消息（命令优先）
     const bmMask = toModifierMask(globalShortcutModifiers)
     const cmdMask = toModifierMask(commandModifiers)
     const hasModifierConflict =
-      bookmarkCode && commandCode && bmMask === cmdMask
+      bookmarkCode &&
+      commandCode &&
+      // 原有：修饰键掩码相等
+      ((bmMask === cmdMask &&
+        !bookmarkNoModifierMode &&
+        !commandNoModifierMode) ||
+        // 无修饰键模式：两者同时开启时冲突
+        (bookmarkNoModifierMode && commandNoModifierMode))
 
     // 通过 Port 发送按键事件到 SW，Port 不可用时降级为 sendMessage 兜底。
     //
@@ -466,7 +489,30 @@ const initMain = () => {
     // sendMessage 能确保即使 SW 正在休眠也能被唤醒处理命令。
     let sent = false
     try {
-      if (bookmarkCode) {
+      // 命令优先：冲突时只发送命令
+      if (commandCode) {
+        if (swReady && port) {
+          port.postMessage({
+            type: MSG_KEYDOWN,
+            key: e.code,
+            source: 'command',
+          })
+          sent = true
+        } else {
+          // Port 不可用：sendMessage 唤醒 SW，命令快捷键依赖 SW 执行
+          try {
+            chrome.runtime.sendMessage({
+              type: MSG_KEYDOWN,
+              key: e.code,
+              source: 'command',
+            })
+            sent = true
+          } catch {
+            // SW 被卸载等极端场景，无法唤醒，不拦截按键
+          }
+        }
+      }
+      if (bookmarkCode && !hasModifierConflict) {
         if (swReady && port) {
           port.postMessage({
             type: MSG_KEYDOWN,
@@ -492,28 +538,6 @@ const initMain = () => {
             e.preventDefault()
             e.stopPropagation()
             chrome.tabs.create({ url: padUrlHttps(entry.url) })
-          }
-        }
-      }
-      if (commandCode && !hasModifierConflict) {
-        if (swReady && port) {
-          port.postMessage({
-            type: MSG_KEYDOWN,
-            key: e.code,
-            source: 'command',
-          })
-          sent = true
-        } else {
-          // Port 不可用：sendMessage 唤醒 SW，命令快捷键依赖 SW 执行
-          try {
-            chrome.runtime.sendMessage({
-              type: MSG_KEYDOWN,
-              key: e.code,
-              source: 'command',
-            })
-            sent = true
-          } catch {
-            // SW 被卸载等极端场景，无法唤醒，不拦截按键
           }
         }
       }

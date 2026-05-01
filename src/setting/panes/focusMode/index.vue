@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import Tips from '@/components/Tips.vue'
+import { computed } from 'vue'
 import {
   localConfig,
   localState,
@@ -10,6 +9,9 @@ import {
 } from '@/logic/store'
 import { widgetsRegistry } from '@/newtab/widgets/registry'
 import { WIDGET_GROUPS } from '@/newtab/widgets/codes'
+import { SettingHeaderBar, SettingFormSection } from '@/setting/components'
+import { SwitchField } from '@/setting/fields'
+import { ICONS } from '@/logic/icons'
 
 const widgetGroups = computed(() =>
   WIDGET_GROUPS.map((group) => ({
@@ -39,29 +41,30 @@ const cssVars = computed(() => ({
   '--nt-focus-primary-icon-bg': primaryIconBg.value,
   '--nt-focus-custom-primary-color': customPrimaryColor.value,
 }))
+
+/**
+ * focusMode 面板故意不使用 SettingFormWrap，属于预期设计。
+ * 其他面板使用 SettingFormWrap 是为了获取统一的容器样式 + 底部重置按钮，
+ * 但 focusMode 操作的是 localState.isFocusMode（布尔开关）而非 localConfig，
+ * 不需要重置功能，且包含自定义的 Widget 网格 UI，无法复用标准表单布局。
+ */
 </script>
 
 <template>
   <div :style="cssVars">
     <SettingHeaderBar :title="$t('setting.focusMode')" />
 
-    <NForm
-      class="setting__pane__content"
-      label-placement="left"
-      :label-width="120"
-      :show-feedback="false"
-    >
-      <NFormItem :label="$t('rightMenu.focusMode')">
-        <NSwitch
-          v-model:value="localState.isFocusMode"
-          size="small"
+    <div class="setting__pane-content">
+      <SettingFormSection
+        :title="$t('generalSetting.focusWidgets')"
+        :icon="ICONS.fullscreen"
+      >
+        <SwitchField
+          v-model="localState.isFocusMode"
+          :label="$t('generalSetting.enableFocusMode')"
+          :tip-content="$t('generalSetting.focusModeTips')"
         />
-        <Tips :content="$t('generalSetting.focusModeTips')" />
-      </NFormItem>
-
-      <NDivider title-placement="left">
-        {{ $t('rightMenu.editFocusMode') }}
-      </NDivider>
+      </SettingFormSection>
 
       <div class="focus__groups">
         <div
@@ -107,7 +110,7 @@ const cssVars = computed(() => ({
           </div>
         </div>
       </div>
-    </NForm>
+    </div>
   </div>
 </template>
 
@@ -149,7 +152,7 @@ const cssVars = computed(() => ({
   padding: 10px 12px;
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
-  background-color: rgba(127, 140, 141, 0.06);
+  background-color: var(--gray-alpha-06);
   cursor: pointer;
   transition:
     background-color var(--transition-base),
@@ -159,8 +162,8 @@ const cssVars = computed(() => ({
   user-select: none;
 
   &:hover {
-    background-color: rgba(127, 140, 141, 0.1);
-    border-color: rgba(127, 140, 141, 0.18);
+    background-color: var(--gray-alpha-10);
+    border-color: var(--gray-alpha-15);
     box-shadow: var(--shadow-sm);
     transform: translateY(-1px);
   }
@@ -197,8 +200,8 @@ const cssVars = computed(() => ({
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
-  background-color: rgba(127, 140, 141, 0.1);
-  color: rgba(127, 140, 141, 0.8);
+  background-color: var(--gray-alpha-10);
+  color: var(--gray-alpha-70);
   transition:
     background-color var(--transition-base),
     color var(--transition-base);

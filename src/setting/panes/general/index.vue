@@ -1,44 +1,43 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import { useI18n } from 'vue-i18n'
 import i18n from '@/lib/i18n'
 import {
   exportSetting,
-  isUploadConfigLoading,
   importSetting,
   refreshSetting,
   resetSetting,
   configSizeMap,
-  SYNC_QUOTA_BYTES_PER_ITEM,
+  lastSyncTime,
+  isUploadConfigLoading,
 } from '@/logic/storage'
 import {
   localConfig,
-  localState,
   globalState,
   customPrimaryColor,
   colorMixWithAlpha,
 } from '@/logic/store'
 import { ICONS } from '@/logic/icons'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
-import Tips from '@/components/Tips.vue'
 import {
-  SliderField,
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormItem,
+  SettingFormSection,
+  SettingFormInlineRow,
+} from '@/setting/components'
+import {
+  NumberField,
   ColorField,
   FontField,
   SwitchField,
-  ToggleColorField,
 } from '@/setting/fields'
 import BackgroundDrawer from './BackgroundDrawer.vue'
+import StorageVisualization from './StorageVisualization.vue'
 
-const instance = getCurrentInstance()
-const proxy = instance?.proxy
-
-if (!proxy) {
-  throw new Error('Failed to get component instance proxy')
-}
+const { locale } = useI18n()
 
 const state = reactive({
-  i18nList: i18n.global.availableLocales.map((locale: string) => ({
+  i18nList: i18n.global.availableLocales.map((locale) => ({
     label: locale,
     value: locale,
   })),
@@ -83,9 +82,9 @@ const loadPageAnimationTypeList = computed(() => [
   { label: window.$t('generalSetting.zoomIn'), value: 'zoom-in' },
 ])
 
-const onChangeLocale = (locale: string) => {
-  proxy.$i18n.locale = locale
-  localConfig.general.lang = locale
+const onChangeLocale = (newLocale: string) => {
+  locale.value = newLocale
+  localConfig.general.lang = newLocale
 }
 
 const openBackgroundDrawer = () => {
@@ -97,7 +96,6 @@ const onBackgroundDrawerClose = () => {
   globalState.isBackgroundDrawerAutoOpen = false
 }
 
-// 组件挂载时立即检查是否需要自动打开
 onMounted(() => {
   if (globalState.isBackgroundDrawerAutoOpen) {
     globalState.isBackgroundDrawerAutoOpen = false
@@ -114,23 +112,6 @@ watch(
     }
   },
 )
-
-const syncTime = computed(() => {
-  if (
-    !Object.prototype.hasOwnProperty.call(
-      localState.value,
-      'isUploadConfigStatusMap',
-    )
-  ) {
-    return '0'
-  }
-  const syncTimeList = [] as number[]
-  for (const field of Object.keys(localState.value.isUploadConfigStatusMap)) {
-    syncTimeList.push(localState.value.isUploadConfigStatusMap[field].syncTime)
-  }
-  const maxSyncTime = Math.max(...syncTimeList)
-  return dayjs(maxSyncTime).format('YYYY-MM-DD HH:mm:ss')
-})
 
 const importSettingInputEl: Ref<HTMLInputElement | null> = ref(null)
 
@@ -160,10 +141,6 @@ const onImportFileChange = (e: Event) => {
   }
 }
 
-// configSizeMap 的 field 映射到 i18n label，兜底展示原始 field 名
-const getFieldLabel = (field: string) => window.$t(`setting.${field}`) || field
-
-// 计算总用量和 Top 占用大户
 const sortedEntries = computed(() => {
   return Object.entries(configSizeMap).sort((a, b) => b[1] - a[1])
 })
@@ -201,37 +178,67 @@ const cssVars = computed(() => ({
       @update:show="onBackgroundDrawerClose"
     />
 
-    <SettingHeaderBar
-      :title="$t('setting.general')"
-      widget-code="general"
-    />
+    <SettingHeaderBar :title="$t('setting.general')" />
 
     <SettingFormWrap
       widget-code="general"
       hide-reset
     >
-      <template #behavior>
-        <NFormItem :label="$t('generalSetting.pageTitle')">
+      <!-- 页面设置 -->
+      <SettingFormSection
+        :title="$t('generalSetting.pageSettings')"
+        :icon="ICONS.fullscreen"
+      >
+        <SettingFormItem :label="$t('generalSetting.pageTitle')">
           <NInput
             v-model:value="localConfig.general.pageTitle"
             type="text"
             size="small"
           />
-        </NFormItem>
+        </SettingFormItem>
 
-        <NFormItem :label="$t('generalSetting.defaultFocus')">
+        <SwitchField
+          v-model="localConfig.general.isLoadPageAnimationEnabled"
+          :label="$t('generalSetting.loadPageAnimation')"
+        >
+          <template #extra>
+            <NRadioGroup
+              v-model:value="localConfig.general.loadPageAnimationType"
+              size="small"
+              direction="horizontal"
+              class="setting__control-group"
+            >
+              <NRadio
+                v-for="item in loadPageAnimationTypeList"
+                :key="item.value"
+                :value="item.value"
+              >
+                {{ item.label }}
+              </NRadio>
+            </NRadioGroup>
+          </template>
+        </SwitchField>
+      </SettingFormSection>
+
+      <!-- 焦点与导航 -->
+      <SettingFormSection
+        :title="$t('generalSetting.focusNavigation')"
+        :icon="ICONS.focus"
+      >
+        <SettingFormItem
+          :label="$t('generalSetting.defaultFocus')"
+          :tip-content="$t('generalSetting.defaultFocusTips')"
+        >
           <NSelect
             v-model:value="localConfig.general.openPageFocusElement"
             :options="focusElementList"
             size="small"
           />
-          <Tips :content="$t('generalSetting.defaultFocusTips')" />
-        </NFormItem>
+        </SettingFormItem>
 
-        <!-- drawer site -->
-        <NFormItem
-          class="drawer__site_wrap--compact"
+        <SettingFormItem
           :label="$t('common.drawerSite')"
+          class="drawer__site_wrap--compact"
         >
           <div class="drawer__site--compact">
             <div
@@ -248,269 +255,157 @@ const cssVars = computed(() => ({
               <Icon :icon="item.icon" />
             </div>
           </div>
-        </NFormItem>
+        </SettingFormItem>
+      </SettingFormSection>
 
-        <!-- language -->
-        <div class="setting__form_wrap">
-          <NFormItem
-            :label="$t('generalSetting.language')"
-            class="n-form-item--half"
-          >
-            <NSelect
-              v-model:value="proxy.$i18n.locale"
-              :options="state.i18nList"
-              size="small"
-              @update:value="onChangeLocale"
-            />
-          </NFormItem>
-          <NFormItem
-            :label="`${$t('generalSetting.timeLanguage')}`"
-            class="n-form-item--half"
-          >
-            <NSelect
-              v-model:value="localConfig.general.timeLang"
-              :options="state.i18nList"
-              size="small"
-            />
-          </NFormItem>
-        </div>
-      </template>
-
-      <!-- 文字排版 -->
-      <template #typography>
+      <!-- 字体与色彩 -->
+      <SettingFormSection
+        :title="$t('generalSetting.fontColor')"
+        :icon="ICONS.palette"
+      >
         <FontField
           v-model:font-family="localConfig.general.fontFamily"
           v-model:font-color="localConfig.general.fontColor"
           v-model:font-size="localConfig.general.fontSize"
-          :label="`${$t('common.font')}`"
+          :label="$t('common.font')"
         />
-      </template>
 
-      <!-- 色彩外观 -->
-      <template #appearance>
-        <NFormItem :label="$t('common.appearance')">
+        <SettingFormItem :label="$t('common.appearance')">
           <NRadioGroup
             v-model:value="localConfig.general.appearance"
             size="small"
+            direction="horizontal"
           >
-            <NRadioButton
+            <NRadio
               v-for="item in themeList"
               :key="item.value"
               :value="item.value"
             >
               {{ item.label }}
-            </NRadioButton>
+            </NRadio>
           </NRadioGroup>
-        </NFormItem>
+        </SettingFormItem>
 
-        <ColorField
-          v-model="localConfig.general.primaryColor"
-          :label="$t('common.primaryColor')"
-        />
-
-        <ColorField
-          v-model="localConfig.general.backgroundColor"
-          :label="$t('common.backgroundColor')"
-        />
-
-        <!-- backgroundImage -->
-        <NFormItem :label="$t('common.backgroundImage')">
-          <NSwitch
-            v-model:value="localConfig.general.isBackgroundImageEnabled"
-            size="small"
+        <SettingFormInlineRow>
+          <ColorField
+            v-model="localConfig.general.primaryColor"
+            :label="$t('common.primaryColor')"
           />
-          <Transition name="setting-expand">
+
+          <ColorField
+            v-model="localConfig.general.backgroundColor"
+            :label="$t('common.backgroundColor')"
+          />
+        </SettingFormInlineRow>
+      </SettingFormSection>
+
+      <!-- 背景图 -->
+      <SettingFormSection
+        :title="$t('generalSetting.bgImage')"
+        :icon="ICONS.imageSquare"
+      >
+        <SwitchField
+          v-model="localConfig.general.isBackgroundImageEnabled"
+          :label="$t('common.backgroundImage')"
+        >
+          <template #extra>
             <NButton
-              v-if="localConfig.general.isBackgroundImageEnabled"
-              class="setting__item-ele setting__item-ml action-btn action-btn--primary"
+              class="setting__btn setting__btn--primary"
               type="primary"
-              size="small"
+              size="tiny"
               secondary
+              round
               @click="openBackgroundDrawer()"
             >
               <Icon :icon="ICONS.selectFinger" />&nbsp;{{ $t('common.select') }}
             </NButton>
-          </Transition>
-        </NFormItem>
+          </template>
+        </SwitchField>
 
-        <SliderField
-          v-model="localConfig.general.bgBlur"
-          :label="$t('common.blur')"
-          :step="0.01"
-          :min="0"
-          :max="50"
-        />
-
-        <SliderField
-          v-model="localConfig.general.bgOpacity"
-          :label="$t('common.opacity')"
-          :step="0.01"
-          :min="0"
-          :max="1"
-        />
-
-        <NFormItem :label="$t('generalSetting.parallax')">
-          <NSwitch
-            v-model:value="localConfig.general.isParallaxEnabled"
-            size="small"
+        <SettingFormInlineRow>
+          <NumberField
+            v-model="localConfig.general.bgBlur"
+            :label="$t('common.blur')"
+            :step="0.01"
+            :min="0"
+            :max="50"
           />
-          <Tips :content="$t('generalSetting.parallaxTips')" />
-        </NFormItem>
 
-        <Transition name="setting-expand">
-          <SliderField
+          <NumberField
+            v-model="localConfig.general.bgOpacity"
+            :label="$t('common.opacity')"
+            :step="0.01"
+            :min="0"
+            :max="1"
+          />
+        </SettingFormInlineRow>
+
+        <SwitchField
+          v-model="localConfig.general.isParallaxEnabled"
+          :label="$t('generalSetting.parallax')"
+          :tip-content="$t('generalSetting.parallaxTips')"
+        />
+
+        <Transition name="setting-slide">
+          <NumberField
             v-if="localConfig.general.isParallaxEnabled"
             v-model="localConfig.general.parallaxIntensity"
             :label="$t('generalSetting.parallaxIntensity')"
             :step="1"
             :min="0"
             :max="20"
-            class="setting__item-ml"
+            show-slider
           />
         </Transition>
+      </SettingFormSection>
 
-        <NFormItem :label="$t('generalSetting.loadPageAnimation')">
-          <NSwitch
-            v-model:value="localConfig.general.isLoadPageAnimationEnabled"
-            size="small"
-          />
-          <Transition name="setting-expand">
-            <NRadioGroup
-              v-if="localConfig.general.isLoadPageAnimationEnabled"
-              v-model:value="localConfig.general.loadPageAnimationType"
+      <!-- 语言与时间 -->
+      <SettingFormSection
+        :title="$t('generalSetting.languageTime')"
+        :icon="ICONS.calendar"
+      >
+        <SettingFormInlineRow>
+          <SettingFormItem :label="$t('generalSetting.language')">
+            <NSelect
+              v-model:value="locale"
+              :options="state.i18nList"
               size="small"
-              class="setting__item-ml"
-            >
-              <NRadioButton
-                v-for="item in loadPageAnimationTypeList"
-                :key="item.value"
-                :value="item.value"
-              >
-                {{ item.label }}
-              </NRadioButton>
-            </NRadioGroup>
-          </Transition>
-        </NFormItem>
-      </template>
+              @update:value="onChangeLocale"
+            />
+          </SettingFormItem>
+          <SettingFormItem :label="$t('generalSetting.timeLanguage')">
+            <NSelect
+              v-model:value="localConfig.general.timeLang"
+              :options="state.i18nList"
+              size="small"
+            />
+          </SettingFormItem>
+        </SettingFormInlineRow>
+      </SettingFormSection>
 
-      <template #footer>
-        <!-- setting -->
-        <NDivider title-placement="left">
-          {{ $t('generalSetting.settingDividerSetting') }}
-        </NDivider>
+      <!-- 数据管理 -->
+      <SettingFormSection
+        :title="$t('generalSetting.dataManagement')"
+        :icon="ICONS.restoreTwotone"
+      >
+        <StorageVisualization
+          :sync-time="lastSyncTime"
+          :is-loading="isUploadConfigLoading"
+          :total-bytes="totalBytes"
+          :top-large-items="topLargeItems"
+          :sorted-entries="sortedEntries"
+        />
 
-        <!-- 同步时间 -->
-        <NFormItem :label="$t('generalSetting.syncTime')">
-          <NSpin
-            :show="isUploadConfigLoading"
-            size="small"
-          >
-            <div class="sync-time__badge">
-              <Icon
-                :icon="ICONS.check"
-                class="sync-time__icon"
-              />
-              <span class="sync-time__text">{{ syncTime }}</span>
-            </div>
-          </NSpin>
-          <Tips :content="$t('generalSetting.syncTimeTips')" />
-        </NFormItem>
-
-        <!-- 配置占用大小 -->
-        <NFormItem :label="$t('generalSetting.syncStorageSize')">
-          <NCollapse :default-expanded-names="[]">
-            <NCollapseItem name="storage">
-              <template #header>
-                <div class="storage-header">
-                  <div class="storage-header__title">
-                    <span class="storage-header__field">{{
-                      $t('generalSetting.total')
-                    }}</span>
-                    <span class="storage-header__total">
-                      {{ (totalBytes / 1024).toFixed(1) }}KB / ~100KB
-                    </span>
-                    <Tips
-                      :content="$t('generalSetting.syncStorageSizeTips')"
-                      class="storage-header__tips"
-                    />
-                  </div>
-                  <div
-                    v-if="topLargeItems.length > 0"
-                    class="storage-header__top"
-                  >
-                    <div
-                      v-for="([field, bytes], index) in topLargeItems"
-                      :key="index"
-                      class="storage-header__item"
-                      :class="{
-                        'storage-header__item--warn': bytes > 7000,
-                        'storage-header__item--danger': bytes > 8000,
-                      }"
-                    >
-                      <span class="storage-header__field">{{
-                        getFieldLabel(field)
-                      }}</span>
-                      <div class="storage-header__bar-wrap">
-                        <div
-                          class="storage-header__bar"
-                          :style="{
-                            width: `${Math.min((bytes / SYNC_QUOTA_BYTES_PER_ITEM) * 100, 100)}%`,
-                          }"
-                        />
-                      </div>
-                      <span class="storage-header__bytes"
-                        >{{ (bytes / 1024).toFixed(1) }}KB</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </template>
-              <div class="storage-size__list">
-                <NTooltip
-                  v-for="[field, bytes] in sortedEntries"
-                  :key="field"
-                  trigger="hover"
-                  placement="top"
-                >
-                  <template #trigger>
-                    <div
-                      class="storage-size__item"
-                      :class="{
-                        'storage-size__item--warn': bytes > 7000,
-                        'storage-size__item--danger': bytes > 8000,
-                      }"
-                    >
-                      <span class="item__field">{{
-                        getFieldLabel(field)
-                      }}</span>
-                      <div class="item__bar-wrap">
-                        <div
-                          class="item__bar"
-                          :style="{
-                            width: `${Math.min((bytes / SYNC_QUOTA_BYTES_PER_ITEM) * 100, 100)}%`,
-                          }"
-                        />
-                      </div>
-                      <span class="item__bytes"
-                        >{{ (bytes / 1024).toFixed(1) }}KB</span
-                      >
-                    </div>
-                  </template>
-                  {{
-                    `${getFieldLabel(field)}: ${bytes} / ${SYNC_QUOTA_BYTES_PER_ITEM} bytes`
-                  }}
-                </NTooltip>
-              </div>
-            </NCollapseItem>
-          </NCollapse>
-        </NFormItem>
-
-        <NFormItem :label="$t('generalSetting.importExportSettingsLabel')">
+        <SettingFormItem
+          :label="$t('generalSetting.importExportSettingsLabel')"
+          :tip-content="$t('generalSetting.importExportSettingsTips')"
+        >
           <NButton
-            class="action-btn action-btn--primary"
+            class="setting__btn setting__btn--primary"
             type="primary"
-            size="small"
+            size="tiny"
             secondary
+            round
             :loading="globalState.isImportSettingLoading"
             @click="onImportSetting"
           >
@@ -524,361 +419,105 @@ const cssVars = computed(() => ({
             accept=".json"
             @change="onImportFileChange"
           />
-          <Tips :content="$t('generalSetting.importSettingsTips')" />
           <NButton
-            class="setting__item-ml action-btn action-btn--primary"
+            class="setting__btn setting__btn--primary"
             type="primary"
-            size="small"
+            size="tiny"
             secondary
+            round
             @click="exportSetting"
           >
             <template #icon><Icon :icon="ICONS.exportFile" /></template>
             {{ $t('generalSetting.exportSettingValue') }}
           </NButton>
-          <Tips :content="$t('generalSetting.exportSettingTips')" />
-        </NFormItem>
+        </SettingFormItem>
 
-        <NFormItem :label="$t('generalSetting.clearStorageLabel')">
+        <SettingFormItem
+          :label="$t('generalSetting.clearStorageLabel')"
+          :tip-content="$t('generalSetting.clearStorageTips')"
+        >
           <NButton
-            class="action-btn action-btn--warning"
+            class="setting__btn setting__btn--warning"
             type="warning"
-            size="small"
+            size="tiny"
             secondary
+            round
             :loading="globalState.isClearStorageLoading"
             @click="refreshSetting()"
           >
             <template #icon><Icon :icon="ICONS.clearOutlined" /></template>
             {{ $t('generalSetting.clearStorageValue') }}
           </NButton>
-          <Tips :content="$t('generalSetting.clearStorageTips')" />
-        </NFormItem>
+        </SettingFormItem>
 
-        <NFormItem :label="$t('generalSetting.resetSettingLabel')">
+        <SettingFormItem
+          :label="$t('generalSetting.resetSettingLabel')"
+          :tip-content="$t('generalSetting.resetSettingTips')"
+        >
           <NPopconfirm @positive-click="resetSetting">
             <template #trigger>
               <NButton
-                class="action-btn action-btn--error"
+                class="setting__btn setting__btn--error"
                 type="error"
-                size="small"
+                size="tiny"
                 secondary
+                round
               >
                 <template #icon><Icon :icon="ICONS.restoreTwotone" /></template>
                 {{ $t('generalSetting.resetAllSettingValue') }}
               </NButton>
             </template>
-            {{
-              `${$t('common.confirm')} ${$t('generalSetting.resetAllSettingValue')}`
-            }}?
+            {{ $t('generalSetting.confirmResetAll') }}
           </NPopconfirm>
-          <Tips :content="$t('generalSetting.resetSettingTips')" />
-        </NFormItem>
-      </template>
+        </SettingFormItem>
+      </SettingFormSection>
     </SettingFormWrap>
   </div>
 </template>
 
-<style>
-/* ——— 抽屉方向选择器 ——— */
-.drawer__site_wrap {
-  .n-form-item-label {
-    margin-top: 14px;
-  }
-  .drawer__site {
-    display: grid;
-    grid-template-rows: repeat(3, 28px);
-    grid-template-columns: repeat(3, 28px);
-    gap: 2px;
-    padding: 3px;
-    border-radius: var(--radius-lg);
-    background: var(--gray-alpha-06);
-    border: 1px solid var(--gray-alpha-10);
-    .site__item {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 17px;
-      cursor: pointer;
-      border-radius: var(--radius-md);
-      border: 1px solid transparent;
-      transition:
-        background-color var(--transition-base),
-        color var(--transition-base),
-        border-color var(--transition-base),
-        transform var(--transition-fast);
-      color: var(--gray-alpha-55);
-      &:hover {
-        background-color: var(--gray-alpha-12);
-        color: var(--gray-alpha-85);
-        transform: scale(1.08);
-      }
-      &:nth-child(1) {
-        grid-column: 1;
-        grid-row: 2;
-      }
-      &:nth-child(2) {
-        grid-column: 2;
-        grid-row: 1;
-      }
-      &:nth-child(3) {
-        grid-column: 2;
-        grid-row: 3;
-      }
-      &:nth-child(4) {
-        grid-column: 3;
-        grid-row: 2;
-      }
-    }
-    .site__item--active {
-      color: var(--nt-general-color) !important;
-      background-color: var(--nt-general-active-color);
-      border-color: var(--nt-general-active-border-color);
-      transform: scale(1.06);
-    }
-  }
+<style scoped>
+.drawer__site_wrap--compact :deep(.form-item__control) {
+  align-items: flex-start;
 }
 
-/* ——— 抽屉方向选择器（紧凑横向版） ——— */
-.drawer__site_wrap--compact {
-  .drawer__site--compact {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px;
-    border-radius: var(--radius-lg);
-    background: var(--gray-alpha-06);
-    border: 1px solid var(--gray-alpha-10);
-    .site__item {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 32px;
-      height: 28px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: var(--radius-md);
-      border: 1px solid transparent;
-      transition:
-        background-color var(--transition-base),
-        color var(--transition-base),
-        border-color var(--transition-base),
-        transform var(--transition-fast);
-      color: var(--gray-alpha-55);
-      &:hover {
-        background-color: var(--gray-alpha-12);
-        color: var(--gray-alpha-85);
-        transform: scale(1.06);
-      }
-    }
-    .site__item--active {
-      color: var(--nt-general-color) !important;
-      background-color: var(--nt-general-active-color);
-      border-color: var(--nt-general-active-border-color);
-      transform: scale(1.06);
-    }
-  }
-}
-
-/* ——— 同步时间徽章 ——— */
-.sync-time__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  background: rgba(56, 168, 102, 0.1);
-  border: 1px solid rgba(56, 168, 102, 0.22);
-  .sync-time__icon {
-    font-size: 13px;
-    color: #38a866;
-    flex-shrink: 0;
-  }
-  .sync-time__text {
-    font-size: var(--text-xs);
-    font-variant-numeric: tabular-nums;
-    color: rgba(56, 168, 102, 0.85);
-    letter-spacing: 0.2px;
-  }
-}
-
-/* ——— 折叠面板头部（总用量 + Top 大户） ——— */
-.storage-header {
-  width: 100%;
-  padding: 4px 0;
-}
-
-.storage-header__title {
+.drawer__site--compact {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.storage-header__title span:first-child {
-  padding-left: 4px;
-  font-weight: 500;
-}
-
-.storage-header__total {
-  font-size: var(--text-xs);
-  font-variant-numeric: tabular-nums;
-}
-
-.storage-header__tips {
-  margin-left: 4px;
-}
-
-.storage-header__field {
-  font-size: 11px;
-  width: 72px;
-  flex-shrink: 0;
-}
-
-.storage-header__top {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding-left: 4px;
-}
-
-.storage-header__item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-
-  .storage-header__field {
-    font-size: 11px;
-    color: var(--gray-alpha-70);
-    width: 72px;
-    flex-shrink: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .storage-header__bar-wrap {
-    flex: 1;
-    height: 4px;
-    max-width: 120px;
-    border-radius: 2px;
-    background: var(--gray-alpha-15);
-    overflow: hidden;
-  }
-
-  .storage-header__bar {
-    height: 100%;
-    border-radius: 2px;
-    background: rgba(16, 152, 173, 0.7);
-  }
-
-  .storage-header__bytes {
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
-    color: var(--gray-alpha-65);
-    width: 36px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  &.storage-header__item--warn {
-    .storage-header__bar {
-      background: rgba(240, 160, 32, 0.85);
-    }
-    .storage-header__bytes {
-      color: rgba(200, 130, 0, 0.9);
-    }
-  }
-
-  &.storage-header__item--danger {
-    .storage-header__bar {
-      background: rgba(220, 50, 50, 0.85);
-    }
-    .storage-header__bytes {
-      color: rgba(200, 40, 40, 0.9);
-    }
-  }
-}
-
-/* ——— 配置占用大小列表 ——— */
-.storage-size__list {
-  display: flex;
-  flex-direction: column;
   gap: 4px;
-  width: 100%;
-  max-width: 320px;
-}
+  padding: 3px;
+  border-radius: var(--radius-lg);
+  background: var(--gray-alpha-06);
+  border: 1px solid var(--gray-alpha-10);
 
-.storage-size__item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 6px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  background: var(--gray-alpha-05);
-  cursor: default;
-  transition: background-color var(--transition-fast);
+  .site__item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 28px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    transition:
+      background-color var(--transition-base),
+      color var(--transition-base),
+      border-color var(--transition-base),
+      transform var(--transition-fast);
+    color: var(--gray-alpha-55);
 
-  &:hover {
-    background: var(--gray-alpha-10);
-  }
-
-  /* 黄色警告：7KB ~ 8KB */
-  &.storage-size__item--warn {
-    background: rgba(240, 160, 32, 0.08);
-    border-color: rgba(240, 160, 32, 0.2);
-    .item__bar {
-      background: rgba(240, 160, 32, 0.85);
-    }
-    .item__bytes {
-      color: rgba(200, 130, 0, 0.9);
+    &:hover {
+      background-color: var(--gray-alpha-12);
+      color: var(--gray-alpha-85);
+      transform: scale(1.06);
     }
   }
 
-  /* 红色危险：>8KB */
-  &.storage-size__item--danger {
-    background: rgba(220, 50, 50, 0.08);
-    border-color: rgba(220, 50, 50, 0.22);
-    .item__bar {
-      background: rgba(220, 50, 50, 0.85);
-    }
-    .item__bytes {
-      color: rgba(200, 40, 40, 0.9);
-    }
-  }
-
-  .item__field {
-    font-size: 11px;
-    font-family: monospace;
-    color: var(--gray-alpha-75);
-    width: 90px;
-    flex-shrink: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .item__bar-wrap {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--gray-alpha-15);
-    overflow: hidden;
-  }
-
-  .item__bar {
-    height: 100%;
-    border-radius: 2px;
-    background: rgba(16, 152, 173, 0.7);
-    transition: width var(--transition-base);
-  }
-
-  .item__bytes {
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
-    color: var(--gray-alpha-65);
-    width: 42px;
-    text-align: right;
-    flex-shrink: 0;
+  .site__item--active {
+    color: var(--nt-general-color) !important;
+    background-color: var(--nt-general-active-color);
+    border-color: var(--nt-general-active-border-color);
+    transform: scale(1.06);
   }
 }
 </style>

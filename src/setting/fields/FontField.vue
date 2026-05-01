@@ -1,79 +1,54 @@
 <script setup lang="ts">
-import { NFormItem, NSelect, NInputNumber } from 'naive-ui'
+import SettingFormItem from '@/setting/components/SettingFormItem.vue'
 import CustomColorPicker from '@/components/CustomColorPicker.vue'
 import {
   localState,
   availableFontOptions,
   fontSelectRenderLabel,
 } from '@/logic/store'
+import { useDualThemeColor } from './useDualThemeColor'
 
-const props = defineProps<{
-  fontFamily: string
-
-  fontColor: string | string[]
-  fontSize: number
+defineProps<{
   label: string
   disabled?: boolean
 }>()
 
-const emit = defineEmits<{
-  'update:fontFamily': [value: string]
-  'update:fontColor': [value: string | string[]]
-  'update:fontSize': [value: number]
-}>()
+const fontFamily = defineModel<string>('fontFamily')
+const fontColor = defineModel<string | string[]>('fontColor')
+const fontSize = defineModel<number>('fontSize')
 
-// 判断是否为数组类型
-const isArrayValue = computed(() => Array.isArray(props.fontColor))
-
-// 计算当前外观的颜色值
-const currentFontColor = computed(() => {
-  if (isArrayValue.value) {
-    return props.fontColor[localState.value.currAppearanceCode]
-  }
-  return props.fontColor as string
-})
-
-// 处理颜色更新
-const handleColorUpdate = (value: string) => {
-  if (isArrayValue.value) {
-    const newArray = [...(props.fontColor as string[])]
-    newArray[localState.value.currAppearanceCode] = value
-    emit('update:fontColor', newArray)
-  } else {
-    emit('update:fontColor', value)
-  }
-}
+const { currentValue, updateValue } = useDualThemeColor(
+  computed(() => fontColor.value as string | string[]),
+  (v) => {
+    fontColor.value = v
+  },
+)
 </script>
 
 <template>
-  <NFormItem
-    :label="label"
-    :disabled="disabled"
-  >
+  <!-- 注意：不传 :disabled 给 SettingFormItem（div 不支持 disabled 属性），
+       禁用状态由各子组件（CustomColorPicker / NSelect / NInputNumber）各自处理 -->
+  <SettingFormItem :label="label">
     <CustomColorPicker
-      class="setting__item-ele"
-      :value="currentFontColor"
+      :value="currentValue"
       :disabled="disabled"
-      @update:value="handleColorUpdate"
+      @update:value="updateValue"
     />
     <NSelect
-      class="setting__item-ml"
-      :value="fontFamily"
+      v-model:value="fontFamily"
       :options="availableFontOptions"
       :render-label="fontSelectRenderLabel"
       size="small"
       :disabled="disabled"
-      @update:value="emit('update:fontFamily', $event)"
     />
     <NInputNumber
-      :value="fontSize"
-      class="setting__item-ele setting__item-ml setting__input-number"
+      v-model:value="fontSize"
+      class="setting__num-input"
       size="small"
       :step="1"
       :min="5"
       :max="1000"
       :disabled="disabled"
-      @update:value="emit('update:fontSize', $event ?? 0)"
     />
-  </NFormItem>
+  </SettingFormItem>
 </template>

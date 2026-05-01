@@ -2,92 +2,157 @@
 /**
  * UrlBlacklistInput
  *
- * 通用域名黑名单输入组件，通过 v-model 双向绑定域名数组。
- * 可在 keyboardBookmark、keyboardCommand 等设置面板中复用。
- *
- * 使用示例：
- * ```vue
- * <UrlBlacklistInput v-model="localConfig.keyboardBookmark.urlBlacklist" />
- * <UrlBlacklistInput v-model="localConfig.keyboardCommand.urlBlacklist" />
- * ```
+ * 折叠面板式域名黑名单输入组件，每行一个域名。
+ * 标题由外层 SettingFormItem label 提供，组件内只负责折叠切换和内容区。
  */
 
-import { NDynamicTags } from 'naive-ui'
-import Tips from '@/components/Tips.vue'
+import { NInput, NTag } from 'naive-ui'
+import { normalizeDomain } from '@/logic/globalShortcut/shortcut-utils'
 
 const model = defineModel<string[]>({ default: [] })
 
-const MAX_TAG_COUNT = 20
-const MAX_TAG_LENGTH = 100
+const MAX_COUNT = 20
+const MAX_LENGTH = 100
 
-const tipsContent = window.$t('generalSetting.urlBlacklistTips')
+const collapsed = ref(true)
+const placeholder = window.$t('generalSetting.urlBlacklistPlaceholder')
 
-/**
- * 清理域名：去掉协议前缀、路径、参数、锚点，只保留域名（+端口），统一转小写
- */
-const cleanUrl = (tag: string): string => {
-  return tag
-    .trim()
-    .replace(/^https?:\/\//i, '') // 去掉协议前缀
-    .replace(/[/?#].*$/, '') // 去掉路径、参数、锚点
-    .replace(/\/+$/, '') // 去掉尾部斜杠
-    .toLowerCase() // 域名不区分大小写
+const parseLines = (text: string): string[] => {
+  const cleaned = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      return line.length > MAX_LENGTH ? line.slice(0, MAX_LENGTH) : line
+    })
+    .map(normalizeDomain)
+    .filter(Boolean)
+  return [...new Set(cleaned)].slice(0, MAX_COUNT)
 }
 
-const handleUpdate = (value: string[]) => {
-  const cleaned = value.map(cleanUrl).filter(Boolean)
-  // 去重并保持原有顺序
-  const deduped = [...new Set(cleaned)]
-  if (
-    deduped.length === value.length &&
-    deduped.every((v, i) => v === value[i])
-  ) {
-    model.value = value
-    return
-  }
-  model.value = deduped
+const inputText = ref(model.value.join('\n'))
+
+watch(
+  () => model.value,
+  (val) => {
+    inputText.value = val.join('\n')
+  },
+)
+
+const handleBlur = () => {
+  model.value = parseLines(inputText.value)
 }
 </script>
 
 <template>
   <div class="url-blacklist">
-    <NDynamicTags
-      :value="model"
-      :max="MAX_TAG_COUNT"
-      :check-str="
-        (tag: string) => {
-          if (tag.length > MAX_TAG_LENGTH) {
-            return $t('generalSetting.urlBlacklistTooLong').replace(
-              '__max__',
-              String(MAX_TAG_LENGTH),
-            )
-          }
-          return ''
-        }
-      "
-      @update:value="handleUpdate"
-    />
-    <Tips :content="tipsContent" />
+    <div
+      class="blacklist__toggle"
+      @click="collapsed = !collapsed"
+    >
+      <span class="toggle__count">({{ model.length }}/{{ MAX_COUNT }})</span>
+      <span
+        class="toggle__arrow"
+        :class="{ 'toggle__arrow--expanded': !collapsed }"
+      >
+        ▼
+      </span>
+    </div>
+
+    <div
+      class="blacklist__content"
+      :class="{ 'blacklist__content--collapsed': collapsed }"
+    >
+      <div class="blacklist__content-inner">
+        <NInput
+          v-model:value="inputText"
+          type="textarea"
+          :placeholder="placeholder"
+          :autosize="{ minRows: 3, maxRows: 6 }"
+          @blur="handleBlur"
+        />
+
+        <div
+          v-if="model.length > 0"
+          class="blacklist-preview"
+        >
+          <NTag
+            v-for="(domain, i) in model"
+            :key="i"
+            :bordered="false"
+            closable
+            @close="model = model.filter((_, idx) => idx !== i)"
+          >
+            {{ domain }}
+          </NTag>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .url-blacklist {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
   flex: 1;
+  align-self: flex-start;
+  padding-top: 3px;
   min-width: 0;
 }
 
-:deep(.n-tag) {
-  max-width: 100%;
+.blacklist__toggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
 }
 
-:deep(.n-tag .n-tag__content) {
-  max-width: 100%;
+.toggle__count {
+  font-size: 12px;
+  color: var(--n-text-color, var(--text-color));
+  opacity: 0.6;
+}
+
+.toggle__arrow {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--n-text-color, var(--text-color));
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.toggle__arrow--expanded {
+  transform: rotate(180deg);
+}
+
+.blacklist__content {
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin-top: 8px;
+  max-height: 400px;
+  opacity: 1;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.2s ease,
+    margin 0.3s ease;
+}
+
+.blacklist__content--collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.blacklist__content-inner {
+  padding: 0 0 12px;
+}
+
+.blacklist-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
 }
 </style>

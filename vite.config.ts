@@ -154,5 +154,8 @@ export default defineConfig(({ command }) => ({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['../test/setup.ts'],
+    coverage: {
+      reportsDirectory: '../coverage',
+    },
   },
 }))

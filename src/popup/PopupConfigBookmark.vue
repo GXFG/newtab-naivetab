@@ -43,9 +43,7 @@ const hasPendingSync = computed(
   >
     <template #header>
       <div class="popup__header">
-        <span class="header__title">{{
-          `${$t('common.config')}${$t('setting.bookmark')}`
-        }}</span>
+        <span class="header__title">{{ $t('popup.configBookmark') }}</span>
         <span
           v-show="hasPendingSync"
           class="header__syncing"
@@ -54,7 +52,7 @@ const hasPendingSync = computed(
             :icon="ICONS.loading"
             class="syncing__icon"
           />
-          {{ `${$t('common.syncing')}...` }}
+          {{ $t('popup.syncingStatus') }}
         </span>
       </div>
     </template>

@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
+import {
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormSection,
+  SettingFormItem,
+  SettingCollapseSection,
+} from '@/setting/components'
+import { ICONS } from '@/logic/icons'
 import PresetThemeDrawer from './PresetThemeDrawer.vue'
 import KeyboardStyleSetting from './KeyboardStyleSetting.vue'
 import KeycapSetting from './KeyboardKeycapSetting.vue'
@@ -10,65 +16,68 @@ const state = reactive({
   isPresetThemeDrawerVisible: false,
 })
 
-const expandedNames = ref<string[]>(['keyboardStyle'])
+const expandedNames = ref<string[]>([])
+
+const handleExpanded = (name: string, isExpanded: boolean) => {
+  if (isExpanded) {
+    if (!expandedNames.value.includes(name)) {
+      expandedNames.value.push(name)
+    }
+  } else {
+    expandedNames.value = expandedNames.value.filter((n) => n !== name)
+  }
+}
 </script>
 
 <template>
   <PresetThemeDrawer v-model:show="state.isPresetThemeDrawerVisible" />
 
-  <SettingHeaderBar
-    :title="$t('setting.keyboardCommon')"
-    widget-code="keyboardCommon"
-  />
+  <SettingHeaderBar :title="$t('setting.keyboardCommon')" />
 
   <SettingFormWrap widget-code="keyboardCommon">
     <!-- 功能配置 -->
-    <template #behavior>
-      <NFormItem :label="$t('keyboardCommon.presetTheme')">
+    <SettingFormSection section-key="common.behavior">
+      <SettingFormItem :label="$t('keyboardCommon.presetTheme')">
         <NButton
           type="primary"
-          size="small"
+          size="tiny"
           secondary
-          class="setting__item-ele setting__item-ml action-btn action-btn--primary"
+          class="setting__btn setting__btn--primary"
           @click="state.isPresetThemeDrawerVisible = true"
         >
           {{ $t('common.select') }}
         </NButton>
-      </NFormItem>
+      </SettingFormItem>
+    </SettingFormSection>
 
-      <NCollapse
-        v-model:expanded-names="expandedNames"
-        display-directive="show"
-      >
-        <NCollapseItem name="keyboardStyle">
-          <template #header>
-            <span class="setting__label setting__label--collapse">
-              {{ `${$t('keyboardCommon.keyboard')}${$t('common.config')}` }}
-            </span>
-          </template>
-          <KeyboardStyleSetting />
-        </NCollapseItem>
+    <SettingCollapseSection
+      name="keyboardStyle"
+      :title="$t('keyboardCommon.keyboardConfigLabel')"
+      :icon="ICONS.keyboardCommon"
+      :expanded="expandedNames.includes('keyboardStyle')"
+      @update:expanded="handleExpanded"
+    >
+      <KeyboardStyleSetting />
+    </SettingCollapseSection>
 
-        <NCollapseItem name="keycapSetting">
-          <template #header>
-            <span class="setting__label setting__label--collapse">
-              {{ `${$t('keyboardCommon.keycap')}${$t('common.config')}` }}
-            </span>
-          </template>
-          <KeycapSetting />
-        </NCollapseItem>
+    <SettingCollapseSection
+      name="keycapSetting"
+      :title="$t('keyboardCommon.keycapConfigLabel')"
+      :icon="ICONS.keyboardKeycapLabel"
+      :expanded="expandedNames.includes('keycapSetting')"
+      @update:expanded="handleExpanded"
+    >
+      <KeycapSetting />
+    </SettingCollapseSection>
 
-        <NCollapseItem name="shellSetting">
-          <template #header>
-            <span class="setting__label setting__label--collapse">
-              {{
-                `${$t('keyboardCommon.shell')} / ${$t('keyboardCommon.plate')}${$t('common.config')}`
-              }}
-            </span>
-          </template>
-          <KeyboardShellSetting />
-        </NCollapseItem>
-      </NCollapse>
-    </template>
+    <SettingCollapseSection
+      name="shellSetting"
+      :title="$t('keyboardCommon.shellPlateConfigLabel')"
+      :icon="ICONS.keyboardShellLabel"
+      :expanded="expandedNames.includes('shellSetting')"
+      @update:expanded="handleExpanded"
+    >
+      <KeyboardShellSetting />
+    </SettingCollapseSection>
   </SettingFormWrap>
 </template>

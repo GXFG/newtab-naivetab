@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
 import { globalState } from '@/logic/store'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
+import { ICONS } from '@/logic/icons'
+import { SettingHeaderBar, SettingCollapseSection } from '@/setting/components'
 import AnalogSetting from './AnalogSetting.vue'
 import DigitalSetting from './DigitalSetting.vue'
 import FlipSetting from './FlipSetting.vue'
 import NeonSetting from './NeonSetting.vue'
 import DateSetting from './DateSetting.vue'
 
+/**
+ * clockDate 是一个聚合面板：通过 SettingCollapseSection 收纳了 5 个子时钟/日期设置组件
+ *（DigitalSetting、AnalogSetting、FlipSetting、NeonSetting、DateSetting）。
+ * 每个子组件各自使用 SettingFormWrap + 独立的 widgetCode，拥有独立的重置按钮。
+ * 因此本文件不包裹 SettingFormWrap，避免重复的容器和冗余的重置入口。
+ */
 const ALL_SECTIONS = [
   'clockDigital',
   'clockAnalog',
@@ -17,6 +22,16 @@ const ALL_SECTIONS = [
   'date',
 ]
 const expandedNames = ref<string[]>([])
+
+const handleExpanded = (name: string, isExpanded: boolean) => {
+  if (isExpanded) {
+    if (!expandedNames.value.includes(name)) {
+      expandedNames.value.push(name)
+    }
+  } else {
+    expandedNames.value = expandedNames.value.filter((n) => n !== name)
+  }
+}
 
 watch(
   () => globalState.currSettingAnchor,
@@ -33,83 +48,63 @@ watch(
 </script>
 
 <template>
-  <SettingHeaderBar :title="`${$t('setting.clock')} / ${$t('setting.date')}`" />
+  <SettingHeaderBar :title="$t('setting.clockDate')" />
 
-  <NCollapse
-    v-model:expanded-names="expandedNames"
-    class="setting__pane__content"
-    display-directive="show"
-    style="margin-top: 18px"
-  >
-    <NCollapseItem name="clockDigital">
-      <template #header>
-        <span class="setting__label setting__label--collapse">
-          <Icon
-            :icon="ICONS.clockDigital"
-            class="label__icon"
-          />
-          {{ $t('setting.clockDigital') }}
-        </span>
-      </template>
+  <div class="setting__clockData">
+    <SettingCollapseSection
+      name="clockDigital"
+      :title="$t('setting.clockDigital')"
+      :icon="ICONS.clockDigital"
+      :expanded="expandedNames.includes('clockDigital')"
+      @update:expanded="handleExpanded"
+    >
       <DigitalSetting />
-    </NCollapseItem>
+    </SettingCollapseSection>
 
-    <NCollapseItem name="clockAnalog">
-      <template #header>
-        <span class="setting__label setting__label--collapse">
-          <Icon
-            :icon="ICONS.clockAnalog"
-            class="label__icon"
-          />
-          {{ $t('setting.clockAnalog') }}
-        </span>
-      </template>
+    <SettingCollapseSection
+      name="clockAnalog"
+      :title="$t('setting.clockAnalog')"
+      :icon="ICONS.clockAnalog"
+      :expanded="expandedNames.includes('clockAnalog')"
+      @update:expanded="handleExpanded"
+    >
       <AnalogSetting />
-    </NCollapseItem>
+    </SettingCollapseSection>
 
-    <NCollapseItem name="clockFlip">
-      <template #header>
-        <span class="setting__label setting__label--collapse">
-          <Icon
-            :icon="ICONS.clockFlip"
-            class="label__icon"
-          />
-          {{ $t('setting.clockFlip') }}
-        </span>
-      </template>
+    <SettingCollapseSection
+      name="clockFlip"
+      :title="$t('setting.clockFlip')"
+      :icon="ICONS.clockFlip"
+      :expanded="expandedNames.includes('clockFlip')"
+      @update:expanded="handleExpanded"
+    >
       <FlipSetting />
-    </NCollapseItem>
+    </SettingCollapseSection>
 
-    <NCollapseItem name="clockNeon">
-      <template #header>
-        <span class="setting__label setting__label--collapse">
-          <Icon
-            :icon="ICONS.clockNeon"
-            class="label__icon"
-          />
-          {{ $t('setting.clockNeon') }}
-        </span>
-      </template>
+    <SettingCollapseSection
+      name="clockNeon"
+      :title="$t('setting.clockNeon')"
+      :icon="ICONS.clockNeon"
+      :expanded="expandedNames.includes('clockNeon')"
+      @update:expanded="handleExpanded"
+    >
       <NeonSetting />
-    </NCollapseItem>
+    </SettingCollapseSection>
 
-    <NCollapseItem name="date">
-      <template #header>
-        <span class="setting__label setting__label--collapse">
-          <Icon
-            :icon="ICONS.date"
-            class="label__icon"
-          />
-          {{ $t('setting.date') }}
-        </span>
-      </template>
+    <SettingCollapseSection
+      name="date"
+      :title="$t('setting.date')"
+      :icon="ICONS.date"
+      :expanded="expandedNames.includes('date')"
+      @update:expanded="handleExpanded"
+    >
       <DateSetting />
-    </NCollapseItem>
-  </NCollapse>
+    </SettingCollapseSection>
+  </div>
 </template>
 
-<style>
-.setting__label--collapse {
-  margin: 0;
+<style scoped>
+.setting__clockData {
+  padding: 8px 12px;
 }
 </style>

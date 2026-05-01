@@ -74,13 +74,8 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
     'emphasisTwoBackgroundColor',
   )
 
-  // 键帽边框 / 模糊 / 字体
+  // 键帽边框 / 字体
   const keycapBorderColor = getStyleField('keyboardCommon', 'keycapBorderColor')
-  const keycapBackgroundBlurPx = getStyleField(
-    'keyboardCommon',
-    'keycapBackgroundBlur',
-    'px',
-  )
   const keycapKeyFontFamily = getStyleField(
     'keyboardCommon',
     'keycapKeyFontFamily',
@@ -110,11 +105,6 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
   const plateBorderRadiusPx = getStyleField(
     'keyboardCommon',
     'plateBorderRadius',
-    'px',
-  )
-  const plateBackgroundBlurPx = getStyleField(
-    'keyboardCommon',
-    'plateBackgroundBlur',
     'px',
   )
 
@@ -369,7 +359,6 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
   const keycapCssVars = computed(() => ({
     '--nt-kb-main-font-color': mainFontColor.value,
     '--nt-kb-main-bg-color': mainBgColor.value,
-    '--nt-kb-background-blur': keycapBackgroundBlurPx.value,
     '--nt-kb-border-radius': borderRadiusCss.value,
     '--nt-kb-primary-color': customPrimaryColor.value,
     '--nt-kb-key-font-family': keycapKeyFontFamily.value,
@@ -395,7 +384,6 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
     '--nt-kb-plate-padding': platePaddingCss.value,
     '--nt-kb-plate-color': plateColor.value,
     '--nt-kb-plate-radius': plateBorderRadiusPx.value,
-    '--nt-kb-plate-blur': plateBackgroundBlurPx.value,
     '--nt-kb-shell-v-padding': shellVPaddingCss.value,
     '--nt-kb-shell-h-padding': shellHPaddingCss.value,
     '--nt-kb-shell-radius': shellBorderRadiusPx.value,

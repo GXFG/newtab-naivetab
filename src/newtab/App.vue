@@ -17,12 +17,8 @@ import {
   stopKeydown,
 } from '@/logic/task'
 import {
-  setupNewtabGlobalShortcutForBookmark,
-  cleanupNewtabGlobalShortcutForBookmark,
-} from '@/logic/globalShortcut/shortcut-bookmark'
-import {
-  setupNewtabGlobalShortcutForCommand,
-  cleanupNewtabGlobalShortcutForCommand,
+  setupNewtabGlobalShortcut,
+  cleanupNewtabGlobalShortcut,
 } from '@/logic/globalShortcut/shortcut-executor'
 import {
   setupPageConfigSync,
@@ -122,8 +118,7 @@ onMounted(async () => {
   initBackgroundImage()
   startTimer()
   startKeydown()
-  setupNewtabGlobalShortcutForBookmark()
-  setupNewtabGlobalShortcutForCommand()
+  setupNewtabGlobalShortcut()
 
   // 阶段 2：配置同步（按顺序，有依赖关系）
   await setupPageConfigSync()
@@ -148,8 +143,7 @@ onUnmounted(() => {
   // 以下清理代码仅在开发 HMR / 扩展热重载时生效，属于防御性清理。
   stopTimer()
   stopKeydown()
-  cleanupNewtabGlobalShortcutForBookmark()
-  cleanupNewtabGlobalShortcutForCommand()
+  cleanupNewtabGlobalShortcut()
   cleanupEvents()
   cleanupResizeObserver()
 })

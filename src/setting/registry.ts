@@ -88,19 +88,14 @@ const SETTING_ORDER: settingPanes[] = SETTING_GROUPS.flatMap((g) =>
   g.items.map((i) => i.code),
 )
 
-/**
- * 面板 code 与目录名的映射（当目录名与 code 不一致时使用）
- */
-const PANE_DIR_MAP: Partial<Record<settingPanes, string>> = {
-  keyboardBookmark: 'keyboardBookmark',
-  keyboardCommand: 'keyboardCommand',
-}
-
 // 创建设置面板元数据
+// 类型安全说明：SETTING_ICON_META 类型为 Record<settingPanes, ...>，
+// TypeScript 编译时强制要求所有 settingPanes 值都必须有对应图标元数据。
+// 新增 panel 时若遗漏注册，TS 会在编译期报错，不会等到运行时空指针。
 const createSettingMeta = (item: SettingItem): SettingMeta => {
   const { code, labelKey } = item
   const iconMeta = SETTING_ICON_META[code]
-  const dirName = PANE_DIR_MAP[code] ?? code
+  const dirName = code
   return {
     code,
     iconName: iconMeta.iconName,
@@ -120,14 +115,14 @@ const createSettingMeta = (item: SettingItem): SettingMeta => {
   }
 }
 
-const registry: Record<settingPanes, SettingMeta> = {} as any
+const registry = new Map<settingPanes, SettingMeta>()
 
 for (const group of SETTING_GROUPS) {
   for (const item of group.items) {
-    registry[item.code] = createSettingMeta(item)
+    registry.set(item.code, createSettingMeta(item))
   }
 }
 
-export const settingsList = SETTING_ORDER.map((code) => registry[code]).filter(
-  Boolean,
-)
+export const settingsList = SETTING_ORDER.map((code) =>
+  registry.get(code),
+).filter(Boolean) as SettingMeta[]

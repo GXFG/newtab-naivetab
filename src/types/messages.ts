@@ -6,7 +6,7 @@
  *
  * 架构概览：
  * - CS (contentScripts/) 注入 HTTP/HTTPS 页面，负责采集按键、执行 DOM 命令
- * - NewTab (newtab/) 是 chrome-extension:// 页面，通过 shortcut-bookmark/executor.ts 注册 keydownTask
+ * - NewTab (newtab/) 是 chrome-extension:// 页面，通过 shortcut-executor.ts 注册 keydownTask
  * - SW (background/) 是中枢：接收 keydown → 查 keymap → 分发执行
  * - 所有连接使用 Port 长连接（name='naivetab-shortcut'），支持冷启动消息队列 + 指数退避重连
  *

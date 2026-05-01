@@ -205,7 +205,7 @@ watch(isRender, (value) => {
                   ghost
                   @click="onRetryNews(source.value)"
                 >
-                  {{ `${$t('common.login')} / ${$t('common.refresh')}` }}
+                  {{ $t('news.loginOrRefresh') }}
                 </NButton>
               </div>
             </div>

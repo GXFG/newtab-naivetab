@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
+import { Icon } from '@iconify/vue'
 import { getCityLookup } from '@/api'
 import { URL_QWEATHER_START } from '@/logic/constants/urls'
 import { localConfig } from '@/logic/store'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
-import Tips from '@/components/Tips.vue'
-import { Icon } from '@iconify/vue'
+import {
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormItem,
+  SettingFormSection,
+} from '@/setting/components'
 import { ICONS } from '@/logic/icons'
-import { FontField } from '@/setting/fields'
+import { FontField, SwitchField } from '@/setting/fields'
 
 const state = reactive({
   isEditCityModel: false,
@@ -56,17 +59,18 @@ const onSelectCity = (cityId: string) => {
 </script>
 
 <template>
-  <SettingHeaderBar
-    :title="$t('setting.weather')"
-    widget-code="weather"
-  />
+  <SettingHeaderBar :title="$t('setting.weather')" />
 
   <SettingFormWrap
     id="weather__setting"
     widget-code="weather"
   >
-    <template #behavior>
-      <NFormItem :label="$t('weather.city')">
+    <!-- 数据设置 -->
+    <SettingFormSection
+      :title="$t('weather.dataSettings')"
+      :icon="ICONS.temp"
+    >
+      <SettingFormItem :label="$t('weather.city')">
         <NInput
           v-if="!state.isEditCityModel"
           v-model:value="localConfig.weather.city.name"
@@ -85,8 +89,8 @@ const onSelectCity = (cityId: string) => {
 
         <NButton
           type="primary"
-          class="setting__item-ele setting__item-ml action-btn action-btn--primary"
-          size="small"
+          class="setting__btn setting__btn--primary"
+          size="tiny"
           secondary
           @click="state.isEditCityModel = !state.isEditCityModel"
         >
@@ -103,70 +107,51 @@ const onSelectCity = (cityId: string) => {
             />
           </template>
         </NButton>
-      </NFormItem>
+      </SettingFormItem>
 
-      <NFormItem label="API Key">
+      <SettingFormItem
+        :label="$t('weather.apiKey')"
+        :tip-content="URL_QWEATHER_START"
+        :tip-link="URL_QWEATHER_START"
+      >
         <NInput
           v-model:value="localConfig.weather.apiKey"
           size="small"
         />
-        <Tips
-          link
-          :content="URL_QWEATHER_START"
-        />
-      </NFormItem>
+      </SettingFormItem>
 
-      <NFormItem :label="$t('weather.icon')">
-        <div class="setting__item_wrap">
-          <div class="item__box">
-            <NSwitch
-              v-model:value="localConfig.weather.iconEnabled"
-              size="small"
-            />
-          </div>
-          <Transition name="setting-expand">
-            <div
-              v-if="localConfig.weather.iconEnabled"
-              class="item__box"
-            >
-              <NSlider
-                v-model:value="localConfig.weather.iconSize"
-                :step="1"
-                :min="30"
-                :max="200"
-                :tooltip="false"
-              />
-              <NInputNumber
-                v-model:value="localConfig.weather.iconSize"
-                class="setting__item-ele setting__item-ml setting__input-number"
-                size="small"
-                :step="1"
-                :min="30"
-                :max="200"
-              />
-            </div>
-          </Transition>
-        </div>
-      </NFormItem>
-    </template>
+      <SwitchField
+        v-model="localConfig.weather.iconEnabled"
+        :label="$t('weather.icon')"
+      >
+        <template #extra>
+          <NSlider
+            v-model:value="localConfig.weather.iconSize"
+            :step="1"
+            :min="30"
+            :max="200"
+            :tooltip="false"
+          />
+          <NInputNumber
+            v-model:value="localConfig.weather.iconSize"
+            class="setting__num-input"
+            size="small"
+            :step="1"
+            :min="30"
+            :max="200"
+          />
+        </template>
+      </SwitchField>
+    </SettingFormSection>
 
     <!-- 文字排版 -->
-    <template #typography>
+    <SettingFormSection section-key="common.typography">
       <FontField
         v-model:font-family="localConfig.weather.fontFamily"
         v-model:font-color="localConfig.weather.fontColor"
         v-model:font-size="localConfig.weather.fontSize"
         :label="$t('common.font')"
       />
-    </template>
+    </SettingFormSection>
   </SettingFormWrap>
 </template>
-
-<style>
-#weather__setting {
-  .n-input.n-input--disabled .n-input__input-el,
-  .n-input.n-input--disabled .n-input__textarea-el {
-    cursor: not-allowed;
-  }
-}
-</style>

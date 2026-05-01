@@ -30,6 +30,10 @@ let lastModifierSnapshot: TShortcutModifier[] = []
 
 const modifier = defineModel<TShortcutModifier[]>({ default: [] })
 
+const props = defineProps<{
+  disabled?: boolean
+}>()
+
 const formattedModifier = computed(() => {
   return formatModifierKeys(modifier.value)
 })
@@ -140,6 +144,7 @@ const handleKeyup = (e: KeyboardEvent) => {
 }
 
 const toggleRecording = () => {
+  if (props.disabled) return
   if (isRecording.value) {
     cancelRecording()
     return
@@ -171,7 +176,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="recorder__row">
+  <div
+    class="recorder__row"
+    :class="{ 'recorder__row--disabled': disabled }"
+  >
     <div
       v-if="isRecording"
       class="recorder__capture recorder__capture--recording"
@@ -219,6 +227,12 @@ onUnmounted(() => {
   gap: 8px;
 }
 
+.recorder__row--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+
 .recorder__capture {
   flex: 1 1 0;
   min-width: 0;
@@ -237,9 +251,9 @@ onUnmounted(() => {
 }
 
 .recorder__capture--recording {
-  background-color: rgba(208, 48, 80, 0.06);
-  border: 1px solid rgba(208, 48, 80, 0.3);
-  color: #d03050;
+  background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-error) 35%, transparent);
+  color: var(--color-error);
   animation: pulse 1.4s ease-in-out infinite;
 }
 
@@ -255,21 +269,21 @@ onUnmounted(() => {
 }
 
 .recorder__toggle-btn:hover {
-  background-color: rgba(208, 48, 80, 0.08);
+  background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
 }
 
 .recorder__toggle-btn--active {
-  border-color: rgba(208, 48, 80, 0.35);
-  background-color: rgba(208, 48, 80, 0.06);
+  border-color: color-mix(in srgb, var(--color-error) 40%, transparent);
+  background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
 }
 
 .recorder__toggle-btn--active:hover {
-  background-color: rgba(208, 48, 80, 0.12);
+  background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
 }
 
 .toggle__icon {
   font-size: 18px;
-  color: #d03050;
+  color: var(--color-error);
   transition: all var(--transition-fast);
 }
 

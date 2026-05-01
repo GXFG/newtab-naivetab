@@ -1,225 +1,210 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
 import { URL_DAYJS_FORMAT } from '@/logic/constants/urls'
+import { ICONS } from '@/logic/icons'
 import { localConfig } from '@/logic/store'
-import Tips from '@/components/Tips.vue'
-import SettingHeaderBar from '@/setting/components/SettingHeaderBar.vue'
-import SettingFormWrap from '@/setting/components/SettingFormWrap.vue'
 import {
-  SliderField,
+  SettingHeaderBar,
+  SettingFormWrap,
+  SettingFormInlineRow,
+  SettingFormSection,
+} from '@/setting/components'
+import {
+  NumberField,
   SwitchField,
   ColorField,
   FontField,
   ToggleColorField,
 } from '@/setting/fields'
-import SliderInput from '@/components/SliderInput.vue'
 </script>
 
 <template>
-  <SettingHeaderBar
-    :title="$t('setting.yearProgress')"
-    widget-code="yearProgress"
-  />
+  <SettingHeaderBar :title="$t('setting.yearProgress')" />
 
   <SettingFormWrap widget-code="yearProgress">
-    <!-- 功能配置 -->
-    <template #behavior>
-      <p class="setting__label">
-        <Icon
-          :icon="ICONS.yearProgressLeftText"
-          class="label__icon"
+    <!-- 左侧文字配置 -->
+    <SettingFormSection
+      :icon="ICONS.yearProgressLeftText"
+      :title="$t('yearProgress.leftTextLabel')"
+    >
+      <SettingFormInlineRow>
+        <SwitchField
+          v-model="localConfig.yearProgress.isRealtime"
+          :label="$t('yearProgress.isRealtime')"
         />
-        {{ `${$t('common.left')}-${$t('common.text')}${$t('common.config')}` }}
-      </p>
 
-      <SwitchField
-        v-model="localConfig.yearProgress.isRealtime"
-        :label="`${$t('yearProgress.isRealtime')}`"
-      />
-
-      <NFormItem :label="`${$t('yearProgress.percentage')}`">
-        <div class="setting__item_wrap">
-          <div class="item__box">
-            <NSwitch
-              v-model:value="localConfig.yearProgress.isPercentageEnabled"
-              size="small"
-            />
-          </div>
-          <div class="item__box">
+        <SwitchField
+          v-model="localConfig.yearProgress.isPercentageEnabled"
+          :label="$t('yearProgress.percentageLabel')"
+        >
+          <template #extra>
             <NInputNumber
               v-model:value="localConfig.yearProgress.percentageDecimal"
-              class="setting__input-number--unit"
+              class="setting__num-input--unit"
               size="small"
               :step="1"
               :min="0"
               :max="6"
             >
               <template #prefix>
-                {{ `${$t('yearProgress.decimal')}` }}
+                {{ $t('yearProgress.decimalLabel') }}
               </template>
             </NInputNumber>
-          </div>
-        </div>
-      </NFormItem>
+          </template>
+        </SwitchField>
+      </SettingFormInlineRow>
 
-      <NFormItem :label="`${$t('setting.date')}`">
-        <NSwitch
-          v-model:value="localConfig.yearProgress.isDateEnabled"
-          size="small"
-        />
-        <Transition name="setting-expand">
-          <div
-            v-if="localConfig.yearProgress.isDateEnabled"
-            class="setting__item_wrap"
-          >
-            <NInput
-              v-model:value="localConfig.yearProgress.format"
-              class="setting__item-ml"
-              size="small"
-            />
-            <Tips
-              link
-              :content="URL_DAYJS_FORMAT"
-            />
-          </div>
-        </Transition>
-      </NFormItem>
+      <SwitchField
+        v-model="localConfig.yearProgress.isDateEnabled"
+        :label="$t('setting.date')"
+        :tip-content="URL_DAYJS_FORMAT"
+        :tip-link="URL_DAYJS_FORMAT"
+      >
+        <template #extra>
+          <!-- 日期格式占位符为通用示例，无需 i18n -->
+          <NInput
+            v-model:value="localConfig.yearProgress.format"
+            class="setting__fill-input"
+            size="small"
+            placeholder="MM-DD"
+          />
+        </template>
+      </SwitchField>
 
-      <NFormItem :label="`${$t('common.lineHeight')}`">
-        <SliderInput
+      <SettingFormInlineRow>
+        <NumberField
           v-model="localConfig.yearProgress.textLineHeight"
+          :label="$t('common.lineHeight')"
           :step="0.1"
           :min="0"
           :max="5"
         />
-      </NFormItem>
 
-      <ColorField
-        v-model="localConfig.yearProgress.textActiveColor"
-        :label="`${$t('common.active')}${$t('common.fontColor')}`"
-      />
-
-      <p class="setting__label">
-        <Icon
-          :icon="ICONS.yearProgressRightBlock"
-          class="label__icon"
+        <ColorField
+          v-model="localConfig.yearProgress.textActiveColor"
+          :label="$t('yearProgress.activeFontColorLabel')"
         />
-        {{
-          `${$t('common.right')}-${$t('yearProgress.block')}${$t('common.config')}`
-        }}
-      </p>
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
-      <NFormItem :label="`${$t('yearProgress.block')}${$t('common.margin')}`">
-        <SliderInput
-          v-model="localConfig.yearProgress.blockMargin"
-          :step="0.1"
-          :min="0"
-          :max="10"
-        />
-      </NFormItem>
-      <NFormItem :label="`${$t('yearProgress.block')}${$t('common.size')}`">
-        <SliderInput
+    <!-- 右侧进度块 -->
+    <SettingFormSection
+      :icon="ICONS.yearProgressRightBlock"
+      :title="$t('yearProgress.rightBlockLabel')"
+    >
+      <SettingFormInlineRow>
+        <NumberField
           v-model="localConfig.yearProgress.blockSize"
+          :label="$t('common.size')"
           :step="0.1"
           :min="2"
           :max="10"
         />
-      </NFormItem>
-      <NFormItem
-        :label="`${$t('yearProgress.block')}${$t('common.borderRadius')}`"
-      >
-        <SliderInput
-          v-model="localConfig.yearProgress.blockRadius"
+        <NumberField
+          v-model="localConfig.yearProgress.blockMargin"
+          :label="$t('common.margin')"
           :step="0.1"
           :min="0"
           :max="10"
         />
-      </NFormItem>
-      <div class="setting__form_wrap">
+      </SettingFormInlineRow>
+
+      <NumberField
+        v-model="localConfig.yearProgress.blockRadius"
+        :label="$t('common.borderRadius')"
+        :step="0.1"
+        :min="0"
+        :max="10"
+      />
+
+      <SettingFormInlineRow>
         <ColorField
           v-model="localConfig.yearProgress.blockDefaultColor"
-          :label="`${$t('common.default')}${$t('common.backgroundColor')}`"
+          :label="$t('yearProgress.defaultBgColorLabel')"
         />
         <ColorField
           v-model="localConfig.yearProgress.blockActiveColor"
-          :label="`${$t('common.active')}${$t('common.backgroundColor')}`"
+          :label="$t('yearProgress.activeBgColorLabel')"
         />
-      </div>
-    </template>
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
-    <!-- 尺寸样式 -->
-    <template #size>
-      <SliderField
-        v-model="localConfig.yearProgress.padding"
-        :label="$t('common.padding')"
-        :min="0"
-        :max="100"
-        :step="1"
-      />
+    <!-- 容器外观 -->
+    <SettingFormSection section-key="common.appearance">
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.yearProgress.width"
+          :label="$t('common.width')"
+          :min="1"
+          :max="1000"
+          :step="1"
+        />
 
-      <SliderField
-        v-model="localConfig.yearProgress.width"
-        :label="$t('common.width')"
-        :min="1"
-        :max="1000"
-        :step="1"
-      />
+        <NumberField
+          v-model="localConfig.yearProgress.height"
+          :label="$t('common.height')"
+          :min="1"
+          :max="1000"
+          :step="1"
+        />
+      </SettingFormInlineRow>
 
-      <SliderField
-        v-model="localConfig.yearProgress.height"
-        :label="$t('common.height')"
-        :min="1"
-        :max="1000"
-        :step="1"
-      />
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.yearProgress.padding"
+          :label="$t('common.padding')"
+          :min="0"
+          :max="100"
+          :step="1"
+        />
 
-      <SliderField
-        v-model="localConfig.yearProgress.borderRadius"
-        :label="$t('common.borderRadius')"
-        :min="0"
-        :max="100"
-        :step="1"
-      />
-    </template>
+        <NumberField
+          v-model="localConfig.yearProgress.borderRadius"
+          :label="$t('common.borderRadius')"
+          :min="0"
+          :max="100"
+          :step="1"
+        />
+      </SettingFormInlineRow>
+
+      <SettingFormInlineRow>
+        <ColorField
+          v-model="localConfig.yearProgress.backgroundColor"
+          :label="$t('common.backgroundColor')"
+        />
+
+        <NumberField
+          v-model="localConfig.yearProgress.backgroundBlur"
+          :label="$t('common.blur')"
+          :min="0"
+          :max="50"
+          :step="0.1"
+        />
+      </SettingFormInlineRow>
+
+      <SettingFormInlineRow>
+        <ToggleColorField
+          v-model:enable="localConfig.yearProgress.isBorderEnabled"
+          v-model:color="localConfig.yearProgress.borderColor"
+          v-model:width="localConfig.yearProgress.borderWidth"
+          :label="$t('common.border')"
+        />
+
+        <ToggleColorField
+          v-model:enable="localConfig.yearProgress.isShadowEnabled"
+          v-model:color="localConfig.yearProgress.shadowColor"
+          :label="$t('common.shadow')"
+        />
+      </SettingFormInlineRow>
+    </SettingFormSection>
 
     <!-- 文字排版 -->
-    <template #typography>
+    <SettingFormSection section-key="common.typography">
       <FontField
         v-model:font-family="localConfig.yearProgress.fontFamily"
         v-model:font-color="localConfig.yearProgress.fontColor"
         v-model:font-size="localConfig.yearProgress.fontSize"
         :label="$t('common.font')"
       />
-    </template>
-
-    <!-- 色彩外观 -->
-    <template #appearance>
-      <ColorField
-        v-model="localConfig.yearProgress.backgroundColor"
-        :label="$t('common.backgroundColor')"
-      />
-
-      <SliderField
-        v-model="localConfig.yearProgress.backgroundBlur"
-        :label="$t('common.blur')"
-        :min="0"
-        :max="50"
-        :step="0.1"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.yearProgress.isBorderEnabled"
-        v-model:color="localConfig.yearProgress.borderColor"
-        v-model:width="localConfig.yearProgress.borderWidth"
-        :label="$t('common.border')"
-      />
-
-      <ToggleColorField
-        v-model:enable="localConfig.yearProgress.isShadowEnabled"
-        v-model:color="localConfig.yearProgress.shadowColor"
-        :label="$t('common.shadow')"
-      />
-    </template>
+    </SettingFormSection>
   </SettingFormWrap>
 </template>

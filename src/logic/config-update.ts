@@ -241,6 +241,18 @@ export const handleAppUpdate = () => {
       delete (localConfig.general as any).isFocusMode
     }
   }
+  if (compareLeftVersionLessThanRightVersions(version, '2.3.1')) {
+    // 无修饰键模式：默认关闭
+    if (typeof localConfig.keyboardCommand.noModifierMode !== 'boolean') {
+      localConfig.keyboardCommand.noModifierMode = false
+    }
+    if (typeof localConfig.keyboardBookmark.noModifierMode !== 'boolean') {
+      localConfig.keyboardBookmark.noModifierMode = false
+    }
+    // 移除键盘键帽 / 定位板的 backdrop-filter blur 配置（性能优化，改为纯 CSS 实现）
+    delete (localConfig.keyboardCommon as any).keycapBackgroundBlur
+    delete (localConfig.keyboardCommon as any).plateBackgroundBlur
+  }
 
   // 更新local版本号
   localConfig.general.version = window.appVersion

@@ -88,6 +88,11 @@ const currFolderBookmarks = computed(() => {
   )
 })
 
+const isBookmarkNode = (
+  node: BookmarkNode,
+): node is BookmarkNode & { url: string } =>
+  !Object.prototype.hasOwnProperty.call(node, 'children')
+
 const openBookmark = (url: string) => {
   if (!url) {
     return
@@ -103,12 +108,11 @@ const onClickItem = (item: BookmarkNode) => {
   if (isDragMode.value) {
     return
   }
-  const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
-  if (isFolder) {
+  if (isBookmarkNode(item)) {
+    openBookmark(item.url || '')
+  } else {
     state.selectedFolderTitles.push(item.title)
-    return
   }
-  openBookmark((item as any).url || '')
 }
 
 const onBack = () => {
@@ -221,7 +225,7 @@ watch(
             />
             <img
               v-else-if="localConfig.bookmarkFolder.isIconVisible"
-              :src="getFaviconFromUrl((item as any).url || '')"
+              :src="getFaviconFromUrl(isBookmarkNode(item) ? item.url : '')"
               :draggable="false"
               alt=""
             />
@@ -402,7 +406,6 @@ watch(
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
     letter-spacing: 0.2px;
   }
 
@@ -444,7 +447,6 @@ watch(
     opacity: 0.75;
     text-align: center;
     padding: 0 12px;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
   .folder__permission-btn {
     padding: 6px 16px;
