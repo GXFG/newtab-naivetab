@@ -1,5 +1,5 @@
 import { gaProxy } from '@/logic/gtag'
-import { requestPermission } from '@/logic/storage'
+import { requestPermission } from '@/logic/permission'
 import { createTab, padUrlHttps } from '@/logic/util'
 import { addVisibilityTask, addPageFocusTask } from '@/logic/task'
 import { getBrowserBookmark } from '@/logic/bookmark'

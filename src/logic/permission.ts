@@ -19,6 +19,21 @@ export const requestNotificationsPermission = (): Promise<boolean> => {
   })
 }
 
+/**
+ * 通用 Chrome 可选权限请求
+ */
+export const requestPermission = (field: OptionsPermission) => {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.permissions.request({ permissions: [field] }, (granted) => {
+        resolve(granted)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 export const sendNotification = (options: NotificationOptions): void => {
   const iconUrl = chrome.runtime.getURL(
     options.icon ?? '/assets/img/icon/icon-128x128.png',

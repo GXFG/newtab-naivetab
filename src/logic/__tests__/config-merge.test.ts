@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mergeState } from '@/logic/config-merge'
+import { mergeState } from '@/logic/config/merge'
 
 describe('mergeState', () => {
   describe('Rule 1: acceptState is empty → use default state', () => {

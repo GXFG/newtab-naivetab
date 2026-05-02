@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * config-reset.test.ts — 测试 config-reset.ts 中的 Widget 配置重置逻辑
+ * config-reset.test.ts — 测试 config/reset.ts 中的 Widget 配置重置逻辑
  *
  * 由于模块级别使用 import.meta.glob 动态构建 PRESERVE_FIELDS_MAP，
  * 每次测试需 vi.resetModules() + vi.doMock() 获取全新模块实例。
@@ -42,7 +42,7 @@ vi.mock('@/logic/store', () => {
 })
 
 // Mock config
-vi.mock('@/logic/config', () => {
+vi.mock('@/logic/config/defaults', () => {
   const obj = {
     defaultConfig: {
       clockDigital: {
@@ -88,7 +88,7 @@ vi.mock('@/logic/keyboard/keyboard-config', () => ({
   PRESERVE_FIELDS: ['fontSize', 'fontFamily'],
 }))
 
-import { resetWidgetConfig, hasWidgetConfig, hasPreserveFields } from '@/logic/config-reset'
+import { resetWidgetConfig, hasWidgetConfig, hasPreserveFields } from '@/logic/config/reset'
 
 function getMockConfig() {
   return (globalThis as any).__mockConfigResetStore.localConfig

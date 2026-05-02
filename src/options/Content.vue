@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { useMessage, useNotification, useDialog } from 'naive-ui'
 import { globalState } from '@/logic/store'
-import {
-  setupPageConfigSync,
-  setupLocalStorageSyncListener,
-} from '@/logic/storage'
+import { setupPageConfigSync } from '@/logic/sync/core'
+import { setupLocalStorageSyncListener } from '@/logic/sync/state'
 import SettingPaneContent from '@/setting/SettingPaneContent.vue'
 import ChangelogModal from '@/components/ChangelogModal.vue'
 

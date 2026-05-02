@@ -4,9 +4,10 @@
 
 | 文件 | 职责 |
 |------|------|
-| `src/logic/config.ts` | 默认配置定义、`useStorageLocal` key 生成、Widget 配置自动扫描 |
-| `src/logic/config-merge.ts` | 递归合并函数 `mergeState` |
-| `src/logic/config-update.ts` | 版本迁移 `handleAppUpdate`、配置更新 `updateSetting` |
+| `src/logic/config/defaults.ts` | 默认配置定义、`useStorageLocal` key 生成、Widget 配置自动扫描 |
+| `src/logic/config/merge.ts` | 递归合并函数 `mergeState` |
+| `src/logic/config/update.ts` | 版本迁移 `handleAppUpdate`、配置更新 `updateSetting` |
+| `src/logic/config/migrate.ts` | 声明式字段迁移 `normalizeLegacyConfig`（导入/升级共用） |
 | `src/logic/store.ts` | 三层配置暴露（`localConfig`/`localState`/`globalState`）、`getStyleField` |
 | `src/newtab/widgets/**/config.ts` | 各 Widget 默认配置（通过 glob 自动扫描） |
 | `src/types/global.d.ts` | `ConfigField` 等类型定义 |
@@ -98,7 +99,7 @@ export const globalState = reactive({
 ```
 localConfig.general.appearance ──watch──▶ localState.currAppearanceCode
 localState.currAppearanceCode ──────────▶ getStyleField 颜色读取
-localState.isUploadConfigStatusMap ─────▶ storage.ts 同步决策
+localState.isUploadConfigStatusMap ─────▶ sync/core.ts 同步决策
 globalState.isSettingDrawerVisible ─────▶ 键盘事件屏蔽
 ```
 
@@ -133,9 +134,9 @@ globalState.isSettingDrawerVisible ─────▶ 键盘事件屏蔽
 ### Widget 配置自动扫描
 
 ```ts
-// src/logic/config.ts
+// src/logic/config/defaults.ts
 const widgetsDefaultConfig = (() => {
-  const modules = import.meta.glob('../newtab/widgets/**/config.ts', { eager: true })
+  const modules = import.meta.glob('../../newtab/widgets/**/config.ts', { eager: true })
   const map: Record<string, any> = {}
   for (const key in modules) {
     const m = modules[key]
@@ -217,7 +218,7 @@ export const compareLeftVersionLessThanRightVersions = (left: string, right: str
 ### handleAppUpdate 迁移流程
 
 ```ts
-// src/logic/config-update.ts
+// src/logic/config/update.ts
 export const handleAppUpdate = () => {
   const version = getLocalVersion()
   if (!compareLeftVersionLessThanRightVersions(version, window.appVersion)) {
@@ -310,7 +311,7 @@ if (localKeyboardData) {
 ## mergeState 合并函数
 
 ```ts
-// src/logic/config-merge.ts
+// src/logic/config/merge.ts
 export const mergeState = (state: unknown, acceptState: unknown): unknown
 ```
 

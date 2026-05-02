@@ -1,6 +1,6 @@
 import type { WidgetConfigByCode } from '@/newtab/widgets/registry'
 import { WIDGET_CODE_LIST } from '@/newtab/widgets/codes'
-import pkg from '../../package.json'
+import pkg from '../../../package.json'
 import { KEYBOARD_COMMAND_CONFIG } from '@/logic/globalShortcut/shortcut-command'
 import {
   IMAGE_NETWORK_SOURCE,

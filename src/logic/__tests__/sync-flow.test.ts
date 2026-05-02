@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * sync-flow.test.ts — 测试 storage.ts 中的 loadRemoteConfig 同步分支
+ * sync-flow.test.ts — 测试 sync/core.ts 中的 loadRemoteConfig 同步分支
  *
  * 覆盖 loadRemoteConfig 的 5 种同步场景。
  * 使用 vi.doMock + vi.resetModules 独立控制 mock 环境，
@@ -120,7 +120,7 @@ vi.doMock('@/logic/store', () => ({
   switchSettingDrawerVisible: vi.fn(),
 }))
 
-vi.doMock('@/logic/config', () => ({
+vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: CONFIG_FIELDS,
   defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false },
 }))
@@ -150,13 +150,13 @@ const mockMergeState = (state: unknown, acceptState: unknown): unknown => {
   return filterState
 }
 
-vi.doMock('@/logic/config-merge', () => ({
+vi.doMock('@/logic/config/merge', () => ({
   mergeState: mockMergeState,
 }))
 
 const mockUpdateSetting = vi.fn().mockResolvedValue(true)
 
-vi.doMock('@/logic/config-update', () => ({
+vi.doMock('@/logic/config/update', () => ({
   handleStateResetAndUpdate: vi.fn(),
   updateSetting: mockUpdateSetting,
 }))
@@ -215,7 +215,7 @@ describe('loadRemoteConfig sync branches', () => {
 
     resetMockState()
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/sync/core')
     loadRemoteConfig = mod.loadRemoteConfig
 
     window.appVersion = '2.3.0'

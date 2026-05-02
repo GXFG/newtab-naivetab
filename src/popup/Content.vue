@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMessage } from 'naive-ui'
-import { loadRemoteKeyboardConfig } from '@/logic/storage'
+import { loadRemoteKeyboardConfig } from '@/logic/sync/core'
 import PopupConfigBookmark from '@/popup/PopupConfigBookmark.vue'
 
 window.$message = useMessage()

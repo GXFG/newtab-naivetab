@@ -4,14 +4,14 @@ import { reactive, ref } from 'vue'
 /**
  * config-update.test.ts — 测试配置更新和版本迁移逻辑
  *
- * Mock 策略：在 import config-update 前 mock 所有依赖
+ * Mock 策略：在 import config/update 前 mock 所有依赖
  */
 
-describe('config-update', () => {
-  let handleStateResetAndUpdate: (typeof import('@/logic/config-update'))['handleStateResetAndUpdate']
-  let updateSetting: (typeof import('@/logic/config-update'))['updateSetting']
-  let handleAppUpdate: (typeof import('@/logic/config-update'))['handleAppUpdate']
-  let getLocalVersion: (typeof import('@/logic/config-update'))['getLocalVersion']
+describe('config/update', () => {
+  let handleStateResetAndUpdate: (typeof import('@/logic/config/update'))['handleStateResetAndUpdate']
+  let updateSetting: (typeof import('@/logic/config/update'))['updateSetting']
+  let handleAppUpdate: (typeof import('@/logic/config/update'))['handleAppUpdate']
+  let getLocalVersion: (typeof import('@/logic/config/update'))['getLocalVersion']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -62,7 +62,7 @@ describe('config-update', () => {
     }))
 
     // Mock config with all needed default fields
-    vi.doMock('@/logic/config', () => ({
+    vi.doMock('@/logic/config/defaults', () => ({
       defaultConfig: {
         general: { version: '2.2.5', timeLang: 'en' },
         keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
@@ -110,8 +110,8 @@ describe('config-update', () => {
       defaultFocusVisibleWidgetMap: { keyboardBookmark: true, search: true },
     }))
 
-    // Mock config-merge: simple passthrough (acceptState wins when defined)
-    vi.doMock('@/logic/config-merge', () => ({
+    // Mock config/merge: simple passthrough (acceptState wins when defined)
+    vi.doMock('@/logic/config/merge', () => ({
       mergeState: vi.fn((state: unknown, acceptState: unknown) => {
         if (acceptState === undefined || acceptState === null) return state
         if (
@@ -163,7 +163,7 @@ describe('config-update', () => {
     window.$t = vi.fn((key: string) => key)
     window.$notification = { success: vi.fn() } as any
 
-    const mod = await import('@/logic/config-update')
+    const mod = await import('@/logic/config/update')
     handleStateResetAndUpdate = mod.handleStateResetAndUpdate
     updateSetting = mod.updateSetting
     handleAppUpdate = mod.handleAppUpdate

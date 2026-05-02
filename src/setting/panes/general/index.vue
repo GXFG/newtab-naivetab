@@ -7,10 +7,12 @@ import {
   importSetting,
   refreshSetting,
   resetSetting,
+} from '@/logic/sync/manage'
+import {
   configSizeMap,
   lastSyncTime,
   isUploadConfigLoading,
-} from '@/logic/storage'
+} from '@/logic/sync/state'
 import {
   localConfig,
   globalState,

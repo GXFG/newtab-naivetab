@@ -10,7 +10,7 @@ import {
 } from '@/logic/constants/urls'
 import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP } from '@/logic/constants/app'
 import { FONT_LIST } from '@/logic/constants/fonts'
-import { defaultConfig, defaultLocalState } from '@/logic/config'
+import { defaultConfig, defaultLocalState } from '@/logic/config/defaults'
 import type { WidgetConfigByCode } from '@/newtab/widgets/registry'
 import { createTab } from '@/logic/util'
 import { WIDGET_CODE_LIST } from '@/newtab/widgets/codes'

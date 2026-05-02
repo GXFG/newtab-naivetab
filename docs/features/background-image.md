@@ -9,7 +9,7 @@
 | `src/setting/panes/general/BackgroundDrawer.vue` | 设置抽屉：图片列表展示、虚拟滚动 |
 | `src/setting/panes/general/BackgroundDrawerImageElement.vue` | 图片原子组件：展示、选中、收藏、工具栏 |
 | `src/logic/constants/image.ts` | 来源类型常量 |
-| `src/logic/config.ts` | 背景相关默认配置字段 |
+| `src/logic/config/defaults.ts` | 背景相关默认配置字段 |
 
 ## 三种图片来源
 
@@ -94,7 +94,7 @@
 └─────────────────────────────────┘
 ```
 
-**背景色层级：** `#background` 容器本身透明，背景色由 `body` 的 `--nt-bg-main` CSS 变量提供（用户在 Setting 面板配置），来自 `src/logic/config.ts` 的 `backgroundColor` 字段。关闭背景图时，用户配置色直接可见。
+**背景色层级：** `#background` 容器本身透明，背景色由 `body` 的 `--nt-bg-main` CSS 变量提供（用户在 Setting 面板配置），来自 `src/logic/config/defaults.ts` 的 `backgroundColor` 字段。关闭背景图时，用户配置色直接可见。
 
 ## 加载流程
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * storage.test.ts — 测试 storage.ts 中的 importSetting 数据迁移逻辑
+ * storage.test.ts — 测试 sync/manage.ts 中的 importSetting / exportSetting 数据迁移逻辑
  *
  * 使用全局单例对象模式：mock factory 直接内联定义对象，
  * 通过 exports 暴露给测试代码，测试代码通过修改这些对象重置状态。
@@ -41,7 +41,7 @@ vi.mock('@/logic/store', () => {
   return obj
 })
 
-vi.mock('@/logic/config', () => ({
+vi.mock('@/logic/config/defaults', () => ({
   defaultConfig: {
     general: { version: '2.2.5' },
     keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
@@ -95,11 +95,11 @@ vi.mock('@/logic/compress', () => ({
   }),
 }))
 
-vi.mock('@/logic/config-merge', () => ({
+vi.mock('@/logic/config/merge', () => ({
   mergeState: vi.fn((s: unknown, a: unknown) => a ?? s),
 }))
 
-vi.mock('@/logic/config-update', () => ({
+vi.mock('@/logic/config/update', () => ({
   handleStateResetAndUpdate: vi.fn(),
   handleAppUpdate: vi.fn(),
   updateSetting: vi.fn().mockImplementation(async (acceptState: any) => {
@@ -142,7 +142,7 @@ vi.mock('crypto-js/md5', () => ({
   default: vi.fn((str: string) => ({ toString: () => `md5-${str.length}` })),
 }))
 
-import { importSetting, exportSetting } from '@/logic/storage'
+import { importSetting, exportSetting } from '@/logic/sync/manage'
 import { downloadJsonByTagA } from '@/logic/util'
 
 // Access mock state from globalThis (set by the mock factory)

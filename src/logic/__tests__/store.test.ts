@@ -52,7 +52,7 @@ describe('store (isolated exports)', () => {
       FONT_LIST: ['system', 'Arial', 'Roboto'],
     }))
 
-    vi.doMock('@/logic/config', () => ({
+    vi.doMock('@/logic/config/defaults', () => ({
       defaultConfig: {
         general: {
           version: '2.2.5',

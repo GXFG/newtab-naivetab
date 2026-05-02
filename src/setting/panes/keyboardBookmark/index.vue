@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { requestPermission } from '@/logic/storage'
+import { requestPermission } from '@/logic/permission'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
 import {

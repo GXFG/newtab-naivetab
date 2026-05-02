@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref, computed, nextTick } from 'vue'
-import { flushConfigSync } from '@/logic/storage'
+import { flushConfigSync } from '@/logic/sync/core'
 import {
   KEYBOARD_URL_MAX_LENGTH,
   KEYBOARD_NAME_MAX_LENGTH,
@@ -12,7 +12,7 @@ import {
   colorMixWithAlpha,
 } from '@/logic/store'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
-import { requestPermission } from '@/logic/storage'
+import { requestPermission } from '@/logic/permission'
 import {
   getBookmarkConfigName,
   getBookmarkConfigUrl,

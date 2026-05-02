@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * handle-app-update.test.ts — 测试 config-update.ts 中的 handleAppUpdate
+ * handle-app-update.test.ts — 测试 config/update.ts 中的 handleAppUpdate
  *
  * 覆盖所有版本迁移分支（v1.20.0 → v2.2.2），验证：
  * - 新增字段正确赋默认值
@@ -62,7 +62,7 @@ vi.doMock('@/logic/store', () => ({
   globalState: mockGlobalState,
 }))
 
-vi.doMock('@/logic/config', () => ({
+vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: {
     general: { version: '2.3.0', lang: 'zh-CN', timeLang: 'zh-CN', openPageFocusElement: 'default', focusVisibleWidgetMap: { search: true }, backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'] },
     keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
@@ -80,7 +80,7 @@ vi.doMock('@/logic/config', () => ({
   defaultFocusVisibleWidgetMap: { search: true, keyboardBookmark: true },
 }))
 
-vi.doMock('@/logic/config-merge', () => ({
+vi.doMock('@/logic/config/merge', () => ({
   mergeState: vi.fn((state: unknown, acceptState: unknown) => acceptState ?? state),
 }))
 
@@ -125,7 +125,7 @@ beforeEach(async () => {
   window.$t = vi.fn((key: string) => key)
   window.$notification = { success: vi.fn() } as any
 
-  const mod = await import('@/logic/config-update')
+  const mod = await import('@/logic/config/update')
   handleAppUpdate = mod.handleAppUpdate
   getLocalVersion = mod.getLocalVersion
 })

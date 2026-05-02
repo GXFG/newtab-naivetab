@@ -20,10 +20,8 @@ import {
   setupNewtabGlobalShortcut,
   cleanupNewtabGlobalShortcut,
 } from '@/logic/globalShortcut/shortcut-executor'
-import {
-  setupPageConfigSync,
-  setupLocalStorageSyncListener,
-} from '@/logic/storage'
+import { setupPageConfigSync } from '@/logic/sync/core'
+import { setupLocalStorageSyncListener } from '@/logic/sync/state'
 import { handleFirstOpen } from '@/logic/guide'
 import {
   getStyleField,
@@ -32,7 +30,7 @@ import {
   currTheme,
   themeOverrides,
 } from '@/logic/store'
-import { handleAppUpdate } from '@/logic/config-update'
+import { handleAppUpdate } from '@/logic/config/update'
 import { initBackgroundImage } from '@/logic/image'
 import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'
 import { initKeyboardData } from '@/newtab/widgets/keyboardBookmark/logic'

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * upload-and-recovery.test.ts — 测试 storage.ts 中的上传链路、故障恢复、监听器
+ * upload-and-recovery.test.ts — 测试 sync/ 中的上传链路、故障恢复、监听器
  *
  * 覆盖场景：
  * 1. flushConfigSync: 强制同步（间接测试 uploadConfigFn 的 MD5 去重、压缩、超限、失败处理）
@@ -111,16 +111,16 @@ vi.doMock('@/logic/store', () => ({
   switchSettingDrawerVisible: vi.fn(),
 }))
 
-vi.doMock('@/logic/config', () => ({
+vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: DEFAULT_CONFIG,
   defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false },
 }))
 
-vi.doMock('@/logic/config-merge', () => ({
+vi.doMock('@/logic/config/merge', () => ({
   mergeState: vi.fn((s: unknown, a: unknown) => a ?? s),
 }))
 
-vi.doMock('@/logic/config-update', () => ({
+vi.doMock('@/logic/config/update', () => ({
   handleStateResetAndUpdate: vi.fn(),
   updateSetting: vi.fn().mockResolvedValue(true),
 }))
@@ -190,7 +190,7 @@ describe('flushConfigSync', () => {
 
     setupChromeSync()
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/sync/core')
     flushConfigSync = mod.flushConfigSync
   }
 
@@ -304,7 +304,7 @@ describe('handleMissedUploadConfig', () => {
 
     setupChromeSync()
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/sync/core')
     handleMissedUploadConfig = mod.handleMissedUploadConfig
   }
 
@@ -366,7 +366,7 @@ describe('setupKeyboardSyncListener', () => {
       removeListener: vi.fn(),
     }
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/sync/state')
     setupKeyboardSyncListener = mod.setupKeyboardSyncListener
   }
 
@@ -465,7 +465,7 @@ describe('setupLocalStorageSyncListener', () => {
     })
     window.removeEventListener = vi.fn()
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/sync/state')
     setupLocalStorageSyncListener = mod.setupLocalStorageSyncListener
   }
 

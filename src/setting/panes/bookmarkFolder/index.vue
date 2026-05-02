@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
 import { localConfig } from '@/logic/store'
 import { getBrowserBookmark } from '@/logic/bookmark'
-import { requestPermission } from '@/logic/storage'
+import { requestPermission } from '@/logic/permission'
 import {
   SettingHeaderBar,
   SettingFormWrap,

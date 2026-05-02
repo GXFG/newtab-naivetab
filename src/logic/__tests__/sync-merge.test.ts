@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * sync-merge.test.ts — 测试 storage.ts 中的 mergeConfigWithVersionAwareness
+ * sync-merge.test.ts — 测试 sync/core.ts 中的 mergeConfigWithVersionAwareness
  *
  * 版本感知的配置合并策略：根据版本号决定以哪一方为模板进行 mergeState。
  */
@@ -18,7 +18,7 @@ vi.doMock('@/logic/util', () => ({
   sleep: vi.fn(),
 }))
 
-vi.doMock('@/logic/config-merge', () => ({
+vi.doMock('@/logic/config/merge', () => ({
   mergeState: mockMergeState,
 }))
 
@@ -35,7 +35,7 @@ beforeEach(async () => {
   mockCompareVersion.mockClear()
   mockMergeState.mockClear()
 
-  const mod = await import('@/logic/storage')
+  const mod = await import('@/logic/sync/core')
   mergeConfigWithVersionAwareness = mod.mergeConfigWithVersionAwareness
 })
 

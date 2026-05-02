@@ -1,5 +1,5 @@
 import { localConfig } from '@/logic/store'
-import { defaultConfig } from '@/logic/config'
+import { defaultConfig } from '@/logic/config/defaults'
 import {
   PRESERVE_FIELDS as COMMAND_PRESERVE_FIELDS,
   COMMAND_SHORTCUT_CODE,

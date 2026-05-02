@@ -237,7 +237,7 @@ export const KEYBOARD_COMMAND_CONFIG = {
 }
 ```
 
-然后在 `src/logic/config.ts` 中导入并挂载到 `defaultConfig`：
+然后在 `src/logic/config/defaults.ts` 中导入并挂载到 `defaultConfig`：
 
 ```ts
 export const defaultConfig = {

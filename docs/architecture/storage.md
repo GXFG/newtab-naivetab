@@ -4,12 +4,14 @@
 
 | 文件 | 职责 |
 |------|------|
-| `src/logic/storage.ts` | 云同步核心：防抖写入、版本感知合并、配额管理、导入/导出 |
+| `src/logic/sync/core.ts` | 同步引擎核心：防抖写入、版本感知合并、配额管理、故障恢复 |
+| `src/logic/sync/state.ts` | 同步状态（`isUploadConfigLoading`/`lastSyncTime`）+ 跨上下文监听 |
+| `src/logic/sync/manage.ts` | 用户操作：导入/导出 JSON、全量重置 |
 | `src/logic/compress.ts` | Gzip 压缩/解压纯函数模块 |
 | `src/composables/useStorageLocal.ts` | localStorage 响应式封装 + 800ms 防抖写入 |
-| `src/logic/config-merge.ts` | 递归配置合并函数 `mergeState` |
+| `src/logic/config/merge.ts` | 递归配置合并函数 `mergeState` |
 | `src/types/global.d.ts` | `SyncPayload`、`ConfigField` 类型定义 |
-| `src/logic/config.ts` | `defaultConfig`、`defaultUploadStatusItem` 默认值 |
+| `src/logic/config/defaults.ts` | `defaultConfig`、`defaultUploadStatusItem` 默认值 |
 | `src/logic/store.ts` | `localConfig`、`localState`、`globalState` 状态管理 |
 
 ## 存储架构总览
@@ -148,7 +150,7 @@ Chrome `chrome.storage.sync` 有严格的配额限制：
 export const MERGE_CONFIG_DELAY = 2000   // 基础延迟
 export const MERGE_CONFIG_MAX_DELAY = 5000  // 最大等待
 
-// src/logic/storage.ts
+// src/logic/sync/core.ts
 const genUploadConfigDebounceFn = (field: ConfigField) => {
   return useDebounceFn(
     () => { uploadConfigFn(field) },

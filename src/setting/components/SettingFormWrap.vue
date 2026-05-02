@@ -6,7 +6,7 @@ import {
   resetWidgetConfig,
   hasWidgetConfig,
   hasPreserveFields,
-} from '@/logic/config-reset'
+} from '@/logic/config/reset'
 
 /**
  * SettingFormWrap — 每个 Widget 设置面板的容器组件，职责：

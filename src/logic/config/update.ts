@@ -4,12 +4,12 @@ import {
   defaultConfig,
   defaultLocalState,
   defaultFocusVisibleWidgetMap,
-} from '@/logic/config'
+} from '@/logic/config/defaults'
 import { log, compareLeftVersionLessThanRightVersions } from '@/logic/util'
 import { type WidgetCodes } from '@/newtab/widgets/codes'
 
-import { mergeState } from './config-merge'
-import { localConfig, localState, globalState } from './store'
+import { mergeState } from './merge'
+import { localConfig, localState, globalState } from '../store'
 
 /**
  * 获取本地版本号

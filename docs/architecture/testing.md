@@ -28,6 +28,10 @@ src/logic/__tests__/
 ├── task.test.ts            # 定时任务系统：keydown、timer、visibility、pageFocus
 ├── config-update.test.ts   # 配置更新与版本迁移逻辑
 ├── store.test.ts           # Store 可独立验证的导出
+├── sync-flow.test.ts       # loadRemoteConfig 同步流程分支
+├── sync-merge.test.ts      # 版本感知合并策略
+├── upload-and-recovery.test.ts  # 上传链路、故障恢复、监听器
+├── handle-app-update.test.ts    # handleAppUpdate 所有版本迁移分支
 └── storage.test.ts         # 导入/导出功能、历史数据迁移
 ```
 
@@ -37,10 +41,10 @@ src/logic/__tests__/
 
 | 层级 | 模块 | Mock 程度 | 价值 |
 |------|------|----------|------|
-| **纯函数** | config-merge、util（版本比较） | 零 mock | 最高，核心逻辑正确性 |
+| **纯函数** | config/merge、util（版本比较） | 零 mock | 最高，核心逻辑正确性 |
 | **轻量 mock** | compress、task | 最少 mock（store globalState） | 高，可独立验证 |
-| **Vue 依赖** | config-update、store | mock reactive 对象 | 中高，覆盖版本迁移 |
-| **重度 mock** | storage | mock 整个依赖树 | 中，覆盖导入/导出流程 |
+| **Vue 依赖** | config/update、store | mock reactive 对象 | 中高，覆盖版本迁移 |
+| **重度 mock** | sync/core、sync/manage | mock 整个依赖树 | 中，覆盖同步/导入导出流程 |
 
 ### 测试环境 Polyfill
 

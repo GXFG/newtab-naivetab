@@ -92,7 +92,7 @@ Widget 是 NaiveTab 扩展的核心构建单元，是可拖拽、可配置、可
 应用启动
   │
   ├─ config.ts glob 扫描 → defaultConfig 聚合
-  │    └─ src/logic/config.ts: import.meta.glob('**/config.ts')
+  │    └─ src/logic/config/defaults.ts: import.meta.glob('**/config.ts')
   │
   ├─ registry.ts 扫描 → widgetsList 构建
   │    └─ import.meta.glob('./**/index.ts', { eager: true })
@@ -817,7 +817,7 @@ import { ICONS } from '@/logic/icons'
 | `src/logic/moveable.ts` | 全局拖拽系统，事件派发、居中吸附、删除动画 |
 | `src/logic/task.ts` | 定时任务管理（1000ms 全局 timer） |
 | `src/logic/store.ts` | 状态管理（localConfig、localState、globalState、getStyleField） |
-| `src/logic/config.ts` | 配置聚合（glob 扫描所有 config.ts） |
+| `src/logic/config/defaults.ts` | 配置聚合（glob 扫描所有 config.ts） |
 | `src/setting/registry.ts` | Setting 面板注册表，异步加载 |
 | `src/types/global.d.ts` | 全局类型定义（WidgetCodes 等） |
 | `src/logic/icons.ts` | 图标常量与元数据 |
