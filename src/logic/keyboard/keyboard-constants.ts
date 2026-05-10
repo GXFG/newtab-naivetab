@@ -291,4 +291,7 @@ export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST_FOR_WIDGET = [
   'ControlRight',
 ]
 
+// chrome.storage.local 的 key，用于跨上下文（CS/SW/newtab）共享 source=1 的 keymap
+export const SYSTEM_KEYMAP_STORAGE_KEY = 'naive-tab-systemKeymap'
+
 export const SPACE_KEYCODE_LIST = ['Space', 'SpaceSplit1', 'SpaceSplit2']

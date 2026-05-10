@@ -253,6 +253,11 @@ export const handleAppUpdate = () => {
     delete (localConfig.keyboardCommon as any).keycapBackgroundBlur
     delete (localConfig.keyboardCommon as any).plateBackgroundBlur
   }
+  if (compareLeftVersionLessThanRightVersions(version, '2.3.2')) {
+    localConfig.keyboardBookmark.layers = Array.from({ length: 4 }, (_, i) => ({
+      sourceFolderTitle: i === 0 ? 'NaiveTab' : '',
+    }))
+  }
 
   // 更新local版本号
   localConfig.general.version = window.appVersion

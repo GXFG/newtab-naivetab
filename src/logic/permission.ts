@@ -20,7 +20,7 @@ export const requestNotificationsPermission = (): Promise<boolean> => {
 }
 
 /**
- * 通用 Chrome 可选权限请求
+ * 通用 Chrome 可选权限请求（可能触发用户弹框）
  */
 export const requestPermission = (field: OptionsPermission) => {
   return new Promise((resolve, reject) => {
@@ -31,6 +31,17 @@ export const requestPermission = (field: OptionsPermission) => {
     } catch (e) {
       reject(e)
     }
+  })
+}
+
+/**
+ * 静默检查权限是否已授予（不触发弹框，不需要用户手势）
+ */
+export const checkPermission = (field: OptionsPermission): Promise<boolean> => {
+  return new Promise((resolve) => {
+    chrome.permissions.contains({ permissions: [field] }, (result) => {
+      resolve(result)
+    })
   })
 }
 

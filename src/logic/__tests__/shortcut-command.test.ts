@@ -68,7 +68,7 @@ describe('getCommandExecEnv', () => {
 describe('PRESERVE_FIELDS', () => {
   it('exports the correct preserve fields', async () => {
     const mod = await import('@/logic/globalShortcut/shortcut-command')
-    expect(mod.PRESERVE_FIELDS).toEqual(['isEnabled', 'noModifierMode', 'modifiers', 'keymap'])
+    expect(mod.PRESERVE_FIELDS).toEqual(['isEnabled', 'noModifierMode', 'shortcutInInputElement', 'urlBlacklist', 'modifiers'])
   })
 })
 

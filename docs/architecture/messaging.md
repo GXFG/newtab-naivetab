@@ -52,7 +52,7 @@
 | 组件 | 文件 | 说明 |
 |------|------|------|
 | `main.ts` | `background/main.ts` | Port 连接管理、消息队列、`onMessage` 兜底处理 |
-| `command-registry.ts` | `background/command-registry.ts` | SW 命令注册表（30+ 命令的实现 + 分发），`execSwCommand` 通过 Record 映射分发 |
+| `command-registry.ts` | `background/command-registry.ts` | SW 命令注册表（命令实现 + Record 映射分发），`execSwCommand` 通过 Record 映射分发 |
 | `config-cache.ts` | `background/config-cache.ts` | 配置缓存加载与更新，`onChanged` 自动刷新内存缓存 |
 | `init-guard.ts` | `background/init-guard.ts` | 启动编排：等待双配置加载完成，暴露 `isInitialized` 守卫（10s 超时兜底） |
 | `commands.ts` | `background/commands.ts` | 可复用的组合命令实现（标签切换、批量关闭、标签组操作等） |

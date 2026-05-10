@@ -36,10 +36,20 @@ import {
   type TShortcutModifier,
 } from '@/logic/globalShortcut/shortcut-utils'
 import { parseStoredData } from '@/logic/compress'
+import { SYSTEM_KEYMAP_STORAGE_KEY } from '@/logic/keyboard/keyboard-constants'
 import { padUrlHttps } from '@/logic/util'
-import type { TCommandEntry } from '@/logic/globalShortcut/shortcut-command'
+import {
+  REPEATABLE_SCROLL_COMMANDS,
+  type TCommandEntry,
+} from '@/logic/globalShortcut/shortcut-command'
 import { showToast, t } from './toast'
-import { getScrollContainer, fastSmoothScrollTo } from './scroll'
+import {
+  getValidatedScrollContainer,
+  fastSmoothScrollTo,
+  startContinuousScroll,
+  stopContinuousScroll,
+  fastSmoothScrollToX,
+} from './scroll'
 import {
   MSG_KEYDOWN,
   MSG_INIT_COMPLETE,
@@ -77,6 +87,10 @@ const initMain = () => {
   let shortcutInInputElement = false
   let urlBlacklist: string[] = []
   let bookmarkNoModifierMode = false
+  let source = 2 // 数据源：1=浏览器书签，2=扩展内
+
+  // -- 系统书签 keymap（source=1 时来自 chrome.storage.local）--
+  let systemKeymap: Record<string, TBookmarkEntry> = {}
 
   // -- 命令快捷键运行时状态 --
   let commandKeymap: Record<string, TCommandEntry> = {}
@@ -96,6 +110,7 @@ const initMain = () => {
     keymap?: Record<string, TBookmarkEntry>
     urlBlacklist?: string[]
     noModifierMode?: boolean
+    source?: number
   }) => {
     if (cfg.isEnabled !== undefined) isEnabled = cfg.isEnabled
     if (cfg.globalShortcutModifiers !== undefined)
@@ -106,6 +121,7 @@ const initMain = () => {
     if (cfg.urlBlacklist !== undefined) urlBlacklist = cfg.urlBlacklist
     if (cfg.noModifierMode !== undefined)
       bookmarkNoModifierMode = cfg.noModifierMode
+    if (cfg.source !== undefined) source = cfg.source
     debug('bookmark config updated', {
       isEnabled,
       globalShortcutModifiers,
@@ -164,6 +180,7 @@ const initMain = () => {
           keymap: parsed.data.keymap ?? {},
           urlBlacklist: parsed.data.urlBlacklist ?? [],
           noModifierMode: parsed.data.noModifierMode ?? false,
+          source: parsed.data.source ?? 2,
         })
         debug('bookmark config loaded from storage', {
           isEnabled,
@@ -175,6 +192,24 @@ const initMain = () => {
       }
     } catch (e) {
       debug('read/parse keyboard storage error', e)
+    }
+
+    // 加载系统书签 keymap（source=1，来自 chrome.storage.local）
+    try {
+      const localData = await chrome.storage.local.get(
+        SYSTEM_KEYMAP_STORAGE_KEY,
+      )
+      if (localData[SYSTEM_KEYMAP_STORAGE_KEY]) {
+        systemKeymap = localData[SYSTEM_KEYMAP_STORAGE_KEY] as Record<
+          string,
+          TBookmarkEntry
+        >
+        debug('system keymap loaded from storage.local', {
+          keymapCount: Object.keys(systemKeymap).length,
+        })
+      }
+    } catch (e) {
+      debug('read/parse system keymap error', e)
     }
 
     // 加载命令快捷键配置
@@ -219,70 +254,91 @@ const initMain = () => {
    * gzip 解压极快（~1-3ms），且独立解析是 CS 本地 fallback 的前提。
    */
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName !== 'sync') return
-
-    // 书签快捷键配置变化
-    const keyboardRaw = changes['naive-tab-keyboardBookmark']?.newValue as
-      | string
-      | undefined
-    if (keyboardRaw) {
-      parseStoredData(keyboardRaw)
-        .then((parsed) => {
-          updateConfig({
-            isEnabled: parsed.data.isGlobalShortcutEnabled ?? false,
-            globalShortcutModifiers: parsed.data.globalShortcutModifiers ?? [],
-            shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
-            keymap: parsed.data.keymap ?? {},
-            urlBlacklist: parsed.data.urlBlacklist ?? [],
-            noModifierMode: parsed.data.noModifierMode ?? false,
+    // 处理 sync 区域的配置变化
+    if (areaName === 'sync') {
+      // 书签快捷键配置变化
+      const keyboardRaw = changes['naive-tab-keyboardBookmark']?.newValue as
+        | string
+        | undefined
+      if (keyboardRaw) {
+        parseStoredData(keyboardRaw)
+          .then((parsed) => {
+            updateConfig({
+              isEnabled: parsed.data.isGlobalShortcutEnabled ?? false,
+              globalShortcutModifiers:
+                parsed.data.globalShortcutModifiers ?? [],
+              shortcutInInputElement:
+                parsed.data.shortcutInInputElement ?? false,
+              keymap: parsed.data.keymap ?? {},
+              urlBlacklist: parsed.data.urlBlacklist ?? [],
+              noModifierMode: parsed.data.noModifierMode ?? false,
+              source: parsed.data.source ?? 2,
+            })
           })
+          .catch((e) => {
+            debug('parse keyboard storage error', e)
+          })
+      } else if (changes['naive-tab-keyboardBookmark']) {
+        // 配置被删除，重置为默认状态
+        updateConfig({
+          isEnabled: false,
+          globalShortcutModifiers: [],
+          shortcutInInputElement: false,
+          keymap: {},
+          urlBlacklist: [],
+          noModifierMode: false,
         })
-        .catch((e) => {
-          debug('parse keyboard storage error', e)
+        debug('bookmark config removed, reset to defaults')
+      }
+
+      // 命令快捷键配置变化
+      const commandRaw = changes['naive-tab-keyboardCommand']?.newValue as
+        | string
+        | undefined
+      if (commandRaw) {
+        parseStoredData(commandRaw)
+          .then((parsed) => {
+            updateCommandConfig({
+              isEnabled: parsed.data.isEnabled ?? false,
+              modifiers: parsed.data.modifiers ?? [],
+              shortcutInInputElement:
+                parsed.data.shortcutInInputElement ?? false,
+              keymap: parsed.data.keymap ?? {},
+              urlBlacklist: parsed.data.urlBlacklist ?? [],
+              noModifierMode: parsed.data.noModifierMode ?? false,
+            })
+          })
+          .catch((e) => {
+            debug('parse command storage error', e)
+          })
+      } else if (changes['naive-tab-keyboardCommand']) {
+        // 配置被删除，重置为默认状态
+        updateCommandConfig({
+          isEnabled: false,
+          modifiers: [],
+          shortcutInInputElement: false,
+          keymap: {},
+          urlBlacklist: [],
+          noModifierMode: false,
         })
-    } else if (changes['naive-tab-keyboardBookmark']) {
-      // 配置被删除，重置为默认状态
-      updateConfig({
-        isEnabled: false,
-        globalShortcutModifiers: [],
-        shortcutInInputElement: false,
-        keymap: {},
-        urlBlacklist: [],
-        noModifierMode: false,
-      })
-      debug('bookmark config removed, reset to defaults')
+        debug('command config removed, reset to defaults')
+      }
     }
 
-    // 命令快捷键配置变化
-    const commandRaw = changes['naive-tab-keyboardCommand']?.newValue as
-      | string
-      | undefined
-    if (commandRaw) {
-      parseStoredData(commandRaw)
-        .then((parsed) => {
-          updateCommandConfig({
-            isEnabled: parsed.data.isEnabled ?? false,
-            modifiers: parsed.data.modifiers ?? [],
-            shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
-            keymap: parsed.data.keymap ?? {},
-            urlBlacklist: parsed.data.urlBlacklist ?? [],
-            noModifierMode: parsed.data.noModifierMode ?? false,
-          })
+    // 处理 local 区域的 systemKeymap 变化（source=1）
+    if (areaName === 'local') {
+      const systemKeymapRaw = changes[SYSTEM_KEYMAP_STORAGE_KEY]?.newValue as
+        | Record<string, TBookmarkEntry>
+        | undefined
+      if (systemKeymapRaw) {
+        systemKeymap = systemKeymapRaw
+        debug('system keymap updated from storage.local', {
+          keymapCount: Object.keys(systemKeymap).length,
         })
-        .catch((e) => {
-          debug('parse command storage error', e)
-        })
-    } else if (changes['naive-tab-keyboardCommand']) {
-      // 配置被删除，重置为默认状态
-      updateCommandConfig({
-        isEnabled: false,
-        modifiers: [],
-        shortcutInInputElement: false,
-        keymap: {},
-        urlBlacklist: [],
-        noModifierMode: false,
-      })
-      debug('command config removed, reset to defaults')
+      } else if (changes[SYSTEM_KEYMAP_STORAGE_KEY]) {
+        systemKeymap = {}
+        debug('system keymap removed from storage.local')
+      }
     }
   })
 
@@ -313,19 +369,39 @@ const initMain = () => {
   /**
    * CS 端命令执行器
    * 仅处理 execIn='cs' 的命令，需要 DOM 操作
+   *
+   * 注意：scroll 系列命令不经过此执行器，由 handleKeydown 中的 tryLocalScroll 直接本地执行。
+   * newtab 页面不支持滚动命令（无 CS 注入，shortcut-executor.ts 的 newtabCommandExecutors 中不包含 scroll）。
    */
   const commandExecutors: Record<string, () => void> = {
-    scrollUp: () => {
-      const el = getScrollContainer()
-      fastSmoothScrollTo(el.scrollTop - el.clientHeight)
-    },
-    scrollDown: () => {
-      const el = getScrollContainer()
-      fastSmoothScrollTo(el.scrollTop + el.clientHeight)
-    },
+    scrollUp: () => startContinuousScroll('scrollUp'),
+    scrollDown: () => startContinuousScroll('scrollDown'),
     scrollToTop: () => fastSmoothScrollTo(0),
     scrollToBottom: () => {
-      fastSmoothScrollTo(getScrollContainer().scrollHeight)
+      const el = getValidatedScrollContainer('vertical')
+      fastSmoothScrollTo(el.scrollHeight, el)
+    },
+    scrollPageUp: () => {
+      const el = getValidatedScrollContainer('vertical')
+      const distance =
+        el === document.scrollingElement ? window.innerHeight : el.clientHeight
+      fastSmoothScrollTo(el.scrollTop - distance, el)
+    },
+    scrollPageDown: () => {
+      const el = getValidatedScrollContainer('vertical')
+      const distance =
+        el === document.scrollingElement ? window.innerHeight : el.clientHeight
+      fastSmoothScrollTo(el.scrollTop + distance, el)
+    },
+    scrollLeft: () => startContinuousScroll('scrollLeft'),
+    scrollRight: () => startContinuousScroll('scrollRight'),
+    scrollToLeft: () => {
+      const el = getValidatedScrollContainer('horizontal')
+      fastSmoothScrollToX(0, el)
+    },
+    scrollToRight: () => {
+      const el = getValidatedScrollContainer('horizontal')
+      fastSmoothScrollToX(el.scrollWidth, el)
     },
     reloadPage: () => location.reload(),
     copyPageUrl: () => {
@@ -433,7 +509,42 @@ const initMain = () => {
    * - 两者修饰键相同或同时开启无修饰键模式 → 书签优先（老功能），只发送一条消息
    */
   const handleKeydown = (e: KeyboardEvent) => {
-    if (e.repeat) return
+    /**
+     * 尝试本地执行 scroll 命令。
+     * scroll 是纯 DOM 操作，CS 本地直接执行即可，无需经 SW 中转。
+     * e.repeat 为 true 时跳过 matchShortcut（被其首行拦截），直接从 keymap 读取。
+     * 非 repeat 时通过 commandCode 传入匹配结果。
+     */
+    const tryLocalScroll = (code?: string): boolean => {
+      const cmdCode = code ?? commandCode
+      if (!cmdCode) return false
+      const entry = commandKeymap?.[cmdCode]
+      if (!entry?.command) return false
+      if (
+        !REPEATABLE_SCROLL_COMMANDS.has(
+          entry.command as typeof REPEATABLE_SCROLL_COMMANDS extends Set<
+            infer U
+          >
+            ? U
+            : never,
+        )
+      )
+        return false
+
+      // 首次按下启动循环，repeat 递增加速——均由 startContinuousScroll 内部处理
+      startContinuousScroll(entry.command)
+      e.preventDefault()
+      e.stopPropagation()
+      return true
+    }
+
+    // scroll 命令的 e.repeat 放行：按住 J/K 持续滚动
+    if (e.repeat) {
+      if (!commandIsEnabled || !commandKeymap) return
+      if (tryLocalScroll(e.code)) return
+      // 非 scroll 命令的 repeat 静默忽略
+      return
+    }
 
     // about:blank 页面 hostname 为空字符串 ""，不会命中 urlBlacklist，快捷键正常工作
     const hostname = location.hostname
@@ -457,6 +568,9 @@ const initMain = () => {
       hostname,
       commandNoModifierMode,
     )
+
+    // scroll 命令本地执行，不走 SW
+    if (tryLocalScroll()) return
 
     if (!bookmarkCode && !commandCode) return
 
@@ -533,7 +647,9 @@ const initMain = () => {
           }
           sent = true
           // 同时用本地 keymap 直接处理，零延迟响应用户
-          const entry = keymap[e.code]
+          // source=1 时使用 systemKeymap，source=2 时使用持久化 keymap
+          const activeKeymap = source === 1 ? systemKeymap : keymap
+          const entry = activeKeymap[e.code]
           if (entry?.url) {
             e.preventDefault()
             e.stopPropagation()
@@ -559,6 +675,24 @@ const initMain = () => {
 
   // 使用 capture phase 捕获事件，快捷键优先于页面逻辑响应
   document.addEventListener('keydown', handleKeydown, true)
+
+  // keyup 时停止持续滚动
+  // 不检查 commandIsEnabled：即使命令已禁用，stopContinuousScroll 也是幂等操作，
+  // 且 keydown 时未启动的滚动 stop 也无副作用
+  const handleKeyup = (e: KeyboardEvent) => {
+    const entry = commandKeymap?.[e.code]
+    if (
+      entry &&
+      REPEATABLE_SCROLL_COMMANDS.has(
+        entry.command as typeof REPEATABLE_SCROLL_COMMANDS extends Set<infer U>
+          ? U
+          : never,
+      )
+    ) {
+      stopContinuousScroll()
+    }
+  }
+  document.addEventListener('keyup', handleKeyup, true)
 
   // BFCache 恢复后重建 Port 连接（导航返回时不重新加载 JS，Port 已断开）
   window.addEventListener('pageshow', (event) => {

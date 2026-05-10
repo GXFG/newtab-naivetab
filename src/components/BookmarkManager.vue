@@ -12,6 +12,7 @@ import {
   colorMixWithAlpha,
 } from '@/logic/store'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
+import { useKeycapDrag } from '@/composables/useKeycapDrag'
 import { requestPermission } from '@/logic/permission'
 import {
   getBookmarkConfigName,
@@ -94,8 +95,6 @@ const bookmarkState = reactive({
   keyCode: '',
   isBookmarkModalVisible: false,
   isBookmarkDragEnabled: true,
-  currDragKeyCode: '',
-  targetDragKeyCode: '',
 })
 
 // ── 延迟创建 keymap entry ───────────────────────────────────────────────
@@ -177,43 +176,23 @@ const onDeleteBookmark = () => {
 }
 
 // ── 拖拽交换 ─────────────────────────────────────────────────────────────
-const handleDragStart = (code: string) => {
-  bookmarkState.currDragKeyCode = code
-}
-
-const handleDragOver = (e: Event, targetCode: string) => {
-  e.preventDefault()
-  bookmarkState.targetDragKeyCode = targetCode
-}
-
-const handleDragEnd = () => {
-  if (bookmarkState.currDragKeyCode === bookmarkState.targetDragKeyCode) {
-    bookmarkState.currDragKeyCode = ''
-    bookmarkState.targetDragKeyCode = ''
-    return
-  }
-  if (!localConfig.keyboardBookmark.keymap[bookmarkState.currDragKeyCode]) {
-    bookmarkState.currDragKeyCode = ''
-    bookmarkState.targetDragKeyCode = ''
-    return
-  }
-
-  const targetData =
-    localConfig.keyboardBookmark.keymap[bookmarkState.targetDragKeyCode]
-  localConfig.keyboardBookmark.keymap[bookmarkState.targetDragKeyCode] =
-    localConfig.keyboardBookmark.keymap[bookmarkState.currDragKeyCode]
-
-  if (targetData) {
-    localConfig.keyboardBookmark.keymap[bookmarkState.currDragKeyCode] =
-      targetData
-  } else {
-    delete localConfig.keyboardBookmark.keymap[bookmarkState.currDragKeyCode]
-  }
-
-  bookmarkState.keyCode = bookmarkState.targetDragKeyCode
-  bookmarkState.currDragKeyCode = ''
-  bookmarkState.targetDragKeyCode = ''
-}
+const { isDropTarget, handleDragStart, handleDragOver, handleDragEnd } =
+  useKeycapDrag({
+    canDrag: (code) => !!localConfig.keyboardBookmark.keymap[code],
+    swapData: (source, target) => {
+      const targetData = localConfig.keyboardBookmark.keymap[target]
+      localConfig.keyboardBookmark.keymap[target] =
+        localConfig.keyboardBookmark.keymap[source]
+      if (targetData) {
+        localConfig.keyboardBookmark.keymap[source] = targetData
+      } else {
+        delete localConfig.keyboardBookmark.keymap[source]
+      }
+    },
+    onAfterSwap: (target) => {
+      bookmarkState.keyCode = target
+    },
+  })
 
 // ── 操作 loading ────────────────────────────────────────────────────────
 const isCommitLoading = ref(false)
@@ -270,7 +249,12 @@ const onHandleApplyCurrentTabUrl = () =>
   wrapSync(() => setCurrKeymapUrl(pendingUrl.value))
 const onHandleSelectBookmark = (payload: { title: string; url?: string }) =>
   wrapSync(() => onSelectBookmark(payload))
-const onHandleDragEnd = () => wrapSync(() => handleDragEnd())
+const onHandleDragEnd = async () => {
+  await handleDragEnd()
+  if (props.immediateSync) {
+    await handleCommit()
+  }
+}
 const onHandleDeleteKey = () => wrapSync(() => onDeleteBookmark())
 
 // URL/name 输入：修改本地状态 短 debounce 同步
@@ -318,9 +302,7 @@ const onHandleInputBlur = () => {
           <div
             class="manager__keycap-drag-wrap"
             :class="{
-              'manager__keycap-drag-wrap--drag-target':
-                bookmarkState.targetDragKeyCode === code &&
-                bookmarkState.currDragKeyCode !== code,
+              'manager__keycap-drag-wrap--drag-target': isDropTarget(code),
             }"
             :draggable="bookmarkState.isBookmarkDragEnabled"
             @dragstart="handleDragStart(code)"
@@ -412,7 +394,7 @@ const onHandleInputBlur = () => {
                 v-else
                 quaternary
                 size="small"
-                class="action-btn"
+                class="setting__btn"
                 @click="onHandleApplyCurrentTabUrl"
               >
                 <Icon

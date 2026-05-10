@@ -2,7 +2,6 @@
 import { DRAG_TRIGGER_DISTANCE } from '@/logic/constants/app'
 import { moveState, isDragMode } from '@/logic/moveable'
 import { localConfig, localState } from '@/logic/store'
-import { styleConst } from '@/styles/const'
 
 const props = defineProps({
   widgetCode: {
@@ -11,27 +10,12 @@ const props = defineProps({
   },
 })
 
-// 拖动位置 CSS 变量 + 样式常量统一通过 :style 注入，避免 v-bind() TDZ 错误
+// 拖动位置 CSS 变量通过 :style 注入，避免 v-bind() TDZ 错误
 const widgetStyle = computed(() => ({
   '--nt-x-offset': state.cssVars.xOffset,
   '--nt-y-offset': state.cssVars.yOffset,
   '--nt-x-translate': state.cssVars.xTranslate,
   '--nt-y-translate': state.cssVars.yTranslate,
-  '--nt-auxiliary-line-widget':
-    styleConst.value.auxiliaryLineWidget[localState.value.currAppearanceCode] ||
-    styleConst.value.auxiliaryLineWidget[0],
-  '--nt-bg-moveable-widget-main':
-    styleConst.value.bgMoveableWidgetMain[
-      localState.value.currAppearanceCode
-    ] || styleConst.value.bgMoveableWidgetMain[0],
-  '--nt-bg-moveable-widget-active':
-    styleConst.value.bgMoveableWidgetActive[
-      localState.value.currAppearanceCode
-    ] || styleConst.value.bgMoveableWidgetActive[0],
-  '--nt-moveable-tool-delete-btn-color':
-    styleConst.value.moveableToolDeleteBtnColor[
-      localState.value.currAppearanceCode
-    ] || styleConst.value.moveableToolDeleteBtnColor[0],
 }))
 
 const state = reactive({

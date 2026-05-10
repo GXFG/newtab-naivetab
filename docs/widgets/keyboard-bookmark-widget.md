@@ -22,13 +22,22 @@
   globalShortcutModifiers: ['alt'],           // 全局快捷键修饰键
   urlBlacklist: string[],                     // URL 黑名单
   isNewTabOpen: false,                        // 始终在新标签页打开
-  defaultExpandFolder: null | string,         // 自动展开的书签文件夹标题
+  bindingMode: true,                          // source=1 键位绑定开关（所有层共用）
+  defaultExpandFolder: null | string,         // 自动展开的书签文件夹标题（仅顺序模式）
+  layers: [                                   // source=1 时最多 4 层，每层绑定一个浏览器书签文件夹
+    { sourceFolderTitle: 'NaiveTab' },
+    { sourceFolderTitle: '' },                // 空字符串表示未配置
+    { sourceFolderTitle: '' },
+    { sourceFolderTitle: '' },
+  ],
   keymap: Record<string, TBookmarkEntry>,     // key code → {url, name?}
   layout: { ... }                             // 页面位置（vw/vh）
 }
 ```
 
-**PRESERVE_FIELDS** = `['source', 'globalShortcutModifiers', 'noModifierMode', 'keymap']` — 快速重置时保护用户数据。
+**PRESERVE_FIELDS** = `['source', 'isGlobalShortcutEnabled', 'noModifierMode', 'shortcutInInputElement', 'globalShortcutModifiers', 'urlBlacklist', 'keymap', 'layers', 'bindingMode']` — 快速重置时保护用户数据。
+
+**activeLayer**（当前激活层索引）不存储在 `localConfig` 中（会被云同步），而是以模块级变量 + `chrome.storage.local` 独立 key（`naive-tab-activeLayer`）管理，设备级持久化、不同步。
 
 ---
 
@@ -36,11 +45,30 @@
 
 ### source = 1（系统书签）
 
-- 通过 `chrome.bookmarks` API 读取浏览器书签树
-- 键位按索引映射到书签树节点
+通过 `chrome.bookmarks` API 读取浏览器书签树，由 `parseBookmarkFolder()` 解析器构建 keymap。支持**多层书签**机制：最多 4 层，每层绑定一个独立的浏览器书签文件夹，通过全局命令快捷键（如 `Alt+1/2/3/4`）切换。`bindingMode` 为所有层共用同一个开关。层激活状态（`activeLayer`）设备级持久化（`chrome.storage.local`），不云同步；`layers` 配置跨设备同步（`chrome.storage.sync`）。
+
+进一步分为两种子模式：
+
+#### 顺序模式（`bindingMode = false`，默认）
+
+- 书签按深度优先遍历顺序填充到键盘键位
 - 首键始终为"返回"按钮
 - 支持文件夹导航栈（`selectedFolderTitleStack`）
+- `defaultExpandFolder` 配置初始展开的文件夹
+- 书签名称/文件夹名以 `_` 开头的条目不参与解析
+- keymap 按遍历顺序填充，供全局快捷键使用
+
+#### 键位绑定模式（`bindingMode = true`）
+
+- 仅读取带有 `[X]` 前缀的书签（如 `[Q] Google`、`[F1] 日历`），精确绑定到对应键位
+- 无前缀书签被忽略
+- 不支持文件夹导航
+- 用户可在设置面板或 popup 通过键盘预览点击键位，选择浏览器书签后系统自动为其添加 `[X]` 前缀
+- 也支持直接在表单区编辑 URL/名称，输入时自动同步到 Chrome 书签
+- 解绑时自动移除 `[X]` 前缀
 - 需要 `bookmarks` 可选权限，未授权时弹出授权对话框
+
+书签解析器详见 [bookmark-parser.ts](../../src/logic/keyboard/bookmark-parser.ts)。
 
 ### source = 2（自定义 keymap）
 
@@ -135,3 +163,5 @@ KeyboardBookmark (Widget 入口)
 - `isDragMode` 激活时，keydown handler 提前返回，防止拖拽 Widget 时误触书签打开
 - 全局快捷键 `source=2` 时从 `keymap` 读取 URL 执行，详情见 [global-shortcut.md](../features/global-shortcut.md)
 - 命令快捷键开启无修饰键模式（`noModifierMode`）时，键盘 Widget 的 keydown handler 会被短路，按键由命令快捷键独占处理
+- **多层书签**（source=1）：`layers` 数组固定 4 个元素，每层 `sourceFolderTitle` 指向一个浏览器书签文件夹。所有外部调用统一通过 `getCurrentLayerFolderTitle()` 获取当前激活层的文件夹名称。层切换通过 `switchBookmarkLayer1-4` 全局命令快捷键触发，`activeLayer` 设备级持久化（`chrome.storage.local`），不云同步
+- `findFolderByName` 通过 DFS 按 title 匹配文件夹，若两个层绑定了同名但不同位置的文件夹，可能匹配到非预期结果。这是现有机制的已知限制，留作后续迭代

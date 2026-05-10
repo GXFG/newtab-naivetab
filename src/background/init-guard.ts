@@ -9,6 +9,7 @@
 import {
   loadAndCacheKeyboardBookmarkConfig,
   loadAndCacheKeyboardCommandConfig,
+  loadAndCacheSystemKeymap,
 } from './config-cache'
 
 const INIT_TIMEOUT_MS = 10000
@@ -22,6 +23,7 @@ export const waitInitialized = (): Promise<void> => {
   initPromise = Promise.all([
     loadAndCacheKeyboardBookmarkConfig(),
     loadAndCacheKeyboardCommandConfig(),
+    loadAndCacheSystemKeymap(),
   ])
     .then(() => {
       isInitialized = true

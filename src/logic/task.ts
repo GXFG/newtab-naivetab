@@ -37,17 +37,11 @@ export const startKeydown = () => {
     if (globalState.isGuideMode) {
       return
     }
-    // 在'搜索框'、'输入框'、'设置抽屉'内时忽略按键事件
-    if (
-      globalState.isSettingDrawerVisible ||
-      globalState.isSearchFocused ||
-      globalState.isInputFocused
-    ) {
-      if (e.code === 'Escape') {
-        nextTick(() => {
-          switchSettingDrawerVisible(false)
-        })
-      }
+    // 设置面板打开时，Escape 用于关闭面板
+    if (globalState.isSettingDrawerVisible && e.code === 'Escape') {
+      nextTick(() => {
+        switchSettingDrawerVisible(false)
+      })
       return
     }
 

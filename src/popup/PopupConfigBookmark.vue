@@ -3,8 +3,7 @@ import { onMounted, computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/icons'
 import { gaProxy } from '@/logic/gtag'
-import { customPrimaryColor, localState } from '@/logic/store'
-import { styleConst } from '@/styles/const'
+import { customPrimaryColor } from '@/logic/store'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import BookmarkManager from '@/components/BookmarkManager.vue'
 
@@ -17,9 +16,6 @@ const popupWidth = computed(
 
 const popupStyle = computed(() => ({
   '--nt-popup-width': popupWidth.value,
-  '--nt-popup-keyboard-border':
-    styleConst.value.popupKeyboardBorder[localState.value.currAppearanceCode] ||
-    styleConst.value.popupKeyboardBorder[0],
   '--nt-popup-custom-primary-color': customPrimaryColor.value,
 }))
 

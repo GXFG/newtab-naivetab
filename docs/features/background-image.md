@@ -5,7 +5,7 @@
 | 文件 | 职责 |
 |------|------|
 | `src/logic/image.ts` | 核心逻辑：状态管理、DB 读写、加载/渲染、图库管理、watch 监听 |
-| `src/newtab/content/BackgroundImg.vue` | 渲染组件：双层渲染、视差效果、loading 指示器 |
+| `src/newtab/layers/BackgroundImg.vue` | 渲染组件：双层渲染、视差效果、loading 指示器 |
 | `src/setting/panes/general/BackgroundDrawer.vue` | 设置抽屉：图片列表展示、虚拟滚动 |
 | `src/setting/panes/general/BackgroundDrawerImageElement.vue` | 图片原子组件：展示、选中、收藏、工具栏 |
 | `src/logic/constants/image.ts` | 来源类型常量 |

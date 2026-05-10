@@ -2,7 +2,6 @@ import type { GlobalThemeOverrides } from 'naive-ui'
 import { enUS, zhCN, darkTheme, useOsTheme } from 'naive-ui'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { isEdge, isFirefox } from '@/env'
-import { styleConst } from '@/styles/const'
 import {
   URL_CHROME_STORE,
   URL_EDGE_STORE,
@@ -240,15 +239,6 @@ export const currDayjsLang = computed(
 
 export const getIsWidgetRender = (widgetCode: WidgetCodes) =>
   computed(() => localConfig[widgetCode].enabled)
-
-export const getStyleConst = (field: string) => {
-  return computed(() => {
-    return (
-      styleConst.value[field][localState.value.currAppearanceCode] ||
-      styleConst.value[field][0]
-    )
-  })
-}
 
 /**
  * e.g. getStyleField('date', 'unit.fontSize', 'px', 1.2)

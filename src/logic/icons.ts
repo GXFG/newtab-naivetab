@@ -119,20 +119,32 @@ export const ICONS = {
 }
 
 export const COMMAND_ICONS = {
-  // 标签页导航
+  // 页面滚动
+  scrollUp: 'material-symbols:arrow-upward-alt-rounded',
+  scrollDown: 'material-symbols:arrow-downward-alt-rounded',
+  scrollLeft: 'material-symbols:arrow-left-alt-rounded',
+  scrollRight: 'material-symbols:arrow-right-alt-rounded',
+  scrollPageUp: 'material-symbols:arrow-circle-up-outline',
+  scrollPageDown: 'material-symbols:arrow-circle-down-outline',
+  scrollToTop: 'tabler:arrow-bar-to-up',
+  scrollToBottom: 'tabler:arrow-bar-to-down',
+  scrollToLeft: 'tabler:arrow-bar-to-left',
+  scrollToRight: 'tabler:arrow-bar-to-right',
+  // 标签页
+  moveTabLeft: 'mdi:arrow-left-bold',
+  moveTabRight: 'mdi:arrow-right-bold',
   nextTab: 'mdi:skip-next',
   prevTab: 'mdi:skip-previous',
   firstTab: 'mdi:page-first',
   lastTab: 'mdi:page-last',
-  goBack: 'material-symbols:arrow-back-rounded',
-  goForward: 'material-symbols:arrow-forward-rounded',
-  // 标签页管理
-  moveTabLeft: 'mdi:arrow-left-bold',
-  moveTabRight: 'mdi:arrow-right-bold',
+  goBack: 'material-symbols:keyboard-double-arrow-left',
+  goForward: 'material-symbols:keyboard-double-arrow-right',
+  goHome: 'mdi:home',
+  lastUsedTab: 'material-symbols:swap-horiz',
+  switchToPinnedTab: 'mdi:pin-outline',
   newTab: 'mdi:plus-box-outline',
-  newTabAfter: 'radix-icons:open-in-new-window',
+  newTabAfter: 'mdi:plus-box-multiple-outline',
   closeTab: 'mdi:close',
-  reopenClosedTab: 'mdi:restore',
   toggleTabPinned: 'mdi:pin',
   toggleTabMute: 'mdi:volume-mute',
   duplicateTab: 'mdi:content-duplicate',
@@ -155,19 +167,16 @@ export const COMMAND_ICONS = {
   closeGroupTabs: 'mdi:grid-off',
   // 页面操作
   copyPageUrl: 'mdi:link-variant-plus',
-  copyPageTitle: 'mdi:format-text-variant',
+  copyPageTitle: 'tabler:text-recognition',
+  reopenClosedTab: 'ic:round-restore',
   reloadPage: 'mdi:refresh',
-  reloadAllTabs: 'mdi:reload',
-  reloadAllTabsAllWindows: 'mdi:autorenew',
-  // 页面滚动
-  scrollUp: 'mdi:arrow-up-bold',
-  scrollDown: 'mdi:arrow-down-bold',
-  scrollToTop: 'mdi:format-vertical-align-top',
-  scrollToBottom: 'mdi:format-vertical-align-bottom',
+  reloadAllTabs: 'tdesign:refresh',
+  reloadAllTabsAllWindows: 'uil:refresh',
   // NaiveTab 页面控制
   toggleFocusMode: 'ri:focus-2-line',
   toggleDragMode: 'tabler:drag-drop',
   toggleSettingDrawer: 'ion:settings-outline',
+  switchBookmarkLayer: 'material-symbols:layers-outline',
 }
 
 export type WidgetIconMeta = {

@@ -17,7 +17,6 @@ import {
 } from '@/logic/store'
 import { downloadCurrentWallpaper } from '@/logic/image'
 import { WIDGET_CODE_LIST, getWidgetSettingPane } from '@/newtab/widgets/codes'
-import { styleConst } from '@/styles/const'
 
 const state = reactive({
   isMenuVisible: false,
@@ -25,15 +24,6 @@ const state = reactive({
   posY: 0,
   currTargetCode: '' as EleTargetCode | '',
 })
-
-// ── 主题颜色：通过 CSS 变量注入到菜单容器 ──
-const c = styleConst.value
-const isDark = computed(() => localState.value.currAppearanceLabel === 'dark')
-const themeVar = (key: keyof typeof c) =>
-  computed(() => {
-    const val = c[key]
-    return isDark.value ? val[1] || val[0] : val[0]
-  })
 
 // ── 菜单项数据结构 ──
 interface MenuItem {
@@ -264,19 +254,7 @@ onUnmounted(() => {
         v-if="state.isMenuVisible"
         ref="menuRef"
         class="ctx-menu"
-        :class="{ 'ctx-menu--dark': isDark }"
         :style="{
-          '--nt-cm-bg': themeVar('dropdownBg').value,
-          '--nt-cm-border': themeVar('dropdownBorder').value,
-          '--nt-cm-shadow': themeVar('dropdownShadowColor').value,
-          '--nt-cm-text': themeVar('dropdownText').value,
-          '--nt-cm-icon': themeVar('dropdownIcon').value,
-          '--nt-cm-icon-hover': themeVar('dropdownIconHover').value,
-          '--nt-cm-hover-bg': themeVar('dropdownHoverBg').value,
-          '--nt-cm-divider': themeVar('dropdownDivider').value,
-          '--nt-cm-danger-text': themeVar('dropdownDangerText').value,
-          '--nt-cm-danger-icon': themeVar('dropdownDangerIcon').value,
-          '--nt-cm-danger-hover': themeVar('dropdownDangerHover').value,
           left: state.posX + 'px',
           top: state.posY + 'px',
         }"
@@ -382,8 +360,7 @@ onUnmounted(() => {
 /* ============================================================
    Right-click Context Menu — Liquid Glass Implementation
 
-   颜色通过 CSS 变量（--nt-cm-*）由模板 :style 动态注入，
-   来源：src/styles/const.ts → styleConst，自动跟随 light/dark 切换。
+   颜色通过 CSS 变量（--nt-cm-*）由 tokens.css 全局 token 提供，自动跟随 light/dark 切换。
    静态 token 来自 src/styles/tokens.css。
 
    玻璃光感语言：
@@ -518,7 +495,7 @@ onUnmounted(() => {
 /* ---- 标签文字 ---- */
 .ctx-menu__item-label {
   font-size: var(--text-base);
-  font-weight: 450;
+  font-weight: 400;
   color: var(--nt-cm-text);
   letter-spacing: 0.2px;
   white-space: nowrap;

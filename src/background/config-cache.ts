@@ -14,6 +14,7 @@ import { WIDGET_CONFIG } from '@/newtab/widgets/keyboardBookmark/config'
 import { KEYBOARD_COMMAND_CONFIG } from '@/logic/globalShortcut/shortcut-command'
 import { log } from '@/logic/util'
 import { parseStoredData } from '@/logic/compress'
+import { SYSTEM_KEYMAP_STORAGE_KEY } from '@/logic/keyboard/keyboard-constants'
 
 const CONFIG_LOAD_TIMEOUT_MS = 5000
 
@@ -26,6 +27,10 @@ cachedKeyboardBookmarkConfig.keymap = {}
 
 let bookmarkConfigLoadingPromise: Promise<void> | null = null
 
+// ── 系统书签 keymap 缓存（source=1，来自 chrome.storage.local）─────────────
+
+let cachedSystemKeymap: Record<string, TBookmarkEntry> = {}
+
 // ── KeyboardCommand 配置缓存 ──────────────────────────────────────────────
 
 let cachedKeyboardCommandConfig = JSON.parse(
@@ -37,7 +42,7 @@ let commandConfigLoadingPromise: Promise<void> | null = null
 
 // ── 监听配置变化，自动更新缓存 ─────────────────────────────────────────────
 
-chrome.storage.onChanged.addListener((changes) => {
+chrome.storage.onChanged.addListener((changes, areaName) => {
   const promises: Promise<void>[] = []
 
   if (changes['naive-tab-keyboardBookmark']) {
@@ -77,6 +82,20 @@ chrome.storage.onChanged.addListener((changes) => {
       )
       cachedKeyboardCommandConfig.keymap = {}
       log('KeyboardCommand config removed, reset to defaults')
+    }
+  }
+
+  // source=1 的 keymap 存储在 local 区域
+  if (areaName === 'local' && changes[SYSTEM_KEYMAP_STORAGE_KEY]) {
+    const newKeymap = changes[SYSTEM_KEYMAP_STORAGE_KEY].newValue as
+      | Record<string, TBookmarkEntry>
+      | undefined
+    if (newKeymap) {
+      cachedSystemKeymap = newKeymap
+      log('System keymap updated from storage.local')
+    } else {
+      cachedSystemKeymap = {}
+      log('System keymap removed from storage.local')
     }
   }
 
@@ -126,6 +145,23 @@ export const loadAndCacheKeyboardBookmarkConfig = (): Promise<void> => {
   return bookmarkConfigLoadingPromise
 }
 
+// ── 加载 system keymap（source=1，来自 chrome.storage.local）─────────────
+
+export const loadAndCacheSystemKeymap = async (): Promise<void> => {
+  try {
+    const data = await chrome.storage.local.get(SYSTEM_KEYMAP_STORAGE_KEY)
+    const keymap = data[SYSTEM_KEYMAP_STORAGE_KEY] as
+      | Record<string, TBookmarkEntry>
+      | undefined
+    if (keymap) {
+      cachedSystemKeymap = keymap
+      log('System keymap loaded from storage.local')
+    }
+  } catch (e) {
+    log('Load system keymap error', e)
+  }
+}
+
 // ── 加载并缓存 keyboardCommand 配置 ───────────────────────────────────────
 
 export const loadAndCacheKeyboardCommandConfig = (): Promise<void> => {
@@ -172,3 +208,4 @@ export const loadAndCacheKeyboardCommandConfig = (): Promise<void> => {
 export const getCachedKeyboardBookmarkConfig = () =>
   cachedKeyboardBookmarkConfig
 export const getCachedKeyboardCommandConfig = () => cachedKeyboardCommandConfig
+export const getCachedSystemKeymap = () => cachedSystemKeymap

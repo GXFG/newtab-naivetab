@@ -268,46 +268,7 @@ keyboardCommon 配置（约 30 个字段）：
 
 ## moveable 拖拽系统
 
-`src/logic/moveable.ts`
-
-### 核心状态
-
-```ts
-const isDragMode: Ref<boolean>            // 编辑模式开关
-const isDraftDrawerVisible: Ref<boolean>  // 组件库抽屉开关
-const moveState = reactive({
-  isDragActive: boolean,
-  currDragTarget: Element | null,
-  currDragType: string | null,
-  mouseDownTaskMap: Map<string, Function>,
-  mouseMoveTaskMap: Map<string, Function>,
-  mouseUpTaskMap: Map<string, Function>,
-  isGuidelineVisible: boolean,
-})
-```
-
-### 架构：任务映射鼠标事件系统
-
-1. `WidgetWrap` 挂载时注册 `startDrag`、`onDragging`、`stopDrag` 到对应 Map
-2. 全局 `mousedown`/`mousemove`/`mouseup`/`mouseleave` 监听器根据 `currDragTarget` 分发任务
-3. `mousemove` 使用 `requestAnimationFrame` 节流渲染
-4. Widget 通过 `data-target-type` / `data-target-code` 属性识别
-
-### Widget 定位
-
-- 位置存储在 `localConfig[code].layout`：
-  ```ts
-  {
-    xOffsetKey: 'left' | 'right',
-    xOffsetValue: number,    // vw 单位
-    yOffsetKey: 'top' | 'bottom',
-    yOffsetValue: number,    // vh 单位
-    xTranslateValue: number,  // CSS translate 百分比（居中）
-    yTranslateValue: number,
-  }
-  ```
-- 拖拽时在 `mouseup` 时写入 `localConfig`（非拖拽过程中），避免过多存储写入
-- 拖到右上角（x > width-100, y < 100）触发删除，`animateDeleteWidget` 动画后设置 `enabled = false`
+详见 [moveable.md](../architecture/moveable.md)。
 
 ---
 

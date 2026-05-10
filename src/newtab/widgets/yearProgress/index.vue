@@ -6,7 +6,6 @@ import {
   localConfig,
   getIsWidgetRender,
   getStyleField,
-  getStyleConst,
 } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
@@ -31,7 +30,6 @@ const customBlockSize = getStyleField(WIDGET_CODE, 'blockSize', 'vmin')
 const customBlockRadius = getStyleField(WIDGET_CODE, 'blockRadius', 'vmin')
 const customBlockDefaultColor = getStyleField(WIDGET_CODE, 'blockDefaultColor')
 const customBlockActiveColor = getStyleField(WIDGET_CODE, 'blockActiveColor')
-const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
 
 const ypStyle = computed(() => ({
   '--nt-yp-padding': customPadding.value,
@@ -54,7 +52,6 @@ const ypStyle = computed(() => ({
   '--nt-yp-block-radius': customBlockRadius.value,
   '--nt-yp-block-default-color': customBlockDefaultColor.value,
   '--nt-yp-block-active-color': customBlockActiveColor.value,
-  '--nt-yp-bg-moveable-main': bgMoveableWidgetMain.value,
 }))
 
 const isRender = getIsWidgetRender(WIDGET_CODE)
@@ -297,7 +294,7 @@ onMounted(() => {
   .yearProgress__container--drag {
     background-color: transparent !important;
     &:hover {
-      background-color: var(--nt-yp-bg-moveable-main) !important;
+      background-color: var(--nt-bg-moveable-widget-main) !important;
     }
   }
   .yearProgress__container--border {

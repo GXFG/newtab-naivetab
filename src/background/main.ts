@@ -8,7 +8,7 @@
  * - main.ts：Port 连接管理、消息队列、sendMessage 兜底
  * - config-cache.ts：配置缓存加载与 onChanged 自动更新
  * - init-guard.ts：启动编排，等待双配置加载完成后放行快捷键处理
- * - command-registry.ts：SW 命令注册表（30+ 命令的实现 + 分发）
+ * - command-registry.ts：SW 命令注册表（SW 命令的实现 + Record 映射分发）
  * - commands.ts：40+ tab 操作命令的具体实现
  */
 import {
@@ -18,9 +18,11 @@ import {
 } from '@/logic/globalShortcut/shortcut-command'
 import { log, padUrlHttps } from '@/logic/util'
 import { gaProxy } from '@/logic/gtag'
+import { registerRecentTab } from './commands'
 import {
   getCachedKeyboardBookmarkConfig,
   getCachedKeyboardCommandConfig,
+  getCachedSystemKeymap,
 } from './config-cache'
 import { waitInitialized, getIsInitialized } from './init-guard'
 import {
@@ -52,6 +54,13 @@ const debug = (...args: any[]) => {
 // ── Service Worker 启动时初始化缓存 ────────────────────────────────────────
 // 使用 waitInitialized 确保两个配置都加载完成，后续 onConnect 可据此守卫
 waitInitialized()
+
+// ── 最近标签页追踪 ──────────────────────────────────────────────────────
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  if (activeInfo.tabId) {
+    registerRecentTab(activeInfo.tabId)
+  }
+})
 
 /**
  * 向已打开的标签页重新注入 Content Script。
@@ -171,7 +180,12 @@ const processKeydown = (
 const handleBookmarkShortcutKeydown = (key: string, _tabId: number) => {
   const config = getCachedKeyboardBookmarkConfig()
   if (!config.isGlobalShortcutEnabled) return
-  const entry = config.keymap?.[key]
+
+  // source=1 时使用 chrome.storage.local 中的 systemKeymap
+  // source=2 时使用持久化配置中的 keymap
+  const keymap =
+    config.source === 1 ? getCachedSystemKeymap() : (config.keymap ?? {})
+  const entry = keymap[key]
   if (!entry?.url) return
 
   const url = padUrlHttps(entry.url)

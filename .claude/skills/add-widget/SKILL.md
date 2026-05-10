@@ -7,7 +7,9 @@ description: NaiveTab 浏览器扩展的 Widget 开发指南。当用户要在 n
 
 新增 Widget 需按顺序完成以下步骤。完整模板参考见 [reference.md](reference.md)。
 
-## 必须修改的 7 个文件
+> 完整注册点索引见 [REGISTRY-MAP.md](src/newtab/widgets/REGISTRY-MAP.md)，新增时对照检查。
+
+## 必须修改的 6 个文件
 
 ### Step 1 — `src/newtab/widgets/codes.ts` ⚠️ 类型由 `WIDGET_CODE_LIST` 自动推导
 
@@ -109,15 +111,14 @@ export const WIDGET_ICON_META: Record<WidgetCodes, WidgetIconMeta> = {
 
 **设置面板中引用图标也必须使用 `ICONS.xxx`，新增专属 setting 面板时还需在 `SETTING_ICON_META` 中注册。**
 
-### Step 6 — `src/newtab/widgets/registry.ts`
+### Step 6 — `src/newtab/widgets/registry.ts` ⚠️ 已简化
 
 ```ts
-// 添加 import
-import type { TWidgetConfig as MyWidgetConfig } from './myWidget/config'
-
-// 添加到 WidgetConfigByCode（@@@@ add widget registry 注释下方）
-myWidget: MyWidgetConfig
+// 添加到 WidgetConfigByCode 类型（使用动态 import() 语法，无需单独 import）
+myWidget: import('./myWidget/config').TWidgetConfig
 ```
+
+> 只需追加一行 key-value，**不再需要单独的 import 语句**。
 
 ### Step 7 — i18n：`src/locales/zh-CN.json` 和 `en-US.json`
 
@@ -200,8 +201,9 @@ export const WIDGET_SETTING_PANE_MAP: Partial<Record<WidgetCodes, settingPanes>>
 
 | 文件 | 机制 |
 |------|------|
-| `src/logic/config.ts` | `import.meta.glob('**/config.ts')` 自动扫描 |
+| `src/logic/config/defaults.ts` | `import.meta.glob('**/config.ts')` 自动扫描收集 |
 | `src/logic/store.ts` | 遍历 `WIDGET_CODE_LIST` 动态创建 storage |
-| `src/logic/storage.ts` | 遍历 `defaultConfig` 处理云同步/导入导出 |
+| `src/logic/sync/` | 遍历 `defaultConfig` 处理云同步/导入导出 |
 | `src/newtab/Content.vue` | 遍历 `widgetsList` 动态渲染 |
 | `src/newtab/draft/DraftDrawer.vue` | 遍历 `widgetsList` 展示组件库 |
+| `src/newtab/widgets/registry.ts` | `import.meta.glob` 自动扫描 widget index.ts 元信息 |

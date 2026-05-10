@@ -1,9 +1,11 @@
 /* ============================================================
-   Design Language: Static Tokens
-   统一不随主题变化的设计常量，供全局各组件复用，保障视觉一致性
+   Design Language: CSS Tokens
 
-   - 间距、圆角、过渡、阴影、字号、透明度等静态量
-   - 所有组件都应使用这些变量，不要硬编码魔数
+   统一全局设计常量，供各组件复用，保障视觉一致性。
+
+   - 静态量（间距、圆角、过渡、阴影、字号、透明度等）
+   - 动态颜色（随 light/dark 主题切换的 --nt-* / --nt-cm-* 变量）
+   - 所有组件都应使用这些变量，禁止硬编码魔数或颜色字面量
    ============================================================ */
 :root {
   /* --- Spacing --- */
@@ -96,4 +98,66 @@
 
   /* --- Semantic Colors (Dark Mode) --- */
   --color-error: rgba(208, 48, 80, 0.9);
+}
+
+/* ============================================================
+   Dynamic Color Tokens (Theme-aware)
+
+   所有随 light/dark 主题切换的颜色必须在此处注册。
+   :root 定义浅色值，:root[data-theme='dark'], .dark 覆盖深色值。
+   深色模式复用浅色值的字段不在 dark 块中重复定义，自然继承。
+
+   组件中直接使用 var(--nt-*) 引用，禁止 JS 中转。
+   ============================================================ */
+
+:root {
+  /* ── Moveable (拖拽编辑) ── */
+  --nt-auxiliary-line-main: #40a9ff;
+  --nt-auxiliary-line-bound: #ff7875;
+  --nt-auxiliary-line-widget: #69c0ff;
+  --nt-bg-moveable-widget-main: rgba(100, 181, 246, 0.5);
+  --nt-bg-moveable-widget-active: rgba(100, 181, 246, 0.7);
+  --nt-moveable-tool-delete-btn-color: #ffa39e;
+  --nt-bg-moveable-tool-drawer: rgba(32, 32, 32, 0.55);
+
+  /* ── Popup Keyboard ── */
+  --nt-popup-keyboard-border: rgb(224, 224, 230);
+  --nt-popup-keyboard-hover-bg: rgba(209, 213, 219, 1);
+  --nt-popup-keyboard-active-bg: rgba(209, 213, 219, 0.85);
+
+  /* ── Context Menu ── */
+  --nt-cm-bg: rgba(252, 252, 253, 0.92);
+  --nt-cm-border: rgba(0, 0, 0, 0.08);
+  --nt-cm-shadow: rgba(0, 0, 0, 0.14);
+  --nt-cm-text: rgba(30, 30, 35, 0.9);
+  --nt-cm-icon: rgba(30, 30, 35, 0.4);
+  --nt-cm-icon-hover: rgba(30, 30, 35, 0.85);
+  --nt-cm-hover-bg: rgba(0, 0, 0, 0.055);
+  --nt-cm-hover-border: rgba(0, 0, 0, 0.04);
+  --nt-cm-divider: rgba(0, 0, 0, 0.08);
+  --nt-cm-danger-text: #d93025;
+  --nt-cm-danger-icon: rgba(217, 48, 37, 0.6);
+  --nt-cm-danger-hover: rgba(217, 48, 37, 0.08);
+}
+
+:root[data-theme='dark'],
+.dark {
+  /* ── Popup Keyboard ── */
+  --nt-popup-keyboard-border: rgba(73, 73, 77, 1);
+  --nt-popup-keyboard-hover-bg: rgba(73, 73, 77, 1);
+  --nt-popup-keyboard-active-bg: rgba(73, 73, 77, 0.8);
+
+  /* ── Context Menu ── */
+  --nt-cm-bg: rgba(28, 28, 32, 0.82);
+  --nt-cm-border: rgba(255, 255, 255, 0.12);
+  --nt-cm-shadow: rgba(0, 0, 0, 0.36);
+  --nt-cm-text: rgba(255, 255, 255, 0.88);
+  --nt-cm-icon: rgba(255, 255, 255, 0.5);
+  --nt-cm-icon-hover: rgba(255, 255, 255, 0.9);
+  --nt-cm-hover-bg: rgba(255, 255, 255, 0.1);
+  --nt-cm-hover-border: rgba(255, 255, 255, 0.07);
+  --nt-cm-divider: rgba(255, 255, 255, 0.1);
+  --nt-cm-danger-text: #ff6b6b;
+  --nt-cm-danger-icon: rgba(255, 107, 107, 0.7);
+  --nt-cm-danger-hover: rgba(255, 80, 80, 0.15);
 }

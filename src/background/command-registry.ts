@@ -13,6 +13,7 @@ import { log } from '@/logic/util'
 import {
   switchTab,
   switchToEdgeTab,
+  switchToPinnedTab,
   closeTabsAround,
   closeDuplicateTabs,
   reloadAllTabs,
@@ -25,6 +26,10 @@ import {
   ungroupCurrentTab,
   toggleGroupCollapse,
   closeGroupTabs,
+  lastUsedTab,
+  goBack,
+  goForward,
+  goHome,
 } from './commands'
 import type { TSwCommandName } from '@/logic/globalShortcut/shortcut-command'
 
@@ -97,6 +102,17 @@ const lastTab = (tabId: number) => {
   switchToEdgeTab(tabId, 'last')
 }
 
+const switchToPinnedTab1 = (tabId: number) => switchToPinnedTab(tabId, 0)
+const switchToPinnedTab2 = (tabId: number) => switchToPinnedTab(tabId, 1)
+const switchToPinnedTab3 = (tabId: number) => switchToPinnedTab(tabId, 2)
+const switchToPinnedTab4 = (tabId: number) => switchToPinnedTab(tabId, 3)
+const switchToPinnedTab5 = (tabId: number) => switchToPinnedTab(tabId, 4)
+const switchToPinnedTab6 = (tabId: number) => switchToPinnedTab(tabId, 5)
+const switchToPinnedTab7 = (tabId: number) => switchToPinnedTab(tabId, 6)
+const switchToPinnedTab8 = (tabId: number) => switchToPinnedTab(tabId, 7)
+const switchToPinnedTab9 = (tabId: number) => switchToPinnedTab(tabId, 8)
+const switchToPinnedTabLast = (tabId: number) => switchToPinnedTab(tabId, -1)
+
 const reloadAllTabsCmd = (tabId: number) => {
   reloadAllTabs(tabId)
 }
@@ -118,14 +134,6 @@ const newTabAfter = (tabId: number) => {
         .catch(logLastError)
     })
     .catch(logLastError)
-}
-
-const goBack = (tabId: number) => {
-  chrome.tabs.goBack(tabId).catch(logLastError)
-}
-
-const goForward = (tabId: number) => {
-  chrome.tabs.goForward(tabId).catch(logLastError)
 }
 
 // ─── 窗口操作 ────────────────────────────────────────────────────────────
@@ -208,6 +216,10 @@ const closeGroupTabsCmd = (tabId: number) => {
   closeGroupTabs(tabId)
 }
 
+const lastUsedTabCmd = (tabId: number) => {
+  lastUsedTab(tabId)
+}
+
 // ─── 命令注册表 ──────────────────────────────────────────────────────────
 
 /**
@@ -227,12 +239,23 @@ const COMMAND_HANDLERS: Record<TSwCommandName, CommandHandler> = {
   prevTab,
   firstTab,
   lastTab,
+  switchToPinnedTab1,
+  switchToPinnedTab2,
+  switchToPinnedTab3,
+  switchToPinnedTab4,
+  switchToPinnedTab5,
+  switchToPinnedTab6,
+  switchToPinnedTab7,
+  switchToPinnedTab8,
+  switchToPinnedTab9,
+  switchToPinnedTabLast,
   reloadAllTabs: reloadAllTabsCmd,
   reloadAllTabsAllWindows: reloadAllTabsAllWindowsCmd,
   newTab,
   newTabAfter,
   goBack,
   goForward,
+  goHome,
 
   // 窗口操作
   closeWindow,
@@ -253,6 +276,9 @@ const COMMAND_HANDLERS: Record<TSwCommandName, CommandHandler> = {
   ungroupCurrentTab: ungroupCurrentTabCmd,
   toggleGroupCollapse: toggleGroupCollapseCmd,
   closeGroupTabs: closeGroupTabsCmd,
+
+  // 最近标签页
+  lastUsedTab: lastUsedTabCmd,
 }
 
 /**

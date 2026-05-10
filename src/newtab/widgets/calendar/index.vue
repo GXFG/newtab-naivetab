@@ -4,7 +4,7 @@ import { ICONS } from '@/logic/icons'
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
 import { gaProxy } from '@/logic/gtag'
 import { isDragMode } from '@/logic/moveable'
-import { localConfig, getStyleField, getStyleConst } from '@/logic/store'
+import { localConfig, getStyleField } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -90,8 +90,6 @@ const customDestivalCountdownRestFontSize = getStyleField(
   'vmin',
   0.65,
 )
-const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
-
 const calendarStyle = computed(() => ({
   '--nt-cal-customFontColor': customFontColor.value,
   '--nt-cal-customFontSize': customFontSize.value,
@@ -133,7 +131,6 @@ const calendarStyle = computed(() => ({
   '--nt-cal-customBorderWidth': customBorderWidth.value,
   '--nt-cal-customBorderColor': customBorderColor.value,
   '--nt-cal-customShadowColor': customShadowColor.value,
-  '--nt-cal-bgMoveableWidgetMain': bgMoveableWidgetMain.value,
   '--nt-cal-customDestivalCountdownItemHeight':
     customDestivalCountdownItemHeight.value,
   '--nt-cal-customDestivalCountdownFontSize':
@@ -953,7 +950,7 @@ const onToggleDetailPopover = (date?: string) => {
   .calendar__container--drag {
     background-color: transparent !important;
     &:hover {
-      background-color: var(--nt-cal-bgMoveableWidgetMain) !important;
+      background-color: var(--nt-bg-moveable-widget-main) !important;
     }
   }
 }

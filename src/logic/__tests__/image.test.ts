@@ -3,8 +3,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 /**
  * image.test.ts — 测试 image.ts 中可独立验证的导出函数
  *
- * image.ts 有大量模块级副作用（watchers、DOM 操作、IndexedDB），
- * 因此测试策略是 mock 所有依赖，仅测试纯/近纯函数。
+ * 覆盖率未显著提升原因：
+ * 核心方法 renderRawBackgroundImage 深度耦合浏览器 API：
+ * new Image() → img.decode() → URL.createObjectURL/revokeObjectURL →
+ * requestAnimationFrame 时序控制。这些 API 在 jsdom 中不可用或行为不完整，
+ * mock 成本极高且不稳定。
+ *
+ * initBackgroundImage / storeLocalBackgroundImage 等函数同样依赖 IndexedDB
+ * 和 DOM 元素选择器，无法在纯测试环境中覆盖。
+ *
+ * 策略：mock 所有依赖，仅测试 getImageUrlFromName（URL 构造）和
+ * downloadCurrentWallpaper 的分支路径、模块导出结构。
+ * 如需进一步提升 coverage，需引入 jsdom 的 Image/decode mock 方案。
  */
 
 vi.mock('@/logic/util', () => ({
@@ -128,5 +138,68 @@ describe('downloadCurrentWallpaper', () => {
 
     const utilMod = await import('@/logic/util')
     expect(vi.mocked(utilMod.downloadImageByUrl).mock.calls[0][0]).toContain('cn.bing.com')
+  })
+
+  it('downloads from URL for BING_PHOTO source', async () => {
+    localConfig.general.backgroundImageSource = 2 // BING_PHOTO
+    localConfig.general.backgroundImageHighQuality = true
+
+    await downloadCurrentWallpaper()
+
+    const utilMod = await import('@/logic/util')
+    expect(vi.mocked(utilMod.downloadImageByUrl)).toHaveBeenCalled()
+  })
+
+  it('returns early when name is empty for network source', async () => {
+    localConfig.general.backgroundImageSource = 1
+    localConfig.general.backgroundImageNames = ['', '']
+    localConfig.general.backgroundImageHighQuality = false
+
+    await downloadCurrentWallpaper()
+
+    const utilMod = await import('@/logic/util')
+    expect(vi.mocked(utilMod.downloadImageByUrl)).not.toHaveBeenCalled()
+  })
+})
+
+describe('imageState exports', () => {
+  it('has expected fields', async () => {
+    const mod = await import('@/logic/image')
+    expect(mod.imageState).toHaveProperty('currBackgroundImageFileName')
+    expect(mod.imageState).toHaveProperty('previewImageUrl')
+    expect(mod.imageState).toHaveProperty('fullImageUrl')
+  })
+})
+
+describe('imageLocalState exports', () => {
+  it('has bing and pexels sub-states', async () => {
+    const mod = await import('@/logic/image')
+    expect(mod.imageLocalState.value).toHaveProperty('bing')
+    expect(mod.imageLocalState.value).toHaveProperty('pexels')
+    expect(mod.imageLocalState.value.bing).toHaveProperty('list')
+  })
+})
+
+describe('previewImageListMap', () => {
+  it('returns computed with favorite, bing, pexels keys', async () => {
+    const mod = await import('@/logic/image')
+    const map = mod.previewImageListMap.value
+    expect(map).toHaveProperty('favorite')
+    expect(map).toHaveProperty('bing')
+    expect(map).toHaveProperty('pexels')
+  })
+})
+
+describe('isImageLoading', () => {
+  it('is a ref', async () => {
+    const mod = await import('@/logic/image')
+    expect(mod.isImageLoading).toHaveProperty('value')
+  })
+})
+
+describe('isImageGalleryLoading', () => {
+  it('is a ref', async () => {
+    const mod = await import('@/logic/image')
+    expect(mod.isImageGalleryLoading).toHaveProperty('value')
   })
 })

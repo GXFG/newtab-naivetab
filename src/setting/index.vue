@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
 import { globalState, localConfig } from '@/logic/store'
 import SettingPaneContent from './SettingPaneContent.vue'
 
 // ── drawer 模式：同步侧边栏 nav 高度与内容区一致 ──
 const settingContentHeight = ref(0)
 
-const updateSettingContentHeight = useDebounceFn(
-  (entries: ResizeObserverEntry[]) => {
+/**
+ * 使用 requestAnimationFrame 代替 debounce：
+ * debounce 延迟期间会累积未处理的 ResizeObserver 通知，
+ * 导致 "ResizeObserver loop completed with undelivered notifications" 警告。
+ * rAF 将更新同步到下一帧，确保每帧只执行一次，消除循环累积。
+ */
+let rafId: number | null = null
+const updateSettingContentHeight = (entries: ResizeObserverEntry[]) => {
+  if (rafId !== null) return // 已在队列中，跳过
+  rafId = requestAnimationFrame(() => {
     if (entries.length === 0) return
     settingContentHeight.value = entries[0].contentRect.height
-  },
-  200,
-)
+    rafId = null
+  })
+}
 
 const settingContentObserver = new ResizeObserver(updateSettingContentHeight)
 

@@ -109,7 +109,7 @@ describe('keydown task system', () => {
     task.stopKeydown()
   })
 
-  it('ignores keys when setting drawer is visible (Escape handled separately)', async () => {
+  it('only intercepts Escape when setting drawer is visible, other keys pass through', async () => {
     vi.resetModules()
     const switchMock = vi.fn()
     vi.doMock('@/logic/store', () => ({
@@ -127,14 +127,13 @@ describe('keydown task system', () => {
     task.addKeydownTask('drawer-test' as any, fn)
     task.startKeydown()
 
-    // Regular key is ignored
+    // Regular key still triggers keydown tasks
     const event = new KeyboardEvent('keydown', { code: 'KeyA' })
     document.onkeydown!(event)
-    expect(fn).not.toHaveBeenCalled()
+    expect(fn).toHaveBeenCalledTimes(1)
 
     // Escape triggers switchSettingDrawerVisible(false)
-    const escapeEvent = new KeyboardEvent('keydown', { code: 'Escape' })
-    document.onkeydown!(escapeEvent)
+    document.onkeydown!(new KeyboardEvent('keydown', { code: 'Escape' }))
     // Escape is handled via nextTick, so we wait
     await vi.waitFor(() => {
       expect(switchMock).toHaveBeenCalledWith(false)

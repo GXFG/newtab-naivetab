@@ -14,6 +14,7 @@ import {
   type TCommandName,
 } from '@/logic/globalShortcut/shortcut-command'
 import { ICONS } from '@/logic/icons'
+import { activeKeymap } from '@/newtab/widgets/keyboardBookmark/logic'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
 import KeyboardKeycapDisplay from '@/components/KeyboardKeycapDisplay.vue'
@@ -144,7 +145,7 @@ const noModifierConflictWarning = computed(() => {
   ) {
     return ''
   }
-  const bookmarkKeymap = localConfig.keyboardBookmark.keymap || {}
+  const bookmarkKeymap = activeKeymap.value
   if (bookmarkKeymap[selectedKeyCode.value]?.url) {
     return window
       .$t('keyboardCommand.noModifierConflict')

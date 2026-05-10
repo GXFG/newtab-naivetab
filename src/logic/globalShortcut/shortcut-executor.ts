@@ -30,6 +30,7 @@ import {
 import { toggleIsDragMode } from '@/logic/moveable'
 import { getCommandExecEnv } from '@/logic/globalShortcut/shortcut-command'
 import { MSG_KEYDOWN, MSG_EXECUTE_COMMAND } from '@/types/messages'
+import { switchLayer } from '@/newtab/widgets/keyboardBookmark/logic'
 
 /**
  * NaiveTab 本地控制命令执行器（execEnv: 'newtab'）
@@ -51,12 +52,24 @@ const newtabControlExecutors: Record<string, () => void> = {
   toggleSettingDrawer: () => {
     switchSettingDrawerVisible(!globalState.isSettingDrawerVisible)
   },
+  switchBookmarkLayer1: () => {
+    switchLayer(0)
+  },
+  switchBookmarkLayer2: () => {
+    switchLayer(1)
+  },
+  switchBookmarkLayer3: () => {
+    switchLayer(2)
+  },
+  switchBookmarkLayer4: () => {
+    switchLayer(3)
+  },
 }
 
 /**
  * newtab 端 CS 命令执行器
- * scrollUp / scrollDown / scrollToTop / scrollToBottom 未在此实现，
- * 因为 newtab 页面无滚动内容，被 setupPortCommandListener 静默忽略。
+ * scroll 系列命令未在此实现，因为 newtab 页面无滚动内容。
+ * 新增 scroll 命令在此静默忽略。
  */
 const newtabCommandExecutors: Record<string, () => void> = {
   reloadPage: () => location.reload(),
@@ -78,6 +91,12 @@ const newtabCommandExecutors: Record<string, () => void> = {
       })
       .catch(() => {})
   },
+  scrollPageUp: () => {},
+  scrollPageDown: () => {},
+  scrollLeft: () => {},
+  scrollRight: () => {},
+  scrollToLeft: () => {},
+  scrollToRight: () => {},
 }
 
 /**

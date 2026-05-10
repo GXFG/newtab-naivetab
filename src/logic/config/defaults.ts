@@ -72,7 +72,10 @@ const generalConfig = {
       networkSourceType: IMAGE_NETWORK_SOURCE.BING,
       name: 'Balsamroot_ZH-CN9456182640',
     },
-    { networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS, name: '19161535' },
+    {
+      networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS,
+      name: '19161535',
+    },
   ] as {
     networkSourceType: (typeof IMAGE_NETWORK_SOURCE)[keyof typeof IMAGE_NETWORK_SOURCE]
     name: string
@@ -103,7 +106,7 @@ const generalConfig = {
 }
 
 const widgetsDefaultConfig = (() => {
-  const modules = import.meta.glob('../newtab/widgets/**/config.ts', {
+  const modules = import.meta.glob('../../newtab/widgets/**/config.ts', {
     eager: true,
   }) as Record<string, any>
   const map: Record<string, any> = {}

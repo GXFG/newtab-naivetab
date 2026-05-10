@@ -52,8 +52,10 @@ export const COMMAND_CATEGORIES = [
       { command: 'nextTab', iconName: COMMAND_ICONS.nextTab },
       { command: 'firstTab', iconName: COMMAND_ICONS.firstTab },
       { command: 'lastTab', iconName: COMMAND_ICONS.lastTab },
+      { command: 'lastUsedTab', iconName: COMMAND_ICONS.lastUsedTab },
       { command: 'goBack', iconName: COMMAND_ICONS.goBack },
       { command: 'goForward', iconName: COMMAND_ICONS.goForward },
+      { command: 'goHome', iconName: COMMAND_ICONS.goHome },
     ],
   },
   {
@@ -68,19 +70,6 @@ export const COMMAND_CATEGORIES = [
       { command: 'toggleTabPinned', iconName: COMMAND_ICONS.toggleTabPinned },
       { command: 'toggleTabMute', iconName: COMMAND_ICONS.toggleTabMute },
       { command: 'duplicateTab', iconName: COMMAND_ICONS.duplicateTab },
-    ],
-  },
-  {
-    categoryKey: 'commandCategory.windowAction',
-    commands: [
-      { command: 'newWindow', iconName: COMMAND_ICONS.newWindow },
-      { command: 'newIncognito', iconName: COMMAND_ICONS.newIncognito },
-      {
-        command: 'moveTabToNextWindow',
-        iconName: COMMAND_ICONS.moveTabToNextWindow,
-      },
-      { command: 'moveToNewWindow', iconName: COMMAND_ICONS.moveToNewWindow },
-      { command: 'closeWindow', iconName: COMMAND_ICONS.closeWindow },
     ],
   },
   {
@@ -137,6 +126,19 @@ export const COMMAND_CATEGORIES = [
     ],
   },
   {
+    categoryKey: 'commandCategory.windowAction',
+    commands: [
+      { command: 'newWindow', iconName: COMMAND_ICONS.newWindow },
+      { command: 'newIncognito', iconName: COMMAND_ICONS.newIncognito },
+      {
+        command: 'moveTabToNextWindow',
+        iconName: COMMAND_ICONS.moveTabToNextWindow,
+      },
+      { command: 'moveToNewWindow', iconName: COMMAND_ICONS.moveToNewWindow },
+      { command: 'closeWindow', iconName: COMMAND_ICONS.closeWindow },
+    ],
+  },
+  {
     categoryKey: 'commandCategory.pageScroll',
     commands: [
       {
@@ -159,6 +161,81 @@ export const COMMAND_CATEGORIES = [
         execEnv: 'cs' as const,
         iconName: COMMAND_ICONS.scrollToBottom,
       },
+      {
+        command: 'scrollPageUp',
+        execEnv: 'cs' as const,
+        iconName: COMMAND_ICONS.scrollPageUp,
+      },
+      {
+        command: 'scrollPageDown',
+        execEnv: 'cs' as const,
+        iconName: COMMAND_ICONS.scrollPageDown,
+      },
+      {
+        command: 'scrollLeft',
+        execEnv: 'cs' as const,
+        iconName: COMMAND_ICONS.scrollLeft,
+      },
+      {
+        command: 'scrollRight',
+        execEnv: 'cs' as const,
+        iconName: COMMAND_ICONS.scrollRight,
+      },
+      {
+        command: 'scrollToLeft',
+        execEnv: 'cs' as const,
+        iconName: COMMAND_ICONS.scrollToLeft,
+      },
+      {
+        command: 'scrollToRight',
+        execEnv: 'cs' as const,
+        iconName: COMMAND_ICONS.scrollToRight,
+      },
+    ],
+  },
+  {
+    categoryKey: 'commandCategory.switchToPinnedTab',
+    commands: [
+      {
+        command: 'switchToPinnedTab1',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab2',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab3',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab4',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab5',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab6',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab7',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab8',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTab9',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
+      {
+        command: 'switchToPinnedTabLast',
+        iconName: COMMAND_ICONS.switchToPinnedTab,
+      },
     ],
   },
   {
@@ -178,6 +255,26 @@ export const COMMAND_CATEGORIES = [
         command: 'toggleSettingDrawer',
         execEnv: 'newtab' as const,
         iconName: COMMAND_ICONS.toggleSettingDrawer,
+      },
+      {
+        command: 'switchBookmarkLayer1',
+        execEnv: 'newtab' as const,
+        iconName: COMMAND_ICONS.switchBookmarkLayer,
+      },
+      {
+        command: 'switchBookmarkLayer2',
+        execEnv: 'newtab' as const,
+        iconName: COMMAND_ICONS.switchBookmarkLayer,
+      },
+      {
+        command: 'switchBookmarkLayer3',
+        execEnv: 'newtab' as const,
+        iconName: COMMAND_ICONS.switchBookmarkLayer,
+      },
+      {
+        command: 'switchBookmarkLayer4',
+        execEnv: 'newtab' as const,
+        iconName: COMMAND_ICONS.switchBookmarkLayer,
       },
     ],
   },
@@ -202,6 +299,12 @@ type TCsCommandName =
   | 'reloadPage'
   | 'copyPageUrl'
   | 'copyPageTitle'
+  | 'scrollPageUp'
+  | 'scrollPageDown'
+  | 'scrollLeft'
+  | 'scrollRight'
+  | 'scrollToLeft'
+  | 'scrollToRight'
 
 /**
  * NaiveTab 页面本地命令（与 COMMAND_CATEGORIES 中 execEnv: 'newtab' 的条目一致）
@@ -211,6 +314,10 @@ export type TNewtabCommandName =
   | 'toggleFocusMode'
   | 'toggleDragMode'
   | 'toggleSettingDrawer'
+  | 'switchBookmarkLayer1'
+  | 'switchBookmarkLayer2'
+  | 'switchBookmarkLayer3'
+  | 'switchBookmarkLayer4'
 
 /**
  * SW 命令名称（TCommandName 排除 CS 命令和 newtab 命令）
@@ -265,10 +372,10 @@ const ALL_COMMANDS = COMMAND_CATEGORIES.flatMap((c) =>
  *
  * | 命令            | CS 端实现 | NewTab 端实现 | 差异原因 |
  * |-----------------|-----------|---------------|----------|
- * | scrollUp        | ✅ 滚动容器 | ❌ 忽略       | NewTab 页面无可滚动内容 |
- * | scrollDown      | ✅ 滚动容器 | ❌ 忽略       | 同上 |
- * | scrollToTop     | ✅ 滚动容器 | ❌ 忽略       | 同上 |
- * | scrollToBottom  | ✅ 滚动容器 | ❌ 忽略       | 同上 |
+ * | scrollUp        | ✅ rAF 循环（按住加速/松开减速） | ❌ 忽略 | NewTab 页面无可滚动内容 |
+ * | scrollDown      | ✅ rAF 循环（按住加速/松开减速） | ❌ 忽略 | 同上 |
+ * | scrollToTop     | ✅ 200ms ease-out 动画 | ❌ 忽略 | 同上 |
+ * | scrollToBottom  | ✅ 200ms ease-out 动画 | ❌ 忽略 | 同上 |
  * | reloadPage      | ✅ location.reload() | ✅ location.reload() | 实现一致 |
  * | copyPageUrl     | ✅ clipboard API + fallback textarea | ✅ clipboard API + $message | CS 端需 fallback 兼容旧环境 |
  * | copyPageTitle   | ✅ clipboard API + fallback textarea | ✅ clipboard API + $message | 同上 |
@@ -309,8 +416,9 @@ export const COMMAND_SHORTCUT_CODE = 'keyboardCommand'
 export const PRESERVE_FIELDS = [
   'isEnabled',
   'noModifierMode',
+  'shortcutInInputElement',
+  'urlBlacklist',
   'modifiers',
-  'keymap',
 ]
 
 export const KEYBOARD_COMMAND_CONFIG = {
@@ -320,45 +428,71 @@ export const KEYBOARD_COMMAND_CONFIG = {
   urlBlacklist: [] as string[],
   modifiers: ['shift', 'alt'] as TShortcutModifier[],
   keymap: {
-    // 标签页位置
-    Digit1: { command: 'firstTab' },
-    Digit2: { command: 'lastTab' },
     KeyQ: { command: 'moveTabLeft' },
     KeyE: { command: 'moveTabRight' },
     KeyA: { command: 'prevTab' },
     KeyD: { command: 'nextTab' },
     KeyF: { command: 'moveTabToNextWindow' },
     KeyG: { command: 'moveToNewWindow' },
-    KeyH: { command: 'mergeAllWindows' },
+    KeyH: { command: 'goHome' },
+    // 页面控制
+    KeyO: { command: 'reloadAllTabsAllWindows' },
+    KeyR: { command: 'reloadPage' },
     KeyT: { command: 'newTabAfter' },
+    KeyY: { command: 'reopenClosedTab' },
+    KeyU: { command: 'copyPageUrl' },
     // 页面滚动
     KeyW: { command: 'scrollToTop' },
     KeyS: { command: 'scrollToBottom' },
+    KeyI: { command: 'scrollUp' },
+    KeyK: { command: 'scrollDown' },
+    KeyJ: { command: 'scrollLeft' },
+    KeyL: { command: 'scrollRight' },
+    Comma: { command: 'scrollPageUp' },
+    Period: { command: 'scrollPageDown' },
     // 标签页管理
-    KeyR: { command: 'reloadAllTabsAllWindows' },
-    KeyZ: { command: 'toggleTabPinned' },
+    Backquote: { command: 'lastUsedTab' },
+    KeyZ: { command: 'lastUsedTab' },
     KeyX: { command: 'closeTab' },
     KeyC: { command: 'duplicateTab' },
+    KeyV: { command: 'toggleTabPinned' },
     // 标签组
-    KeyV: { command: 'toggleGroupCollapse' },
-    KeyB: { command: 'groupCurrentTab' },
-    KeyN: { command: 'ungroupCurrentTab' },
-    KeyM: { command: 'closeGroupTabs' },
-    // 批量关闭
-    KeyJ: { command: 'closeLeftTabs' },
-    KeyL: { command: 'closeRightTabs' },
-    KeyK: { command: 'closeOtherTabs' },
-    KeyP: { command: 'closeDuplicateTabs' },
-    // 导航
+    KeyB: { command: 'toggleGroupCollapse' },
+    KeyN: { command: 'groupCurrentTab' },
+    KeyM: { command: 'ungroupCurrentTab' },
+    // 其他
+    Backslash: { command: 'mergeAllWindows' },
     ArrowLeft: { command: 'goBack' },
     ArrowRight: { command: 'goForward' },
-    // 页面控制
-    KeyU: { command: 'copyPageUrl' },
-    KeyI: { command: 'copyPageTitle' },
+    Slash: { command: 'toggleFocusMode' },
+    // 标签页
+    Digit1: { command: 'switchToPinnedTab1' },
+    Digit2: { command: 'switchToPinnedTab2' },
+    Digit3: { command: 'switchToPinnedTab3' },
+    Digit4: { command: 'switchToPinnedTab4' },
+    Digit5: { command: 'switchToPinnedTab5' },
+    Digit6: { command: 'switchToPinnedTab6' },
+    Digit7: { command: 'switchToPinnedTab7' },
+    Digit8: { command: 'switchToPinnedTab8' },
+    Digit9: { command: 'switchToPinnedTab9' },
+    Digit0: { command: 'switchToPinnedTabLast' },
+    Minus: { command: 'firstTab' },
+    Equal: { command: 'lastTab' },
   } as Record<string, TCommandEntry>,
 }
 
 export type TCommandShortcutConfig = typeof KEYBOARD_COMMAND_CONFIG
+
+/**
+ * 支持按键重复（按住持续触发）的命令。
+ * 用于 Content Script 中区分哪些命令需要放行 e.repeat 事件。
+ */
+export const REPEATABLE_SCROLL_COMMANDS = new Set([
+  'scrollUp',
+  'scrollDown',
+  'scrollLeft',
+  'scrollRight',
+] as const)
 
 /**
  * 运行时断言：所有在 keymap 中使用的命令必须在 COMMAND_CATEGORIES 中声明

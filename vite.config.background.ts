@@ -11,7 +11,9 @@ export default defineConfig({
     __NAME__: JSON.stringify(packageJson.name),
     // https://github.com/vitejs/vite/issues/9320
     // https://github.com/vitejs/vite/issues/9186
-    'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
+    'process.env.NODE_ENV': JSON.stringify(
+      isDev ? 'development' : 'production',
+    ),
   },
   build: {
     watch: isDev ? {} : undefined,
@@ -19,6 +21,7 @@ export default defineConfig({
     cssCodeSplit: false,
     emptyOutDir: false,
     sourcemap: isDev ? 'inline' : false,
+    minify: process.env.NO_MINIFY ? false : 'esbuild',
     lib: {
       entry: r('src/background/main.ts'),
       name: packageJson.name,

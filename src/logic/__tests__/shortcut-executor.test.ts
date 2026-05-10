@@ -64,6 +64,17 @@ function setupMocks(options?: {
   vi.doMock('@/logic/task', () => ({
     addKeydownTask: mockAddKeydownTask,
     removeKeydownTask: mockRemoveKeydownTask,
+    addPageFocusTask: vi.fn(),
+    removePageFocusTask: vi.fn(),
+    addVisibilityTask: vi.fn(),
+    removeVisibilityTask: vi.fn(),
+    addTimerTask: vi.fn(),
+    removeTimerTask: vi.fn(),
+    startKeydown: vi.fn(),
+    stopKeydown: vi.fn(),
+    startTimer: vi.fn(),
+    stopTimer: vi.fn(),
+    onPageFocus: vi.fn(),
   }))
 
   mockMatchShortcut = vi.fn()

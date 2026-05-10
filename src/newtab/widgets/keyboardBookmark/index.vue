@@ -15,19 +15,13 @@ import {
   getKeycapUrl,
   handlePressKeycap,
 } from '@/newtab/widgets/keyboardBookmark/logic'
-import { getStyleConst, getIsWidgetRender } from '@/logic/store'
+import { getIsWidgetRender } from '@/logic/store'
 import WidgetWrap from '../WidgetWrap.vue'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
 import KeyboardKeycapWidget from './KeyboardKeycapWidget.vue'
 import { WIDGET_CODE } from './config'
 
-const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
-
 const isRender = getIsWidgetRender(WIDGET_CODE)
-
-const keyboardStyle = computed(() => ({
-  '--nt-k-bg-moveable-widget-main': bgMoveableWidgetMain.value,
-}))
 
 // keyboard listener
 const keyboardTask = (e: KeyboardEvent) => {
@@ -87,7 +81,6 @@ const containerClass = computed(() => ({
       unit="vmin"
       :keys="currKeyboardConfig.keys"
       :extra-class="containerClass"
-      :style="keyboardStyle"
       class="keyboardBookmark__container"
     >
       <template #keycap="{ code }">
@@ -114,7 +107,7 @@ const containerClass = computed(() => ({
   .keyboardBookmark__container--drag {
     background-color: transparent !important;
     &:hover {
-      background-color: var(--nt-k-bg-moveable-widget-main) !important;
+      background-color: var(--nt-bg-moveable-widget-main) !important;
     }
   }
 }

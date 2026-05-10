@@ -4,9 +4,14 @@ import type { TShortcutModifier } from '@/logic/globalShortcut/shortcut-utils'
 
 export const PRESERVE_FIELDS = [
   'source',
-  'globalShortcutModifiers',
+  'isGlobalShortcutEnabled',
   'noModifierMode',
+  'shortcutInInputElement',
+  'globalShortcutModifiers',
+  'urlBlacklist',
+  'bindingMode',
   'keymap',
+  'layers',
 ]
 
 export const WIDGET_CONFIG = {
@@ -17,8 +22,15 @@ export const WIDGET_CONFIG = {
   shortcutInInputElement: true,
   globalShortcutModifiers: ['alt'] as TShortcutModifier[],
   urlBlacklist: [] as string[],
-  isNewTabOpen: false,
   defaultExpandFolder: null as null | string,
+  bindingMode: true,
+  isNewTabOpen: false,
+  layers: [
+    { sourceFolderTitle: 'NaiveTab' },
+    { sourceFolderTitle: '' },
+    { sourceFolderTitle: '' },
+    { sourceFolderTitle: '' },
+  ] as Array<{ sourceFolderTitle: string }>,
   keymap: {
     Digit1: {
       url: 'www.baidu.com',

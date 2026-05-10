@@ -13,15 +13,53 @@ const logLastError = (e: Error) => {
   log('Chrome API error:', e)
 }
 
+/**
+ * 最近使用的标签页历史（维护最多 2 个 tabId）。
+ * 供 lastUsedTab 命令和 chrome.tabs.onActivated 监听器使用。
+ */
+let recentTabHistory: number[] = []
+
+/**
+ * 记录标签页激活事件，维护最近两个 tabId。
+ * 应在 main.ts 的 chrome.tabs.onActivated 监听器中调用。
+ */
+export const registerRecentTab = (tabId: number) => {
+  recentTabHistory = recentTabHistory.filter((id) => id !== tabId)
+  recentTabHistory.unshift(tabId)
+  if (recentTabHistory.length > 2) recentTabHistory.pop()
+}
+
+/**
+ * 在最近使用的两个标签页间切换（类似 Alt+Tab）。
+ */
+export const lastUsedTab = async (currentTabId: number) => {
+  registerRecentTab(currentTabId)
+  const targetId = recentTabHistory[1]
+  if (!targetId || targetId === currentTabId) return
+  chrome.tabs.update(targetId, { active: true }).catch(logLastError)
+}
+
+// ── 页面导航 ──────────────────────────────────────────────────────────────
+
+export const goBack = async (tabId: number) => {
+  chrome.tabs.goBack(tabId).catch(logLastError)
+}
+
+export const goForward = async (tabId: number) => {
+  chrome.tabs.goForward(tabId).catch(logLastError)
+}
+
+export const goHome = async (_tabId: number) => {
+  chrome.tabs.update({ url: 'chrome://newtab' }).catch(logLastError)
+}
+
 // ── 标签页切换 ──────────────────────────────────────────────────────────────
 
 export const switchTab = async (currentTabId: number, offset: 1 | -1) => {
   const tab = await chrome.tabs.get(currentTabId).catch(logLastError)
   if (!tab?.windowId) return
 
-  const tabs = await chrome.tabs
-    .query({ windowId: tab.windowId })
-    .then((ts) => ts.filter((t) => !t.pinned))
+  const tabs = await chrome.tabs.query({ windowId: tab.windowId })
   if (tabs.length <= 1) return
 
   const currentIndex = tabs.findIndex((t) => t.id === currentTabId)
@@ -47,6 +85,31 @@ export const switchToEdgeTab = async (
 
   const target = edge === 'first' ? tabs[0] : tabs[tabs.length - 1]
   chrome.tabs.update(target.id!, { active: true }).catch(logLastError)
+}
+
+/**
+ * 切换到指定位置的 pinned tab。
+ * @param index 0-based 索引；负数表示倒数（-1 = 最后一个 pinned tab）
+ */
+export const switchToPinnedTab = async (
+  currentTabId: number,
+  index: number,
+) => {
+  const tab = await chrome.tabs.get(currentTabId).catch(logLastError)
+  if (!tab?.windowId) return
+
+  const pinnedTabs = await chrome.tabs
+    .query({ windowId: tab.windowId, pinned: true })
+    .catch(logLastError)
+  if (!pinnedTabs || pinnedTabs.length === 0) return
+
+  const targetIndex = index >= 0 ? index : pinnedTabs.length + index
+  if (targetIndex < 0 || targetIndex >= pinnedTabs.length) return
+
+  const target = pinnedTabs[targetIndex]
+  if (target?.id) {
+    chrome.tabs.update(target.id, { active: true }).catch(logLastError)
+  }
 }
 
 // ── 标签页关闭 ──────────────────────────────────────────────────────────────
@@ -139,15 +202,14 @@ export const moveTab = async (currentTabId: number, offset: 1 | -1) => {
   if (!tab?.windowId || tab.index === undefined) return
 
   const tabs = await chrome.tabs.query({ windowId: tab.windowId })
-  const unpinned = tabs.filter((t) => !t.pinned)
-  const currentIndex = unpinned.findIndex((t) => t.id === currentTabId)
+  const currentIndex = tabs.findIndex((t) => t.id === currentTabId)
   if (currentIndex < 0) return
 
   const targetIndex = currentIndex + offset
-  if (targetIndex < 0 || targetIndex >= unpinned.length) return
+  if (targetIndex < 0 || targetIndex >= tabs.length) return
 
   chrome.tabs
-    .move(currentTabId, { index: unpinned[targetIndex].index })
+    .move(currentTabId, { index: tabs[targetIndex].index })
     .catch(logLastError)
 }
 

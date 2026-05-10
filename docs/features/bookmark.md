@@ -26,8 +26,8 @@
          ┌─────────┴─────────┐
          ▼                   ▼
 ┌──────────────────┐  ┌──────────────────────────────────────────────┐
-│ localStorage     │  │ chrome.storage.sync（云同步）                  │
-│ key: c-keyboard  │  │ key: naive-tab-keyboardBookmark              │
+│ localStorage         │  │ chrome.storage.sync（云同步）                  │
+│ key: c-keyboardBookmark│  │ key: naive-tab-keyboardBookmark              │
 │ Bookmark         │  │ 格式: {syncTime, syncId, appVersion, data}    │
 └──────────────────┘  └──────────────────────────────────────────────┘
                               │
@@ -72,7 +72,15 @@ interface BookmarkItem {
   globalShortcutModifiers: ['alt'],           // 修饰键
   urlBlacklist: string[],                     // URL 黑名单
   isNewTabOpen: false,                        // 始终在新标签页打开
-  defaultExpandFolder: null | string,         // 自动展开的书签文件夹标题
+  bindingMode: true,                          // source=1 键位绑定开关（所有层共用）
+  defaultExpandFolder: null | string,         // 自动展开的书签文件夹标题（仅顺序模式）
+  layers: [                                   // source=1 时最多 4 层，每层绑定一个浏览器书签文件夹
+    { sourceFolderTitle: 'NaiveTab' },
+    { sourceFolderTitle: '' },
+    { sourceFolderTitle: '' },
+    { sourceFolderTitle: '' },
+    { sourceFolderTitle: '' },
+  ],
   keymap: Record<string, TBookmarkEntry>,     // key code → {url, name?}
   layout: { ... }                             // 页面位置
 }
@@ -127,8 +135,44 @@ const state = reactive({
 | `ensureKeymapEntry(code)` | 延迟创建 keymap 条目（防止空条目污染） |
 | `selectKey(code)` | 选择待编辑的键位 |
 | `onDeleteBookmark()` | 从 keymap 删除书签 |
-| `handleDragStart/Over/End()` | 拖拽交换两个键位 |
 | `handleCommit()` | 强制同步到 chrome.storage.sync（popup 场景） |
+
+### 书签绑定管理 UI（`src/components/BookmarkBindingManager.vue`）
+
+用于 source=1 键位绑定模式（`bindingMode = true`）下的可视化书签绑定管理。用户通过键盘预览点击键帽选择待编辑键位，在表单区编辑 URL/名称或选择浏览器书签：
+
+| 方法 | 作用 |
+|------|------|
+| `selectKey(code)` | 选择待编辑的键位（同步中禁止切换） |
+| `onOpenBookmarkPicker()` | 打开浏览器书签选择器 |
+| `onSelectBookmark(payload)` | 绑定书签到选中键位 |
+| `onUnbind()` | 解绑选中键位的书签 |
+| `onHandleSetUrl(value)` | 编辑 URL（去空格、触发防抖同步） |
+| `onHandleSetName(value)` | 编辑名称（截断长度、触发防抖同步） |
+| `syncBookmark()` | 同步 Chrome 书签（区分新建/更新/删除） |
+| `scheduleDebouncedSync()` | 防抖同步入口（仅 popup 场景生效） |
+| `onHandleInputBlur()` | 失焦立即同步，清除待执行的防抖 timer |
+
+**同步策略：**
+
+- **popup 场景**（`immediateSync=true`）：输入时 300ms 防抖同步 + 失焦立即同步，防止用户改完直接关闭导致数据丢失
+- **setting 场景**（`immediateSync=false`）：仅失焦时同步，不触发防抖
+
+**`originUrl` 机制：** `selectKey` 时记录键位的原始 URL，`syncBookmark` 据此判断操作类型：有原始 URL → 更新，无原始 URL → 新建。`isSyncing` 守卫确保同步进行中不允许切换键帽，避免状态污染。
+
+**拖拽交换逻辑：** 统一由 `useKeycapDrag` 组合式函数提供。两个组件共用同一套交互模式，差异仅在 `swapData` 回调中：
+- `BookmarkManager`（source=2）：直接交换 `localConfig.keyboardBookmark.keymap` 中的数据
+- `BookmarkBindingManager`（source=1）：交换 `systemKeymap` + Chrome 书签。前缀（如 `[Digit1]`）保持不变，只交换名称和 URL；`swapBookmarksInSourceFolder` 通过删除+重建实现
+
+### 键帽拖拽组合式函数（`src/composables/useKeycapDrag.ts`）
+
+封装 HTML5 拖拽交互的通用逻辑。调用方实现三个回调：
+
+| 回调 | 作用 |
+|------|------|
+| `canDrag(code)` | 判断键帽是否可作为拖拽源 |
+| `swapData(source, target)` | 交换两个键位的数据 |
+| `onAfterSwap?(target)` | 交换完成后的回调（如更新选中、刷新数据） |
 
 ### 书签树选择器（`src/components/BrowserBookmarkPicker.vue`）
 
@@ -138,17 +182,104 @@ const state = reactive({
 
 ## 双模式运行机制
 
-### source = 1（系统书签）
-- 直接从 `chrome.bookmarks` API 读取
-- 键位按索引映射到书签树节点
-- 不需要 keymap 配置
-- 首键始终为"返回"按钮
-- 支持文件夹导航栈（`selectedFolderTitleStack`）
-
 ### source = 2（自定义 keymap）
 - 使用 `localConfig.keyboardBookmark.keymap`
 - 每个 key code 映射到 `{url, name?}`
 - 数据持久化在 localStorage + chrome.storage.sync
+
+### source = 1（浏览器书签驱动）
+
+用户通过在书签管理器中维护一个**专用文件夹**（默认 `NaiveTab`，可自定义）来控制键盘展示。支持**多层书签**：最多 4 层，每层绑定一个独立的浏览器书签文件夹，通过全局命令快捷键（`switchBookmarkLayer1-4`）切换。`bindingMode` 为所有层共用同一个开关。层激活状态（`activeLayer`）设备级持久化（`chrome.storage.local`），不云同步；`layers` 配置跨设备同步（`chrome.storage.sync`）。
+
+根据 `bindingMode` 开关，分为两种独立模式：
+
+#### 键位绑定模式（`bindingMode: true`）
+
+书签名以 `[标准Code]` 前缀精确绑定到对应键位：
+
+```
+📁 书签栏
+  📁 NaiveTab                    ← 数据源根文件夹（名称可自定义）
+    🔗 [KeyQ] Google             ← 精确绑定到 Q 键
+    🔗 [KeyW] GitHub             ← 精确绑定到 W 键
+    🔗 [F1] 日历                 ← 精确绑定到 F1 键
+    📁 工作                      ← 子文件夹名任意，仅作管理分组
+      🔗 [KeyE] 精确到 E          ← 精确绑定
+      🔗 Notion                  ← 无前缀 → 忽略
+    📁 _archive                  ← _ 开头，隐藏不展示
+      🔗 旧书签
+```
+
+拖拽两个已绑定键帽交换时，**前缀（如 `[KeyQ]`）保持不变**，只交换书签名称和 URL：
+
+```
+拖拽前: 位置0 → [KeyQ] Google · google.com    位置1 → [KeyW] GitHub · github.com
+拖拽后: 位置0 → [KeyQ] GitHub · github.com    位置1 → [KeyW] Google · google.com
+```
+
+#### 顺序模式（`bindingMode: false`，默认）
+
+所有书签按深度优先遍历顺序填充到键位，`[X]` 前缀被忽略：
+
+```
+📁 书签栏
+  📁 NaiveTab
+    🔗 Google                    ← 第 1 个键位
+    🔗 GitHub                    ← 第 2 个键位
+    🔗 Twitter                   ← 第 3 个键位
+    📁 工作
+      🔗 Notion                  ← 第 4 个键位
+      🔗 Figma                   ← 第 5 个键位
+    📁 _archive                  ← _ 开头，隐藏不展示
+```
+
+#### 解析规则
+
+| 规则 | 行为 |
+|------|------|
+| 书签名以 `_` 开头 | 隐藏，不参与任何模式解析 |
+| 文件夹名以 `_` 开头 | 整个文件夹跳过 |
+| 子文件夹 | 名称不参与布局，仅作书签管理分组，递归遍历所有子节点 |
+
+#### 前缀格式
+
+`[X]` 中的 `X` 必须使用标准键盘事件 code（`KeyboardEvent.code`），例如 `KeyQ`、`Digit1`、`F1`、`Escape` 等。导出功能也使用相同格式（`[KeyQ]`），保持导入导出完全对称。
+
+完整 code 列表见 [MDN KeyboardEvent.code 值](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values)。设置面板可视化绑定时自动使用标准 code，无需手动编写。
+
+#### 解析流程
+
+```
+chrome.bookmarks.getTree()
+    │
+    ▼
+1. 根据当前 activeLayer 获取 layers[cachedActiveLayer].sourceFolderTitle
+   （统一通过 getCurrentLayerFolderTitle() 获取，降级默认值 'NaiveTab'）
+   │
+   ▼
+2. 深度优先遍历所有子节点
+   ├─ 文件夹名以 _ 开头 → 跳过
+   ├─ 书签名以 _ 开头   → 跳过
+   └─ 书签
+      ├─ bindingMode=true：有 [X] 前缀 → 精确绑定；无前缀 → 忽略
+      └─ bindingMode=false：所有书签（忽略 [X] 前缀）→ 按顺序填充
+   │
+   ▼
+3. 生成 systemKeymap（内存） + 写入 chrome.storage.local（供 CS/SW 使用）
+```
+
+#### 全局快捷键（source=1）
+
+keymap 存储在 `chrome.storage.local`（key: `SYSTEM_KEYMAP_STORAGE_KEY`，定义于 `src/logic/keyboard/keyboard-constants.ts`），不触发云同步。SW 和 CS 根据 `config.source === 1` 决定读取 `systemKeymap` 而非 `keymap`。详见 `src/background/config-cache.ts` 中的 `cachedSystemKeymap`。
+
+#### 模式切换行为
+
+| 切换场景 | keymap 变化 |
+|---------|------------|
+| source=2 → source=1 | 被解析结果覆盖 |
+| source=1 → source=2 | 恢复 source=2 在 localStorage 中保留的旧 keymap |
+| 顺序模式 → 精确模式 | 被精确模式 keymap 覆盖 |
+| 精确模式 → 顺序模式 | 被顺序模式 keymap 覆盖 |
 
 ---
 
