@@ -26,9 +26,11 @@
 async function loadMoveable(overrides: { localConfig?: Record<string, any> } = {}) {
   vi.resetModules()
 
-  vi.doMock('@/logic/gtag', () => ({ gaProxy: vi.fn() }))
-  vi.doMock('@/logic/store', () => ({
+  vi.doMock('@/logic/utils/gtag', () => ({ gaProxy: vi.fn() }))
+  vi.doMock('@/logic/store/state', () => ({
     globalState: { isGuideMode: false, isSettingDrawerVisible: false, isSearchFocused: false, isInputFocused: false },
+  }))
+  vi.doMock('@/logic/config/state', () => ({
     localConfig: overrides.localConfig ?? {},
   }))
 
@@ -314,9 +316,11 @@ describe('cleanupResizeObserver', () => {
   beforeEach(async () => {
     vi.resetModules()
 
-    vi.doMock('@/logic/gtag', () => ({ gaProxy: vi.fn() }))
-    vi.doMock('@/logic/store', () => ({
+    vi.doMock('@/logic/utils/gtag', () => ({ gaProxy: vi.fn() }))
+    vi.doMock('@/logic/store/state', () => ({
       globalState: { isGuideMode: false, isSettingDrawerVisible: false, isSearchFocused: false, isInputFocused: false },
+    }))
+    vi.doMock('@/logic/config/state', () => ({
       localConfig: {},
     }))
 

@@ -1,22 +1,18 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { gaProxy } from '@/logic/gtag'
+import { ICONS } from '@/logic/constants/icons'
+import { gaProxy } from '@/logic/utils/gtag'
 import {
   isDragMode,
   toggleIsDragMode,
   getTargetDataFromEvent,
   animateDeleteWidget,
 } from '@/logic/moveable'
-import {
-  toggleFullscreen,
-  switchSettingDrawerVisible,
-  globalState,
-  localConfig,
-  localState,
-} from '@/logic/store'
-import { downloadCurrentWallpaper } from '@/logic/image'
-import { WIDGET_CODE_LIST, getWidgetSettingPane } from '@/newtab/widgets/codes'
+import { localConfig, localState } from '@/logic/config/state'
+import { toggleFullscreen } from '@/logic/store/dom'
+import { switchSettingDrawerVisible, globalState } from '@/logic/store/state'
+import { downloadCurrentWallpaper } from '@/logic/image/service'
+import { WIDGET_CODE_LIST, getWidgetSetting } from '@/common/widget-constants'
 
 const state = reactive({
   isMenuVisible: false,
@@ -123,7 +119,7 @@ const menuActionMap: Record<string, () => void | Promise<void>> = {
     if (code.length === 0) {
       openSettingPane('general')
     } else {
-      const pane = getWidgetSettingPane(code as WidgetCodes)
+      const pane = getWidgetSetting(code as WidgetCodes)
       const anchor = pane === 'clockDate' ? code : ''
       openSettingPane(pane, anchor)
     }

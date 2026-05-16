@@ -1,14 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { showToast } from '@/common/toast'
+
+vi.mock('@/common/toast', () => ({
+  showToast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    info: vi.fn(),
+  },
+}))
 
 /**
- * storage.test.ts — 测试 sync/manage.ts 中的 importSetting / exportSetting 数据迁移逻辑
+ * storage.test.ts — 测试 config/sync/manage.ts 中的 importSetting / exportSetting 数据迁移逻辑
  *
  * 使用全局单例对象模式：mock factory 直接内联定义对象，
  * 通过 exports 暴露给测试代码，测试代码通过修改这些对象重置状态。
  */
 
 // Mock 定义必须使用内联对象字面量，避免 TDZ 和 hoisting 问题
-vi.mock('@/logic/store', () => {
+vi.mock('@/logic/config/state', () => {
   const obj = {
     localConfig: {
       general: {
@@ -17,7 +27,7 @@ vi.mock('@/logic/store', () => {
         openPageFocusElement: 'default',
         isFocusMode: false,
       },
-      keyboardBookmark: { keymap: {}, source: 0, defaultExpandFolder: null },
+      keyboardBookmark: { keymap: {}, source: 0 },
       keyboardCommon: { fontSize: 14, fontFamily: 'system' },
       keyboardCommand: { enabled: true },
       search: { isNewTabOpen: false },
@@ -44,7 +54,7 @@ vi.mock('@/logic/store', () => {
 vi.mock('@/logic/config/defaults', () => ({
   defaultConfig: {
     general: { version: '2.2.5' },
-    keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
+    keyboardBookmark: { keymap: {}, source: 1 },
     keyboardCommon: { fontSize: 14, fontFamily: 'system' },
     keyboardCommand: { enabled: true },
     search: { isNewTabOpen: true },
@@ -63,9 +73,59 @@ vi.mock('@/logic/config/defaults', () => ({
     localModifiedTime: 0,
     dirty: false,
   },
+  KEYBOARD_COMMON_CONFIG: {
+    keyboardType: 'key67',
+    splitSpace: 'space1',
+    keyboardWklMode: false,
+    keycapType: 'gmk',
+    keycapPadding: 1.5,
+    keycapSize: 58,
+    keycapBorderRadius: 5,
+    isKeycapBorderEnabled: false,
+    keycapBorderWidth: 1,
+    keycapBorderColor: [],
+    isShellVisible: true,
+    shellVerticalPadding: 15,
+    shellHorizontalPadding: 15,
+    shellBorderRadius: 10,
+    shellColor: [],
+    isShellShadowEnabled: true,
+    shellShadowColor: [],
+    shellBackgroundBlur: 5,
+    isPlateVisible: true,
+    platePadding: 3,
+    plateBorderRadius: 5,
+    plateColor: [],
+    isCapKeyVisible: true,
+    keycapKeyFontFamily: 'OpenCherry',
+    keycapKeyFontSize: 12,
+    isNameVisible: true,
+    keycapBookmarkFontFamily: 'Arial',
+    keycapBookmarkFontSize: 11,
+    isFaviconVisible: true,
+    faviconSize: 0.85,
+    isTactileBumpsVisible: true,
+    mainFontColor: [],
+    mainBackgroundColor: [],
+    emphasisOneFontColor: [],
+    emphasisOneBackgroundColor: [],
+    emphasisTwoFontColor: [],
+    emphasisTwoBackgroundColor: [],
+    emphasisKeyOverrides: {},
+    fontSize: 14,
+    fontFamily: 'system',
+  },
+  KEYBOARD_COMMAND_CONFIG: {
+    isEnabled: true,
+    noModifierMode: false,
+    shortcutInInputElement: true,
+    urlBlacklist: [],
+    modifiers: ['shift', 'alt'],
+    keymap: {},
+  },
 }))
 
-vi.mock('@/logic/util', () => ({
+vi.mock('@/logic/utils/util', () => ({
   log: vi.fn(),
   compareLeftVersionLessThanRightVersions: vi.fn(
     (left: string, right: string) => {
@@ -78,11 +138,10 @@ vi.mock('@/logic/util', () => ({
       return false
     },
   ),
-  downloadJsonByTagA: vi.fn(),
   sleep: vi.fn().mockResolvedValue(null),
 }))
 
-vi.mock('@/logic/compress', () => ({
+vi.mock('@/logic/config/compress', () => ({
   COMPRESS_PREFIX: 'gzip:',
   compressString: vi.fn().mockResolvedValue('compressed'),
   decompressString: vi.fn().mockResolvedValue('{}'),
@@ -116,17 +175,13 @@ vi.mock('@/logic/config/update', () => ({
   }),
 }))
 
-vi.mock('@/logic/database', () => ({
+vi.mock('@/logic/utils/database', () => ({
   clearDatabase: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock('@/logic/keyboard/keyboard-constants', () => ({
   KEYBOARD_URL_MAX_LENGTH: 200,
   KEYBOARD_NAME_MAX_LENGTH: 10,
-}))
-
-vi.mock('@/logic/keyboard/keyboard-config', () => ({
-  KEYBOARD_COMMON_CONFIG: { fontSize: 14, fontFamily: 'system' },
 }))
 
 vi.mock('@/logic/constants/app', () => ({
@@ -142,8 +197,7 @@ vi.mock('crypto-js/md5', () => ({
   default: vi.fn((str: string) => ({ toString: () => `md5-${str.length}` })),
 }))
 
-import { importSetting, exportSetting } from '@/logic/sync/manage'
-import { downloadJsonByTagA } from '@/logic/util'
+import { importSetting, exportSetting } from '@/logic/config/sync/manage'
 
 // Access mock state from globalThis (set by the mock factory)
 const getMock = () => (globalThis as any).__mockStore
@@ -156,7 +210,6 @@ function resetMockState() {
   m.localConfig.general.isFocusMode = false
   m.localConfig.keyboardBookmark.keymap = {}
   m.localConfig.keyboardBookmark.source = 0
-  m.localConfig.keyboardBookmark.defaultExpandFolder = null
   m.localConfig.keyboardCommon.fontSize = 14
   m.localConfig.keyboardCommon.fontFamily = 'system'
   m.localConfig.keyboardCommand.enabled = true
@@ -311,7 +364,6 @@ describe('importSetting migrations', () => {
           Digit1: { url: 'https://github.com', name: 'GitHub' },
         },
         source: 2,
-        defaultExpandFolder: 'work',
       },
       search: { isNewTabOpen: true, isVoiceEnabled: true },
     }
@@ -320,7 +372,6 @@ describe('importSetting migrations', () => {
     expect(m.general.lang).toBe('zh-CN')
     expect(m.keyboardBookmark.keymap.KeyA.name).toBe('Google')
     expect(m.keyboardBookmark.source).toBe(2)
-    expect(m.keyboardBookmark.defaultExpandFolder).toBe('work')
     expect(m.search.isNewTabOpen).toBe(true)
   })
 })
@@ -359,13 +410,8 @@ describe('exportSetting', () => {
     vi.clearAllMocks()
   })
 
-  it('calls downloadJsonByTagA with localConfig', async () => {
-    await exportSetting()
-    expect(downloadJsonByTagA).toHaveBeenCalled()
-  })
-
   it('shows success message', async () => {
     await exportSetting()
-    expect(window.$message.success).toHaveBeenCalled()
+    expect(showToast.success).toHaveBeenCalled()
   })
 })

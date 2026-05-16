@@ -13,12 +13,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * 如需进一步提升 coverage，建议引入 fake-indexeddb 依赖。
  */
 
-vi.mock('@/logic/util', () => ({ log: vi.fn() }))
+vi.mock('@/logic/utils/util', () => ({ log: vi.fn() }))
 
 // ── clearDatabase: success ──
 
 describe('clearDatabase success', () => {
-  let clearDatabase: typeof import('@/logic/database')['clearDatabase']
+  let clearDatabase: typeof import('@/logic/utils/database')['clearDatabase']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -38,7 +38,7 @@ describe('clearDatabase success', () => {
       writable: true,
     })
 
-    const mod = await import('@/logic/database')
+    const mod = await import('@/logic/utils/database')
     clearDatabase = mod.clearDatabase
 
     setTimeout(() => fakeDeleteRequest.onsuccess?.({}), 0)
@@ -53,7 +53,7 @@ describe('clearDatabase success', () => {
 // ── clearDatabase: error ──
 
 describe('clearDatabase error handling', () => {
-  let clearDatabase: typeof import('@/logic/database')['clearDatabase']
+  let clearDatabase: typeof import('@/logic/utils/database')['clearDatabase']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -73,7 +73,7 @@ describe('clearDatabase error handling', () => {
       writable: true,
     })
 
-    const mod = await import('@/logic/database')
+    const mod = await import('@/logic/utils/database')
     clearDatabase = mod.clearDatabase
 
     setTimeout(() => fakeDeleteRequest.onerror?.({ target: fakeDeleteRequest }), 0)
@@ -88,7 +88,7 @@ describe('clearDatabase error handling', () => {
 // ── clearDatabase: blocked ──
 
 describe('clearDatabase blocked handling', () => {
-  let clearDatabase: typeof import('@/logic/database')['clearDatabase']
+  let clearDatabase: typeof import('@/logic/utils/database')['clearDatabase']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -108,7 +108,7 @@ describe('clearDatabase blocked handling', () => {
       writable: true,
     })
 
-    const mod = await import('@/logic/database')
+    const mod = await import('@/logic/utils/database')
     clearDatabase = mod.clearDatabase
 
     setTimeout(() => fakeDeleteRequest.onblocked?.({ target: fakeDeleteRequest }), 0)
@@ -124,13 +124,13 @@ describe('clearDatabase blocked handling', () => {
 
 describe('database module exports', () => {
   it('exports clearDatabase and databaseStore functions', async () => {
-    const dbModule = await import('@/logic/database')
+    const dbModule = await import('@/logic/utils/database')
     expect(typeof dbModule.clearDatabase).toBe('function')
     expect(typeof dbModule.databaseStore).toBe('function')
   })
 
   it('uses correct IndexedDB constants', async () => {
-    const dbModule = await import('@/logic/database')
+    const dbModule = await import('@/logic/utils/database')
     // Verify the module uses the expected DB name and version
     // (These are module-level constants, we can verify via behavior)
     expect(dbModule).toBeDefined()

@@ -2,7 +2,7 @@
  * useKeycapDrag
  *
  * 键帽拖拽交换逻辑的通用组合式函数。
- * BookmarkManager（source=2）和 BookmarkBindingManager（source=1）共用。
+ * BaseNaiveBookmarkManager（source=2）和 BaseSystemBookmarkManager（source=1）共用。
  *
  * 交互模式：HTML5 原生 draggable，拖拽事件绑定在外层 wrap div。
  */

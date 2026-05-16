@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { gaProxy } from '@/logic/gtag'
-import { createTab } from '@/logic/util'
+import { gaProxy } from '@/logic/utils/gtag'
+import { createTab } from '@/logic/utils/common'
 import { isDragMode } from '@/logic/moveable'
 import {
   state,
@@ -9,7 +9,8 @@ import {
   onRetryNews,
   handleWatchNewsConfigChange,
 } from '@/newtab/widgets/news/logic'
-import { localConfig, getIsWidgetRender, getStyleField } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 

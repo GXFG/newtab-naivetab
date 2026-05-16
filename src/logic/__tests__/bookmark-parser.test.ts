@@ -2,11 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   parseBookmarkTitle,
   parseBookmarkFolder,
-  findFolderByName,
+  findFolderByPath,
   findBookmarkByUrl,
+} from '@/logic/bookmark/parser'
+import {
   addBookmarkPrefix,
   removeBookmarkPrefix,
-} from '@/logic/keyboard/bookmark-parser'
+  swapBookmarksInSourceFolder,
+  removeBookmarkFromSourceFolder,
+} from '@/logic/bookmark/mutations'
 
 /** 创建模拟书签节点 */
 const bookmark = (
@@ -107,7 +111,7 @@ describe('parseBookmarkFolder', () => {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
 
-    const result = await parseBookmarkFolder('NaiveTab', layoutCodes, { bindingMode: true })
+    const result = await parseBookmarkFolder('NaiveTab', layoutCodes)
 
     expect(result.entries).toHaveLength(2)
     expect(result.entries[0]).toEqual({
@@ -122,10 +126,10 @@ describe('parseBookmarkFolder', () => {
     })
   })
 
-  it('精确模式：用户简写 [Q] 被过滤（非标准 code）', async () => {
+  it('标准 code 前缀正确绑定', async () => {
     const mockTree = [
       folder('NaiveTab', [
-        bookmark('[Q] Google', 'https://google.com'),
+        bookmark('[KeyQ] Google', 'https://google.com'),
         bookmark('[KeyW] GitHub', 'https://github.com'),
       ]),
     ]
@@ -133,33 +137,14 @@ describe('parseBookmarkFolder', () => {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
 
-    const result = await parseBookmarkFolder('NaiveTab', layoutCodes, { bindingMode: true })
+    const result = await parseBookmarkFolder('NaiveTab', layoutCodes)
 
-    expect(result.entries).toHaveLength(1)
-    expect(result.entries[0].code).toBe('KeyW')
-  })
-
-  it('顺序模式：所有书签按顺序填充', async () => {
-    const mockTree = [
-      folder('NaiveTab', [
-        bookmark('Google', 'https://google.com'),
-        bookmark('[KeyW] GitHub', 'https://github.com'),
-        bookmark('Notion', 'https://notion.so'),
-      ]),
-    ]
-    ;(globalThis.chrome as any).bookmarks = {
-      getTree: vi.fn(() => Promise.resolve(mockTree)),
-    }
-
-    const result = await parseBookmarkFolder('NaiveTab', layoutCodes, { bindingMode: false })
-
-    expect(result.entries).toHaveLength(3)
+    expect(result.entries).toHaveLength(2)
     expect(result.entries[0].code).toBe('KeyQ')
     expect(result.entries[1].code).toBe('KeyW')
-    expect(result.entries[2].code).toBe('KeyE')
   })
 
-  it('精确模式：_ 开头书签被跳过', async () => {
+  it('_ 开头书签被跳过', async () => {
     const mockTree = [
       folder('NaiveTab', [
         bookmark('[KeyQ] Google', 'https://google.com'),
@@ -171,12 +156,12 @@ describe('parseBookmarkFolder', () => {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
 
-    const result = await parseBookmarkFolder('NaiveTab', layoutCodes, { bindingMode: true })
+    const result = await parseBookmarkFolder('NaiveTab', layoutCodes)
 
     expect(result.entries).toHaveLength(2)
   })
 
-  it('精确模式：_ 开头文件夹被跳过', async () => {
+  it('_ 开头文件夹被跳过', async () => {
     const mockTree = [
       folder('NaiveTab', [
         bookmark('[KeyQ] Google', 'https://google.com'),
@@ -189,7 +174,7 @@ describe('parseBookmarkFolder', () => {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
 
-    const result = await parseBookmarkFolder('NaiveTab', layoutCodes, { bindingMode: true })
+    const result = await parseBookmarkFolder('NaiveTab', layoutCodes)
 
     expect(result.entries).toHaveLength(1)
     expect(result.entries[0].code).toBe('KeyQ')
@@ -201,19 +186,19 @@ describe('parseBookmarkFolder', () => {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
 
-    const result = await parseBookmarkFolder('NaiveTab', layoutCodes, { bindingMode: true })
+    const result = await parseBookmarkFolder('NaiveTab', layoutCodes)
 
     expect(result.entries).toHaveLength(0)
   })
 })
 
-describe('findFolderByName', () => {
+describe('findFolderByPath', () => {
   it('在顶层找到匹配的文件夹', () => {
     const tree = [
       folder('NaiveTab', []),
       folder('Other', []),
     ]
-    expect(findFolderByName(tree, 'NaiveTab')).toBe(tree[0])
+    expect(findFolderByPath(tree, 'NaiveTab')).toBe(tree[0])
   })
 
   it('在嵌套文件夹中找到', () => {
@@ -224,23 +209,30 @@ describe('findFolderByName', () => {
         ]),
       ]),
     ]
-    const found = findFolderByName(tree, 'Target')
+    const found = findFolderByPath(tree, 'Root/Level1/Target')
     expect(found).not.toBeNull()
     expect(found?.title).toBe('Target')
   })
 
   it('找不到返回 null', () => {
     const tree = [folder('Other', [])]
-    expect(findFolderByName(tree, 'Missing')).toBeNull()
+    expect(findFolderByPath(tree, 'Missing')).toBeNull()
   })
 
-  it('优先匹配第一个（深度优先）', () => {
+  it('路径部分不存在返回 null', () => {
     const tree = [
       folder('A', [folder('Sub', [])]),
-      folder('B', [folder('Sub', [])]),
+      folder('B', [folder('Other', [])]),
     ]
-    const found = findFolderByName(tree, 'Sub')
-    expect(found?.id).toBe('1')
+    expect(findFolderByPath(tree, 'A/NonExistent')).toBeNull()
+  })
+
+  it('跳过 Chrome 隐形根节点（id="0"，无 title）', () => {
+    const tree = [
+      { id: '0', children: [folder('书签栏', [folder('NaiveTab', [folder('layer1', [])])])], title: '' },
+    ]
+    expect(findFolderByPath(tree, 'NaiveTab/layer1')?.title).toBe('layer1')
+    expect(findFolderByPath(tree, 'NaiveTab')?.title).toBe('NaiveTab')
   })
 })
 
@@ -354,5 +346,224 @@ describe('removeBookmarkPrefix', () => {
     await removeBookmarkPrefix('https://google.com')
 
     expect(chrome.bookmarks.update).not.toHaveBeenCalled()
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// swapBookmarksInSourceFolder / removeBookmarkFromSourceFolder
+// ════════════════════════════════════════════════════════════
+
+describe('swapBookmarksInSourceFolder', () => {
+  /** 交换测试专用书签，带 index 和 parentId */
+  const swapBookmark = (
+    title: string,
+    url: string,
+    id: string,
+    index: number,
+    parentId: string,
+  ): chrome.bookmarks.BookmarkTreeNode =>
+    ({ id, title, url, index, parentId, children: [] } as unknown as chrome.bookmarks.BookmarkTreeNode)
+
+  /**
+   * 构造 Chrome 风格的书签树：root → Bookmarks Bar → NaiveTab → layer1 → bookmarks
+   * findFolderByPath('NaiveTab/layer1') 会按路径查找嵌套文件夹
+   */
+  function mockBookmarks(children: chrome.bookmarks.BookmarkTreeNode[]) {
+    const layer1Folder: chrome.bookmarks.BookmarkTreeNode = {
+      id: 'layer1',
+      title: 'layer1',
+      url: undefined,
+      children,
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+    const naiveTabFolder: chrome.bookmarks.BookmarkTreeNode = {
+      id: 'naiveTab',
+      title: 'NaiveTab',
+      url: undefined,
+      children: [layer1Folder],
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+    const bookmarksBar: chrome.bookmarks.BookmarkTreeNode = {
+      id: 'bar',
+      title: 'Bookmarks Bar',
+      url: undefined,
+      children: [naiveTabFolder],
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+    const root: chrome.bookmarks.BookmarkTreeNode = {
+      id: '0',
+      title: '',
+      url: undefined,
+      children: [bookmarksBar],
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+
+    ;(globalThis.chrome as any).bookmarks = {
+      getTree: vi.fn(() => Promise.resolve([root])),
+      remove: vi.fn(() => Promise.resolve({})),
+      create: vi.fn(() => Promise.resolve({ id: 'new' })),
+    }
+    return {
+      removeMock: chrome.bookmarks.remove as ReturnType<typeof vi.fn>,
+      createMock: chrome.bookmarks.create as ReturnType<typeof vi.fn>,
+    }
+  }
+
+  it('交换两个书签的 URL 和名称，前缀保持不变', async () => {
+    const { removeMock, createMock } = mockBookmarks([
+      swapBookmark('[KeyQ] Google', 'https://google.com', 'bm1', 0, 'folder1'),
+      swapBookmark('[KeyW] GitHub', 'https://github.com', 'bm2', 1, 'folder1'),
+    ])
+
+    await swapBookmarksInSourceFolder('NaiveTab/layer1', 'KeyQ', 'KeyW')
+
+    // 应该先删除两个书签（从大到小索引）
+    expect(removeMock).toHaveBeenCalledTimes(2)
+    // 然后创建两个新书签
+    expect(createMock).toHaveBeenCalledTimes(2)
+
+    // 验证创建的内容：KeyQ 处放 GitHub，KeyW 处放 Google
+    const created = createMock.mock.calls
+    expect(created[0][0]).toMatchObject({
+      title: '[KeyQ] GitHub',
+      url: 'https://github.com',
+    })
+    expect(created[1][0]).toMatchObject({
+      title: '[KeyW] Google',
+      url: 'https://google.com',
+    })
+  })
+
+  it('交换时保持原始索引位置', async () => {
+    const { removeMock, createMock } = mockBookmarks([
+      swapBookmark('[KeyA] Alpha', 'https://alpha.com', 'bm1', 0, 'folder1'),
+      swapBookmark('[KeyB] Beta', 'https://beta.com', 'bm2', 1, 'folder1'),
+      swapBookmark('[KeyC] Gamma', 'https://gamma.com', 'bm3', 2, 'folder1'),
+    ])
+
+    await swapBookmarksInSourceFolder('NaiveTab/layer1', 'KeyA', 'KeyC')
+
+    // KeyA 在索引 0，KeyC 在索引 2
+    // KeyA 处放 Gamma，KeyC 处放 Alpha
+    const created = createMock.mock.calls
+    // 索引 0 的创建
+    expect(created[0][0]).toMatchObject({
+      index: 0,
+      title: '[KeyA] Gamma',
+      url: 'https://gamma.com',
+    })
+    // 索引 2 的创建
+    expect(created[1][0]).toMatchObject({
+      index: 2,
+      title: '[KeyC] Alpha',
+      url: 'https://alpha.com',
+    })
+  })
+
+  it('找不到 codeA 的书签时跳过', async () => {
+    const { removeMock, createMock } = mockBookmarks([
+      swapBookmark('[KeyW] GitHub', 'https://github.com', 'bm1', 0, 'folder1'),
+    ])
+
+    await swapBookmarksInSourceFolder('NaiveTab/layer1', 'KeyQ', 'KeyW')
+
+    expect(removeMock).not.toHaveBeenCalled()
+    expect(createMock).not.toHaveBeenCalled()
+  })
+
+  it('找不到 codeB 的书签时跳过', async () => {
+    const { removeMock, createMock } = mockBookmarks([
+      swapBookmark('[KeyQ] Google', 'https://google.com', 'bm1', 0, 'folder1'),
+    ])
+
+    await swapBookmarksInSourceFolder('NaiveTab/layer1', 'KeyQ', 'KeyW')
+
+    expect(removeMock).not.toHaveBeenCalled()
+    expect(createMock).not.toHaveBeenCalled()
+  })
+
+  it('文件夹不存在时跳过', async () => {
+    ;(globalThis.chrome as any).bookmarks = {
+      getTree: vi.fn(() => Promise.resolve([folder('NaiveTab', [])])),
+      remove: vi.fn(() => Promise.resolve({})),
+      create: vi.fn(() => Promise.resolve({ id: 'new' })),
+    }
+
+    await swapBookmarksInSourceFolder('NonExistent', 'KeyQ', 'KeyW')
+
+    expect(chrome.bookmarks.remove).not.toHaveBeenCalled()
+    expect(chrome.bookmarks.create).not.toHaveBeenCalled()
+  })
+})
+
+describe('removeBookmarkFromSourceFolder', () => {
+  /** 删除测试专用书签 */
+  const removeBookmark = (
+    title: string,
+    url: string,
+    id: string,
+  ): chrome.bookmarks.BookmarkTreeNode =>
+    ({ id, title, url, children: [] } as unknown as chrome.bookmarks.BookmarkTreeNode)
+
+  function mockBookmarks(children: chrome.bookmarks.BookmarkTreeNode[]) {
+    const layer1Folder: chrome.bookmarks.BookmarkTreeNode = {
+      id: 'layer1',
+      title: 'layer1',
+      url: undefined,
+      children,
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+    const naiveTabFolder: chrome.bookmarks.BookmarkTreeNode = {
+      id: 'naiveTab',
+      title: 'NaiveTab',
+      url: undefined,
+      children: [layer1Folder],
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+    const bookmarksBar: chrome.bookmarks.BookmarkTreeNode = {
+      id: 'bar',
+      title: 'Bookmarks Bar',
+      url: undefined,
+      children: [naiveTabFolder],
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+    const root: chrome.bookmarks.BookmarkTreeNode = {
+      id: '0',
+      title: '',
+      url: undefined,
+      children: [bookmarksBar],
+    } as unknown as chrome.bookmarks.BookmarkTreeNode
+
+    ;(globalThis.chrome as any).bookmarks = {
+      getTree: vi.fn(() => Promise.resolve([root])),
+      remove: vi.fn(() => Promise.resolve({})),
+    }
+    return chrome.bookmarks.remove as ReturnType<typeof vi.fn>
+  }
+
+  it('删除指定 code 的书签', async () => {
+    const removeMock = mockBookmarks([
+      removeBookmark('[KeyQ] Google', 'https://google.com', 'bm1'),
+      removeBookmark('[KeyW] GitHub', 'https://github.com', 'bm2'),
+    ])
+
+    await removeBookmarkFromSourceFolder('NaiveTab/layer1', 'KeyQ')
+
+    expect(removeMock).toHaveBeenCalledWith('bm1')
+    expect(removeMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('找不到指定 code 的书签时跳过', async () => {
+    const removeMock = mockBookmarks([
+      removeBookmark('[KeyQ] Google', 'https://google.com', 'bm1'),
+    ])
+
+    await removeBookmarkFromSourceFolder('NaiveTab/layer1', 'KeyW')
+
+    expect(removeMock).not.toHaveBeenCalled()
+  })
+
+  it('文件夹不存在时跳过', async () => {
+    ;(globalThis.chrome as any).bookmarks = {
+      getTree: vi.fn(() => Promise.resolve([folder('NaiveTab', [])])),
+      remove: vi.fn(() => Promise.resolve({})),
+    }
+
+    await removeBookmarkFromSourceFolder('NonExistent', 'KeyQ')
+
+    expect(chrome.bookmarks.remove).not.toHaveBeenCalled()
   })
 })

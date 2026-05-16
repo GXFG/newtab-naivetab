@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import { defineAsyncComponent, computed } from 'vue'
-import { globalState, localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
 
 const modules = import.meta.glob('../../CHANGELOG.md')
 const ChangeLogMd = modules['../../CHANGELOG.md']

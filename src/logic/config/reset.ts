@@ -1,10 +1,8 @@
-import { localConfig } from '@/logic/store'
+/**
+ * Widget 配置重置 — 支持快速重置（保留用户数据）和完全重置。
+ */
+import { localConfig } from '@/logic/config/state'
 import { defaultConfig } from '@/logic/config/defaults'
-import {
-  PRESERVE_FIELDS as COMMAND_PRESERVE_FIELDS,
-  COMMAND_SHORTCUT_CODE,
-} from '@/logic/globalShortcut/shortcut-command'
-import { PRESERVE_FIELDS as KEYBOARD_COMMON_PRESERVE_FIELDS } from '@/logic/keyboard/keyboard-config'
 
 /**
  * 自动发现各 Widget 的 PRESERVE_FIELDS，模块级别只计算一次。
@@ -24,12 +22,6 @@ function buildPreserveFieldsMap(): Record<string, string[]> {
     ) {
       map[m.WIDGET_CODE] = m.PRESERVE_FIELDS
     }
-  }
-  if (COMMAND_PRESERVE_FIELDS.length > 0) {
-    map[COMMAND_SHORTCUT_CODE] = COMMAND_PRESERVE_FIELDS
-  }
-  if (KEYBOARD_COMMON_PRESERVE_FIELDS.length > 0) {
-    map['keyboardCommon'] = KEYBOARD_COMMON_PRESERVE_FIELDS
   }
   return map
 }
@@ -68,6 +60,15 @@ export const resetWidgetConfig = (
           preserved[field] = deepClone(current[field])
         }
       })
+    }
+  }
+
+  // 删除不在默认值中且非保留的字段，避免 Object.assign 只覆盖不删除的问题
+  const defaultKeys = new Set(Object.keys(defaultValue))
+  const preserveKeysSet = new Set(preserved ? Object.keys(preserved) : [])
+  for (const key of Object.keys(current)) {
+    if (!defaultKeys.has(key) && !preserveKeysSet.has(key)) {
+      delete current[key]
     }
   }
 

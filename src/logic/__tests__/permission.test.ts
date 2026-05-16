@@ -4,7 +4,7 @@ import type { Mock } from 'vitest'
 /**
  * permission.test.ts — 测试权限管理模块
  *
- * 覆盖: requestNotificationsPermission、requestPermission、sendNotification
+ * 覆盖: requestPermissionAsync、requestPermission、sendNotification
  */
 
 beforeEach(() => {
@@ -17,45 +17,44 @@ beforeEach(() => {
   }
 })
 
-describe('requestNotificationsPermission', () => {
-  let requestNotificationsPermission: typeof import('@/logic/permission')['requestNotificationsPermission']
+describe('requestPermissionAsync', () => {
+  let requestPermissionAsync: typeof import('@/logic/utils/permission')['requestPermissionAsync']
 
   beforeEach(async () => {
     vi.resetModules()
     ;(chrome.permissions.request as Mock).mockImplementation((_perms, cb) => {
       cb(true)
     })
-    const mod = await import('@/logic/permission')
-    requestNotificationsPermission = mod.requestNotificationsPermission
+    const mod = await import('@/logic/utils/permission')
+    requestPermissionAsync = mod.requestPermissionAsync
   })
 
-  it('returns true when granted', async () => {
-    const result = await requestNotificationsPermission()
-    expect(result).toBe(true)
+  it('requests the specified permission without blocking', async () => {
+    await requestPermissionAsync('notifications')
     expect(chrome.permissions.request).toHaveBeenCalledWith(
       { permissions: ['notifications'] },
       expect.any(Function),
     )
   })
 
-  it('returns false when denied', async () => {
-    ;(chrome.permissions.request as Mock).mockImplementation((_perms, cb) => {
-      cb(false)
+  it('silently catches rejection', async () => {
+    ;(chrome.permissions.request as Mock).mockImplementation(() => {
+      throw new Error('Permission API unavailable')
     })
     vi.resetModules()
-    const mod = await import('@/logic/permission')
-    const fn = mod.requestNotificationsPermission
-    const result = await fn()
-    expect(result).toBe(false)
+    const mod = await import('@/logic/utils/permission')
+    const fn = mod.requestPermissionAsync
+    // Should not throw — errors are caught internally
+    expect(() => fn('notifications')).not.toThrow()
   })
 })
 
 describe('requestPermission', () => {
-  let requestPermission: typeof import('@/logic/permission')['requestPermission']
+  let requestPermission: typeof import('@/logic/utils/permission')['requestPermission']
 
   beforeEach(async () => {
     vi.resetModules()
-    const mod = await import('@/logic/permission')
+    const mod = await import('@/logic/utils/permission')
     requestPermission = mod.requestPermission
   })
 
@@ -80,7 +79,7 @@ describe('requestPermission', () => {
 })
 
 describe('sendNotification', () => {
-  let sendNotification: typeof import('@/logic/permission')['sendNotification']
+  let sendNotification: typeof import('@/logic/utils/permission')['sendNotification']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -89,7 +88,7 @@ describe('sendNotification', () => {
       create: vi.fn(),
       clear: vi.fn(),
     }
-    const mod = await import('@/logic/permission')
+    const mod = await import('@/logic/utils/permission')
     sendNotification = mod.sendNotification
   })
 

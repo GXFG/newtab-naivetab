@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  */
 
 // Mock store
-vi.mock('@/logic/store', () => {
+vi.mock('@/logic/config/state', () => {
   const mockLocalConfig = {
     clockDigital: {
       enabled: true,
@@ -61,7 +61,6 @@ vi.mock('@/logic/config/defaults', () => {
         keymap: {},
         layout: { x: 0, y: 0 },
         source: 0,
-        defaultExpandFolder: null,
       },
       keyboardCommand: {
         enabled: true,
@@ -77,16 +76,6 @@ vi.mock('@/logic/config/defaults', () => {
   return obj
 })
 
-// Mock shortcut-command
-vi.mock('@/logic/globalShortcut/shortcut-command', () => ({
-  COMMAND_SHORTCUT_CODE: 'keyboardCommand',
-  PRESERVE_FIELDS: ['modifiers', 'keymap'],
-}))
-
-// Mock keyboard-config
-vi.mock('@/logic/keyboard/keyboard-config', () => ({
-  PRESERVE_FIELDS: ['fontSize', 'fontFamily'],
-}))
 
 import { resetWidgetConfig, hasWidgetConfig, hasPreserveFields } from '@/logic/config/reset'
 
@@ -107,10 +96,12 @@ describe('hasWidgetConfig', () => {
 
 describe('hasPreserveFields', () => {
   it('returns true for widgets with preserve fields', () => {
-    // keyboardCommand has PRESERVE_FIELDS from shortcut-command
-    expect(hasPreserveFields('keyboardCommand')).toBe(true)
-    // keyboardCommon has PRESERVE_FIELDS from keyboard-config
-    expect(hasPreserveFields('keyboardCommon')).toBe(true)
+    // keyboardBookmark has PRESERVE_FIELDS from its config.ts
+    expect(hasPreserveFields('keyboardBookmark')).toBe(true)
+  })
+
+  it('returns false for keyboardCommand (no longer has COMMAND_PRESERVE_FIELDS)', () => {
+    expect(hasPreserveFields('keyboardCommand')).toBe(false)
   })
 
   it('returns false for widgets without preserve fields', () => {
@@ -168,12 +159,10 @@ describe('resetWidgetConfig — full mode', () => {
 describe('resetWidgetConfig — quick mode', () => {
   beforeEach(() => {
     const mock = getMockConfig()
-    // Use keyboardCommand since its PRESERVE_FIELDS are registered via the mock
-    // (shortcut-command mock: COMMAND_SHORTCUT_CODE = 'keyboardCommand', PRESERVE_FIELDS = ['modifiers', 'keymap'])
-    mock.keyboardCommand = {
+    mock.keyboardBookmark = {
       enabled: false,
       keymap: { KeyB: { url: 'https://custom.com', name: 'Custom' } },
-      modifiers: ['ctrl', 'alt'],
+      source: 1,
       layout: { x: 3, y: 7 },
       isEnabled: true,
       noModifierMode: false,
@@ -182,27 +171,26 @@ describe('resetWidgetConfig — quick mode', () => {
 
   it('resets to default, preserving enabled, layout, AND preserve fields', () => {
     const mock = getMockConfig()
-    resetWidgetConfig('keyboardCommand', 'quick')
+    resetWidgetConfig('keyboardBookmark', 'quick')
 
     // enabled preserved
-    expect(mock.keyboardCommand.enabled).toBe(false)
+    expect(mock.keyboardBookmark.enabled).toBe(false)
     // layout preserved
-    expect(mock.keyboardCommand.layout).toEqual({ x: 3, y: 7 })
-    // preserve fields (keymap, modifiers) preserved
-    expect(mock.keyboardCommand.keymap).toEqual({ KeyB: { url: 'https://custom.com', name: 'Custom' } })
-    expect(mock.keyboardCommand.modifiers).toEqual(['ctrl', 'alt'])
+    expect(mock.keyboardBookmark.layout).toEqual({ x: 3, y: 7 })
+    // preserve fields (source, keymap) preserved
+    expect(mock.keyboardBookmark.source).toBe(1)
+    expect(mock.keyboardBookmark.keymap).toEqual({ KeyB: { url: 'https://custom.com', name: 'Custom' } })
     // non-preserve fields reset
-    expect(mock.keyboardCommand.isEnabled).toBe(true)
-    expect(mock.keyboardCommand.noModifierMode).toBe(false)
+    expect(mock.keyboardBookmark.isEnabled).toBeUndefined()
   })
 
   it('preserves preserve fields even when they are deep objects', () => {
     const mock = getMockConfig()
-    const originalKeymap = mock.keyboardCommand.keymap
-    resetWidgetConfig('keyboardCommand', 'quick')
+    const originalKeymap = mock.keyboardBookmark.keymap
+    resetWidgetConfig('keyboardBookmark', 'quick')
     // keymap should be a deep clone, not the same reference
-    expect(mock.keyboardCommand.keymap).toBeTruthy()
-    expect(mock.keyboardCommand.keymap).toEqual(originalKeymap)
+    expect(mock.keyboardBookmark.keymap).toBeTruthy()
+    expect(mock.keyboardBookmark.keymap).toEqual(originalKeymap)
     // The preserved value is deep-cloned, so reference differs
     // (implementation uses JSON.parse(JSON.stringify))
   })

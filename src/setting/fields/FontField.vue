@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import SettingFormItem from '@/setting/components/SettingFormItem.vue'
 import CustomColorPicker from '@/components/CustomColorPicker.vue'
+import { localState } from '@/logic/config/state'
 import {
-  localState,
   availableFontOptions,
   fontSelectRenderLabel,
-} from '@/logic/store'
+} from '@/logic/store/style'
 import { useDualThemeColor } from './useDualThemeColor'
 
 defineProps<{

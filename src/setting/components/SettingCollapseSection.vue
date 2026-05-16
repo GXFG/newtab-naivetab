@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { customPrimaryColor } from '@/logic/store'
+import { ICONS } from '@/logic/constants/icons'
+import { customPrimaryColor } from '@/logic/store/style'
 
 const props = withDefaults(
   defineProps<{

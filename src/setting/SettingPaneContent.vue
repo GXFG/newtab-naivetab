@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { globalState } from '@/logic/store'
+import { globalState } from '@/logic/store/state'
 import { settingsList, SETTING_GROUPS } from './registry'
 
 const props = withDefaults(

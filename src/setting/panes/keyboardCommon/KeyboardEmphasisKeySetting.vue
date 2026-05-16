@@ -8,7 +8,8 @@
  * 渲染复用 KeyboardLayout + KeyboardKeycapDisplay，固定 24px 基准。
  */
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
-import { localConfig, getStyleField } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { getStyleField } from '@/logic/store/style'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
 import KeyboardKeycapDisplay from '@/components/KeyboardKeycapDisplay.vue'

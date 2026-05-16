@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { globalState } from '@/logic/store'
-import { ICONS } from '@/logic/icons'
+import { globalState } from '@/logic/store/state'
+import { ICONS } from '@/logic/constants/icons'
 import { SettingHeaderBar, SettingCollapseSection } from '@/setting/components'
 import AnalogSetting from './AnalogSetting.vue'
 import DigitalSetting from './DigitalSetting.vue'

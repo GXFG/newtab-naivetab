@@ -1,5 +1,5 @@
 import { type MaybeRefOrGetter, computed, toValue } from 'vue'
-import { localState } from '@/logic/store'
+import { localState } from '@/logic/config/state'
 
 /**
  * 双主题色值处理：自动根据当前外观（浅色/深色）取对应值

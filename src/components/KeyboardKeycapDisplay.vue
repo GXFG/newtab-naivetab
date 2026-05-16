@@ -16,7 +16,7 @@
  */
 
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 
 // ── Props ────────────────────────────────────────────────────────────────────
 const props = withDefaults(
@@ -28,8 +28,7 @@ const props = withDefaults(
     visualType: KeycapVisualType // 键帽型别：flat / gmk / dsa
 
     // 书签相关
-    bookmarkType?: KeycapBookmarkType // mark（网页）/ folder（文件夹）/ back（返回）
-    iconSrc?: string // favicon URL（mark 类型）
+    iconSrc?: string // favicon URL
 
     // 命令图标（优先级高于书签图标，用于 keyboardCommand 设置面板）
     commandIcon?: string // iconify 图标名称
@@ -51,10 +50,11 @@ const props = withDefaults(
     showName?: boolean // 显示书签名称
     showFavicon?: boolean // 显示书签图标
     showTactileBumps?: boolean // 显示触感凸起（F / J 键）
-    isBackIconVisible?: boolean // back 类型时是否显示返回箭头
+
+    // 动画控制
+    enableTransition?: boolean // 是否启用 layer 切换动画（首次加载禁用，后续启用）
   }>(),
   {
-    bookmarkType: 'mark',
     iconSrc: '',
     commandIcon: '',
     stageStyle: '',
@@ -69,7 +69,7 @@ const props = withDefaults(
     showName: true,
     showFavicon: true,
     showTactileBumps: false,
-    isBackIconVisible: false,
+    enableTransition: false,
   },
 )
 
@@ -93,6 +93,10 @@ const shouldShowTactileBumps = computed(
 
 /** 空值占位符（避免模板中使用 &nbsp; 或不可见字符被转义） */
 const EMPTY_PLACEHOLDER = ' '
+
+/** layer 切换动画 key，内容变化时触发过渡 */
+const iconKey = computed(() => `${props.iconSrc || 'noicon'}-${props.keyCode}`)
+const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
 </script>
 
 <template>
@@ -140,43 +144,42 @@ const EMPTY_PLACEHOLDER = ' '
         class="keycap__img"
         :style="iconStyle"
       >
-        <!-- 命令图标：优先级最高，用于 keyboardCommand 设置面板 -->
-        <Icon
-          v-if="commandIcon"
-          :icon="commandIcon"
-          class="img__command"
-        />
-        <!-- 书签 favicon（mark 类型） -->
-        <img
-          v-else-if="showFavicon && bookmarkType === 'mark' && iconSrc"
-          class="img__main"
-          :src="iconSrc"
-          :draggable="imgDraggable"
-        />
-        <!-- 文件夹图标（folder 类型） -->
-        <Icon
-          v-else-if="showFavicon && bookmarkType === 'folder'"
-          :icon="ICONS.folderOutline"
-          class="img__type"
-        />
-        <!-- 返回箭头（back 类型） -->
-        <Icon
-          v-else-if="
-            showFavicon && bookmarkType === 'back' && isBackIconVisible
-          "
-          :icon="ICONS.arrowBackRounded"
-          class="img__type"
-        />
+        <Transition
+          :name="enableTransition ? 'keycap-icon' : ''"
+          mode="out-in"
+        >
+          <!-- 命令图标：优先级最高，用于 keyboardCommand 设置面板 -->
+          <Icon
+            v-if="commandIcon"
+            :key="`cmd-${iconKey}`"
+            :icon="commandIcon"
+            class="img__command"
+          />
+          <!-- 书签 favicon -->
+          <img
+            v-else-if="showFavicon && iconSrc"
+            :key="`icon-${iconKey}`"
+            class="img__main"
+            :src="iconSrc"
+            :draggable="imgDraggable"
+          />
+        </Transition>
       </div>
 
       <!-- 书签名称 -->
-      <p
-        v-if="showName"
-        class="keycap__name"
-        :style="textStyle"
+      <Transition
+        :name="enableTransition ? 'keycap-content' : ''"
+        mode="out-in"
       >
-        {{ name || EMPTY_PLACEHOLDER }}
-      </p>
+        <p
+          v-if="showName"
+          :key="`name-${nameKey}`"
+          class="keycap__name"
+          :style="textStyle"
+        >
+          {{ name || EMPTY_PLACEHOLDER }}
+        </p>
+      </Transition>
 
       <!-- 触感凸起（仅 F / J 键，模拟实体键盘触感标记） -->
       <div
@@ -362,6 +365,54 @@ const EMPTY_PLACEHOLDER = ' '
         0 1px 0 rgba(255, 255, 255, 0.15);
     }
   }
+}
+
+/* ── layer 切换内容过渡动画 ── */
+
+/* 图标过渡：快速缩放 + 淡入淡出 */
+.keycap-icon-enter-active {
+  transition:
+    opacity 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.keycap-icon-leave-active {
+  transition:
+    opacity 80ms ease,
+    transform 80ms ease;
+}
+
+.keycap-icon-enter-from {
+  opacity: 0;
+  transform: scale(0.4) !important;
+}
+
+.keycap-icon-leave-to {
+  opacity: 0;
+  transform: scale(0.4) !important;
+}
+
+/* 名称过渡：轻微缩放 + 淡入淡出 */
+.keycap-content-enter-active {
+  transition:
+    opacity 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.keycap-content-leave-active {
+  transition:
+    opacity 80ms ease,
+    transform 80ms ease;
+}
+
+.keycap-content-enter-from {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.keycap-content-leave-to {
+  opacity: 0;
+  transform: scale(0.98);
 }
 
 /* ── 选中动画关键帧 ── */

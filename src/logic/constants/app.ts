@@ -1,3 +1,6 @@
+/**
+ * 应用常量 — 防抖延迟、拖拽阈值、外观/时间/焦点映射表、Pexels API。
+ */
 export const MERGE_CONFIG_DELAY = 2000
 export const MERGE_CONFIG_MAX_DELAY = 5000
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getIsWidgetRender, getStyleField } from '@/logic/store'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import {
   updateWeather,
   refreshWeather,

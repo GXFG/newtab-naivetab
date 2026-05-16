@@ -1,5 +1,5 @@
 /**
- * bookmark.test.ts — 测试 bookmark.ts 中的书签相关工具函数
+ * bookmark.test.ts — 测试 bookmark/api.ts 中的书签相关工具函数
  *
  * 测试目标：
  * - getBrowserBookmark: 跨浏览器书签树解析（Chrome / Firefox）
@@ -11,7 +11,7 @@
  */
 
 describe('getBrowserBookmark', () => {
-  let getBrowserBookmark: typeof import('@/logic/bookmark')['getBrowserBookmark']
+  let getBrowserBookmark: typeof import('@/logic/bookmark/api')['getBrowserBookmark']
 
   describe('Chrome 环境（默认）', () => {
     beforeEach(async () => {
@@ -52,7 +52,7 @@ describe('getBrowserBookmark', () => {
         }),
       }
 
-      const mod = await import('@/logic/bookmark')
+      const mod = await import('@/logic/bookmark/api')
       getBrowserBookmark = mod.getBrowserBookmark
     })
 
@@ -85,7 +85,7 @@ describe('getBrowserBookmark', () => {
         }),
       }
 
-      const { getBrowserBookmark: fn } = await import('@/logic/bookmark')
+      const { getBrowserBookmark: fn } = await import('@/logic/bookmark/api')
       const result = await fn()
       expect(result).toEqual([])
     })
@@ -125,7 +125,7 @@ describe('getBrowserBookmark', () => {
         }),
       }
 
-      const mod = await import('@/logic/bookmark')
+      const mod = await import('@/logic/bookmark/api')
       getBrowserBookmark = mod.getBrowserBookmark
     })
 
@@ -152,7 +152,7 @@ describe('getBrowserBookmark', () => {
         }),
       }
 
-      const { getBrowserBookmark: fn } = await import('@/logic/bookmark')
+      const { getBrowserBookmark: fn } = await import('@/logic/bookmark/api')
       const result = await fn()
       expect(result).toEqual([])
     })
@@ -172,7 +172,7 @@ describe('getBrowserBookmark', () => {
       const origBookmarks = (globalThis as any).chrome.bookmarks
       delete (globalThis as any).chrome.bookmarks
 
-      const { getBrowserBookmark: fn } = await import('@/logic/bookmark')
+      const { getBrowserBookmark: fn } = await import('@/logic/bookmark/api')
       await expect(fn()).rejects.toThrow('chrome.bookmarks API not available')
 
       ;(globalThis as any).chrome.bookmarks = origBookmarks
@@ -181,7 +181,7 @@ describe('getBrowserBookmark', () => {
 })
 
 describe('getFaviconFromUrl', () => {
-  let getFaviconFromUrl: typeof import('@/logic/bookmark')['getFaviconFromUrl']
+  let getFaviconFromUrl: typeof import('@/logic/bookmark/api')['getFaviconFromUrl']
 
   describe('Chrome 环境', () => {
     beforeEach(async () => {
@@ -197,7 +197,7 @@ describe('getFaviconFromUrl', () => {
 
       ;(chrome.runtime as any).id = 'test-extension-id'
 
-      const mod = await import('@/logic/bookmark')
+      const mod = await import('@/logic/bookmark/api')
       getFaviconFromUrl = mod.getFaviconFromUrl
     })
 
@@ -239,7 +239,7 @@ describe('getFaviconFromUrl', () => {
         isForbiddenUrl: vi.fn(),
       }))
 
-      const mod = await import('@/logic/bookmark')
+      const mod = await import('@/logic/bookmark/api')
       getFaviconFromUrl = mod.getFaviconFromUrl
     })
 

@@ -21,7 +21,7 @@ describe('getSearchSuggestion', () => {
     vi.resetModules()
     mockRequest = createMockRequest()
 
-    vi.doMock('@/lib/request', () => ({
+    vi.doMock('@/api/request', () => ({
       default: mockRequest,
     }))
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import { localConfig, getIsWidgetRender, getStyleField } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { WIDGET_CODE } from './config'

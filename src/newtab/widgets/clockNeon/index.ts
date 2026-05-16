@@ -1,6 +1,6 @@
 import Index from './index.vue'
 import { WIDGET_CODE, WIDGET_CONFIG } from './config'
-import { WIDGET_ICON_META } from '@/logic/icons'
+import { WIDGET_ICON_META } from '@/logic/constants/icons'
 
 export default {
   code: WIDGET_CODE,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { globalState, localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState, openDrawer } from '@/logic/store/state'
 import SettingPaneContent from './SettingPaneContent.vue'
 
 // ── drawer 模式：同步侧边栏 nav 高度与内容区一致 ──
@@ -23,13 +24,19 @@ const updateSettingContentHeight = (entries: ResizeObserverEntry[]) => {
 
 const settingContentObserver = new ResizeObserver(updateSettingContentHeight)
 
+let settingCloseDrawer: (() => void) | undefined
+
 watch(
   () => globalState.isSettingDrawerVisible,
   async (visible) => {
     if (!visible) {
+      settingCloseDrawer?.()
       settingContentObserver.disconnect()
       return
     }
+    settingCloseDrawer = openDrawer('setting', () => {
+      globalState.isSettingDrawerVisible = false
+    })
     /**
      * NDrawer 使用 teleport + transition 渲染，需要两次 nextTick 才能获取到 DOM：
      * 1. 第一次：等待 Vue 响应式更新完成（isSettingDrawerVisible 触发渲染）

@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import {
   WEATHER_TEMPERATURE_UNIT_MAP,
   WEATHER_SPEED_UNIT_MAP,
 } from '@/logic/constants/weather'
 import { URL_QWEATHER_HOME } from '@/logic/constants/urls'
-import { createTab } from '@/logic/util'
+import { createTab } from '@/logic/utils/common'
 import { isDragMode } from '@/logic/moveable'
-import {
-  localConfig,
-  localState,
-  getStyleField,
-  globalState,
-} from '@/logic/store'
+import { localConfig, localState } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
+import { getStyleField } from '@/logic/store/style'
 import {
   weatherState,
   weatherIndicesInfo,

@@ -1,3 +1,6 @@
+/**
+ * 搜索引擎常量 — 搜索引擎列表定义与模板。
+ */
 export interface TSearchEngine {
   label: string
   value: string

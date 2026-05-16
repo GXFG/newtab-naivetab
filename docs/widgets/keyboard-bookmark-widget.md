@@ -22,53 +22,32 @@
   globalShortcutModifiers: ['alt'],           // 全局快捷键修饰键
   urlBlacklist: string[],                     // URL 黑名单
   isNewTabOpen: false,                        // 始终在新标签页打开
-  bindingMode: true,                          // source=1 键位绑定开关（所有层共用）
-  defaultExpandFolder: null | string,         // 自动展开的书签文件夹标题（仅顺序模式）
   layers: [                                   // source=1 时最多 4 层，每层绑定一个浏览器书签文件夹
-    { sourceFolderTitle: 'NaiveTab' },
-    { sourceFolderTitle: '' },                // 空字符串表示未配置
-    { sourceFolderTitle: '' },
-    { sourceFolderTitle: '' },
+    { sourceFolderPath: 'layer1' },
+    { sourceFolderPath: '' },                // 空字符串表示未配置
+    { sourceFolderPath: '' },
+    { sourceFolderPath: '' },
   ],
   keymap: Record<string, TBookmarkEntry>,     // key code → {url, name?}
   layout: { ... }                             // 页面位置（vw/vh）
 }
 ```
 
-**PRESERVE_FIELDS** = `['source', 'isGlobalShortcutEnabled', 'noModifierMode', 'shortcutInInputElement', 'globalShortcutModifiers', 'urlBlacklist', 'keymap', 'layers', 'bindingMode']` — 快速重置时保护用户数据。
+**PRESERVE_FIELDS** = `['source', 'isGlobalShortcutEnabled', 'noModifierMode', 'shortcutInInputElement', 'globalShortcutModifiers', 'urlBlacklist', 'keymap', 'layers']` — 快速重置时保护用户数据。
 
-**activeLayer**（当前激活层索引）不存储在 `localConfig` 中（会被云同步），而是以模块级变量 + `chrome.storage.local` 独立 key（`naive-tab-activeLayer`）管理，设备级持久化、不同步。
+**activeLayer**（当前激活层索引）不存储在 `localConfig` 中（会被云同步），而是以模块级变量 + `chrome.storage.local` 独立 key（`ACTIVE_LAYER_STORAGE_KEY`，值为 `'naive-tab-activeLayer'`）管理，设备级持久化、不同步。
 
 ---
 
-## 双模式运行机制
+## 运行机制
 
 ### source = 1（系统书签）
 
-通过 `chrome.bookmarks` API 读取浏览器书签树，由 `parseBookmarkFolder()` 解析器构建 keymap。支持**多层书签**机制：最多 4 层，每层绑定一个独立的浏览器书签文件夹，通过全局命令快捷键（如 `Alt+1/2/3/4`）切换。`bindingMode` 为所有层共用同一个开关。层激活状态（`activeLayer`）设备级持久化（`chrome.storage.local`），不云同步；`layers` 配置跨设备同步（`chrome.storage.sync`）。
+通过 `chrome.bookmarks` API 读取浏览器书签树，由 `parseBookmarkFolder()` 解析器构建 keymap。支持**多层书签**机制：最多 4 层，每层绑定一个独立的浏览器书签文件夹，通过全局命令快捷键（如 `Alt+1/2/3/4`）切换。层激活状态（`activeLayer`）设备级持久化（`chrome.storage.local`），不云同步；`layers` 配置跨设备同步（`chrome.storage.sync`）。
 
-进一步分为两种子模式：
+书签名以 `[X]` 前缀精确绑定到对应键位（如 `[KeyQ] Google`、`[F1] 日历`），无前缀书签被忽略。用户可在设置面板或 popup 通过键盘预览点击键位，选择浏览器书签后系统自动为其添加 `[X]` 前缀。也支持直接在表单区编辑 URL/名称，输入时自动同步到 Chrome 书签。解绑时自动移除 `[X]` 前缀。需要 `bookmarks` 可选权限，未授权时弹出授权对话框。
 
-#### 顺序模式（`bindingMode = false`，默认）
-
-- 书签按深度优先遍历顺序填充到键盘键位
-- 首键始终为"返回"按钮
-- 支持文件夹导航栈（`selectedFolderTitleStack`）
-- `defaultExpandFolder` 配置初始展开的文件夹
-- 书签名称/文件夹名以 `_` 开头的条目不参与解析
-- keymap 按遍历顺序填充，供全局快捷键使用
-
-#### 键位绑定模式（`bindingMode = true`）
-
-- 仅读取带有 `[X]` 前缀的书签（如 `[Q] Google`、`[F1] 日历`），精确绑定到对应键位
-- 无前缀书签被忽略
-- 不支持文件夹导航
-- 用户可在设置面板或 popup 通过键盘预览点击键位，选择浏览器书签后系统自动为其添加 `[X]` 前缀
-- 也支持直接在表单区编辑 URL/名称，输入时自动同步到 Chrome 书签
-- 解绑时自动移除 `[X]` 前缀
-- 需要 `bookmarks` 可选权限，未授权时弹出授权对话框
-
-书签解析器详见 [bookmark-parser.ts](../../src/logic/keyboard/bookmark-parser.ts)。
+书签解析器详见 [parser.ts](../../src/logic/bookmark/parser.ts)。
 
 ### source = 2（自定义 keymap）
 
@@ -88,8 +67,7 @@ KeyboardBookmark (Widget 入口)
         └── KeyboardKeycapWidget (单键包装 — 通用引擎)
               └── KeyboardKeycapDisplay (纯展示组件)
                     ├── keycap__label  — 键位标识
-                    ├── keycap__img    — favicon / 文件夹图标
-                    └── keycap__name   — 书签名称
+                    └─ keycap__name   — 书签名称
 ```
 
 ### 数据绑定流程
@@ -112,8 +90,7 @@ KeyboardBookmark (Widget 入口)
 2. 屏蔽修饰键组合
 3. 过滤不在当前布局中的按键
 4. **命令快捷键开启无修饰键模式时静默跳过**（`keyboardCommand.noModifierMode` 为 true 时返回，避免与命令快捷键冲突）
-5. folder/back 类型：调用 `handleSpecialKeycapExec` 导航书签树
-6. 其他：通过 `openPage()` 打开 URL，设置 `currSelectKeyCode` 做视觉反馈
+5. 有 URL 的键位：通过 `openPage()` 打开 URL，设置 `currSelectKeyCode` 做视觉反馈
 
 ### 鼠标交互
 
@@ -131,9 +108,9 @@ KeyboardBookmark (Widget 入口)
 
 | 层级 | 所属 | 文档 |
 |------|------|------|
-| 布局定义（16 种） | 通用引擎 | [keyboard.md](../features/keyboard.md) |
+| 布局定义（19 种） | 通用引擎 | [keyboard.md](../features/keyboard.md) |
 | 键帽渲染（GMK/DSA/flat） | 通用引擎 | [keyboard.md](../features/keyboard.md) |
-| 主题预设（80+） | 通用引擎 | [keyboard.md](../features/keyboard.md) |
+| 主题预设（81） | 通用引擎 | [keyboard.md](../features/keyboard.md) |
 | 拖拽系统（moveable） | 通用基础设施 | [keyboard.md](../features/keyboard.md) |
 | 书签数据绑定 | keyboardBookmark Widget | 本文档 |
 | 全局快捷键执行 | keyboardBookmark + shortcut-executor | [global-shortcut.md](../features/global-shortcut.md) |
@@ -142,26 +119,119 @@ KeyboardBookmark (Widget 入口)
 
 | 命名空间 | 配置文件 | 用途 |
 |----------|----------|------|
-| `keyboardCommon` | `src/logic/keyboard/keyboard-config.ts` | 视觉样式（布局、键帽、外壳、配色） |
+| `keyboardCommon` | `src/logic/config/defaults.ts` | 视觉样式（布局、键帽、外壳、配色） |
 | `keyboardBookmark` | `src/newtab/widgets/keyboardBookmark/config.ts` | Widget 业务数据（keymap、位置、来源模式） |
 
 ---
 
 ## Widget 注册与扩展点
 
-- Widget 注册在 `src/newtab/widgets/keyboardBookmark/registry.ts`
+- Widget 通过 glob 自动注册到 `src/newtab/widgets/registry.ts`（`index.ts` 导出 `config.ts` 中的元信息）
 - Setting 面板注册在 `src/setting/registry.ts` 的 `widget` 分组中
 - Setting 面板代码在 `src/setting/panes/keyboardBookmark/`
-- Setting 图标注册在 `src/logic/icons.ts` 的 `SETTING_ICON_META` 中
+- Setting 图标注册在 `src/logic/constants/icons.ts` 的 `SETTING_ICON_META` 中
 
 ---
 
 ## 注意事项
 
 - 修改 `keyboardBookmark` 配置字段时，**必须同步修改** `src/background/main.ts` 中的字段引用
+- 第 0 层默认 `sourceFolderPath` 为 `'layer1'`，与 `bookmark-export.ts` 的 `EXPORT_LAYERS[0]` 和 `getCurrentLayerFolderTitle()` fallback 值一致，确保导出书签和解析书签使用同一个文件夹
 - popup 修改书签后必须在 `handleCommit` 中调用 `flushConfigSync` 强制同步
 - `isDragMode` 激活时，keydown handler 提前返回，防止拖拽 Widget 时误触书签打开
 - 全局快捷键 `source=2` 时从 `keymap` 读取 URL 执行，详情见 [global-shortcut.md](../features/global-shortcut.md)
 - 命令快捷键开启无修饰键模式（`noModifierMode`）时，键盘 Widget 的 keydown handler 会被短路，按键由命令快捷键独占处理
-- **多层书签**（source=1）：`layers` 数组固定 4 个元素，每层 `sourceFolderTitle` 指向一个浏览器书签文件夹。所有外部调用统一通过 `getCurrentLayerFolderTitle()` 获取当前激活层的文件夹名称。层切换通过 `switchBookmarkLayer1-4` 全局命令快捷键触发，`activeLayer` 设备级持久化（`chrome.storage.local`），不云同步
-- `findFolderByName` 通过 DFS 按 title 匹配文件夹，若两个层绑定了同名但不同位置的文件夹，可能匹配到非预期结果。这是现有机制的已知限制，留作后续迭代
+- **多层书签**（source=1）：`layers` 数组固定 4 个元素，每层 `sourceFolderPath` 指向一个浏览器书签文件夹路径（如 `"NaiveTab/layer1"`）。所有外部调用统一通过 `getCurrentLayerFolderTitle()` 获取当前激活层的文件夹路径。层切换通过 `switchBookmarkLayer1-4` 全局命令快捷键触发，`activeLayer` 设备级持久化（`chrome.storage.local`），不云同步
+- `findFolderByPath` 按路径精确匹配文件夹，避免了 DFS 同名匹配的不确定性。路径格式如 `"NaiveTab/layer1"` 或单层 `"layer1"`
+
+---
+
+## Layer 层切换架构
+
+### 完整数据流
+
+**路径 A：命令快捷键触发（主流路径，不依赖 newtab 页面是否存在）**
+
+```
+用户按下 layer 切换快捷键
+  → CS/NEWtab 通过 Port 发送 MSG_KEYDOWN 到 SW
+  → SW processKeydown → handleCommandShortcutKeydown
+  → getCommandExecEnv 返回 'sw' → execSwCommand('switchBookmarkLayerN', tabId)
+  → commands/registry.ts: switchBookmarkLayer (markLayerKeymapBuilding + buildAndSaveLayerKeymap)
+    └─ markLayerKeymapBuilding 和 getCachedKeyboardBookmarkLayers 来自 config/cache.ts（避免循环依赖）
+  → SW 端构建新层 keymap → chrome.storage.local.set({ keymap, activeLayer })
+  → 触发 storage.onChanged，各端同步：
+    ├── SW config/cache.ts: 更新 cachedSystemKeymap，清除 isBuildingLayerKeymap
+    ├── SW messaging/toast.ts: 向当前活跃 tab 的 Port 发送 MSG_SWITCH_BOOKMARK_LAYER
+    ├── NewTab shortcut-executor.ts: Port 消息显示 showToast
+    └── CS index.ts: onChanged 更新 systemKeymap 本地缓存，Port 消息显示 toast
+```
+
+**路径 B：UI 点击 switchLayer()（消息驱动，原子写入）**
+
+```
+UI 点击 layer tab → switchLayer(layerIndex)
+  → runtime.sendMessage({ type: MSG_SWITCH_BOOKMARK_LAYER_UI, layerIndex })
+  → SW port-manager.ts: handleSwitchBookmarkLayerFromUI
+    → markLayerKeymapBuilding()
+    → buildAndSaveLayerKeymap(layerIndex)
+    → chrome.storage.local.set({ keymap, activeLayer })  原子写入
+    → sendLayerSwitchToast(layerIndex)
+  → 触发 storage.onChanged，各端同步：
+    ├── SW config/cache.ts: 更新 cachedSystemKeymap，清除 isBuildingLayerKeymap
+    ├── NewTab bookmark-state.ts: 更新 state.systemKeymap
+    └── CS index.ts: 更新 systemKeymap 本地缓存
+```
+
+**路径 C：popup 页面内 switchLayer() 触发**
+
+```
+popup 点击 layer tab → switchLayer(layerIndex)
+  → runtime.sendMessage({ type: MSG_SWITCH_BOOKMARK_LAYER_UI, layerIndex })
+  → 与路径 B 完全一致，SW 原子写入
+```
+
+三条路径统一通过 SW 执行 `buildAndSaveLayerKeymap`，原子写入 keymap + activeLayer，不存在中间状态。
+
+### Toast 显示规则
+
+| 路径 | newtab 页面 | 普通网页 |
+|------|-----------|---------|
+| A：命令快捷键 | Port 消息 `showToast` | `sendLayerSwitchToast` 通过 Port 发 toast |
+| B/C：UI 点击 | Port 消息 `showToast` | `sendLayerSwitchToast` 通过 Port 发 toast |
+
+newtab 和普通网页的 toast 统一通过 SW → Port 消息路径下发，各自使用 `showToast` 显示（Shadow DOM 隔离样式）。
+
+所有路径均为原子写入，如果目标层 keymap 与当前相同，`onChanged` 不会触发。命令路径通过 `sendLayerSwitchToast` 始终通过 Port 发送 toast，确保用户始终获得反馈。
+
+### 冷却机制
+
+`config/cache.ts` 采用 `isBuildingLayerKeymap` 标志位防护：从 `markLayerKeymapBuilding()` 到 `onChanged` 完成期间始终为 true，书签快捷键被拦截。所有路径统一为 SW 原子写入，不存在多 writer 竞态窗口。
+
+`isBuildingLayerKeymap` 有两类清除路径：
+- **成功路径**：仅在 `storage.onChanged` 监听器（`config/cache.ts`）中清除，确保标志位在 storage 实际写入、`cachedSystemKeymap` 刷新后才释放。
+- **非成功路径**（层未配置提前返回、解析异常）：在 `buildAndSaveLayerKeymap` 中直接清除。这两种情况均不写入 storage、不触发 `onChanged`，必须自行清除，否则标志位永久为 `true`，所有书签快捷键被永久拦截。
+
+详见 [layer-keymap-builder.ts](../../src/background/commands/layer-keymap-builder.ts)。
+
+**Toast 反馈**：`switchBookmarkLayer` 和 `cycleBookmarkLayers` 在执行层切换后始终调用 `sendLayerSwitchToast`，无论目标层 keymap 是否为空，确保用户每次切换都能获得视觉反馈。
+
+### 设计决策说明（非问题）
+
+以下是容易误认为是 bug 的设计决策，特此说明：
+
+**所有路径统一为 SW 原子写入**
+
+三条切层路径（命令快捷键、newtab UI 点击、popup 点击）统一通过 SW 执行 `buildAndSaveLayerKeymap`，原子写入 keymap + activeLayer。UI 端通过 `runtime.sendMessage` 通知 SW，不直接写入 storage。这消除了两步写入的中间状态，书签快捷键由 `isBuildingLayerKeymap` 标志位全程防护。
+
+**多处 storage.onChanged 监听器**
+
+`bookmark-state.ts`（newtab）、`cache.ts`（SW）、`logic.ts`（widget）各有独立的 `onChanged` 监听器，这是因为 Chrome 扩展的不同上下文（Content Script、Service Worker、newtab 页面）无法共享内存，必须各自监听 storage 变更来更新本地缓存。每个监听器只处理自己关心的 key，过滤规则不同是设计意图。
+
+**exportKeymapToBrowser 只写到 layer1**
+
+source=2（自定义 keymap）只有一套 keymap，没有 layer 概念。导出到浏览器书签时写入 layer1 并创建 layer2-4 空文件夹占位。如果用户需要利用多层功能，应切换到 source=1（系统书签）后手动配置其他 layer 的文件夹。这是两种数据源模式的职责边界。
+
+**Setting 面板的 layer 视觉指示**
+
+Setting 面板和 Popup 中 `BaseBookmarkLayerTabSwitcher` 组件已提供 layer 切换标签（pill tabs），active tab 有明确颜色区分。Widget 页面不提供常驻 layer 指示器，因为 layer 切换完全通过键盘快捷键完成，切换时已有 toast 通知反馈。

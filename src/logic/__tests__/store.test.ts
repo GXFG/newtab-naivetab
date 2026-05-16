@@ -9,10 +9,10 @@ import { ref, reactive } from 'vue'
  */
 
 describe('store (isolated exports)', () => {
-  let colorMixWithAlpha: (typeof import('@/logic/store'))['colorMixWithAlpha']
-  let getSettingKeyboardSize: (typeof import('@/logic/store'))['getSettingKeyboardSize']
-  let getStyleField: (typeof import('@/logic/store'))['getStyleField']
-  let getIsWidgetRender: (typeof import('@/logic/store'))['getIsWidgetRender']
+  let colorMixWithAlpha: (typeof import('@/logic/store/style'))['colorMixWithAlpha']
+  let getSettingKeyboardSize: (typeof import('@/logic/store/style'))['getSettingKeyboardSize']
+  let getStyleField: (typeof import('@/logic/store/style'))['getStyleField']
+  let getIsWidgetRender: (typeof import('@/logic/store/style'))['getIsWidgetRender']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -76,20 +76,17 @@ describe('store (isolated exports)', () => {
       },
     }))
 
-    vi.doMock('@/logic/util', () => ({
+    vi.doMock('@/logic/utils/util', () => ({
       log: vi.fn(),
       compareLeftVersionLessThanRightVersions: vi.fn(),
       createTab: vi.fn(),
-      downloadJsonByTagA: vi.fn(),
     }))
 
-    vi.doMock('@/newtab/widgets/codes', () => ({
+    vi.doMock('@/common/widget-constants', () => ({
       WIDGET_CODE_LIST: ['search', 'clockDigital'],
     }))
 
-    vi.doMock('@/newtab/widgets/registry', () => ({}))
-
-    vi.doMock('@/setting/registry', () => ({
+    vi.doMock('@/common/keyboard', () => ({
       SETTING_KEYBOARD_BASE_SIZE: 35,
     }))
 
@@ -117,7 +114,7 @@ describe('store (isolated exports)', () => {
       writable: true,
     })
 
-    const mod = await import('@/logic/store')
+    const mod = await import('@/logic/store/style')
     colorMixWithAlpha = mod.colorMixWithAlpha
     getSettingKeyboardSize = mod.getSettingKeyboardSize
     getStyleField = mod.getStyleField
@@ -154,13 +151,13 @@ describe('store (isolated exports)', () => {
 
   describe('getSettingKeyboardSize', () => {
     it('returns base size in drawer mode', async () => {
-      const { globalState } = await import('@/logic/store')
+      const { globalState } = await import('@/logic/store/state')
       globalState.settingMode = 'drawer'
       expect(getSettingKeyboardSize()).toBe(35)
     })
 
     it('returns 1.4x size in options mode', async () => {
-      const { globalState } = await import('@/logic/store')
+      const { globalState } = await import('@/logic/store/state')
       globalState.settingMode = 'options'
       expect(getSettingKeyboardSize()).toBe(Math.round(35 * 1.4)) // 49
     })
@@ -168,7 +165,7 @@ describe('store (isolated exports)', () => {
 
   describe('getStyleField', () => {
     it('returns color value at current appearance index for arrays', async () => {
-      const { localConfig, localState } = await import('@/logic/store')
+      const { localConfig, localState } = await import('@/logic/config/state')
       localConfig.general.fontColor = [
         'rgba(44, 62, 80, 1)',
         'rgba(255, 255, 255, 1)',
@@ -179,7 +176,7 @@ describe('store (isolated exports)', () => {
     })
 
     it('returns dark mode color when appearanceCode is 1', async () => {
-      const { localConfig, localState } = await import('@/logic/store')
+      const { localConfig, localState } = await import('@/logic/config/state')
       localConfig.general.fontColor = [
         'rgba(44, 62, 80, 1)',
         'rgba(255, 255, 255, 1)',
@@ -190,21 +187,21 @@ describe('store (isolated exports)', () => {
     })
 
     it('returns raw value for non-number fields', async () => {
-      const { localConfig } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
       localConfig.search.enabled = false
       const result = getStyleField('search', 'enabled')
       expect(result.value).toBe(false)
     })
 
     it('applies ratio multiplier', async () => {
-      const { localConfig } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
       localConfig.search.fontSize = 14
       const result = getStyleField('search', 'fontSize', undefined, 2)
       expect(result.value).toBe(28)
     })
 
     it('converts number to vmin unit (with ×0.1 factor)', async () => {
-      const { localConfig } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
       localConfig.search.fontSize = 14
       const result = getStyleField('search', 'fontSize', 'vmin')
       // 14 * 0.1 = 1.4 (floating point: 1.4000000000000001)
@@ -212,7 +209,7 @@ describe('store (isolated exports)', () => {
     })
 
     it('applies ratio + vmin together', async () => {
-      const { localConfig } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
       localConfig.search.fontSize = 14
       const result = getStyleField('search', 'fontSize', 'vmin', 2)
       // 14 * 2 * 0.1 = 2.8 (floating point: 2.8000000000000003)
@@ -220,14 +217,14 @@ describe('store (isolated exports)', () => {
     })
 
     it('appends px unit without scaling', async () => {
-      const { localConfig } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
       localConfig.search.fontSize = 14
       const result = getStyleField('search', 'fontSize', 'px')
       expect(result.value).toBe('14px')
     })
 
     it('handles nested field paths with dot notation', async () => {
-      const { localConfig } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
       // general doesn't have nested, but let's test with general.version
       localConfig.general.version = '2.2.5'
       const result = getStyleField('general', 'version')
@@ -237,7 +234,7 @@ describe('store (isolated exports)', () => {
 
   describe('getIsWidgetRender', () => {
     it('returns computed ref reflecting widget enabled state', async () => {
-      const { localConfig } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
       localConfig.search.enabled = true
       const isRender = getIsWidgetRender('search')
       expect(isRender.value).toBe(true)
@@ -249,13 +246,13 @@ describe('store (isolated exports)', () => {
 
   describe('switchSettingDrawerVisible', () => {
     it('sets isSettingDrawerVisible to true', async () => {
-      const mod = await import('@/logic/store')
+      const mod = await import('@/logic/store/state')
       mod.switchSettingDrawerVisible(true)
       expect(mod.globalState.isSettingDrawerVisible).toBe(true)
     })
 
     it('sets isSettingDrawerVisible to false', async () => {
-      const mod = await import('@/logic/store')
+      const mod = await import('@/logic/store/state')
       mod.switchSettingDrawerVisible(false)
       expect(mod.globalState.isSettingDrawerVisible).toBe(false)
     })
@@ -263,7 +260,7 @@ describe('store (isolated exports)', () => {
 
   describe('openChangelogModal', () => {
     it('sets isChangelogModalVisible to true', async () => {
-      const mod = await import('@/logic/store')
+      const mod = await import('@/logic/store/state')
       mod.openChangelogModal()
       expect(mod.globalState.isChangelogModalVisible).toBe(true)
     })
@@ -271,7 +268,8 @@ describe('store (isolated exports)', () => {
 
   describe('currDayjsLang', () => {
     it('returns lang based on timeLang config', async () => {
-      const { localConfig, currDayjsLang } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
+      const { currDayjsLang } = await import('@/logic/store/theme')
       localConfig.general.timeLang = 'zh-CN'
       expect(currDayjsLang.value).toBe('zh-cn')
 
@@ -280,7 +278,8 @@ describe('store (isolated exports)', () => {
     })
 
     it('falls back to en for unknown lang', async () => {
-      const { localConfig, currDayjsLang } = await import('@/logic/store')
+      const { localConfig } = await import('@/logic/config/state')
+      const { currDayjsLang } = await import('@/logic/store/theme')
       localConfig.general.timeLang = 'unknown'
       expect(currDayjsLang.value).toBe('en')
     })

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SEARCH_ENGINE_LIST } from '@/logic/constants/search'
-import { localConfig } from '@/logic/store'
-import { ICONS } from '@/logic/icons'
+import { localConfig } from '@/logic/config/state'
+import { ICONS } from '@/logic/constants/icons'
 import {
   SettingHeaderBar,
   SettingFormWrap,

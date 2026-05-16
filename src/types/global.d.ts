@@ -13,13 +13,10 @@ interface Window {
    */
   __naivetabGlobalShortcutInit: boolean
   $t: (key: string) => string
-  $message: MessageApiInjection
-  $notification: NotificationApiInjection
   $dialog: DialogApiInjection
-  $loadingBar: LoadingBarApiInjection
 }
 
-type WidgetCodes = import('@/newtab/widgets/codes').WidgetCodes
+type WidgetCodes = import('@/common/widget-constants').WidgetCodes
 type ConfigField =
   | WidgetCodes
   | 'general'
@@ -62,7 +59,7 @@ type DatabaseLocalBackgroundImages = {
   smallBase64: string
 }
 
-type OptionsPermission = 'bookmarks'
+type OptionsPermission = 'bookmarks' | 'notifications'
 
 type Placement =
   | 'top-start'

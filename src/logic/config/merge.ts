@@ -1,25 +1,14 @@
 /**
- * 配置合并函数（递归）
- *
- * 合并策略说明：
- * ┌─────────────────────────────────────────────────────────────────────────────┐
- * │  参数说明                                                                   │
- * │  - state: 默认配置（来自 defaultConfig）                                   │
- * │  - acceptState: 待合并的配置（来自云端/导入/本地）                          │
- * │                                                                             │
- * │  合并规则（按优先级）：                                                     │
- * │  1. acceptState 为空 → 使用默认值 state                                     │
- * │  2. 类型不同 → 使用默认值 state（处理新增字段）                             │
- * │  3. 基础类型 → 直接使用 acceptState 的值                                    │
- * │  4. 数组等非纯Object → 直接使用 acceptState 的值                            │
- * │  5. keymap 特殊对象 → 直接使用 acceptState 的值（避免深合并破坏结构）        │
- * │  6. 普通对象 → 递归合并，只合并 state 中已定义的字段                        │
- * │                                                                             │
- * │  设计目标：                                                                 │
- * │  - 保留用户新版本新增字段的默认值                                           │
- * │  - 删除旧版本废弃的字段                                                     │
- * │  - 避免合并破坏特殊数据结构（如 keymap）                                    │
- * └─────────────────────────────────────────────────────────────────────────────┘
+ * @module merge
+ * @description 递归配置合并函数。以 defaultConfig 为模板过滤未知/废弃字段。
+ * @dependencies 无（纯函数）
+ * @consumers upload.ts（上传前校验）、loader.ts（版本感知合并）、update.ts（updateSetting 写入）
+ * @pitfalls
+ *   - keymap 对象（Key/Digit/Numpad 开头的键名）和数组直接替换，不深合并
+ *   - 嵌套对象新增字段不能依赖浅合并自动补全，必须在 handleAppUpdate 中手动赋值
+ *   - 类型不同时使用默认值（处理旧版本类型变更），不会尝试转换
+ * @see docs/architecture/config.md#mergeState-合并函数
+ * @see .claude/rules/pitfalls.md#mergestate-合并陷阱
  */
 export const mergeState = (state: unknown, acceptState: unknown): unknown => {
   // 规则1: acceptState 为空，使用默认值

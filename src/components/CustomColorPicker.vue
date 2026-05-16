@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import { FAVORITE_SWATCHE_MAX_COUNT } from '@/logic/constants/app'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+
+import { showToast } from '@/common/toast'
 
 const props = defineProps({
   value: {
@@ -43,7 +45,7 @@ const addFavoriteColor = () => {
     return
   }
   if (localConfig.general.swatcheColors.length >= FAVORITE_SWATCHE_MAX_COUNT) {
-    window.$message.error(window.$t('prompts.favoriteLimit'))
+    showToast.error(window.$t('prompts.favoriteLimit'))
     return
   }
   localConfig.general.swatcheColors.push(props.value)

@@ -2,29 +2,33 @@
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import {
   LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M,
   SECOND_MODAL_WIDTH,
 } from '@/logic/constants/app'
-import { localConfig, localState } from '@/logic/store'
+import { localConfig, localState } from '@/logic/config/state'
+import { useDrawerStack } from '@/composables/useDrawerStack'
 import {
   BACKGROUND_IMAGE_SOURCE,
   IMAGE_NETWORK_SOURCE,
-} from '@/logic/constants/image'
+} from '@/logic/image/constants'
 import {
-  previewImageListMap,
   imageLocalState,
   imageState,
   isImageLoading,
   isImageGalleryLoading,
+} from '@/logic/image/state'
+import {
+  previewImageListMap,
   updateBingImages,
   updatePexelsImages,
-  getImageUrlFromName,
-  storeLocalBackgroundImage,
-} from '@/logic/image'
+} from '@/logic/image/gallery'
+import { showToast } from '@/common/toast'
+import { getImageUrlFromName } from '@/logic/image/utils'
+import { storeLocalBackgroundImage } from '@/logic/image/service'
 import { getPexelsImagesData } from '@/api/image'
-import { log } from '@/logic/util'
+import { log } from '@/logic/utils/common'
 import { SettingFormItem, SettingFormSection } from '@/setting/components'
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
 
@@ -53,16 +57,12 @@ const currentBackgroundPreviewUrl = computed(() => {
         ] || ''
       )
     }
-    // Bing/Pexels 图库：从配置的图片名拼接 URL
-    const name =
-      localConfig.general.backgroundImageNames?.[
-        localState.value.currAppearanceCode
-      ]
-    if (name) {
-      return getImageUrlFromName(
-        localConfig.general.backgroundNetworkSourceType,
-        name,
-      )
+    // Bing/Pexels 图库：从配置的图片对象拼接 URL
+    const config = (localConfig.general.backgroundImageList as any)[
+      localState.value.currAppearanceCode
+    ]
+    if (config?.name) {
+      return getImageUrlFromName(config.networkSourceType, config.name)
     }
     return ''
   }
@@ -148,6 +148,9 @@ watch(
   },
 )
 
+// ESC 逐层关闭支持
+useDrawerStack('background-drawer', toRef(props, 'show'), onCloseModal)
+
 const bgImageFileInputEl: Ref<HTMLInputElement | null> = ref(null)
 
 const onSelectBackgroundImage = () => {
@@ -165,7 +168,7 @@ const onBackgroundImageFileChange = async (e: Event) => {
   }
   const file = input.files[0]
   if (file.size > LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M * 1024 * 1024) {
-    window.$message.error(window.$t('prompts.imageTooLarge'))
+    showToast.error(window.$t('prompts.imageTooLarge'))
     return
   }
   await storeLocalBackgroundImage(file)
@@ -292,20 +295,6 @@ const loadMorePexels = async () => {
                 :tip-content="$t('generalSetting.localBackgroundTips')"
               >
                 <div class="form__local">
-                  <div class="local__actions">
-                    <NButton
-                      type="primary"
-                      size="tiny"
-                      secondary
-                      class="setting__btn setting__btn--primary"
-                      @click="onSelectBackgroundImage"
-                    >
-                      <template #icon>
-                        <Icon :icon="ICONS.importFile" />
-                      </template>
-                      {{ $t('common.import') }}
-                    </NButton>
-                  </div>
                   <p
                     v-if="imageState.currBackgroundImageFileName"
                     class="local__filename"
@@ -314,8 +303,22 @@ const loadMorePexels = async () => {
                       :icon="ICONS.imageSquare"
                       class="filename__icon"
                     />
-                    {{ imageState.currBackgroundImageFileName }}
+                    <span class="filename__text">
+                      {{ imageState.currBackgroundImageFileName }}
+                    </span>
                   </p>
+                  <NButton
+                    type="primary"
+                    size="tiny"
+                    secondary
+                    class="setting__btn setting__btn--primary"
+                    @click="onSelectBackgroundImage"
+                  >
+                    <template #icon>
+                      <Icon :icon="ICONS.importFile" />
+                    </template>
+                    {{ $t('common.import') }}
+                  </NButton>
                   <input
                     ref="bgImageFileInputEl"
                     style="display: none"
@@ -500,29 +503,32 @@ const loadMorePexels = async () => {
 
   .form__local {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    gap: 8px;
 
-    .local__actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .setting__btn {
+      flex-shrink: 0;
     }
 
     .local__filename {
       display: flex;
       align-items: center;
       gap: 5px;
-      max-width: 340px;
+      min-width: 0;
+      flex: 1;
       padding: 5px 10px;
       border-radius: 5px;
       background-color: var(--n-color-target);
       border: 1px solid var(--n-border-color);
       font-size: 12px;
       color: var(--n-text-color-3);
+      margin: 0;
       overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+
+      .filename__text {
+        min-width: 0;
+        line-height: 1.2;
+      }
 
       .filename__icon {
         flex-shrink: 0;

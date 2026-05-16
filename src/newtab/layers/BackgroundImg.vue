@@ -13,8 +13,8 @@
  * - 鼠标视差效果（parallax）：mousemove 时背景轻微偏移，容器扩展 parallaxIntensity * 2 px
  * - Loading 指示器：大图加载超过 500ms 时显示三个脉冲圆点
  */
-import { localConfig } from '@/logic/store'
-import { imageState, isImageLoading } from '@/logic/image'
+import { localConfig } from '@/logic/config/state'
+import { imageState, isImageLoading } from '@/logic/image/state'
 
 // 视差效果：鼠标移动时背景轻微偏移
 const parallaxX = ref(0)

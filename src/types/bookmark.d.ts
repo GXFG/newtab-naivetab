@@ -1,5 +1,3 @@
-type KeycapBookmarkType = 'none' | 'mark' | 'folder' | 'back'
-
 type KeycapVisualType = 'gmk' | 'dsa' | 'flat'
 
 /** 单个键位的坐标定义 */

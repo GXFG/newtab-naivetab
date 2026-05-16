@@ -5,8 +5,8 @@ import {
   getWeatherAirNow,
   getWeatherWarning,
 } from '@/api'
-import { log } from '@/logic/util'
-import { localConfig } from '@/logic/store'
+import { log } from '@/logic/utils/common'
+import { localConfig } from '@/logic/config/state'
 
 const defaultWeatherState = {
   state: { isWarningVisible: false },

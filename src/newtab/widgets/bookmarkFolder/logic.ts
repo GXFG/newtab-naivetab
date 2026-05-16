@@ -1,5 +1,5 @@
-import { getBrowserBookmark } from '@/logic/bookmark'
-import { localConfig } from '@/logic/store'
+import { getBrowserBookmark } from '@/logic/bookmark/api'
+import { localConfig } from '@/logic/config/state'
 
 export const state = reactive({
   systemBookmarks: [] as BookmarkNode[],

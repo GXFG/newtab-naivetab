@@ -11,11 +11,13 @@ const mockLog = vi.fn()
 const mockCompareVersion = vi.fn()
 const mockMergeState = vi.fn()
 
-vi.doMock('@/logic/util', () => ({
+vi.doMock('@/logic/utils/util', () => ({
   log: mockLog,
-  compareLeftVersionLessThanRightVersions: mockCompareVersion,
-  downloadJsonByTagA: vi.fn(),
   sleep: vi.fn(),
+}))
+
+vi.doMock('@/logic/config/version', () => ({
+  compareLeftVersionLessThanRightVersions: mockCompareVersion,
 }))
 
 vi.doMock('@/logic/config/merge', () => ({
@@ -35,7 +37,7 @@ beforeEach(async () => {
   mockCompareVersion.mockClear()
   mockMergeState.mockClear()
 
-  const mod = await import('@/logic/sync/core')
+  const mod = await import('@/logic/config/sync/loader')
   mergeConfigWithVersionAwareness = mod.mergeConfigWithVersionAwareness
 })
 

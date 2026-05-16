@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { Transition, computed } from 'vue'
+import { ICONS } from '@/logic/constants/icons'
 import Tips from '@/components/Tips.vue'
 
 /**
@@ -25,6 +26,8 @@ const props = withDefaults(
     tipLink?: string
     /** 纵向对齐方式，对应 CSS align-items，默认 center，内容多行时传 flex-start */
     alignItems?: 'center' | 'flex-start'
+    /** 警告信息，有值时显示带警告图标的提示卡片，支持单条或多条 */
+    warningMessage?: string | string[]
   }>(),
   {
     labelWidth: 120,
@@ -32,8 +35,19 @@ const props = withDefaults(
     tipContent: undefined,
     tipLink: undefined,
     alignItems: 'center' as 'center' | 'flex-start',
+    warningMessage: undefined,
   },
 )
+
+/**
+ * 规范化警告消息为数组，过滤空值
+ */
+const warnings = computed(() => {
+  const msgs = Array.isArray(props.warningMessage)
+    ? props.warningMessage
+    : [props.warningMessage]
+  return msgs.filter(Boolean) as string[]
+})
 </script>
 
 <template>
@@ -68,6 +82,25 @@ const props = withDefaults(
       </div>
     </div>
 
+    <Transition name="warning-fade">
+      <div
+        v-if="warnings.length"
+        class="warning-list"
+      >
+        <div
+          v-for="msg in warnings"
+          :key="msg"
+          class="setting-form-item__warning"
+        >
+          <Icon
+            :icon="ICONS.warning"
+            class="warning__icon"
+          />
+          <span class="warning__text">{{ msg }}</span>
+        </div>
+      </div>
+    </Transition>
+
     <p
       v-if="tipContent && !tipLink"
       class="tip-inline"
@@ -99,6 +132,10 @@ const props = withDefaults(
     padding-bottom: 4px;
   }
 
+  &:has(+ .warning-list) {
+    padding-bottom: 4px;
+  }
+
   &.form-item--flex-start {
     align-items: flex-start;
 
@@ -107,7 +144,7 @@ const props = withDefaults(
     }
   }
 
-  &:not(:has(+ .tip-inline)) {
+  &:not(:has(+ .tip-inline)):not(:has(+ .warning-list)) {
     border-bottom: 1px solid var(--gray-alpha-10);
   }
 }
@@ -132,6 +169,50 @@ const props = withDefaults(
     flex: 1;
     min-width: 0;
   }
+}
+
+.setting-form-item__warning {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 0 var(--space-3) var(--space-3);
+  font-size: var(--text-xs);
+  color: rgba(208, 48, 80, 0.9);
+  line-height: 1.5;
+
+  .warning__icon {
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .warning__text {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* 多条警告时增加间距 */
+.setting-form-item__warning + .setting-form-item__warning {
+  padding-top: 0;
+  margin-top: -4px;
+}
+
+.warning-fade-enter-active {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.warning-fade-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.warning-fade-enter-from,
+.warning-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 
 .form-item__label {

@@ -6,16 +6,14 @@ import {
   currKeyboardConfig,
   keyboardCurrentModelAllKeyList,
 } from '@/logic/keyboard/keyboard-layout'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { state as keyboardState } from '@/logic/keyboard/bookmark-state'
 import {
-  state as keyboardState,
   openPage,
-  handleSpecialKeycapExec,
-  getKeycapBookmarkType,
   getKeycapUrl,
   handlePressKeycap,
 } from '@/newtab/widgets/keyboardBookmark/logic'
-import { getIsWidgetRender } from '@/logic/store'
+import { getIsWidgetRender } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
 import KeyboardKeycapWidget from './KeyboardKeycapWidget.vue'
@@ -47,9 +45,8 @@ const keyboardTask = (e: KeyboardEvent) => {
   ) {
     return
   }
-  const isHandled = handleSpecialKeycapExec(code, getKeycapBookmarkType(code))
   const url = getKeycapUrl(code)
-  if (isHandled || url.length === 0) {
+  if (url.length === 0) {
     handlePressKeycap(code)
     return
   }

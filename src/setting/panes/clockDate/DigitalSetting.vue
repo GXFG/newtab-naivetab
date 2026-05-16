@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { URL_DAYJS_FORMAT } from '@/logic/constants/urls'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 import {
   SettingFormWrap,
   SettingFormItem,

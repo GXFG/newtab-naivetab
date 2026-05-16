@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { createTab } from '@/logic/util'
+import { ICONS } from '@/logic/constants/icons'
+import { createTab } from '@/logic/utils/common'
 
 const props = defineProps({
   content: {

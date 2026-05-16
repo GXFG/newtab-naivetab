@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import {
-  currDayjsLang,
-  localConfig,
-  getIsWidgetRender,
-  getStyleField,
-} from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
+import { currDayjsLang } from '@/logic/store/theme'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 

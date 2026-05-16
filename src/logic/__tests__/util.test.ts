@@ -1,18 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { padUrlHttps, log, sleep, createTab } from '@/logic/utils/common'
+import { compareLeftVersionLessThanRightVersions } from '@/logic/config/version'
 import {
-  compareLeftVersionLessThanRightVersions,
-  padUrlHttps,
-  log,
-  sleep,
-  createTab,
   downloadImageByUrl,
-  downloadJsonByTagA,
   urlToFile,
   urlToImage,
   compressedImageToBlob,
   blobToBase64,
   compressedImageUrlToBase64,
-} from '@/logic/util'
+} from '@/logic/image/utils'
 
 describe('compareLeftVersionLessThanRightVersions', () => {
   it('returns true when left is clearly older (major diff)', () => {
@@ -248,43 +244,6 @@ describe('downloadImageByUrl', () => {
     await downloadImageByUrl('https://example.com/img', 'my-photo.webp')
 
     expect(mockLink.download).toBe('my-photo.webp')
-
-    ;(document.createElement as any).mockRestore()
-  })
-})
-
-describe('downloadJsonByTagA', () => {
-  it('creates and downloads JSON file', () => {
-    const mockLink = {
-      setAttribute: vi.fn(),
-      click: vi.fn(),
-    }
-    vi.stubGlobal('URL', {
-      createObjectURL: vi.fn().mockReturnValue('blob:json-url'),
-      revokeObjectURL: vi.fn(),
-    })
-    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any)
-
-    downloadJsonByTagA({ key: 'value' }, 'export.json')
-
-    expect(mockLink.setAttribute).toHaveBeenCalledWith('href', 'blob:json-url')
-    expect(mockLink.setAttribute).toHaveBeenCalledWith('download', 'export.json')
-    expect(mockLink.click).toHaveBeenCalled()
-
-    ;(document.createElement as any).mockRestore()
-  })
-
-  it('uses default filename when not provided', () => {
-    const mockLink = { setAttribute: vi.fn(), click: vi.fn() }
-    vi.stubGlobal('URL', {
-      createObjectURL: vi.fn().mockReturnValue('blob:json-url'),
-      revokeObjectURL: vi.fn(),
-    })
-    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any)
-
-    downloadJsonByTagA({ foo: 1 })
-
-    expect(mockLink.setAttribute).toHaveBeenCalledWith('download', 'file')
 
     ;(document.createElement as any).mockRestore()
   })

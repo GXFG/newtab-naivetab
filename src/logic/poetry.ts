@@ -1,6 +1,9 @@
+/**
+ * 每日诗词业务模块 — 从 API 获取并缓存（4小时），暴露 poetryState 和更新函数。
+ */
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { getPoetryTokenData, getTodayPoetryData } from '@/api'
-import { log } from '@/logic/util'
+import { log } from '@/logic/utils/common'
 
 export const poetryState = useStorageLocal('data-poetry', {
   token: '',

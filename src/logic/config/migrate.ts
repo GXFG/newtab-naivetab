@@ -7,7 +7,7 @@
  * - importSetting：用户导入的 JSON 可能是任意历史版本
  * - handleAppUpdate v2.2.2：localStorage 中仍存有旧 key（c-keyboard, c-commandShortcut）
  */
-import { KEYBOARD_COMMON_CONFIG } from '@/logic/keyboard/keyboard-config'
+import { KEYBOARD_COMMON_CONFIG } from '@/logic/config/defaults'
 
 /**
  * 顶层配置 key 重命名映射（old → new），按引入版本的时间顺序排列

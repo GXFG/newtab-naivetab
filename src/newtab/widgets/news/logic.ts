@@ -1,9 +1,9 @@
 import * as cheerio from 'cheerio'
-import request from '@/lib/request'
+import request from '@/api/request'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { NEWS_SOURCE_MAP } from '@/logic/constants/urls'
-import { createTab, log } from '@/logic/util'
-import { localConfig } from '@/logic/store'
+import { createTab, log } from '@/logic/utils/common'
+import { localConfig } from '@/logic/config/state'
 
 export const state = reactive({
   currNewsTabValue: localConfig.news.sourceList[0] || '',

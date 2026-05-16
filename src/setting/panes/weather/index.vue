@@ -3,14 +3,14 @@ import { useDebounceFn } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { getCityLookup } from '@/api'
 import { URL_QWEATHER_START } from '@/logic/constants/urls'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 import {
   SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormSection,
 } from '@/setting/components'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import { FontField, SwitchField } from '@/setting/fields'
 
 const state = reactive({

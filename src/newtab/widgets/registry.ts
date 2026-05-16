@@ -1,25 +1,17 @@
-import type { DefineComponent } from 'vue'
-import { WIDGET_CODE_LIST } from './codes'
+import { WIDGET_CODE_LIST } from '@/common/widget-constants'
+import type { WidgetConfigByCode } from '@/common/widget-constants'
 
-// 类型定义：Widget code → config 类型的映射。
-// 使用动态 import() 语法，无需单独的 import 语句。
-// 新增 Widget 时只需在此追加一行。
-export type WidgetConfigByCode = {
-  keyboardBookmark: import('./keyboardBookmark/config').TWidgetConfig
-  bookmarkFolder: import('./bookmarkFolder/config').TWidgetConfig
-  calendar: import('./calendar/config').TWidgetConfig
-  search: import('./search/config').TWidgetConfig
-  news: import('./news/config').TWidgetConfig
-  memo: import('./memo/config').TWidgetConfig
-  date: import('./date/config').TWidgetConfig
-  clockDigital: import('./clockDigital/config').TWidgetConfig
-  clockAnalog: import('./clockAnalog/config').TWidgetConfig
-  clockFlip: import('./clockFlip/config').TWidgetConfig
-  clockNeon: import('./clockNeon/config').TWidgetConfig
-  weather: import('./weather/config').TWidgetConfig
-  yearProgress: import('./yearProgress/config').TWidgetConfig
-  countdown: import('./countdown/config').TWidgetConfig
-}
+export { WIDGET_CODE_LIST } from '@/common/widget-constants'
+export type { WidgetCodes } from '@/common/widget-constants'
+export {
+  WIDGET_SETTING_PANE_MAP,
+  getWidgetSetting,
+} from '@/common/widget-constants'
+export { WIDGET_GROUPS } from '@/common/widget-constants'
+
+// ─── 以下类型/逻辑仅 UI 层使用，保留在 registry.ts ───
+
+import type { DefineComponent } from 'vue'
 
 export type WidgetMeta = {
   component: DefineComponent

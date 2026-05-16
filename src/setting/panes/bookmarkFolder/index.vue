@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { localConfig } from '@/logic/store'
-import { getBrowserBookmark } from '@/logic/bookmark'
-import { requestPermission } from '@/logic/permission'
+import { ICONS } from '@/logic/constants/icons'
+import { localConfig } from '@/logic/config/state'
+import { getBrowserBookmark } from '@/logic/bookmark/api'
+import { requestPermission } from '@/logic/utils/permission'
+import { showToast } from '@/common/toast'
 import {
   SettingHeaderBar,
   SettingFormWrap,
@@ -62,7 +63,7 @@ const onOpenPicker = async () => {
       await ensureBookmarkRoot()
       state.showPicker = true
     } else {
-      window.$message.error(window.$t('browserPermission.bookmark') as string)
+      showToast.error(window.$t('browserPermission.bookmark') as string)
     }
   }
 }

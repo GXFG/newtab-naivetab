@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * 默认返回 'sw'（Service Worker）。
  */
 
-vi.mock('@/logic/store', () => ({
+vi.mock('@/logic/config/state', () => ({
   localConfig: {
     keyboardCommand: {
       isEnabled: true,
@@ -22,17 +22,12 @@ vi.mock('@/env', () => ({
   isMacOS: false,
 }))
 
-vi.mock('./keyboard-constants', () => ({
-  EMPHASIS_ONE_KEYS: [],
-  EMPHASIS_TWO_KEYS: [],
-}))
-
 describe('getCommandExecEnv', () => {
-  let getCommandExecEnv: typeof import('@/logic/globalShortcut/shortcut-command')['getCommandExecEnv']
+  let getCommandExecEnv: typeof import('@/logic/shortcut/shortcut-command')['getCommandExecEnv']
 
   beforeEach(async () => {
     vi.resetModules()
-    const mod = await import('@/logic/globalShortcut/shortcut-command')
+    const mod = await import('@/logic/shortcut/shortcut-command')
     getCommandExecEnv = mod.getCommandExecEnv
   })
 
@@ -65,23 +60,16 @@ describe('getCommandExecEnv', () => {
   })
 })
 
-describe('PRESERVE_FIELDS', () => {
-  it('exports the correct preserve fields', async () => {
-    const mod = await import('@/logic/globalShortcut/shortcut-command')
-    expect(mod.PRESERVE_FIELDS).toEqual(['isEnabled', 'noModifierMode', 'shortcutInInputElement', 'urlBlacklist', 'modifiers'])
-  })
-})
-
 describe('KEYBOARD_COMMAND_CONFIG', () => {
   it('has default keymap entries', async () => {
-    const mod = await import('@/logic/globalShortcut/shortcut-command')
-    expect(mod.KEYBOARD_COMMAND_CONFIG.keymap.KeyA.command).toBe('prevTab')
-    expect(mod.KEYBOARD_COMMAND_CONFIG.keymap.KeyD.command).toBe('nextTab')
-    expect(mod.KEYBOARD_COMMAND_CONFIG.keymap.KeyX.command).toBe('closeTab')
+    const { KEYBOARD_COMMAND_CONFIG } = await import('@/logic/config/defaults')
+    expect(KEYBOARD_COMMAND_CONFIG.keymap.KeyA.command).toBe('prevTab')
+    expect(KEYBOARD_COMMAND_CONFIG.keymap.KeyD.command).toBe('nextTab')
+    expect(KEYBOARD_COMMAND_CONFIG.keymap.KeyX.command).toBe('closeTab')
   })
 
   it('has default modifiers', async () => {
-    const mod = await import('@/logic/globalShortcut/shortcut-command')
-    expect(mod.KEYBOARD_COMMAND_CONFIG.modifiers).toEqual(['shift', 'alt'])
+    const { KEYBOARD_COMMAND_CONFIG } = await import('@/logic/config/defaults')
+    expect(KEYBOARD_COMMAND_CONFIG.modifiers).toEqual(['shift', 'alt'])
   })
 })

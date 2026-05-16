@@ -11,11 +11,11 @@ description: NaiveTab 浏览器扩展的 Widget 开发指南。当用户要在 n
 
 ## 必须修改的 6 个文件
 
-### Step 1 — `src/newtab/widgets/codes.ts` ⚠️ 类型由 `WIDGET_CODE_LIST` 自动推导
+### Step 1 — `src/common/widget-constants.ts`：代码列表与分组
 
 **`WidgetCodes` 不再手动维护联合类型，而是从 `WIDGET_CODE_LIST` 用 `typeof` 自动推导。** 只需在列表数组中追加 code 即可。
 
-三件事都在同一个文件：
+`WidgetConfigByCode` 类型映射也在 `src/common/widget-constants.ts` 中（Step 6 处说明）。本 Step 处理以下三项：
 
 **1-A：添加到 `WIDGET_CODE_LIST`**
 ```ts
@@ -75,7 +75,7 @@ export type TWidgetConfig = typeof WIDGET_CONFIG
 ```ts
 import Index from './index.vue'
 import { WIDGET_CODE, WIDGET_CONFIG } from './config'
-import { WIDGET_ICON_META } from '@/logic/icons'
+import { WIDGET_ICON_META } from '@/logic/constants/icons'
 
 export default {
   code: WIDGET_CODE,
@@ -87,7 +87,7 @@ export default {
 }
 ```
 
-### Step 5 — `src/logic/icons.ts` ⚠️ 需修改两处，缺一不可
+### Step 5 — `src/logic/constants/icons.ts` ⚠️ 需修改两处，缺一不可
 
 **5-A：在 `ICONS` 对象中定义图标常量**（图标来自 [Iconify](https://icon-sets.iconify.design/)，需验证图标名存在）：
 
@@ -111,11 +111,11 @@ export const WIDGET_ICON_META: Record<WidgetCodes, WidgetIconMeta> = {
 
 **设置面板中引用图标也必须使用 `ICONS.xxx`，新增专属 setting 面板时还需在 `SETTING_ICON_META` 中注册。**
 
-### Step 6 — `src/newtab/widgets/registry.ts` ⚠️ 已简化
+### Step 6 — `src/common/widget-constants.ts` 类型映射
 
 ```ts
-// 添加到 WidgetConfigByCode 类型（使用动态 import() 语法，无需单独 import）
-myWidget: import('./myWidget/config').TWidgetConfig
+// 在 WidgetConfigByCode 类型中追加一行（使用动态 import() 语法，无需单独 import）
+myWidget: import('@/newtab/widgets/myWidget/config').TWidgetConfig
 ```
 
 > 只需追加一行 key-value，**不再需要单独的 import 语句**。
@@ -156,7 +156,7 @@ myWidget: import('./myWidget/config').TWidgetConfig
 <script setup lang="ts">
 import { SettingFormWrap } from '@/setting/components/SettingFormWrap'
 import { SwitchField, ColorField } from '@/setting/fields'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 </script>
 ```
 
@@ -173,7 +173,7 @@ import { localConfig } from '@/logic/store'
 
 ### 步骤 3 — 添加设置图标元数据
 
-在 `src/logic/icons.ts` 的 `SETTING_ICON_META` 中注册：
+在 `src/logic/constants/icons.ts` 的 `SETTING_ICON_META` 中注册：
 
 ```ts
 export const SETTING_ICON_META: Record<settingPanes, SettingIconMeta> = {
@@ -186,7 +186,7 @@ export const SETTING_ICON_META: Record<settingPanes, SettingIconMeta> = {
 
 ### 步骤 4 — 建立 Widget 与 Setting Pane 的映射
 
-在 `src/newtab/widgets/codes.ts` 的 `WIDGET_SETTING_PANE_MAP` 中添加：
+在 `src/common/widget-constants.ts` 的 `WIDGET_SETTING_PANE_MAP` 中添加：
 
 ```ts
 export const WIDGET_SETTING_PANE_MAP: Partial<Record<WidgetCodes, settingPanes>> = {
@@ -202,8 +202,8 @@ export const WIDGET_SETTING_PANE_MAP: Partial<Record<WidgetCodes, settingPanes>>
 | 文件 | 机制 |
 |------|------|
 | `src/logic/config/defaults.ts` | `import.meta.glob('**/config.ts')` 自动扫描收集 |
-| `src/logic/store.ts` | 遍历 `WIDGET_CODE_LIST` 动态创建 storage |
-| `src/logic/sync/` | 遍历 `defaultConfig` 处理云同步/导入导出 |
+| `src/logic/config/state.ts` | 遍历 `WIDGET_CODE_LIST` 动态创建 storage |
+| `src/logic/config/sync/` | 遍历 `defaultConfig` 处理云同步/导入导出 |
 | `src/newtab/Content.vue` | 遍历 `widgetsList` 动态渲染 |
 | `src/newtab/draft/DraftDrawer.vue` | 遍历 `widgetsList` 展示组件库 |
 | `src/newtab/widgets/registry.ts` | `import.meta.glob` 自动扫描 widget index.ts 元信息 |

@@ -238,7 +238,7 @@ onLeave:  maxHeight: scrollHeight → 0  (在 rAF 中执行)
 
 ## 预览功能
 
-`SettingHeaderBar` 的预览按钮通过 hover 事件切换 `document.body` 的 `setting-preview-active` 类。对应 CSS 在 `styles/global.css` 中：
+`SettingHeaderBar` 的预览按钮通过 hover 事件切换 `document.body` 的 `setting-preview-active` 类。对应 CSS 在 `styles/setting-utils.css` 中：
 - 抽屉透明度设为 0
 - 遮罩背景变为透明
 
@@ -255,3 +255,62 @@ onLeave:  maxHeight: scrollHeight → 0  (在 rAF 中执行)
 | search/memo 等 | 不使用 | 内容量适中，直接平铺即可 |
 
 建议：内容较少（2-3 个 section）的面板直接平铺；内容多（4+ 个 section）或需要聚合多个子设置时使用 NCollapse。
+
+## Drawer Stack 架构
+
+Setting 面板打开时按 `Escape` 需要逐层关闭：先关最上层子 Drawer（背景图选择器、书签选择器、键盘主题预设等），再按一次才关闭 Setting 主面板。
+
+### 实现原理
+
+`globalState.drawerStack` 是一个栈，记录当前打开的所有 Drawer：
+
+```
+drawerStack = [{ code: 'setting', close: fn }, { code: 'background-drawer', close: fn }]
+              ← 栈底（先开）                             ← 栈顶（后开）
+```
+
+`task/` 拦截 `Escape` 事件：
+- 栈长度 >1：调用 `closeTopDrawer()`（pop 栈顶 + 执行 `close()`）
+- 栈长度 =1：调用 `closeSettingDrawer()`（清空栈 + 关闭主面板）
+
+相关函数位于 `src/logic/store/state.ts`。
+
+### 子 Drawer 注册
+
+子 Drawer 组件使用 `useDrawerStack` composable 自动注册/注销：
+
+```ts
+import { useDrawerStack } from '@/composables/useDrawerStack'
+
+// code: 唯一标识，showRef: 组件的显示状态 ref，onClose: 关闭时的回调
+useDrawerStack('background-drawer', toRef(props, 'show'), onCloseModal)
+```
+
+`openDrawer` 返回一个 `close` 函数，调用后自动从栈中移除自己并触发关闭回调。组件无需感知 `code` 或栈操作细节。
+
+### 已注册的子 Drawer
+
+| 组件 | Code | 挂载点 |
+|------|------|--------|
+| `BrowserBookmarkPicker` | `browser-bookmark-picker` | teleport 到 body（Naive UI 默认） |
+| `BackgroundDrawer` | `background-drawer` | `#background__drawer` |
+| `PresetThemeDrawer` | `preset-theme-drawer` | `#preset-theme__drawer` |
+
+### 关闭路径
+
+| 操作 | 行为 |
+|------|------|
+| ESC 按键 | `closeTopDrawer()` pop 栈顶并关闭 |
+| 子 Drawer X 按钮 | 调用 `openDrawer` 返回的 `close()` 函数 |
+| 子 Drawer 内选择操作 | emit `update:show=false` → watch → `close()` |
+| 外部关闭 Setting | `closeSettingDrawer()` 清空栈 |
+
+### 新增子 Drawer
+
+在子 Drawer 组件中添加 `useDrawerStack` 调用即可：
+
+```ts
+useDrawerStack('your-drawer-code', toRef(props, 'show'), onCloseCallback)
+```
+
+其中 `code` 必须全局唯一。

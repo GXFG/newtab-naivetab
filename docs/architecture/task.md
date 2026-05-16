@@ -1,12 +1,12 @@
 # 定时任务系统
 
-`src/logic/task.ts` 提供四类任务系统，管理 newtab 页面的生命周期事件（键盘、定时、可见性、页面焦点）。所有 Widget 和页面逻辑必须通过这些 API 注册/注销任务，禁止直接使用 `setInterval`、`document.onkeydown` 或 `addEventListener`。
+`src/logic/task/` 提供四类任务系统，管理 newtab 页面的生命周期事件（键盘、定时、可见性、页面焦点）。所有 Widget 和页面逻辑必须通过这些 API 注册/注销任务，禁止直接使用 `setInterval`、`document.onkeydown` 或 `addEventListener`。
 
 ## 文件索引
 
 | 文件 | 职责 |
 |------|------|
-| `src/logic/task.ts` | 四类任务系统的注册、注销、启停 |
+| `src/logic/task/` | 四类任务系统的注册、注销、启停 |
 
 ## 四类任务系统
 
@@ -17,7 +17,7 @@
 │ 任务类型      │ 说明                                        │
 ├──────────────┼──────────────────────────────────────────────┤
 │ keydown      │ 键盘事件分发，返回 true 短路后续 handler       │
-│ timer        │ 全局 setInterval(1000ms)，统一调度秒级任务     │
+│ timer        │ rAF + 节流(1s)，后台标签自动暂停，统一调度秒级任务  │
 │ visibility   │ document.visibilitychange 监听                │
 │ pageFocus    │ 页面焦点恢复时触发（由 App.vue 手动调用）       │
 └──────────────┴──────────────────────────────────────────────┘
@@ -50,33 +50,35 @@ stopKeydown()    // 注销 document.onkeydown
 ### 特殊处理
 
 - **引导模式**：`globalState.isGuideMode` 为 `true` 时，所有按键被忽略
-- **设置面板**：面板打开时 `Escape` 被拦截用于关闭面板，不再传递给 task
+- **设置面板**：面板打开时 `Escape` 被拦截用于关闭面板，不再传递给 task。通过 `globalState.drawerStack` 实现逐层关闭：栈长度 >1 时关闭最上层子 Drawer，否则关闭 Setting 主面板。子 Drawer 通过 `useDrawerStack` composable 自动注册/注销。详见 [setting.md](setting.md#drawer-stack-架构)。
 - **启动时机**：`startKeydown()` 在 `src/newtab/App.vue` 的 `onMounted` 中调用
 
-## 2. Timer 任务（全局 1 秒定时器）
+## 2. Timer 任务（rAF 秒级定时器）
 
 ```ts
-addTimerTask(key: string, task: () => void)
-removeTimerTask(key: string)
-startTimer()   // setInterval(fn, 1000)
-stopTimer()    // clearInterval
+addTimerTask(key: string, task: () => void)   // 立即执行一次 + 注册
+removeTimerTask(key: string)                   // 删除，最后一个任务时自动停止
+startTimer()                                   // 手动启动 rAF 循环
+stopTimer()                                    // 取消 rAF
 ```
 
-### 设计要点
+### 实现机制
 
-- **单一全局 `setInterval`**：所有秒级任务共享同一个定时器，避免每个 Widget 各起一个 `setInterval` 造成 N 个定时器
+基于 `requestAnimationFrame` + 节流（`TICK_INTERVAL = 1000ms`），而非 `setInterval`。详见 `src/logic/task/timer.ts`。
+
+**核心优势：** 后台标签页自动暂停，切换回前台自动恢复，不会像 `setInterval` 那样在后台累积执行。
+
+### 行为
+
 - **注册即执行**：`addTimerTask` 会**立即执行一次** `task()`，然后再由定时器周期调度
-- **任务执行顺序**：按注册顺序遍历，无优先级
+- **自动停止**：删除最后一个任务时自动取消 rAF 循环，不需要页面卸载时手动 `stopTimer()`
+- **任务执行顺序**：按 Map 注册顺序遍历，无优先级
 
 ### 典型用途
 
 - ClockDigital：每秒更新时钟显示
 - Calendar：检查节日/倒计时
 - News/Weather：定时刷新数据（配合 `addVisibilityTask` 使用）
-
-### 注意
-
-`stopTimer()` 是全局操作，调用后**所有** timer task 都会停止。通常只在页面卸载时调用。
 
 ## 3. Visibility 任务（页面可见性）
 

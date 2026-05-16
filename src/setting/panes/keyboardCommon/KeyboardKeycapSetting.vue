@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { localConfig } from '@/logic/config/state'
 import {
-  localConfig,
   availableFontOptions,
   fontSelectRenderLabel,
-} from '@/logic/store'
+} from '@/logic/store/style'
 import KeyboardEmphasisKeySetting from './KeyboardEmphasisKeySetting.vue'
 import { SettingFormInlineRow, SettingFormSection } from '@/setting/components'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import {
   NumberField,
   SwitchField,

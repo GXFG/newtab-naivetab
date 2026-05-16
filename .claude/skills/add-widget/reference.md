@@ -57,7 +57,7 @@ watch(isRender, (value) => {
 ## 关键规范速查（完整说明见 `/CLAUDE.md`）
 
 - **颜色字段**：统一使用双元素数组 `[浅色值, 深色值]`，`getStyleField` 自动处理
-- **图标**：必须先在 `src/logic/icons.ts` 的 `ICONS` 定义，再从常量引用，禁止硬编码
+- **图标**：必须先在 `src/logic/constants/icons.ts` 的 `ICONS` 定义，再从常量引用，禁止硬编码
 - **Setting 原子组件**：所有表单项使用 `@/setting/fields` 中提供的 `ColorField`/`FontField`/`SliderField`/`SwitchField`/`ToggleColorField`
 - **定时任务**：必须使用 `addTimerTask`/`removeTimerTask`，禁止组件内自行 `setInterval`
 - **v-bind 变量声明顺序**：所有 CSS `v-bind()` 引用的变量必须在 `<script setup>` 最顶部声明（imports 之后、`watch`/`onMounted` 等之前），否则生产模式触发 TDZ 错误

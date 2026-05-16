@@ -30,18 +30,15 @@
 // - Port 断开后指数退避重连（100ms 起步，上限 1000ms）
 // - 检测到 "Extension context invalidated" 时停止重连，不可恢复
 //
-import {
-  matchShortcut,
-  toModifierMask,
-  type TShortcutModifier,
-} from '@/logic/globalShortcut/shortcut-utils'
-import { parseStoredData } from '@/logic/compress'
+import { matchShortcut } from '@/logic/shortcut/matcher'
+import { toModifierMask, type TShortcutModifier } from '@/logic/shortcut/utils'
+import { parseStoredData } from '@/logic/config/compress'
 import { SYSTEM_KEYMAP_STORAGE_KEY } from '@/logic/keyboard/keyboard-constants'
-import { padUrlHttps } from '@/logic/util'
+import { padUrlHttps } from '@/logic/utils/common'
 import {
   REPEATABLE_SCROLL_COMMANDS,
   type TCommandEntry,
-} from '@/logic/globalShortcut/shortcut-command'
+} from '@/logic/shortcut/shortcut-command'
 import { showToast, t } from './toast'
 import {
   getValidatedScrollContainer,
@@ -55,6 +52,7 @@ import {
   MSG_INIT_COMPLETE,
   MSG_HELLO,
   MSG_EXECUTE_COMMAND,
+  MSG_SWITCH_BOOKMARK_LAYER,
   type SwToCsMessage,
 } from '@/types/messages'
 
@@ -408,22 +406,22 @@ const initMain = () => {
       navigator.clipboard
         .writeText(location.href)
         .then(() => {
-          showToast(t('keyboardCommand.toast.copyPageUrl'))
+          showToast.success(t('keyboardCommand.toast.copyPageUrl'))
         })
         .catch(() => {
           fallbackCopyText(location.href)
-          showToast(t('keyboardCommand.toast.copyPageUrl'))
+          showToast.success(t('keyboardCommand.toast.copyPageUrl'))
         })
     },
     copyPageTitle: () => {
       navigator.clipboard
         .writeText(document.title)
         .then(() => {
-          showToast(t('keyboardCommand.toast.copyPageTitle'))
+          showToast.success(t('keyboardCommand.toast.copyPageTitle'))
         })
         .catch(() => {
           fallbackCopyText(document.title)
-          showToast(t('keyboardCommand.toast.copyPageTitle'))
+          showToast.success(t('keyboardCommand.toast.copyPageTitle'))
         })
     },
   }
@@ -463,6 +461,13 @@ const initMain = () => {
         } else if (msg.type === MSG_INIT_COMPLETE) {
           swReady = true
           debug('SW initialization complete')
+        } else if (msg.type === MSG_SWITCH_BOOKMARK_LAYER) {
+          showToast.info(
+            t('keyboardCommand.toast.switchToLayer').replace(
+              '__n__',
+              msg.folderName,
+            ),
+          )
         }
       })
       // 首次连接和重连后主动发握手消息，确认 SW 就绪状态
@@ -569,18 +574,27 @@ const initMain = () => {
       commandNoModifierMode,
     )
 
+    // 无修饰键模式下 matchShortcut 对 ALLOWED_SET 中所有键都返回 code，
+    // 但 keymap 中可能没有实际绑定。发送消息前先检查是否真正绑定了命令/书签，
+    // 避免拦截页面原生的按键行为（如视频站点的方向键控制进度）。
+    const hasCommandBinding =
+      commandCode && commandKeymap?.[commandCode]?.command
+    const activeBookmarkKeymap = source === 1 ? systemKeymap : keymap
+    const hasBookmarkBinding =
+      bookmarkCode && activeBookmarkKeymap[bookmarkCode]?.url
+
     // scroll 命令本地执行，不走 SW
     if (tryLocalScroll()) return
 
-    if (!bookmarkCode && !commandCode) return
+    if (!hasCommandBinding && !hasBookmarkBinding) return
 
     // 修饰键冲突互斥：当书签和命令使用相同修饰键或同时开启无修饰键模式时，
     // 只发送命令消息（命令优先）
     const bmMask = toModifierMask(globalShortcutModifiers)
     const cmdMask = toModifierMask(commandModifiers)
     const hasModifierConflict =
-      bookmarkCode &&
-      commandCode &&
+      hasBookmarkBinding &&
+      hasCommandBinding &&
       // 原有：修饰键掩码相等
       ((bmMask === cmdMask &&
         !bookmarkNoModifierMode &&
@@ -604,7 +618,7 @@ const initMain = () => {
     let sent = false
     try {
       // 命令优先：冲突时只发送命令
-      if (commandCode) {
+      if (hasCommandBinding) {
         if (swReady && port) {
           port.postMessage({
             type: MSG_KEYDOWN,
@@ -626,7 +640,7 @@ const initMain = () => {
           }
         }
       }
-      if (bookmarkCode && !hasModifierConflict) {
+      if (hasBookmarkBinding && !hasModifierConflict) {
         if (swReady && port) {
           port.postMessage({
             type: MSG_KEYDOWN,

@@ -20,7 +20,7 @@ const mockIsUploadConfigStatusMap: Record<string, any> = {}
 
 const CONFIG_FIELDS = {
   general: { version: '2.3.0', lang: 'zh-CN' },
-  keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
+  keyboardBookmark: { keymap: {}, source: 1 },
   search: { isNewTabOpen: false, isVoiceEnabled: true },
 } as const
 
@@ -98,7 +98,7 @@ function setupChromeSync(cloudData: Record<string, string>) {
 
 // ── Mock 定义 ──
 
-vi.doMock('@/logic/util', () => ({
+vi.doMock('@/logic/utils/util', () => ({
   log: mockLog,
   compareLeftVersionLessThanRightVersions: (left: string, right: string) => {
     const l = left.split('.').map(Number)
@@ -109,13 +109,14 @@ vi.doMock('@/logic/util', () => ({
     }
     return false
   },
-  downloadJsonByTagA: vi.fn(),
   sleep: vi.fn(),
 }))
 
-vi.doMock('@/logic/store', () => ({
+vi.doMock('@/logic/config/state', () => ({
   localConfig: mockLocalConfig,
   localState: { value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap } },
+}))
+vi.doMock('@/logic/store/state', () => ({
   globalState: {},
   switchSettingDrawerVisible: vi.fn(),
 }))
@@ -161,10 +162,10 @@ vi.doMock('@/logic/config/update', () => ({
   updateSetting: mockUpdateSetting,
 }))
 
-vi.doMock('@/logic/database', () => ({ clearDatabase: vi.fn() }))
-vi.doMock('@/logic/permission', () => ({}))
+vi.doMock('@/logic/utils/database', () => ({ clearDatabase: vi.fn() }))
+vi.doMock('@/logic/utils/permission', () => ({}))
 
-vi.doMock('@/logic/compress', () => ({
+vi.doMock('@/logic/config/compress', () => ({
   COMPRESS_PREFIX: 'gzip:',
   compressString: vi.fn().mockResolvedValue('compressed'),
   decompressString: vi.fn().mockResolvedValue('{}'),
@@ -180,10 +181,6 @@ vi.doMock('@/logic/constants/app', () => ({
 vi.doMock('@/logic/keyboard/keyboard-constants', () => ({
   KEYBOARD_URL_MAX_LENGTH: 200,
   KEYBOARD_NAME_MAX_LENGTH: 10,
-}))
-
-vi.doMock('@/logic/keyboard/keyboard-config', () => ({
-  KEYBOARD_COMMON_CONFIG: { fontSize: 14, fontFamily: 'system' },
 }))
 
 vi.doMock('@vueuse/core', () => ({
@@ -215,7 +212,7 @@ describe('loadRemoteConfig sync branches', () => {
 
     resetMockState()
 
-    const mod = await import('@/logic/sync/core')
+    const mod = await import('@/logic/config/sync/loader')
     loadRemoteConfig = mod.loadRemoteConfig
 
     window.appVersion = '2.3.0'

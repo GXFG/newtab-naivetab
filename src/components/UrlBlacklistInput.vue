@@ -7,7 +7,7 @@
  */
 
 import { NInput, NTag } from 'naive-ui'
-import { normalizeDomain } from '@/logic/globalShortcut/shortcut-utils'
+import { normalizeDomain } from '@/logic/shortcut/utils'
 
 const model = defineModel<string[]>({ default: [] })
 

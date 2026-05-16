@@ -111,7 +111,7 @@ const checkUnregisteredWidgets = () => {
   section('Widget 注册完整性')
 
   const codesSource = readFileSync(
-    resolve(SRC, 'newtab/widgets/codes.ts'),
+    resolve(SRC, 'common/widget-constants.ts'),
     'utf-8',
   )
   const codeList = extractArrayItems(codesSource, 'WIDGET_CODE_LIST')
@@ -144,7 +144,10 @@ const checkUnregisteredWidgets = () => {
   }
 
   // 校验 2：Widget 在 codes.ts 但 WIDGET_ICON_META 无条目
-  const iconsSource = readFileSync(resolve(SRC, 'logic/icons.ts'), 'utf-8')
+  const iconsSource = readFileSync(
+    resolve(SRC, 'logic/constants/icons.ts'),
+    'utf-8',
+  )
   const widgetIconMetaKeys = extractWidgetIconMetaKeys(iconsSource)
   const missingIconMeta = codeList.filter(
     (c: string) => !widgetIconMetaKeys.includes(c),
@@ -156,9 +159,9 @@ const checkUnregisteredWidgets = () => {
     ok('所有 Widget 均已在 WIDGET_ICON_META 中注册')
   }
 
-  // 校验 3：Widget 在 codes.ts 但 registry.ts 无类型映射
+  // 校验 3：Widget 在 codes.ts 但 WidgetConfigByCode 无类型映射
   const registrySource = readFileSync(
-    resolve(SRC, 'newtab/widgets/registry.ts'),
+    resolve(SRC, 'common/widget-constants.ts'),
     'utf-8',
   )
   const registryKeys = extractRegistryKeys(registrySource)
@@ -182,7 +185,7 @@ const checkCommandConsistency = () => {
   section('Command 注册一致性')
 
   const shortcutSource = readFileSync(
-    resolve(SRC, 'logic/globalShortcut/shortcut-command.ts'),
+    resolve(SRC, 'logic/shortcut/shortcut-command.ts'),
     'utf-8',
   )
 

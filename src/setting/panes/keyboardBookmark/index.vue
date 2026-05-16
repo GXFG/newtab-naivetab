@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { requestPermission } from '@/logic/permission'
+import { ref, onMounted, computed } from 'vue'
+import { requestPermission } from '@/logic/utils/permission'
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import {
-  state as keyboardState,
   getSystemBookmarkForKeyboard,
-  getCurrentLayerFolderTitle,
   cachedActiveLayer,
-} from '@/newtab/widgets/keyboardBookmark/logic'
-import { localConfig, getSettingKeyboardSize } from '@/logic/store'
-import { toModifierMask } from '@/logic/globalShortcut/shortcut-utils'
+} from '@/logic/keyboard/bookmark-state'
+import { localConfig } from '@/logic/config/state'
+import { getSettingKeyboardSize } from '@/logic/store/style'
+import { toModifierMask } from '@/logic/shortcut/utils'
+import { getGlobalModifierTip } from '@/common/i18n'
 import {
   exportKeymapToBrowser,
-  findFolderByName,
-} from '@/logic/keyboard/bookmark-parser'
-import BookmarkManager from '@/components/BookmarkManager.vue'
-import BookmarkBindingManager from '@/components/BookmarkBindingManager.vue'
+  EXPORT_FOLDER_PATH,
+  createLayerBookmarkFolders,
+} from '@/logic/keyboard/bookmark-export'
+import { findFolderByPath } from '@/logic/bookmark/parser'
+import { KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER } from '@/logic/keyboard/keyboard-constants'
+import BaseNaiveBookmarkManager from '@/components/BaseNaiveBookmarkManager.vue'
+import BaseSystemBookmarkManager from '@/components/BaseSystemBookmarkManager.vue'
+import BaseBookmarkLayerTabSwitcher from '@/components/BaseBookmarkLayerTabSwitcher.vue'
 import BrowserBookmarkPicker from '@/components/BrowserBookmarkPicker.vue'
 import GlobalShortcutRecorder from '@/components/GlobalShortcutRecorder.vue'
 import UrlBlacklistInput from '@/components/UrlBlacklistInput.vue'
-import { NRadioGroup, NSelect, NButton, NInput } from 'naive-ui'
+import { NRadioGroup, NButton } from 'naive-ui'
 import {
   SettingHeaderBar,
   SettingFormWrap,
@@ -29,53 +33,39 @@ import {
   SettingFormInlineRow,
 } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
+import { showToast } from '@/common/toast'
+import { BookmarkSource } from '@/common/widget-constants'
 
 const bookmarkSourceList = computed(() => [
-  { label: window.$t('keyboardBookmark.systemBrowser'), value: 1 },
-  { label: window.$t('keyboardBookmark.thisExtension'), value: 2 },
+  {
+    label: window.$t('keyboardBookmark.systemBrowser'),
+    value: BookmarkSource.BROWSER,
+  },
+  {
+    label: window.$t('keyboardBookmark.thisExtension'),
+    value: BookmarkSource.INTERNAL,
+  },
 ])
 
 /**
  * Setting 面板打开时加载系统书签，确保下拉列表有数据
  */
 onMounted(() => {
-  if (localConfig.keyboardBookmark.source === 1) {
+  if (localConfig.keyboardBookmark.source === BookmarkSource.BROWSER) {
     getSystemBookmarkForKeyboard()
   }
 })
 
 const handleBookmarkSourceChange = async (source: number) => {
-  if (source === 2) {
+  if (source === BookmarkSource.INTERNAL) {
     return
   }
   const granted = await requestPermission('bookmarks')
   if (!granted) {
-    localConfig.keyboardBookmark.source = 2
+    localConfig.keyboardBookmark.source = BookmarkSource.INTERNAL
     return
   }
   getSystemBookmarkForKeyboard()
-}
-
-const bookmarkFolderOptions = computed(() => {
-  return keyboardState.systemBookmarks
-    .filter((item) => Object.prototype.hasOwnProperty.call(item, 'children'))
-    .map((item) => ({
-      label: item.title,
-      value: item.title,
-    }))
-})
-
-const defaultFolderOptions = computed(() => {
-  return keyboardState.systemBookmarks
-    .filter((item) => Object.prototype.hasOwnProperty.call(item, 'children'))
-    .map((item) => ({
-      label: item.title,
-      value: item.title,
-    }))
-})
-
-const handleDefaultFolderTitleChange = (value: string) => {
-  keyboardState.selectedFolderTitleStack = value ? [value] : []
 }
 
 // options 页面更宽，使用更大的键盘基准尺寸
@@ -85,7 +75,8 @@ const keyboardBaseSize = computed(() => getSettingKeyboardSize())
  * source=2 时，keymap 序列化大小接近 5KB 则提示切换浏览器书签
  */
 const showBrowserBookmarkSuggestion = computed(() => {
-  if (localConfig.keyboardBookmark.source !== 2) return false
+  if (localConfig.keyboardBookmark.source !== BookmarkSource.INTERNAL)
+    return false
   const keymap = localConfig.keyboardBookmark.keymap
   const size = new Blob([JSON.stringify(keymap)]).size
   return size > 5000
@@ -94,20 +85,17 @@ const showBrowserBookmarkSuggestion = computed(() => {
 const handleSwitchToBrowserBookmark = async () => {
   const granted = await requestPermission('bookmarks')
   if (!granted) return
-  localConfig.keyboardBookmark.source = 1
+  localConfig.keyboardBookmark.source = BookmarkSource.BROWSER
   getSystemBookmarkForKeyboard()
 }
 
 /**
- * source=1 时，bindingMode 或 layers 变化需重新解析书签
+ * source=BookmarkSource.BROWSER 时，layers 变化需重新解析书签
  */
 watch(
-  [
-    () => localConfig.keyboardBookmark.bindingMode,
-    () => localConfig.keyboardBookmark.layers.map((l) => l.sourceFolderTitle),
-  ],
+  () => localConfig.keyboardBookmark.layers.map((l) => l.sourceFolderPath),
   () => {
-    if (localConfig.keyboardBookmark.source === 1) {
+    if (localConfig.keyboardBookmark.source === BookmarkSource.BROWSER) {
       getSystemBookmarkForKeyboard()
     }
   },
@@ -157,7 +145,17 @@ const noModifierInInputWarning = computed(() => {
 })
 
 /**
- * 文件夹选择器控制：-1 = 关闭，0-4 = 打开对应层
+ * 修饰键相关警告集合（多条独立显示）
+ */
+const modifierWarnings = computed(() => {
+  return [
+    modifierConflictWarning.value,
+    noModifierConflictWarning.value,
+  ].filter(Boolean)
+})
+
+/**
+ * 文件夹选择器控制：-1 = 关闭，0-3 = 打开对应层
  */
 const layerFolderPickerIndex = ref(-1)
 
@@ -168,7 +166,8 @@ const showLayerFolderPicker = (idx: number) => {
 const onSelectLayerFolder = (option: BookmarkNode) => {
   const idx = layerFolderPickerIndex.value
   if (idx < 0) return
-  localConfig.keyboardBookmark.layers[idx].sourceFolderTitle = option.title
+  localConfig.keyboardBookmark.layers[idx].sourceFolderPath =
+    (option as any).path || option.title
   layerFolderPickerIndex.value = -1
   if (idx === cachedActiveLayer.value) {
     getSystemBookmarkForKeyboard()
@@ -176,9 +175,38 @@ const onSelectLayerFolder = (option: BookmarkNode) => {
 }
 
 const onClearLayerFolder = (idx: number) => {
-  localConfig.keyboardBookmark.layers[idx].sourceFolderTitle = ''
+  localConfig.keyboardBookmark.layers[idx].sourceFolderPath = ''
   if (idx === cachedActiveLayer.value) {
     getSystemBookmarkForKeyboard()
+  }
+}
+
+/** 取文件夹路径最后一段作为 UI 展示 */
+const displayFolderName = (path: string) => path.split('/').pop() || path
+
+/**
+ * 是否展示"一键创建层"按钮
+ * 条件：所有 layer 均未配置 sourceFolderPath
+ */
+const showCreateLayerButton = computed(() => {
+  if (localConfig.keyboardBookmark.source !== BookmarkSource.BROWSER)
+    return false
+  return localConfig.keyboardBookmark.layers.every((l) => !l.sourceFolderPath)
+})
+
+/**
+ * 一键创建 4 个书签层
+ */
+const handleCreateLayerFolders = async () => {
+  try {
+    const paths = await createLayerBookmarkFolders()
+    // 将创建的路径绑定到对应 Layer
+    paths.forEach((path: string, idx: number) => {
+      localConfig.keyboardBookmark.layers[idx].sourceFolderPath = path
+    })
+    showToast.success(window.$t('keyboardBookmark.createLayerFoldersSuccess'))
+  } catch {
+    showToast.error(window.$t('keyboardBookmark.createLayerFoldersFailed'))
   }
 }
 
@@ -187,12 +215,10 @@ const onClearLayerFolder = (idx: number) => {
  */
 const handleExportToBrowser = async () => {
   const keymap = localConfig.keyboardBookmark.keymap
-  const folderTitle =
-    localConfig.keyboardBookmark.layers[0]?.sourceFolderTitle || 'NaiveTab'
 
   const bookmarkCount = Object.values(keymap).filter((e) => e?.url).length
   if (bookmarkCount === 0) {
-    window.$message.warning(window.$t('keyboardBookmark.exportNoBookmarks'))
+    showToast.warning(window.$t('keyboardBookmark.exportNoBookmarks'))
     return
   }
 
@@ -200,46 +226,43 @@ const handleExportToBrowser = async () => {
   if (!granted) return
 
   const tree = await chrome.bookmarks.getTree()
-  const existingFolder = findFolderByName(tree, folderTitle)
+  const existingFolder = findFolderByPath(tree, `${EXPORT_FOLDER_PATH}/layer1`)
 
-  if (existingFolder) {
+  if (existingFolder && existingFolder.children?.length) {
+    const exportPath = `${KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER}/layer1`
     const dialogContent =
       window
         .$t('keyboardBookmark.exportFolderExists')
-        .replace('__folder__', folderTitle) +
+        .replace('__folder__', exportPath) +
       '\n' +
       window
         .$t('keyboardBookmark.exportClearConfirm')
-        .replace('__folder__', folderTitle)
+        .replace('__folder__', exportPath)
 
     window.$dialog.create({
       title: window.$t('keyboardBookmark.exportFolderExistsTitle'),
       content: dialogContent,
       positiveText: window.$t('keyboardBookmark.exportClearAndRebuild'),
       negativeText: window.$t('keyboardBookmark.exportCancel'),
-      onPositiveClick: () => doExport(folderTitle, keymap, 'clearAndRebuild'),
+      onPositiveClick: () => doExport(keymap),
     })
   } else {
-    await doExport(folderTitle, keymap, 'create')
+    await doExport(keymap)
   }
 }
 
-const doExport = async (
-  folderTitle: string,
-  keymap: Record<string, TBookmarkEntry>,
-  mode: 'create' | 'clearAndRebuild',
-) => {
+const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
   try {
     const count = Object.values(keymap).filter((e) => e?.url).length
-    await exportKeymapToBrowser(folderTitle, keymap, mode)
+    await exportKeymapToBrowser(keymap)
     const successMsg = window
       .$t('keyboardBookmark.exportSuccess')
       .replace('__count__', String(count))
-      .replace('__folder__', folderTitle)
-    window.$message.success(successMsg)
+      .replace('__folder__', `${KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER}/layer1`)
+    showToast.success(successMsg)
   } catch (e) {
     console.error('[Export] failed:', e)
-    window.$message.error(window.$t('keyboardBookmark.exportFailed'))
+    showToast.error(window.$t('keyboardBookmark.exportFailed'))
   }
 }
 </script>
@@ -291,28 +314,14 @@ const doExport = async (
         </NButton>
       </SettingFormItem>
 
-      <template v-if="localConfig.keyboardBookmark.source === 1">
-        <SwitchField
-          v-model="localConfig.keyboardBookmark.bindingMode"
-          :label="$t('keyboardBookmark.bindingMode')"
-          :tip-content="$t('keyboardBookmark.bindingModeDesc')"
-        />
-        <!-- bindingMode = false: 保留原有默认展开文件夹 NSelect -->
-        <SettingFormItem
-          v-if="!localConfig.keyboardBookmark.bindingMode"
-          :label="$t('keyboardBookmark.defaultDisplayFolderTitle')"
-        >
-          <NSelect
-            v-model:value="localConfig.keyboardBookmark.defaultExpandFolder"
-            :options="defaultFolderOptions"
-            :placeholder="$t('keyboardBookmark.rootDirectory')"
-            clearable
-            @update:value="handleDefaultFolderTitleChange"
-          />
-        </SettingFormItem>
-      </template>
+      <SwitchField
+        v-model="localConfig.keyboardBookmark.isNewTabOpen"
+        :label="$t('generalSetting.newTabOpen')"
+      />
 
-      <template v-if="localConfig.keyboardBookmark.source === 2">
+      <template
+        v-if="localConfig.keyboardBookmark.source === BookmarkSource.INTERNAL"
+      >
         <SettingFormItem
           :label="$t('keyboardBookmark.exportToBrowserBookmark')"
           :tip-content="$t('keyboardBookmark.exportToBrowserBookmarkDesc')"
@@ -330,81 +339,113 @@ const doExport = async (
           </NButton>
         </SettingFormItem>
       </template>
-
-      <SwitchField
-        v-model="localConfig.keyboardBookmark.isNewTabOpen"
-        :label="$t('generalSetting.newTabOpen')"
-      />
     </SettingFormSection>
 
-    <!-- bindingMode = true: 4 层文件夹配置 -->
-    <SettingFormSection
-      v-if="
-        localConfig.keyboardBookmark.source === 1 &&
-        localConfig.keyboardBookmark.bindingMode
-      "
-      :title="$t('keyboardBookmark.layerFolders')"
-      :icon="ICONS.folderOutline"
+    <template
+      v-if="localConfig.keyboardBookmark.source === BookmarkSource.BROWSER"
     >
-      <SettingFormInlineRow>
-        <SettingFormItem
-          v-for="(_, idx) in localConfig.keyboardBookmark.layers.slice(0, 2)"
+      <!-- 4 个书签层配置 -->
+      <SettingFormSection
+        :title="$t('keyboardBookmark.layerFolders')"
+        :icon="ICONS.folderOutline"
+        :tip-content="$t('keyboardBookmark.layerFoldersTip')"
+      >
+        <SettingFormItem v-if="showCreateLayerButton">
+          <NButton
+            class="setting__btn setting__btn--primary"
+            type="primary"
+            size="tiny"
+            secondary
+            round
+            @click="handleCreateLayerFolders"
+          >
+            <Icon :icon="ICONS.add" />
+            {{ $t('keyboardBookmark.createLayerFolders') }}
+          </NButton>
+        </SettingFormItem>
+
+        <template
+          v-for="(layer, idx) in localConfig.keyboardBookmark.layers"
           :key="idx"
-          :label="
-            $t('keyboardBookmark.layerN').replace('__n__', String(idx + 1))
-          "
         >
-          <span
-            class="layer-folder-name"
-            @click="showLayerFolderPicker(idx)"
-          >
-            {{
-              localConfig.keyboardBookmark.layers[idx].sourceFolderTitle ||
-              $t('keyboardBookmark.notConfigured')
-            }}
-          </span>
-          <NButton
-            size="small"
-            text
-            :disabled="
-              !localConfig.keyboardBookmark.layers[idx].sourceFolderTitle
-            "
-            @click="onClearLayerFolder(idx)"
-          >
-            <Icon :icon="ICONS.closeCircleLine" />
-          </NButton>
-        </SettingFormItem>
-      </SettingFormInlineRow>
-      <SettingFormInlineRow>
-        <SettingFormItem
-          v-for="(_, idx) in localConfig.keyboardBookmark.layers.slice(2, 4)"
-          :key="idx + 2"
-          :label="
-            $t('keyboardBookmark.layerN').replace('__n__', String(idx + 3))
-          "
-        >
-          <span
-            class="layer-folder-name"
-            @click="showLayerFolderPicker(idx + 2)"
-          >
-            {{
-              localConfig.keyboardBookmark.layers[idx + 2].sourceFolderTitle ||
-              $t('keyboardBookmark.notConfigured')
-            }}
-          </span>
-          <NButton
-            size="small"
-            text
-            :disabled="
-              !localConfig.keyboardBookmark.layers[idx + 2].sourceFolderTitle
-            "
-            @click="onClearLayerFolder(idx + 2)"
-          >
-            <Icon :icon="ICONS.closeCircleLine" />
-          </NButton>
-        </SettingFormItem>
-      </SettingFormInlineRow>
-    </SettingFormSection>
+          <SettingFormInlineRow v-if="idx % 2 === 0">
+            <SettingFormItem
+              :label-width="55"
+              :label="
+                $t('keyboardBookmark.layerN').replace('__n__', String(idx + 1))
+              "
+            >
+              <span
+                class="layer-folder-name"
+                @click="showLayerFolderPicker(idx)"
+              >
+                <template v-if="displayFolderName(layer.sourceFolderPath)">
+                  {{ displayFolderName(layer.sourceFolderPath) }}
+                </template>
+                <span
+                  v-else
+                  class="layer-folder-name--placeholder"
+                >
+                  {{ $t('keyboardBookmark.notConfigured') }}
+                </span>
+              </span>
+              <NButton
+                size="small"
+                text
+                :disabled="!layer.sourceFolderPath"
+                @click="onClearLayerFolder(idx)"
+              >
+                <Icon :icon="ICONS.closeCircleLine" />
+              </NButton>
+            </SettingFormItem>
+            <SettingFormItem
+              v-if="idx + 1 < localConfig.keyboardBookmark.layers.length"
+              :label-width="55"
+              :label="
+                $t('keyboardBookmark.layerN').replace('__n__', String(idx + 2))
+              "
+            >
+              <span
+                class="layer-folder-name"
+                @click="showLayerFolderPicker(idx + 1)"
+              >
+                <template
+                  v-if="
+                    displayFolderName(
+                      localConfig.keyboardBookmark.layers[idx + 1]
+                        .sourceFolderPath,
+                    )
+                  "
+                >
+                  {{
+                    displayFolderName(
+                      localConfig.keyboardBookmark.layers[idx + 1]
+                        .sourceFolderPath,
+                    )
+                  }}
+                </template>
+                <span
+                  v-else
+                  class="layer-folder-name--placeholder"
+                >
+                  {{ $t('keyboardBookmark.notConfigured') }}
+                </span>
+              </span>
+              <NButton
+                size="small"
+                text
+                :disabled="
+                  !localConfig.keyboardBookmark.layers[idx + 1].sourceFolderPath
+                "
+                @click="onClearLayerFolder(idx + 1)"
+              >
+                <Icon :icon="ICONS.closeCircleLine" />
+              </NButton>
+            </SettingFormItem>
+          </SettingFormInlineRow>
+        </template>
+      </SettingFormSection>
+    </template>
 
     <!-- 快捷键设置 -->
     <SettingFormSection
@@ -418,23 +459,11 @@ const doExport = async (
       />
 
       <template v-if="localConfig.keyboardBookmark.isGlobalShortcutEnabled">
-        <SettingFormItem
-          v-if="noModifierInInputWarning"
-          class="setting-hint-card"
-        >
-          <span class="setting-hint danger">
-            <Icon
-              :icon="ICONS.warning"
-              class="hint__icon"
-            />
-            {{ noModifierInInputWarning }}
-          </span>
-        </SettingFormItem>
-
         <SwitchField
           v-model="localConfig.keyboardBookmark.shortcutInInputElement"
           :label="$t('keyboardBookmark.shortcutInInputElement')"
           :tip-content="$t('keyboardBookmark.shortcutInInputElementTips')"
+          :warning-message="noModifierInInputWarning"
         />
 
         <SettingFormItem
@@ -453,51 +482,29 @@ const doExport = async (
           :tip-content="$t('keyboardBookmark.noModifierModeDesc')"
         />
 
-        <SettingFormItem :label="$t('keyboardBookmark.globalModifier')">
+        <SettingFormItem
+          :label="$t('keyboardBookmark.globalModifier')"
+          :tip-content="getGlobalModifierTip()"
+          :warning-message="modifierWarnings"
+        >
           <GlobalShortcutRecorder
             v-model="localConfig.keyboardBookmark.globalShortcutModifiers"
             :disabled="localConfig.keyboardBookmark.noModifierMode"
           />
         </SettingFormItem>
-
-        <SettingFormItem
-          v-if="modifierConflictWarning"
-          class="setting-hint-card"
-        >
-          <span class="setting-hint danger">
-            <Icon
-              :icon="ICONS.warning"
-              class="hint__icon"
-            />
-            {{ modifierConflictWarning }}
-          </span>
-        </SettingFormItem>
-
-        <SettingFormItem
-          v-if="noModifierConflictWarning"
-          class="setting-hint-card"
-        >
-          <span class="setting-hint danger">
-            <Icon
-              :icon="ICONS.warning"
-              class="hint__icon"
-            />
-            {{ noModifierConflictWarning }}
-          </span>
-        </SettingFormItem>
       </template>
     </SettingFormSection>
 
     <template
-      v-if="
-        localConfig.keyboardBookmark.source === 1 &&
-        localConfig.keyboardBookmark.bindingMode
-      "
+      v-if="localConfig.keyboardBookmark.source === BookmarkSource.BROWSER"
     >
-      <BookmarkBindingManager :base-size="keyboardBaseSize" />
+      <div class="layer-switcher-wrap">
+        <BaseBookmarkLayerTabSwitcher />
+      </div>
+      <BaseSystemBookmarkManager :base-size="keyboardBaseSize" />
     </template>
-    <BookmarkManager
-      v-if="localConfig.keyboardBookmark.source === 2"
+    <BaseNaiveBookmarkManager
+      v-if="localConfig.keyboardBookmark.source === BookmarkSource.INTERNAL"
       :base-size="keyboardBaseSize"
     />
 
@@ -522,19 +529,10 @@ const doExport = async (
 
 .setting-hint {
   font-size: 12px;
-  color: rgba(208, 48, 80, 0.9);
   padding: 4px 0;
   display: flex;
   align-items: center;
   gap: var(--space-1);
-}
-
-.setting-hint.danger {
-  color: rgba(208, 48, 80, 0.9);
-}
-
-.setting-hint.danger .hint__icon {
-  color: rgba(208, 48, 80, 0.9);
 }
 
 .setting-hint.info {
@@ -555,20 +553,35 @@ const doExport = async (
 }
 
 .layer-folder-name {
+  display: inline-flex;
+  align-items: center;
   font-size: 14px;
   color: var(--n-text-color);
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
 .layer-folder-name:hover {
-  background-color: var(--gray-alpha-8);
+  background-color: var(--gray-alpha-10);
+  color: var(--n-text-color-hover, var(--n-text-color));
+}
+
+.layer-folder-name:active {
+  transform: scale(0.98);
+  background-color: var(--gray-alpha-12);
+}
+
+.layer-folder-name--placeholder {
+  color: var(--gray-alpha-9);
+}
+
+.layer-switcher-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
 }
 </style>

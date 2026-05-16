@@ -8,11 +8,13 @@ const props = withDefaults(
     tipContent?: string
     tipLink?: string
     disabled?: boolean
+    warningMessage?: string
   }>(),
   {
     tipContent: undefined,
     tipLink: undefined,
     disabled: false,
+    warningMessage: undefined,
   },
 )
 
@@ -24,6 +26,7 @@ const modelValue = defineModel<boolean>({ required: true })
     :label="label"
     :tip-content="tipContent"
     :tip-link="tipLink"
+    :warning-message="warningMessage"
   >
     <Transition name="setting-slide">
       <div

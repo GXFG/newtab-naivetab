@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { useMessage, useNotification, useDialog } from 'naive-ui'
-import { globalState } from '@/logic/store'
-import { setupPageConfigSync } from '@/logic/sync/core'
-import { setupLocalStorageSyncListener } from '@/logic/sync/state'
+import { useDialog } from 'naive-ui'
+import { globalState } from '@/logic/store/state'
+import { setupPageConfigSync } from '@/logic/config/sync/loader'
+import { setupLocalStorageSyncListener } from '@/logic/config/sync/state'
 import SettingPaneContent from '@/setting/SettingPaneContent.vue'
 import ChangelogModal from '@/components/ChangelogModal.vue'
 
-window.$message = useMessage()
-window.$notification = useNotification()
 window.$dialog = useDialog()
 
 onMounted(async () => {

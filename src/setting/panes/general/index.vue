@@ -1,25 +1,22 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { useI18n } from 'vue-i18n'
-import i18n from '@/lib/i18n'
+import i18n from '@/common/i18n'
 import {
   exportSetting,
   importSetting,
   refreshSetting,
   resetSetting,
-} from '@/logic/sync/manage'
+} from '@/logic/config/sync/manage'
 import {
   configSizeMap,
   lastSyncTime,
   isUploadConfigLoading,
-} from '@/logic/sync/state'
-import {
-  localConfig,
-  globalState,
-  customPrimaryColor,
-  colorMixWithAlpha,
-} from '@/logic/store'
-import { ICONS } from '@/logic/icons'
+} from '@/logic/config/sync/state'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
+import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
+import { ICONS } from '@/logic/constants/icons'
 import {
   SettingHeaderBar,
   SettingFormWrap,

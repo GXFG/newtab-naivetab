@@ -1,7 +1,19 @@
 <script setup lang="ts">
+/**
+ * @module WidgetWrap
+ * @description Widget 包裹组件，提供定位（CSS 变量注入）、拖拽（注册到 moveState）、专注模式可见性控制。
+ * @dependencies logic/moveable.ts（moveState、isDragMode）、logic/config/state.ts（localConfig/localState）
+ * @consumers 所有 Widget 的根组件（必须用此组件包裹）
+ * @pitfalls
+ *   - widget__wrap div 的 :style 已被 widgetStyle 用于注入定位 CSS 变量，禁止再 :style 绑定
+ *   - 拖动样式分两层：高频 CSS 变量值更新（widgetStyle）vs 低频 el.style 方向 key 切换（applyContainerLayout）
+ *   - stopDrag 后通过 scheduleApplyContainerLayout 在 rAF 中写入 localConfig，避免连续布局写入
+ *   - 组件 enabled=false 时需重置 targetContainerEle，否则下次启用时可能指向已销毁的 DOM
+ * @see docs/widgets/widget-dev.md#WidgetWrap-深度解析
+ */
 import { DRAG_TRIGGER_DISTANCE } from '@/logic/constants/app'
 import { moveState, isDragMode } from '@/logic/moveable'
-import { localConfig, localState } from '@/logic/store'
+import { localConfig, localState } from '@/logic/config/state'
 
 const props = defineProps({
   widgetCode: {
@@ -10,7 +22,7 @@ const props = defineProps({
   },
 })
 
-// 拖动位置 CSS 变量通过 :style 注入，避免 v-bind() TDZ 错误
+// 拖动位置 CSS 变量通过 :style 注入
 const widgetStyle = computed(() => ({
   '--nt-x-offset': state.cssVars.xOffset,
   '--nt-y-offset': state.cssVars.yOffset,
@@ -35,7 +47,7 @@ const state = reactive({
    *
    * 【第一层：高频，每帧执行】更新 CSS 变量的「值」
    *   - 作用元素：widget__wrap（Vue 管理的父 div）
-   *   - 操作方式：修改此处的 cssVars → 由 v-bind 写入 CSS 变量（--x-offset 等）
+   *   - 操作方式：修改此处的 cssVars → 通过 :style 写入 CSS 变量（--x-offset 等）
    *   - 每帧拖动时只更新 4 个 JS 字符串，Vue 在下一次 flush 时批量写入 CSS 变量
    *
    * 【第二层：低频，仅 key 切换时执行】更新 container 的「属性名」
@@ -295,7 +307,7 @@ const onDragging = (e: MouseEvent) => {
     moveState.isBottomBoundVisible = false
   }
 
-  // 第一层（高频）：更新 CSS 变量的值，由 v-bind 批量写入 widget__wrap
+  // 第一层（高频）：更新 CSS 变量的值，通过 widgetStyle 写入 widget__wrap
   state.cssVars.xOffset = `${offsetData.xOffsetValue ?? 0}vw`
   state.cssVars.yOffset = `${offsetData.yOffsetValue ?? 0}vh`
   state.cssVars.xTranslate = `${offsetData.xTranslateValue ?? 0}%`
@@ -446,7 +458,7 @@ watch(
 )
 
 /**
- * widget__wrap div 的style会被用来存放v-bind的css var，不能再进行:style操作
+ * widget__wrap div 的 style 被用于存放定位相关的 CSS 变量，不能再进行 :style 操作
  */
 </script>
 
@@ -478,10 +490,6 @@ watch(
   --y-offset: 0;
   --x-translate: 0;
   --y-translate: 0;
-  --nt-auxiliary-line-widget: rgba(0, 0, 0, 0);
-  --nt-bg-moveable-widget-main: rgba(0, 0, 0, 0);
-  --nt-bg-moveable-widget-active: rgba(0, 0, 0, 0);
-  --nt-moveable-tool-delete-btn-color: rgba(0, 0, 0, 0);
 }
 
 .widget__wrap--hidden {

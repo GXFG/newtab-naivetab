@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { gaProxy } from '@/logic/gtag'
+import { ICONS } from '@/logic/constants/icons'
+import { gaProxy } from '@/logic/utils/gtag'
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import {
   isDragMode,
@@ -11,9 +11,11 @@ import {
   moveState,
   animateDeleteWidget,
 } from '@/logic/moveable'
-import { customPrimaryColor, localConfig, globalState } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
+import { customPrimaryColor } from '@/logic/store/style'
 import { widgetsRegistry } from '@/newtab/widgets/registry'
-import { WIDGET_GROUPS } from '@/newtab/widgets/codes'
+import { WIDGET_GROUPS } from '@/common/widget-constants'
 
 const draftDrawerStyle = computed(() => ({
   '--nt-draft-custom-primary-color': customPrimaryColor.value,

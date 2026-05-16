@@ -19,6 +19,8 @@ export const MSG_KEYDOWN = 'NAIVETAB_KEYDOWN'
 export const MSG_INIT_COMPLETE = 'NAIVETAB_INIT_COMPLETE'
 export const MSG_HELLO = 'NAIVETAB_HELLO'
 export const MSG_EXECUTE_COMMAND = 'NAIVETAB_EXECUTE_COMMAND'
+export const MSG_SWITCH_BOOKMARK_LAYER = 'NAIVETAB_SWITCH_BOOKMARK_LAYER'
+export const MSG_SWITCH_BOOKMARK_LAYER_UI = 'NAIVETAB_SWITCH_BOOKMARK_LAYER_UI'
 
 // ── 消息接口 ─────────────────────────────────────────────────────────────
 
@@ -41,6 +43,27 @@ export interface CsToSwHello {
   type: typeof MSG_HELLO
 }
 
-export type CsToSwMessage = CsToSwKeydownMessage | CsToSwHello
+export interface SwToCsSwitchBookmarkLayer {
+  type: typeof MSG_SWITCH_BOOKMARK_LAYER
+  folderName: string
+}
 
-export type SwToCsMessage = SwToCsExecuteCommand | SwToCsInitComplete
+/**
+ * UI（newtab / popup）→ SW 消息：请求切换书签层。
+ * SW 收到后通过原子写入（keymap + activeLayer 一次 set）完成切换，
+ * 避免两步写入的中间状态。
+ */
+export interface CsToSwSwitchBookmarkLayer {
+  type: typeof MSG_SWITCH_BOOKMARK_LAYER_UI
+  layerIndex: number
+}
+
+export type CsToSwMessage =
+  | CsToSwKeydownMessage
+  | CsToSwHello
+  | CsToSwSwitchBookmarkLayer
+
+export type SwToCsMessage =
+  | SwToCsExecuteCommand
+  | SwToCsInitComplete
+  | SwToCsSwitchBookmarkLayer

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { URL_DAYJS_FORMAT } from '@/logic/constants/urls'
-import { ICONS } from '@/logic/icons'
-import { localConfig } from '@/logic/store'
+import { ICONS } from '@/logic/constants/icons'
+import { localConfig } from '@/logic/config/state'
 import {
   SettingHeaderBar,
   SettingFormWrap,

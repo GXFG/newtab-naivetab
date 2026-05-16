@@ -1,5 +1,13 @@
+/**
+ * @module keyboard/keyboard-layout
+ * @description 键盘布局变换引擎：WKL 模式、macOS 修饰键交换、Space 键拆分、
+ *   强调键注入。从 layouts/ 目录加载 19 种预设布局，运行时根据配置转换。
+ * @dependencies keyboard/keyboard-constants.ts（强调键集合）、keyboard/layouts/（预设布局）
+ * @consumers widgets/keyboardBookmark/logic.ts、components/KeyboardLayout.vue
+ * @see docs/features/keyboard.md
+ */
 import { isMacOS } from '@/env'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 import { EMPHASIS_ONE_KEYS, EMPHASIS_TWO_KEYS } from './keyboard-constants'
 import * as layouts from './layouts'
 

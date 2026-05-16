@@ -17,7 +17,7 @@ describe('config/update', () => {
     vi.resetModules()
 
     // Mock store with reactive state
-    vi.doMock('@/logic/store', () => ({
+    vi.doMock('@/logic/config/state', () => ({
       localConfig: reactive({
         general: {
           version: '1.0.0',
@@ -27,7 +27,7 @@ describe('config/update', () => {
           focusVisibleWidgetMap: {},
           isFocusMode: false,
         },
-        keyboardBookmark: { keymap: {}, source: 0, defaultExpandFolder: null },
+        keyboardBookmark: { keymap: {}, source: 0 },
         keyboardCommon: { fontSize: 14 },
         keyboardCommand: { enabled: true },
         search: { isNewTabOpen: false },
@@ -65,7 +65,7 @@ describe('config/update', () => {
     vi.doMock('@/logic/config/defaults', () => ({
       defaultConfig: {
         general: { version: '2.2.5', timeLang: 'en' },
-        keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
+        keyboardBookmark: { keymap: {}, source: 1 },
         keyboardCommon: { fontSize: 14 },
         keyboardCommand: { enabled: true },
         search: { isNewTabOpen: true },
@@ -135,7 +135,7 @@ describe('config/update', () => {
     }))
 
     // Mock util
-    vi.doMock('@/logic/util', () => ({
+    vi.doMock('@/logic/utils/util', () => ({
       log: vi.fn(),
       compareLeftVersionLessThanRightVersions: vi.fn(
         (left: string, right: string) => {
@@ -150,7 +150,6 @@ describe('config/update', () => {
           return false
         },
       ),
-      downloadJsonByTagA: vi.fn(),
     }))
 
     // Mock vue naive-ui components
@@ -173,7 +172,7 @@ describe('config/update', () => {
   describe('handleStateResetAndUpdate', () => {
     it('adds missing fields to isUploadConfigStatusMap', async () => {
       // Re-import to get the mocked localState
-      const { localState } = await import('@/logic/store')
+      const { localState } = await import('@/logic/config/state')
 
       // Only 'general' exists in isUploadConfigStatusMap before call
       const initialKeys = Object.keys(localState.value.isUploadConfigStatusMap)

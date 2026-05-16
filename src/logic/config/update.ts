@@ -1,15 +1,32 @@
-import { h } from 'vue'
-import { NButton } from 'naive-ui'
+/**
+ * @module update
+ * @description 配置更新与版本迁移。updateSetting 合并配置，handleAppUpdate 处理跨版本数据结构迁移。
+ * @dependencies config/merge.ts（mergeState）、config/version.ts（版本比较）、config/defaults.ts（默认值）
+ * @consumers config/sync/loader.ts（拉取后调用 updateSetting）、SW init-guard（启动时 handleAppUpdate）
+ * @pitfalls
+ *   - handleAppUpdate 使用 if 而非 if-else，确保跨越多个版本的旧用户能依次执行所有迁移
+ *   - 末尾的 updateSetting() 是异步执行（不 await），整理配置结构但不阻塞首屏渲染
+ *   - 新增迁移分支时必须同步升 package.json version
+ * @see docs/architecture/config.md#配置迁移系统
+ * @see .claude/rules/pitfalls.md#配置迁移黄金法则
+ */
+import { showToast } from '@/common/toast'
 import {
   defaultConfig,
   defaultLocalState,
   defaultFocusVisibleWidgetMap,
 } from '@/logic/config/defaults'
-import { log, compareLeftVersionLessThanRightVersions } from '@/logic/util'
-import { type WidgetCodes } from '@/newtab/widgets/codes'
-
+import { log } from '@/logic/utils/common'
+import {
+  type WidgetCodes,
+  MAX_LAYERS,
+  BookmarkSource,
+} from '@/common/widget-constants'
+import { DEFAULT_LAYER_SOURCE_FOLDER } from '@/logic/keyboard/keyboard-constants'
+import { globalState } from '@/logic/store/state'
 import { mergeState } from './merge'
-import { localConfig, localState, globalState } from '../store'
+import { localConfig, localState } from './state'
+import { compareLeftVersionLessThanRightVersions } from './version'
 
 /**
  * 获取本地版本号
@@ -27,25 +44,9 @@ export const getLocalVersion = () => {
  * 更新成功通知
  */
 const updateSuccess = () => {
-  window.$notification?.success({
-    duration: 5000,
-    title: `${window.$t('common.update')}${window.$t('common.success')}`,
-    content: `${window.$t('common.version')} ${window.appVersion}`,
-    action: () =>
-      h(
-        NButton,
-        {
-          text: true,
-          type: 'primary',
-          onClick: () => {
-            globalState.isChangelogModalVisible = true
-          },
-        },
-        {
-          default: () => window.$t('about.changelog'),
-        },
-      ),
-  })
+  showToast.success(
+    `${window.$t('common.update')}${window.$t('common.success')} — V${window.appVersion}`,
+  )
 }
 
 /**
@@ -124,8 +125,8 @@ export const handleAppUpdate = () => {
   // @@@@ 更新localConfig后需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
     const keymapLength = Object.keys(localConfig.keyboardBookmark.keymap).length
-    localConfig.keyboardBookmark.source = keymapLength === 0 ? 1 : 2
-    localConfig.keyboardBookmark.defaultExpandFolder = null
+    localConfig.keyboardBookmark.source =
+      keymapLength === 0 ? BookmarkSource.BROWSER : BookmarkSource.INTERNAL
   }
   if (compareLeftVersionLessThanRightVersions(version, '1.21.0')) {
     localConfig.search.isNewTabOpen = false
@@ -254,9 +255,30 @@ export const handleAppUpdate = () => {
     delete (localConfig.keyboardCommon as any).plateBackgroundBlur
   }
   if (compareLeftVersionLessThanRightVersions(version, '2.3.2')) {
-    localConfig.keyboardBookmark.layers = Array.from({ length: 4 }, (_, i) => ({
-      sourceFolderTitle: i === 0 ? 'NaiveTab' : '',
-    }))
+    localConfig.general.showBreakingChangeNotice = true
+    // 新增书签层功能，初始化默认 4 层配置（第 0 层默认为 DEFAULT_LAYER_SOURCE_FOLDER，与导出路径一致）
+    localConfig.keyboardBookmark.layers = Array.from(
+      { length: MAX_LAYERS },
+      (_, i) => ({
+        sourceFolderPath: i === 0 ? DEFAULT_LAYER_SOURCE_FOLDER : '',
+      }),
+    )
+    // 移除顺序模式，统一为 [X] 前缀精确绑定，引导用户使用「文件夹书签」Widget
+    delete (localConfig.keyboardBookmark as any).defaultExpandFolder
+    // 背景图配置重构：backgroundImageNames 从字符串数组改为对象数组，backgroundNetworkSourceType 废弃
+    const oldNames = (localConfig.general as any).backgroundImageNames
+    if (Array.isArray(oldNames) && typeof oldNames[0] === 'string') {
+      const networkSourceType = (localConfig.general as any)
+        .backgroundNetworkSourceType
+      localConfig.general.backgroundImageList = oldNames.map(
+        (name: string) => ({
+          networkSourceType: networkSourceType,
+          name,
+        }),
+      )
+    }
+    delete (localConfig.general as any).backgroundImageNames
+    delete (localConfig.general as any).backgroundNetworkSourceType
   }
 
   // 更新local版本号

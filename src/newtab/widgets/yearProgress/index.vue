@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { isDragMode } from '@/logic/moveable'
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import {
-  currDayjsLang,
-  localConfig,
-  getIsWidgetRender,
-  getStyleField,
-} from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
+import { currDayjsLang } from '@/logic/store/theme'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -67,27 +64,37 @@ const state = reactive({
   }[],
 })
 
-const startOfYear = dayjs().startOf('year')
-const endOfYear = dayjs().endOf('year')
+/**
+ * 获取当前年份的起止时间戳。
+ * 使用 getter 而非模块级常量，避免页面跨年时数据过时。
+ */
+const getYearRange = () => {
+  const start = dayjs().startOf('year')
+  const end = dayjs().endOf('year')
+  return { start, end }
+}
 
-const calculateDay = () => {
-  state.totalDay = endOfYear.diff(startOfYear, 'day') + 1
-  state.passDay = dayjs().diff(startOfYear, 'day') + 1
+/**
+ * 初始化表格数据：构建全年 365/366 天的日期数组。
+ * 一年内的数据不变，只需在 onMounted 时执行一次。
+ */
+const initTableData = () => {
+  const { start, end } = getYearRange()
+  state.totalDay = end.diff(start, 'day') + 1
+  state.passDay = dayjs().diff(start, 'day') + 1
   state.tableList = Array.from(Array(state.totalDay), (_, index) => {
     return {
       dayNum: index + 1,
-      date: startOfYear.add(index, 'day').format('YYYY-MM-DD'),
+      date: start.add(index, 'day').format('YYYY-MM-DD'),
     }
   })
 }
 
-const startYearTS = startOfYear.valueOf()
-const endYearTS = endOfYear.valueOf()
-const totalTS = endYearTS - startYearTS
-
 const calculateProgress = () => {
+  const { start, end } = getYearRange()
+  const totalTS = end.valueOf() - start.valueOf()
   const currTS = dayjs().valueOf()
-  const passTS = currTS - startYearTS
+  const passTS = currTS - start.valueOf()
   state.percent = ((passTS / totalTS) * 100).toFixed(
     localConfig.yearProgress.percentageDecimal,
   )
@@ -99,8 +106,11 @@ const updateDate = () => {
     .format(localConfig.yearProgress.format)
 }
 
+/**
+ * 每秒执行：只更新进度百分比和日期文本。
+ * 表格数据由 initTableData 在 onMounted 时初始化一次，不在此重复构建。
+ */
 const onRender = () => {
-  calculateDay()
   calculateProgress()
   updateDate()
 }
@@ -129,6 +139,7 @@ watch([() => localConfig.yearProgress.format, currDayjsLang], () => {
 })
 
 onMounted(() => {
+  initTableData()
   onRender()
 })
 </script>

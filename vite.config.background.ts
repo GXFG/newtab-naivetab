@@ -24,13 +24,11 @@ export default defineConfig({
     minify: process.env.NO_MINIFY ? false : 'esbuild',
     lib: {
       entry: r('src/background/main.ts'),
-      name: packageJson.name,
-      formats: ['iife'],
+      formats: ['es'],
     },
     rollupOptions: {
       output: {
         entryFileNames: 'index.mjs',
-        extend: true,
       },
     },
   },

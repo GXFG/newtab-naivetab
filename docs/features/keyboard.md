@@ -2,7 +2,7 @@
 
 ## 概述
 
-键盘系统负责在 NaiveTab 新标签页中渲染可定制的虚拟键盘，支持 16 种布局、3 种键帽视觉风格、80+ 预设配色方案。键盘与书签 Widget（`keyboardBookmark`）和全局命令快捷键共享视觉渲染逻辑。
+键盘系统负责在 NaiveTab 新标签页中渲染可定制的虚拟键盘，支持 19 种布局、3 种键帽视觉风格、81 个预设配色方案。键盘与书签 Widget（`keyboardBookmark`）和全局命令快捷键共享视觉渲染逻辑。
 
 **业务范围：** 本文档描述通用键盘引擎（布局、渲染、主题、拖拽）。Widget 专属内容（书签绑定、keymap、事件处理）详见 [keyboard-bookmark-widget.md](../widgets/keyboard-bookmark-widget.md)。
 
@@ -12,10 +12,10 @@
 
 | 命名空间 | 配置文件 | 用途 |
 |----------|----------|------|
-| `keyboardCommon` | `src/logic/keyboard/keyboard-config.ts` | 键盘视觉样式（布局、键帽、外壳、配色） |
+| `keyboardCommon` | `src/logic/config/defaults.ts` | 键盘视觉样式（布局、键帽、外壳、配色） |
 | `keyboardBookmark` | `src/newtab/widgets/keyboardBookmark/config.ts` | Widget 业务数据（keymap、位置、来源模式） |
 
-另有 `keyboardCommand` 配置在 `src/logic/globalShortcut/shortcut-command.ts` 中——**不是可视 Widget**，是全局命令快捷键系统。
+另有 `keyboardCommand` 配置在 `src/logic/shortcut/shortcut-command.ts` 中——**不是可视 Widget**，是全局命令快捷键系统。
 
 ---
 
@@ -23,12 +23,18 @@
 
 ### 文件
 
-- `src/logic/keyboard/keyboard-layout.ts` — 布局定义与运行时转换
-- `src/logic/keyboard/keyboard-constants.ts` — 按键默认配置（label、size、textAlign）
-- `src/logic/keyboard/keyboard-config.ts` — `keyboardCommon` 默认配置
-- `src/logic/keyboard/keycap-themes.ts` — 80+ 预设配色方案
+- `src/logic/keyboard/keyboard-layout.ts` — 布局定义与运行时转换（WKL/Mac 替换/空格分割）
+- `src/logic/keyboard/keyboard-constants.ts` — 按键默认配置（label/size/textAlign）、强调键集合、`ALL_KEYBOARD_CODES`
+- `src/logic/config/defaults.ts` — `KEYBOARD_COMMON_CONFIG` 默认配置
+- `src/logic/keyboard/themes/` — 80+ 预设配色方案（4 大系列，6 个文件）
+- `src/logic/keyboard/keyboard-options.ts` — UI 选择器选项（键盘类型、空格拆分、键帽类型、禁用按键列表）
+- `src/logic/bookmark/api.ts` — 浏览器书签读取 API 封装（`getBrowserBookmark`、`getFaviconFromUrl`）
+- `src/logic/bookmark/parser.ts` — 书签解析器（解析 chrome.bookmarks 构建 keymap、`findFolderByPath`）
+- `src/logic/bookmark/mutations.ts` — 书签变更操作（`swapBookmarksInSourceFolder`、`removeBookmarkFromSourceFolder`）
+- `src/logic/keyboard/bookmark-export.ts` — 书签导出模块（`exportKeymapToBrowser`、`addBookmarkToSourceFolder`）
+- `src/logic/keyboard/layouts/` — 19 种键盘布局定义（key33~key104、hhkb），统一导出自 `layouts/index.ts`
 
-### 可用布局（18 种）
+### 可用布局（19 种）
 
 `key33`, `key45`, `key47`, `key53`, `key61`, `key64`, `key66`, `key67`（默认）, `key68`, `key80`, `key81a`, `key81b`, `key84`, `key87`, `key96a`, `key96b`, `key98`, `key104`, `hhkb`
 
@@ -134,14 +140,14 @@ KeyboardLayout（容器）
 
 `src/components/KeyboardKeycapDisplay.vue`
 
-Props: `keyCode`, `label`, `name`, `visualType`, `bookmarkType`, `iconSrc`, 样式字符串, 可见性开关。
+Props: `keyCode`, `label`, `name`, `visualType`, `iconSrc`, 样式字符串, 可见性开关。
 
 **视觉层次（从外到内）：**
 ```
 row__keycap（基础边框/阴影，按类型差异化：flat/gmk/dsa）
   keycap__stage（顶面，类型差异化渐变/内阴影）
     keycap__label  （键位标识，如 'A' / 'Enter'）
-    keycap__img    （favicon 或文件夹/返回图标）
+    keycap__img    （favicon）
     keycap__name   （书签名称）
 ```
 
@@ -189,7 +195,6 @@ function useKeyboardStyle(unit: 'vmin' | 'px', baseSizeOverride?: number)
 | `getCustomLabel(code)` | 解析标签文本（优先 `keys[].label`，回退到默认配置） |
 | `getCustomTextAlign(code)` | 解析文字对齐（优先 `keys[].textAlign`，回退到默认配置） |
 | `getKeycapWidthValue(code)` | 获取键帽宽度原始数值（优先 `keys[].w`，回退到默认 `size`） |
-| `getKeycapWrapStyle(code)` | 宽度 + 自定义边距的内联样式 |
 | `getKeycapStageStyle(code)` | GMK/DSA 立体偏移（含纵向扩展键高度适配） |
 | `getKeycapTextStyle(code)` | text-align + 条件 padding |
 | `getKeycapIconStyle(code)` | justify-content + 条件 padding |
@@ -213,14 +218,14 @@ function useKeyboardStyle(unit: 'vmin' | 'px', baseSizeOverride?: number)
 
 ## 键帽主题预设
 
-`src/logic/keyboard/keycap-themes.ts` — 80+ 预设主题，分 4 组：
+`src/logic/keyboard/themes/` — 81 个预设主题，分 4 组 6 文件：
 
 | 分组 | 数量 | 示例 |
 |------|------|------|
-| `KEYCAP_CLASSIC_MAP` | 30 | Light, White on Black, Dolch, Godspeed |
-| `KEYCAP_ATMOSPHERE_MAP` | 22 | Nord, Sakura, Mocha, Aurora |
-| `KEYCAP_STUDIO_MAP` | 20 | Dracula, Gruvbox, Tokyo Night, Catppuccin |
-| `KEYCAP_PREMIUM_MAP` | 8 | Cashmere, Titanium, Obsidian |
+| `KEYCAP_CLASSIC_MAP` | 32 | Light, White on Black, Dolch, Godspeed |
+| `KEYCAP_ATMOSPHERE_MAP` | 21 | Nord, Sakura, Mocha, Aurora |
+| `KEYCAP_STUDIO_MAP` | 21 | Dracula, Gruvbox, Tokyo Night, Catppuccin |
+| `KEYCAP_PREMIUM_MAP` | 7 | Cashmere, Titanium, Obsidian |
 
 每个主题定义 7 个颜色字段：`shellColor`, `mainFontColor`, `mainBackgroundColor`, `emphasisOneFontColor`, `emphasisOneBackgroundColor`, `emphasisTwoFontColor`, `emphasisTwoBackgroundColor`。
 
