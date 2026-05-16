@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { gaProxy } from '@/logic/gtag'
+import { ICONS } from '@/logic/constants/icons'
+import { gaProxy } from '@/logic/utils/gtag'
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import {
   isDragMode,
@@ -11,25 +11,15 @@ import {
   moveState,
   animateDeleteWidget,
 } from '@/logic/moveable'
-import {
-  customPrimaryColor,
-  localConfig,
-  localState,
-  globalState,
-} from '@/logic/store'
-import { styleConst } from '@/styles/const'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
+import { customPrimaryColor } from '@/logic/store/style'
 import { widgetsRegistry } from '@/newtab/widgets/registry'
-import { WIDGET_GROUPS } from '@/newtab/widgets/codes'
+import { WIDGET_GROUPS } from '@/common/widget-constants'
 
-const draftDrawerStyle = computed(() => {
-  const c = styleConst.value
-  const ac = localState.value.currAppearanceCode
-  return {
-    '--nt-bg-moveable-tool-drawer':
-      c.bgMoveableToolDrawer[ac] || c.bgMoveableToolDrawer[0],
-    '--nt-draft-custom-primary-color': customPrimaryColor.value,
-  }
-})
+const draftDrawerStyle = computed(() => ({
+  '--nt-draft-custom-primary-color': customPrimaryColor.value,
+}))
 
 const state = reactive({
   isCursorInDraftDrawer: false,
@@ -282,14 +272,14 @@ const handlerDeleteMouseUp = () => {
 }
 .draft-tool--shadow {
   box-shadow:
-    0 -4px 24px var(--gray-alpha-55),
-    0 -1px 6px var(--gray-alpha-35);
+    0 -4px 24px rgba(0, 0, 0, 0.55),
+    0 -1px 6px rgba(0, 0, 0, 0.3);
 }
 
 #draft-tool {
   z-index: 20;
   position: fixed;
-  bottom: -300px;
+  bottom: -280px;
   left: 25vw;
   width: 50vw;
   height: 280px;
@@ -309,9 +299,9 @@ const handlerDeleteMouseUp = () => {
     background: linear-gradient(
       90deg,
       transparent,
-      var(--gray-alpha-18) 30%,
-      var(--gray-alpha-28) 50%,
-      var(--gray-alpha-18) 70%,
+      rgba(255, 255, 255, 0.18) 30%,
+      rgba(255, 255, 255, 0.28) 50%,
+      rgba(255, 255, 255, 0.18) 70%,
       transparent
     );
     border-top-left-radius: 16px;
@@ -336,14 +326,15 @@ const handlerDeleteMouseUp = () => {
       justify-content: center;
       align-items: center;
       width: 5vw;
+      min-width: 60px;
       height: 26px;
       background-color: var(--nt-bg-moveable-tool-drawer);
       backdrop-filter: saturate(180%) blur(20px);
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       box-shadow:
-        -3px -4px 10px var(--gray-alpha-40),
-        3px -4px 10px var(--gray-alpha-40);
+        -3px -4px 10px rgba(0, 0, 0, 0.4),
+        3px -4px 10px rgba(0, 0, 0, 0.4);
       transform: translate(-50%, 0);
       cursor: pointer;
       transition: color 200ms ease;
@@ -358,7 +349,7 @@ const handlerDeleteMouseUp = () => {
         background: linear-gradient(
           90deg,
           transparent,
-          var(--gray-alpha-30) 50%,
+          rgba(255, 255, 255, 0.3) 50%,
           transparent
         );
         border-radius: 50%;
@@ -373,11 +364,11 @@ const handlerDeleteMouseUp = () => {
         transform: rotate(180deg);
         opacity: 1;
       }
-    }
-    .drawer__switch:hover {
-      color: var(--nt-draft-custom-primary-color);
-      .switch__icon {
-        opacity: 1;
+      &:hover {
+        color: var(--nt-draft-custom-primary-color);
+        .switch__icon {
+          opacity: 1;
+        }
       }
     }
 
@@ -415,7 +406,7 @@ const handlerDeleteMouseUp = () => {
           background-size: 100%;
           background-image: url('/assets/img/keyboard/esc.png');
           opacity: 0.85;
-          filter: drop-shadow(0 1px 2px var(--gray-alpha-40));
+          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
         }
       }
       .header__tips {
@@ -500,10 +491,29 @@ const handlerDeleteMouseUp = () => {
           height: 40%;
           background: linear-gradient(
             180deg,
-            var(--gray-alpha-07) 0%,
+            rgba(255, 255, 255, 0.07) 0%,
             transparent 100%
           );
           pointer-events: none;
+        }
+        &:hover {
+          background: rgba(100, 181, 246, 0.18);
+          border-color: rgba(100, 181, 246, 0.45);
+          box-shadow:
+            0 2px 12px rgba(100, 181, 246, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12);
+          transform: translateY(-1px);
+          .item__icon {
+            opacity: 1;
+            transform: scale(1.08);
+          }
+          .item__text {
+            opacity: 1;
+          }
+        }
+        &:active {
+          transform: scale(0.96);
+          box-shadow: none;
         }
         .item__icon {
           display: flex;
@@ -528,25 +538,6 @@ const handlerDeleteMouseUp = () => {
           font-size: 11px;
           width: 100%;
         }
-      }
-      .content__item:hover {
-        background: rgba(100, 181, 246, 0.18);
-        border-color: rgba(100, 181, 246, 0.45);
-        box-shadow:
-          0 2px 12px rgba(100, 181, 246, 0.2),
-          inset 0 1px 0 var(--gray-alpha-12);
-        transform: translateY(-1px);
-        .item__icon {
-          opacity: 1;
-          transform: scale(1.08);
-        }
-        .item__text {
-          opacity: 1;
-        }
-      }
-      .content__item:active {
-        transform: scale(0.96);
-        box-shadow: none;
       }
     }
   }
@@ -576,31 +567,32 @@ const handlerDeleteMouseUp = () => {
       font-size: 36px;
       color: #fff;
       transform: rotate(-45deg);
-      filter: drop-shadow(0 2px 4px var(--gray-alpha-35));
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
       transition:
         transform 250ms cubic-bezier(0.34, 1.06, 0.64, 1),
         filter 250ms ease;
     }
+    &:hover {
+      transform: rotate(45deg) scale(1.12);
+      box-shadow:
+        -6px 6px 40px rgba(220, 38, 38, 0.8),
+        0 0 60px rgba(255, 80, 80, 0.35);
+      .delete__icon {
+        filter: drop-shadow(0 2px 12px rgba(255, 255, 255, 0.5));
+        transform: rotate(-45deg) scale(1.15);
+      }
+    }
   }
+
   .tool__delete--active {
     top: -100px;
     right: -100px;
     box-shadow:
       -4px 4px 30px rgba(220, 38, 38, 0.7),
       0 0 50px rgba(255, 80, 80, 0.25);
-  }
-  .tool__delete:hover {
-    transform: rotate(45deg) scale(1.12);
-    box-shadow:
-      -6px 6px 40px rgba(220, 38, 38, 0.8),
-      0 0 60px rgba(255, 80, 80, 0.35);
-    .delete__icon {
-      filter: drop-shadow(0 2px 12px var(--gray-alpha-55));
-      transform: rotate(-45deg) scale(1.15);
+    &:hover {
+      transform: rotate(45deg) scale(1.12);
     }
-  }
-  .tool__delete--active:hover {
-    transform: rotate(45deg) scale(1.12);
   }
 }
 </style>

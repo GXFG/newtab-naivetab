@@ -1,6 +1,6 @@
-import request from '@/lib/request'
+import request from './request'
 import { PEXELS_API } from '@/logic/constants/app'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 
 // https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=10
 export const getBingImagesData = (

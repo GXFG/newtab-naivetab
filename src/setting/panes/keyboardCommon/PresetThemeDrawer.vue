@@ -4,8 +4,9 @@ import {
   KEYCAP_PREINSTALL_GROUPS,
   KEYCAP_PREINSTALL_MAP,
   type KeycapThemeKey,
-} from '@/logic/keyboard/keycap-themes'
-import { localConfig, localState } from '@/logic/store'
+} from '@/logic/keyboard/themes'
+import { localConfig, localState } from '@/logic/config/state'
+import { useDrawerStack } from '@/composables/useDrawerStack'
 
 const props = defineProps({
   show: {
@@ -19,6 +20,9 @@ const emit = defineEmits(['update:show'])
 const onCloseModal = () => {
   emit('update:show', false)
 }
+
+// ESC 逐层关闭支持
+useDrawerStack('preset-theme-drawer', toRef(props, 'show'), onCloseModal)
 
 const onSelectPresetTheme = (themeKey: KeycapThemeKey) => {
   localConfig.keyboardCommon.shellColor[localState.value.currAppearanceCode] =

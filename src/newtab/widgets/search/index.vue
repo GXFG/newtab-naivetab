@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import { useDebounceFn, onClickOutside } from '@vueuse/core'
-import { gaProxy } from '@/logic/gtag'
-import { createTab, sleep, log } from '@/logic/util'
+import { gaProxy } from '@/logic/utils/gtag'
+import { createTab, sleep, log } from '@/logic/utils/common'
 import { getSearchSuggestion } from '@/api'
 import { SEARCH_ENGINE_LIST } from '@/logic/constants/search'
 import { isDragMode } from '@/logic/moveable'
-import {
-  localConfig,
-  globalState,
-  getStyleField,
-  customPrimaryColor,
-} from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
+import { getStyleField, customPrimaryColor } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 

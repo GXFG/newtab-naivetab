@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import {
-  NConfigProvider,
-  NMessageProvider,
-  NNotificationProvider,
-  NLoadingBarProvider,
-} from 'naive-ui'
-import { log } from '@/logic/util'
-import { gaProxy } from '@/logic/gtag'
+import { NConfigProvider, NDialogProvider } from 'naive-ui'
+import { log } from '@/logic/utils/common'
+import { gaProxy } from '@/logic/utils/gtag'
 import { FOCUS_ELEMENT_SELECTOR_MAP } from '@/logic/constants/app'
 import { SYSTEM_FONT_STACK } from '@/logic/constants/fonts'
 import {
@@ -19,23 +14,23 @@ import {
 import {
   setupNewtabGlobalShortcut,
   cleanupNewtabGlobalShortcut,
-} from '@/logic/globalShortcut/shortcut-executor'
-import {
-  setupPageConfigSync,
-  setupLocalStorageSyncListener,
-} from '@/logic/storage'
+} from '@/logic/shortcut/shortcut-executor'
+import { setupPageConfigSync } from '@/logic/config/sync/loader'
+import { setupLocalStorageSyncListener } from '@/logic/config/sync/state'
 import { handleFirstOpen } from '@/logic/guide'
+import { localConfig } from '@/logic/config/state'
 import {
-  getStyleField,
-  localConfig,
-  nativeUILang,
-  currTheme,
-  themeOverrides,
-} from '@/logic/store'
-import { handleAppUpdate } from '@/logic/config-update'
-import { initBackgroundImage } from '@/logic/image'
+  initFullscreenSync,
+  initDomStyleWatchers,
+  cleanupFullscreenSync,
+  cleanupDomStyleWatchers,
+} from '@/logic/store/dom'
+import { getStyleField } from '@/logic/store/style'
+import { nativeUILang, currTheme, themeOverrides } from '@/logic/store/theme'
+import { handleAppUpdate } from '@/logic/config/update'
+import { initBackgroundImage } from '@/logic/image/service'
 import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'
-import { initKeyboardData } from '@/newtab/widgets/keyboardBookmark/logic'
+import { initKeyboardData } from '@/logic/keyboard/bookmark-state'
 import { updatePoetry } from '@/logic/poetry'
 import Content from '@/newtab/Content.vue'
 
@@ -114,6 +109,10 @@ const onDot = () => {
 }
 
 onMounted(async () => {
+  // 阶段 0：DOM 副作用初始化（必须在同步阶段，确保渲染前生效）
+  initFullscreenSync()
+  initDomStyleWatchers()
+
   // 阶段 1：基础初始化（同步操作，无依赖）
   initBackgroundImage()
   startTimer()
@@ -141,6 +140,8 @@ onMounted(async () => {
 onUnmounted(() => {
   // 注意：浏览器新标签页关闭时不会触发 onUnmounted，整个 JS 环境直接销毁。
   // 以下清理代码仅在开发 HMR / 扩展热重载时生效，属于防御性清理。
+  cleanupFullscreenSync()
+  cleanupDomStyleWatchers()
   stopTimer()
   stopKeydown()
   cleanupNewtabGlobalShortcut()
@@ -186,19 +187,13 @@ const onAnimationEnd = () => {
     @animationend="onAnimationEnd"
   >
     <NDialogProvider>
-      <NNotificationProvider>
-        <NMessageProvider>
-          <NLoadingBarProvider>
-            <div
-              id="container__main"
-              tabindex="100"
-              @focus="onPageFocus"
-            >
-              <Content />
-            </div>
-          </NLoadingBarProvider>
-        </NMessageProvider>
-      </NNotificationProvider>
+      <div
+        id="container__main"
+        tabindex="100"
+        @focus="onPageFocus"
+      >
+        <Content />
+      </div>
     </NDialogProvider>
   </NConfigProvider>
 </template>

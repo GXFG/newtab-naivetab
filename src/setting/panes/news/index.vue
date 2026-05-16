@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { localConfig } from '@/logic/store'
+import { ICONS } from '@/logic/constants/icons'
+import { localConfig } from '@/logic/config/state'
 import {
   SettingHeaderBar,
   SettingFormWrap,
@@ -81,7 +81,7 @@ const unselectedSources = computed<NewsSourceItem[]>(() =>
       :icon="ICONS.news"
     >
       <SettingFormItem
-        :label="$t('news.source')"
+        :label="$t('news.currentSource')"
         align-items="flex-start"
       >
         <div class="news-source-sorter">

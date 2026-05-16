@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest'
-import { isUrlInBlacklist, normalizeDomain, matchShortcut, buildModifierKeys, formatModifierKeys, toModifierMask, isInInputElement } from '@/logic/globalShortcut/shortcut-utils'
+import { isUrlInBlacklist, normalizeDomain, buildModifierKeys, formatModifierKeys, toModifierMask, isInInputElement } from '@/logic/shortcut/utils'
+import { matchShortcut } from '@/logic/shortcut/matcher'
 
 describe('normalizeDomain', () => {
   it('removes https:// protocol', () => {

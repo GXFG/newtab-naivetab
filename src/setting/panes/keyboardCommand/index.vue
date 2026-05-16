@@ -2,23 +2,24 @@
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { NPopconfirm } from 'naive-ui'
-import { localConfig, getSettingKeyboardSize } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { getSettingKeyboardSize } from '@/logic/store/style'
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
-import {
-  ALLOWED_SET,
-  formatModifierKeys,
-  toModifierMask,
-} from '@/logic/globalShortcut/shortcut-utils'
+import { ALLOWED_SET } from '@/logic/keyboard/keyboard-constants'
+import { formatModifierKeys, toModifierMask } from '@/logic/shortcut/utils'
+import { getGlobalModifierTip } from '@/common/i18n'
 import {
   COMMAND_CATEGORIES,
   type TCommandName,
-} from '@/logic/globalShortcut/shortcut-command'
-import { ICONS } from '@/logic/icons'
+} from '@/logic/shortcut/shortcut-command'
+import { ICONS } from '@/logic/constants/icons'
+import { activeKeymap } from '@/logic/keyboard/bookmark-state'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
 import KeyboardKeycapDisplay from '@/components/KeyboardKeycapDisplay.vue'
 import GlobalShortcutRecorder from '@/components/GlobalShortcutRecorder.vue'
 import UrlBlacklistInput from '@/components/UrlBlacklistInput.vue'
+import { showToast } from '@/common/toast'
 import {
   SettingFormWrap,
   SettingHeaderBar,
@@ -30,7 +31,7 @@ import { SwitchField } from '@/setting/fields'
 const keyboardBaseSize = computed(() => getSettingKeyboardSize())
 
 /**
- * 键盘样式 composable（与 BookmarkManager 共享同一套样式计算）
+ * 键盘样式 composable（与 BaseNaiveBookmarkManager/BaseSystemBookmarkManager 共享同一套样式计算）
  */
 const commandKeyboardStyle = useKeyboardStyle('px', keyboardBaseSize.value)
 const {
@@ -144,7 +145,7 @@ const noModifierConflictWarning = computed(() => {
   ) {
     return ''
   }
-  const bookmarkKeymap = localConfig.keyboardBookmark.keymap || {}
+  const bookmarkKeymap = activeKeymap.value
   if (bookmarkKeymap[selectedKeyCode.value]?.url) {
     return window
       .$t('keyboardCommand.noModifierConflict')
@@ -167,6 +168,16 @@ const noModifierInInputWarning = computed(() => {
 })
 
 /**
+ * 修饰键相关警告集合（多条独立显示）
+ */
+const modifierWarnings = computed(() => {
+  return [
+    modifierConflictWarning.value,
+    noModifierConflictWarning.value,
+  ].filter(Boolean)
+})
+
+/**
  * 选中/取消选中按键
  */
 const toggleSelectKey = (code: string) => {
@@ -181,7 +192,7 @@ const handleDeleteBinding = () => {
   if (!selectedKeyCode.value) return
   delete localConfig.keyboardCommand.keymap[selectedKeyCode.value]
   const keyLabel = getCustomLabel(selectedKeyCode.value)
-  window.$message?.success(`${keyLabel} → ${window.$t('common.none')}`)
+  showToast.success(`${keyLabel} → ${window.$t('common.none')}`)
   selectedKeyCode.value = null
 }
 
@@ -198,7 +209,7 @@ const handleCommandSelect = (cmd: TCommandName) => {
   // 不关闭选择面板，让用户看到绑定结果并可以继续选择
   const keyLabel = getCustomLabel(selectedKeyCode.value)
   const cmdLabel = cmd ? window.$t(`command.${cmd}`) : window.$t('common.none')
-  window.$message?.success(`${keyLabel} → ${cmdLabel}`)
+  showToast.success(`${keyLabel} → ${cmdLabel}`)
 }
 </script>
 
@@ -216,23 +227,11 @@ const handleCommandSelect = (cmd: TCommandName) => {
         :label="$t('keyboardCommand.enabled')"
       />
 
-      <SettingFormItem
-        v-if="noModifierInInputWarning"
-        class="modifier-conflict-card"
-      >
-        <span class="modifier-conflict-warning">
-          <Icon
-            :icon="ICONS.warning"
-            class="warning__icon"
-          />
-          {{ noModifierInInputWarning }}
-        </span>
-      </SettingFormItem>
-
       <SwitchField
         v-model="localConfig.keyboardCommand.shortcutInInputElement"
         :label="$t('keyboardCommand.shortcutInInputElement')"
         :tip-content="$t('keyboardCommand.shortcutInInputElementTips')"
+        :warning-message="noModifierInInputWarning"
       />
 
       <SettingFormItem
@@ -248,37 +247,15 @@ const handleCommandSelect = (cmd: TCommandName) => {
         :tip-content="$t('keyboardCommand.noModifierModeDesc')"
       />
 
-      <SettingFormItem :label="$t('keyboardCommand.globalModifier')">
+      <SettingFormItem
+        :label="$t('keyboardCommand.globalModifier')"
+        :tip-content="getGlobalModifierTip()"
+        :warning-message="modifierWarnings"
+      >
         <GlobalShortcutRecorder
           v-model="localConfig.keyboardCommand.modifiers"
           :disabled="localConfig.keyboardCommand.noModifierMode"
         />
-      </SettingFormItem>
-
-      <SettingFormItem
-        v-if="modifierConflictWarning"
-        class="modifier-conflict-card"
-      >
-        <span class="modifier-conflict-warning">
-          <Icon
-            :icon="ICONS.warning"
-            class="warning__icon"
-          />
-          {{ modifierConflictWarning }}
-        </span>
-      </SettingFormItem>
-
-      <SettingFormItem
-        v-if="noModifierConflictWarning"
-        class="modifier-conflict-card"
-      >
-        <span class="modifier-conflict-warning">
-          <Icon
-            :icon="ICONS.warning"
-            class="warning__icon"
-          />
-          {{ noModifierConflictWarning }}
-        </span>
       </SettingFormItem>
     </SettingFormSection>
 
@@ -546,23 +523,5 @@ const handleCommandSelect = (cmd: TCommandName) => {
 
 .selector__close:hover .close__icon {
   color: var(--n-text-color);
-}
-
-.modifier-conflict-warning {
-  font-size: 12px;
-  color: rgba(208, 48, 80, 0.9);
-  padding: 4px 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.warning__icon {
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.modifier-conflict-card :deep(.form-item__control) {
-  justify-content: flex-start;
 }
 </style>

@@ -1,28 +1,42 @@
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import { globalState, localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState, openDrawer } from '@/logic/store/state'
 import SettingPaneContent from './SettingPaneContent.vue'
 
 // ── drawer 模式：同步侧边栏 nav 高度与内容区一致 ──
 const settingContentHeight = ref(0)
 
-const updateSettingContentHeight = useDebounceFn(
-  (entries: ResizeObserverEntry[]) => {
+/**
+ * 使用 requestAnimationFrame 代替 debounce：
+ * debounce 延迟期间会累积未处理的 ResizeObserver 通知，
+ * 导致 "ResizeObserver loop completed with undelivered notifications" 警告。
+ * rAF 将更新同步到下一帧，确保每帧只执行一次，消除循环累积。
+ */
+let rafId: number | null = null
+const updateSettingContentHeight = (entries: ResizeObserverEntry[]) => {
+  if (rafId !== null) return // 已在队列中，跳过
+  rafId = requestAnimationFrame(() => {
     if (entries.length === 0) return
     settingContentHeight.value = entries[0].contentRect.height
-  },
-  200,
-)
+    rafId = null
+  })
+}
 
 const settingContentObserver = new ResizeObserver(updateSettingContentHeight)
+
+let settingCloseDrawer: (() => void) | undefined
 
 watch(
   () => globalState.isSettingDrawerVisible,
   async (visible) => {
     if (!visible) {
+      settingCloseDrawer?.()
       settingContentObserver.disconnect()
       return
     }
+    settingCloseDrawer = openDrawer('setting', () => {
+      globalState.isSettingDrawerVisible = false
+    })
     /**
      * NDrawer 使用 teleport + transition 渲染，需要两次 nextTick 才能获取到 DOM：
      * 1. 第一次：等待 Vue 响应式更新完成（isSettingDrawerVisible 触发渲染）

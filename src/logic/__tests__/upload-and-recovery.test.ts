@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * upload-and-recovery.test.ts — 测试 storage.ts 中的上传链路、故障恢复、监听器
+ * upload-and-recovery.test.ts — 测试 config/sync/ 中的上传链路、故障恢复、监听器
  *
  * 覆盖场景：
  * 1. flushConfigSync: 强制同步（间接测试 uploadConfigFn 的 MD5 去重、压缩、超限、失败处理）
@@ -30,7 +30,7 @@ const mockIsUploadConfigStatusMap: Record<string, any> = {}
 
 const DEFAULT_CONFIG = {
   general: { version: '2.3.0', lang: 'zh-CN' },
-  keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
+  keyboardBookmark: { keymap: {}, source: 1 },
   search: { isNewTabOpen: false, isVoiceEnabled: true },
 } as const
 
@@ -97,38 +97,43 @@ function setupChromeSync(options?: {
 
 // ── Mock 定义 ──
 
-vi.doMock('@/logic/util', () => ({
+vi.doMock('@/logic/utils/util', () => ({
   log: mockLog,
   compareLeftVersionLessThanRightVersions: mockCompareVersion,
-  downloadJsonByTagA: vi.fn(),
   sleep: mockSleep,
 }))
 
-vi.doMock('@/logic/store', () => ({
+vi.doMock('@/logic/utils/common', () => ({
+  log: mockLog,
+}))
+
+vi.doMock('@/logic/config/state', () => ({
   localConfig: mockLocalConfig,
   localState: { value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap } },
+}))
+vi.doMock('@/logic/store/state', () => ({
   globalState: {},
   switchSettingDrawerVisible: vi.fn(),
 }))
 
-vi.doMock('@/logic/config', () => ({
+vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: DEFAULT_CONFIG,
   defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false },
 }))
 
-vi.doMock('@/logic/config-merge', () => ({
+vi.doMock('@/logic/config/merge', () => ({
   mergeState: vi.fn((s: unknown, a: unknown) => a ?? s),
 }))
 
-vi.doMock('@/logic/config-update', () => ({
+vi.doMock('@/logic/config/update', () => ({
   handleStateResetAndUpdate: vi.fn(),
   updateSetting: vi.fn().mockResolvedValue(true),
 }))
 
-vi.doMock('@/logic/database', () => ({ clearDatabase: vi.fn() }))
-vi.doMock('@/logic/permission', () => ({}))
+vi.doMock('@/logic/utils/database', () => ({ clearDatabase: vi.fn() }))
+vi.doMock('@/logic/utils/permission', () => ({}))
 
-vi.doMock('@/logic/compress', () => ({
+vi.doMock('@/logic/config/compress', () => ({
   COMPRESS_PREFIX: 'gzip:',
   compressString: vi.fn().mockResolvedValue('compressed-base64-data'),
   decompressString: vi.fn().mockResolvedValue('{}'),
@@ -141,13 +146,18 @@ vi.doMock('@/logic/constants/app', () => ({
   MERGE_CONFIG_MAX_DELAY: 0,
 }))
 
+vi.doMock('@/common/toast', () => ({
+  showToast: {
+    success: mockMessageSuccess,
+    error: mockMessageError,
+    warning: mockMessageWarn,
+    info: vi.fn(),
+  },
+}))
+
 vi.doMock('@/logic/keyboard/keyboard-constants', () => ({
   KEYBOARD_URL_MAX_LENGTH: 200,
   KEYBOARD_NAME_MAX_LENGTH: 10,
-}))
-
-vi.doMock('@/logic/keyboard/keyboard-config', () => ({
-  KEYBOARD_COMMON_CONFIG: { fontSize: 14, fontFamily: 'system' },
 }))
 
 vi.doMock('@vueuse/core', () => ({
@@ -190,7 +200,7 @@ describe('flushConfigSync', () => {
 
     setupChromeSync()
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/config/sync/upload')
     flushConfigSync = mod.flushConfigSync
   }
 
@@ -266,7 +276,6 @@ describe('flushConfigSync', () => {
         KeyC: { url: 'https://test.com/' + 'a'.repeat(200), name: 'LongName' + 'b'.repeat(20) },
       },
       source: 1,
-      defaultExpandFolder: null,
     }
     mockIsUploadConfigStatusMap.keyboardBookmark.syncId = 'old-sync-id'
 
@@ -304,7 +313,7 @@ describe('handleMissedUploadConfig', () => {
 
     setupChromeSync()
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/config/sync/upload')
     handleMissedUploadConfig = mod.handleMissedUploadConfig
   }
 
@@ -366,7 +375,7 @@ describe('setupKeyboardSyncListener', () => {
       removeListener: vi.fn(),
     }
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/config/sync/state')
     setupKeyboardSyncListener = mod.setupKeyboardSyncListener
   }
 
@@ -385,7 +394,7 @@ describe('setupKeyboardSyncListener', () => {
       syncTime: 123456,
       syncId: 'new-remote-sync-id',
       appVersion: '2.3.0',
-      data: { keymap: { KeyZ: { url: 'https://new.com' } }, source: 2, defaultExpandFolder: 'work' },
+      data: { keymap: { KeyA: { url: 'https://example.com' } }, source: 2 },
     }
 
     triggerStorageChange({
@@ -396,7 +405,6 @@ describe('setupKeyboardSyncListener', () => {
     await new Promise((r) => setTimeout(r, 10))
 
     expect(mockLocalConfig.keyboardBookmark.source).toBe(2)
-    expect(mockLocalConfig.keyboardBookmark.defaultExpandFolder).toBe('work')
     expect(mockIsUploadConfigStatusMap.keyboardBookmark.syncId).toBe('new-remote-sync-id')
     expect(mockIsUploadConfigStatusMap.keyboardBookmark.dirty).toBe(false)
   })
@@ -409,7 +417,7 @@ describe('setupKeyboardSyncListener', () => {
       syncTime: 123456,
       syncId: 'same-sync-id',
       appVersion: '2.3.0',
-      data: { keymap: {}, source: 0, defaultExpandFolder: null },
+      data: { keymap: {}, source: 0 },
     }
 
     triggerStorageChange({
@@ -465,7 +473,7 @@ describe('setupLocalStorageSyncListener', () => {
     })
     window.removeEventListener = vi.fn()
 
-    const mod = await import('@/logic/storage')
+    const mod = await import('@/logic/config/sync/state')
     setupLocalStorageSyncListener = mod.setupLocalStorageSyncListener
   }
 

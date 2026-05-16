@@ -18,7 +18,7 @@
  */
 
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 
 /** 将数值按单位转成 CSS 字符串 */
 const toUnit = (value: number, unit: 'vmin' | 'px'): string =>

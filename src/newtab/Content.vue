@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useMessage, useNotification, useDialog, useLoadingBar } from 'naive-ui'
+import { useDialog } from 'naive-ui'
 import ChangelogModal from '@/components/ChangelogModal.vue'
 
 import BackgroundImg from '@/newtab/layers/BackgroundImg.vue'
@@ -11,10 +11,7 @@ import DraftDrawer from '@/newtab/draft/DraftDrawer.vue'
 import Setting from '@/setting/index.vue'
 import { widgetsList } from '@/newtab/widgets/registry'
 
-window.$message = useMessage()
-window.$notification = useNotification()
 window.$dialog = useDialog()
-window.$loadingBar = useLoadingBar()
 </script>
 
 <template>

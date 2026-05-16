@@ -1,24 +1,39 @@
 export const WIDGET_CODE = 'keyboardBookmark'
 
-import type { TShortcutModifier } from '@/logic/globalShortcut/shortcut-utils'
+import type { TShortcutModifier } from '@/logic/shortcut/utils'
+import {
+  MAX_LAYERS,
+  BookmarkSource,
+  type TLayerConfig,
+} from '@/common/widget-constants'
 
 export const PRESERVE_FIELDS = [
   'source',
-  'globalShortcutModifiers',
+  'isGlobalShortcutEnabled',
   'noModifierMode',
+  'shortcutInInputElement',
+  'globalShortcutModifiers',
+  'urlBlacklist',
   'keymap',
+  'layers',
 ]
 
 export const WIDGET_CONFIG = {
   enabled: true,
-  source: 2,
+  source: BookmarkSource.INTERNAL,
   isGlobalShortcutEnabled: true,
   noModifierMode: false,
   shortcutInInputElement: true,
   globalShortcutModifiers: ['alt'] as TShortcutModifier[],
   urlBlacklist: [] as string[],
   isNewTabOpen: false,
-  defaultExpandFolder: null as null | string,
+  /**
+   * 书签层配置，固定 MAX_LAYERS 层。
+   * 如需扩展层数量，只需修改 MAX_LAYERS 常量。
+   */
+  layers: Array.from({ length: MAX_LAYERS }, (_, i) => ({
+    sourceFolderPath: '',
+  })) as TLayerConfig[],
   keymap: {
     Digit1: {
       url: 'www.baidu.com',
@@ -28,58 +43,6 @@ export const WIDGET_CONFIG = {
     },
     Digit3: {
       url: 'www.bing.com',
-    },
-    KeyR: {
-      url: 'www.reddit.com',
-    },
-    KeyT: {
-      url: 'tieba.baidu.com',
-    },
-    KeyY: {
-      url: 'www.youtube.com',
-    },
-    KeyI: {
-      url: 'mail.google.com',
-    },
-    KeyO: {
-      url: 'outlook.live.com',
-    },
-    KeyA: {
-      url: 'www.apple.com.cn',
-    },
-    KeyS: {
-      url: 'sspai.com',
-    },
-    KeyD: {
-      url: 'douban.com',
-    },
-    KeyF: {
-      url: 'www.figma.com',
-    },
-    KeyG: {
-      url: 'github.com',
-    },
-    Enter: {
-      url: 'gxfg.github.io/newtab-naivetab/',
-      name: 'NaiveTab',
-    },
-    KeyZ: {
-      url: 'www.zhihu.com/hot',
-    },
-    KeyX: {
-      url: 'x.com',
-    },
-    KeyC: {
-      url: 'xiaohongshu.com',
-    },
-    KeyV: {
-      url: 'www.douyin.com',
-    },
-    KeyB: {
-      url: 'www.bilibili.com',
-    },
-    MetaLeft: {
-      url: 'gemini.google.com',
     },
   } as Record<string, TBookmarkEntry>,
   layout: {

@@ -1,25 +1,11 @@
 <script setup lang="ts">
 import { moveState, isDragMode } from '@/logic/moveable'
-import { localState } from '@/logic/store'
-import { styleConst } from '@/styles/const'
-
-const lineStyle = computed(() => {
-  const c = styleConst.value
-  const ac = localState.value.currAppearanceCode
-  return {
-    '--nt-auxiliary-line-main':
-      c.auxiliaryLineMain[ac] || c.auxiliaryLineMain[0],
-    '--nt-auxiliary-line-bound':
-      c.auxiliaryLineBound[ac] || c.auxiliaryLineBound[0],
-  }
-})
 </script>
 
 <template>
   <div
     v-if="isDragMode"
     class="guide__line"
-    :style="lineStyle"
   >
     <div
       class="axis xaxis__center"

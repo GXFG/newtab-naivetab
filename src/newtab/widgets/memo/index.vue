@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { isDragMode } from '@/logic/moveable'
-import { globalState, localConfig, getStyleField } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
+import { getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 

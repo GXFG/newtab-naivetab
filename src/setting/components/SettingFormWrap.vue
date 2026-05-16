@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { h } from 'vue'
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import {
   resetWidgetConfig,
   hasWidgetConfig,
   hasPreserveFields,
-} from '@/logic/config-reset'
+} from '@/logic/config/reset'
+
+import { showToast } from '@/common/toast'
 
 /**
  * SettingFormWrap — 每个 Widget 设置面板的容器组件，职责：
@@ -116,7 +118,7 @@ const handleResetSelect = (key: string) => {
   // i18n key 约定：reset 按钮文案拼接 setting.{widgetCode}
   // 新增 Widget 时须在 registry.ts 的 SETTING_GROUPS 中注册 labelKey 为 'setting.xxx'，
   // 且同时在 locales/zh-CN.json 和 en-US.json 的 setting 命名空间下添加对应翻译
-  window.$message?.success(
+  showToast.success(
     `${window.$t('generalSetting.resetSettingValue')} "${window.$t('setting.' + props.widgetCode)}" ${window.$t('common.success')}`,
   )
 }
@@ -176,13 +178,13 @@ const handleResetSelect = (key: string) => {
 
 <style scoped>
 .setting-form-wrap {
-  padding: 14px 14px 0;
+  padding: 14px;
 
   .form-wrap__reset-wrap {
     display: flex;
     justify-content: flex-end;
     margin-top: var(--space-4);
-    margin-bottom: var(--space-1);
+    margin-bottom: var(--space-4);
   }
 
   .reset-btn {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ICONS } from '@/logic/icons'
-import { localConfig } from '@/logic/store'
+import { ICONS } from '@/logic/constants/icons'
+import { localConfig } from '@/logic/config/state'
 import {
   SettingFormWrap,
   SettingFormSection,
@@ -27,7 +27,7 @@ import {
 
         <SwitchField
           v-model="localConfig.clockNeon.is24Hour"
-          :label="$t('clock.24hour')"
+          :label="$t('clock.hour24')"
         />
       </SettingFormInlineRow>
 

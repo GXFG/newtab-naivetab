@@ -21,7 +21,14 @@ export async function getManifest() {
       48: '/assets/img/icon/icon-48x48.png',
       128: '/assets/img/icon/icon-128x128.png',
     },
-    permissions: ['storage', 'tabs', 'scripting', 'sessions', 'tabGroups'],
+    permissions: [
+      'storage',
+      'tabs',
+      'scripting',
+      'sessions',
+      'tabGroups',
+      'system.display',
+    ],
     host_permissions: ['*://*/*'],
     optional_permissions: ['bookmarks', 'notifications'],
     chrome_url_overrides: {
@@ -33,6 +40,7 @@ export async function getManifest() {
     },
     background: {
       service_worker: '/dist/background/index.mjs',
+      type: 'module',
     },
     content_scripts: [
       {
@@ -66,6 +74,7 @@ export async function getManifest() {
   if (process.env.BROWSER === 'firefox') {
     manifest.background = {
       scripts: ['/dist/background/index.mjs'],
+      type: 'module',
     }
     manifest.browser_specific_settings = {
       gecko: {

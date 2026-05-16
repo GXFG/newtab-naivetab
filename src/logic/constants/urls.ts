@@ -1,3 +1,6 @@
+/**
+ * URL 常量 — 扩展商店、GitHub、文档、天气、新闻源等链接。
+ */
 export const URL_FEEDBACK_EMAIL =
   'mailto:gxfgim@outlook.com?subject=NaiveTab Feedback'
 

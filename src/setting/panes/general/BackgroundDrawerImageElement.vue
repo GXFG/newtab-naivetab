@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { FAVORITE_IMAGE_MAX_COUNT } from '@/logic/constants/app'
-import { createTab, downloadImageByUrl } from '@/logic/util'
-import {
-  customPrimaryColor,
-  localConfig,
-  localState,
-  colorMixWithAlpha,
-} from '@/logic/store'
-import { isImageLoading, getImageUrlFromName } from '@/logic/image'
-import { IMAGE_NETWORK_SOURCE } from '@/logic/constants/image'
+import { createTab } from '@/logic/utils/common'
+import { downloadImageByUrl } from '@/logic/image/utils'
+import { showToast } from '@/common/toast'
+import { localConfig, localState } from '@/logic/config/state'
+import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
+import { isImageLoading } from '@/logic/image/state'
+import { getImageUrlFromName } from '@/logic/image/utils'
+import { IMAGE_NETWORK_SOURCE } from '@/logic/image/constants'
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 
 const props = defineProps({
   data: {
@@ -68,12 +67,10 @@ const isCurrSelectedImage = computed(() => {
   if (!props.select) {
     return false
   }
-  return (
-    props.data.name ===
-    localConfig.general.backgroundImageNames[
-      localState.value.currAppearanceCode
-    ]
-  )
+  const config = (localConfig.general.backgroundImageList as any)[
+    localState.value.currAppearanceCode
+  ]
+  return props.data.name === config?.name
 })
 
 const onSelectImage = () => {
@@ -84,13 +81,12 @@ const onSelectImage = () => {
   if (isImageLoading.value) {
     return
   }
-  if (props.data.networkSourceType) {
-    localConfig.general.backgroundNetworkSourceType =
-      props.data.networkSourceType
-  }
-  localConfig.general.backgroundImageNames[
+  ;(localConfig.general.backgroundImageList as any)[
     localState.value.currAppearanceCode
-  ] = props.data.name || ''
+  ] = {
+    networkSourceType: props.data.networkSourceType,
+    name: props.data.name || '',
+  }
 }
 
 const getOriginalImageUrl = () => {
@@ -128,7 +124,7 @@ const onFavoriteImage = () => {
   if (
     localConfig.general.favoriteImageList.length >= FAVORITE_IMAGE_MAX_COUNT
   ) {
-    window.$message.error(window.$t('prompts.favoriteLimit'))
+    showToast.error(window.$t('prompts.favoriteLimit'))
     return
   }
   if (!props.data.networkSourceType) {
@@ -139,7 +135,7 @@ const onFavoriteImage = () => {
     networkSourceType: props.data.networkSourceType,
     name: props.data.name || '',
   })
-  window.$message.success(
+  showToast.success(
     `${window.$t('common.favorite')}${window.$t('common.success')}`,
   )
 }

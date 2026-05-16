@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { isDragMode } from '@/logic/moveable'
-import { getFaviconFromUrl } from '@/logic/bookmark'
+import { getFaviconFromUrl } from '@/logic/bookmark/api'
+import { state as keyboardState } from '@/logic/keyboard/bookmark-state'
 import {
-  state as keyboardState,
   openPage,
-  handleSpecialKeycapExec,
-  getKeycapBookmarkType,
   getKeycapName,
   getKeycapUrl,
 } from '@/newtab/widgets/keyboardBookmark/logic'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import KeyboardKeycapDisplay from '@/components/KeyboardKeycapDisplay.vue'
 
@@ -18,6 +16,14 @@ const props = defineProps({
     type: String,
     required: true,
   },
+})
+
+// 首次加载禁用动画，后续 layer 切换时启用
+const enableTransition = ref(false)
+onMounted(() => {
+  setTimeout(() => {
+    enableTransition.value = true
+  }, 300)
 })
 
 const {
@@ -34,7 +40,6 @@ const keycapLabel = computed(() => getCustomLabel(props.keyCode))
 
 const keycapName = computed(() => getKeycapName(props.keyCode))
 const keycapBookmarkUrl = computed(() => getKeycapUrl(props.keyCode))
-const keycapBookmarkType = computed(() => getKeycapBookmarkType(props.keyCode))
 const keycapVisualType = computed(() => localConfig.keyboardCommon.keycapType)
 
 // title 用于鼠标悬浮提示，名称为空时不展示 tooltip，避免空提示框
@@ -61,10 +66,6 @@ const onMouseDownKey = (event: MouseEvent, keyCode: string) => {
   const { button, shiftKey, altKey } = event
   // 忽略鼠标右键
   if (button === 2) {
-    return
-  }
-  const isHandled = handleSpecialKeycapExec(keyCode, keycapBookmarkType.value)
-  if (isHandled) {
     return
   }
   const url = keycapBookmarkUrl.value
@@ -104,7 +105,6 @@ const keycapStyle = computed(() => getEmphasisStyle(props.keyCode))
     :label="keycapLabel"
     :name="keycapName"
     :visual-type="keycapVisualType"
-    :bookmark-type="keycapBookmarkType"
     :icon-src="getFaviconFromUrl(keycapBookmarkUrl)"
     :stage-style="keycapStageStyle"
     :text-style="keycapTextStyle"
@@ -119,8 +119,8 @@ const keycapStyle = computed(() => getEmphasisStyle(props.keyCode))
     :show-name="localConfig.keyboardCommon.isNameVisible"
     :show-favicon="localConfig.keyboardCommon.isFaviconVisible"
     :show-tactile-bumps="localConfig.keyboardCommon.isTactileBumpsVisible"
-    :is-back-icon-visible="keyboardState.selectedFolderTitleStack.length !== 0"
     :render-mode="'full'"
+    :enable-transition="enableTransition"
     :class="rowKeycapClassName"
     :style="[keycapCssVars, keycapStyle]"
     :title="keycapTitle"

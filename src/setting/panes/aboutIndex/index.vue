@@ -1,25 +1,26 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { createTab } from '@/logic/util'
+import { ICONS } from '@/logic/constants/icons'
+import { createTab } from '@/logic/utils/common'
 import {
   URL_NAIVETAB_DOC_HOME,
   URL_GITHUB_HOME,
   URL_FEEDBACK_EMAIL,
 } from '@/logic/constants/urls'
 import { openUserGuide } from '@/logic/guide'
+import { showToast } from '@/common/toast'
 import {
   openChangelogModal,
   openExtensionsStorePage,
   globalState,
-} from '@/logic/store'
+} from '@/logic/store/state'
 import { SettingHeaderBar } from '@/setting/components'
 
 const appVersion = computed(() => window.appVersion)
 
 const handleOpenUserGuide = () => {
   if (globalState.settingMode === 'options') {
-    window.$message.info(window.$t('about.guideInNewtab'))
+    showToast.info(window.$t('about.guideInNewtab'))
     return
   }
   openUserGuide()

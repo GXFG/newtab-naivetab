@@ -29,7 +29,7 @@ function setupMocks(overrides?: {
   const splitSpace = overrides?.splitSpace ?? 'space1'
 
   vi.doMock('@/env', () => ({ isMacOS }))
-  vi.doMock('@/logic/store', () => ({
+  vi.doMock('@/logic/config/state', () => ({
     localConfig: {
       keyboardCommon: { keyboardType, keyboardWklMode, splitSpace },
     },
@@ -37,6 +37,7 @@ function setupMocks(overrides?: {
   vi.doMock('@/logic/keyboard/keyboard-constants', () => ({
     EMPHASIS_ONE_KEYS: ['Escape', 'Enter'],
     EMPHASIS_TWO_KEYS: ['Space'],
+    DEFAULT_LAYER_SOURCE_FOLDER: 'NaiveTab',
   }))
   vi.doMock('@/logic/keyboard/layouts', () => {
     const layoutsObj: Record<string, any> = {

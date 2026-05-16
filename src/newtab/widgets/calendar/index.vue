@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
-import { gaProxy } from '@/logic/gtag'
+import { gaProxy } from '@/logic/utils/gtag'
 import { isDragMode } from '@/logic/moveable'
-import { localConfig, getStyleField, getStyleConst } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { CalendarDayType } from '@/common/widget-constants'
+import { getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -90,8 +92,6 @@ const customDestivalCountdownRestFontSize = getStyleField(
   'vmin',
   0.65,
 )
-const bgMoveableWidgetMain = getStyleConst('bgMoveableWidgetMain')
-
 const calendarStyle = computed(() => ({
   '--nt-cal-customFontColor': customFontColor.value,
   '--nt-cal-customFontSize': customFontSize.value,
@@ -133,7 +133,6 @@ const calendarStyle = computed(() => ({
   '--nt-cal-customBorderWidth': customBorderWidth.value,
   '--nt-cal-customBorderColor': customBorderColor.value,
   '--nt-cal-customShadowColor': customShadowColor.value,
-  '--nt-cal-bgMoveableWidgetMain': bgMoveableWidgetMain.value,
   '--nt-cal-customDestivalCountdownItemHeight':
     customDestivalCountdownItemHeight.value,
   '--nt-cal-customDestivalCountdownFontSize':
@@ -285,11 +284,11 @@ const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
     festivalCountdownDay = dateEle.diff(todayDayjs, 'day')
   }
 
-  let dayType = 0
+  let dayType = CalendarDayType.NORMAL
   if (holidayEle && holidayEle.isWork()) {
-    dayType = 2
+    dayType = CalendarDayType.WORK
   } else if (holidayEle && holidayEle.getName()) {
-    dayType = 1
+    dayType = CalendarDayType.REST
   }
 
   const param = {
@@ -580,8 +579,8 @@ const onToggleDetailPopover = (date?: string) => {
                       'body__item--blur': item.isNotCurrMonth,
                       'body__item--weekend': item.isWeekend,
                       'body__item--today': item.isToday,
-                      'body__item--rest': item.type === 1,
-                      'body__item--work': item.type === 2,
+                      'body__item--rest': item.type === CalendarDayType.REST,
+                      'body__item--work': item.type === CalendarDayType.WORK,
                     }"
                   >
                     <span
@@ -700,7 +699,7 @@ const onToggleDetailPopover = (date?: string) => {
           <div class="item__left">
             <p class="left__date">{{ item.shortDate }}</p>
             <p
-              v-if="item.type === 1"
+              v-if="item.type === CalendarDayType.REST"
               class="left__rest"
             >
               {{ $t('calendar.rest') }}
@@ -953,7 +952,7 @@ const onToggleDetailPopover = (date?: string) => {
   .calendar__container--drag {
     background-color: transparent !important;
     &:hover {
-      background-color: var(--nt-cal-bgMoveableWidgetMain) !important;
+      background-color: var(--nt-bg-moveable-widget-main) !important;
     }
   }
 }

@@ -5,7 +5,7 @@ import {
   parseStoredData,
   compressString,
   decompressString,
-} from '@/logic/compress'
+} from '@/logic/config/compress'
 
 describe('shouldCompress', () => {
   it('returns true for keyboardBookmark exceeding threshold', () => {

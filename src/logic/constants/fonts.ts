@@ -1,3 +1,6 @@
+/**
+ * 字体常量 — 系统字体栈 + 候选字体列表。
+ */
 export const SYSTEM_FONT_STACK =
   '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
 

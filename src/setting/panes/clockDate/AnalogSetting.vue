@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 import { SettingFormWrap, SettingFormSection } from '@/setting/components'
 import { NumberField, SwitchField, FontField } from '@/setting/fields'
 

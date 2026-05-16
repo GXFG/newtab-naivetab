@@ -15,7 +15,8 @@
 import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/constants/app'
 import { KEYBOARD_CODE_TO_DEFAULT_CONFIG } from '@/logic/keyboard/keyboard-constants'
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
-import { localConfig, getStyleField, customPrimaryColor } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { getStyleField, customPrimaryColor } from '@/logic/store/style'
 
 type Unit = 'vmin' | 'px'
 

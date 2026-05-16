@@ -4,20 +4,20 @@ import { reactive, ref } from 'vue'
 /**
  * config-update.test.ts — 测试配置更新和版本迁移逻辑
  *
- * Mock 策略：在 import config-update 前 mock 所有依赖
+ * Mock 策略：在 import config/update 前 mock 所有依赖
  */
 
-describe('config-update', () => {
-  let handleStateResetAndUpdate: (typeof import('@/logic/config-update'))['handleStateResetAndUpdate']
-  let updateSetting: (typeof import('@/logic/config-update'))['updateSetting']
-  let handleAppUpdate: (typeof import('@/logic/config-update'))['handleAppUpdate']
-  let getLocalVersion: (typeof import('@/logic/config-update'))['getLocalVersion']
+describe('config/update', () => {
+  let handleStateResetAndUpdate: (typeof import('@/logic/config/update'))['handleStateResetAndUpdate']
+  let updateSetting: (typeof import('@/logic/config/update'))['updateSetting']
+  let handleAppUpdate: (typeof import('@/logic/config/update'))['handleAppUpdate']
+  let getLocalVersion: (typeof import('@/logic/config/update'))['getLocalVersion']
 
   beforeEach(async () => {
     vi.resetModules()
 
     // Mock store with reactive state
-    vi.doMock('@/logic/store', () => ({
+    vi.doMock('@/logic/config/state', () => ({
       localConfig: reactive({
         general: {
           version: '1.0.0',
@@ -27,7 +27,7 @@ describe('config-update', () => {
           focusVisibleWidgetMap: {},
           isFocusMode: false,
         },
-        keyboardBookmark: { keymap: {}, source: 0, defaultExpandFolder: null },
+        keyboardBookmark: { keymap: {}, source: 0 },
         keyboardCommon: { fontSize: 14 },
         keyboardCommand: { enabled: true },
         search: { isNewTabOpen: false },
@@ -62,10 +62,10 @@ describe('config-update', () => {
     }))
 
     // Mock config with all needed default fields
-    vi.doMock('@/logic/config', () => ({
+    vi.doMock('@/logic/config/defaults', () => ({
       defaultConfig: {
         general: { version: '2.2.5', timeLang: 'en' },
-        keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
+        keyboardBookmark: { keymap: {}, source: 1 },
         keyboardCommon: { fontSize: 14 },
         keyboardCommand: { enabled: true },
         search: { isNewTabOpen: true },
@@ -110,8 +110,8 @@ describe('config-update', () => {
       defaultFocusVisibleWidgetMap: { keyboardBookmark: true, search: true },
     }))
 
-    // Mock config-merge: simple passthrough (acceptState wins when defined)
-    vi.doMock('@/logic/config-merge', () => ({
+    // Mock config/merge: simple passthrough (acceptState wins when defined)
+    vi.doMock('@/logic/config/merge', () => ({
       mergeState: vi.fn((state: unknown, acceptState: unknown) => {
         if (acceptState === undefined || acceptState === null) return state
         if (
@@ -135,7 +135,7 @@ describe('config-update', () => {
     }))
 
     // Mock util
-    vi.doMock('@/logic/util', () => ({
+    vi.doMock('@/logic/utils/util', () => ({
       log: vi.fn(),
       compareLeftVersionLessThanRightVersions: vi.fn(
         (left: string, right: string) => {
@@ -150,7 +150,6 @@ describe('config-update', () => {
           return false
         },
       ),
-      downloadJsonByTagA: vi.fn(),
     }))
 
     // Mock vue naive-ui components
@@ -163,7 +162,7 @@ describe('config-update', () => {
     window.$t = vi.fn((key: string) => key)
     window.$notification = { success: vi.fn() } as any
 
-    const mod = await import('@/logic/config-update')
+    const mod = await import('@/logic/config/update')
     handleStateResetAndUpdate = mod.handleStateResetAndUpdate
     updateSetting = mod.updateSetting
     handleAppUpdate = mod.handleAppUpdate
@@ -173,7 +172,7 @@ describe('config-update', () => {
   describe('handleStateResetAndUpdate', () => {
     it('adds missing fields to isUploadConfigStatusMap', async () => {
       // Re-import to get the mocked localState
-      const { localState } = await import('@/logic/store')
+      const { localState } = await import('@/logic/config/state')
 
       // Only 'general' exists in isUploadConfigStatusMap before call
       const initialKeys = Object.keys(localState.value.isUploadConfigStatusMap)

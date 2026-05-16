@@ -20,6 +20,10 @@ const chromeMock = {
   storage: {
     sync: {
       get: vi.fn((keys, callback) => {
+        if (typeof keys === 'string' && callback === undefined) {
+          // Promise form: return Promise
+          return Promise.resolve({ [keys]: mockSyncData[keys] })
+        }
         if (keys === null) {
           callback({ ...mockSyncData })
         } else if (typeof keys === 'string') {
@@ -90,6 +94,10 @@ const chromeMock = {
     contains: vi.fn((_perms, callback) => {
       callback(true)
     }),
+  },
+  notifications: {
+    create: vi.fn(),
+    clear: vi.fn(),
   },
   menus: {
     create: vi.fn(),

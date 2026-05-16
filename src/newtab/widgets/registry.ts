@@ -1,37 +1,17 @@
-import type { DefineComponent } from 'vue'
-import { WIDGET_CODE_LIST } from './codes'
-import type { TWidgetConfig as KeyboardBookmarkConfig } from './keyboardBookmark/config'
-import type { TWidgetConfig as BookmarkFolderConfig } from './bookmarkFolder/config'
-import type { TWidgetConfig as CalendarConfig } from './calendar/config'
-import type { TWidgetConfig as SearchConfig } from './search/config'
-import type { TWidgetConfig as NewsConfig } from './news/config'
-import type { TWidgetConfig as MemoConfig } from './memo/config'
-import type { TWidgetConfig as DateConfig } from './date/config'
-import type { TWidgetConfig as ClockDigitalConfig } from './clockDigital/config'
-import type { TWidgetConfig as ClockAnalogConfig } from './clockAnalog/config'
-import type { TWidgetConfig as ClockFlipConfig } from './clockFlip/config'
-import type { TWidgetConfig as ClockNeonConfig } from './clockNeon/config'
-import type { TWidgetConfig as WeatherConfig } from './weather/config'
-import type { TWidgetConfig as YearProgressConfig } from './yearProgress/config'
-import type { TWidgetConfig as CountdownConfig } from './countdown/config'
+import { WIDGET_CODE_LIST } from '@/common/widget-constants'
+import type { WidgetConfigByCode } from '@/common/widget-constants'
 
-// @@@@ add widget registry
-export type WidgetConfigByCode = {
-  keyboardBookmark: KeyboardBookmarkConfig
-  bookmarkFolder: BookmarkFolderConfig
-  calendar: CalendarConfig
-  search: SearchConfig
-  news: NewsConfig
-  memo: MemoConfig
-  date: DateConfig
-  clockDigital: ClockDigitalConfig
-  clockAnalog: ClockAnalogConfig
-  clockFlip: ClockFlipConfig
-  clockNeon: ClockNeonConfig
-  weather: WeatherConfig
-  yearProgress: YearProgressConfig
-  countdown: CountdownConfig
-}
+export { WIDGET_CODE_LIST } from '@/common/widget-constants'
+export type { WidgetCodes } from '@/common/widget-constants'
+export {
+  WIDGET_SETTING_PANE_MAP,
+  getWidgetSetting,
+} from '@/common/widget-constants'
+export { WIDGET_GROUPS } from '@/common/widget-constants'
+
+// ─── 以下类型/逻辑仅 UI 层使用，保留在 registry.ts ───
+
+import type { DefineComponent } from 'vue'
 
 export type WidgetMeta = {
   component: DefineComponent
@@ -42,6 +22,7 @@ export type WidgetMeta = {
   widgetLabel: string // i18n key
 }
 
+// 自动扫描所有 widget index.ts 元信息模块
 const modules = import.meta.glob('./**/index.ts', { eager: true }) as Record<
   string,
   { default: WidgetMeta }

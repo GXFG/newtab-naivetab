@@ -1,7 +1,11 @@
+/**
+ * 用户引导系统 — 首次打开引导 + 手动触发引导，基于 driver.js 实现。
+ */
 import 'driver.js/dist/driver.css'
 import { driver } from 'driver.js'
 import { toggleIsDragMode } from '@/logic/moveable'
-import { localConfig, globalState } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
 
 const onCloseGuide = () => {
   localConfig.general.isFirstOpen = false

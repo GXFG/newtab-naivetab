@@ -1,5 +1,7 @@
 import { defineConfig } from 'vitepress'
 
+const siteUrl = 'https://gxfg.github.io/newtab-naivetab'
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: "/newtab-naivetab/",
@@ -7,7 +9,10 @@ export default defineConfig({
   title: "NaiveTab 新标签页",
   description: "可视化键盘展示书签和浏览器指令，肌肉记忆一键直达。支持自由拖拽、深度自定义外观、专注模式、云同步",
   head: [
-    ['link', { rel: 'icon', size: 'any', href: '/newtab-naivetab/images/logo.svg' }]
+    ['link', { rel: 'icon', size: 'any', href: '/newtab-naivetab/images/logo.svg' }],
+    // 规范网址，防止 Google 报重复网页警告
+    ['link', { rel: 'canonical', href: siteUrl }],
+    ['meta', { name: 'google-site-verification', content: 'bd1267a4ec2bd851' }],
   ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

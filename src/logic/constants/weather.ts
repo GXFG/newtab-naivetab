@@ -1,3 +1,6 @@
+/**
+ * 天气常量 — 语言/温度/风速单位的映射表。
+ */
 export const WEATHER_LANG_MAP = {
   'zh-CN': 'zh',
   'en-US': 'en',

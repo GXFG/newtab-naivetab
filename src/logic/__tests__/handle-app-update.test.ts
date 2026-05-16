@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * handle-app-update.test.ts — 测试 config-update.ts 中的 handleAppUpdate
+ * handle-app-update.test.ts — 测试 config/update.ts 中的 handleAppUpdate
  *
  * 覆盖所有版本迁移分支（v1.20.0 → v2.2.2），验证：
  * - 新增字段正确赋默认值
@@ -29,7 +29,6 @@ function resetMockState() {
     keyboardBookmark: {
       keymap: {},
       source: 0,
-      defaultExpandFolder: null,
     },
     keyboardCommon: { fontSize: 14, fontFamily: 'system' },
     keyboardCommand: { enabled: true, modifierKeys: [] },
@@ -56,16 +55,18 @@ function resetMockState() {
   mockGlobalState.isChangelogModalVisible = false
 }
 
-vi.doMock('@/logic/store', () => ({
+vi.doMock('@/logic/config/state', () => ({
   localConfig: mockLocalConfig,
   localState: mockLocalState,
+}))
+vi.doMock('@/logic/store/state', () => ({
   globalState: mockGlobalState,
 }))
 
-vi.doMock('@/logic/config', () => ({
+vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: {
     general: { version: '2.3.0', lang: 'zh-CN', timeLang: 'zh-CN', openPageFocusElement: 'default', focusVisibleWidgetMap: { search: true }, backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'] },
-    keyboardBookmark: { keymap: {}, source: 1, defaultExpandFolder: null },
+    keyboardBookmark: { keymap: {}, source: 1 },
     keyboardCommon: { fontSize: 14, fontFamily: 'system' },
     keyboardCommand: { enabled: true, modifierKeys: [] },
     search: { isNewTabOpen: false, backgroundBlur: 0 },
@@ -80,11 +81,11 @@ vi.doMock('@/logic/config', () => ({
   defaultFocusVisibleWidgetMap: { search: true, keyboardBookmark: true },
 }))
 
-vi.doMock('@/logic/config-merge', () => ({
+vi.doMock('@/logic/config/merge', () => ({
   mergeState: vi.fn((state: unknown, acceptState: unknown) => acceptState ?? state),
 }))
 
-vi.doMock('@/logic/util', () => ({
+vi.doMock('@/logic/utils/util', () => ({
   log: vi.fn(),
   compareLeftVersionLessThanRightVersions: (left: string, right: string) => {
     const l = left.split('.').map(Number)
@@ -95,7 +96,6 @@ vi.doMock('@/logic/util', () => ({
     }
     return false
   },
-  downloadJsonByTagA: vi.fn(),
 }))
 
 vi.doMock('naive-ui', () => ({ NButton: { name: 'NButton' } }))
@@ -125,7 +125,7 @@ beforeEach(async () => {
   window.$t = vi.fn((key: string) => key)
   window.$notification = { success: vi.fn() } as any
 
-  const mod = await import('@/logic/config-update')
+  const mod = await import('@/logic/config/update')
   handleAppUpdate = mod.handleAppUpdate
   getLocalVersion = mod.getLocalVersion
 })
@@ -158,7 +158,6 @@ describe('handleAppUpdate: no upgrade', () => {
   })
 })
 
-// ── v1.20.0: keyboardBookmark 新增 source / defaultExpandFolder ──
 
 describe('handleAppUpdate: v1.20.0 migration', () => {
   beforeEach(() => { mockLocalConfig.general.version = '1.19.0' })
@@ -173,11 +172,6 @@ describe('handleAppUpdate: v1.20.0 migration', () => {
     mockLocalConfig.keyboardBookmark.keymap = { KeyA: { url: 'https://example.com' } }
     handleAppUpdate()
     expect(mockLocalConfig.keyboardBookmark.source).toBe(2)
-  })
-
-  it('sets defaultExpandFolder to null', () => {
-    handleAppUpdate()
-    expect(mockLocalConfig.keyboardBookmark.defaultExpandFolder).toBeNull()
   })
 })
 
@@ -378,7 +372,6 @@ describe('handleAppUpdate: v2.2.2 migration', () => {
     localStorageMock['c-keyboard'] = JSON.stringify({
       keymap: { KeyA: { url: 'https://test.com' } },
       source: 1,
-      defaultExpandFolder: null,
       fontSize: 16,
       fontFamily: 'Roboto',
     })
@@ -445,7 +438,6 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
 
     // v1.20.0
     expect(mockLocalConfig.keyboardBookmark.source).toBe(2)
-    expect(mockLocalConfig.keyboardBookmark.defaultExpandFolder).toBeNull()
     // v1.23.1
     expect(mockLocalConfig.clockDigital.width).toBe(30 / 2 + 8)
     expect((mockLocalConfig.clockDigital as any).letterSpacing).toBeUndefined()
@@ -478,11 +470,13 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
     expect(mockGlobalState.isChangelogModalVisible).toBe(true)
   })
 
-  it('does not show changelog when upgrading without breaking change flag', () => {
+  it('shows changelog when migrating from old version (2.3.2 breaking change)', () => {
     mockLocalConfig.general.version = '2.2.5'
     mockLocalConfig.general.showBreakingChangeNotice = false
     handleAppUpdate()
-    expect(mockGlobalState.isChangelogModalVisible).toBe(false)
+    // 2.3.2 迁移将 showBreakingChangeNotice 设为 true（breaking change），
+    // 因此最终 isChangelogModalVisible = true
+    expect(mockGlobalState.isChangelogModalVisible).toBe(true)
   })
 })
 

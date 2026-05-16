@@ -1,4 +1,13 @@
+/**
+ * @module keyboard/keyboard-constants
+ * @description 键盘系统常量：强调键集合、按键码列表、默认配置映射、UI 选择器选项、
+ *   书签相关常量（文件夹名、导出标记、层数）。
+ * @dependencies common/widget-constants.ts（MAX_LAYERS、LAYER_FOLDER_NAMES）
+ * @consumers keyboard/keyboard-layout.ts、keyboard/bookmark-state.ts、keyboard/bookmark-export.ts
+ * @see docs/features/keyboard.md
+ */
 import { isMacOS } from '@/env'
+import { MAX_LAYERS, LAYER_FOLDER_NAMES } from '@/common/widget-constants'
 
 // ── 公共强调键集合 ─────────────────────────
 /** 一级强调键：功能键区 + 修饰键 + 编辑键 */
@@ -58,39 +67,13 @@ export const KEYCAP_ACTIVE_DURATION = 80
 export const KEYBOARD_URL_MAX_LENGTH = 200
 export const KEYBOARD_NAME_MAX_LENGTH = 10
 
-export const KEYBOARD_TYPE_OPTION = [
-  { label: '33', value: 'key33' },
-  { label: '45', value: 'key45' },
-  { label: '47', value: 'key47' },
-  { label: '53', value: 'key53' },
-  { label: '61', value: 'key61' },
-  { label: '64', value: 'key64' },
-  { label: '66', value: 'key66' },
-  { label: '67', value: 'key67' },
-  { label: '68', value: 'key68' },
-  { label: '80', value: 'key80' },
-  { label: '81a', value: 'key81a' },
-  { label: '81b', value: 'key81b' },
-  { label: '84', value: 'key84' },
-  { label: '87', value: 'key87' },
-  { label: '96a', value: 'key96a' },
-  { label: '96b', value: 'key96b' },
-  { label: '98', value: 'key98' },
-  { label: '104', value: 'key104' },
-  { label: 'HHKB', value: 'hhkb' },
-]
-
-export const SPLIT_SPACE_OPTION = [
-  { label: '1', value: 'space1' },
-  { label: '2', value: 'space2' },
-  { label: '3', value: 'space3' },
-]
-
-export const KEYCAP_TYPE_OPTION = [
-  { label: 'GMK', value: 'gmk' },
-  { label: 'DSA', value: 'dsa' },
-  { label: 'FLAT', value: 'flat' },
-]
+// UI 选择器选项 → 已迁移至 ./keyboard-options
+export {
+  KEYBOARD_TYPE_OPTION,
+  SPLIT_SPACE_OPTION,
+  KEYCAP_TYPE_OPTION,
+  KEYBOARD_NOT_ALLOW_KEYCODE_LIST_FOR_WIDGET,
+} from './keyboard-options'
 
 export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   // 0
@@ -279,16 +262,235 @@ export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
   NumpadDecimal: { label: '.', textAlign: 'center', size: 1 },
 }
 
-export const KEYBOARD_NOT_ALLOW_KEYCODE_LIST_FOR_WIDGET = [
+// chrome.storage.local 的 key，用于跨上下文（CS/SW/newtab）共享 source=1 的 keymap
+export const SYSTEM_KEYMAP_STORAGE_KEY = 'naive-tab-systemKeymap'
+
+// chrome.storage.local 的 key，用于设备级持久化当前激活的书签层索引（不同步）
+export const ACTIVE_LAYER_STORAGE_KEY = 'naive-tab-activeLayer'
+
+// 键盘书签顶层文件夹名称（导出书签、层迁移默认值等统一使用此常量）
+export const KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER = 'NaiveTab'
+
+// 书签层默认 sourceFolderPath，基于 LAYER_FOLDER_NAMES 生成
+export const DEFAULT_LAYER_SOURCE_FOLDER = `${KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER}/${LAYER_FOLDER_NAMES[0]}`
+
+/** 导出书签时使用的层文件夹名称列表，与配置层一一对应 */
+export const EXPORT_LAYERS = LAYER_FOLDER_NAMES
+
+export const SPACE_KEYCODE_LIST = ['Space', 'SpaceSplit1', 'SpaceSplit2']
+
+/**
+ * 所有标准键位的 code 列表（key104 布局），作为 parseBookmarkFolder 的 keyboardLayout 参数。
+ *
+ * 为什么手动维护此列表而非从 layouts 目录动态聚合：
+ * 1. 此列表由 SW 端（layer-keymap-builder.ts）使用，layouts 目录依赖 Vue 响应式，
+ *    无法在 SW 环境中导入
+ * 2. keymap 消费者只按 keymap[code] 查询，不需要知道实际键盘布局的渲染顺序
+ * 3. 使用最大键位列表（key104 全集）可覆盖所有可能的 layout 变体（33/61/67/87/96/104 等）
+ *
+ * 维护原则：新增布局时，如果包含以下列表中不存在的标准键码，需要追加到此列表。
+ * 注意：不包含 SpaceSplit1/SpaceSplit2，这两个是纯 UI 渲染虚拟码，
+ * 浏览器的 KeyboardEvent.code 永远不会生成这两个值（按下空格始终生成 'Space'），
+ * 因此不需要包含在此列表中。
+ */
+export const ALL_KEYBOARD_CODES = [
+  'Escape',
+  'F1',
+  'F2',
+  'F3',
+  'F4',
+  'F5',
+  'F6',
+  'F7',
+  'F8',
+  'F9',
+  'F10',
+  'F11',
+  'F12',
+  'PrintScreen',
+  'ScrollLock',
+  'Pause',
+  'Backquote',
+  'Digit1',
+  'Digit2',
+  'Digit3',
+  'Digit4',
+  'Digit5',
+  'Digit6',
+  'Digit7',
+  'Digit8',
+  'Digit9',
+  'Digit0',
+  'Minus',
+  'Equal',
+  'Backspace',
+  'Insert',
+  'Home',
+  'PageUp',
+  'NumLock',
+  'NumpadDivide',
+  'NumpadMultiply',
+  'NumpadSubtract',
+  'Tab',
+  'KeyQ',
+  'KeyW',
+  'KeyE',
+  'KeyR',
+  'KeyT',
+  'KeyY',
+  'KeyU',
+  'KeyI',
+  'KeyO',
+  'KeyP',
+  'BracketLeft',
+  'BracketRight',
+  'Backslash',
+  'Delete',
+  'End',
+  'PageDown',
+  'Numpad7',
+  'Numpad8',
+  'Numpad9',
+  'NumpadAdd',
+  'CapsLock',
+  'KeyA',
+  'KeyS',
+  'KeyD',
+  'KeyF',
+  'KeyG',
+  'KeyH',
+  'KeyJ',
+  'KeyK',
+  'KeyL',
+  'Semicolon',
+  'Quote',
+  'Enter',
+  'Numpad4',
+  'Numpad5',
+  'Numpad6',
   'ShiftLeft',
+  'KeyZ',
+  'KeyX',
+  'KeyC',
+  'KeyV',
+  'KeyB',
+  'KeyN',
+  'KeyM',
+  'Comma',
+  'Period',
+  'Slash',
   'ShiftRight',
+  'ArrowUp',
+  'Numpad1',
+  'Numpad2',
+  'Numpad3',
+  'NumpadEnter',
   'ControlLeft',
   'MetaLeft',
   'AltLeft',
   'Space',
   'AltRight',
   'MetaRight',
+  'ContextMenu',
   'ControlRight',
+  'ArrowLeft',
+  'ArrowDown',
+  'ArrowRight',
+  'Numpad0',
+  'NumpadDecimal',
 ]
 
-export const SPACE_KEYCODE_LIST = ['Space', 'SpaceSplit1', 'SpaceSplit2']
+/**
+ * 允许作为快捷键主键的按键 code（ALL_KEYBOARD_CODES 的子集）。
+ * 排除修饰键（Shift/Ctrl/Alt/Meta）和有浏览器默认行为的特殊键（Escape/Tab/Enter 等）。
+ */
+export const ALLOWED_MAIN_KEYS = [
+  'KeyA',
+  'KeyB',
+  'KeyC',
+  'KeyD',
+  'KeyE',
+  'KeyF',
+  'KeyG',
+  'KeyH',
+  'KeyI',
+  'KeyJ',
+  'KeyK',
+  'KeyL',
+  'KeyM',
+  'KeyN',
+  'KeyO',
+  'KeyP',
+  'KeyQ',
+  'KeyR',
+  'KeyS',
+  'KeyT',
+  'KeyU',
+  'KeyV',
+  'KeyW',
+  'KeyX',
+  'KeyY',
+  'KeyZ',
+  'Digit0',
+  'Digit1',
+  'Digit2',
+  'Digit3',
+  'Digit4',
+  'Digit5',
+  'Digit6',
+  'Digit7',
+  'Digit8',
+  'Digit9',
+  'Comma',
+  'Period',
+  'Slash',
+  'Minus',
+  'Equal',
+  'BracketLeft',
+  'BracketRight',
+  'Semicolon',
+  'Quote',
+  'Backquote',
+  'Backslash',
+  'IntlBackslash',
+  'Numpad0',
+  'Numpad1',
+  'Numpad2',
+  'Numpad3',
+  'Numpad4',
+  'Numpad5',
+  'Numpad6',
+  'Numpad7',
+  'Numpad8',
+  'Numpad9',
+  'NumpadDecimal',
+  'NumpadEnter',
+  'NumpadAdd',
+  'NumpadSubtract',
+  'NumpadMultiply',
+  'NumpadDivide',
+  'F1',
+  'F2',
+  'F3',
+  'F4',
+  'F5',
+  'F6',
+  'F7',
+  'F8',
+  'F9',
+  'F10',
+  'F11',
+  'F12',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'ArrowDown',
+  'Home',
+  'End',
+  'PageUp',
+  'PageDown',
+  'Insert',
+  'Delete',
+]
+
+export const ALLOWED_SET = new Set(ALLOWED_MAIN_KEYS)

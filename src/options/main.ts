@@ -1,6 +1,6 @@
 import '../styles/index'
 import { createApp } from 'vue'
-import i18n from '@/lib/i18n'
+import i18n from '@/common/i18n'
 import App from './App.vue'
 import pkg from '../../package.json'
 

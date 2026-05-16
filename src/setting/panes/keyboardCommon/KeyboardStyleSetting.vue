@@ -4,10 +4,10 @@ import {
   SPLIT_SPACE_OPTION,
   KEYCAP_TYPE_OPTION,
 } from '@/logic/keyboard/keyboard-constants'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 import { SettingFormItem, SettingFormSection } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 </script>
 
 <template>

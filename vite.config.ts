@@ -17,6 +17,7 @@ import packageJson from './package.json'
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
+  cacheDir: r('node_modules/.vite'),
   resolve: {
     alias: {
       '@/': `${r('src')}/`,

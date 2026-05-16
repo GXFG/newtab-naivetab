@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 import {
   SettingFormWrap,
   SettingFormSection,
@@ -26,7 +26,7 @@ import {
 
         <SwitchField
           v-model="localConfig.clockFlip.is24Hour"
-          :label="$t('clock.24hour')"
+          :label="$t('clock.hour24')"
         />
       </SettingFormInlineRow>
 

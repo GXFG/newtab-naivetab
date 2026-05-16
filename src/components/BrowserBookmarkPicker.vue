@@ -3,8 +3,9 @@ import { Icon } from '@iconify/vue'
 import type { TreeOption } from 'naive-ui'
 import { h, reactive, type PropType } from 'vue'
 import { SECOND_MODAL_WIDTH } from '@/logic/constants/app'
-import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark'
-import { ICONS } from '@/logic/icons'
+import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark/api'
+import { ICONS } from '@/logic/constants/icons'
+import { useDrawerStack } from '@/composables/useDrawerStack'
 
 const props = defineProps({
   show: {
@@ -29,30 +30,16 @@ const onClose = () => {
 
 const state = reactive({
   treePattern: '',
-  bookmarks: [] as BookmarkNode[],
+  bookmarks: [] as TreeOption[],
   defaultExpandedKeys: ['1'], // 默认展开书签栏
   nodeProps: ({ option }: { option: TreeOption }) => {
     return {
       onClick() {
-        const isFolder = Object.prototype.hasOwnProperty.call(
-          option,
-          'children',
-        )
-        if (props.selectType === 'bookmark') {
-          if (isFolder) {
-            return
-          }
-          emit('select', option)
-          onClose()
-          return
-        }
-        if (props.selectType === 'folder') {
-          if (!isFolder) {
-            return
-          }
-          emit('select', option)
-          onClose()
-        }
+        const isFolder = option.isFolder as boolean | undefined
+        if (isFolder && props.selectType === 'bookmark') return
+        if (!isFolder && props.selectType === 'folder') return
+        emit('select', option)
+        onClose()
       },
     }
   },
@@ -65,26 +52,51 @@ const handleUpdateShow = (value: boolean) => {
   onClose()
 }
 
-const formatBookmark = (root: BookmarkNode[]) => {
-  const res = [] as BookmarkNode[]
+/**
+ * 构建 Naive UI TreeOption 数据
+ * selectType='folder' 时过滤掉所有书签节点，只保留文件夹
+ */
+const buildTreeOptions = (
+  root: BookmarkNode[],
+  parentPath = '',
+  selectType: 'bookmark' | 'folder' = 'bookmark',
+): TreeOption[] => {
+  const res: TreeOption[] = []
   for (const item of root) {
-    const isFolder = Object.prototype.hasOwnProperty.call(item, 'children')
-    const curr = {
-      ...item,
-      prefix: () =>
-        h('img', {
-          style: 'width: 14px; height: 14px',
-          src: getFaviconFromUrl(item.url || ''),
-        }), // favicon
+    const isFolder = !item.url && Array.isArray(item.children)
+    if (selectType === 'folder' && !isFolder) continue
+    const fullPath = parentPath ? `${parentPath}/${item.title}` : item.title
+    const curr: TreeOption = {
+      key: item.id,
+      label: item.title,
+      isFolder,
+      path: fullPath,
+      // 保留原始数据供 emit('select') 传递完整信息
+      url: item.url,
+      id: item.id,
+      title: item.title,
     }
     if (isFolder) {
-      curr.children = formatBookmark(item.children as BookmarkNode[])
+      const filteredChildren = buildTreeOptions(
+        item.children as BookmarkNode[],
+        fullPath,
+        selectType,
+      )
+      if (filteredChildren.length) {
+        curr.children = filteredChildren
+      }
       curr.prefix = () =>
         h(
           'div',
           { style: 'margin-top: 3px;font-size: 16px;' },
           h(Icon, { icon: ICONS.folderOutline }),
-        ) // folder
+        )
+    } else {
+      curr.prefix = () =>
+        h('img', {
+          style: 'width: 14px; height: 14px',
+          src: getFaviconFromUrl(item.url || ''),
+        })
     }
     res.push(curr)
   }
@@ -92,20 +104,21 @@ const formatBookmark = (root: BookmarkNode[]) => {
 }
 
 const onInitBookmarks = async () => {
-  let root = await getBrowserBookmark()
-  root = formatBookmark(root)
-  state.bookmarks = root
+  const root = await getBrowserBookmark()
+  state.bookmarks = buildTreeOptions(root, '', props.selectType)
 }
 
 watch(
   () => props.show,
   (value: boolean) => {
-    if (!value) {
-      return
+    if (value) {
+      onInitBookmarks()
     }
-    onInitBookmarks()
   },
 )
+
+// ESC 逐层关闭支持
+useDrawerStack('browser-bookmark-picker', toRef(props, 'show'), onClose)
 </script>
 
 <template>
@@ -127,8 +140,8 @@ watch(
         :data="state.bookmarks"
         :pattern="state.treePattern"
         :show-irrelevant-nodes="false"
-        key-field="id"
-        label-field="title"
+        key-field="key"
+        label-field="label"
         :selectable="false"
         :keyboard="false"
         block-line

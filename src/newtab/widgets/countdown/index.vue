@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import {
-  localConfig,
-  globalState,
-  getIsWidgetRender,
-  getStyleField,
-} from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
+import { globalState } from '@/logic/store/state'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import {
   sendNotification,
-  requestNotificationsPermission,
-} from '@/logic/permission'
+  requestPermissionAsync,
+} from '@/logic/utils/permission'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -173,7 +170,7 @@ const tick = () => {
 // ─── 控制操作 ───
 const handleStart = () => {
   if (countdownState.value.remainingSeconds <= 0) return
-  requestNotificationsPermission()
+  requestPermissionAsync('notifications')
   countdownState.value.startedAt = Date.now()
   countdownState.value.initialRemaining = countdownState.value.remainingSeconds
   countdownState.value.isRunning = true
@@ -222,19 +219,6 @@ watch(
     addTimerTask(WIDGET_CODE, tick)
   },
   { immediate: true },
-)
-
-// ─── 页面重新可见时补算（应对标签页节流）───
-const onVisibilityChange = () => {
-  if (document.visibilityState === 'visible') {
-    tick()
-  }
-}
-onMounted(() =>
-  document.addEventListener('visibilitychange', onVisibilityChange),
-)
-onUnmounted(() =>
-  document.removeEventListener('visibilitychange', onVisibilityChange),
 )
 
 // ─── 进度环计算 ───

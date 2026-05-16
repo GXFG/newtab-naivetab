@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
-import {
-  localConfig,
-  localState,
-  customPrimaryColor,
-  colorMixWithAlpha,
-} from '@/logic/store'
+import { localConfig, localState } from '@/logic/config/state'
+import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
 import { widgetsRegistry } from '@/newtab/widgets/registry'
-import { WIDGET_GROUPS } from '@/newtab/widgets/codes'
+import { WIDGET_GROUPS } from '@/common/widget-constants'
 import { SettingHeaderBar, SettingFormSection } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
-import { ICONS } from '@/logic/icons'
+import { ICONS } from '@/logic/constants/icons'
 
 const widgetGroups = computed(() =>
   WIDGET_GROUPS.map((group) => ({

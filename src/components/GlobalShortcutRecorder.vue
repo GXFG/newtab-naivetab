@@ -12,14 +12,13 @@
  */
 
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { isMacOS } from '@/env'
+import { ICONS } from '@/logic/constants/icons'
 import {
   formatModifierKeys,
   type TShortcutModifier,
-} from '@/logic/globalShortcut/shortcut-utils'
+} from '@/logic/shortcut/utils'
 import { NButton } from 'naive-ui'
-import Tips from '@/components/Tips.vue'
+import { showToast } from '@/common/toast'
 import { onUnmounted } from 'vue'
 
 const isRecording = ref(false)
@@ -36,12 +35,6 @@ const props = defineProps<{
 
 const formattedModifier = computed(() => {
   return formatModifierKeys(modifier.value)
-})
-
-const globalModifierTips = computed(() => {
-  const altLabel = isMacOS ? 'Opt' : 'Alt'
-  const tips = window.$t('keyboardBookmark.globalModifierTips')
-  return tips.replace('__alt__', altLabel)
 })
 
 /**
@@ -81,12 +74,12 @@ const saveModifier = () => {
   const modifiers =
     lastModifierSnapshot.length > 0 ? lastModifierSnapshot : modifierFromSet()
   if (modifiers.length === 0) {
-    window.$message.warning(window.$t('keyboardBookmark.requireModifier'))
+    showToast.warning(window.$t('keyboardBookmark.requireModifier'))
     return
   }
   modifier.value = modifiers
   isRecording.value = false
-  window.$message?.success(`${window.$t('common.success')}`)
+  showToast.success(`${window.$t('common.success')}`)
 }
 
 /**
@@ -217,7 +210,6 @@ onUnmounted(() => {
       />
     </NButton>
   </div>
-  <Tips :content="globalModifierTips" />
 </template>
 
 <style scoped>

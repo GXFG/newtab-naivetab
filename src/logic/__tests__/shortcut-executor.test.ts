@@ -5,10 +5,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
  *
  * Mock 策略：
  * - @/logic/task → 捕获 addKeydownTask/removeKeydownTask 调用
- * - @/logic/globalShortcut/shortcut-utils → 控制 matchShortcut / isSwReady / getSharedPort
+ * - @/logic/shortcut/utils → 控制 matchShortcut / isSwReady / getSharedPort
  * - @/logic/store → 控制 localConfig / localState / globalState
  * - @/logic/moveable → toggleIsDragMode spy
- * - @/logic/globalShortcut/shortcut-command → getCommandExecEnv
+ * - @/logic/shortcut/shortcut-command → getCommandExecEnv
  */
 
 let mockAddKeydownTask: ReturnType<typeof vi.fn>
@@ -26,6 +26,7 @@ const baseLocalConfig = (overrides?: {
   bookmarkModifiers?: readonly string[]
   commandModifiers?: readonly string[]
   commandKeymap?: Record<string, { command: string }>
+  bookmarkKeymap?: Record<string, { url: string; name?: string }>
   noModifierModeBookmark?: boolean
   noModifierModeCommand?: boolean
 }) => ({
@@ -35,6 +36,9 @@ const baseLocalConfig = (overrides?: {
     shortcutInInputElement: false,
     urlBlacklist: [] as string[],
     noModifierMode: overrides?.noModifierModeBookmark ?? false,
+    keymap: overrides?.bookmarkKeymap ?? {
+      KeyB: { url: 'https://bing.com', name: 'Bing' },
+    },
   },
   keyboardCommand: {
     isEnabled: true,
@@ -64,6 +68,17 @@ function setupMocks(options?: {
   vi.doMock('@/logic/task', () => ({
     addKeydownTask: mockAddKeydownTask,
     removeKeydownTask: mockRemoveKeydownTask,
+    addPageFocusTask: vi.fn(),
+    removePageFocusTask: vi.fn(),
+    addVisibilityTask: vi.fn(),
+    removeVisibilityTask: vi.fn(),
+    addTimerTask: vi.fn(),
+    removeTimerTask: vi.fn(),
+    startKeydown: vi.fn(),
+    stopKeydown: vi.fn(),
+    startTimer: vi.fn(),
+    stopTimer: vi.fn(),
+    onPageFocus: vi.fn(),
   }))
 
   mockMatchShortcut = vi.fn()
@@ -74,19 +89,25 @@ function setupMocks(options?: {
     onDisconnect: { addListener: vi.fn() },
   }
   mockGetSharedPort = vi.fn().mockReturnValue(mockPort)
-  vi.doMock('@/logic/globalShortcut/shortcut-utils', () => ({
-    matchShortcut: mockMatchShortcut,
-    isSwReady: mockIsSwReady,
+  vi.doMock('@/logic/shortcut/utils', () => ({
     toModifierMask: (keys: readonly string[]) => keys.length,
+  }))
+  vi.doMock('@/logic/shortcut/matcher', () => ({
+    matchShortcut: mockMatchShortcut,
+  }))
+  vi.doMock('@/logic/shortcut/port', () => ({
+    isSwReady: mockIsSwReady,
     getSharedPort: mockGetSharedPort,
   }))
 
   mockSwitchSettingDrawerVisible = vi.fn()
   const localState = { value: { isFocusMode: options?.isFocusMode ?? false } }
   const globalState = { isSettingDrawerVisible: options?.isSettingDrawerVisible ?? false }
-  vi.doMock('@/logic/store', () => ({
+  vi.doMock('@/logic/config/state', () => ({
     localConfig: options?.localConfig ?? baseLocalConfig(),
     localState,
+  }))
+  vi.doMock('@/logic/store/state', () => ({
     globalState,
     switchSettingDrawerVisible: mockSwitchSettingDrawerVisible,
   }))
@@ -97,17 +118,19 @@ function setupMocks(options?: {
   }))
 
   mockGetCommandExecEnv = vi.fn().mockReturnValue('newtab')
-  vi.doMock('@/logic/globalShortcut/shortcut-command', () => ({
+  vi.doMock('@/logic/shortcut/shortcut-command', () => ({
     getCommandExecEnv: mockGetCommandExecEnv,
   }))
 
   mockMessage = { warning: vi.fn(), info: vi.fn(), success: vi.fn() }
-  vi.stubGlobal('$message', mockMessage)
+  vi.doMock('@/common/toast', () => ({
+    showToast: mockMessage,
+  }))
   vi.stubGlobal('$t', vi.fn((key: string) => key))
 }
 
 async function setupExecutor() {
-  const executor = await import('@/logic/globalShortcut/shortcut-executor')
+  const executor = await import('@/logic/shortcut/shortcut-executor')
   executor.setupNewtabGlobalShortcut()
   return mockAddKeydownTask.mock.calls[0][1] as (e: KeyboardEvent) => boolean | void
 }
@@ -133,7 +156,7 @@ describe('cleanupNewtabGlobalShortcut', () => {
   afterEach(() => { vi.unstubAllGlobals() })
 
   it('removes keydown task', async () => {
-    const executor = await import('@/logic/globalShortcut/shortcut-executor')
+    const executor = await import('@/logic/shortcut/shortcut-executor')
     executor.cleanupNewtabGlobalShortcut()
     expect(mockRemoveKeydownTask).toHaveBeenCalledWith('globalShortcut')
   })

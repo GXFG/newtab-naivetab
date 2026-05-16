@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import {
-  NConfigProvider,
-  NMessageProvider,
-  NNotificationProvider,
-  NDialogProvider,
-} from 'naive-ui'
-import { nativeUILang, currTheme, themeOverrides } from '@/logic/store'
+import { NConfigProvider, NDialogProvider } from 'naive-ui'
+import { nativeUILang, currTheme, themeOverrides } from '@/logic/store/theme'
 import Content from '@/options/Content.vue'
 </script>
 
@@ -15,13 +10,9 @@ import Content from '@/options/Content.vue'
     :theme="currTheme"
     :theme-overrides="themeOverrides"
   >
-    <NMessageProvider>
-      <NNotificationProvider>
-        <NDialogProvider>
-          <Content />
-        </NDialogProvider>
-      </NNotificationProvider>
-    </NMessageProvider>
+    <NDialogProvider>
+      <Content />
+    </NDialogProvider>
   </NConfigProvider>
 </template>
 

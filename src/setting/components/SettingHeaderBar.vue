@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { ICONS } from '@/logic/icons'
-import { globalState } from '@/logic/store'
+import { ICONS } from '@/logic/constants/icons'
+import { globalState } from '@/logic/store/state'
 
 const props = defineProps<{
   title: string

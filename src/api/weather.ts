@@ -1,6 +1,6 @@
-import request from '@/lib/request'
+import request from './request'
 import { WEATHER_LANG_MAP } from '@/logic/constants/weather'
-import { localConfig } from '@/logic/store'
+import { localConfig } from '@/logic/config/state'
 
 // https://dev.qweather.com/docs/api/geo/city-lookup/
 export const getCityLookup = (
