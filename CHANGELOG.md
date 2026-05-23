@@ -73,7 +73,7 @@
 - ^: 依赖库升级
 
 ## 🌟V1.25.x
-- +: 🚀支持Firefox [Firefox addon](https://addons.mozilla.org/zh-CN/firefox/addon/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/)
+- +: 🚀支持Firefox [Firefox addon](https://addons.mozilla.org/zh-CN/firefox/addon/naivetab-%E5%8F%AF%E8%A7%86%E5%8C%96%E9%94%AE%E7%9B%98%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/)
 - ^: 设置抽屉样式优化
 - ^: 编辑布局性能优化
 - ^: 万年历新增节日倒数

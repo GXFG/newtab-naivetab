@@ -77,7 +77,7 @@
   <a href="https://microsoftedge.microsoft.com/addons/detail/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/kejadmppkffccjopodhekdnmkofidmjl">
     <img src="https://img.shields.io/badge/Edge%20Add--ons-安装-0078D7?style=for-the-badge&logo=microsoft-edge&logoColor=white" alt="Microsoft Edge" />
   </a>
-  <a href="https://addons.mozilla.org/zh-CN/firefox/addon/naivetab-%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5">
+  <a href="https://addons.mozilla.org/zh-CN/firefox/addon/naivetab-%E5%8F%AF%E8%A7%86%E5%8C%96%E9%94%AE%E7%9B%98%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/">
     <img src="https://img.shields.io/badge/Firefox%20Add--ons-安装-FF7139?style=for-the-badge&logo=firefox-browser&logoColor=white" alt="Firefox Add-ons" />
   </a>
 </div>
