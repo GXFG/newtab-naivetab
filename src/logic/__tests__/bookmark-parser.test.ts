@@ -17,14 +17,14 @@ const bookmark = (
   title: string,
   url: string,
 ): chrome.bookmarks.BookmarkTreeNode =>
-  ({ id: '1', title, url, children: [] } as unknown as chrome.bookmarks.BookmarkTreeNode)
+  ({ id: `bm-${title}`, title, url, children: [] } as unknown as chrome.bookmarks.BookmarkTreeNode)
 
 /** 创建模拟文件夹 */
 const folder = (
   title: string,
   children: chrome.bookmarks.BookmarkTreeNode[],
 ): chrome.bookmarks.BookmarkTreeNode =>
-  ({ id: '1', title, url: undefined, children } as unknown as chrome.bookmarks.BookmarkTreeNode)
+  ({ id: `folder-${title}`, title, url: undefined, children } as unknown as chrome.bookmarks.BookmarkTreeNode)
 
 const layoutCodes = ['KeyQ', 'KeyW', 'KeyE', 'Digit1', 'F1']
 
@@ -99,14 +99,35 @@ describe('parseBookmarkTitle', () => {
 })
 
 describe('parseBookmarkFolder', () => {
+  /** 构造标准 Chrome 书签树结构：root(id='0') → Bookmarks Bar(id='1') → 子文件夹 */
+  function mockChromeTree(
+    subFolders: chrome.bookmarks.BookmarkTreeNode[],
+  ): chrome.bookmarks.BookmarkTreeNode[] {
+    return [
+      {
+        id: '0',
+        title: '',
+        url: undefined,
+        children: [
+          {
+            id: '1',
+            title: 'Bookmarks Bar',
+            url: undefined,
+            children: subFolders,
+          },
+        ],
+      } as unknown as chrome.bookmarks.BookmarkTreeNode,
+    ]
+  }
+
   it('精确模式：标准 code 前缀正确绑定', async () => {
-    const mockTree = [
+    const mockTree = mockChromeTree([
       folder('NaiveTab', [
         bookmark('[KeyQ] Google', 'https://google.com'),
         bookmark('[KeyW] GitHub', 'https://github.com'),
         bookmark('Notion', 'https://notion.so'),
       ]),
-    ]
+    ])
     ;(globalThis.chrome as any).bookmarks = {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
@@ -127,12 +148,12 @@ describe('parseBookmarkFolder', () => {
   })
 
   it('标准 code 前缀正确绑定', async () => {
-    const mockTree = [
+    const mockTree = mockChromeTree([
       folder('NaiveTab', [
         bookmark('[KeyQ] Google', 'https://google.com'),
         bookmark('[KeyW] GitHub', 'https://github.com'),
       ]),
-    ]
+    ])
     ;(globalThis.chrome as any).bookmarks = {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
@@ -145,13 +166,13 @@ describe('parseBookmarkFolder', () => {
   })
 
   it('_ 开头书签被跳过', async () => {
-    const mockTree = [
+    const mockTree = mockChromeTree([
       folder('NaiveTab', [
         bookmark('[KeyQ] Google', 'https://google.com'),
         bookmark('_hidden', 'https://hidden.com'),
         bookmark('[KeyW] GitHub', 'https://github.com'),
       ]),
-    ]
+    ])
     ;(globalThis.chrome as any).bookmarks = {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
@@ -162,14 +183,14 @@ describe('parseBookmarkFolder', () => {
   })
 
   it('_ 开头文件夹被跳过', async () => {
-    const mockTree = [
+    const mockTree = mockChromeTree([
       folder('NaiveTab', [
         bookmark('[KeyQ] Google', 'https://google.com'),
         folder('_archive', [
           bookmark('[KeyW] GitHub', 'https://github.com'),
         ]),
       ]),
-    ]
+    ])
     ;(globalThis.chrome as any).bookmarks = {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
@@ -181,7 +202,7 @@ describe('parseBookmarkFolder', () => {
   })
 
   it('找不到文件夹返回空', async () => {
-    const mockTree = [folder('Other', [])]
+    const mockTree = mockChromeTree([folder('Other', [])])
     ;(globalThis.chrome as any).bookmarks = {
       getTree: vi.fn(() => Promise.resolve(mockTree)),
     }
@@ -193,21 +214,37 @@ describe('parseBookmarkFolder', () => {
 })
 
 describe('findFolderByPath', () => {
-  it('在顶层找到匹配的文件夹', () => {
+  it('在书签栏中找到文件夹', () => {
     const tree = [
-      folder('NaiveTab', []),
-      folder('Other', []),
+      {
+        id: '0', title: '', url: undefined,
+        children: [
+          { id: '1', title: 'Bookmarks Bar', url: undefined, children: [
+            folder('NaiveTab', []),
+            folder('Other', []),
+          ]},
+        ],
+      } as unknown as chrome.bookmarks.BookmarkTreeNode,
     ]
-    expect(findFolderByPath(tree, 'NaiveTab')).toBe(tree[0])
+    const found = findFolderByPath(tree, 'NaiveTab')
+    expect(found).not.toBeNull()
+    expect(found?.title).toBe('NaiveTab')
   })
 
-  it('在嵌套文件夹中找到', () => {
+  it('在书签栏的嵌套文件夹中找到', () => {
     const tree = [
-      folder('Root', [
-        folder('Level1', [
-          folder('Target', []),
-        ]),
-      ]),
+      {
+        id: '0', title: '', url: undefined,
+        children: [
+          { id: '1', title: 'Bookmarks Bar', url: undefined, children: [
+            folder('Root', [
+              folder('Level1', [
+                folder('Target', []),
+              ]),
+            ]),
+          ]},
+        ],
+      } as unknown as chrome.bookmarks.BookmarkTreeNode,
     ]
     const found = findFolderByPath(tree, 'Root/Level1/Target')
     expect(found).not.toBeNull()
@@ -215,22 +252,48 @@ describe('findFolderByPath', () => {
   })
 
   it('找不到返回 null', () => {
-    const tree = [folder('Other', [])]
+    const tree = [
+      {
+        id: '0', title: '', url: undefined,
+        children: [
+          { id: '1', title: 'Bookmarks Bar', url: undefined, children: [
+            folder('Other', []),
+          ]},
+        ],
+      } as unknown as chrome.bookmarks.BookmarkTreeNode,
+    ]
     expect(findFolderByPath(tree, 'Missing')).toBeNull()
   })
 
   it('路径部分不存在返回 null', () => {
     const tree = [
-      folder('A', [folder('Sub', [])]),
-      folder('B', [folder('Other', [])]),
+      {
+        id: '0', title: '', url: undefined,
+        children: [
+          { id: '1', title: 'Bookmarks Bar', url: undefined, children: [
+            folder('A', [folder('Sub', [])]),
+            folder('B', [folder('Other', [])]),
+          ]},
+        ],
+      } as unknown as chrome.bookmarks.BookmarkTreeNode,
     ]
     expect(findFolderByPath(tree, 'A/NonExistent')).toBeNull()
   })
 
   it('跳过 Chrome 隐形根节点（id="0"，无 title）', () => {
     const tree = [
-      { id: '0', children: [folder('书签栏', [folder('NaiveTab', [folder('layer1', [])])])], title: '' },
-    ]
+      {
+        id: '0', title: '', url: undefined,
+        children: [
+          {
+            id: '1', title: 'Bookmarks Bar', url: undefined,
+            children: [
+              folder('NaiveTab', [folder('layer1', [])]),
+            ],
+          },
+        ],
+      },
+    ] as unknown as chrome.bookmarks.BookmarkTreeNode[]
     expect(findFolderByPath(tree, 'NaiveTab/layer1')?.title).toBe('layer1')
     expect(findFolderByPath(tree, 'NaiveTab')?.title).toBe('NaiveTab')
   })
@@ -365,7 +428,7 @@ describe('swapBookmarksInSourceFolder', () => {
     ({ id, title, url, index, parentId, children: [] } as unknown as chrome.bookmarks.BookmarkTreeNode)
 
   /**
-   * 构造 Chrome 风格的书签树：root → Bookmarks Bar → NaiveTab → layer1 → bookmarks
+   * 构造 Chrome 风格的书签树：root → Bookmarks Bar(id='1') → NaiveTab → layer1 → bookmarks
    * findFolderByPath('NaiveTab/layer1') 会按路径查找嵌套文件夹
    */
   function mockBookmarks(children: chrome.bookmarks.BookmarkTreeNode[]) {
@@ -382,7 +445,7 @@ describe('swapBookmarksInSourceFolder', () => {
       children: [layer1Folder],
     } as unknown as chrome.bookmarks.BookmarkTreeNode
     const bookmarksBar: chrome.bookmarks.BookmarkTreeNode = {
-      id: 'bar',
+      id: '1',
       title: 'Bookmarks Bar',
       url: undefined,
       children: [naiveTabFolder],
@@ -515,7 +578,7 @@ describe('removeBookmarkFromSourceFolder', () => {
       children: [layer1Folder],
     } as unknown as chrome.bookmarks.BookmarkTreeNode
     const bookmarksBar: chrome.bookmarks.BookmarkTreeNode = {
-      id: 'bar',
+      id: '1',
       title: 'Bookmarks Bar',
       url: undefined,
       children: [naiveTabFolder],
