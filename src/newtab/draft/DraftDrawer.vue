@@ -5,7 +5,7 @@ import { gaProxy } from '@/logic/utils/gtag'
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
 import {
   isDragMode,
-  toggleIsDragMode,
+  toggleDragMode,
   isDraftDrawerVisible,
   handleToggleIsDraftDrawerVisible,
   moveState,
@@ -48,9 +48,8 @@ const handleExitDragMode = () => {
   if (globalState.isGuideMode) {
     return
   }
-  toggleIsDragMode(false)
+  toggleDragMode(false)
 }
-
 // DraftDrawer
 const handleDraftDrawerMouseEnter = () => {
   state.isCursorInDraftDrawer = true
@@ -82,7 +81,7 @@ const handleDraftMouseDown = async (e: MouseEvent) => {
   }
 }
 
-const handleDraftMouseMove = async (e: MouseEvent) => {
+const handleDraftMouseMove = (e: MouseEvent) => {
   const mouseMoveTask = moveState.mouseMoveTaskMap.get(
     moveState.currDragTarget.code,
   )
@@ -99,9 +98,13 @@ const handleDraftMouseUp = (e: MouseEvent) => {
     mouseUpTask(e)
   }
   const isEnabled = !state.isCursorInDraftDrawer
+  const wasEnabled = localConfig[moveState.currDragTarget.code].enabled
   localConfig[moveState.currDragTarget.code].enabled = isEnabled
   if (!isEnabled) {
     return
+  }
+  if (!wasEnabled) {
+    gaProxy('click', ['widget', 'add', moveState.currDragTarget.code])
   }
   gaProxy('move', ['widget', moveState.currDragTarget.code], {
     enabled: true,
@@ -116,7 +119,7 @@ const keyboardHandler = (e: KeyboardEvent) => {
   const { code } = e
   if (code === 'Escape') {
     nextTick(() => {
-      toggleIsDragMode()
+      toggleDragMode()
     })
     return
   }
@@ -148,6 +151,7 @@ const onDeleteComponent = () => {
   animateDeleteWidget(code as WidgetCodes)
   gaProxy('delete', ['widget', code], {
     enabled: false,
+    source: 'keyboard',
   })
 }
 

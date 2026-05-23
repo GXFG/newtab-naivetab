@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest'
 import { isUrlInBlacklist, normalizeDomain, buildModifierKeys, formatModifierKeys, toModifierMask, isInInputElement } from '@/logic/shortcut/utils'
 import { matchShortcut } from '@/logic/shortcut/matcher'
 
@@ -224,130 +224,181 @@ describe('formatModifierKeys', () => {
 })
 
 describe('isInInputElement', () => {
-  let originalActiveElement: Element | null
-
-  beforeEach(() => {
-    originalActiveElement = document.activeElement
-  })
-
-  afterEach(() => {
-    // Restore original activeElement if possible
-    if (originalActiveElement && document.body.contains(originalActiveElement)) {
-      ;(originalActiveElement as HTMLElement).focus?.()
-    }
-  })
-
-  function setActiveElement(el: HTMLElement) {
-    // Use Object.defineProperty to mock document.activeElement
-    Object.defineProperty(document, 'activeElement', {
-      value: el,
-      configurable: true,
-    })
+  /**
+   * 模拟 activeElement（现在的首要检测源）。
+   */
+  function withActiveElement(el: Element | null): void {
+    Object.defineProperty(document, 'activeElement', { value: el, configurable: true })
   }
 
-  it('returns false when no active element', () => {
-    Object.defineProperty(document, 'activeElement', { value: null, configurable: true })
-    expect(isInInputElement()).toBe(false)
+  const originalActiveElement = document.activeElement
+
+  beforeEach(() => {
+    // 每个测试前恢复 activeElement 为原始值，避免测试间泄漏
+    withActiveElement(originalActiveElement)
   })
 
-  it('returns true for INPUT element', () => {
+  // -- activeElement 主路径 --
+
+  it('returns true for INPUT element via activeElement', () => {
     const input = document.createElement('input')
-    setActiveElement(input)
-    expect(isInInputElement()).toBe(true)
+    withActiveElement(input)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
   })
 
-  it('returns true for TEXTAREA element', () => {
+  it('returns true for TEXTAREA via activeElement', () => {
     const textarea = document.createElement('textarea')
-    setActiveElement(textarea)
-    expect(isInInputElement()).toBe(true)
+    withActiveElement(textarea)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
   })
 
-  it('returns true for contenteditable="true" element', () => {
+  it('returns true for SELECT via activeElement', () => {
+    const select = document.createElement('select')
+    withActiveElement(select)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+  })
+
+  it('returns true for EMBED via activeElement', () => {
+    const embed = document.createElement('embed')
+    withActiveElement(embed)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+  })
+
+  it('returns true for OBJECT via activeElement', () => {
+    const obj = document.createElement('object')
+    withActiveElement(obj)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+  })
+
+  it('returns true for contenteditable="true" via activeElement', () => {
     const div = document.createElement('div')
     div.setAttribute('contenteditable', 'true')
-    setActiveElement(div)
-    expect(isInInputElement()).toBe(true)
+    Object.defineProperty(div, 'isContentEditable', { value: true })
+    withActiveElement(div)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
   })
 
-  it('returns true for contenteditable="" element (empty string)', () => {
-    const div = document.createElement('div')
-    div.setAttribute('contenteditable', '')
-    setActiveElement(div)
-    expect(isInInputElement()).toBe(true)
-  })
-
-  it('returns false for contenteditable="false" element', () => {
-    const div = document.createElement('div')
-    div.setAttribute('contenteditable', 'false')
-    setActiveElement(div)
-    expect(isInInputElement()).toBe(false)
-  })
-
-  it('returns true for role=textbox element', () => {
+  it('returns true for role=textbox via activeElement', () => {
     const div = document.createElement('div')
     div.setAttribute('role', 'textbox')
-    setActiveElement(div)
-    expect(isInInputElement()).toBe(true)
+    withActiveElement(div)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
   })
 
-  it('returns true for role=searchbox element', () => {
-    const div = document.createElement('div')
-    div.setAttribute('role', 'searchbox')
-    setActiveElement(div)
-    expect(isInInputElement()).toBe(true)
-  })
-
-  it('returns true for role=combobox element', () => {
+  it('returns true for role=combobox via activeElement', () => {
     const div = document.createElement('div')
     div.setAttribute('role', 'combobox')
-    setActiveElement(div)
-    expect(isInInputElement()).toBe(true)
+    withActiveElement(div)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
   })
 
-  it('returns true for IFRAME element', () => {
+  it('returns true for IFRAME via activeElement', () => {
     const iframe = document.createElement('iframe')
-    setActiveElement(iframe)
-    expect(isInInputElement()).toBe(true)
+    withActiveElement(iframe)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
   })
 
-  it('returns true when document.designMode is "on"', () => {
+  it('returns false for regular div when neither activeElement nor composedPath match', () => {
     const div = document.createElement('div')
-    setActiveElement(div)
-    const originalDesignMode = document.designMode
-    Object.defineProperty(document, 'designMode', { value: 'on', configurable: true })
-    try {
-      expect(isInInputElement()).toBe(true)
-    } finally {
-      Object.defineProperty(document, 'designMode', { value: originalDesignMode, configurable: true })
+    withActiveElement(div)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(false)
+  })
+
+  it('returns false for body as activeElement', () => {
+    withActiveElement(document.body)
+    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(false)
+  })
+
+  // -- composedPath 兜底路径（activeElement 非输入时） --
+
+  it('falls back to composedPath when activeElement is non-input', () => {
+    const nonInput = document.createElement('div')
+    const input = document.createElement('input')
+    withActiveElement(nonInput)
+    const e = new KeyboardEvent('keydown', { code: 'KeyA' })
+    vi.spyOn(e, 'composedPath').mockReturnValue([input])
+    expect(isInInputElement(e)).toBe(true)
+  })
+
+  it('returns true for input inside Shadow DOM via composedPath', () => {
+    const host = document.createElement('div')
+    const input = document.createElement('input')
+    host.attachShadow({ mode: 'open' })
+    host.shadowRoot!.appendChild(input)
+    const nonInput = document.createElement('span')
+    const e = new KeyboardEvent('keydown', { code: 'KeyA' })
+    withActiveElement(nonInput)
+    vi.spyOn(e, 'composedPath').mockReturnValue([host, input])
+    expect(isInInputElement(e)).toBe(true)
+  })
+
+  it('returns true when composedPath contains a textbox role ancestor', () => {
+    const wrapper = document.createElement('div')
+    wrapper.setAttribute('role', 'searchbox')
+    const inner = document.createElement('span')
+    wrapper.appendChild(inner)
+    const nonInput = document.createElement('div')
+    withActiveElement(nonInput)
+    const e = new KeyboardEvent('keydown', { code: 'KeyA' })
+    vi.spyOn(e, 'composedPath').mockReturnValue([inner, wrapper])
+    expect(isInInputElement(e)).toBe(true)
+  })
+
+  // -- 竞态场景 --
+
+  it('detects input via activeElement when composedPath has no input (focus race condition)', () => {
+    const nonInput = document.createElement('div')
+    const input = document.createElement('input')
+    withActiveElement(input)
+    const e = new KeyboardEvent('keydown', { code: 'KeyA' })
+    vi.spyOn(e, 'composedPath').mockReturnValue([nonInput])
+    expect(isInInputElement(e)).toBe(true)
+  })
+
+  // -- input type 白名单 --
+
+  it('returns true for text/password/email/search/number/tel/url input types', () => {
+    for (const type of ['text', 'password', 'email', 'search', 'number', 'tel', 'url', 'date', 'time', 'datetime-local', 'month', 'week']) {
+      const input = document.createElement('input')
+      input.type = type
+      withActiveElement(input)
+      expect(isInInputElement(new KeyboardEvent('keydown'))).toBe(true)
     }
   })
 
-  it('returns false for regular div without input attributes', () => {
-    const div = document.createElement('div')
-    setActiveElement(div)
-    expect(isInInputElement()).toBe(false)
+  it('returns false for button/checkbox/radio/file/hidden/image/submit/reset/color input types', () => {
+    for (const type of ['button', 'checkbox', 'radio', 'file', 'hidden', 'image', 'submit', 'reset', 'color']) {
+      const input = document.createElement('input')
+      input.type = type
+      withActiveElement(input)
+      expect(isInInputElement(new KeyboardEvent('keydown'))).toBe(false)
+    }
   })
 
-  // Cleanup: restore activeElement to document.body after all the Object.defineProperty mocks
-  // This prevents state leakage to subsequent test suites
+  it('treats unknown input type as text (not excluded)', () => {
+    const input = document.createElement('input')
+    input.setAttribute('type', 'unknown-type')
+    withActiveElement(input)
+    expect(isInInputElement(new KeyboardEvent('keydown'))).toBe(true)
+  })
+
+  it('returns true when document.designMode is on', () => {
+    const nonInput = document.createElement('div')
+    withActiveElement(nonInput)
+    // jsdom 中 designMode 默认是 'off'，需要模拟
+    Object.defineProperty(document, 'designMode', { value: 'on', configurable: true })
+    expect(isInInputElement(new KeyboardEvent('keydown'))).toBe(true)
+    // 恢复
+    Object.defineProperty(document, 'designMode', { value: 'off', configurable: true })
+  })
+
   afterAll(() => {
-    Object.defineProperty(document, 'activeElement', {
-      value: document.body,
-      configurable: true,
-      writable: false,
-    })
+    // 防止 activeElement mock 泄漏到后续测试块
+    withActiveElement(originalActiveElement)
   })
 })
 
 describe('matchShortcut — non-blacklist paths', () => {
-  afterEach(() => {
-    // Restore activeElement after any test that may have mocked it
-    Object.defineProperty(document, 'activeElement', {
-      value: document.body,
-      configurable: true,
-      writable: false,
-    })
-  })
 
   it('returns null when disabled', () => {
     const e = new KeyboardEvent('keydown', { code: 'KeyK', ctrlKey: true })
@@ -361,15 +412,15 @@ describe('matchShortcut — non-blacklist paths', () => {
 
   it('respects shortcutInInputElement=false (blocks in input)', () => {
     const input = document.createElement('input')
-    Object.defineProperty(document, 'activeElement', { value: input, configurable: true })
     const e = new KeyboardEvent('keydown', { code: 'KeyK', ctrlKey: true })
+    vi.spyOn(e, 'composedPath').mockReturnValue([input])
     expect(matchShortcut(e, true, ['ctrl'], false)).toBeNull()
   })
 
   it('respects shortcutInInputElement=true (allows in input)', () => {
     const input = document.createElement('input')
-    Object.defineProperty(document, 'activeElement', { value: input, configurable: true })
     const e = new KeyboardEvent('keydown', { code: 'KeyK', ctrlKey: true })
+    vi.spyOn(e, 'composedPath').mockReturnValue([input])
     expect(matchShortcut(e, true, ['ctrl'], true)).toBe('KeyK')
   })
 

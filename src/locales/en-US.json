@@ -10,6 +10,7 @@
     "clear": "Clear",
     "success": "Success",
     "fail": "Fail",
+    "widgetError": "Widget error: __code__",
     "origin": "Origin",
     "custom": "Custom",
     "import": "Import",
@@ -100,8 +101,15 @@
     "changeWallpaper": "Change Wallpaper"
   },
   "popup": {
-    "configBookmark": "Bookmark Config",
+    "configNaivetab": "NaiveTab Config",
     "syncingStatus": "Syncing..."
+  },
+  "popupDomainFilter": {
+    "label": "Domain blocklist",
+    "bookmarkShortcut": "Bookmark Shortcut",
+    "commandShortcut": "Command Shortcut",
+    "unsupportedPage": "Domain filter not available on this page",
+    "tip": "Shortcuts will be disabled on blocked domains."
   },
   "sponsor": {
     "title": "🔥「Caffeinated Commit: Code Brewed with 200% ☕️ Power」",
@@ -196,6 +204,7 @@
     "overwriteUrlConfirm": "This key already has a URL. Overwrite with current tab URL?",
     "urlBlacklistTips": "Shortcuts won't trigger on these domains. One domain per line, input is auto-cleaned of protocol prefixes, paths, ports, and casing.\n• google.com — matches google.com and all subdomains (e.g. docs.google.com)\n• *.google.com — same as above, both formats are equivalent",
     "urlBlacklistPlaceholder": "One domain per line, e.g. google.com",
+    "maxBlacklistCount": "Blocklist supports up to __n__ domains",
     "pageSettings": "Page Settings",
     "focusNavigation": "Focus & Navigation",
     "languageTime": "Language & Time",
@@ -291,7 +300,7 @@
     "recordModifier": "Press modifier to record",
     "requireModifier": "Press at least one modifier key",
     "recording": "Recording...",
-    "shortcutNote": "Shortcuts are disabled in input fields and special pages (chrome:// etc.).",
+    "shortcutNote": "Shortcuts are not supported on special pages (chrome:// etc.).",
     "shortcutInInputElement": "Shortcuts in input",
     "shortcutInInputElementTips": "Shortcuts also trigger in input fields. May accidentally trigger in no-modifier mode; safe with modifier combinations",
     "selectKeycapTip": "Click a key on the keyboard to edit",

@@ -22,7 +22,7 @@ export function matchShortcut(
   if (e.repeat) return null
   if (!isEnabled) return null
 
-  if (!shortcutInInputElement && isInInputElement()) return null
+  if (!shortcutInInputElement && isInInputElement(e)) return null
 
   if (
     hostname &&

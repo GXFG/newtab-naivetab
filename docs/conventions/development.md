@@ -6,7 +6,7 @@
 
 **BEM 命名：** `block__element--modifier`。`block` 使用 camelCase，子元素用 `__`，修饰符用 `--`。
 
-- 子元素可使用简短前缀（Reblock 模式），但**必须嵌套在父级选择器内**，不得平铺到根级
+- **必须嵌套书写**：子元素和 modifier 必须嵌套在父级选择器内，不得平铺到根级
 - **禁止 `&--modifier` 拼接**：`postcss-preset-env` 不支持，modifier 必须写完整类名
 - `&` 只允许用于伪类/伪元素（`&:hover`）或嵌套完整类名（`&.parent-class`）
 - Widget 样式外层使用 `#widgetCode`（由 WidgetWrap 自动设置 id）
@@ -95,6 +95,18 @@ pnpm test -- --run     # 执行一次后退出（CI/PR）
 | 轻量 mock | compress、task | 最少 mock |
 | Vue 依赖 | config/update、store | mock reactive |
 | 重度 mock | config/sync/ | mock 整个依赖树 |
+| 快照测试 | config-snapshot | 基于真实用户配置快照的端到端迁移验证 |
+
+### 配置兼容性快照测试
+
+新增迁移分支后，运行 `npx vitest run src/logic/__tests__/config-snapshot.test.ts` 验证不破坏老用户数据。
+
+| 文件 | 职责 |
+|------|------|
+| `src/logic/__tests__/config-snapshot.test.ts` | 从不同历史版本的用户配置快照出发，运行完整迁移流程 |
+| `test/fixtures/snapshot-v*.json` | 用户配置快照 JSON，可从线上用户 localStorage 导出或手动构造 |
+
+详见 [config.md](architecture/config.md#配置兼容性快照测试)。
 
 ### 测试环境 Polyfill
 

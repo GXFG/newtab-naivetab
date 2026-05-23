@@ -17,6 +17,7 @@ import {
   defaultFocusVisibleWidgetMap,
 } from '@/logic/config/defaults'
 import { log } from '@/logic/utils/common'
+import { gaProxy } from '@/logic/utils/gtag'
 import {
   type WidgetCodes,
   MAX_LAYERS,
@@ -122,6 +123,10 @@ export const handleAppUpdate = () => {
     return
   }
   log('Get new version', window.appVersion)
+  gaProxy('view', ['version_upgrade'], {
+    fromVersion: version,
+    toVersion: window.appVersion,
+  })
   // @@@@ 更新localConfig后需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
     const keymapLength = Object.keys(localConfig.keyboardBookmark.keymap).length

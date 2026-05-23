@@ -9,6 +9,7 @@ import DraftGuideLine from '@/newtab/draft/DraftGuideLine.vue'
 import DraftDrawer from '@/newtab/draft/DraftDrawer.vue'
 
 import Setting from '@/setting/index.vue'
+import WidgetErrorBoundary from '@/newtab/WidgetErrorBoundary.vue'
 import { widgetsList } from '@/newtab/widgets/registry'
 
 window.$dialog = useDialog()
@@ -27,9 +28,11 @@ window.$dialog = useDialog()
   <Setting />
 
   <!-- widget -->
-  <component
-    :is="item.component"
+  <WidgetErrorBoundary
     v-for="item in widgetsList"
     :key="item.code"
-  />
+    :code="item.code"
+  >
+    <component :is="item.component" />
+  </WidgetErrorBoundary>
 </template>

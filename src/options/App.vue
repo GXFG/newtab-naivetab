@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { NConfigProvider, NDialogProvider } from 'naive-ui'
 import { nativeUILang, currTheme, themeOverrides } from '@/logic/store/theme'
+import {
+  registerGlobalErrorHandler,
+  registerVueErrorHandler,
+} from '@/logic/utils/errorHandler'
 import Content from '@/options/Content.vue'
+
+onMounted(() => {
+  registerGlobalErrorHandler('options')
+  registerVueErrorHandler(getCurrentInstance()!.appContext.app, 'options')
+})
 </script>
 
 <template>

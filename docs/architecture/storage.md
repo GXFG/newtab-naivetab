@@ -8,6 +8,7 @@
 | `src/logic/config/sync/loader.ts` | 拉取合并：版本感知同步、页面启动流程 |
 | `src/logic/config/sync/state.ts` | 同步状态 + 跨上下文监听 |
 | `src/logic/config/sync/manage.ts` | 用户操作：导入/导出/重置 |
+| `src/logic/config/sync/pending-writes.ts` | 预期写入注册表，防 onChanged 时序竞态 |
 | `src/logic/config/compress.ts` | Gzip 压缩/解压纯函数 |
 | `src/logic/config/merge.ts` | 递归配置合并函数 `mergeState` |
 | `src/types/global.d.ts` | `SyncPayload`、`ConfigField` 类型定义 |
@@ -57,6 +58,9 @@ interface UploadStatusItem {
   syncId: string         // 云端数据 MD5
   localModifiedTime: number  // 本地最后修改时间
   dirty: boolean         // 本地是否有未同步修改
+  retryCount: number     // 当前 session 内自动重试次数（≤3），成功时归零
+  lastError: string      // 最近一次失败的错误信息（空串表示无失败）
+  syncStatus: 'idle' | 'syncing' | 'success' | 'failed' | 'quota-exceeded'
 }
 ```
 
@@ -91,12 +95,20 @@ interface UploadStatusItem {
 ```
 用户修改配置 → watch(localConfig[field]) → 标记 dirty + localModifiedTime
     → 触发防抖函数 → uploadConfigFn:
-      1. MD5 与 prevSyncId 比较（内容未变则跳过）
+      1. MD5 与 prevSyncId 比较（内容未变则跳过，不记录写入速率）
       2. 构造 SyncPayload
       3. 判断是否压缩（keyboardBookmark > 4000 字节）
-      4. 上传到 chrome.storage.sync
-      5. 成功后更新 syncTime/syncId，清除 dirty
+      4. 大小检查（8KB 硬限，7KB 警告，超限设 syncStatus='quota-exceeded'）
+      5. 写入速率检查 + 警告（只记录实际会写入的调用）
+      6. addPendingWrite(currConfigMd5) 注册预期写入标记
+      7. 设置 syncId/syncTime（必须在 set 调用前，防止 onChanged 竞态）
+      8. chrome.storage.sync.set(payload)
+      9. 回调：removePendingWrite(md5) + 清除 dirty / retryCount 归零 / syncStatus 更新
 ```
+
+**双重防循环机制：**
+- **第一道防线 `pendingWrites`**：upload.ts 在 set 前 add MD5，state.ts 的 onChanged 先检查 pendingWrites，命中则跳过。从架构上消除自身写入的时序竞态。
+- **第二道防线 `syncId`**：兜底处理其他上下文（popup 等）的写入，内容相同则跳过。
 
 ### flushConfigSync
 
@@ -129,12 +141,14 @@ loadRemoteConfig
 
 版本相同 → 直接采用远程配置；版本不同 → 以较新版本为模板调用 `mergeState` 合并。详见 `src/logic/config/sync/loader.ts` 源码注释。
 
+**loadRemoteConfig 合并后的 syncId 处理：** `updateSetting` 完成后，用 `getUploadConfigData(field)` 的 MD5 重新设置 syncId + dirty=false。原因是 `mergeState` 会过滤掉云端数据中的未知字段，导致最终 `localConfig` 的 MD5 与云端原始 syncId 不同。如果不重新设置，watch 触发的防抖上传会因 MD5 不匹配而多余上传一次。
+
 ### Dirty 标记生命周期
 
 - **设置**：用户本地修改任何配置字段时立即设置
 - **清除**：上传成功后 / 云端拉取合并后 / popup onChanged 同步后
 - **持久化**：存储在 localStorage 的 `l-state` 中，页面刷新后保留
-- **故障恢复**：启动时 `handleMissedUploadConfig` 重试 `loading=true` 的字段
+- **故障恢复**：启动时 `handleMissedUploadConfig` 重试 `loading=true` 以及 `dirty=true` 且 `retryCount < 3` 的字段。每个字段在整个 session 生命周期中最多自动重试 3 次，超过后保留 `dirty` 和 `lastError` 标记，用户可手动触发同步
 
 ## Chrome 配额管理
 
@@ -145,22 +159,28 @@ loadRemoteConfig
 
 详见 `src/logic/config/sync/upload.ts` 源码注释。
 
-## Popup 书签同步
+## Popup 配置同步
 
 ```
 Popup → flushConfigSync() 写入云端
          ↓
-Newtab → setupKeyboardSyncListener() 通过 onChanged 感知
+         ├── addPendingWrite(md5) 注册预期写入
+         └── chrome.storage.sync.set(payload)
+              ↓
+Newtab → setupKeyboardSyncListener() 通过 onChanged 感知（keyboardBookmark + keyboardCommand）
          ↓
-      syncId 比较防循环（相同则跳过）
+      isPendingWrite(md5)? → 是 → 跳过（自身写入）
+      → 否 → syncId 比较防循环（相同则跳过）
 ```
+
+**注意：** `setupKeyboardSyncListener` 仅在新标签页打开时生效。如果用户未打开新标签页就关闭 popup，`chrome.storage.onChanged` 事件不会触发到任何扩展页面上下文，`localConfig` 不会被更新。依赖 `useStorageLocal` 的 localStorage 即时写入保证即使无新标签页也能持久化配置（见 `src/composables/useStorageLocal.ts`）。
 
 详见 `src/logic/config/sync/state.ts` 源码注释。
 
 ## 配置导入/导出
 
 - **导出**：序列化 `localConfig`，文件名含版本号和日期时间
-- **导入**：通过 `normalizeLegacyConfig()` 处理旧版本数据结构（6 层兼容），更新版本号后调用 `updateSetting`
+- **导入**：通过 `normalizeLegacyConfig()` 处理旧版本数据结构（6 层兼容），更新版本号后调用 `updateSetting`。**导入完成后必须将各字段的 syncId 设置为导入数据的 MD5、dirty 设为 false**，否则 `updateSetting` 逐字段写入会触发 watch 并排队上传，导致导入数据覆盖云端。MD5 计算必须使用 `getUploadConfigData`（而非直接 `JSON.stringify`），确保与上传时的序列化方式一致（如 keyboardBookmark 的 keymap 过滤）。
 - **重置**：清除 chrome.storage.sync + localStorage + IndexedDB，刷新页面
 
 详见 `src/logic/config/sync/manage.ts` 源码注释。
@@ -173,7 +193,7 @@ setupPageConfigSync()
     ├── await loadRemoteConfig()          ← 拉取云端，版本感知合并
     ├── await handleMissedUploadConfig()  ← 补救未完成的上传
     ├── handleWatchLocalConfigChange()    ← 注册 watch 监听本地变更
-    └── setupKeyboardSyncListener()       ← 注册 onChanged 感知 popup 修改
+    └── setupKeyboardSyncListener()       ← 注册 onChanged 感知 popup 修改（keyboardBookmark + keyboardCommand）
 ```
 
 ## 跨标签页同步
@@ -222,3 +242,41 @@ databaseStore(storeName, type: 'add'|'put'|'get'|'delete', payload): Promise<...
 ### CompressionStream 兼容性
 
 依赖 Chrome 80+。旧版浏览器中 catch 处理，降级为未压缩格式。Firefox 支持可能不完整。
+
+### uploadConfigFn 返回值语义
+
+`uploadConfigFn` 返回 `Promise<boolean>`：`true` 表示上传成功，`false` 表示失败（包括 MD5 去重跳过前的内容不变返回 `true`、大小超限返回 `false`、`chrome.storage.sync.set` 回调报错返回 `false`）。调用方（如 `flushConfigSync`、`BaseNaiveBookmarkManager`）依赖此返回值区分成功/失败。
+
+### pendingWrites 内存泄漏说明
+
+`pendingWrites` 是内存 Set，不持久化。页面关闭/Service Worker 回收时自动清理。极端情况下（`chrome.storage.sync.set` 回调延迟 30 秒以上），残留的 MD5 会被第二道防线 syncId 兜底，不会导致数据丢失。
+
+### setupLocalStorageSyncListener 版本兼容性
+
+`setupLocalStorageSyncListener` 直接调用 `mergeState` 而不做版本感知合并。同设备上不同版本窗口共存时，新版本字段可能被旧版本的 `defaultConfig` 过滤掉。但此场景概率极低（用户极少同时打开不同版本窗口），且最坏结果是字段回退为默认值，不会丢失用户数据。
+
+### loadRemoteConfig 分支互斥性
+
+`loadRemoteConfig` 中每个字段只会进入 `uploadPromises` 或 `pendingConfig` 之一，不会重复处理。条件分支为：云端无字段 → 上传；syncId 相同 → 跳过；dirty=false → 合并到 pendingConfig；dirty=true + localModifiedTime > syncTime → 上传；否则 → 合并到 pendingConfig。`updateSetting` 不会覆盖已上传字段。
+
+### 自动重试机制
+
+`handleMissedUploadConfig` 在页面启动时调用，补救两类字段：
+1. `loading=true`：上次页面生命周期中已启动但未完成的上传（如页面关闭/刷新）
+2. `dirty=true` 且 `retryCount < 3`：上次上传失败后未达重试上限的字段
+
+上传失败时 `retryCount` 递增（最多 3 次），成功时归零。超过 3 次后保留 `dirty` 和 `lastError` 标记，用户可手动触发同步。
+
+### cancelAllDebounce
+
+`clearStorage` 在清空 localStorage 前调用 `cancelAllDebounce()`。由于 `useDebounceFn` 不暴露 timer ID，内部用 generation 计数器实现：取消时递增 generation，排队的防抖回调检测到 generation 变化则跳过执行。
+
+### syncStatus 状态流转
+
+```
+idle → syncing → success → idle（成功路径）
+           → failed（网络错误等，retryCount++）
+           → quota-exceeded（大小超限，不可重试）
+
+failed → syncing → ...（下次启动自动重试，最多 3 次）
+```

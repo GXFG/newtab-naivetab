@@ -2,7 +2,12 @@
 import { NConfigProvider, NDialogProvider } from 'naive-ui'
 import { log } from '@/logic/utils/common'
 import { gaProxy } from '@/logic/utils/gtag'
+import {
+  registerGlobalErrorHandler,
+  registerVueErrorHandler,
+} from '@/logic/utils/errorHandler'
 import { FOCUS_ELEMENT_SELECTOR_MAP } from '@/logic/constants/app'
+import { WIDGET_CODE_LIST } from '@/common/widget-constants'
 import { SYSTEM_FONT_STACK } from '@/logic/constants/fonts'
 import {
   startKeydown,
@@ -12,8 +17,8 @@ import {
   stopKeydown,
 } from '@/logic/task'
 import {
-  setupNewtabGlobalShortcut,
-  cleanupNewtabGlobalShortcut,
+  setupNewtabCommandShortcut,
+  cleanupNewtabCommandShortcut,
 } from '@/logic/shortcut/shortcut-executor'
 import { setupPageConfigSync } from '@/logic/config/sync/loader'
 import { setupLocalStorageSyncListener } from '@/logic/config/sync/state'
@@ -105,10 +110,29 @@ const onDot = () => {
     platform: browserPlatform,
     browser: `${browserBrand}_${browserVersion}`,
   })
+
+  const enabledWidgets = WIDGET_CODE_LIST.filter(
+    (code) => localConfig[code].enabled,
+  )
+  for (const code of enabledWidgets) {
+    gaProxy('view', ['widget_active', code])
+  }
+
   log('platform', `${browserPlatform}_${browserBrand}_${browserVersion}`)
 }
 
+// ── 初始化 ─────────────────────────────────────────────────────────────
+
+// 命令快捷键必须在子组件 setup 之前注册，确保 globalShortcutTask 先于
+// keyboardTask 执行（命令优先）。子组件的 setup 在父组件 script setup
+// 执行完后才会开始。
+setupNewtabCommandShortcut()
+
 onMounted(async () => {
+  // 注册全局错误监听
+  registerGlobalErrorHandler('newtab')
+  registerVueErrorHandler(getCurrentInstance()!.appContext.app, 'newtab')
+
   // 阶段 0：DOM 副作用初始化（必须在同步阶段，确保渲染前生效）
   initFullscreenSync()
   initDomStyleWatchers()
@@ -117,7 +141,7 @@ onMounted(async () => {
   initBackgroundImage()
   startTimer()
   startKeydown()
-  setupNewtabGlobalShortcut()
+  // setupNewtabCommandShortcut() 已移至 script setup 顶层
 
   // 阶段 2：配置同步（按顺序，有依赖关系）
   await setupPageConfigSync()
@@ -144,7 +168,7 @@ onUnmounted(() => {
   cleanupDomStyleWatchers()
   stopTimer()
   stopKeydown()
-  cleanupNewtabGlobalShortcut()
+  cleanupNewtabCommandShortcut()
   cleanupEvents()
   cleanupResizeObserver()
 })

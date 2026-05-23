@@ -32,7 +32,7 @@ export const useStorageLocal = <T>(
         const valueText = JSON.stringify(state.value)
         localStorage.setItem(key, valueText)
         // console.log(`@set ${key}`, value)
-      }, 800)
+      }, 500)
     },
     {
       deep: true,

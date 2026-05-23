@@ -80,6 +80,28 @@ import.meta.glob 扫描 → 构建 defaultConfig → createLocalConfig()
 
 详见 [pitfalls.md](../../.claude/rules/pitfalls.md#配置迁移黄金法则)。
 
+### 配置兼容性快照测试
+
+新增迁移分支后，**必须运行快照测试确认不破坏老用户数据**：
+
+```bash
+npx vitest run src/logic/__tests__/config-snapshot.test.ts
+```
+
+| 文件 | 职责 |
+|------|------|
+| `src/logic/__tests__/config-snapshot.test.ts` | 从不同历史版本的用户配置快照出发，运行完整迁移流程，验证核心数据不丢失、结构完整 |
+| `test/fixtures/snapshot-v*.json` | 用户配置快照 JSON，可从线上用户 localStorage 导出或手动构造典型配置 |
+
+每个快照覆盖 5 个断言：
+1. 迁移不抛出异常
+2. 用户核心数据（keymap、颜色、背景图列表）不丢失
+3. 迁移后包含当前所有必需字段
+4. 旧版字段被正确清理
+5. 版本号升级到目标版本
+
+**新增快照**：在测试文件的 `fixtures` 数组中追加配置对象即可自动纳入测试。
+
 ## mergeState 合并函数
 
 ```ts

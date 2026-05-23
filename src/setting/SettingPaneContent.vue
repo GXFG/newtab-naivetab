@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { globalState } from '@/logic/store/state'
+import { gaProxy } from '@/logic/utils/gtag'
 import { settingsList, SETTING_GROUPS } from './registry'
 
 const props = withDefaults(
@@ -30,6 +31,9 @@ const tabPaneList = computed(() => settingsList)
 
 const onTabsChange = (tabCode: string) => {
   globalState.currSettingTabCode = tabCode
+  if (tabCode.startsWith('keyboard')) {
+    gaProxy('view', ['keyboard_setting'], { tab: tabCode })
+  }
 }
 
 // ── 分组逻辑 ──

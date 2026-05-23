@@ -52,3 +52,13 @@ const createLocalConfig = (): LocalConfigRefs => {
 export const localConfig: typeof defaultConfig = reactive(createLocalConfig())
 
 export const localState = useStorageLocal('l-state', defaultLocalState)
+
+/**
+ * 强制将 localConfig 中的配置写入 localStorage。
+ * 用于 popup 关闭前确保配置持久化，防止快速关闭导致 useStorageLocal 的 800ms 防抖被清除。
+ */
+export const flushConfigToLocalStorage = () => {
+  for (const key of Object.keys(localConfig)) {
+    localStorage.setItem(`c-${key}`, JSON.stringify(localConfig[key]))
+  }
+}

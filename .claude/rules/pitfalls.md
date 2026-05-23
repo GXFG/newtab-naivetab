@@ -48,6 +48,24 @@ alpha 通道必须写字面量。
 
 **How to apply：** 如需自定义样式，作用于 `WidgetWrap` 内部子元素（如 `*__container`），而非 `WidgetWrap` 本身的根 div。
 
+### 禁止在 `<Icon>` 上直接绑定事件
+
+`@iconify/vue` 的 `<Icon>` 组件默认渲染 `<svg aria-hidden="true" role="img">`，禁止在其上直接绑定 `@click`、`@mousedown` 等交互事件。
+
+**Why：** Chrome 会将绑定了事件的 `<svg>` 视为可交互元素，点击后 `<svg>` 获得焦点，与自身的 `aria-hidden="true"` 产生无障碍冲突，控制台报错：`Blocked aria-hidden on an element because its descendant retained focus`。
+
+**How to apply：** 必须用 `<button type="button">` 包裹 Icon，将事件绑定在 `<button>` 上，并在 button 上添加 `:aria-label` 提供无障碍描述。按钮样式需重置浏览器默认 `padding/border/background`。示例：
+
+```vue
+<!-- 错误 -->
+<Icon :icon="ICONS.info" class="foo" @click.stop="onAction" />
+
+<!-- 正确 -->
+<button type="button" class="foo" :aria-label="$t('common.action')" @click.stop="onAction">
+  <Icon :icon="ICONS.info" />
+</button>
+```
+
 ---
 
 ## 配置系统
@@ -95,6 +113,22 @@ alpha 通道必须写字面量。
 
 popup 修改书签等配置后**必须调用 `flushConfigSync`** 强制同步，否则 popup 销毁后防抖回调不会执行，配置丢失。
 
+### checkWriteRate 必须在 MD5 去重之后调用
+
+`checkWriteRate` 记录的是实际 `chrome.storage.sync.set` 调用次数，必须在 MD5 去重、大小检查**之后**、`set` 调用**之前**执行。
+
+**Why：** 如果在函数入口调用，被 MD5 去重拦截的调用、被大小检查拦截的调用也会虚增计数器，导致用户收到假的"写入速率即将超限"警告。
+
+**How to apply：** 确保 `checkWriteRate` 在所有可能提前 return 的检查之后执行。
+
+### syncId 必须在 set 调用前设置
+
+`uploadConfigFn` 中 `syncId` 必须在 `chrome.storage.sync.set` **调用前**设置，不能写在回调中。
+
+**Why：** `chrome.storage.sync.set` 写入完成后，`chrome.storage.onChanged` 事件可能在 `set` 回调执行前就触发（事件分发与回调调度是独立的 microtask）。如果 syncId 尚未更新，`setupKeyboardSyncListener` 的 syncId 守卫会失效，导致自己上传的配置又触发本地配置被覆盖 → Vue watch → 第二次上传。
+
+**How to apply：** 修改上传逻辑时，`syncId`/`syncTime` 赋值必须放在 `chrome.storage.sync.set` 调用之前，回调中只保留错误处理和 `dirty` 清理。
+
 ---
 
 ## 快捷键系统
@@ -107,6 +141,25 @@ popup 修改书签等配置后**必须调用 `flushConfigSync`** 强制同步，
 
 **How to apply：** 在 `handleKeydown` 中，`matchShortcut` 返回后必须**额外检查 keymap 中是否存在对应绑定**（`commandKeymap[code]?.command` / `bookmarkKeymap[code]?.url`），只有真正绑定了才发送消息和拦截事件。Content Script 和 newtab executor 两端都要遵守。
 
+### 输入框检测：`activeElement` 优先 + `composedPath()` 兜底
+
+`isInInputElement(e)` 采用双路径检测：
+
+| 检测源 | 覆盖场景 |
+|--------|---------|
+| `document.activeElement`（优先） | 焦点转移竞态：点击输入框后立即按键，focus 事件先于 keydown，`activeElement` 已更新 |
+| `e.composedPath()`（兜底） | Shadow DOM 穿透：当 `activeElement` 指向 Shadow Host 时，`composedPath` 包含 Shadow Root 内实际 input |
+
+**Why：**
+- 仅用 `composedPath()`：点击输入框后立即按键时，keydown 事件的 target 可能仍是旧元素，漏判
+- 仅用 `activeElement`：Shadow DOM 内输入框可能指向 host 而非实际 input
+- Vimium C 以 `activeElement` 为主要检测手段（`findNewEditable`），原始 Vimium 同时检查 `event.target` 和 `activeElement`
+
+**How to apply：**
+- 检测 `contenteditable` 时使用 `element.isContentEditable`（DOM 只读属性，自动处理继承链），而非 `getAttribute('contenteditable')`
+- `<input>` 必须区分 type：`button`/`checkbox`/`radio`/`file`/`hidden`/`image`/`submit`/`reset`/`color`/`range` 不属于可编辑输入
+- 额外检测 `<embed>` 和 `<object>`（可聚焦的嵌入式内容）
+
 ---
 
 ## 后台脚本
@@ -116,6 +169,22 @@ popup 修改书签等配置后**必须调用 `flushConfigSync`** 强制同步，
 `onChanged` 监听器必须返回 `Promise`，否则 Service Worker 可能在异步 resolve 前休眠。
 
 **Why：** Chrome MV3 的 Service Worker 空闲后会被回收，如果监听器不返回 Promise 等待异步完成，异步操作会被截断。
+
+### `chrome.tabs.move` 跨窗口不保留 pinned 状态
+
+`chrome.tabs.move` 跨窗口移动 tab 时，**`pinned` 属性和 pinned 索引都会丢失**，tab 在目标窗口变成普通 tab。
+
+**Why：** Chrome API 的行为，`move` 只保证 tab 转移到目标窗口，不保证 pinned 状态。
+
+**How to apply：**
+- 跨窗口移动前必须保存 `tab.pinned` 状态
+- 如果是 pinned tab，还需记录在当前窗口的 pinned 索引（必须在 `move` **之前**查询，移动后 tab 已不在源窗口）
+- 移动完成后通过 `chrome.tabs.update(tabId, { pinned: true })` 恢复状态
+- 如需恢复 pinned 索引位置：设 pinned 后再次 `chrome.tabs.move(tabId, { index: pinnedIndex })`
+- `chrome.windows.create({ tabId })` 创建新窗口同样丢失 pinned 状态
+- `mergeAllWindows` 等批量跨窗口移动的命令也要逐个恢复
+
+**位置恢复策略：** 用内存 Map（`pinnedPositionCache`）记录 `{ tabId → { originalWindowId, pinnedIndex } }`。移出时记录，移回原窗口时恢复，其他窗口追加末尾。
 
 ---
 

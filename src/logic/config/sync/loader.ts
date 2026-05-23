@@ -5,13 +5,19 @@
  * @consumers config/sync/state.ts（setupPageConfigSync）、popup/Setting 面板（手动同步）
  * @pitfalls
  *   - mergeConfigWithVersionAwareness 比较版本号决定以哪边为模板，版本相同直接使用远程数据
- *   - loadRemoteKeyboardConfig 是轻量版拉取，只同步 keyboardBookmark 字段，不触发全量合并
+ *   - loadRemoteKeyboardConfig 是轻量版拉取，只同步 keyboardBookmark 字段，不触发全量合并。
+ *     必须使用 mergeState 合并默认配置，确保云端缺失新版本字段时能自动补全
+ *   - loadRemoteConfig 合并后必须用 getUploadConfigData 的 MD5 设置 syncId，否则
+ *     mergeState 过滤后 MD5 变化 → watch 触发 dirty → 多余上传
+ *   - loadRemoteConfig 的 new Promise + async 回调是因为 chrome.storage.sync.get
+ *     是回调式 API，async 内部需要 await，外层手动 resolve 控制完成时机
  *   - setupPageConfigSync 是页面启动入口，按顺序：状态重置 → 拉取 → 补救未完成的上传 → 监听变化 → 跨标签页同步
  *   - parseStoredData 解析失败会 fallback 到 JSON.parse（兼容旧版本未压缩数据）
  * @see docs/architecture/storage.md#版本感知同步策略
  */
 import { defaultConfig, defaultUploadStatusItem } from '@/logic/config/defaults'
 import { log } from '@/logic/utils/common'
+import { gaProxy } from '@/logic/utils/gtag'
 import { compareLeftVersionLessThanRightVersions } from '@/logic/config/version'
 import { localConfig, localState } from '@/logic/config/state'
 import { mergeState } from '@/logic/config/merge'
@@ -23,7 +29,9 @@ import {
   uploadConfigFn,
   handleWatchLocalConfigChange,
   handleMissedUploadConfig,
+  getUploadConfigData,
 } from './upload'
+import md5 from 'crypto-js/md5'
 
 export const mergeConfigWithVersionAwareness = (
   localData: Record<string, any>,
@@ -52,6 +60,10 @@ export const mergeConfigWithVersionAwareness = (
 
 export const loadRemoteConfig = () => {
   log('Load config start')
+  // 使用 new Promise 包装 chrome.storage.sync.get（回调式 API）。
+  // 回调声明为 async 是因为内部需要 await parseStoredData / Promise.allSettled，
+  // async 返回的 Promise 被 Chrome 忽略，但内部 await 能正确执行。
+  // resolve/reject 由外层手动调用，不受回调的 async 影响。
   return new Promise((resolve) => {
     console.time('loadRemoteConfig')
     chrome.storage.sync.get(null, async (data) => {
@@ -125,8 +137,16 @@ export const loadRemoteConfig = () => {
               pendingConfig[field] = mergedConfig as any
               localState.value.isUploadConfigStatusMap[field].syncTime =
                 targetSyncTime
+              // 此处先设 syncId = targetSyncId（云端原始 MD5）是防御性设计。
+              // 虽然 updateSetting 之后第 184-194 行会用 getUploadConfigData 的 MD5 覆盖，
+              // 但 updateSetting 修改 reactive 对象可能触发 watch 回调（nextTick 异步），
+              // 在覆盖之前提供临时 syncId 防止 watch 触发的 MD5 比较误判。
               localState.value.isUploadConfigStatusMap[field].syncId =
                 targetSyncId
+              localState.value.isUploadConfigStatusMap[field].retryCount = 0
+              localState.value.isUploadConfigStatusMap[field].lastError = ''
+              localState.value.isUploadConfigStatusMap[field].syncStatus =
+                'idle'
             } else if (localModifiedTime > targetSyncTime) {
               log(
                 `Config-${field} upload local (local newer: ${localModifiedTime} > ${targetSyncTime})`,
@@ -146,8 +166,13 @@ export const loadRemoteConfig = () => {
               localState.value.isUploadConfigStatusMap[field].dirty = false
               localState.value.isUploadConfigStatusMap[field].syncTime =
                 targetSyncTime
+              // 同上，防御性设置 syncId，后续会被 updateSetting 后的 MD5 覆盖
               localState.value.isUploadConfigStatusMap[field].syncId =
                 targetSyncId
+              localState.value.isUploadConfigStatusMap[field].retryCount = 0
+              localState.value.isUploadConfigStatusMap[field].lastError = ''
+              localState.value.isUploadConfigStatusMap[field].syncStatus =
+                'idle'
             }
           }
         }
@@ -161,12 +186,31 @@ export const loadRemoteConfig = () => {
         }
         log('Load config done', pendingConfig)
         await updateSetting(pendingConfig)
+
+        // 合并后更新 syncId，防止 getUploadConfigData 过滤导致 MD5 变化、
+        // 触发多余的防抖上传（与 importSetting 的修复思路一致）。
+        for (const field of Object.keys(pendingConfig) as ConfigField[]) {
+          const status = localState.value.isUploadConfigStatusMap[field]
+          if (status) {
+            status.syncId = md5(
+              JSON.stringify(getUploadConfigData(field)),
+            ).toString()
+            status.dirty = false
+            status.loading = false
+            status.retryCount = 0
+            status.lastError = ''
+            status.syncStatus = 'idle'
+          }
+        }
+
         resolve(true)
+        gaProxy('click', ['sync', 'download'], { result: 'success' })
       } catch (e) {
         log('Process remote config error', e)
         showToast.error(
           `${window.$t('common.process')}${window.$t('common.setting')}${window.$t('common.fail')}`,
         )
+        gaProxy('click', ['sync', 'download'], { result: 'failed' })
         console.timeEnd('loadRemoteConfig')
         resolve(false)
       }
@@ -175,6 +219,8 @@ export const loadRemoteConfig = () => {
 }
 
 export const loadRemoteKeyboardConfig = async () => {
+  // 轻量版拉取：只同步 keyboardBookmark 字段，不触发全量合并。
+  // 使用 mergeState 合并默认配置，确保云端数据缺失新版本字段时能自动补全。
   try {
     const data = await chrome.storage.sync.get('naive-tab-keyboardBookmark')
     const raw = data['naive-tab-keyboardBookmark'] as string
@@ -202,7 +248,15 @@ export const loadRemoteKeyboardConfig = async () => {
     localState.value.isUploadConfigStatusMap.keyboardBookmark.syncTime =
       parsed.syncTime
     localState.value.isUploadConfigStatusMap.keyboardBookmark.dirty = false
-    localConfig.keyboardBookmark = parsed.data
+    localState.value.isUploadConfigStatusMap.keyboardBookmark.retryCount = 0
+    localState.value.isUploadConfigStatusMap.keyboardBookmark.lastError = ''
+    localState.value.isUploadConfigStatusMap.keyboardBookmark.syncStatus =
+      'idle'
+    // 使用 mergeState 合并，确保云端配置缺失新版本字段时能从默认配置中补全
+    localConfig.keyboardBookmark = mergeState(
+      defaultConfig.keyboardBookmark,
+      parsed.data,
+    ) as typeof defaultConfig.keyboardBookmark
 
     log('Load remote keyboardBookmark config: updated from cloud')
     return true

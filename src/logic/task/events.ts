@@ -6,7 +6,7 @@
  * @see docs/architecture/task.md#3-visibility-任务、#4-pagefocus-任务
  */
 
-const visibilityTasks = new Map()
+const visibilityTasks = new Map<string, (isHidden: boolean) => void>()
 
 export const addVisibilityTask = (
   key: string,
@@ -25,7 +25,7 @@ document.addEventListener('visibilitychange', () => {
   }
 })
 
-const pageFocusTasks = new Map()
+const pageFocusTasks = new Map<string, (isHidden: boolean) => void>()
 
 export const addPageFocusTask = (
   key: string,

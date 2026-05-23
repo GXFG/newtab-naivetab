@@ -1,10 +1,11 @@
 /**
  * @module shortcut/shortcut-executor
- * @description 全局快捷键 Port 连接（newtab 页面专用）—— 书签 + 命令统一处理。
+ * @description 命令快捷键 Port 连接（newtab 页面专用）。
  *   Content Script 不会注入扩展页面，所以 newtab 页面通过 addKeydownTask 注册按键处理，
- *   通过共享 Port 发送到 Service Worker。包含 newtabControlExecutors（newtab 内部控制命令）
- *   和 newtabCommandExecutors（CS 命令回传执行器）。
- *   冲突处理：单一 handler 内同时匹配书签和命令，冲突时命令优先（与 CS 端对齐）。
+ *   通过共享 Port 发送到 Service Worker。
+ *   - newtabControlExecutors：newtab 内部控制命令（toggleFocusMode/dragMode/settingDrawer），直接本地执行
+ *   - newtabCommandExecutors：CS 命令回传执行器（reloadPage/copyPageUrl/copyPageTitle），Port 回传后执行
+ *   书签由 keyboardBookmark Widget 的 keyboardTask 独立处理，通过 keydownTaskMap 的插入顺序保证命令优先。
  *   Port 消息监听还处理层切换 toast（MSG_SWITCH_BOOKMARK_LAYER），统一由 SW 下发。
  * @dependencies shortcut/port.ts（getSharedPort/isSwReady）、shortcut/matcher.ts（matchShortcut）、
  *   shortcut/shortcut-command.ts（COMMAND_SHORTCUT_CODE）、logic/task（addKeydownTask）
@@ -13,12 +14,12 @@
  * @see docs/architecture/messaging.md
  */
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
-import { toModifierMask } from '@/logic/shortcut/utils'
 import { matchShortcut } from '@/logic/shortcut/matcher'
 import { isSwReady, getSharedPort } from '@/logic/shortcut/port'
 import { localConfig, localState } from '@/logic/config/state'
 import { globalState, switchSettingDrawerVisible } from '@/logic/store/state'
-import { toggleIsDragMode } from '@/logic/moveable'
+import { gaProxy } from '@/logic/utils/gtag'
+import { toggleDragMode } from '@/logic/moveable'
 import {
   getCommandExecEnv,
   type TCommandName,
@@ -43,13 +44,21 @@ const newtabControlExecutors: Record<string, () => void> = {
       ? window.$t('rightMenu.focusMode')
       : `${window.$t('common.exit')} ${window.$t('rightMenu.focusMode')}`
     showToast.info(label)
+    gaProxy('click', ['focusMode_toggle'], {
+      enabled: next,
+      source: 'shortcut',
+    })
   },
   toggleDragMode: () => {
     switchSettingDrawerVisible(false)
-    toggleIsDragMode()
+    toggleDragMode()
   },
   toggleSettingDrawer: () => {
-    switchSettingDrawerVisible(!globalState.isSettingDrawerVisible)
+    const next = !globalState.isSettingDrawerVisible
+    switchSettingDrawerVisible(next)
+    if (next) {
+      gaProxy('click', ['setting', 'open'], { trigger: 'shortcut' })
+    }
   },
 }
 
@@ -106,25 +115,17 @@ const setupPortCommandListener = () => {
 }
 
 /**
- * newtab 页面全局快捷键统一 keydown 处理
+ * newtab 页面命令快捷键 keydown 处理。
  *
- * 同时匹配书签和命令快捷键，冲突时命令优先（与 Content Script 对齐）。
- * newtab 本地命令（execEnv: 'newtab'）直接执行，不走 SW。
+ * 仅匹配命令快捷键。书签由 keyboardTask 独立处理，
+ * 两者通过 keydownTaskMap 的插入顺序实现命令优先：
+ * setupNewtabCommandShortcut 在 App.vue script setup 顶层同步执行，
+ * 确保 globalShortcutTask 先于 keyboardTask 注册。
  */
 const globalShortcutTask = (e: KeyboardEvent) => {
-  const keyboardBookmark = localConfig.keyboardBookmark
   const keyboardCommand = localConfig.keyboardCommand
 
-  // 分别匹配书签和命令快捷键
-  const bookmarkCode = matchShortcut(
-    e,
-    keyboardBookmark.isGlobalShortcutEnabled,
-    keyboardBookmark.globalShortcutModifiers,
-    keyboardBookmark.shortcutInInputElement,
-    keyboardBookmark.urlBlacklist,
-    location.hostname,
-    keyboardBookmark.noModifierMode,
-  )
+  // 匹配命令快捷键
   const commandCode = matchShortcut(
     e,
     keyboardCommand.isEnabled,
@@ -135,33 +136,21 @@ const globalShortcutTask = (e: KeyboardEvent) => {
     keyboardCommand.noModifierMode,
   )
 
-  // 无修饰键模式下 matchShortcut 对 ALLOWED_SET 中所有键都返回 code，
-  // 但 keymap 中可能没有实际绑定。先检查是否真正存在绑定，
-  // 避免拦截页面原生的按键行为（如视频站点的方向键控制进度）。
   const hasCommandBinding =
     commandCode && keyboardCommand.keymap?.[commandCode]?.command
-  const hasBookmarkBinding =
-    bookmarkCode && localConfig.keyboardBookmark.keymap?.[bookmarkCode]?.url
+  if (!hasCommandBinding) return false
 
-  if (!hasCommandBinding && !hasBookmarkBinding) return
-
-  // 修饰键冲突检测：同修饰键掩码 或 同时开启无修饰键模式 → 命令优先
-  const bmMask = toModifierMask(keyboardBookmark.globalShortcutModifiers)
-  const cmdMask = toModifierMask(keyboardCommand.modifiers)
-  const hasModifierConflict =
-    hasBookmarkBinding &&
-    hasCommandBinding &&
-    ((bmMask === cmdMask &&
-      !keyboardBookmark.noModifierMode &&
-      !keyboardCommand.noModifierMode) ||
-      (keyboardBookmark.noModifierMode && keyboardCommand.noModifierMode))
-
-  // 命令快捷键：先处理 newtab 本地命令（直接执行，不走 SW）
+  // newtab 本地命令（execEnv: 'newtab'）直接执行，不走 SW
   if (hasCommandBinding) {
-    const entry = keyboardCommand.keymap?.[commandCode]
+    const entry = keyboardCommand.keymap[commandCode]
     if (entry?.command) {
       const execEnv = getCommandExecEnv(entry.command as TCommandName)
       if (execEnv === 'newtab') {
+        // newtab 本地命令：SW 不会收到消息，由 newtab 端上报 press
+        gaProxy('press', ['command'], {
+          key_code: commandCode,
+          command_code: entry.command,
+        })
         const executor = newtabControlExecutors[entry.command as TCommandName]
         if (executor) {
           executor()
@@ -169,37 +158,35 @@ const globalShortcutTask = (e: KeyboardEvent) => {
           e.stopPropagation()
           return true
         }
+        // executor 不存在说明 execEnv 声明与实际实现不一致，
+        // fall through 到 SW 路径（SW 可能也不认识该命令，但不会崩溃）。
       }
     }
   }
 
-  // SW 就绪检查：有需要发送到 SW 的消息时才检查
-  if ((hasCommandBinding || hasBookmarkBinding) && !isSwReady()) {
+  // SW 就绪检查：isSwReady 反映"Port 是否已连接且收到过 INIT_COMPLETE"。
+  //
+  // newtab 端只有 Port 一条路径，不使用 sendMessage 降级。原因：
+  // 1. Port 断连后 scheduleReconnect 使用指数退避（100ms~1000ms）自动重连，窗口期极短
+  // 2. connect() 调用本身就会唤醒休眠的 SW
+  // 3. 用户打开 newtab 页面时会立即建立 Port 连接，实际场景中 Port 断开的窗口期几乎不存在
+  // 4. toast 提示比静默等待 50-200ms 更直接
+  // CS 端使用 sendMessage 降级是因为注入到第三方网页，容错要求更高。
+  if (!isSwReady()) {
     showToast.warning(window.$t('common.swInitializing'))
     return false
   }
 
-  // 通过共享 Port 发送按键事件到 SW
+  // 通过共享 Port 发送命令到 SW
   let sent = false
   try {
     const port = getSharedPort()
-    // 命令优先：冲突时只发命令，书签被跳过
-    if (hasCommandBinding) {
-      port.postMessage({
-        type: MSG_KEYDOWN,
-        key: commandCode,
-        source: 'command',
-      })
-      sent = true
-    }
-    if (hasBookmarkBinding && !hasModifierConflict) {
-      port.postMessage({
-        type: MSG_KEYDOWN,
-        key: bookmarkCode,
-        source: 'bookmark',
-      })
-      sent = true
-    }
+    port.postMessage({
+      type: MSG_KEYDOWN,
+      key: commandCode,
+      source: 'command',
+    })
+    sent = true
   } catch {
     return false
   }
@@ -213,20 +200,20 @@ const globalShortcutTask = (e: KeyboardEvent) => {
 }
 
 /**
- * 在 newtab 中启用全局快捷键监听（书签 + 命令统一处理）
+ * 在 newtab 中启用命令快捷键监听
  */
-export const setupNewtabGlobalShortcut = () => {
+export const setupNewtabCommandShortcut = () => {
   addKeydownTask('globalShortcut', globalShortcutTask)
   setupPortCommandListener()
 }
 
 /**
- * 在 newtab 中移除全局快捷键监听
+ * 在 newtab 中移除命令快捷键监听
  *
  * 注意：浏览器新标签页关闭时不会触发 Vue onUnmounted，整个 JS 环境直接销毁，
  * 此函数在实际运行中几乎不会被调用。仅在开发 HMR / 扩展热重载时生效。
  * 属于防御性清理代码，无害。
  */
-export const cleanupNewtabGlobalShortcut = () => {
+export const cleanupNewtabCommandShortcut = () => {
   removeKeydownTask('globalShortcut')
 }

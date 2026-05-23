@@ -240,24 +240,19 @@ export const defaultConfig = {
   ...widgetsDefaultConfig,
 }
 
-export const defaultUploadStatusItem = {
+export const defaultUploadStatusItem: UploadStatusItem = {
   loading: false,
   syncTime: 0,
   syncId: '',
   localModifiedTime: 0,
   dirty: false,
+  retryCount: 0,
+  lastError: '',
+  syncStatus: 'idle',
 }
 
 const genUploadConfigStatusMap = () => {
-  const statusMap = {} as {
-    [key in ConfigField]: {
-      loading: boolean
-      syncTime: number
-      syncId: string
-      localModifiedTime: number
-      dirty: boolean
-    }
-  }
+  const statusMap = {} as { [key in ConfigField]: UploadStatusItem }
   for (const widget in defaultConfig) {
     statusMap[widget as ConfigField] = { ...defaultUploadStatusItem }
   }

@@ -35,6 +35,7 @@ import { toModifierMask, type TShortcutModifier } from '@/logic/shortcut/utils'
 import { parseStoredData } from '@/logic/config/compress'
 import { SYSTEM_KEYMAP_STORAGE_KEY } from '@/logic/keyboard/keyboard-constants'
 import { padUrlHttps } from '@/logic/utils/common'
+import { registerGlobalErrorHandler } from '@/logic/utils/errorHandler'
 import {
   REPEATABLE_SCROLL_COMMANDS,
   type TCommandEntry,
@@ -281,7 +282,7 @@ const initMain = () => {
         updateConfig({
           isEnabled: false,
           globalShortcutModifiers: [],
-          shortcutInInputElement: false,
+          shortcutInInputElement: true,
           keymap: {},
           urlBlacklist: [],
           noModifierMode: false,
@@ -314,7 +315,7 @@ const initMain = () => {
         updateCommandConfig({
           isEnabled: false,
           modifiers: [],
-          shortcutInInputElement: false,
+          shortcutInInputElement: true,
           keymap: {},
           urlBlacklist: [],
           noModifierMode: false,
@@ -715,6 +716,9 @@ const initMain = () => {
       connectPort()
     }
   })
+
+  // ── 错误捕获 ────────────────────────────────────────────────────────────
+  registerGlobalErrorHandler('content-script')
 }
 
 initMain()

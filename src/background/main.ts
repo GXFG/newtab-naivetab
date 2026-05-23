@@ -20,6 +20,10 @@ import {
 import { initLayerToast } from './messaging/toast'
 import { execSwCommand } from './commands/registry'
 import { registerRecentTab } from './commands/handlers'
+import { registerSWErrorHandler } from '@/logic/utils/errorHandler'
+
+// ── Service Worker 错误处理（最先注册，捕获后续所有异常）───────────────────
+registerSWErrorHandler('service-worker')
 
 // ── Service Worker 启动时初始化缓存 ────────────────────────────────────────
 // 使用 waitInitialized 确保两个配置都加载完成，后续 onConnect 可据此守卫

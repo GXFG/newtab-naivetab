@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { localConfig, localState } from '@/logic/config/state'
 import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
 import { widgetsRegistry } from '@/newtab/widgets/registry'
@@ -8,12 +8,23 @@ import { WIDGET_GROUPS } from '@/common/widget-constants'
 import { SettingHeaderBar, SettingFormSection } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
 import { ICONS } from '@/logic/constants/icons'
+import { gaProxy } from '@/logic/utils/gtag'
 
 const widgetGroups = computed(() =>
   WIDGET_GROUPS.map((group) => ({
     label: window.$t(group.labelKey),
     items: group.codes.map((code) => widgetsRegistry[code]).filter(Boolean),
   })),
+)
+
+watch(
+  () => localState.value.isFocusMode,
+  (val) => {
+    gaProxy('click', ['focusMode_toggle'], {
+      enabled: val,
+      source: 'setting',
+    })
+  },
 )
 
 // 将主题色替换 alpha 通道，生成半透明版本

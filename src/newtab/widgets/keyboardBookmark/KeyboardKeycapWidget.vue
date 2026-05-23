@@ -76,10 +76,10 @@ const onMouseDownKey = (event: MouseEvent, keyCode: string) => {
     // 按下鼠标左键
     keyboardState.currSelectKeyCode = keyCode
     // shift + 点击key后台打开书签，alt + key 新标签页打开
-    openPage(url, shiftKey, altKey)
+    openPage(url, shiftKey, altKey, keyCode)
   } else if (button === 1) {
     // 按下鼠标中键
-    openPage(url, true)
+    openPage(url, true, false, keyCode)
   }
 }
 

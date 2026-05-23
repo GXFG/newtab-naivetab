@@ -2,12 +2,17 @@
  * @module moveable
  * @description 拖拽定位与编辑布局系统 — Widget 拖拽、辅助线、删除动画、窗口 resize 监听。
  * @dependencies constants/app.ts（DRAG_TRIGGER_DISTANCE）、config/state.ts（localConfig）、store/state.ts（globalState）
- * @consumers WidgetWrap.vue（注册 mousedown/mousemove/mouseup 任务）、Content.vue（isDragMode 入口）
+ * @consumers WidgetWrap.vue（注册 mousedown/mousemove/mouseup 任务）、Content.vue（isDragMode 入口）、
+ *   RightClickMenu.vue / DraftDrawer.vue / shortcut-executor.ts（通过 toggleDragMode 进入拖拽模式）
  * @pitfalls
  *   - moveState.mouseDownTaskMap 等是 Map 结构，WidgetWrap 在 onMounted 时注册，onUnmounted 时注销
- *   - handleMousemove 使用 requestAnimationFrame 节流，坐标通过代理对象传入（clientX/clientY/buttons），避免 event 对象被复用
+ *   - handleMousemove 使用 requestAnimationFrame 节流，坐标和 currMouseTaskKey 必须在同步上下文中捕获，
+ *     避免 rAF 回调中被后续 mousedown 修改（竞态：拖动 A 释放后快速点击 B）
+ *   - handleMousedown 是 async 函数，但不会与 mousemove 产生竞态：浏览器事件串行派发，
+ *     await 完成前不会派发下一个鼠标事件（详见 docs/architecture/moveable.md）
  *   - window.innerWidth 用 ResizeObserver 缓存而非直接读取，避免频繁重排（性能提升 ~30%）
  *   - 删除动画（animateDeleteWidget）使用 transform: scale(0.3) + opacity: 0，动画结束后才设置 enabled=false
+ *   - toggleDragMode 是统一入口（含 GA 上报），右键/快捷键/ESC 应调用此函数而非 toggleIsDragMode
  * @see docs/architecture/moveable.md
  */
 import { useToggle, useThrottleFn } from '@vueuse/core'
@@ -16,6 +21,23 @@ import { localConfig } from '@/logic/config/state'
 import { globalState } from '@/logic/store/state'
 
 export const [isDragMode, toggleIsDragMode] = useToggle(false)
+
+/**
+ * 包装版 toggle，统一上报拖拽模式切换事件。
+ * 快捷键和右键菜单应调用此函数而非直接调用 toggleIsDragMode。
+ */
+export const toggleDragMode = (nextValue?: boolean) => {
+  // useToggle 的 toggle 函数通过 arguments.length 判断是切换还是赋值：
+  // toggle() → 切换值；toggle(v) → 赋值为 v
+  // 如果传 undefined 但 arguments.length 为 1，会被当作赋值而非切换
+  if (nextValue === undefined) {
+    toggleIsDragMode()
+  } else {
+    toggleIsDragMode(nextValue)
+  }
+  gaProxy('click', ['dragMode_toggle'], { enabled: isDragMode.value })
+}
+
 export const [isDraftDrawerVisible, toggleIsDraftDrawerVisible] =
   useToggle(true)
 
@@ -115,6 +137,10 @@ const handleMousedown = async (e: MouseEvent) => {
   }
   const task = moveState.mouseDownTaskMap.get(currMouseTaskKey.value)
   if (task) {
+    // async handler + await 不会阻塞浏览器派发后续 mousemove 事件，
+    // 因为浏览器的事件模型是串行派发：当前事件的所有监听器（含 async Promise）
+    // resolve 之前，不会派发下一个鼠标事件。
+    // 且用户从按下鼠标到产生位移至少需要几十毫秒，远超 await nextTick() 的执行时间。
     await task(e)
   }
 }
@@ -134,17 +160,21 @@ const handleMousemove = (e: MouseEvent) => {
     cancelAnimationFrame(lastFrameId)
   }
 
-  // 捕获当前事件坐标，避免 rAF 回调时 event 对象已更新
+  // 捕获当前事件坐标和目标，避免 rAF 回调中被后续 mousedown 修改。
+  // 竞态场景：拖动 A 释放后快速点击 B，A 的最后一个 mousemove 已提交 rAF 回调但尚未执行。
+  // 如果不在此处捕获 currMouseTaskKey，rAF 回调执行时会读到已被 mousedown(B) 修改的值，
+  // 导致用 A 的坐标调 B.onDragging() → A 跑到 B 的位置。
   const clientX = e.clientX
   const clientY = e.clientY
   const buttons = e.buttons
+  const currTaskKey = currMouseTaskKey.value
 
   lastFrameId = requestAnimationFrame(() => {
     lastFrameId = null
     if (!isDragMode.value || buttons === 0 || !moveState.currDragTarget.type) {
       return
     }
-    const task = moveState.mouseMoveTaskMap.get(currMouseTaskKey.value)
+    const task = moveState.mouseMoveTaskMap.get(currTaskKey)
     if (task) {
       // 构造一个轻量代理对象，避免重新创建完整 MouseEvent
       task({ clientX, clientY, buttons } as MouseEvent)
@@ -183,6 +213,7 @@ const handleMouseup = (e: MouseEvent) => {
     animateDeleteWidget(moveState.currDragTarget.code as WidgetCodes)
     gaProxy('delete', ['widget', moveState.currDragTarget.code], {
       enabled: false,
+      source: 'drag',
     })
     moveState.isWidgetStartDrag = false
     moveState.currDragTarget.type = ''
@@ -284,10 +315,16 @@ const handleUpdateWindowSize = useThrottleFn(() => {
 }, 100)
 
 // 使用ResizeObserver代替window.resize事件，性能更好
+// 用 requestAnimationFrame 包装避免 "undelivered notifications" 警告，
+// 确保布局计算在下一帧执行，不会与当前渲染冲突
 let resizeObserver: ResizeObserver | null = null
 
 if (typeof ResizeObserver !== 'undefined') {
-  resizeObserver = new ResizeObserver(handleUpdateWindowSize)
+  resizeObserver = new ResizeObserver(() => {
+    requestAnimationFrame(() => {
+      handleUpdateWindowSize()
+    })
+  })
   resizeObserver.observe(document.documentElement)
 } else {
   // 降级方案

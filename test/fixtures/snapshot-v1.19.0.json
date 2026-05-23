@@ -1,0 +1,68 @@
+{
+  "_description": "v1.19.0 老用户配置：键盘书签配置未拆分，包含用户自定义书签和颜色",
+  "_version": "1.19.0",
+  "_captureDate": "2026-05",
+  "general": {
+    "version": "1.19.0",
+    "lang": "zh-CN",
+    "appearance": "auto",
+    "pageTitle": "新标签页",
+    "fontFamily": "Arial",
+    "fontSize": 14,
+    "fontColor": ["rgba(44, 62, 80, 1)", "rgba(255, 255, 255, 1)"],
+    "primaryColor": ["rgba(58, 115, 195, 1)", "rgba(100, 160, 230, 1)"],
+    "openPageFocusElement": "bookmarkKeyboard",
+    "focusVisibleWidgetMap": {
+      "search": true,
+      "keyboard": true,
+      "clockDigital": true,
+      "date": true
+    }
+  },
+  "bookmark": {
+    "keymap": {
+      "KeyA": { "url": "https://github.com", "title": "GitHub" },
+      "KeyB": { "url": "https://google.com", "title": "Google" },
+      "Digit1": { "url": "https://mail.google.com", "title": "Gmail" }
+    },
+    "keyboardType": "key61",
+    "keycapType": "gmk",
+    "mainFontColor": ["rgba(0, 0, 0, 1)", "rgba(255, 255, 255, 1)"],
+    "isShellVisible": true,
+    "shellColor": ["rgba(225, 219, 209, 1.0)", "rgba(51,65,85,1.0)"]
+  },
+  "commandShortcut": {
+    "keymap": {
+      "KeyQ": { "command": "moveTabLeft" },
+      "KeyE": { "command": "moveTabRight" },
+      "KeyX": { "command": "closeTab" }
+    },
+    "isEnabled": true
+  },
+  "search": {
+    "isNewTabOpen": true,
+    "backgroundBlur": 5
+  },
+  "clockDigital": {
+    "fontSize": 32,
+    "letterSpacing": 2
+  },
+  "calendar": {
+    "festivalCountdown": false,
+    "dayFontFamily": "Arial",
+    "descFontFamily": "Arial"
+  },
+  "memo": {
+    "enabled": true,
+    "fontFamily": "Arial"
+  },
+  "yearProgress": {
+    "enabled": false
+  },
+  "clockFlip": {
+    "enabled": true
+  },
+  "news": {
+    "enabled": false
+  }
+}

@@ -2,10 +2,12 @@
  * @module config/sync/state
  * @description 同步状态（computed/reactive）与跨上下文监听器。
  *   保持同一 Chrome Profile 下 newtab ↔ popup ↔ options 之间的配置同步：
- *   - setupKeyboardSyncListener：popup 修改书签后通过 chrome.storage.onChanged 通知 newtab
+ *   - setupKeyboardSyncListener：popup 修改 keyboardBookmark/keyboardCommand 后通过 chrome.storage.onChanged 通知 newtab
  *   - setupLocalStorageSyncListener：options 和 newtab 同设备内通过 localStorage storage 事件同步
- * @dependencies config/merge.ts（mergeState）、config/compress.ts（parseStoredData）、config/state.ts
+ * @dependencies config/merge.ts（mergeState）、config/compress.ts（parseStoredData）、config/state.ts、
+ *   config/sync/upload.ts（isPendingWrite 预期写入注册表）
  * @consumers config/sync/loader.ts（setupPageConfigSync 中调用）、newtab/App.vue
+ *   同步 keyboardBookmark 和 keyboardCommand 配置，确保 popup/CS/newtab 间配置一致
  * @see docs/architecture/storage.md#跨上下文同步
  */
 import { computed, reactive } from 'vue'
@@ -13,6 +15,7 @@ import { log } from '@/logic/utils/common'
 import { localConfig, localState } from '@/logic/config/state'
 import { mergeState } from '@/logic/config/merge'
 import { parseStoredData } from '@/logic/config/compress'
+import { isPendingWrite } from './pending-writes'
 
 export const isUploadConfigLoading = computed(() => {
   if (
@@ -56,47 +59,75 @@ export const lastSyncTime = computed(() => {
 /**
  * 各 field 在 chrome.storage.sync 中的实际占用字节数（通过 getBytesInUse 获取）
  * key: ConfigField, value: bytes
+ * 注意：此映射仅用于 UI 展示（setting 面板显示云同步占用），不用于任何逻辑判断。
+ * loadRemoteConfig 中异步更新时可能与 upload.ts 中同步写入短暂不一致，不影响功能。
  */
 export const configSizeMap = reactive<Record<string, number>>({})
 
+const SYNC_FIELD_KEYS = ['keyboardBookmark', 'keyboardCommand'] as const
+type SyncField = (typeof SYNC_FIELD_KEYS)[number]
+const SYNC_KEY_MAP: Record<SyncField, string> = {
+  keyboardBookmark: 'naive-tab-keyboardBookmark',
+  keyboardCommand: 'naive-tab-keyboardCommand',
+}
+
 /**
- * 监听 popup 修改 keyboardBookmark → 自动同步到 newtab 的 localConfig
+ * 监听 popup 修改配置 → 自动同步到 other context 的 localConfig
  *
  * chrome.storage.onChanged 在 popup 调用 flushConfigSync 写入后触发。
  * parseStoredData 自动处理 gzip 压缩数据。
- * 通过 syncId 比对避免本地修改后又触发 onChanged 形成循环更新。
+ * 双重防护：先检查 pendingWrites（自身发起的写入），再检查 syncId 守卫（兜底）。
  */
+const syncConfigFromOnChange = (
+  changes: chrome.storage.StorageChange,
+  field: SyncField,
+) => {
+  const key = SYNC_KEY_MAP[field]
+  const change = changes[key]
+  if (!change) return
+
+  const raw = change.newValue as string
+  if (!raw || raw.length === 0) return
+
+  return parseStoredData(raw)
+    .then((parsed: SyncPayload) => {
+      const newSyncId = parsed.syncId
+
+      // 第一道防线：pendingWrites 预期写入注册表
+      // 命中说明是当前页面发起的 chrome.storage.sync.set 写入，直接跳过
+      if (isPendingWrite(newSyncId)) {
+        log(`Sync ${field} skipped (pending write)`)
+        return
+      }
+
+      // 第二道防线：syncId 兜底（popup 等其他上下文写入的场景）
+      const currSyncId = localState.value.isUploadConfigStatusMap[field]?.syncId
+
+      if (newSyncId === currSyncId) {
+        log(`Sync ${field} skipped (same syncId)`)
+        return
+      }
+
+      localState.value.isUploadConfigStatusMap[field].syncId = newSyncId
+      localState.value.isUploadConfigStatusMap[field].syncTime = parsed.syncTime
+      localState.value.isUploadConfigStatusMap[field].dirty = false
+      localState.value.isUploadConfigStatusMap[field].retryCount = 0
+      localState.value.isUploadConfigStatusMap[field].lastError = ''
+      localState.value.isUploadConfigStatusMap[field].syncStatus = 'idle'
+
+      localConfig[field] = parsed.data
+      log(`Sync ${field} updated from storage.onChanged`)
+    })
+    .catch((e) => {
+      log(`Sync ${field} parse error`, e)
+    })
+}
+
 export const setupKeyboardSyncListener = () => {
   chrome.storage.onChanged.addListener((changes) => {
-    const key = 'naive-tab-keyboardBookmark'
-    if (!changes[key]) return
-
-    const raw = changes[key].newValue as string
-    if (!raw || raw.length === 0) return
-
-    return parseStoredData(raw)
-      .then((parsed: SyncPayload) => {
-        const newSyncId = parsed.syncId
-        const currSyncId =
-          localState.value.isUploadConfigStatusMap.keyboardBookmark?.syncId
-
-        if (newSyncId === currSyncId) {
-          log('Sync keyboardBookmark skipped (same syncId)')
-          return
-        }
-
-        localState.value.isUploadConfigStatusMap.keyboardBookmark.syncId =
-          newSyncId
-        localState.value.isUploadConfigStatusMap.keyboardBookmark.syncTime =
-          parsed.syncTime
-        localState.value.isUploadConfigStatusMap.keyboardBookmark.dirty = false
-
-        localConfig.keyboardBookmark = parsed.data
-        log('Sync keyboardBookmark updated from storage.onChanged')
-      })
-      .catch((e) => {
-        log('Sync keyboardBookmark parse error', e)
-      })
+    for (const field of SYNC_FIELD_KEYS) {
+      syncConfigFromOnChange(changes, field)
+    }
   })
 }
 
@@ -111,6 +142,9 @@ export const setupLocalStorageSyncListener = () => {
     const newConfig = JSON.parse(e.newValue)
     const field = e.key === 'l-state' ? 'state' : e.key.replace('c-', '')
     if (field !== 'state' && localConfig[field]) {
+      // 注意：使用 JSON.stringify 比较存在 key 顺序不同的误判可能，最坏情况是多
+      // 执行一次 mergeState（不会导致数据错误，mergeState 以默认配置为模板会产出
+      // 相同结果）。如果未来发现频繁不必要的 merge，可替换为深比较函数。
       if (JSON.stringify(localConfig[field]) === JSON.stringify(newConfig)) {
         return
       }
