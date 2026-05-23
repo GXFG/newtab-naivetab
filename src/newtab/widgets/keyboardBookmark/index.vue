@@ -24,7 +24,7 @@ const isRender = getIsWidgetRender(WIDGET_CODE)
 /**
  * 键盘书签 keydown 处理，作为命令快捷键的兜底处理书签。
  * 使用 matchShortcut 统一匹配（自动处理 isInInputElement、urlBlacklist、e.repeat）。
- * globalShortcutTask 先注册先执行处理命令，本 task 后执行处理书签（命令优先）。
+ * 通过 task 显式优先级保证命令(0)先于书签(10)执行。
  *
  * keyboardCurrentModelAllKeyList 前置过滤：限定只有当前键盘布局中"可见"的键才能
  * 触发书签快捷键。这是有意设计——newtab 页面有可视化键盘 UI，快捷键行为应与 UI 展示
@@ -71,7 +71,7 @@ watch(
       removeKeydownTask(WIDGET_CODE)
       return
     }
-    addKeydownTask(WIDGET_CODE, keyboardTask)
+    addKeydownTask(WIDGET_CODE, keyboardTask, 10)
   },
   { immediate: true },
 )

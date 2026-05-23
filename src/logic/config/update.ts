@@ -1,8 +1,9 @@
 /**
  * @module update
  * @description 配置更新与版本迁移。updateSetting 合并配置，handleAppUpdate 处理跨版本数据结构迁移。
- * @dependencies config/merge.ts（mergeState）、config/version.ts（版本比较）、config/defaults.ts（默认值）
- * @consumers config/sync/loader.ts（拉取后调用 updateSetting）、SW init-guard（启动时 handleAppUpdate）
+ * @dependencies config/merge.ts（mergeState）、config/version.ts（版本比较）、config/defaults.ts（默认值）、
+ *   store/state.ts（globalState）— handleAppUpdate 作为顶层编排器需要控制 changelog 弹窗等 UI 状态，
+ *   globalState 在此充当跨层共享状态总线，非纯配置工具依赖 UI 层
  * @pitfalls
  *   - handleAppUpdate 使用 if 而非 if-else，确保跨越多个版本的旧用户能依次执行所有迁移
  *   - 末尾的 updateSetting() 是异步执行（不 await），整理配置结构但不阻塞首屏渲染

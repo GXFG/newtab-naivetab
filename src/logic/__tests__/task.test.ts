@@ -44,7 +44,7 @@ describe('keydown task system', () => {
 
   it('registers and removes keydown tasks', () => {
     const fn = vi.fn()
-    addKeydownTask('test-task' as any, fn)
+    addKeydownTask('test-task' as any, fn, 0)
     // Task is registered (no error thrown)
     removeKeydownTask('test-task' as any)
     // Task is removed (no error thrown)
@@ -53,8 +53,8 @@ describe('keydown task system', () => {
   it('calls registered tasks when key is pressed', () => {
     const fn1 = vi.fn()
     const fn2 = vi.fn()
-    addKeydownTask('task1' as any, fn1)
-    addKeydownTask('task2' as any, fn2)
+    addKeydownTask('task1' as any, fn1, 0)
+    addKeydownTask('task2' as any, fn2, 0)
     startKeydown()
 
     const event = new KeyboardEvent('keydown', { code: 'KeyA' })
@@ -71,8 +71,8 @@ describe('keydown task system', () => {
   it('stops further tasks when a task returns true', () => {
     const fn1 = vi.fn().mockReturnValue(true)
     const fn2 = vi.fn()
-    addKeydownTask('task1' as any, fn1)
-    addKeydownTask('task2' as any, fn2)
+    addKeydownTask('task1' as any, fn1, 0)
+    addKeydownTask('task2' as any, fn2, 0)
     startKeydown()
 
     const event = new KeyboardEvent('keydown', { code: 'KeyA' })
@@ -103,7 +103,7 @@ describe('keydown task system', () => {
 
     const task = await import('@/logic/task')
     const fn = vi.fn()
-    task.addKeydownTask('guide-test' as any, fn)
+    task.addKeydownTask('guide-test' as any, fn, 0)
     task.startKeydown()
 
     const event = new KeyboardEvent('keydown', { code: 'KeyA' })
@@ -134,7 +134,7 @@ describe('keydown task system', () => {
 
     const task = await import('@/logic/task')
     const fn = vi.fn()
-    task.addKeydownTask('drawer-test' as any, fn)
+    task.addKeydownTask('drawer-test' as any, fn, 0)
     task.startKeydown()
 
     // Escape triggers closeSettingDrawer (no sub-drawer)
@@ -167,7 +167,7 @@ describe('keydown task system', () => {
 
     const task = await import('@/logic/task')
     const fn = vi.fn()
-    task.addKeydownTask('drawer-test' as any, fn)
+    task.addKeydownTask('drawer-test' as any, fn, 0)
     task.startKeydown()
 
     // Escape triggers closeTopDrawer (sub-drawer open)
@@ -200,7 +200,7 @@ describe('keydown task system', () => {
 
     const task = await import('@/logic/task')
     const fn = vi.fn()
-    task.addKeydownTask('drawer-test' as any, fn)
+    task.addKeydownTask('drawer-test' as any, fn, 0)
     task.startKeydown()
 
     // Regular key still triggers keydown tasks

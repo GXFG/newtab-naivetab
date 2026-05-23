@@ -26,11 +26,13 @@
 ## 1. Keydown 任务
 
 ```ts
-addKeydownTask(key: KeydownTaskKey, task: (e: KeyboardEvent) => boolean | void)
+addKeydownTask(key: KeydownTaskKey, task: (e: KeyboardEvent) => boolean | void, priority: TaskPriority)
 removeKeydownTask(key: KeydownTaskKey)
 startKeydown()   // 注册 document.onkeydown
 stopKeydown()    // 注销 document.onkeydown
 ```
+
+`TaskPriority` 类型：`0 | 10 | 20 | 30`（数字越小越优先）。
 
 ### 返回值约定
 
@@ -39,7 +41,16 @@ stopKeydown()    // 注销 document.onkeydown
 
 ### 执行顺序
 
-`startKeydown` 遍历 `keydownTaskMap.values()`，按注册顺序执行。防冲突由各 task 内部修饰键过滤保证：
+`startKeydown` 按 **优先级升序** 遍历 task（同优先级按 Map 注册顺序）。当前分配：
+
+| Priority | Task | 说明 |
+|----------|------|------|
+| 0 | `globalShortcut` | 命令快捷键，最高优先 |
+| 10 | `keyboardBookmark` | 书签键盘 |
+| 20 | `bookmarkFolder` | 书签文件夹导航（仅 Escape） |
+| 30 | `draft-tool` | 草稿工具（仅 Escape） |
+
+防冲突由各 task 内部修饰键过滤保证：
 
 | Task | 过滤规则 |
 |------|---------|
@@ -145,7 +156,7 @@ onPageFocus()   // 手动触发，由 App.vue 调用
 
 | 模块 | Map 类型 | key 类型 |
 |------|---------|---------|
-| keydown | `Map<KeydownTaskKey, (e: KeyboardEvent) => boolean \| void>` | 字面量联合类型 |
+| keydown | `Map<KeydownTaskKey, { task, priority }>` | 字面量联合类型 + 优先级 |
 | timer | `Map<string, () => void>` | string |
 | visibility | `Map<string, (isHidden: boolean) => void>` | string |
 | pageFocus | `Map<string, (isHidden: boolean) => void>` | string |

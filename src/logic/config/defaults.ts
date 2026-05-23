@@ -87,14 +87,6 @@ const generalConfig = {
     networkSourceType: (typeof IMAGE_NETWORK_SOURCE)[keyof typeof IMAGE_NETWORK_SOURCE]
     name: string
   }[],
-  layout: {
-    xOffsetKey: 'right',
-    xOffsetValue: 1,
-    xTranslateValue: 0,
-    yOffsetKey: 'top',
-    yOffsetValue: 50,
-    yTranslateValue: -50,
-  },
   fontFamily: 'system',
   fontSize: 14,
   fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],

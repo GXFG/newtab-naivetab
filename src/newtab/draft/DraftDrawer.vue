@@ -135,7 +135,7 @@ onMounted(() => {
   moveState.mouseDownTaskMap.set('draft-common', handleDraftMouseDown)
   moveState.mouseMoveTaskMap.set('draft-common', handleDraftMouseMove)
   moveState.mouseUpTaskMap.set('draft-common', handleDraftMouseUp)
-  addKeydownTask('draft-tool', keyboardHandler)
+  addKeydownTask('draft-tool', keyboardHandler, 30)
 })
 
 onUnmounted(() => {

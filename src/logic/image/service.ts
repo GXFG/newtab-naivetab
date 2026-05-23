@@ -311,7 +311,11 @@ const decodeAndApplyImage = (
         safeSetFirstScreen(smallBase64)
       }
       isImageLoading.value = false
-      console.log(`RenderRawImage: ${(performance.now() - start).toFixed(2)}ms`)
+      if (__DEV__) {
+        console.log(
+          `RenderRawImage: ${(performance.now() - start).toFixed(2)}ms`,
+        )
+      }
     })
     .catch(() => {
       if (pendingAppearanceCode !== targetAppearanceCode) {

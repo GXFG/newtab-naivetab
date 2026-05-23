@@ -1,70 +1,64 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { globalState } from '@/logic/store/state'
+import { customPrimaryColor } from '@/logic/store/style'
+import { localState } from '@/logic/config/state'
 import { gaProxy } from '@/logic/utils/gtag'
 import { settingsList, SETTING_GROUPS } from './registry'
 
 const props = withDefaults(
   defineProps<{
-    /** 'drawer': NDrawer 容器内，需同步 nav 高度；'page': 全屏页面，自然流动 */
+    /** 'drawer': NDrawer 容器内；'page': 全屏页面 */
     layout?: 'drawer' | 'page'
-    /** drawer 模式下由父组件传入的内容区高度 */
-    settingContentHeight?: number
   }>(),
   {
     layout: 'drawer',
-    settingContentHeight: 0,
   },
 )
 
-const settingContentHeightStyle = computed(
-  () => `${props.settingContentHeight}px`,
-)
-
-const cssVars = computed(() => ({
-  '--nt-setting-content-height': settingContentHeightStyle.value,
-}))
-
 const isDrawer = computed(() => props.layout === 'drawer')
-
 const tabPaneList = computed(() => settingsList)
 
-const onTabsChange = (tabCode: string) => {
-  globalState.currSettingTabCode = tabCode
-  if (tabCode.startsWith('keyboard')) {
-    gaProxy('view', ['keyboard_setting'], { tab: tabCode })
+/** 当前激活的面板组件（按需加载，替代 v-for+v-show 的全量渲染） */
+const activeComponent = computed(() => {
+  const code = globalState.currSettingTabCode
+  return settingsList.find((item) => item.code === code)?.component
+})
+
+/**
+ * 注入 CSS 变量，替代不可靠的 Naive UI --n-* 变量。
+ * Naive UI 通过 teleport 渲染 Drawer 时 --n-* 变量可能不存在或拿到错误值，
+ * 因此 nav 背景和 divider 文字背景使用项目自己的 token，确保 drawer/page 双模式一致。
+ */
+const cssVars = computed(() => ({
+  '--nt-primary-color': customPrimaryColor.value,
+  '--nt-setting-nav-bg':
+    localState.value.currAppearanceCode === 0 ? '#fff' : 'rgb(24, 24, 28)',
+}))
+
+const contentRef = ref<HTMLElement | null>(null)
+
+const onTabClick = (code: string) => {
+  globalState.currSettingTabCode = code
+  contentRef.value?.scrollTo({ top: 0, behavior: 'instant' })
+  if (code.startsWith('keyboard')) {
+    gaProxy('view', ['keyboard_setting'], { tab: code })
   }
 }
 
 // ── 分组逻辑 ──
 // SETTING_GROUPS 定义了 5 个分组（global / keyboardAndBookmark / timeAndDate / tool / other）。
-// NTabs 的左侧 nav 中，从第二个分组开始，其首个 tab 上方显示分组标题分隔线。
-// groupStartSet 用于给 tab 添加 CSS class，groupWithFirstItem 提供对应的 labelKey。
-const groupsWithFirstItem = computed(() => {
-  const result: Array<{ firstCode: settingPanes; labelKey: string }> = []
+// 从第二个分组开始，其首个 tab 上方显示分组标题分隔线。
+// groupLabelMap: firstCode → labelKey，同时作为该 code 是否为分组首项的判断依据。
+const groupLabelMap = computed(() => {
+  const map = new Map<settingPanes, string>()
   SETTING_GROUPS.forEach((group, index) => {
     if (index > 0 && group.items.length > 0) {
-      result.push({
-        firstCode: group.items[0].code,
-        labelKey: group.labelKey,
-      })
+      map.set(group.items[0].code, group.labelKey)
     }
   })
-  return result
+  return map
 })
-
-const groupStartSet = computed(() => {
-  const set = new Set<settingPanes>()
-  groupsWithFirstItem.value.forEach((item) => set.add(item.firstCode))
-  return set
-})
-
-const getGroupLabel = (code: settingPanes): string => {
-  return (
-    groupsWithFirstItem.value.find((item) => item.firstCode === code)
-      ?.labelKey || ''
-  )
-}
 </script>
 
 <template>
@@ -73,126 +67,154 @@ const getGroupLabel = (code: settingPanes): string => {
     class="setting-tabs"
     :style="cssVars"
   >
-    <NTabs
-      type="line"
-      :value="globalState.currSettingTabCode"
-      placement="left"
-      animated
-      @update:value="onTabsChange"
-    >
-      <NTabPane
+    <!-- 左侧 nav -->
+    <div class="setting-tabs__nav">
+      <div
         v-for="item of tabPaneList"
         :key="item.code"
-        :name="item.code"
-        :tab="$t(item.labelKey || '')"
+        class="setting-tabs__nav-item"
+        :class="{
+          'setting-tabs__nav-item--active':
+            globalState.currSettingTabCode === item.code,
+          'setting-tabs__nav-item--group-start': groupLabelMap.has(item.code),
+        }"
+        @click="onTabClick(item.code)"
       >
-        <template #tab>
-          <div
-            class="tab__title"
-            :class="{ 'tab__title--group-start': groupStartSet.has(item.code) }"
-          >
-            <template v-if="groupStartSet.has(item.code)">
-              <div class="group-divider">
-                <span class="group-divider__text">{{
-                  $t(getGroupLabel(item.code))
-                }}</span>
-              </div>
-            </template>
-            <div
-              class="title__icon"
-              :style="`font-size: ${item.iconSize}px`"
-            >
-              <Icon :icon="item.iconName" />
-            </div>
-            <span class="title__text">{{ $t(item.labelKey || '') }}</span>
+        <template v-if="groupLabelMap.has(item.code)">
+          <div class="group-divider">
+            <span class="group-divider__text">{{
+              $t(groupLabelMap.get(item.code)!)
+            }}</span>
           </div>
         </template>
+        <div
+          class="nav-item__icon"
+          :style="`font-size: ${item.iconSize}px`"
+        >
+          <Icon :icon="item.iconName" />
+        </div>
+        <span class="nav-item__text">{{ $t(item.labelKey || '') }}</span>
+      </div>
+    </div>
 
-        <template #default>
-          <component :is="item.component" />
-        </template>
-      </NTabPane>
-    </NTabs>
+    <!-- 右侧内容区 -->
+    <div
+      ref="contentRef"
+      class="setting-tabs__content"
+    >
+      <KeepAlive>
+        <div :key="globalState.currSettingTabCode">
+          <component :is="activeComponent" />
+        </div>
+      </KeepAlive>
+    </div>
   </div>
 </template>
 
-<style>
+<style scoped>
 /* ============================================================
-   通用样式：两种模式共用（通过 .setting-tabs 类匹配）
+   布局：纯 flex，不依赖任何 JS 测量或 ResizeObserver
    ============================================================ */
 .setting-tabs {
-  .n-radio {
-    width: auto;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+
+  /* ── 左侧 nav ── */
+  .setting-tabs__nav {
+    flex-shrink: 0;
+    padding: 10px 8px;
+    background: var(--nt-setting-nav-bg, var(--n-color));
+    border-right: 1px solid var(--n-tab-border-color, var(--gray-alpha-15));
+    overflow-y: auto;
+    user-select: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--n-tab-border-color, transparent) transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--n-tab-border-color, var(--gray-alpha-20));
+      border-radius: var(--radius-pill);
+    }
   }
-  .n-divider:not(.n-divider--vertical) {
-    margin-top: var(--space-4);
-    margin-bottom: var(--space-3);
-  }
-  .n-divider .n-divider__title {
-    font-size: var(--text-md) !important;
-    font-weight: 500;
-    opacity: var(--opacity-primary);
+
+  /* ── nav 条目 ── */
+  .setting-tabs__nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    position: relative;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition:
+      background var(--transition-base),
+      color var(--transition-fast);
     letter-spacing: 0.1px;
-  }
 
-  /* nav 基础样式 */
-  .n-tabs .n-tabs-nav {
-    padding: 10px 4px 4px 4px;
-    background: var(--n-color);
-
-    .n-tabs-tab {
-      border-radius: var(--radius-md);
-      transition: background var(--transition-base);
+    &:hover {
+      background: var(--gray-alpha-08);
     }
 
-    .tab__title {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 5px;
-      .title__icon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: var(--opacity-secondary);
-        transition: opacity var(--transition-fast);
-      }
-      .title__text {
-        user-select: none;
-        letter-spacing: 0.1px;
-      }
-    }
+    &.setting-tabs__nav-item--active {
+      background: color-mix(in srgb, var(--nt-primary-color) 14%, transparent);
+      color: var(--nt-primary-color);
 
-    .n-tabs-tab--active .tab__title .title__icon {
-      opacity: 1;
-    }
-  }
-
-  /* ——— 分组分隔线（两种模式共用） ——— */
-  .n-tabs .n-tabs-nav {
-    .n-tabs-nav-scroll-wrapper {
-      .n-tabs-tab:has(.tab__title--group-start) {
-        margin-top: 20px;
-        position: relative;
+      .nav-item__icon {
+        opacity: 1;
+        color: var(--nt-primary-color);
       }
 
-      .tab__title--group-start .group-divider {
+      .nav-item__text {
+        color: var(--nt-primary-color);
+        font-weight: 600;
+      }
+
+      /* 左侧激活指示线（替代 NTabs type="line" 的竖线） */
+      &::before {
+        content: '';
         position: absolute;
-        top: -18px;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 70%;
+        background: var(--nt-primary-color);
+        border-radius: 2px;
+      }
+    }
+
+    /* 分组分隔线 */
+    &.setting-tabs__nav-item--group-start {
+      margin-top: 20px;
+      position: relative;
+
+      .group-divider {
+        position: absolute;
+        top: -22px;
         left: 0;
         right: 0;
         text-align: center;
-        background: var(--n-color);
         padding: 0 4px;
 
         .group-divider__text {
           display: inline-block;
+          position: relative;
+          z-index: 1;
           padding: 0 10px;
           font-size: 10px;
           font-weight: 500;
-          color: var(--n-text-color-3);
-          background: var(--n-color);
-          opacity: 0.45;
+          color: var(--gray-alpha-55);
+          background: var(--nt-setting-nav-bg, var(--n-color));
           letter-spacing: 0.5px;
           text-transform: uppercase;
         }
@@ -207,8 +229,8 @@ const getGroupLabel = (code: settingPanes): string => {
           background: linear-gradient(
             90deg,
             transparent,
-            var(--n-tab-border-color) 20%,
-            var(--n-tab-border-color) 80%,
+            var(--n-tab-border-color, var(--gray-alpha-35)) 20%,
+            var(--n-tab-border-color, var(--gray-alpha-35)) 80%,
             transparent
           );
           opacity: 1;
@@ -218,81 +240,106 @@ const getGroupLabel = (code: settingPanes): string => {
     }
   }
 
-  /* ——— 滚动条样式（两种模式共用） ——— */
-  .n-tab-pane {
+  /* nav 图标 & 文字 */
+  .nav-item__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 22px;
+    flex-shrink: 0;
+    transition:
+      color var(--transition-fast),
+      opacity var(--transition-fast);
+  }
+
+  .nav-item__text {
+    font-size: var(--text-base);
+    user-select: none;
+    letter-spacing: 0.1px;
+  }
+
+  /* ── 右侧内容区 ── */
+  .setting-tabs__content {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
     user-select: none;
     scrollbar-width: thin;
-    scrollbar-color: var(--n-tab-border-color) transparent;
+    scrollbar-color: var(--n-tab-border-color, var(--gray-alpha-20)) transparent;
+
     &::-webkit-scrollbar {
       width: 4px;
     }
+
     &::-webkit-scrollbar-track {
       background: transparent;
     }
+
     &::-webkit-scrollbar-thumb {
-      background: var(--n-tab-border-color);
+      background: var(--n-tab-border-color, var(--gray-alpha-20));
       border-radius: var(--radius-pill);
     }
   }
-}
 
-/* 抽屉 NDrawerContent 的 header 样式 */
-.n-drawer-content .n-drawer-header {
-  font-size: 15px !important;
-  font-weight: 500 !important;
-  padding: 12px 16px !important;
-}
+  /* 子组件内 Naive UI 组件样式 */
+  :deep(.n-radio) {
+    width: auto;
+  }
 
+  :deep(.n-divider:not(.n-divider--vertical)) {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+
+  :deep(.n-divider .n-divider__title) {
+    font-size: var(--text-md) !important;
+    font-weight: 500;
+    opacity: var(--opacity-primary);
+    letter-spacing: 0.1px;
+  }
+}
+</style>
+
+<style>
 /* ============================================================
-   drawer 模式专用
-   这些样式需要穿透到 #setting 下的 NDrawer 内部结构
-   NDrawer 渲染为 #setting 的子元素，.n-tab-pane 在 NDrawer 内部
+   drawer 模式专用（非 scoped，需穿透 NDrawer）
    ============================================================ */
 #setting {
   .n-drawer
     .n-drawer-content.n-drawer-content--native-scrollbar
     .n-drawer-body-content-wrapper {
     padding: 0 !important;
+    display: flex;
+    overflow: hidden;
   }
+
   .drawer-wrap {
     box-shadow: var(--shadow-lg) !important;
-  }
-
-  .n-tabs .n-tabs-nav {
-    .n-tabs-nav-scroll-wrapper {
-      height: var(--nt-setting-content-height);
-    }
-  }
-
-  .n-tab-pane {
-    padding: 0;
-    height: var(--nt-setting-content-height);
-    overflow: auto;
-    box-sizing: border-box;
   }
 }
 
 /* ============================================================
-   page 模式专用（options 页面）
-   选择器需要匹配 #setting-tabs--page 内部的 .n-tab-pane
-   （NTabs 将 pane 渲染在 teleport 中，挂载在 .setting-tabs 内部）
+   pane 组件根元素撑满内容区（非 scoped 以跨组件作用域）
    ============================================================ */
-#setting-tabs--page {
-  .n-tabs {
-    height: calc(100vh);
-  }
+.setting-tabs__content > div {
+  width: 100%;
+  min-width: 0;
+}
 
-  .n-tabs .n-tabs-nav {
-    .n-tabs-nav-scroll-wrapper {
-      max-height: calc(100vh - 124px);
-      overflow-y: auto;
-    }
-  }
+.setting-tabs__content > div > * {
+  width: 100%;
+  min-width: 0;
+}
 
-  .n-tab-pane {
-    padding: 0 16px 50px 16px !important;
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
+/* ============================================================
+   page 模式专用（options 页面）
+   ============================================================ */
+#setting-tabs--page.setting-tabs {
+  height: 100vh;
+}
+
+#setting-tabs--page .setting-tabs__content {
+  padding: 0 16px 50px 16px;
 }
 </style>

@@ -140,7 +140,7 @@ describe('setupNewtabCommandShortcut', () => {
 
   it('registers keydown task with correct name', async () => {
     await setupExecutor()
-    expect(mockAddKeydownTask).toHaveBeenCalledWith('globalShortcut', expect.any(Function))
+    expect(mockAddKeydownTask).toHaveBeenCalledWith('globalShortcut', expect.any(Function), 0)
   })
 
   it('registers port command listener', async () => {

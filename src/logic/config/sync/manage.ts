@@ -1,8 +1,9 @@
 /**
  * @module manage
  * @description 配置的导入/导出/重置用户操作。
- * @dependencies config/migrate.ts（normalizeLegacyConfig 旧数据兼容）、config/update.ts（updateSetting 写入）
- * @consumers Setting 面板中的导入/导出/重置按钮
+ * @dependencies config/migrate.ts（normalizeLegacyConfig 旧数据兼容）、config/update.ts（updateSetting 写入）、
+ *   store/state.ts（globalState/switchSettingDrawerVisible）— 导入/导出/重置需要控制 loading 状态和关闭 drawer，
+ *   globalState 在此充当跨层共享状态总线，非纯配置工具依赖 UI 层
  * @pitfalls
  *   - importSetting 必须通过 normalizeLegacyConfig() 处理旧版本数据结构（6 层兼容）
  *   - importSetting 导入后必须更新 syncId/dirty 状态，避免 watch 触发不必要的上传

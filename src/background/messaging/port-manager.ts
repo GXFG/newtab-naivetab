@@ -155,10 +155,12 @@ const processKeydown = (
 }
 
 /**
- * 调试日志
+ * 调试日志，仅开发环境输出。__DEV__ 由 Vite define 在构建时替换为布尔值。
  */
 const debug = (...args: any[]) => {
-  console.log('[NaiveTab-sw]', ...args)
+  if (__DEV__) {
+    console.log('[NaiveTab-sw]', ...args)
+  }
 }
 
 /**

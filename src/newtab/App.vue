@@ -123,11 +123,6 @@ const onDot = () => {
 
 // ── 初始化 ─────────────────────────────────────────────────────────────
 
-// 命令快捷键必须在子组件 setup 之前注册，确保 globalShortcutTask 先于
-// keyboardTask 执行（命令优先）。子组件的 setup 在父组件 script setup
-// 执行完后才会开始。
-setupNewtabCommandShortcut()
-
 onMounted(async () => {
   // 注册全局错误监听
   registerGlobalErrorHandler('newtab')
@@ -140,8 +135,9 @@ onMounted(async () => {
   // 阶段 1：基础初始化（同步操作，无依赖）
   initBackgroundImage()
   startTimer()
+  // 命令快捷键 keydown 注册 + Port 监听（priority 0 保证命令优先于书签）
+  setupNewtabCommandShortcut()
   startKeydown()
-  // setupNewtabCommandShortcut() 已移至 script setup 顶层
 
   // 阶段 2：配置同步（按顺序，有依赖关系）
   await setupPageConfigSync()

@@ -229,7 +229,7 @@ databaseStore(storeName, type: 'add'|'put'|'get'|'delete', payload): Promise<...
 
 ## 常见坑点
 
-详见 `.claude/rules/pitfalls.md` 中「配置系统」章节。以下为 storage 特有陷阱：
+上传相关的通用陷阱（`checkWriteRate` 调用位置、`syncId` 赋值时机、popup 必须 `flushSync` 等）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#配置系统)。以下为 storage 特有陷阱：
 
 ### 压缩前必须判断 field 类型
 

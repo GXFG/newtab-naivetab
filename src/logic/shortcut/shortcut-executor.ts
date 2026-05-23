@@ -5,7 +5,7 @@
  *   通过共享 Port 发送到 Service Worker。
  *   - newtabControlExecutors：newtab 内部控制命令（toggleFocusMode/dragMode/settingDrawer），直接本地执行
  *   - newtabCommandExecutors：CS 命令回传执行器（reloadPage/copyPageUrl/copyPageTitle），Port 回传后执行
- *   书签由 keyboardBookmark Widget 的 keyboardTask 独立处理，通过 keydownTaskMap 的插入顺序保证命令优先。
+ *   书签由 keyboardBookmark Widget 的 keyboardTask 独立处理，通过 TaskPriority（命令 0，书签 10）保证命令优先。
  *   Port 消息监听还处理层切换 toast（MSG_SWITCH_BOOKMARK_LAYER），统一由 SW 下发。
  * @dependencies shortcut/port.ts（getSharedPort/isSwReady）、shortcut/matcher.ts（matchShortcut）、
  *   shortcut/shortcut-command.ts（COMMAND_SHORTCUT_CODE）、logic/task（addKeydownTask）
@@ -118,9 +118,7 @@ const setupPortCommandListener = () => {
  * newtab 页面命令快捷键 keydown 处理。
  *
  * 仅匹配命令快捷键。书签由 keyboardTask 独立处理，
- * 两者通过 keydownTaskMap 的插入顺序实现命令优先：
- * setupNewtabCommandShortcut 在 App.vue script setup 顶层同步执行，
- * 确保 globalShortcutTask 先于 keyboardTask 注册。
+ * 两者通过 TaskPriority 实现命令优先（命令 0 > 书签 10）。
  */
 const globalShortcutTask = (e: KeyboardEvent) => {
   const keyboardCommand = localConfig.keyboardCommand
@@ -203,7 +201,7 @@ const globalShortcutTask = (e: KeyboardEvent) => {
  * 在 newtab 中启用命令快捷键监听
  */
 export const setupNewtabCommandShortcut = () => {
-  addKeydownTask('globalShortcut', globalShortcutTask)
+  addKeydownTask('globalShortcut', globalShortcutTask, 0)
   setupPortCommandListener()
 }
 

@@ -32,6 +32,8 @@ const useWidgetStorageLocal = <K extends keyof WidgetConfigByCode>(key: K) => {
 }
 
 const createLocalConfig = (): LocalConfigRefs => {
+  // 逐字段构建后通过 return 处 as LocalConfigRefs 收敛类型，
+  // 中间对象用 any 避免逐字段声明类型（builder 模式常见做法）
   const res: any = {}
   res.general = useStorageLocal('c-general', defaultConfig.general)
   res.keyboardCommon = useStorageLocal(

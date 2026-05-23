@@ -7,12 +7,40 @@
 **BEM 命名：** `block__element--modifier`。`block` 使用 camelCase，子元素用 `__`，修饰符用 `--`。
 
 - **必须嵌套书写**：子元素和 modifier 必须嵌套在父级选择器内，不得平铺到根级
-- **禁止 `&--modifier` 拼接**：`postcss-preset-env` 不支持，modifier 必须写完整类名
 - `&` 只允许用于伪类/伪元素（`&:hover`）或嵌套完整类名（`&.parent-class`）
 - Widget 样式外层使用 `#widgetCode`（由 WidgetWrap 自动设置 id）
-- **禁止 `v-bind()`**，使用 `:style` + `computed` + `var()` 注入
-- `widget__wrap` div 的 style 由 WidgetWrap 自动注入，不可再 `:style` 绑定
-- `rgba()` 的 alpha 通道写**字面量**，不可用 `var()`
+
+CSS 踩坑（`&--modifier` 禁止、`v-bind()` 禁止、`rgba()` + `var()` 等）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#css--样式)。
+
+- **禁止在 scoped CSS 中使用 Naive UI 的 `--n-*` 变量**（`--n-primary-color`、`--n-text-color` 等），使用项目自有 token 或 `customPrimaryColor` 注入（详见下方 CSS 变量对照表）
+
+**Naive UI → 项目 token 对照表：**
+
+| 禁止使用 | 替换为 |
+|----------|--------|
+| `var(--n-primary-color)` | 通过 `customPrimaryColor` + `cssVars` 注入（见下方示例） |
+| `var(--n-text-color)` | `var(--gray-alpha-85)` |
+| `var(--n-text-color-2)` | `var(--gray-alpha-65)` |
+| `var(--n-text-color-3)` | `var(--gray-alpha-55)` |
+| `var(--n-tab-border-color)` | `var(--n-tab-border-color, var(--gray-alpha-15))`（加 fallback） |
+
+主题色注入模式：
+
+```ts
+import { customPrimaryColor } from '@/logic/store/style'
+
+const cssVars = computed(() => ({
+  '--nt-primary-color': customPrimaryColor.value,
+}))
+```
+
+```html
+<div :style="cssVars">...</div>
+```
+
+```css
+.el--active { color: var(--nt-primary-color); }
+```
 
 ### Vue 组件
 
