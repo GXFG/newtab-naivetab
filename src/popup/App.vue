@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { NConfigProvider } from 'naive-ui'
 import { nativeUILang, currTheme, themeOverrides } from '@/logic/store/theme'
+import {
+  registerGlobalErrorHandler,
+  registerVueErrorHandler,
+} from '@/logic/utils/errorHandler'
 import Content from '@/popup/Content.vue'
+
+onMounted(() => {
+  registerGlobalErrorHandler('popup')
+  registerVueErrorHandler(getCurrentInstance()!.appContext.app, 'popup')
+})
 </script>
 
 <template>

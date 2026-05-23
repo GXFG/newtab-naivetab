@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 /**
- * shortcut-executor.test.ts — 测试 newtab 页面全局快捷键执行器
+ * shortcut-executor.test.ts — 测试 newtab 页面命令快捷键执行器
  *
  * Mock 策略：
  * - @/logic/task → 捕获 addKeydownTask/removeKeydownTask 调用
- * - @/logic/shortcut/utils → 控制 matchShortcut / isSwReady / getSharedPort
+ * - @/logic/shortcut/matcher → 控制 matchShortcut 返回值
+ * - @/logic/shortcut/port → 控制 isSwReady / getSharedPort
  * - @/logic/store → 控制 localConfig / localState / globalState
- * - @/logic/moveable → toggleIsDragMode spy
+ * - @/logic/moveable → toggleDragMode spy
  * - @/logic/shortcut/shortcut-command → getCommandExecEnv
  */
 
@@ -33,7 +34,7 @@ const baseLocalConfig = (overrides?: {
   keyboardBookmark: {
     isGlobalShortcutEnabled: true,
     globalShortcutModifiers: (overrides?.bookmarkModifiers ?? ['alt']) as readonly string[],
-    shortcutInInputElement: false,
+    shortcutInInputElement: true,
     urlBlacklist: [] as string[],
     noModifierMode: overrides?.noModifierModeBookmark ?? false,
     keymap: overrides?.bookmarkKeymap ?? {
@@ -43,7 +44,7 @@ const baseLocalConfig = (overrides?: {
   keyboardCommand: {
     isEnabled: true,
     modifiers: (overrides?.commandModifiers ?? ['shift', 'alt']) as readonly string[],
-    shortcutInInputElement: false,
+    shortcutInInputElement: true,
     urlBlacklist: [] as string[],
     noModifierMode: overrides?.noModifierModeCommand ?? false,
     keymap: overrides?.commandKeymap ?? {
@@ -89,9 +90,6 @@ function setupMocks(options?: {
     onDisconnect: { addListener: vi.fn() },
   }
   mockGetSharedPort = vi.fn().mockReturnValue(mockPort)
-  vi.doMock('@/logic/shortcut/utils', () => ({
-    toModifierMask: (keys: readonly string[]) => keys.length,
-  }))
   vi.doMock('@/logic/shortcut/matcher', () => ({
     matchShortcut: mockMatchShortcut,
   }))
@@ -115,6 +113,7 @@ function setupMocks(options?: {
   mockToggleIsDragMode = vi.fn()
   vi.doMock('@/logic/moveable', () => ({
     toggleIsDragMode: mockToggleIsDragMode,
+    toggleDragMode: mockToggleIsDragMode,
   }))
 
   mockGetCommandExecEnv = vi.fn().mockReturnValue('newtab')
@@ -131,17 +130,17 @@ function setupMocks(options?: {
 
 async function setupExecutor() {
   const executor = await import('@/logic/shortcut/shortcut-executor')
-  executor.setupNewtabGlobalShortcut()
+  executor.setupNewtabCommandShortcut()
   return mockAddKeydownTask.mock.calls[0][1] as (e: KeyboardEvent) => boolean | void
 }
 
-describe('setupNewtabGlobalShortcut', () => {
+describe('setupNewtabCommandShortcut', () => {
   beforeEach(() => { setupMocks() })
   afterEach(() => { vi.unstubAllGlobals() })
 
   it('registers keydown task with correct name', async () => {
     await setupExecutor()
-    expect(mockAddKeydownTask).toHaveBeenCalledWith('globalShortcut', expect.any(Function))
+    expect(mockAddKeydownTask).toHaveBeenCalledWith('globalShortcut', expect.any(Function), 0)
   })
 
   it('registers port command listener', async () => {
@@ -151,13 +150,13 @@ describe('setupNewtabGlobalShortcut', () => {
   })
 })
 
-describe('cleanupNewtabGlobalShortcut', () => {
+describe('cleanupNewtabCommandShortcut', () => {
   beforeEach(() => { setupMocks() })
   afterEach(() => { vi.unstubAllGlobals() })
 
   it('removes keydown task', async () => {
     const executor = await import('@/logic/shortcut/shortcut-executor')
-    executor.cleanupNewtabGlobalShortcut()
+    executor.cleanupNewtabCommandShortcut()
     expect(mockRemoveKeydownTask).toHaveBeenCalledWith('globalShortcut')
   })
 })
@@ -172,7 +171,7 @@ describe('globalShortcutTask — local commands', () => {
   afterEach(() => { vi.unstubAllGlobals() })
 
   it('executes toggleFocusMode command and shows message', () => {
-    mockMatchShortcut.mockReturnValueOnce(null).mockReturnValueOnce('KeyF')
+    mockMatchShortcut.mockReturnValueOnce('KeyF')
     const e = new KeyboardEvent('keydown', { code: 'KeyF', cancelable: true })
     const result = taskFn(e)
     expect(result).toBe(true)
@@ -181,7 +180,7 @@ describe('globalShortcutTask — local commands', () => {
   })
 
   it('executes toggleDragMode — hides setting drawer and toggles drag', () => {
-    mockMatchShortcut.mockReturnValueOnce(null).mockReturnValueOnce('KeyD')
+    mockMatchShortcut.mockReturnValueOnce('KeyD')
     const e = new KeyboardEvent('keydown', { code: 'KeyD', cancelable: true })
     const result = taskFn(e)
     expect(result).toBe(true)
@@ -191,11 +190,15 @@ describe('globalShortcutTask — local commands', () => {
   })
 
   it('executes toggleSettingDrawer — toggles visibility on', () => {
-    setupMocks({ isSettingDrawerVisible: false, swReady: true })
+    mockMatchShortcut.mockReturnValueOnce('KeyS')
+    const e = new KeyboardEvent('keydown', { code: 'KeyS', cancelable: true })
+    const result = taskFn(e)
+    expect(result).toBe(true)
+    expect(mockSwitchSettingDrawerVisible).toHaveBeenCalledWith(true)
   })
 
   it('returns true and prevents default for local commands', () => {
-    mockMatchShortcut.mockReturnValueOnce(null).mockReturnValueOnce('KeyF')
+    mockMatchShortcut.mockReturnValueOnce('KeyF')
     const e = new KeyboardEvent('keydown', { code: 'KeyF', cancelable: true })
     const result = taskFn(e)
     expect(result).toBe(true)
@@ -213,20 +216,9 @@ describe('globalShortcutTask — SW forwarding', () => {
   })
   afterEach(() => { vi.unstubAllGlobals() })
 
-  it('forwards bookmark shortcut via Port when no command matches', () => {
-    mockMatchShortcut.mockReturnValueOnce('KeyB').mockReturnValueOnce(null)
-    const e = new KeyboardEvent('keydown', { code: 'KeyB', cancelable: true })
-    const result = taskFn(e)
-    expect(result).toBe(true)
-    expect(e.defaultPrevented).toBe(true)
-    expect(mockPort.postMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ key: 'KeyB', source: 'bookmark' }),
-    )
-  })
-
   it('forwards command shortcut via Port when execEnv is not newtab', () => {
     mockGetCommandExecEnv.mockReturnValue('sw')
-    mockMatchShortcut.mockReturnValueOnce(null).mockReturnValueOnce('KeyR')
+    mockMatchShortcut.mockReturnValueOnce('KeyR')
     const e = new KeyboardEvent('keydown', { code: 'KeyR', cancelable: true })
     const result = taskFn(e)
     expect(result).toBe(true)
@@ -241,17 +233,17 @@ describe('globalShortcutTask — SW forwarding', () => {
       onMessage: { addListener: vi.fn() },
       onDisconnect: { addListener: vi.fn() },
     })
-    mockMatchShortcut.mockReturnValueOnce(null).mockReturnValueOnce('KeyR')
+    mockMatchShortcut.mockReturnValueOnce('KeyR')
     const e = new KeyboardEvent('keydown', { code: 'KeyR', cancelable: true })
     const result = taskFn(e)
     expect(result).toBe(false)
   })
 
-  it('returns undefined when neither bookmark nor command matches', () => {
-    mockMatchShortcut.mockReturnValueOnce(null).mockReturnValueOnce(null)
+  it('returns false when command does not match', () => {
+    mockMatchShortcut.mockReturnValueOnce(null)
     const e = new KeyboardEvent('keydown', { code: 'KeyZ', cancelable: true })
     const result = taskFn(e)
-    expect(result).toBeUndefined()
+    expect(result).toBe(false)
   })
 })
 
@@ -259,30 +251,24 @@ describe('globalShortcutTask — command priority (modifier conflict)', () => {
   let taskFn: (e: KeyboardEvent) => boolean | void
 
   beforeEach(async () => {
-    // Both have 2 modifiers → toModifierMask returns 2 → masks match → conflict
-    // Use a command with execEnv !== 'newtab' so it reaches Port forwarding (not handled locally)
     setupMocks({
       swReady: true,
       localConfig: baseLocalConfig({
         bookmarkModifiers: ['shift', 'alt'],
         commandModifiers: ['shift', 'alt'],
-        commandKeymap: { KeyX: { command: 'copyPageUrl' } }, // not a 'newtab' command
+        commandKeymap: { KeyX: { command: 'copyPageUrl' } },
       }),
     })
     taskFn = await setupExecutor()
   })
   afterEach(() => { vi.unstubAllGlobals() })
 
-  it('only sends command, skips bookmark on modifier conflict', () => {
-    mockGetCommandExecEnv.mockReturnValue('sw') // forward to SW, not handled locally
-    mockMatchShortcut.mockReturnValueOnce('KeyX').mockReturnValueOnce('KeyX')
+  it('sends command via Port when command matches', () => {
+    mockGetCommandExecEnv.mockReturnValue('sw')
+    mockMatchShortcut.mockReturnValueOnce('KeyX')
     const e = new KeyboardEvent('keydown', { code: 'KeyX', cancelable: true })
     taskFn(e)
 
-    const bookmarkCalls = mockPort.postMessage.mock.calls.filter(
-      (c: any[]) => c[0].source === 'bookmark',
-    )
-    expect(bookmarkCalls.length).toBe(0)
     const commandCalls = mockPort.postMessage.mock.calls.filter(
       (c: any[]) => c[0].source === 'command',
     )
@@ -299,9 +285,9 @@ describe('globalShortcutTask — SW not ready', () => {
   })
   afterEach(() => { vi.unstubAllGlobals() })
 
-  it('shows warning and returns false', () => {
-    mockMatchShortcut.mockReturnValueOnce('KeyB').mockReturnValueOnce(null)
-    const e = new KeyboardEvent('keydown', { code: 'KeyB', cancelable: true })
+  it('shows warning and returns false when command matches', () => {
+    mockMatchShortcut.mockReturnValueOnce('KeyR')
+    const e = new KeyboardEvent('keydown', { code: 'KeyR', cancelable: true })
     const result = taskFn(e)
     expect(result).toBe(false)
     expect(mockMessage.warning).toHaveBeenCalled()

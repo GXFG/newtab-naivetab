@@ -2,18 +2,16 @@
  * bookmark.test.ts — 测试 bookmark/api.ts 中的书签相关工具函数
  *
  * 测试目标：
- * - getBrowserBookmark: 跨浏览器书签树解析（Chrome / Firefox）
+ * - getBrowserBookmark: 通过 GUID 直接获取书签工具栏内容
+ * - findBookmarksBarFromTree: 从 getTree 结果中定位书签栏节点
  * - getFaviconFromUrl: favicon URL 生成（Chrome / 其他浏览器）
- *
- * Mock 策略：
- * - @/env 使用 vi.doMock() + vi.resetModules() 控制 isChrome / isFirefox
- * - chrome.bookmarks.getTree 通过 test/setup.ts 已注入的全局 chrome mock 扩展
  */
 
 describe('getBrowserBookmark', () => {
   let getBrowserBookmark: typeof import('@/logic/bookmark/api')['getBrowserBookmark']
+  let findBookmarksBarFromTree: typeof import('@/logic/bookmark/api')['findBookmarksBarFromTree']
 
-  describe('Chrome 环境（默认）', () => {
+  describe('Chrome 环境', () => {
     beforeEach(async () => {
       vi.resetModules()
 
@@ -25,51 +23,63 @@ describe('getBrowserBookmark', () => {
         isForbiddenUrl: vi.fn(),
       }))
 
-      // 模拟 Chrome 书签树结构：root → children[0](Bookmarks Bar) → 子书签
       ;(chrome.bookmarks as any) = {
-        getTree: vi.fn((cb) => {
-          cb([
-            {
-              id: '0',
-              title: '',
-              children: [
-                {
-                  id: '1',
-                  title: 'Bookmarks Bar',
-                  children: [
-                    { id: '10', title: 'Google', url: 'https://google.com' },
-                    {
-                      id: '11',
-                      title: 'Work',
-                      children: [{ id: '110', title: 'Jira', url: 'https://jira.example.com' }],
-                    },
-                  ],
-                },
-                { id: '2', title: 'Other Bookmarks', children: [] },
-              ],
-            },
-          ])
+        getSubTree: vi.fn(async (id: string) => {
+          if (id === '1') {
+            return [
+              {
+                id: '1',
+                title: 'Bookmarks Bar',
+                children: [
+                  { id: '10', title: 'Google', url: 'https://google.com' },
+                  {
+                    id: '11',
+                    title: 'Work',
+                    children: [{ id: '110', title: 'Jira', url: 'https://jira.example.com' }],
+                  },
+                ],
+              },
+            ]
+          }
+          return []
         }),
       }
 
       const mod = await import('@/logic/bookmark/api')
       getBrowserBookmark = mod.getBrowserBookmark
+      findBookmarksBarFromTree = mod.findBookmarksBarFromTree
     })
 
-    it('returns the first root children (Bookmarks Bar) for Chrome', async () => {
+    it('returns bookmarks bar content via getSubTree("1") for Chrome', async () => {
       const result = await getBrowserBookmark()
-      // Chrome 路径：res[0].children[0].children = 书签栏的直接子项
       expect(result).toHaveLength(2)
       expect(result[0].title).toBe('Google')
       expect(result[1].title).toBe('Work')
     })
 
-    it('calls chrome.bookmarks.getTree', async () => {
+    it('calls chrome.bookmarks.getSubTree with "1"', async () => {
       await getBrowserBookmark()
-      expect(chrome.bookmarks.getTree).toHaveBeenCalled()
+      expect(chrome.bookmarks.getSubTree).toHaveBeenCalledWith('1')
     })
 
-    it('returns empty array when root has no children', async () => {
+    it('findBookmarksBarFromTree returns node with id="1" for Chrome', () => {
+      const tree = [{ id: '0', children: [
+        { id: '1', title: 'Bookmarks Bar' },
+        { id: '2', title: 'Other Bookmarks' },
+      ]}]
+      const bar = findBookmarksBarFromTree(tree)
+      expect(bar?.id).toBe('1')
+    })
+
+    it('findBookmarksBarFromTree falls back to children[0] for Chrome', () => {
+      const tree = [{ id: '0', children: [
+        { id: '99', title: 'Some Folder' },
+      ]}]
+      const bar = findBookmarksBarFromTree(tree)
+      expect(bar?.title).toBe('Some Folder')
+    })
+
+    it('returns empty array when getSubTree returns empty children', async () => {
       vi.resetModules()
       vi.doMock('@/env', () => ({
         isChrome: true,
@@ -80,9 +90,10 @@ describe('getBrowserBookmark', () => {
       }))
 
       ;(chrome.bookmarks as any) = {
-        getTree: vi.fn((cb) => {
-          cb([{ id: '0', title: '' }])
-        }),
+        getSubTree: vi.fn(async () => [{ id: '1', title: 'Bookmarks Bar' }]),
+        getTree: vi.fn(async () => [{ id: '0', title: '', children: [
+          { id: '1', title: 'Bookmarks Bar', children: [] },
+        ]}]),
       }
 
       const { getBrowserBookmark: fn } = await import('@/logic/bookmark/api')
@@ -103,40 +114,60 @@ describe('getBrowserBookmark', () => {
         isForbiddenUrl: vi.fn(),
       }))
 
-      // Firefox 书签结构：root → children[1] 才是用户书签
       ;(chrome.bookmarks as any) = {
-        getTree: vi.fn((cb) => {
-          cb([
-            {
-              id: 'root',
-              title: '',
-              children: [
-                { id: 'menu', title: 'menu', children: [] },
-                {
-                  id: 'toolbar',
-                  title: 'toolbar',
-                  children: [
-                    { id: '20', title: 'Mozilla', url: 'https://mozilla.org' },
-                  ],
-                },
-              ],
-            },
-          ])
+        getSubTree: vi.fn(async (id: string) => {
+          if (id === 'toolbar_____') {
+            return [
+              {
+                id: 'toolbar_____',
+                title: 'Bookmarks Toolbar',
+                children: [
+                  { id: '20', title: 'Mozilla', url: 'https://mozilla.org' },
+                ],
+              },
+            ]
+          }
+          return []
         }),
       }
 
       const mod = await import('@/logic/bookmark/api')
       getBrowserBookmark = mod.getBrowserBookmark
+      findBookmarksBarFromTree = mod.findBookmarksBarFromTree
     })
 
-    it('returns children[1] (toolbar) bookmarks for Firefox', async () => {
+    it('returns bookmarks toolbar content via getSubTree("toolbar_____") for Firefox', async () => {
       const result = await getBrowserBookmark()
-      // Firefox 路径：res[0].children[1].children = toolbar 的子项
       expect(result).toHaveLength(1)
       expect(result[0].title).toBe('Mozilla')
     })
 
-    it('returns empty array when children[1] is missing', async () => {
+    it('calls chrome.bookmarks.getSubTree with toolbar GUID', async () => {
+      await getBrowserBookmark()
+      expect(chrome.bookmarks.getSubTree).toHaveBeenCalledWith('toolbar_____')
+    })
+
+    it('findBookmarksBarFromTree returns node with id="toolbar_____" for Firefox', () => {
+      const tree = [{ id: 'root', children: [
+        { id: 'menu', title: 'Bookmarks Menu' },
+        { id: 'toolbar_____', title: 'Bookmarks Toolbar' },
+        { id: 'unfiled', title: 'Other Bookmarks' },
+      ]}]
+      const bar = findBookmarksBarFromTree(tree)
+      expect(bar?.id).toBe('toolbar_____')
+    })
+
+    it('findBookmarksBarFromTree falls back to children[1] for Firefox', () => {
+      const tree = [{ id: 'root', children: [
+        { id: 'menu', title: 'Bookmarks Menu' },
+        { id: 'custom', title: 'Bookmarks Toolbar' },
+        { id: 'unfiled', title: 'Other Bookmarks' },
+      ]}]
+      const bar = findBookmarksBarFromTree(tree)
+      expect(bar?.id).toBe('custom')
+    })
+
+    it('returns empty array when toolbar has no children', async () => {
       vi.resetModules()
       vi.doMock('@/env', () => ({
         isChrome: false,
@@ -147,9 +178,7 @@ describe('getBrowserBookmark', () => {
       }))
 
       ;(chrome.bookmarks as any) = {
-        getTree: vi.fn((cb) => {
-          cb([{ id: 'root', title: '', children: [] }])
-        }),
+        getSubTree: vi.fn(async () => [{ id: 'toolbar_____', title: 'Bookmarks Toolbar' }]),
       }
 
       const { getBrowserBookmark: fn } = await import('@/logic/bookmark/api')

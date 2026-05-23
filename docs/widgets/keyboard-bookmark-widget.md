@@ -87,10 +87,13 @@ KeyboardBookmark (Widget 入口)
 通过 `addKeydownTask(WIDGET_CODE, keyboardTask)` 注册：
 
 1. `isDragMode` 时提前返回
-2. 屏蔽修饰键组合
-3. 过滤不在当前布局中的按键
-4. **命令快捷键开启无修饰键模式时静默跳过**（`keyboardCommand.noModifierMode` 为 true 时返回，避免与命令快捷键冲突）
+2. 过滤不在当前布局中的按键
+3. **通过 `matchShortcut` 统一匹配书签快捷键**（自动处理 `isInInputElement`、`urlBlacklist`、`e.repeat`）
+4. 检查书签是否真正绑定了 URL
 5. 有 URL 的键位：通过 `openPage()` 打开 URL，设置 `currSelectKeyCode` 做视觉反馈
+6. 匹配成功返回 `true` 阻断后续 task
+
+**命令优先机制：** `globalShortcutTask` 在 App.vue script setup 顶层同步注册（先于子组件 setup），确保先执行处理命令。`keyboardTask` 后执行，作为命令的兜底处理书签。命令匹配成功时返回 `true` 阻断 `keyboardTask`。
 
 ### 鼠标交互
 
@@ -113,7 +116,7 @@ KeyboardBookmark (Widget 入口)
 | 主题预设（81） | 通用引擎 | [keyboard.md](../features/keyboard.md) |
 | 拖拽系统（moveable） | 通用基础设施 | [keyboard.md](../features/keyboard.md) |
 | 书签数据绑定 | keyboardBookmark Widget | 本文档 |
-| 全局快捷键执行 | keyboardBookmark + shortcut-executor | [global-shortcut.md](../features/global-shortcut.md) |
+| 书签快捷键执行 | keyboardBookmark（keyboardTask） | 本文档 |
 
 配置命名空间也分为两块：
 
@@ -140,7 +143,7 @@ KeyboardBookmark (Widget 入口)
 - popup 修改书签后必须在 `handleCommit` 中调用 `flushConfigSync` 强制同步
 - `isDragMode` 激活时，keydown handler 提前返回，防止拖拽 Widget 时误触书签打开
 - 全局快捷键 `source=2` 时从 `keymap` 读取 URL 执行，详情见 [global-shortcut.md](../features/global-shortcut.md)
-- 命令快捷键开启无修饰键模式（`noModifierMode`）时，键盘 Widget 的 keydown handler 会被短路，按键由命令快捷键独占处理
+- `globalShortcutTask` 先于 `keyboardTask` 执行（命令优先），同一按键在命令有绑定时不会打开书签
 - **多层书签**（source=1）：`layers` 数组固定 4 个元素，每层 `sourceFolderPath` 指向一个浏览器书签文件夹路径（如 `"NaiveTab/layer1"`）。所有外部调用统一通过 `getCurrentLayerFolderTitle()` 获取当前激活层的文件夹路径。层切换通过 `switchBookmarkLayer1-4` 全局命令快捷键触发，`activeLayer` 设备级持久化（`chrome.storage.local`），不云同步
 - `findFolderByPath` 按路径精确匹配文件夹，避免了 DFS 同名匹配的不确定性。路径格式如 `"NaiveTab/layer1"` 或单层 `"layer1"`
 

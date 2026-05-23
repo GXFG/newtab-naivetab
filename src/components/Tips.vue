@@ -48,7 +48,6 @@ const onClick = () => {
   white-space: pre-line;
 }
 .tips__btn {
-  width: 30px;
   .btn__icon {
     font-size: 14px;
   }

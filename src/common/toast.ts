@@ -196,6 +196,8 @@ function show(
     ;(iconEl as HTMLElement).style.display = 'none'
   } else {
     ;(iconEl as HTMLElement).style.display = ''
+    // SVG_ICONS 是硬编码常量，type 是 'success'|'error'|'warning'|'info' 字面量联合，
+    // 不存在用户输入拼接，innerHTML 在此安全
     iconEl!.innerHTML = SVG_ICONS[type] || SVG_ICONS.info
     const color = TYPE_COLORS[type] || TYPE_COLORS.info
     ;(iconEl as HTMLElement).style.color = color

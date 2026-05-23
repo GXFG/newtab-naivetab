@@ -91,6 +91,7 @@ const handleBookmarkShortcutKeydown = (key: string, _tabId: number) => {
   if (!entry?.url) return
 
   const url = padUrlHttps(entry.url)
+  gaProxy('click', ['openBookmark'], { key_code: key, source: 'shortcut' })
   chrome.tabs.create({ url })
 }
 
@@ -112,8 +113,11 @@ export const handleCommandShortcutKeydown = (
   const execIn = getCommandExecEnv(entry.command)
   log('Command shortcut:', entry.command, 'execIn:', execIn, 'tabId:', tabId)
 
-  // newtab 命令由 newtab 页面本地执行，SW 无需处理
+  // newtab 命令由 newtab 页面本地执行，SW 无需处理/上报
   if (execIn === 'newtab') return
+
+  // 命令实际由 SW/CS 执行时才上报
+  gaProxy('press', ['command'], { key_code: key, command_code: entry.command })
 
   if (execIn === 'sw') {
     execSwCommand(entry.command as TSwCommandName, tabId)
@@ -151,10 +155,12 @@ const processKeydown = (
 }
 
 /**
- * 调试日志
+ * 调试日志，仅开发环境输出。__DEV__ 由 Vite define 在构建时替换为布尔值。
  */
 const debug = (...args: any[]) => {
-  console.log('[NaiveTab-sw]', ...args)
+  if (__DEV__) {
+    console.log('[NaiveTab-sw]', ...args)
+  }
 }
 
 /**
@@ -288,13 +294,5 @@ export const setupPortManager = (
     } else if (msg.type === MSG_SWITCH_BOOKMARK_LAYER_UI) {
       handleSwitchBookmarkLayerFromUI(msg.layerIndex)
     }
-  })
-
-  // ── 未捕获异常上报 ─────────────────────────────────────────────────────
-
-  addEventListener('unhandledrejection', async (event) => {
-    gaProxy('error', ['unhandledrejection'], {
-      reason: String(event.reason),
-    })
   })
 }

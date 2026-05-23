@@ -87,14 +87,6 @@ const generalConfig = {
     networkSourceType: (typeof IMAGE_NETWORK_SOURCE)[keyof typeof IMAGE_NETWORK_SOURCE]
     name: string
   }[],
-  layout: {
-    xOffsetKey: 'right',
-    xOffsetValue: 1,
-    xTranslateValue: 0,
-    yOffsetKey: 'top',
-    yOffsetValue: 50,
-    yTranslateValue: -50,
-  },
   fontFamily: 'system',
   fontSize: 14,
   fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
@@ -240,24 +232,19 @@ export const defaultConfig = {
   ...widgetsDefaultConfig,
 }
 
-export const defaultUploadStatusItem = {
+export const defaultUploadStatusItem: UploadStatusItem = {
   loading: false,
   syncTime: 0,
   syncId: '',
   localModifiedTime: 0,
   dirty: false,
+  retryCount: 0,
+  lastError: '',
+  syncStatus: 'idle',
 }
 
 const genUploadConfigStatusMap = () => {
-  const statusMap = {} as {
-    [key in ConfigField]: {
-      loading: boolean
-      syncTime: number
-      syncId: string
-      localModifiedTime: number
-      dirty: boolean
-    }
-  }
+  const statusMap = {} as { [key in ConfigField]: UploadStatusItem }
   for (const widget in defaultConfig) {
     statusMap[widget as ConfigField] = { ...defaultUploadStatusItem }
   }

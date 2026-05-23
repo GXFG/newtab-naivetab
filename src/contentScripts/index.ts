@@ -35,6 +35,7 @@ import { toModifierMask, type TShortcutModifier } from '@/logic/shortcut/utils'
 import { parseStoredData } from '@/logic/config/compress'
 import { SYSTEM_KEYMAP_STORAGE_KEY } from '@/logic/keyboard/keyboard-constants'
 import { padUrlHttps } from '@/logic/utils/common'
+import { registerGlobalErrorHandler } from '@/logic/utils/errorHandler'
 import {
   REPEATABLE_SCROLL_COMMANDS,
   type TCommandEntry,
@@ -281,7 +282,7 @@ const initMain = () => {
         updateConfig({
           isEnabled: false,
           globalShortcutModifiers: [],
-          shortcutInInputElement: false,
+          shortcutInInputElement: true,
           keymap: {},
           urlBlacklist: [],
           noModifierMode: false,
@@ -314,7 +315,7 @@ const initMain = () => {
         updateCommandConfig({
           isEnabled: false,
           modifiers: [],
-          shortcutInInputElement: false,
+          shortcutInInputElement: true,
           keymap: {},
           urlBlacklist: [],
           noModifierMode: false,
@@ -501,60 +502,104 @@ const initMain = () => {
     }
   }
 
-  /**
-   * 键盘事件处理
-   *
-   * 匹配修饰键（或无修饰键模式下单键）后，通过 Port 将按键事件发送到 SW 统一处理。
-   * SW 负责查 keymap 并分发执行（书签打开 URL / 命令路由到 SW 或 CS）。
-   * 使用 capture phase (true) 确保在页面脚本之前捕获事件。
-   *
-   * 两套快捷键共享同一个 handler，根据匹配结果决定 source：
-   * - 匹配书签快捷键 → source: 'bookmark'
-   * - 匹配命令快捷键 → source: 'command'
-   * - 两者修饰键相同或同时开启无修饰键模式 → 书签优先（老功能），只发送一条消息
-   */
-  const handleKeydown = (e: KeyboardEvent) => {
-    /**
-     * 尝试本地执行 scroll 命令。
-     * scroll 是纯 DOM 操作，CS 本地直接执行即可，无需经 SW 中转。
-     * e.repeat 为 true 时跳过 matchShortcut（被其首行拦截），直接从 keymap 读取。
-     * 非 repeat 时通过 commandCode 传入匹配结果。
-     */
-    const tryLocalScroll = (code?: string): boolean => {
-      const cmdCode = code ?? commandCode
-      if (!cmdCode) return false
-      const entry = commandKeymap?.[cmdCode]
-      if (!entry?.command) return false
-      if (
-        !REPEATABLE_SCROLL_COMMANDS.has(
-          entry.command as typeof REPEATABLE_SCROLL_COMMANDS extends Set<
-            infer U
-          >
-            ? U
-            : never,
-        )
-      )
-        return false
+  // ── 按键处理 helper ────────────────────────────────────────────────────
+  // 从 handleKeydown 中提取，运行在 initMain 闭包内，共享 keymap、port 等状态。
 
-      // 首次按下启动循环，repeat 递增加速——均由 startContinuousScroll 内部处理
-      startContinuousScroll(entry.command)
-      e.preventDefault()
-      e.stopPropagation()
+  /**
+   * 尝试本地执行 scroll 命令。
+   * scroll 是纯 DOM 操作，CS 本地直接执行即可，无需经 SW 中转。
+   */
+  const tryLocalScroll = (e: KeyboardEvent, code: string | null): boolean => {
+    if (!code) return false
+    const entry = commandKeymap?.[code]
+    if (!entry?.command) return false
+    if (
+      !REPEATABLE_SCROLL_COMMANDS.has(
+        entry.command as typeof REPEATABLE_SCROLL_COMMANDS extends Set<infer U>
+          ? U
+          : never,
+      )
+    )
+      return false
+    startContinuousScroll(entry.command)
+    e.preventDefault()
+    e.stopPropagation()
+    return true
+  }
+
+  /**
+   * 通过 Port（优先）或 sendMessage（降级）发送命令快捷键到 SW。
+   * 返回 true 表示消息已发出，应拦截按键。
+   */
+  const tryDispatchCommand = (e: KeyboardEvent): boolean => {
+    if (swReady && port) {
+      port.postMessage({
+        type: MSG_KEYDOWN,
+        key: e.code,
+        source: 'command',
+      })
       return true
     }
+    try {
+      chrome.runtime.sendMessage({
+        type: MSG_KEYDOWN,
+        key: e.code,
+        source: 'command',
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
 
+  /**
+   * 通过 Port（优先）或 sendMessage + 本地 keymap（兜底）发送书签快捷键到 SW。
+   * 本地 keymap 兜底确保即使 SW 休眠也能零延迟打开书签 URL。
+   */
+  const tryDispatchBookmark = (e: KeyboardEvent): boolean => {
+    if (swReady && port) {
+      port.postMessage({
+        type: MSG_KEYDOWN,
+        key: e.code,
+        source: 'bookmark',
+      })
+      return true
+    }
+    try {
+      chrome.runtime.sendMessage({
+        type: MSG_KEYDOWN,
+        key: e.code,
+        source: 'bookmark',
+      })
+    } catch {
+      // sendMessage 也可能失败（SW 被卸载等极端场景）
+    }
+    const activeKeymap = source === 1 ? systemKeymap : keymap
+    const entry = activeKeymap[e.code]
+    if (entry?.url) {
+      chrome.tabs.create({ url: padUrlHttps(entry.url) })
+    }
+    return true
+  }
+
+  /**
+   * 键盘事件主编排器。
+   *
+   * 两套快捷键共享同一个 handler，通过两次 matchShortcut 分别匹配书签和命令。
+   * 命令优先于书签：修饰键冲突时只发送命令消息。
+   * 使用 capture phase (true) 确保在页面脚本之前捕获事件。
+   */
+  const handleKeydown = (e: KeyboardEvent) => {
     // scroll 命令的 e.repeat 放行：按住 J/K 持续滚动
     if (e.repeat) {
       if (!commandIsEnabled || !commandKeymap) return
-      if (tryLocalScroll(e.code)) return
-      // 非 scroll 命令的 repeat 静默忽略
+      if (tryLocalScroll(e, e.code)) return
       return
     }
 
-    // about:blank 页面 hostname 为空字符串 ""，不会命中 urlBlacklist，快捷键正常工作
+    // about:blank 页面 hostname 为空字符串 ""，不会命中 urlBlacklist
     const hostname = location.hostname
 
-    // 使用 matchShortcut 复用匹配逻辑（内置输入元素 + urlBlacklist 检查）
     const bookmarkCode = matchShortcut(
       e,
       isEnabled,
@@ -575,7 +620,7 @@ const initMain = () => {
     )
 
     // 无修饰键模式下 matchShortcut 对 ALLOWED_SET 中所有键都返回 code，
-    // 但 keymap 中可能没有实际绑定。发送消息前先检查是否真正绑定了命令/书签，
+    // 但 keymap 中可能没有实际绑定。先检查是否真正绑定了命令/书签，
     // 避免拦截页面原生的按键行为（如视频站点的方向键控制进度）。
     const hasCommandBinding =
       commandCode && commandKeymap?.[commandCode]?.command
@@ -584,7 +629,7 @@ const initMain = () => {
       bookmarkCode && activeBookmarkKeymap[bookmarkCode]?.url
 
     // scroll 命令本地执行，不走 SW
-    if (tryLocalScroll()) return
+    if (tryLocalScroll(e, commandCode)) return
 
     if (!hasCommandBinding && !hasBookmarkBinding) return
 
@@ -595,90 +640,26 @@ const initMain = () => {
     const hasModifierConflict =
       hasBookmarkBinding &&
       hasCommandBinding &&
-      // 原有：修饰键掩码相等
       ((bmMask === cmdMask &&
         !bookmarkNoModifierMode &&
         !commandNoModifierMode) ||
-        // 无修饰键模式：两者同时开启时冲突
         (bookmarkNoModifierMode && commandNoModifierMode))
 
-    // 通过 Port 发送按键事件到 SW，Port 不可用时降级为 sendMessage 兜底。
-    //
-    // sent 变量的关键作用：只有在至少一条消息成功发出时才拦截按键（preventDefault + stopPropagation）。
-    // 避免 Port 断开窗口期内用户按键被吞却无任何响应——Port 断开时 sent 保持 false，
-    // 事件继续传递给浏览器默认行为，用户不会感到"按键丢失"。
-    //
-    // 三层 fallback 机制（按优先级）：
-    //   1. Port 正常连接 → port.postMessage（最低延迟）
-    //   2. Port 不可用（SW 休眠/断连） → chrome.runtime.sendMessage（唤醒 SW，~50-200ms 延迟）
-    //   3. 书签快捷键专属 fallback → 使用本地 keymap 直接打开 URL（零延迟，不依赖 SW）
-    //
-    // Chrome MV3 的 SW 在 30s 空闲后会被终止，Port 连接也随之断开。
-    // sendMessage 能确保即使 SW 正在休眠也能被唤醒处理命令。
     let sent = false
     try {
-      // 命令优先：冲突时只发送命令
       if (hasCommandBinding) {
-        if (swReady && port) {
-          port.postMessage({
-            type: MSG_KEYDOWN,
-            key: e.code,
-            source: 'command',
-          })
-          sent = true
-        } else {
-          // Port 不可用：sendMessage 唤醒 SW，命令快捷键依赖 SW 执行
-          try {
-            chrome.runtime.sendMessage({
-              type: MSG_KEYDOWN,
-              key: e.code,
-              source: 'command',
-            })
-            sent = true
-          } catch {
-            // SW 被卸载等极端场景，无法唤醒，不拦截按键
-          }
-        }
+        sent = tryDispatchCommand(e)
       }
       if (hasBookmarkBinding && !hasModifierConflict) {
-        if (swReady && port) {
-          port.postMessage({
-            type: MSG_KEYDOWN,
-            key: e.code,
-            source: 'bookmark',
-          })
-          sent = true
-        } else {
-          // Port 不可用：先用 sendMessage 唤醒 SW，再用本地 keymap 兜底
-          try {
-            chrome.runtime.sendMessage({
-              type: MSG_KEYDOWN,
-              key: e.code,
-              source: 'bookmark',
-            })
-          } catch {
-            // sendMessage 也可能失败（SW 被卸载等极端场景）
-          }
-          sent = true
-          // 同时用本地 keymap 直接处理，零延迟响应用户
-          // source=1 时使用 systemKeymap，source=2 时使用持久化 keymap
-          const activeKeymap = source === 1 ? systemKeymap : keymap
-          const entry = activeKeymap[e.code]
-          if (entry?.url) {
-            e.preventDefault()
-            e.stopPropagation()
-            chrome.tabs.create({ url: padUrlHttps(entry.url) })
-          }
-        }
+        const bookmarkSent = tryDispatchBookmark(e)
+        sent = sent || bookmarkSent
       }
-      // 只有在至少一条消息成功发出时才拦截按键，
-      // 避免 Port 断开窗口期内用户按键被吞却无任何响应
       if (sent) {
         e.preventDefault()
         e.stopPropagation()
       }
     } catch {
-      // Port 异常时静默忽略，重连机制会自动恢复，不拦截按键
+      // Port 异常时静默忽略，重连机制会自动恢复
     }
   }
 
@@ -715,6 +696,9 @@ const initMain = () => {
       connectPort()
     }
   })
+
+  // ── 错误捕获 ────────────────────────────────────────────────────────────
+  registerGlobalErrorHandler('content-script')
 }
 
 initMain()

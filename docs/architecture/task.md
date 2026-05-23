@@ -26,11 +26,13 @@
 ## 1. Keydown 任务
 
 ```ts
-addKeydownTask(key: KeydownTaskKey, task: (e: KeyboardEvent) => boolean | void)
+addKeydownTask(key: KeydownTaskKey, task: (e: KeyboardEvent) => boolean | void, priority: TaskPriority)
 removeKeydownTask(key: KeydownTaskKey)
 startKeydown()   // 注册 document.onkeydown
 stopKeydown()    // 注销 document.onkeydown
 ```
+
+`TaskPriority` 类型：`0 | 10 | 20 | 30`（数字越小越优先）。
 
 ### 返回值约定
 
@@ -39,7 +41,16 @@ stopKeydown()    // 注销 document.onkeydown
 
 ### 执行顺序
 
-`startKeydown` 遍历 `keydownTaskMap.values()`，按注册顺序执行。防冲突由各 task 内部修饰键过滤保证：
+`startKeydown` 按 **优先级升序** 遍历 task（同优先级按 Map 注册顺序）。当前分配：
+
+| Priority | Task | 说明 |
+|----------|------|------|
+| 0 | `globalShortcut` | 命令快捷键，最高优先 |
+| 10 | `keyboardBookmark` | 书签键盘 |
+| 20 | `bookmarkFolder` | 书签文件夹导航（仅 Escape） |
+| 30 | `draft-tool` | 草稿工具（仅 Escape） |
+
+防冲突由各 task 内部修饰键过滤保证：
 
 | Task | 过滤规则 |
 |------|---------|
@@ -138,3 +149,20 @@ onPageFocus()   // 手动触发，由 App.vue 调用
 ### 4. Visibility task 自动注册
 
 `addVisibilityTask` 不需要手动 start/stop，模块被 import 后监听器就生效了。但如果模块被动态卸载（如 Widget 禁用），需要调用 `removeVisibilityTask` 清理。
+
+## 类型安全设计
+
+所有任务 Map 均使用泛型类型约束，禁止裸 `new Map()` 或使用 `string` 作为回调签名。
+
+| 模块 | Map 类型 | key 类型 |
+|------|---------|---------|
+| keydown | `Map<KeydownTaskKey, { task, priority }>` | 字面量联合类型 + 优先级 |
+| timer | `Map<string, () => void>` | string |
+| visibility | `Map<string, (isHidden: boolean) => void>` | string |
+| pageFocus | `Map<string, (isHidden: boolean) => void>` | string |
+
+新增任务类型时，应在对应文件中显式声明 key 联合类型，而非使用裸 `string`。
+
+## Widget 错误边界
+
+每个 Widget 在 `Content.vue` 中由 `WidgetErrorBoundary` 组件包裹。单个 Widget 在 `setup`/`onMounted`/渲染中抛出未捕获异常时，不会导致整个 Vue 应用崩溃，而是降级为错误占位提示。详见 `src/newtab/WidgetErrorBoundary.vue`。

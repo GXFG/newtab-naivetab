@@ -11,6 +11,7 @@
 import { keyboardCurrentModelAllKeyList } from '@/logic/keyboard/keyboard-layout'
 import { padUrlHttps } from '@/logic/utils/common'
 import { findFolderByPath, extractDomainName } from '@/logic/bookmark/parser'
+import { findBookmarksBarFromTree } from '@/logic/bookmark/api'
 import { removeBookmarkFromSourceFolder } from '@/logic/bookmark/mutations'
 import {
   KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER,
@@ -52,9 +53,9 @@ const getOrCreateTopLevelFolder = async (
   const existingTopFolder = findFolderByPath(tree, TOP_LEVEL_FOLDER)
   if (existingTopFolder) return existingTopFolder.id
 
-  const bookmarksBar = tree[0]?.children?.[0]
-  const otherBookmarks = tree[0]?.children?.[1]
-  const parentId = bookmarksBar?.id || otherBookmarks?.id || tree[0].id
+  // 通过 findBookmarksBarFromTree 定位书签工具栏，Chrome ID "1" 在 M142+ 后可能不再稳定
+  const barNode = findBookmarksBarFromTree(tree)
+  const parentId = barNode?.id || tree[0].id
   const folder = await chrome.bookmarks.create({
     parentId,
     title: TOP_LEVEL_FOLDER,
@@ -189,9 +190,9 @@ export const addBookmarkToSourceFolder = async (
   const tree = await chrome.bookmarks.getTree()
   const sourceFolder = findFolderByPath(tree, sourceFolderPath)
   if (!sourceFolder) {
-    const bookmarksBar = tree[0]?.children?.[0]
-    const otherBookmarks = tree[0]?.children?.[1]
-    const parentId = bookmarksBar?.id || otherBookmarks?.id || tree[0].id
+    // 通过 findBookmarksBarFromTree 定位书签工具栏，与 getOrCreateTopLevelFolder 保持一致
+    const barNode = findBookmarksBarFromTree(tree)
+    const parentId = barNode?.id || tree[0].id
     const folder = await chrome.bookmarks.create({
       parentId,
       title: sourceFolderPath.split('/').pop() || sourceFolderPath,

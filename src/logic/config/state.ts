@@ -32,6 +32,8 @@ const useWidgetStorageLocal = <K extends keyof WidgetConfigByCode>(key: K) => {
 }
 
 const createLocalConfig = (): LocalConfigRefs => {
+  // 逐字段构建后通过 return 处 as LocalConfigRefs 收敛类型，
+  // 中间对象用 any 避免逐字段声明类型（builder 模式常见做法）
   const res: any = {}
   res.general = useStorageLocal('c-general', defaultConfig.general)
   res.keyboardCommon = useStorageLocal(
@@ -52,3 +54,13 @@ const createLocalConfig = (): LocalConfigRefs => {
 export const localConfig: typeof defaultConfig = reactive(createLocalConfig())
 
 export const localState = useStorageLocal('l-state', defaultLocalState)
+
+/**
+ * 强制将 localConfig 中的配置写入 localStorage。
+ * 用于 popup 关闭前确保配置持久化，防止快速关闭导致 useStorageLocal 的 800ms 防抖被清除。
+ */
+export const flushConfigToLocalStorage = () => {
+  for (const key of Object.keys(localConfig)) {
+    localStorage.setItem(`c-${key}`, JSON.stringify(localConfig[key]))
+  }
+}

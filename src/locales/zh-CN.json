@@ -10,6 +10,7 @@
     "clear": "清除",
     "success": "成功",
     "fail": "失败",
+    "widgetError": "组件异常: __code__",
     "origin": "来源",
     "custom": "自定义",
     "import": "导入",
@@ -100,8 +101,15 @@
     "changeWallpaper": "更换壁纸"
   },
   "popup": {
-    "configBookmark": "书签配置",
+    "configNaivetab": "NaiveTab 配置",
     "syncingStatus": "同步中..."
+  },
+  "popupDomainFilter": {
+    "label": "域名黑名单",
+    "bookmarkShortcut": "书签快捷键",
+    "commandShortcut": "命令快捷键",
+    "unsupportedPage": "此页面不支持域名过滤",
+    "tip": "加入黑名单后，在该域名下快捷键将不会触发。"
   },
   "sponsor": {
     "title": "🔥「续命模式激活！今日代码含 ☕️ 量 200%」",
@@ -196,6 +204,7 @@
     "overwriteUrlConfirm": "当前按键已有 URL，确认覆盖为当前标签页地址？",
     "urlBlacklistTips": "在这些域名下不触发快捷键。每行一个域名，输入会自动清理协议前缀、路径、端口和大小写。\n• google.com — 匹配 google.com 及所有子域名（如 docs.google.com）\n• *.google.com — 同上，两种写法等价",
     "urlBlacklistPlaceholder": "每行一个域名，例如：google.com",
+    "maxBlacklistCount": "黑名单最多添加 __n__ 个域名",
     "pageSettings": "页面设置",
     "focusNavigation": "焦点与导航",
     "languageTime": "语言与时间",
@@ -291,7 +300,7 @@
     "recordModifier": "按下修饰键录制",
     "requireModifier": "请至少按下一个修饰键",
     "recording": "正在录制...",
-    "shortcutNote": "快捷键在输入框聚焦时自动禁用。特殊页面（chrome:// 等）不支持。",
+    "shortcutNote": "快捷键在特殊页面（chrome:// 等）不支持。",
     "shortcutInInputElement": "输入框中触发",
     "shortcutInInputElementTips": "开启后在输入框中也会触发快捷键。无修饰键模式下可能误触，使用组合键则不受影响",
     "selectKeycapTip": "点击键盘按键进行编辑",

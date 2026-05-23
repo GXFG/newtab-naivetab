@@ -6,6 +6,7 @@ export {
   removeKeydownTask,
   startKeydown,
   stopKeydown,
+  type TaskPriority,
 } from './keydown'
 export { addTimerTask, removeTimerTask, startTimer, stopTimer } from './timer'
 export { addVisibilityTask, removeVisibilityTask } from './events'

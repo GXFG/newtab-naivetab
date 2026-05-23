@@ -74,25 +74,80 @@ export function formatModifierKeys(keys: string[]): string {
   return keys.map((part) => MODIFIER_LABEL_MAP[part] || part).join(' + ')
 }
 
-export function isInInputElement(): boolean {
+/**
+ * 检查键盘事件的 target 是否为输入类元素。
+ * 检查顺序（与 Vimium C 一致）：
+ * 1. document.designMode（文档级状态，提前判断）
+ * 2. document.activeElement（浏览器焦点状态，焦点转移竞态下更新最快）
+ * 3. composedPath（Shadow DOM 穿透，补全 activeElement 未更新时的漏判）
+ * 支持 input/textarea/select/contenteditable/embed/object 等。
+ */
+export function isInInputElement(e: KeyboardEvent): boolean {
+  // 文档级可编辑模式提前判断，避免在 composedPath 循环中重复检查
+  if (document.designMode === 'on') return true
+
+  // 优先：检查当前聚焦元素（Vimium C 的主要检测手段）
   const active = document.activeElement
-  if (!active) return false
-
-  if (active.tagName === 'IFRAME') return true
-
-  const tag = active.tagName
-  if (tag === 'INPUT' || tag === 'TEXTAREA') return true
   if (
-    active.getAttribute('contenteditable') === 'true' ||
-    active.getAttribute('contenteditable') === ''
-  )
+    active instanceof Element &&
+    active !== document.body &&
+    isInputElementLike(active)
+  ) {
     return true
+  }
 
-  const role = active.getAttribute('role')
+  // 兜底：通过事件传播路径检测（Shadow DOM 场景）
+  const path = e.composedPath()
+  for (const el of path) {
+    if (!(el instanceof Element)) continue
+    if (isInputElementLike(el)) return true
+  }
+  return false
+}
+
+/**
+ * 判断单个元素是否为输入类元素。
+ * 参考 Vimium C getEditableType_ 和原始 Vimium isSelectable/isEditable。
+ */
+function isInputElementLike(el: Element): boolean {
+  if (el.tagName === 'IFRAME') return true
+
+  // embed/object 是可聚焦的嵌入式内容（如 Flash/PDF 阅读器）
+  const tag = el.tagName
+  if (tag === 'EMBED' || tag === 'OBJECT') return true
+
+  if (tag === 'INPUT') {
+    // 排除不可编辑的 input type（参考 Vimium C uneditableInputs_）
+    const type = (el as HTMLInputElement).type.toLowerCase()
+    return !UNEDITABLE_INPUT_TYPES.has(type)
+  }
+  if (tag === 'TEXTAREA' || tag === 'SELECT') return true
+
+  // 使用 isContentEditable 而非 getAttribute，自动处理继承链
+  // 当父元素设置了 contenteditable="true" 时，子元素的 getAttribute 返回 null，
+  // 但 isContentEditable 仍为 true（参考 Vimium lib/dom_utils.js）
+  if ((el as HTMLElement).isContentEditable) return true
+
+  const role = el.getAttribute('role')
   if (role === 'textbox' || role === 'searchbox' || role === 'combobox')
     return true
 
-  if (document.designMode === 'on') return true
-
   return false
 }
+
+/**
+ * html5 input 中不接收文本输入的类型（参考 Vimium C uneditableInputs_）。
+ * 浏览器将未知 type 视为 "text"，不在排除列表中。
+ */
+const UNEDITABLE_INPUT_TYPES = new Set([
+  'button',
+  'checkbox',
+  'color',
+  'file',
+  'hidden',
+  'image',
+  'radio',
+  'range',
+  'reset',
+  'submit',
+])

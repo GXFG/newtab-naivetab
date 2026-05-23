@@ -6,6 +6,7 @@ import { gaProxy } from '@/logic/utils/gtag'
 import { customPrimaryColor } from '@/logic/store/style'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import BaseNaiveBookmarkManager from '@/components/BaseNaiveBookmarkManager.vue'
+import PopupDomainFilter from './components/PopupDomainFilter.vue'
 
 // ── 键盘宽度计算 ────────────────────────────────────────────────────────
 const CARD_CONTENT_H_PADDING = 28
@@ -20,9 +21,7 @@ const popupStyle = computed(() => ({
 }))
 
 onMounted(() => {
-  gaProxy('view', ['popup'], {
-    userAgent: navigator.userAgent,
-  })
+  gaProxy('view', ['popup', 'naiveBookmark'])
 })
 
 // ── 同步状态 ────────────────────────────────────────────────────────────
@@ -39,7 +38,7 @@ const hasPendingSync = computed(
   >
     <template #header>
       <div class="popup__header">
-        <span class="header__title">{{ $t('popup.configBookmark') }}</span>
+        <span class="header__title">{{ $t('popup.configNaivetab') }}</span>
         <span
           v-show="hasPendingSync"
           class="header__syncing"
@@ -56,8 +55,10 @@ const hasPendingSync = computed(
     <BaseNaiveBookmarkManager
       ref="bookmarkManagerRef"
       :base-size="35"
-      :immediate-sync="true"
+      immediate-sync
     />
+
+    <PopupDomainFilter />
   </NCard>
 </template>
 

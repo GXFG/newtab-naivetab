@@ -67,37 +67,33 @@ import.meta.glob 扫描 → 构建 defaultConfig → createLocalConfig()
 - 末尾的 `updateSetting()` 是异步执行（不 await），整理配置结构但不阻塞首屏渲染
 - 每次修改配置结构都**必须同步升 `package.json` 版本号**
 
-### 配置迁移最佳实践
+配置迁移最佳实践（含各场景正确/错误做法对照表）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#配置迁移黄金法则)。
 
-| 场景 | 正确做法 | 错误做法 |
-|------|----------|----------|
-| 新增扁平字段 | 在 `handleAppUpdate` 中赋值 | 只改 `defaultConfig` |
-| 新增嵌套对象 | 整体赋值 `defaultConfig.xxx` | 只依赖浅合并 |
-| 重命名字段 | 新字段=旧字段值 → delete 旧字段 | 直接改字段名 |
-| 删除字段 | 先 `delete` 旧值 → 再删 `defaultConfig` | 直接从 `defaultConfig` 删 |
-| 修改类型 | 新增替代字段 + 迁移 | 直接改类型 |
-| 跨层迁移 | 从源层读值 → 写入目标层 → delete 源值 | 直接删除 |
+### 配置兼容性快照测试
 
-详见 [pitfalls.md](../../.claude/rules/pitfalls.md#配置迁移黄金法则)。
+新增迁移分支后，**必须运行快照测试确认不破坏老用户数据**：
+
+```bash
+npx vitest run src/logic/__tests__/config-snapshot.test.ts
+```
+
+| 文件 | 职责 |
+|------|------|
+| `src/logic/__tests__/config-snapshot.test.ts` | 从不同历史版本的用户配置快照出发，运行完整迁移流程，验证核心数据不丢失、结构完整 |
+| `test/fixtures/snapshot-v*.json` | 用户配置快照 JSON，可从线上用户 localStorage 导出或手动构造典型配置 |
+
+每个快照覆盖 5 个断言：
+1. 迁移不抛出异常
+2. 用户核心数据（keymap、颜色、背景图列表）不丢失
+3. 迁移后包含当前所有必需字段
+4. 旧版字段被正确清理
+5. 版本号升级到目标版本
+
+**新增快照**：在测试文件的 `fixtures` 数组中追加配置对象即可自动纳入测试。
 
 ## mergeState 合并函数
 
-```ts
-export const mergeState = (state: unknown, acceptState: unknown): unknown
-```
-
-**合并规则：**
-
-| 规则 | 条件 | 行为 |
-|------|------|------|
-| 1 | `acceptState` 为空 | 使用 `state`（默认值） |
-| 2 | 类型不同 | 使用 `state`（处理类型变更） |
-| 3 | 基础类型 | 直接使用 `acceptState` |
-| 4 | 数组等非纯 Object | 直接使用 `acceptState` |
-| 5 | keymap 特殊对象 | 直接使用 `acceptState`（Key*/Digit*/Numpad* 检测） |
-| 6 | 普通对象 | 递归合并，**只保留 `state` 中定义的字段** |
-
-核心设计：以 `state`（默认配置）为模板，过滤 `acceptState` 中的未知/废弃字段。
+以 `state`（默认配置）为模板，过滤 `acceptState` 中的未知/废弃字段。完整合并规则（含 keymap 直接替换、数组直接替换等特殊行为）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#mergestate-合并陷阱)。
 
 ## 主题与颜色系统
 

@@ -4,6 +4,17 @@
  * 自动检查 Widget/Command 的注册完整性，防止遗漏关键注册点。
  * 同时在 lint-staged 中作为 i18n key 同步校验使用。
  *
+ * 校验项：
+ *  1. Widget 在 codes.ts 但 codes.ts 未注册
+ *  2. Widget 在 codes.ts 但 WIDGET_ICON_META 无条目
+ *  3. Widget 在 codes.ts 但 WidgetConfigByCode 无类型映射
+ *  4. Command 在 keymap 但不在 CATEGORIES
+ *  5. i18n key 同步：zh-CN.json 与 en-US.json key 一致
+ *  6. i18n key 使用校验：
+ *     - 源码 $t('key') → locale 中必须存在（ERROR，阻断 pre-commit）
+ *     - locale 中 key 但源码未引用 → 警告（不阻断）
+ *     - 模板字符串调用 $t(`...`) → 提醒无法静态校验
+ *
  * 用法：
  *   pnpm exec esno scripts/validate-registries.ts          # 全量校验
  *   pnpm exec esno scripts/validate-registries.ts i18n     # 仅校验 i18n
@@ -234,6 +245,135 @@ const extractKeymapCommands = (source: string): string[] => {
 }
 
 /**
+ * 校验 7：i18n key 使用校验
+ * - 源码中 $t('key.xxx') 的 key 必须在 locale 文件中存在
+ * - locale 文件中无用的 key（源码未引用）也一并报告
+ */
+const checkI18nUsage = () => {
+  section('i18n key 使用校验')
+
+  const zhPath = resolve(SRC, 'locales/zh-CN.json')
+  const enPath = resolve(SRC, 'locales/en-US.json')
+
+  if (!existsSync(zhPath) || !existsSync(enPath)) {
+    error('locale 文件不存在')
+    return
+  }
+
+  const zh = readJson<Record<string, unknown>>(zhPath)
+  const en = readJson<Record<string, unknown>>(enPath)
+  const zhKeys = new Set(deepKeys(zh))
+  const enKeys = new Set(deepKeys(en))
+  const allLocaleKeys = new Set([...zhKeys, ...enKeys])
+
+  // ── 扫描源码中的 $t 调用 ──
+
+  // 匹配模式：
+  //   $t('key.xxx')          Vue 模板
+  //   window.$t('key.xxx')   TypeScript
+  //   .$t('key.xxx')         链式调用
+  // 支持单引号和双引号
+  // 注意：不匹配模板字符串 $t(`key.${var}`)，这些无法静态分析
+  const i18nRegex = /\$t\(\s*['"]([^'"`\s]+)['"]\s*[),.]/g
+
+  // 需要排除的目录
+  const excludeDirs = [
+    'node_modules',
+    '__tests__',
+    '.claude',
+    'dist',
+    'extension-chrome',
+    'extension-firefox',
+  ]
+
+  // 收集所有源码文件
+  const sourceFiles: string[] = []
+  const scanDir = (dir: string) => {
+    const entries = readdirSync(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      const fullPath = resolve(dir, entry.name)
+      if (entry.isDirectory()) {
+        if (!excludeDirs.includes(entry.name) && !entry.name.startsWith('.')) {
+          scanDir(fullPath)
+        }
+      } else if (entry.isFile() && /\.(vue|ts)$/.test(entry.name)) {
+        sourceFiles.push(fullPath)
+      }
+    }
+  }
+  scanDir(SRC)
+
+  // 提取所有引用的 i18n key
+  const usedKeys = new Set<string>()
+  const dynamicPatterns: string[] = [] // 无法静态分析的模板字符串 key
+
+  for (const file of sourceFiles) {
+    const content = readFileSync(file, 'utf-8')
+
+    // 提取静态 key
+    let match: RegExpExecArray | null
+    while ((match = i18nRegex.exec(content)) !== null) {
+      usedKeys.add(match[1])
+    }
+
+    // 检测模板字符串调用（无法静态分析，仅报告提醒）
+    const templateRegex = /\$t\(\s*`([^`]+)`/g
+    while ((match = templateRegex.exec(content)) !== null) {
+      const pattern = match[1]
+      // 如果包含 ${ 说明是动态的
+      if (pattern.includes('${')) {
+        const relativePath = file.replace(ROOT + '/', '')
+        dynamicPatterns.push(`${relativePath}: \`${pattern}\``)
+      }
+    }
+  }
+
+  // ── 校验：源码引用 → locale 是否存在 ──
+  const missingKeys = [...usedKeys].filter((k) => !allLocaleKeys.has(k))
+
+  if (missingKeys.length > 0) {
+    error(
+      `源码引用了 ${missingKeys.length} 个不存在的 i18n key: ${missingKeys.slice(0, 10).join(', ')}${missingKeys.length > 10 ? ' ...' : ''}`,
+    )
+  } else {
+    ok(`所有源码引用的 i18n key 均存在于 locale 文件中（${usedKeys.size} 个）`)
+  }
+
+  // ── 反向校验：locale 中存在但源码未引用（可能已废弃） ──
+  // 只报告 zh-CN 中的 key（en-US 的 key 应该和 zh-CN 一致）
+  // 注意：此为警告，不阻断 pre-commit（可能是有意保留的未来文案）
+  const unusedKeys = [...zhKeys].filter((k) => !usedKeys.has(k))
+
+  const warn = (msg: string) => {
+    console.log(`  ⚠️  ${msg}`)
+  }
+
+  if (unusedKeys.length > 0) {
+    warn(
+      `locale 中有但源码未引用的 key (${unusedKeys.length} 个，可能已废弃): ${unusedKeys.slice(0, 10).join(', ')}${unusedKeys.length > 10 ? ' ...' : ''}`,
+    )
+  } else {
+    ok('locale 中无冗余 key')
+  }
+
+  // ── 报告动态模板字符串调用（无法静态校验） ──
+  if (dynamicPatterns.length > 0) {
+    warn(`${dynamicPatterns.length} 处使用模板字符串调用 $t，无法静态校验:`)
+    for (const p of dynamicPatterns.slice(0, 5)) {
+      console.log(`     ${p}`)
+    }
+    if (dynamicPatterns.length > 5) {
+      console.log(`     ... 等 ${dynamicPatterns.length} 处`)
+    }
+  }
+
+  // 仅 missingKeys 阻断 pre-commit，unusedKeys 和 dynamicPatterns 仅警告
+  if (missingKeys.length === 0) {
+    ok('i18n key 使用校验通过')
+  }
+}
+
+/**
  * 校验 6：i18n key 同步
  */
 const checkI18nSync = () => {
@@ -284,11 +424,13 @@ const mode = args[0]
 
 if (mode === 'i18n') {
   checkI18nSync()
+  checkI18nUsage()
 } else {
   console.log('═══ NaiveTab 注册点完整性校验 ═══')
   checkUnregisteredWidgets()
   checkCommandConsistency()
   checkI18nSync()
+  checkI18nUsage()
 
   console.log()
   if (hasError) {

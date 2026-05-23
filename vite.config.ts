@@ -25,7 +25,8 @@ export const sharedConfig: UserConfig = {
   },
   define: {
     __DEV__: isDev,
-    __NAME__: JSON.stringify(packageJson.name),
+    __APP_NAME__: JSON.stringify(packageJson.name),
+    __APP_VERSION__: JSON.stringify(packageJson.version),
   },
   css: {
     postcss: {

@@ -88,6 +88,10 @@ const saveModifier = () => {
  * ⚠️ 使用 capture phase (true)：
  * 确保在页面脚本的 keydown 监听器之前捕获事件，
  * 防止页面调用 stopPropagation 导致录制器收不到事件。
+ *
+ * Debounce 逻辑：
+ * 每次 keydown 重置 100ms timer，持续按住时不会立即保存。
+ * 100ms 无新 keydown 后自动调用 saveModifier 落盘当前修饰键组合。
  */
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.code === 'Escape') {
@@ -105,8 +109,11 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (e.altKey) pressedModifiers.add('alt')
   if (e.metaKey) pressedModifiers.add('meta')
 
+  // 每次 keydown 更新修饰键快照，记录当前按下的组合
   lastModifierSnapshot = modifierFromSet()
 
+  // Debounce：重置 100ms 保存 timer
+  // 持续按键时不会触发 save，松手后 100ms 自动保存
   if (debounceTimer) {
     clearTimeout(debounceTimer)
   }
@@ -114,6 +121,13 @@ const handleKeydown = (e: KeyboardEvent) => {
   debounceTimer = setTimeout(() => saveModifier(), 100)
 }
 
+/**
+ * 按键松开处理
+ *
+ * 当所有修饰键都松开时（pressedModifiers.size === 0），
+ * 取消 debounce timer 并立即保存 —— 此时快照已由 keydown 更新，
+ * 即使 pressedModifiers 被清空也不会丢失选择。
+ */
 const handleKeyup = (e: KeyboardEvent) => {
   const hasModifier = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey
   if (hasModifier) {
@@ -129,6 +143,7 @@ const handleKeyup = (e: KeyboardEvent) => {
   if (e.code === 'MetaLeft' || e.code === 'MetaRight')
     pressedModifiers.delete('meta')
 
+  // 所有修饰键都已松开 → 立即保存，不再等 debounce
   if (pressedModifiers.size === 0 && debounceTimer) {
     clearTimeout(debounceTimer)
     debounceTimer = null

@@ -177,7 +177,7 @@ const warnings = computed(() => {
   gap: var(--space-1);
   padding: 0 0 var(--space-3) var(--space-3);
   font-size: var(--text-xs);
-  color: rgba(208, 48, 80, 0.9);
+  color: var(--color-error);
   line-height: 1.5;
 
   .warning__icon {

@@ -215,13 +215,66 @@ export const moveTab = async (currentTabId: number, offset: 1 | -1) => {
 
 // ── 窗口操作 ────────────────────────────────────────────────────────────────
 
+/**
+ * 记录 pinned tab 被移出窗口前的位置。
+ * key: tabId, value: { originalWindowId, pinnedIndex }
+ * 用于 tab 移回原窗口时恢复 pinned 位置。
+ */
+const pinnedPositionCache = new Map<
+  number,
+  { originalWindowId: number; pinnedIndex: number }
+>()
+
+/**
+ * 获取 tab 在当前窗口 pinned tab 中的索引。
+ */
+const getPinnedIndex = async (
+  tabId: number,
+  windowId: number,
+): Promise<number> => {
+  const pinnedTabs = await chrome.tabs
+    .query({ windowId, pinned: true })
+    .catch(() => [] as chrome.tabs.Tab[])
+  return pinnedTabs.findIndex((t) => t.id === tabId)
+}
+
 export const moveToNewWindow = async (tabId: number) => {
-  chrome.windows.create({ tabId }).catch(logLastError)
+  const tab = await chrome.tabs.get(tabId).catch(logLastError)
+  if (!tab) return
+
+  const wasPinned = tab.pinned
+
+  // 记录 pinned 位置（在移动前，tab 仍在源窗口中）
+  // 必须 await 确保 cache 在后续操作前写入，否则用户快速连续操作
+  //（如 moveToNewWindow 后立即 moveTabToNextWindow 移回）时，
+  // getPinnedIndex 的 .then 尚未执行，cache 为空导致丢失原始 pinned 索引。
+  if (wasPinned && tab.windowId) {
+    const pinnedIndex = await getPinnedIndex(tabId, tab.windowId)
+    if (pinnedIndex >= 0) {
+      pinnedPositionCache.set(tabId, {
+        originalWindowId: tab.windowId!,
+        pinnedIndex,
+      })
+    }
+  }
+
+  const newWindow = await chrome.windows.create({ tabId }).catch(logLastError)
+  if (!newWindow) return
+
+  // 跨窗口移动后恢复 pinned 状态
+  if (wasPinned && newWindow.tabs) {
+    const movedTab = newWindow.tabs.find((t) => t.id === tabId)
+    if (movedTab?.id) {
+      chrome.tabs.update(movedTab.id, { pinned: true }).catch(logLastError)
+    }
+  }
 }
 
 export const moveTabToNextWindow = async (tabId: number) => {
   const currentTab = await chrome.tabs.get(tabId).catch(() => null)
   if (!currentTab?.windowId) return
+
+  const sourceWindowId = currentTab.windowId
 
   const windows = await chrome.windows.getAll().catch(() => [])
   const otherWindows = windows.filter(
@@ -245,15 +298,64 @@ export const moveTabToNextWindow = async (tabId: number) => {
     }
   }
 
-  chrome.tabs
-    .move(tabId, { windowId: targetWindow.id!, index: -1 })
-    .then(() => {
-      chrome.tabs.update(tabId, { active: true }).catch(logLastError)
-      chrome.windows
-        .update(targetWindow.id!, { focused: true })
-        .catch(logLastError)
-    })
-    .catch(logLastError)
+  const wasPinned = currentTab.pinned
+  const cachedPos = wasPinned ? pinnedPositionCache.get(tabId) : null
+  const isReturning =
+    wasPinned && cachedPos && cachedPos.originalWindowId === targetWindow.id
+
+  // 在移动前获取 pinned 位置（tab 仍在源窗口中）
+  let savedPinnedIndex = -1
+  if (wasPinned && !isReturning) {
+    savedPinnedIndex = await getPinnedIndex(tabId, sourceWindowId)
+  }
+
+  // 移回原窗口 → 恢复 pinned 位置；移到新窗口 → 追加到末尾
+  if (isReturning) {
+    // 恢复原始 pinned 索引
+    const pinnedIndex = cachedPos!.pinnedIndex
+    pinnedPositionCache.delete(tabId)
+
+    chrome.tabs
+      .move(tabId, { windowId: targetWindow.id!, index: -1 })
+      .then(async () => {
+        // 恢复 pinned
+        await chrome.tabs.update(tabId, { pinned: true })
+
+        // 获取恢复后的 pinned 位置，再 move 到原始索引
+        const actualIndex = await getPinnedIndex(tabId, targetWindow.id!)
+        if (actualIndex >= 0 && actualIndex !== pinnedIndex) {
+          chrome.tabs.move(tabId, { index: pinnedIndex }).catch(logLastError)
+        }
+
+        chrome.tabs.update(tabId, { active: true }).catch(logLastError)
+        chrome.windows
+          .update(targetWindow.id!, { focused: true })
+          .catch(logLastError)
+      })
+      .catch(logLastError)
+  } else {
+    // 记录原始位置（在移动前已完成查询）
+    if (wasPinned && savedPinnedIndex >= 0) {
+      pinnedPositionCache.set(tabId, {
+        originalWindowId: sourceWindowId,
+        pinnedIndex: savedPinnedIndex,
+      })
+    }
+
+    chrome.tabs
+      .move(tabId, { windowId: targetWindow.id!, index: -1 })
+      .then(() => {
+        const updates: chrome.tabs.UpdateProperties = { active: true }
+        if (wasPinned) {
+          updates.pinned = true
+        }
+        chrome.tabs.update(tabId, updates).catch(logLastError)
+        chrome.windows
+          .update(targetWindow.id!, { focused: true })
+          .catch(logLastError)
+      })
+      .catch(logLastError)
+  }
 }
 
 /**
@@ -330,12 +432,27 @@ export const mergeAllWindows = async (_currentTabId: number) => {
 
   for (const win of others) {
     if (!win.tabs) continue
+
+    // 保存每个 tab 的 pinned 状态，跨窗口移动后需要恢复
+    const pinnedMap = new Map<number, boolean>()
+    for (const t of win.tabs) {
+      if (t.id) pinnedMap.set(t.id, t.pinned)
+    }
+
     const tabIds = win.tabs.map((t) => t.id!).filter(Boolean)
     if (tabIds.length === 0) continue
 
     await chrome.tabs
       .move(tabIds, { windowId: targetId, index: -1 })
       .catch(logLastError)
+
+    // 恢复 pinned 状态
+    for (const [id, wasPinned] of pinnedMap) {
+      if (wasPinned) {
+        chrome.tabs.update(id, { pinned: true }).catch(logLastError)
+      }
+    }
+
     await chrome.windows.remove(win.id!).catch(logLastError)
   }
 

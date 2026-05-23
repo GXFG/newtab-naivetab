@@ -46,6 +46,9 @@ function resetMockState() {
       syncId: DEFAULT_SYNC_IDS[field],
       localModifiedTime: 0,
       dirty: false,
+      retryCount: 0,
+      lastError: '',
+      syncStatus: 'idle',
     }
   }
 }
@@ -123,7 +126,7 @@ vi.doMock('@/logic/store/state', () => ({
 
 vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: CONFIG_FIELDS,
-  defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false },
+  defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false, retryCount: 0, lastError: '', syncStatus: 'idle' },
 }))
 
 // Recursive merge helper (cannot reference vi.doMock factory's own name)
@@ -264,8 +267,13 @@ describe('loadRemoteConfig sync branches', () => {
         general: { version: '2.3.0', lang: 'en' },
       }),
     )
-    // 同步状态应更新
-    expect(mockIsUploadConfigStatusMap.general.syncId).toBe(remoteSyncId)
+    // 同步状态应更新：syncId 设为过滤后数据的 MD5（防止 watch 触发多余上传）
+    expect(mockIsUploadConfigStatusMap.general.syncId).toBeTruthy()
+    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
+    expect(mockIsUploadConfigStatusMap.general.loading).toBe(false)
+    expect(mockIsUploadConfigStatusMap.general.retryCount).toBe(0)
+    expect(mockIsUploadConfigStatusMap.general.lastError).toBe('')
+    expect(mockIsUploadConfigStatusMap.general.syncStatus).toBe('idle')
   })
 
   it('Branch 4: local newer (dirty=true, localModifiedTime > syncTime) → upload local', async () => {
@@ -306,9 +314,13 @@ describe('loadRemoteConfig sync branches', () => {
         general: { version: '2.3.0', lang: 'fr' },
       }),
     )
-    // dirty 应被清除
+    // dirty 应被清除，syncId 设为过滤后数据的 MD5
     expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
-    expect(mockIsUploadConfigStatusMap.general.syncId).toBe(remoteSyncId)
+    expect(mockIsUploadConfigStatusMap.general.loading).toBe(false)
+    expect(mockIsUploadConfigStatusMap.general.syncId).toBeTruthy()
+    expect(mockIsUploadConfigStatusMap.general.retryCount).toBe(0)
+    expect(mockIsUploadConfigStatusMap.general.lastError).toBe('')
+    expect(mockIsUploadConfigStatusMap.general.syncStatus).toBe('idle')
   })
 
   it('Branch 3 with local newer version → local as template preserves local new fields', async () => {
@@ -539,6 +551,9 @@ describe('multi-device sync scenarios', () => {
       syncId: string
       localModifiedTime: number
       dirty: boolean
+      retryCount?: number
+      lastError?: string
+      syncStatus?: string
     }>
   }
 

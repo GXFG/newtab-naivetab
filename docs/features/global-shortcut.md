@@ -50,20 +50,21 @@
 │                                                               │
 │  task/keydown.ts → 多个 keydown task 依次执行              │
 │                                                               │
-│  ① globalShortcutTask（书签 + 命令统一处理）：                   │
-│     - 同时匹配书签和命令快捷键，冲突时命令优先                    │
+│  ① globalShortcutTask（命令快捷键）：                            │
+│     - 仅匹配命令快捷键，通过 matchShortcut 统一匹配               │
 │     - execEnv='newtab': 直接本地执行（不走 SW）                 │
 │       * toggleFocusMode → localState.isFocusMode 切换          │
 │       * toggleDragMode → toggleIsDragMode()                    │
 │       * toggleSettingDrawer → switchSettingDrawerVisible()     │
-│     - 仅书签匹配: Port.postMessage({key, source:'bookmark'})    │
-│     - 命令匹配(无冲突): Port.postMessage({key, source:'command'})│
+│     - 匹配成功：Port.postMessage({key, source:'command'})       │
+│     - 匹配失败：返回 false，交由 keyboardTask 处理书签            │
 │     - 接收 SW 回传的 CS 命令（与 CS 共享 Port，复用执行器）      │
 │                                                               │
-│  ② keyboardBookmark keydown task（键盘 Widget 按键绑定）：      │
-│     - 无修饰键直接匹配，在当前 layout 中查找对应键              │
-│     - 命令快捷键开启 noModifierMode 时静默跳过（命令优先）       │
-│     - 匹配成功后打开对应书签 URL                                │
+│  ② keyboardBookmark keydown task（书签快捷键）：                 │
+│     - 作为命令的兜底，通过 matchShortcut 统一匹配书签             │
+│     - 自动处理 isInInputElement、urlBlacklist、e.repeat         │
+│     - 限定当前 layout 可见按键，匹配后打开书签 URL               │
+│     - 命令优先：globalShortcutTask 先注册先执行，返回 true 阻断   │
 └──────────────────────────┬────────────────────────────────────┘
                            │ Port 消息 (双向)
                            ▼
@@ -99,7 +100,7 @@
 
 ### 已实现状态
 
-- [x] `globalShortcutForBookmark` 已迁移至 Port 架构（newtab 端已合并至 `globalShortcutTask`）
+- [x] `globalShortcutForBookmark` 已迁移至 Port 架构（newtab 端由 keyboardTask 处理）
 - [x] 命令快捷键配置定义 + SW 缓存 + 命令分发
 - [x] Port 双向通信：CS → SW 发送按键，SW → CS 回传命令
 - [x] CS 端命令执行器：scrollUp/Down/ToTop/ToBottom、reloadPage、copyPageUrl、copyPageTitle
@@ -108,7 +109,8 @@
 - [x] newtab 本地命令（execEnv: 'newtab'）：不走 SW，直接在 newtab 页面执行
 - [x] SW 独立校验 `isEnabled`（bookmark + command 双重校验）
 - [x] CS 端命令快捷键监听（`source: 'command'` 发送路径）
-- [x] newtab 端统一快捷键 task（`globalShortcutTask`，书签 + 命令合并，命令优先）
+- [x] newtab 端命令快捷键 task（`globalShortcutTask`，仅处理命令）
+- [x] newtab 端书签快捷键 task（`keyboardTask`，由 keyboardBookmark Widget 注册，命令优先）
 - [x] SW 端 `source` 字段安全校验（只允许 `'bookmark'` 或 `'command'`）
 - [x] SW 端 Chrome API 调用错误处理（`.catch(logLastError)`）
 
@@ -244,10 +246,11 @@ chrome.storage sync key:  naive-tab-keyboardCommand
 | 文件 | 职责 |
 |------|------|
 | `src/logic/shortcut/shortcut-command.ts` | 命令定义（`COMMAND_CATEGORIES`）、类型（`TCommandName`、`TSwCommandName`、`TCsCommandName`、`TNewtabCommandName`）、配置（`KEYBOARD_COMMAND_CONFIG`） |
-| `src/logic/shortcut/shortcut-executor.ts` | newtab 端统一快捷键 task（书签 + 命令合并处理）；冲突检测（命令优先）；newtab 本地命令执行器；CS 命令回传执行器；Port 监听注册 |
+| `src/logic/shortcut/shortcut-executor.ts` | newtab 端命令快捷键 task（仅处理命令）；newtab 本地命令执行器；CS 命令回传执行器；Port 监听注册 |
 | `src/logic/shortcut/matcher.ts` | 快捷键匹配核心：`matchShortcut` 位掩码比较、O(1) 修饰键匹配 |
 | `src/logic/shortcut/port.ts` | 共享 Port 长连接管理：`getSharedPort()` 自动重连、`isSwReady` 状态检测 |
 | `src/logic/shortcut/utils.ts` | 快捷键工具：域名规范化、黑名单、修饰键系统（`toModifierMask`）、输入元素检测 |
+| `src/newtab/widgets/keyboardBookmark/index.vue` | newtab 端书签快捷键 task（键盘 Widget），通过 matchShortcut 统一匹配，命令优先兜底 |
 | `src/background/main.ts` | SW 入口：启动编排、Port 管理注册、CS 重新注入（胶水层） |
 | `src/background/config/cache.ts` | SW 端配置缓存，监听 `storage.onChanged` 自动更新 |
 | `src/background/commands/handlers.ts` | SW 端所有 chrome tab/window 操作的具体实现 |
@@ -279,7 +282,7 @@ chrome.storage sync key:  naive-tab-keyboardCommand
 | 存储 key | `c-keyboardBookmark` | `c-keyboardCommand` | `c-keyboardBookmark` |
 | 云同步 key | `naive-tab-keyboardBookmark` | `naive-tab-keyboardCommand` | `naive-tab-keyboardBookmark` |
 | 启用开关 | `keyboardBookmark.isGlobalShortcutEnabled` | `keyboardCommand.isEnabled` | `keyboardBookmark.enabled`（Widget 开关） |
-| 无修饰键模式 | `keyboardBookmark.noModifierMode`（默认 `false`） | `keyboardCommand.noModifierMode`（默认 `false`） | ❌ 无修饰键，始终无修饰键匹配 |
+| 无修饰键模式 | `keyboardBookmark.noModifierMode`（默认 `false`） | `keyboardCommand.noModifierMode`（默认 `false`） | 使用 `keyboardBookmark.noModifierMode` |
 | 修饰键 | `keyboardBookmark.globalShortcutModifiers`（默认 `['alt']`，数组） | `keyboardCommand.modifiers`（默认 `['shift', 'alt']`，数组） | ❌ 不响应修饰键 |
 | Keymap | `keyboardBookmark.keymap: Record<string, TBookmarkEntry>` | `keyboardCommand.keymap: Record<string, TCommandEntry>` | 复用 `keyboardBookmark.keymap` |
 | 功能 | 打开书签 URL | 执行浏览器命令 | 键盘 UI 映射打开书签 URL |
@@ -287,9 +290,9 @@ chrome.storage sync key:  naive-tab-keyboardCommand
 
 **修饰键冲突处理：命令优先。** 当书签和命令使用相同修饰键掩码或同时开启无修饰键模式时，命令快捷键优先生效，书签被短路。
 - Content Script 端：`hasModifierConflict` 检测，冲突时只发送 `source: 'command'` 消息
-- newtab 端：`globalShortcutTask` 单一 handler 内命令优先
+- newtab 端：`globalShortcutTask` 先注册先执行处理命令，返回 `true` 阻断后续 `keyboardTask`（书签）
 
-**键盘书签 Widget 与命令快捷键冲突：命令优先。** 当命令快捷键开启无修饰键模式（`noModifierMode: true`）时，键盘书签 Widget 的 keydown handler 静默跳过，不响应任何按键。这样避免同一按键同时触发命令执行和书签打开。
+**键盘书签 Widget 与命令快捷键冲突：命令优先。** `globalShortcutTask` 通过 `setupNewtabCommandShortcut()` 在 App.vue script setup 顶层同步注册（早于所有子组件 setup），确保其先于 `keyboardTask` 执行。命令匹配成功时返回 `true` 阻断，书签作为兜底处理。
 
 ---
 
@@ -315,9 +318,31 @@ chrome.storage sync key:  naive-tab-keyboardCommand
 
 ### 为什么 CS 和 newtab 端的快捷键处理代码不抽成通用函数？
 
-CS 端需要处理：书签本地 fallback、scroll 命令本地执行、`swReady` 状态判断、Port 断开时的 sendMessage 降级。newtab 端需要处理：`newtabControlExecutors` 本地命令、通过 `getSharedPort()` 自动重连、`task` 系统注册。
+CS 端需要处理：书签本地 fallback、scroll 命令本地执行、`swReady` 状态判断、Port 断开时的 sendMessage 降级。newtab 端分为两个 task：`globalShortcutTask`（命令快捷键，App.vue script setup 顶层注册）和 `keyboardTask`（书签快捷键，keyboardBookmark Widget 挂载时注册），利用 `keydownTaskMap` 的插入顺序保证命令优先。
 
 两端的特殊逻辑与所在层的职责紧密耦合，强抽通用函数会引入 15+ 参数的怪物函数，模糊层级边界。匹配引擎（`matcher.ts`）已经是正确的抽象层级。
+
+### 为什么 newtab 端的书签快捷键有 `keyboardCurrentModelAllKeyList` 前置过滤？
+
+newtab 页面有可视化键盘 UI，`keyboardCurrentModelAllKeyList` 确保只有当前键盘布局中"可见"的键才能触发书签快捷键。例如 key61 布局不包含 F13，用户按 F13 时不应触发书签，因为虚拟键盘上没有对应的键。
+
+CS 页面注入到普通网页中，没有可视化 UI 约束，因此使用更通用的 `ALLOWED_SET` 白名单。
+
+### 为什么 newtab 端的命令快捷键不使用 sendMessage 降级？
+
+CS 端在 Port 不可用时通过 `chrome.runtime.sendMessage` 唤醒 SW，是因为 CS 注入到第三方网页，用户可能在页面停留数小时，SW 休眠后 Port 断连的概率较高。
+
+newtab 端只有 Port 一条路径，不使用 sendMessage 降级：
+1. Port 断连后 `scheduleReconnect` 使用指数退避（100ms~1000ms）自动重连，窗口期极短
+2. `chrome.runtime.connect()` 调用本身会唤醒休眠的 SW
+3. 用户打开 newtab 页面时会立即建立 Port 连接，实际场景中 Port 断开的窗口期几乎不存在
+4. toast 提示比静默等待 50-200ms 更直接
+
+### 为什么 URL 黑名单在 newtab 页面不生效？
+
+newtab 页面的 URL 为 `chrome-extension://<id>/dist/newtab.html`，`location.hostname` 为空字符串。`matchShortcut` 中 `hostname &&` 会短路跳过黑名单检查，快捷键在 newtab 页面始终可用。
+
+这是有意设计——黑名单的语义是"在这些域名下不触发快捷键"，面向的是普通网页场景。用户在 newtab 自己的主页面上，快捷键应该始终生效。
 
 ---
 
@@ -329,7 +354,7 @@ CS 端需要处理：书签本地 fallback、scroll 命令本地执行、`swRead
 |------|----------|
 | 按键按住不放（repeat 事件） | 非 scroll 命令：`e.repeat` 过滤，不重复触发<br>scroll 命令：`tryLocalScroll` 放行，启动 rAF 动画循环（按住加速、松开减速，不依赖 OS repeat） |
 | 未启用全局快捷键 | CS/SW 双重 `isEnabled` 校验 |
-| 输入元素中误触发 | CS: `isInInputElement()` + `shortcutInInputElement` 配置<br>newtab: `isInputFocused` 上游屏蔽 |
+| 输入元素中误触发 | CS: `isInInputElement(e)` 检查 `composedPath()` + `shortcutInInputElement` 配置<br>newtab: `isInputFocused` 上游屏蔽 |
 | 修饰键不匹配 | `eventMask !== configMask` 位掩码严格相等 |
 | 主键不在白名单 | `ALLOWED_SET.has(e.code)` |
 | keymap 中无对应命令 | `entry?.command` 可选链 |
@@ -340,9 +365,9 @@ CS 端需要处理：书签本地 fallback、scroll 命令本地执行、`swRead
 | Content Script 重复注入 | `window.__naivetabGlobalShortcutInit` guard |
 | 配置异步加载期间按键 | `keymap` 初始为空对象，查不到不触发 |
 | 修饰键冲突（书签 + 命令同时匹配） | Content Script：命令优先，只发送 `source:'command'`，不重复触发书签 |
-| 两者同时开启无修饰键模式 + 同键冲突 | Content Script：命令优先（跳过书签消息）<br>newtab：`globalShortcutTask` 单一 handler 内命令优先，书签被跳过 |
-| newtab 冲突防护 | `globalShortcutTask`（`shortcut-executor.ts`）：单一 task 内同时匹配书签和命令，冲突时命令优先 |
-| keyboardBookmark 与命令冲突 | 命令快捷键开启 `noModifierMode` 时，keyboardBookmark 的 keydown task 静默跳过，命令优先 |
+| 两者同时开启无修饰键模式 + 同键冲突 | Content Script：命令优先（跳过书签消息）<br>newtab：`globalShortcutTask` 先注册先执行处理命令，返回 `true` 阻断后续 `keyboardTask` |
+| newtab 冲突防护 | `globalShortcutTask`（`shortcut-executor.ts`）仅处理命令，`keyboardTask`（`keyboardBookmark/index.vue`）处理书签，通过 `keydownTaskMap` 插入顺序保证命令优先 |
+| keyboardBookmark 与命令冲突 | `globalShortcutTask` 在 App.vue script setup 顶层同步注册（先于子组件 setup），命令匹配成功时返回 `true` 阻断 `keyboardTask` |
 | prototype 污染攻击 | `keymap[key]` 直接查找，非原型属性返回 undefined |
 | gzip 压缩数据解析 | `parseStoredData` 自动解压，降级兼容原始 JSON |
 | SW 信任发送方 | SW 独立校验 `isEnabled`，不完全信任发送方 |
@@ -384,3 +409,4 @@ CS 端需要处理：书签本地 fallback、scroll 命令本地执行、`swRead
 | Port 断连后首次按键可能丢失 | 极低 | SW 休眠时重建连接需要时间，首次 `postMessage` 可能在连接建立前发出，被 `try/catch` 静默吞掉。下次按键自动恢复 |
 | `onUnmounted` 清理几乎不会执行 | 无 | 标签页关闭时 JS 环境直接销毁，不触发 Vue 生命周期。清理代码仅在 HMR / 热重载时生效 |
 | newtab 命令在 newtab 页面设置抽屉打开时无效 | 低 | `task/keydown.ts` 在设置面板打开时屏蔽所有按键事件（仅 Escape 除外） |
+| `moveTabToNextWindow` 移出时 pinned tab 位置丢失 | 低 | `chrome.tabs.move` 跨窗口移动不保留 pinned 索引，移出时位置丢失，**移回原窗口时自动恢复**。新窗口中 pinned tab 始终追加到末尾。由 `pinnedPositionCache`（内存 Map）记录原始窗口 ID 和 pinned 索引。 |

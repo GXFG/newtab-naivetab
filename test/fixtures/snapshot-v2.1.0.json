@@ -1,0 +1,121 @@
+{
+  "_description": "v2.1.0 用户配置：键盘已拆分但未迁移到新版快捷键架构",
+  "_version": "2.1.0",
+  "_captureDate": "2026-05",
+  "general": {
+    "version": "2.1.0",
+    "lang": "en-US",
+    "timeLang": "en-US",
+    "appearance": "dark",
+    "pageTitle": "NaiveTab",
+    "fontFamily": "Roboto",
+    "fontSize": 16,
+    "fontColor": ["rgba(255, 255, 255, 1)", "rgba(255, 255, 255, 1)"],
+    "primaryColor": ["rgba(100, 160, 230, 1)", "rgba(100, 160, 230, 1)"],
+    "backgroundColor": ["rgba(26, 26, 46, 1)", "rgba(26, 26, 46, 1)"],
+    "openPageFocusElement": "search",
+    "focusVisibleWidgetMap": {
+      "search": true,
+      "keyboardBookmark": true,
+      "clockDigital": true,
+      "calendar": true
+    },
+    "showBreakingChangeNotice": false,
+    "isBackgroundImageEnabled": true,
+    "backgroundImageSource": "network",
+    "backgroundImageList": [
+      { "networkSourceType": "pexels", "name": "19161535" },
+      { "networkSourceType": "pexels", "name": "36873465" }
+    ]
+  },
+  "keyboardBookmark": {
+    "keymap": {
+      "KeyG": { "url": "https://github.com", "title": "GitHub" },
+      "KeyY": { "url": "https://youtube.com", "title": "YouTube" },
+      "KeyT": { "url": "https://twitter.com", "title": "Twitter" },
+      "Digit1": { "url": "https://mail.google.com", "title": "Gmail" },
+      "Digit2": { "url": "https://docs.google.com", "title": "Google Docs" }
+    },
+    "source": 1,
+    "isListenBackgroundKeystrokes": false
+  },
+  "keyboardCommon": {
+    "keyboardType": "key87",
+    "keycapType": "dsa",
+    "splitSpace": "space2",
+    "fontSize": 15,
+    "fontFamily": "Roboto",
+    "keycapSize": 60,
+    "keycapPadding": 2,
+    "isShellVisible": true,
+    "shellColor": ["rgba(40, 40, 60, 1.0)", "rgba(40, 40, 60, 1.0)"],
+    "shellBackgroundBlur": 8,
+    "mainFontColor": ["rgba(226, 232, 240, 1.0)", "rgba(226, 232, 240, 1.0)"],
+    "mainBackgroundColor": ["rgba(71,85,105,1.0)", "rgba(71,85,105,1.0)"],
+    "plateColor": ["rgba(119, 119, 119, 0.5)", "rgba(119, 119, 119, 0.5)"]
+  },
+  "keyboardCommand": {
+    "keymap": {
+      "KeyQ": { "command": "moveTabLeft" },
+      "KeyE": { "command": "moveTabRight" },
+      "KeyA": { "command": "prevTab" },
+      "KeyD": { "command": "nextTab" },
+      "KeyX": { "command": "closeTab" },
+      "KeyV": { "command": "toggleTabPinned" },
+      "KeyT": { "command": "newTabAfter" }
+    },
+    "enabled": true,
+    "modifierKeys": ["shift", "ctrl"]
+  },
+  "search": {
+    "isNewTabOpen": true,
+    "backgroundBlur": 0
+  },
+  "clockDigital": {
+    "fontSize": 28,
+    "width": 22
+  },
+  "clockAnalog": {
+    "enabled": true,
+    "showSecondHand": false
+  },
+  "clockFlip": {
+    "enabled": false
+  },
+  "clockNeon": {
+    "enabled": false
+  },
+  "date": {
+    "enabled": true
+  },
+  "yearProgress": {
+    "enabled": true,
+    "backgroundBlur": 0
+  },
+  "calendar": {
+    "festivalCountdown": true,
+    "backgroundBlur": 0,
+    "dayFontFamily": "Roboto",
+    "descFontFamily": "Roboto"
+  },
+  "memo": {
+    "enabled": true,
+    "backgroundBlur": 0,
+    "fontFamily": "Roboto"
+  },
+  "news": {
+    "enabled": true,
+    "backgroundBlur": 0,
+    "fontFamily": "Roboto"
+  },
+  "bookmarkFolder": {
+    "enabled": false
+  },
+  "weather": {
+    "enabled": true,
+    "unit": "metric"
+  },
+  "countdown": {
+    "enabled": false
+  }
+}

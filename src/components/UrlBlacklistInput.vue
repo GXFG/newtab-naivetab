@@ -68,7 +68,7 @@ const handleBlur = () => {
           v-model:value="inputText"
           type="textarea"
           :placeholder="placeholder"
-          :autosize="{ minRows: 3, maxRows: 6 }"
+          :rows="3"
           @blur="handleBlur"
         />
 

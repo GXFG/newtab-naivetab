@@ -34,6 +34,8 @@ export const getToutiaoNews = async () => {
     newsLocalState.value.toutiao.syncTime = dayjs().valueOf()
     log('News-update toutiao')
   } catch (e) {
+    // 请求已成功（非网络错误），catch 仅兜底第三方 API 响应结构变更导致的解析异常。
+    // widget 无新闻数据显示即可，不需要 toast 打扰用户。
     console.warn(e)
   }
 }

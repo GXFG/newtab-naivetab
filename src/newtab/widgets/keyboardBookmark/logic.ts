@@ -42,9 +42,13 @@ export const openPage = (
   url: string,
   isBgOpen = false,
   isNewTabOpen = false,
+  keyCode?: string,
 ) => {
   if (url.length === 0) return
-  gaProxy('click', ['keyboardBookmark', 'openPage'])
+  gaProxy('click', ['openBookmark'], {
+    source: keyCode ? 'widget_key' : 'widget_click',
+    ...(keyCode ? { key_code: keyCode } : {}),
+  })
   if (isBgOpen) {
     createTab(url, false)
     delayResetPressKey()

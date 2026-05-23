@@ -22,6 +22,8 @@
  * 如需进一步提升 coverage，需在集成测试中挂载真实 Widget 组件。
  */
 
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 /** 统一的 mock 辅助函数，减少重复代码 */
 async function loadMoveable(overrides: { localConfig?: Record<string, any> } = {}) {
   vi.resetModules()
@@ -363,6 +365,102 @@ describe('toggle exports', () => {
   it('toggleIsDragMode toggles the value', () => {
     toggleIsDragMode()
     expect(isDragMode.value).toBe(true)
+    toggleIsDragMode()
+    expect(isDragMode.value).toBe(false)
+  })
+})
+
+// ── toggleDragMode 测试 ──
+
+describe('toggleDragMode', () => {
+  let isDragMode: typeof import('@/logic/moveable')['isDragMode']
+  let toggleDragMode: typeof import('@/logic/moveable')['toggleDragMode']
+  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+
+  beforeEach(async () => {
+    vi.useFakeTimers()
+    const mod = await loadMoveable()
+    isDragMode = mod.isDragMode
+    toggleDragMode = mod.toggleDragMode
+    cleanupEvents = mod.cleanupEvents
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    cleanupEvents()
+  })
+
+  it('无参数调用时切换 isDragMode 并上报当前值', async () => {
+    expect(isDragMode.value).toBe(false)
+    toggleDragMode()
+    expect(isDragMode.value).toBe(true)
+    // gaProxy 由 loadMoveable mock，验证调用参数
+    const { gaProxy } = await import('@/logic/utils/gtag')
+    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], { enabled: true })
+  })
+
+  it('传 true 时设为 true 并上报 { enabled: true }', async () => {
+    toggleDragMode(true)
+    expect(isDragMode.value).toBe(true)
+    const { gaProxy } = await import('@/logic/utils/gtag')
+    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], { enabled: true })
+  })
+
+  it('传 false 时设为 false 并上报 { enabled: false }', async () => {
+    const { gaProxy } = await import('@/logic/utils/gtag')
+    toggleDragMode(true)
+    gaProxy.mockClear()
+    toggleDragMode(false)
+    expect(isDragMode.value).toBe(false)
+    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], { enabled: false })
+  })
+})
+
+// ── watch isDragMode 副作用测试 ──
+// 注意：watch 的副作用（addEventListener/removeEventListener）深度耦合
+// document.body 和内部函数引用，不适合在纯单测中验证。
+// 以下测试验证 toggleDragMode 的 watch 副作用间接可观测行为：
+// 进入拖拽模式时草稿抽屉自动打开，退出时自动关闭（reset）。
+
+describe('watch isDragMode 副作用', () => {
+  let isDragMode: typeof import('@/logic/moveable')['isDragMode']
+  let isDraftDrawerVisible: typeof import('@/logic/moveable')['isDraftDrawerVisible']
+  let toggleIsDragMode: typeof import('@/logic/moveable')['toggleIsDragMode']
+  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+
+  beforeEach(async () => {
+    const mod = await loadMoveable()
+    isDragMode = mod.isDragMode
+    isDraftDrawerVisible = mod.isDraftDrawerVisible
+    toggleIsDragMode = mod.toggleIsDragMode
+    cleanupEvents = mod.cleanupEvents
+  })
+
+  afterEach(() => {
+    cleanupEvents()
+  })
+
+  it('进入拖拽模式时草稿抽屉自动打开', () => {
+    // loadMoveable 后 isDragMode=false，草稿抽屉默认打开
+    expect(isDragMode.value).toBe(false)
+    expect(isDraftDrawerVisible.value).toBe(true)
+
+    // 进入拖拽模式，watch 会确保草稿抽屉打开
+    toggleIsDragMode()
+    expect(isDraftDrawerVisible.value).toBe(true)
+  })
+
+  it('退出拖拽模式时 moveState 被重置', async () => {
+    const mod = await loadMoveable()
+    isDragMode = mod.isDragMode
+    toggleIsDragMode = mod.toggleIsDragMode
+    cleanupEvents = mod.cleanupEvents
+
+    // 先开启
+    toggleIsDragMode()
+    expect(isDragMode.value).toBe(true)
+
+    // 再关闭，watch 调用 onResetMoveState
     toggleIsDragMode()
     expect(isDragMode.value).toBe(false)
   })

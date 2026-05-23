@@ -137,7 +137,7 @@ watch(
       return
     }
     initData()
-    addKeydownTask(WIDGET_CODE, keyboardTask)
+    addKeydownTask(WIDGET_CODE, keyboardTask, 20)
   },
   { immediate: true },
 )

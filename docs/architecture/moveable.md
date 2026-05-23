@@ -166,7 +166,17 @@ if (lastIsDraftDrawerVisible) {
 
 `mousemove` 中使用 `requestAnimationFrame` 时，必须在 rAF 回调外捕获 `clientX/clientY/buttons`，因为 rAF 回调执行时原始 `event` 对象可能已被浏览器更新。
 
-### 4. 编辑模式退出时的清理
+### 4. rAF 回调中的 currMouseTaskKey 必须在同步上下文中捕获
+
+拖动 A widget 释放后快速点击 B，A 的最后一个 `mousemove` 已提交 rAF 回调但尚未执行，此时 `mousedown(B)` 已将 `currDragTarget.code` 改为 B。若 rAF 回调中直接读取 `currMouseTaskKey.value`，会拿到 B 的 key，导致用 A 的坐标调 B 的 `onDragging`。
+
+**正确做法**：在 `handleMousemove` 的同步作用域中捕获 `currTaskKey = currMouseTaskKey.value`，rAF 回调使用捕获值。
+
+### 5. handleMousedown 的 async/await 不会导致 mousemove 竞态
+
+`handleMousedown` 是 async 函数，内部 `await task(e)` 调用 `startDrag`（含 `await nextTick()`）。虽然 async 函数遇到 await 会返回 Promise，但浏览器的事件派发模型是**串行**的：当前事件的所有监听器（含 Promise）resolve 之前，不会派发下一个鼠标事件。且用户从按下鼠标到产生位移至少需要几十毫秒，远超 `await nextTick()` 的执行时间。
+
+### 6. 编辑模式退出时的清理
 
 `isDragMode` 变为 `false` 时会自动：
 - 移除所有鼠标事件监听器

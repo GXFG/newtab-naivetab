@@ -3,7 +3,8 @@
 // window.navigator
 
 declare const __DEV__: boolean
-declare const __NAME__: string //  Extension name, defined in packageJson.name
+declare const __APP_NAME__: string // Extension name, defined in packageJson.name
+declare const __APP_VERSION__: string // Extension version, injected by Vite
 
 interface Window {
   appVersion: string
@@ -97,4 +98,18 @@ interface SyncPayload {
   syncId: string // md5
   appVersion: string // 生成该数据的客户端版本
   data: any
+}
+
+/**
+ * 单个配置字段的同步状态（持久化到 localStorage 的 l-state）
+ */
+interface UploadStatusItem {
+  loading: boolean
+  syncTime: number
+  syncId: string
+  localModifiedTime: number
+  dirty: boolean
+  retryCount: number // 当前 session 内自动重试次数（≤3），成功时归零
+  lastError: string // 最近一次失败的错误信息（空串表示无失败）
+  syncStatus: 'idle' | 'syncing' | 'success' | 'failed' | 'quota-exceeded'
 }

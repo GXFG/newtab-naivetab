@@ -2,10 +2,15 @@
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { globalState } from '@/logic/store/state'
+import { customPrimaryColor } from '@/logic/store/style'
 
 const props = defineProps<{
   title: string
 }>()
+
+const cssVars = computed(() => ({
+  '--nt-primary-color': customPrimaryColor.value,
+}))
 
 const isDrawerMode = computed(() => globalState.settingMode === 'drawer')
 
@@ -45,7 +50,10 @@ const openInNewTab = () => {
 </script>
 
 <template>
-  <div class="setting-header-bar">
+  <div
+    class="setting-header-bar"
+    :style="cssVars"
+  >
     <!-- 左侧：标题 + 预览/新标签页按钮 -->
     <div class="header-bar__left">
       <p class="header-bar__title">{{ props.title }}</p>
@@ -100,8 +108,7 @@ const openInNewTab = () => {
   top: 0;
   width: 100%;
   background-color: var(--n-color);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--n-tab-border-color);
+  border-bottom: 1px solid var(--n-tab-border-color, var(--gray-alpha-15));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -127,7 +134,7 @@ const openInNewTab = () => {
     gap: var(--space-1);
     padding: 4px var(--space-2);
     border-radius: var(--radius-md);
-    border: 1px solid var(--n-tab-border-color);
+    border: 1px solid var(--n-tab-border-color, var(--gray-alpha-15));
     cursor: pointer;
     transition:
       background-color var(--transition-base),
@@ -150,21 +157,39 @@ const openInNewTab = () => {
     }
 
     &:hover {
-      background-color: var(--n-tab-border-color);
+      background-color: var(--n-tab-border-color, var(--gray-alpha-15));
       border-color: transparent;
-      color: var(--n-text-color);
+      color: var(--gray-alpha-85);
       box-shadow: var(--shadow-sm);
     }
 
     &.header-bar__action--active {
-      background-color: rgba(16, 152, 173, 0.1);
-      border-color: rgba(16, 152, 173, 0.4);
-      color: var(--n-primary-color, #1098ad);
-      box-shadow: 0 0 0 2px rgba(16, 152, 173, 0.12);
+      background-color: color-mix(
+        in srgb,
+        var(--nt-primary-color, #1098ad) 10%,
+        transparent
+      );
+      border-color: color-mix(
+        in srgb,
+        var(--nt-primary-color, #1098ad) 40%,
+        transparent
+      );
+      color: var(--nt-primary-color, #1098ad);
+      box-shadow: 0 0 0 2px
+        color-mix(in srgb, var(--nt-primary-color, #1098ad) 12%, transparent);
       :root[data-theme='dark'] & {
-        background-color: rgba(16, 152, 173, 0.15);
-        border-color: rgba(16, 152, 173, 0.45);
-        box-shadow: 0 0 0 2px rgba(16, 152, 173, 0.18);
+        background-color: color-mix(
+          in srgb,
+          var(--nt-primary-color, #1098ad) 15%,
+          transparent
+        );
+        border-color: color-mix(
+          in srgb,
+          var(--nt-primary-color, #1098ad) 45%,
+          transparent
+        );
+        box-shadow: 0 0 0 2px
+          color-mix(in srgb, var(--nt-primary-color, #1098ad) 18%, transparent);
       }
     }
 

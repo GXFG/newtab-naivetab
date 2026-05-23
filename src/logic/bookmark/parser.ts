@@ -3,10 +3,12 @@
  * @description 书签解析器：从 chrome.bookmarks 解析指定文件夹，构建键盘 keymap。
  *   解析规则：只读取 `[X] 名称` 前缀书签，精确绑定到对应键位。
  *   隐藏规则：书签名/文件夹名以 `_` 开头的条目不参与解析。
- * @dependencies bookmark/api.ts（getBrowserBookmark）
+ * @dependencies bookmark/api.ts（findBookmarksBarFromTree）
  * @consumers bookmark/mutations.ts、keyboard/bookmark-state.ts、keyboard/bookmark-export.ts
  * @see docs/features/bookmark.md
  */
+
+import { findBookmarksBarFromTree } from '@/logic/bookmark/api'
 
 // ── 解析接口 ─────────────────────────────────────────────────────────────────
 
@@ -40,8 +42,7 @@ export const parseBookmarkTitle = (
 /**
  * 在书签树中按路径查找文件夹（如 "NaiveTab/layer1" 或 "layer1"）
  *
- * 自动处理 Chrome 书签树的隐形根节点：chrome.bookmarks.getTree() 返回 [rootNode]，
- * rootNode 无 title，实际文件夹在其 children 中。
+ * 通过 findBookmarksBarFromTree 定位书签工具栏，不依赖 children 索引顺序。
  */
 export const findFolderByPath = (
   tree: chrome.bookmarks.BookmarkTreeNode[],
@@ -49,15 +50,13 @@ export const findFolderByPath = (
 ): chrome.bookmarks.BookmarkTreeNode | null => {
   const parts = path.split('/')
 
-  // 自动处理 Chrome 书签树的隐形根节点：
-  // chrome.bookmarks.getTree() 返回 [{id:"0", title:"", children:[书签栏, 其他书签]}]
-  // getBrowserBookmark() 返回 tree[0].children[0].children（书签栏内容），
-  // BrowserBookmarkPicker 的路径基于此构建，所以也从书签栏内容开始查找。
+  // 通过 findBookmarksBarFromTree 定位书签工具栏，与 getBrowserBookmark 保持一致。
+  // Chrome: 通过 ID "1" 或标题匹配定位；Firefox: 通过 GUID "toolbar_____" 定位。
   const root = tree[0]
   let current: chrome.bookmarks.BookmarkTreeNode[] = tree
-  if (root && !root.title && root.children) {
-    const bookmarksBar = root.children[0]
-    current = bookmarksBar?.children ?? root.children
+  if (root?.children) {
+    const barNode = findBookmarksBarFromTree(tree)
+    current = barNode?.children ?? root.children
   }
   let foundNode: chrome.bookmarks.BookmarkTreeNode | null = null
 

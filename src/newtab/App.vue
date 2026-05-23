@@ -2,7 +2,12 @@
 import { NConfigProvider, NDialogProvider } from 'naive-ui'
 import { log } from '@/logic/utils/common'
 import { gaProxy } from '@/logic/utils/gtag'
+import {
+  registerGlobalErrorHandler,
+  registerVueErrorHandler,
+} from '@/logic/utils/errorHandler'
 import { FOCUS_ELEMENT_SELECTOR_MAP } from '@/logic/constants/app'
+import { WIDGET_CODE_LIST } from '@/common/widget-constants'
 import { SYSTEM_FONT_STACK } from '@/logic/constants/fonts'
 import {
   startKeydown,
@@ -12,8 +17,8 @@ import {
   stopKeydown,
 } from '@/logic/task'
 import {
-  setupNewtabGlobalShortcut,
-  cleanupNewtabGlobalShortcut,
+  setupNewtabCommandShortcut,
+  cleanupNewtabCommandShortcut,
 } from '@/logic/shortcut/shortcut-executor'
 import { setupPageConfigSync } from '@/logic/config/sync/loader'
 import { setupLocalStorageSyncListener } from '@/logic/config/sync/state'
@@ -105,10 +110,24 @@ const onDot = () => {
     platform: browserPlatform,
     browser: `${browserBrand}_${browserVersion}`,
   })
+
+  const enabledWidgets = WIDGET_CODE_LIST.filter(
+    (code) => localConfig[code].enabled,
+  )
+  for (const code of enabledWidgets) {
+    gaProxy('view', ['widget_active', code])
+  }
+
   log('platform', `${browserPlatform}_${browserBrand}_${browserVersion}`)
 }
 
+// ── 初始化 ─────────────────────────────────────────────────────────────
+
 onMounted(async () => {
+  // 注册全局错误监听
+  registerGlobalErrorHandler('newtab')
+  registerVueErrorHandler(getCurrentInstance()!.appContext.app, 'newtab')
+
   // 阶段 0：DOM 副作用初始化（必须在同步阶段，确保渲染前生效）
   initFullscreenSync()
   initDomStyleWatchers()
@@ -116,8 +135,9 @@ onMounted(async () => {
   // 阶段 1：基础初始化（同步操作，无依赖）
   initBackgroundImage()
   startTimer()
+  // 命令快捷键 keydown 注册 + Port 监听（priority 0 保证命令优先于书签）
+  setupNewtabCommandShortcut()
   startKeydown()
-  setupNewtabGlobalShortcut()
 
   // 阶段 2：配置同步（按顺序，有依赖关系）
   await setupPageConfigSync()
@@ -144,7 +164,7 @@ onUnmounted(() => {
   cleanupDomStyleWatchers()
   stopTimer()
   stopKeydown()
-  cleanupNewtabGlobalShortcut()
+  cleanupNewtabCommandShortcut()
   cleanupEvents()
   cleanupResizeObserver()
 })

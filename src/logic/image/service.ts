@@ -25,7 +25,7 @@ import {
 import { imageState, imageLocalState, isImageLoading } from './state'
 import { updateBingImages } from './gallery'
 
-const getCurrBackgroundImageStoreName = (): DatabaseStore => {
+export const getCurrBackgroundImageStoreName = (): DatabaseStore => {
   return localConfig.general.backgroundImageSource ===
     BACKGROUND_IMAGE_SOURCE.LOCAL
     ? 'localBackgroundImages'
@@ -50,7 +50,7 @@ const getCurrBackgroundImageFromDB =
     )
   }
 
-const getCurrNetworkBackgroundImageUrl = (
+export const getCurrNetworkBackgroundImageUrl = (
   applyToAppearanceCode = localState.value.currAppearanceCode,
 ): string => {
   const quality = localConfig.general.backgroundImageHighQuality
@@ -100,7 +100,7 @@ let pendingAppearanceCode: number | null = null
  * 获取对立外观码。当前系统仅有 0/1 两个外观，此函数集中管理互反逻辑。
  * 若未来支持多外观（>2），此处需同步改造。
  */
-const getOppositeAppearanceCode = (code: number): number => {
+export const getOppositeAppearanceCode = (code: number): number => {
   return +!code
 }
 
@@ -311,7 +311,11 @@ const decodeAndApplyImage = (
         safeSetFirstScreen(smallBase64)
       }
       isImageLoading.value = false
-      console.log(`RenderRawImage: ${(performance.now() - start).toFixed(2)}ms`)
+      if (__DEV__) {
+        console.log(
+          `RenderRawImage: ${(performance.now() - start).toFixed(2)}ms`,
+        )
+      }
     })
     .catch(() => {
       if (pendingAppearanceCode !== targetAppearanceCode) {

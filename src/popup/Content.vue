@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BookmarkSource } from '@/common/widget-constants'
-import { localConfig } from '@/logic/config/state'
+import { localConfig, flushConfigToLocalStorage } from '@/logic/config/state'
 import { loadRemoteKeyboardConfig } from '@/logic/config/sync/loader'
 import {
   loadActiveLayer,
@@ -22,6 +22,11 @@ onMounted(async () => {
     await loadActiveLayer()
     await getSystemBookmarkForKeyboard()
   }
+})
+
+onBeforeUnmount(() => {
+  // popup 关闭前强制写入 localStorage，防止快速关闭导致 useStorageLocal 的 800ms 防抖被清除
+  flushConfigToLocalStorage()
 })
 </script>
 

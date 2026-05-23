@@ -4,7 +4,7 @@ import { ICONS } from '@/logic/constants/icons'
 import { gaProxy } from '@/logic/utils/gtag'
 import {
   isDragMode,
-  toggleIsDragMode,
+  toggleDragMode,
   getTargetDataFromEvent,
   animateDeleteWidget,
 } from '@/logic/moveable'
@@ -109,6 +109,7 @@ const openSettingPane = (tabValue: settingPanes, anchor = '') => {
   globalState.currSettingTabCode = tabValue
   globalState.currSettingAnchor = anchor
   switchSettingDrawerVisible(true)
+  gaProxy('click', ['setting', 'open'], { trigger: 'rightMenu', tab: tabValue })
   gaProxy('click', ['rightMenu', tabValue])
 }
 
@@ -126,7 +127,7 @@ const menuActionMap: Record<string, () => void | Promise<void>> = {
   },
   editLayout: () => {
     switchSettingDrawerVisible(false)
-    toggleIsDragMode()
+    toggleDragMode(true)
     gaProxy('click', ['rightMenu', 'editLayout'])
   },
   fullscreen: () => {
@@ -135,7 +136,10 @@ const menuActionMap: Record<string, () => void | Promise<void>> = {
   },
   focusMode: () => {
     localState.value.isFocusMode = !localState.value.isFocusMode
-    gaProxy('click', ['rightMenu', 'focusMode'])
+    gaProxy('click', ['focusMode_toggle'], {
+      enabled: localState.value.isFocusMode,
+      source: 'rightMenu',
+    })
   },
   editFocusMode: () => {
     openSettingPane('focusMode')
@@ -226,7 +230,7 @@ const handleContextMenu = (e: MouseEvent) => {
   if (globalState.isGuideMode || globalState.isSettingDrawerVisible) return
   e.preventDefault()
   if (isDragMode.value) {
-    toggleIsDragMode(false)
+    toggleDragMode(false)
   }
   // 无论菜单是否已打开，都直接更新位置和目标（已打开时无缝移动，未打开时弹出）
   openMenu(e)
@@ -295,11 +299,14 @@ onUnmounted(() => {
               placement="bottom"
             >
               <template #trigger>
-                <Icon
-                  :icon="ICONS.imageSquare"
+                <button
+                  type="button"
                   class="ctx-menu__footer-icon"
+                  :aria-label="$t('rightMenu.changeWallpaper')"
                   @click.stop="onSelectMenu('changeWallpaper')"
-                />
+                >
+                  <Icon :icon="ICONS.imageSquare" />
+                </button>
               </template>
               {{ $t('rightMenu.changeWallpaper') }}
             </n-tooltip>
@@ -308,11 +315,14 @@ onUnmounted(() => {
               placement="bottom"
             >
               <template #trigger>
-                <Icon
-                  :icon="ICONS.downloadFill"
+                <button
+                  type="button"
                   class="ctx-menu__footer-icon"
+                  :aria-label="$t('rightMenu.downloadWallpaper')"
                   @click.stop="onSelectMenu('downloadWallpaper')"
-                />
+                >
+                  <Icon :icon="ICONS.downloadFill" />
+                </button>
               </template>
               {{ $t('rightMenu.downloadWallpaper') }}
             </n-tooltip>
@@ -325,11 +335,14 @@ onUnmounted(() => {
             placement="bottom"
           >
             <template #trigger>
-              <Icon
-                :icon="ICONS.sponsor"
+              <button
+                type="button"
                 class="ctx-menu__footer-icon"
+                :aria-label="$t('setting.aboutSponsor')"
                 @click.stop="onSelectMenu('aboutSponsor')"
-              />
+              >
+                <Icon :icon="ICONS.sponsor" />
+              </button>
             </template>
             {{ $t('setting.aboutSponsor') }}
           </n-tooltip>
@@ -338,11 +351,14 @@ onUnmounted(() => {
             placement="bottom"
           >
             <template #trigger>
-              <Icon
-                :icon="ICONS.info"
+              <button
+                type="button"
                 class="ctx-menu__footer-icon"
+                :aria-label="$t('setting.aboutIndex')"
                 @click.stop="onSelectMenu('aboutIndex')"
-              />
+              >
+                <Icon :icon="ICONS.info" />
+              </button>
             </template>
             {{ $t('setting.aboutIndex') }}
           </n-tooltip>
@@ -555,10 +571,14 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
   font-size: 16px;
   color: var(--nt-cm-icon);
   border-radius: var(--radius-md);
   cursor: pointer;
+  min-width: 0;
   transition:
     color var(--transition-fast),
     background var(--transition-fast),
