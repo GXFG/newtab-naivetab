@@ -46,7 +46,6 @@ const cssVars = computed(() => ({
   '--nt-focus-primary-bg-hover': primaryBgHover.value,
   '--nt-focus-primary-border': primaryBorder.value,
   '--nt-focus-primary-icon-bg': primaryIconBg.value,
-  '--nt-focus-custom-primary-color': customPrimaryColor.value,
 }))
 
 /**
@@ -185,7 +184,7 @@ const cssVars = computed(() => ({
 
     .focus__icon-wrap {
       background-color: var(--nt-focus-primary-icon-bg);
-      color: var(--nt-focus-custom-primary-color);
+      color: var(--nt-primary-color);
     }
 
     .focus__label {

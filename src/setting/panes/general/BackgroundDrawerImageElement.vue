@@ -153,7 +153,6 @@ const ntBgDrawerOutlineMix = computed(() =>
 )
 
 const cssVars = computed(() => ({
-  '--nt-bg-drawer-color': customPrimaryColor.value,
   '--nt-bg-drawer-outline-mix': ntBgDrawerOutlineMix.value,
 }))
 </script>
@@ -268,7 +267,7 @@ const cssVars = computed(() => ({
   cursor: pointer;
   overflow: hidden;
   outline: 1.5px solid transparent;
-  background-color: var(--n-color-target);
+  background-color: var(--gray-alpha-08);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition:
     outline 0.2s ease,
@@ -307,7 +306,7 @@ const cssVars = computed(() => ({
     width: 100%;
     height: 100%;
     min-height: 89px;
-    color: var(--n-placeholder-color);
+    opacity: var(--opacity-muted);
     font-size: 32px;
   }
 
@@ -391,14 +390,14 @@ const cssVars = computed(() => ({
       font-size: 28px;
       background-color: rgba(0, 0, 0, 0.25);
       backdrop-filter: blur(4px);
-      color: var(--nt-bg-drawer-color);
+      color: var(--nt-primary-color);
       box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
     }
   }
 }
 
 .image__wrap--active {
-  outline: 2px solid var(--nt-bg-drawer-color) !important;
+  outline: 2px solid var(--nt-primary-color) !important;
   box-shadow: 0 0 0 4px var(--nt-bg-drawer-outline-mix);
 }
 

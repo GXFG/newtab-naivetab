@@ -203,7 +203,7 @@ const containerHeightCss = computed(() => {
     0px 3px 8px var(--nt-kb-shell-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 -2px 4px rgba(0, 0, 0, 0.15),
-    0 0 28px color-mix(in srgb, var(--nt-kb-primary-color) 25%, transparent),
-    0 0 56px color-mix(in srgb, var(--nt-kb-primary-color) 12%, transparent);
+    0 0 28px color-mix(in srgb, var(--nt-primary-color) 25%, transparent),
+    0 0 56px color-mix(in srgb, var(--nt-primary-color) 12%, transparent);
 }
 </style>

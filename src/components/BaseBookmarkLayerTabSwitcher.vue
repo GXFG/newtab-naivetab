@@ -68,7 +68,7 @@ const configuredLayers = computed(() => {
     }
 
     &.layer-tab--active {
-      color: var(--nt-popup-custom-primary-color, var(--n-color-target));
+      color: var(--nt-primary-color);
       background-color: var(--gray-alpha-12);
     }
   }

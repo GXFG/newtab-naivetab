@@ -16,7 +16,7 @@ import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/constants/app'
 import { KEYBOARD_CODE_TO_DEFAULT_CONFIG } from '@/logic/keyboard/keyboard-constants'
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
 import { localConfig } from '@/logic/config/state'
-import { getStyleField, customPrimaryColor } from '@/logic/store/style'
+import { getStyleField } from '@/logic/store/style'
 
 type Unit = 'vmin' | 'px'
 
@@ -361,7 +361,6 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
     '--nt-kb-main-font-color': mainFontColor.value,
     '--nt-kb-main-bg-color': mainBgColor.value,
     '--nt-kb-border-radius': borderRadiusCss.value,
-    '--nt-kb-primary-color': customPrimaryColor.value,
     '--nt-kb-key-font-family': keycapKeyFontFamily.value,
     '--nt-kb-key-font-size': keycapKeyFontSizeCss.value,
     '--nt-kb-bookmark-font-size': keycapBookmarkFontSizeCss.value,
@@ -391,7 +390,6 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
     '--nt-kb-shell-color': shellColor.value,
     '--nt-kb-shell-blur': shellBackgroundBlurPx.value,
     '--nt-kb-shell-shadow': shellShadowColor.value,
-    '--nt-kb-primary-color': customPrimaryColor.value,
   }))
 
   // ── 返回值 ────────────────────────────────────────────────────────────────

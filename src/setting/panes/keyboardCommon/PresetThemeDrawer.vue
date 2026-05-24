@@ -187,7 +187,7 @@ const getKeycapStyle = (themeKey: string, type: 'main' | 'e1' | 'e2') => {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--n-text-color-base);
+  color: inherit;
 }
 
 .section__count {
@@ -200,8 +200,7 @@ const getKeycapStyle = (themeKey: string, type: 'main' | 'e1' | 'e2') => {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--n-text-color-2);
-  background-color: var(--n-color-target);
+  background-color: var(--gray-alpha-08);
 }
 
 .theme__container {

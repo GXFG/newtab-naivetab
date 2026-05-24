@@ -3,7 +3,6 @@ import { onMounted, computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { gaProxy } from '@/logic/utils/gtag'
-import { customPrimaryColor } from '@/logic/store/style'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import BaseNaiveBookmarkManager from '@/components/BaseNaiveBookmarkManager.vue'
 import PopupDomainFilter from './components/PopupDomainFilter.vue'
@@ -17,7 +16,6 @@ const popupWidth = computed(
 
 const popupStyle = computed(() => ({
   '--nt-popup-width': popupWidth.value,
-  '--nt-popup-custom-primary-color': customPrimaryColor.value,
 }))
 
 onMounted(() => {
@@ -98,7 +96,7 @@ const hasPendingSync = computed(
           width: 3px;
           height: 13px;
           border-radius: 2px;
-          background-color: var(--nt-popup-custom-primary-color);
+          background-color: var(--nt-primary-color);
           opacity: 0.8;
           flex-shrink: 0;
         }

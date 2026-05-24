@@ -2,15 +2,10 @@
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { globalState } from '@/logic/store/state'
-import { customPrimaryColor } from '@/logic/store/style'
 
 const props = defineProps<{
   title: string
 }>()
-
-const cssVars = computed(() => ({
-  '--nt-primary-color': customPrimaryColor.value,
-}))
 
 const isDrawerMode = computed(() => globalState.settingMode === 'drawer')
 
@@ -50,10 +45,7 @@ const openInNewTab = () => {
 </script>
 
 <template>
-  <div
-    class="setting-header-bar"
-    :style="cssVars"
-  >
+  <div class="setting-header-bar">
     <!-- 左侧：标题 + 预览/新标签页按钮 -->
     <div class="header-bar__left">
       <p class="header-bar__title">{{ props.title }}</p>
@@ -166,30 +158,30 @@ const openInNewTab = () => {
     &.header-bar__action--active {
       background-color: color-mix(
         in srgb,
-        var(--nt-primary-color, #1098ad) 10%,
+        var(--nt-primary-color) 10%,
         transparent
       );
       border-color: color-mix(
         in srgb,
-        var(--nt-primary-color, #1098ad) 40%,
+        var(--nt-primary-color) 40%,
         transparent
       );
-      color: var(--nt-primary-color, #1098ad);
+      color: var(--nt-primary-color);
       box-shadow: 0 0 0 2px
-        color-mix(in srgb, var(--nt-primary-color, #1098ad) 12%, transparent);
+        color-mix(in srgb, var(--nt-primary-color) 12%, transparent);
       :root[data-theme='dark'] & {
         background-color: color-mix(
           in srgb,
-          var(--nt-primary-color, #1098ad) 15%,
+          var(--nt-primary-color) 15%,
           transparent
         );
         border-color: color-mix(
           in srgb,
-          var(--nt-primary-color, #1098ad) 45%,
+          var(--nt-primary-color) 45%,
           transparent
         );
         box-shadow: 0 0 0 2px
-          color-mix(in srgb, var(--nt-primary-color, #1098ad) 18%, transparent);
+          color-mix(in srgb, var(--nt-primary-color) 18%, transparent);
       }
     }
 

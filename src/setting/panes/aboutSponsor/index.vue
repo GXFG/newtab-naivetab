@@ -103,7 +103,7 @@ const removeToast = (id: string) => {
   margin: 14px 0 10px;
   padding: 14px 16px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--n-tab-border-color);
+  border: 1px solid var(--gray-alpha-08);
   background: linear-gradient(
     135deg,
     rgba(16, 152, 173, 0.04) 0%,
@@ -139,7 +139,7 @@ const removeToast = (id: string) => {
   .intro__highlight {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed var(--n-tab-border-color);
+    border-top: 1px dashed var(--gray-alpha-10);
     text-align: center;
     font-size: var(--text-base);
     font-weight: 600;
@@ -166,8 +166,8 @@ const removeToast = (id: string) => {
   gap: 10px;
   padding: 14px 14px 12px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--n-tab-border-color);
-  background: var(--n-color);
+  border: 1px solid var(--gray-alpha-08);
+  background: var(--gray-alpha-05);
   box-shadow: var(--shadow-sm);
   transition:
     box-shadow var(--transition-base),

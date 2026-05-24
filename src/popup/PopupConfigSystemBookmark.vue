@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { gaProxy } from '@/logic/utils/gtag'
-import { customPrimaryColor } from '@/logic/store/style'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import BaseSystemBookmarkManager from '@/components/BaseSystemBookmarkManager.vue'
 import BaseBookmarkLayerTabSwitcher from '@/components/BaseBookmarkLayerTabSwitcher.vue'
@@ -17,7 +16,6 @@ const popupWidth = computed(
 const popupStyle = computed(() => ({
   '--nt-popup-width': popupWidth.value,
   '--nt-popup-keyboard-border': 'rgba(0, 0, 0, 0.06)',
-  '--nt-popup-custom-primary-color': customPrimaryColor.value,
 }))
 
 onMounted(() => {
@@ -82,7 +80,7 @@ onMounted(() => {
           width: 3px;
           height: 13px;
           border-radius: 2px;
-          background-color: var(--nt-popup-custom-primary-color);
+          background-color: var(--nt-primary-color);
           opacity: 0.8;
           flex-shrink: 0;
         }

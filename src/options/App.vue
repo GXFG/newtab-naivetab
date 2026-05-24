@@ -5,11 +5,20 @@ import {
   registerGlobalErrorHandler,
   registerVueErrorHandler,
 } from '@/logic/utils/errorHandler'
+import {
+  initDomStyleWatchers,
+  cleanupDomStyleWatchers,
+} from '@/logic/store/dom'
 import Content from '@/options/Content.vue'
 
 onMounted(() => {
   registerGlobalErrorHandler('options')
   registerVueErrorHandler(getCurrentInstance()!.appContext.app, 'options')
+  initDomStyleWatchers()
+})
+
+onUnmounted(() => {
+  cleanupDomStyleWatchers()
 })
 </script>
 

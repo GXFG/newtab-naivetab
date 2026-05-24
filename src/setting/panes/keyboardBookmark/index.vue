@@ -576,7 +576,7 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
 }
 
 .layer-folder-name--placeholder {
-  color: var(--gray-alpha-9);
+  color: var(--gray-alpha-09);
 }
 
 .layer-switcher-wrap {

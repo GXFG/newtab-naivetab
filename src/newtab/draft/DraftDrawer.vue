@@ -13,13 +13,8 @@ import {
 } from '@/logic/moveable'
 import { localConfig } from '@/logic/config/state'
 import { globalState } from '@/logic/store/state'
-import { customPrimaryColor } from '@/logic/store/style'
 import { widgetsRegistry } from '@/newtab/widgets/registry'
 import { WIDGET_GROUPS } from '@/common/widget-constants'
-
-const draftDrawerStyle = computed(() => ({
-  '--nt-draft-custom-primary-color': customPrimaryColor.value,
-}))
 
 const state = reactive({
   isCursorInDraftDrawer: false,
@@ -172,7 +167,6 @@ const handlerDeleteMouseUp = () => {
 <template>
   <div
     id="draft-tool"
-    :style="draftDrawerStyle"
     :class="{
       'draft-tool--active': isDragMode && isDraftDrawerVisible,
       'draft-tool--shadow': isDragMode,
@@ -369,7 +363,7 @@ const handlerDeleteMouseUp = () => {
         opacity: 1;
       }
       &:hover {
-        color: var(--nt-draft-custom-primary-color);
+        color: var(--nt-primary-color);
         .switch__icon {
           opacity: 1;
         }

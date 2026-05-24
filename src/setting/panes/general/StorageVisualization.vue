@@ -162,7 +162,7 @@ const barWidth = (bytes: number) =>
   gap: var(--space-1);
   width: 120px;
   font-size: var(--text-base);
-  color: var(--n-text-color-2);
+  opacity: var(--opacity-secondary);
   cursor: default;
   user-select: none;
 }

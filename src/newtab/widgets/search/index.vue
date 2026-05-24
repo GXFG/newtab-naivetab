@@ -9,7 +9,7 @@ import { SEARCH_ENGINE_LIST } from '@/logic/constants/search'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig } from '@/logic/config/state'
 import { globalState } from '@/logic/store/state'
-import { getStyleField, customPrimaryColor } from '@/logic/store/style'
+import { getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -97,7 +97,6 @@ const searchStyle = computed(() => ({
   '--nt-s-dropdown-font-family': customDropdownFontFamily.value,
   '--nt-s-dropdown-font-color': customDropdownFontColor.value,
   '--nt-s-dropdown-font-size': customDropdownFontSize.value,
-  '--nt-s-primary-color': customPrimaryColor.value,
 }))
 
 const state = reactive({
@@ -621,7 +620,7 @@ watch(isDragMode, () => {
         border-radius: var(--radius-md);
         background: color-mix(
           in srgb,
-          var(--nt-s-primary-color) 22%,
+          var(--nt-primary-color) 22%,
           transparent
         );
         /* pending 态左侧醒目高亮条 */
@@ -633,7 +632,7 @@ watch(isDragMode, () => {
           bottom: 20%;
           width: 3px;
           border-radius: 2px;
-          background: var(--nt-s-primary-color);
+          background: var(--nt-primary-color);
         }
       }
     }
@@ -669,15 +668,11 @@ watch(isDragMode, () => {
         .search__dropdown-item--pending {
           background: color-mix(
             in srgb,
-            var(--nt-s-primary-color) 30%,
+            var(--nt-primary-color) 30%,
             transparent
           );
           &::after {
-            background: color-mix(
-              in srgb,
-              var(--nt-s-primary-color) 80%,
-              white
-            );
+            background: color-mix(in srgb, var(--nt-primary-color) 80%, white);
           }
         }
       }

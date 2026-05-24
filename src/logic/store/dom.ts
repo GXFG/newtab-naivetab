@@ -1,14 +1,14 @@
 /**
  * @module store/dom
- * @description DOM 副作用 — 全屏状态同步、CSS 变量（背景色/字体色）的动态注入。
- *   通过 watch 响应 localConfig.general.backgroundColor / fontColor 变化。
- * @dependencies config/state.ts、state.ts（globalState）、style.ts（getStyleField）
+ * @description DOM 副作用 — 全屏状态同步、CSS 变量（背景色/字体色/主色）的动态注入。
+ *   通过 watch 响应 localConfig.general.backgroundColor / fontColor / primaryColor 变化。
+ * @dependencies config/state.ts、state.ts（globalState）、style.ts（getStyleField、customPrimaryColor）
  * @consumers newtab/App.vue（onMounted 中调用 setupDomSync）
  * @see docs/architecture/config.md#主题与颜色系统
  */
 import { localConfig, localState } from '@/logic/config/state'
 import { globalState } from './state'
-import { getStyleField } from './style'
+import { getStyleField, customPrimaryColor } from './style'
 
 const onFullscreenChange = () => {
   globalState.isFullScreen = !!document.fullscreenElement
@@ -45,6 +45,7 @@ export const initDomStyleWatchers = () => {
     [
       () => localConfig.general.backgroundColor,
       () => localConfig.general.fontColor,
+      () => localConfig.general.primaryColor,
       () => localState.value.currAppearanceCode,
     ],
     () => {
@@ -55,6 +56,10 @@ export const initDomStyleWatchers = () => {
       document.body.style.setProperty(
         '--nt-text-color-main',
         getStyleField('general', 'fontColor').value,
+      )
+      document.body.style.setProperty(
+        '--nt-primary-color',
+        customPrimaryColor.value,
       )
     },
     {
