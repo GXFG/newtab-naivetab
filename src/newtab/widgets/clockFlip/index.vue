@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import { localConfig, localState } from '@/logic/config/state'
+import { localConfig } from '@/logic/config/state'
 import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'

@@ -443,6 +443,7 @@ const handleCommandSelect = (cmd: TCommandName) => {
 /* 命令选择器中的 radio 使用 auto 宽度，配合 2 列网格布局 */
 :deep(.category-group__options .n-radio) {
   width: auto;
+  padding-left: 8px;
 }
 
 .category-group__options {
@@ -464,22 +465,24 @@ const handleCommandSelect = (cmd: TCommandName) => {
 
 /* 增强选中命令的视觉反馈 */
 :deep(.category-group__options .n-radio.n-radio--checked) {
-  position: relative;
   background: var(--gray-alpha-08);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--nt-primary-color);
-  padding-left: 5px;
-  font-weight: 600;
   transition: all var(--transition-fast);
 }
 
 :deep(.category-group__options .n-radio.n-radio--checked .n-radio__label) {
   font-weight: 600;
+  color: var(--nt-primary-color);
 }
 
 :deep(.category-group__options .n-radio.n-radio--checked .n-radio__dot) {
   border-color: var(--nt-primary-color);
-  background-color: var(--nt-primary-color);
+}
+
+:deep(.category-group__options .n-radio:hover:not(.n-radio--checked)) {
+  background: var(--gray-alpha-08);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
 }
 
 .selector__key {

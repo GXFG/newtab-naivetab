@@ -7,7 +7,6 @@ import { widgetsRegistry } from '@/newtab/widgets/registry'
 import { WIDGET_GROUPS } from '@/common/widget-constants'
 import { SettingHeaderBar, SettingFormSection } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
-import { ICONS } from '@/logic/constants/icons'
 import { gaProxy } from '@/logic/utils/gtag'
 
 const widgetGroups = computed(() =>
@@ -61,10 +60,7 @@ const cssVars = computed(() => ({
     <SettingHeaderBar :title="$t('setting.focusMode')" />
 
     <div class="setting__pane-content">
-      <SettingFormSection
-        :title="$t('generalSetting.focusWidgets')"
-        :icon="ICONS.fullscreen"
-      >
+      <SettingFormSection section-key="common.behavior">
         <SwitchField
           v-model="localState.isFocusMode"
           :label="$t('generalSetting.enableFocusMode')"

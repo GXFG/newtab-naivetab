@@ -7,6 +7,8 @@ import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
 import { useKeycapDrag } from '@/composables/useKeycapDrag'
+import { useKeyboardLayerWheel } from '@/composables/useKeyboardLayerWheel'
+import { useKeyboardLayerMouseButtons } from '@/composables/useKeyboardLayerMouseButtons'
 import { requestPermission } from '@/logic/utils/permission'
 import { getFaviconFromUrl } from '@/logic/bookmark/api'
 import {
@@ -115,6 +117,9 @@ const selectKey = (code: string) => {
 }
 
 // ── 拖拽交换 ─────────────────────────────────────────────────────────────
+const { handleWheel } = useKeyboardLayerWheel()
+const { handleMouseDown: handleMouseLayerBtn } = useKeyboardLayerMouseButtons()
+
 const { isDropTarget, handleDragStart, handleDragOver, handleDragEnd } =
   useKeycapDrag({
     canDrag: (code) => !!keyboardState.systemKeymap[code],
@@ -361,6 +366,8 @@ const getKeycapTitle = (code: string) => {
         unit="px"
         :base-size="baseSize"
         :keys="currKeyboardConfig.keys"
+        @wheel="handleWheel"
+        @mousedown="handleMouseLayerBtn"
       >
         <template #keycap="{ code }">
           <div

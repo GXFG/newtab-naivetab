@@ -32,7 +32,7 @@ import {
 } from '@/logic/store/dom'
 import { getStyleField } from '@/logic/store/style'
 import { nativeUILang, currTheme, themeOverrides } from '@/logic/store/theme'
-import { handleAppUpdate } from '@/logic/config/update'
+import { handleAppUpdate, getLocalVersion } from '@/logic/config/update'
 import { initBackgroundImage } from '@/logic/image/service'
 import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'
 import { initKeyboardData } from '@/logic/keyboard/bookmark-state'
@@ -140,16 +140,21 @@ onMounted(async () => {
   startKeydown()
 
   // 阶段 2：配置同步（按顺序，有依赖关系）
+  // 在云端同步前快照本地版本号。loadRemoteConfig 合并云端数据后，
+  // localConfig.general.version 可能被覆盖为新版本，导致 handleAppUpdate 误跳过迁移。
+  // 传入快照版本确保迁移判定基于真正的本地版本。
+  const localVersion = getLocalVersion()
   await setupPageConfigSync()
   setupLocalStorageSyncListener()
 
   // 阶段 3：版本升级（配置修改同步生效，updateSetting 异步执行）
   // handleAppUpdate 内的配置修改会立即生效（Vue 响应式）
   // updateSetting 在后台异步执行，不阻塞首屏渲染
-  handleAppUpdate()
+  handleAppUpdate(localVersion)
 
   // 阶段 4：应用初始化（使用最新配置）
-  initKeyboardData()
+  // await 确保缓存数据加载完成后再 nextTick，避免首屏键帽空白
+  await initKeyboardData()
   await nextTick()
   handleFirstOpen()
   handleFocusPage()

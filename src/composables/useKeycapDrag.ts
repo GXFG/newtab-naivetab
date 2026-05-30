@@ -7,7 +7,7 @@
  * 交互模式：HTML5 原生 draggable，拖拽事件绑定在外层 wrap div。
  */
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 interface UseKeycapDragOptions {
   /** 判断某个键帽是否可以作为拖拽源 */

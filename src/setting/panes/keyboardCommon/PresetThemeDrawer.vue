@@ -91,7 +91,7 @@ const KB_ROWS = [
 ]
 
 const getKeycapStyle = (themeKey: string, type: 'main' | 'e1' | 'e2') => {
-  const theme = KEYCAP_PREINSTALL_MAP[themeKey]
+  const theme = KEYCAP_PREINSTALL_MAP[themeKey as KeycapThemeKey]
   if (type === 'e1')
     return `color:${theme.emphasisOneFontColor};background-color:${theme.emphasisOneBackgroundColor}`
   if (type === 'e2')

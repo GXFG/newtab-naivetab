@@ -1,8 +1,9 @@
 /**
- * 统一管理需要用户授权的浏览器权限
+ * 统一管理需要用户授权的浏览器权限。
  *
- * notifications 作为 optional_permissions 动态申请，
- * 仅在用户首次使用相关功能时触发授权弹框。
+ * bookmarks 和 notifications 均为必需权限（permissions），安装时即授予。
+ * requestPermission 对必需权限直接返回 true，不弹窗。
+ * 保留 checkPermission/requestPermission 封装以兼容未来权限变更。
  */
 
 // ─── Notification ───

@@ -3,7 +3,7 @@
 ## 概述
 
 书签系统实现键盘 Widget 对浏览器书签的绑定、导航与执行。核心包含两个数据源模式：
-- **source = 1**：直接读取浏览器原生书签树（需要 `bookmarks` 权限）
+- **source = 1**：读取浏览器原生书签树（需要 `bookmarks` 权限）。**首次安装默认使用此模式**，自动创建 `NaiveTab/layer1-4` 书签文件夹并初始化默认书签。权限被拒则自动回退到 source=2。
 - **source = 2**：使用自定义 keymap（key code → URL 映射），数据持久化在 localStorage + chrome.storage.sync
 
 ---
@@ -217,12 +217,25 @@ chrome.bookmarks.getTree()
       └─ 有 [X] 前缀 → 精确绑定到对应键位；无前缀 → 忽略
    │
    ▼
-3. 生成 systemKeymap（内存） + 写入 chrome.storage.local（供 CS/SW 使用）
+3. 生成 systemKeymap（内存） + 写入 chrome.storage.local（供 CS/SW 跨上下文共享） + 写入 localStorage（供 newtab 首屏同步读取，避免异步 API 导致键帽空白）
 ```
+
+#### 首次安装自动初始化
+
+`bookmarks` 为必需权限，安装时即授予。首次安装（`isFirstOpen === true`）且 source 为 BROWSER 时，`initKeyboardData()` 会自动执行 `initFirstOpenBookmarkLayers()`：
+
+1. 检查书签树中是否已有 `NaiveTab` 文件夹
+2. 已存在（如重装场景）→ 仅回填 `layers[i].sourceFolderPath`，跳过创建和导出
+3. 不存在 → 在书签栏创建 `NaiveTab/layer1-4` 文件夹 → 回填路径 → 导出默认 keymap（baidu/google/bing → Digit1/2/3）到 layer1
+4. bookmarks API 异常时回退到 INTERNAL 模式
+
+该逻辑仅执行一次（`isFirstOpen` 由 `handleFirstOpen` 关闭）。
 
 #### 全局快捷键（source=1）
 
-keymap 存储在 `chrome.storage.local`（key: `SYSTEM_KEYMAP_STORAGE_KEY`，定义于 `src/logic/keyboard/keyboard-constants.ts`），不触发云同步。SW 和 CS 根据 `config.source === 1` 决定读取 `systemKeymap` 而非 `keymap`。详见 `src/background/config/cache.ts` 中的 `cachedSystemKeymap`。
+keymap 存储在 `chrome.storage.local`（key: `SYSTEM_KEYMAP_STORAGE_KEY`，定义于 `src/logic/keyboard/keyboard-constants.ts`），不触发云同步。SW 和 CS 根据 `config.source === 1` 决定读取 `systemKeymap` 而非 `keymap`。
+
+newtab 页面额外维护一份 `localStorage` 缓存：模块加载时同步读取（避免 `chrome.storage.local.get` 异步导致首屏空白），每次 `systemKeymap` 变更时同步刷新。详见 `src/logic/keyboard/bookmark-state.ts` 中的 `persistKeymapToLocal` 和模块顶层读取逻辑。
 
 #### 模式切换行为
 

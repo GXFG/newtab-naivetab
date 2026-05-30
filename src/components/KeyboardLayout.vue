@@ -18,7 +18,8 @@
  */
 
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
-import { localConfig } from '@/logic/config/state'
+import { localConfig, localState } from '@/logic/config/state'
+import { isDragMode, moveState } from '@/logic/moveable'
 
 /** 将数值按单位转成 CSS 字符串 */
 const toUnit = (value: number, unit: 'vmin' | 'px'): string =>
@@ -42,6 +43,14 @@ const { getLayoutKeyStyle, layoutCssVars, base } = useKeyboardStyle(
   props.unit,
   props.baseSize,
 )
+
+/** 1 键盘单位对应的实际 CSS 像素数，拖拽时用于精确跟踪鼠标位移 */
+const keyboardUnitToPx = computed(() => {
+  if (props.unit === 'px') return base.value
+  return (
+    (base.value * 0.1 * Math.min(window.innerWidth, window.innerHeight)) / 100
+  )
+})
 
 // ── 显示开关 ─────────────────────────────────────────────────────────────────
 const isShellVisible = computed(() => localConfig.keyboardCommon.isShellVisible)
@@ -70,16 +79,154 @@ const containerHeightCss = computed(() => {
   const pad = (localConfig.keyboardCommon.shellVerticalPadding / s) * base.value
   return keyHeight + 2 * pad + SHELL_BORDER_PX
 })
+
+// ── 铭牌层 ──────────────────────────────────────────────────────────────
+const nameplateList = computed(
+  () => localConfig.keyboardCommon.nameplates ?? [],
+)
+
+/** 获取铭牌绝对定位 + 样式，拖拽中叠加偏移量避免频繁写配置触发同步 */
+const getNameplateStyle = (np: TNameplate): string => {
+  const code = localState.value.currAppearanceCode
+  const s = localConfig.keyboardCommon.keycapSize
+  const isShellVisible = localConfig.keyboardCommon.isShellVisible
+  const padX = isShellVisible
+    ? localConfig.keyboardCommon.shellHorizontalPadding
+    : 0
+  const padY = isShellVisible
+    ? localConfig.keyboardCommon.shellVerticalPadding
+    : 0
+  const offsetX = (padX / s) * base.value
+  const offsetY = (padY / s) * base.value
+  const dragDx =
+    draggingNameplateId.value === np.id ? draggingOffset.value.dx : 0
+  const dragDy =
+    draggingNameplateId.value === np.id ? draggingOffset.value.dy : 0
+  const left = (np.x + dragDx) * base.value + offsetX
+  const top = (np.y + dragDy) * base.value + offsetY
+  const fontSize = (np.fontSize / s) * base.value
+  const padding = (np.padding / s) * base.value
+
+  const border = np.borderEnabled
+    ? `${np.borderWidth}px solid ${np.borderColor[code]}`
+    : 'none'
+
+  const shadow = np.shadowEnabled
+    ? `${np.shadowOffsetX}px ${np.shadowOffsetY}px ${np.shadowBlur}px ${np.shadowColor[code]}`
+    : 'none'
+
+  const textShadow = np.textShadowEnabled
+    ? `${np.textShadowOffsetX}px ${np.textShadowOffsetY}px ${np.textShadowBlur}px ${np.textShadowColor[code]}`
+    : 'none'
+
+  return [
+    `left: ${toUnit(left, props.unit)};`,
+    `top: ${toUnit(top, props.unit)};`,
+    `font-size: ${toUnit(fontSize, props.unit)};`,
+    `font-family: ${np.fontFamily};`,
+    `font-weight: ${np.fontWeight};`,
+    `color: ${np.color[code]};`,
+    `background-color: ${np.backgroundColor[code]};`,
+    `border: ${border};`,
+    `border-radius: ${np.borderRadius}px;`,
+    `padding: ${toUnit(padding, props.unit)};`,
+    `transform: rotate(${np.rotation}deg);`,
+    `box-shadow: ${shadow};`,
+    `text-shadow: ${textShadow};`,
+  ].join('')
+}
+
+// ── 铭牌拖拽 ────────────────────────────────────────────────────────────
+const keyboardLayoutRef = ref<HTMLElement | null>(null)
+const draggingNameplateId = ref<string | null>(null)
+/** 拖拽中的位移偏移量（键盘单位），仅更新此 ref 避免频繁触发配置同步 */
+const draggingOffset = ref({ dx: 0, dy: 0 })
+const dragStart = ref({ px: 0, py: 0 })
+
+const onNameplateMouseDown = (e: MouseEvent, np: TNameplate) => {
+  e.stopPropagation()
+  e.preventDefault()
+  if (!keyboardLayoutRef.value) return
+
+  // 清除 moveable 的拖拽目标，防止键盘 Widget 被同时拖动
+  moveState.currDragTarget.type = ''
+  moveState.currDragTarget.code = ''
+
+  const containerRect = keyboardLayoutRef.value.getBoundingClientRect()
+  const s = localConfig.keyboardCommon.keycapSize
+  const shellPadX = localConfig.keyboardCommon.isShellVisible
+    ? localConfig.keyboardCommon.shellHorizontalPadding / s
+    : 0
+  const shellPadY = localConfig.keyboardCommon.isShellVisible
+    ? localConfig.keyboardCommon.shellVerticalPadding / s
+    : 0
+
+  // 铭牌自身像素尺寸（转键盘单位），钳制右/下边界时需扣除
+  const nameplateEl = e.currentTarget as HTMLElement
+  const nameplateRect = nameplateEl.getBoundingClientRect()
+  const pxScale = keyboardUnitToPx.value
+  const npW = nameplateRect.width / pxScale
+  const npH = nameplateRect.height / pxScale
+
+  draggingNameplateId.value = np.id
+  draggingOffset.value = { dx: 0, dy: 0 }
+  dragStart.value = { px: e.clientX, py: e.clientY }
+
+  const onMove = (ev: MouseEvent) => {
+    if (draggingNameplateId.value !== np.id) return
+
+    // 鼠标移出外壳容器时停止拖拽
+    if (
+      ev.clientX < containerRect.left ||
+      ev.clientX > containerRect.right ||
+      ev.clientY < containerRect.top ||
+      ev.clientY > containerRect.bottom
+    ) {
+      onUp()
+      return
+    }
+
+    const scale = keyboardUnitToPx.value
+    const dx = (ev.clientX - dragStart.value.px) / scale
+    const dy = (ev.clientY - dragStart.value.py) / scale
+
+    draggingOffset.value = {
+      dx: Math.max(
+        -shellPadX - np.x,
+        Math.min(containerRect.width / scale - shellPadX - np.x - npW, dx),
+      ),
+      dy: Math.max(
+        -shellPadY - np.y,
+        Math.min(containerRect.height / scale - shellPadY - np.y - npH, dy),
+      ),
+    }
+  }
+
+  const onUp = () => {
+    // 拖拽结束时将偏移写入配置，仅触发一次持久化和同步
+    np.x += draggingOffset.value.dx
+    np.y += draggingOffset.value.dy
+    draggingNameplateId.value = null
+    draggingOffset.value = { dx: 0, dy: 0 }
+    document.removeEventListener('mousemove', onMove)
+    document.removeEventListener('mouseup', onUp)
+  }
+
+  document.addEventListener('mousemove', onMove)
+  document.addEventListener('mouseup', onUp)
+}
 </script>
 
 <template>
   <!-- 键盘容器：shell 可见时附加对应 modifier class -->
   <div
+    ref="keyboardLayoutRef"
     class="keyboard-layout"
     :class="[
       {
         'keyboard-layout--shell': isShellVisible,
         'keyboard-layout--shell-shadow': isShellVisible && isShellShadowEnabled,
+        'keyboard-layout--clip': nameplateList.length > 0,
       },
       extraClass,
     ]"
@@ -109,6 +256,24 @@ const containerHeightCss = computed(() => {
         :code="key.code"
         :row-index="key.y"
       />
+    </div>
+
+    <!-- 铭牌层：键帽之上的文字叠加层，编辑模式开启后可拖拽 -->
+    <div
+      v-for="np in nameplateList"
+      :key="np.id"
+      class="keyboard-layout__nameplate"
+      :class="{
+        'keyboard-layout__nameplate--edit': isDragMode,
+        'keyboard-layout__nameplate--dragging': draggingNameplateId === np.id,
+      }"
+      :style="[
+        getNameplateStyle(np),
+        { pointerEvents: isDragMode ? 'auto' : 'none' },
+      ]"
+      @mousedown="onNameplateMouseDown($event, np)"
+    >
+      {{ np.text }}
     </div>
   </div>
 </template>
@@ -205,5 +370,39 @@ const containerHeightCss = computed(() => {
     inset 0 -2px 4px rgba(0, 0, 0, 0.15),
     0 0 28px color-mix(in srgb, var(--nt-primary-color) 25%, transparent),
     0 0 56px color-mix(in srgb, var(--nt-primary-color) 12%, transparent);
+}
+
+/* 有铭牌时裁剪溢出，防止拖出外壳边界 */
+.keyboard-layout--clip {
+  overflow: hidden;
+}
+
+/* ── 铭牌叠加层 ── */
+.keyboard-layout {
+  .keyboard-layout__nameplate {
+    position: absolute;
+    white-space: nowrap;
+    user-select: none;
+    z-index: 1;
+    line-height: 1.2;
+
+    &.keyboard-layout__nameplate--edit {
+      cursor: grab;
+      outline: 1px dashed
+        color-mix(in srgb, var(--nt-primary-color) 40%, transparent);
+      outline-offset: 2px;
+      border-radius: 2px;
+      transition: outline-color 0.15s;
+
+      &:hover {
+        outline-color: var(--nt-primary-color);
+      }
+    }
+
+    &.keyboard-layout__nameplate--dragging {
+      cursor: grabbing;
+      outline: 2px dashed var(--nt-primary-color);
+    }
+  }
 }
 </style>

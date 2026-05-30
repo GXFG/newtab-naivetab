@@ -29,6 +29,7 @@ export const ICONS = {
   // setting__label
   calendarHoliday: 'mdi:calendar-star',
   keyboardCommand: 'ic:twotone-keyboard-command-key',
+  keyboardNameplate: 'mdi:label-outline',
   calendarToday: 'mdi:calendar-today',
   calendarRest: 'mdi:bed',
   calendarWork: 'mdi:briefcase-outline',

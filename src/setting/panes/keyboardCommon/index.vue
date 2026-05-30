@@ -17,6 +17,7 @@ import PresetThemeDrawer from './PresetThemeDrawer.vue'
 import KeyboardStyleSetting from './KeyboardStyleSetting.vue'
 import KeycapSetting from './KeyboardKeycapSetting.vue'
 import KeyboardShellSetting from './KeyboardShellSetting.vue'
+import KeyboardNameplateSetting from './KeyboardNameplateSetting.vue'
 import { showToast } from '@/common/toast'
 
 const state = reactive({
@@ -131,6 +132,16 @@ const onRandomTheme = () => {
       @update:expanded="handleExpanded"
     >
       <KeyboardShellSetting />
+    </SettingCollapseSection>
+
+    <SettingCollapseSection
+      name="nameplateSetting"
+      :title="$t('keyboardNameplate.label')"
+      :icon="ICONS.keyboardNameplate"
+      :expanded="expandedNames.includes('nameplateSetting')"
+      @update:expanded="handleExpanded"
+    >
+      <KeyboardNameplateSetting />
     </SettingCollapseSection>
   </SettingFormWrap>
 </template>

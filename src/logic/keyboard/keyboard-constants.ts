@@ -7,7 +7,7 @@
  * @see docs/features/keyboard.md
  */
 import { isMacOS } from '@/env'
-import { MAX_LAYERS, LAYER_FOLDER_NAMES } from '@/common/widget-constants'
+import { LAYER_FOLDER_NAMES } from '@/common/widget-constants'
 
 // ── 公共强调键集合 ─────────────────────────
 /** 一级强调键：功能键区 + 修饰键 + 编辑键 */
@@ -75,7 +75,10 @@ export {
   KEYBOARD_NOT_ALLOW_KEYCODE_LIST_FOR_WIDGET,
 } from './keyboard-options'
 
-export const KEYBOARD_CODE_TO_DEFAULT_CONFIG = {
+export const KEYBOARD_CODE_TO_DEFAULT_CONFIG: Record<
+  string,
+  { label: string; textAlign: string; alias?: string; size: number } | undefined
+> = {
   // 0
   Escape: { label: isMacOS ? 'esc' : 'Esc', textAlign: 'left', size: 1 },
   F1: { label: 'F1', textAlign: 'center', size: 1 },

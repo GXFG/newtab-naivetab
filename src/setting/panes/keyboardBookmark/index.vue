@@ -276,7 +276,10 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
       :title="$t('bookmarkFolder.sectionBookmark')"
       :icon="ICONS.folderOutline"
     >
-      <SettingFormItem :label="$t('keyboardBookmark.bookmarkSource')">
+      <SettingFormItem
+        :label="$t('keyboardBookmark.bookmarkSource')"
+        :tip-content="$t('keyboardBookmark.bookmarkSourceTips')"
+      >
         <NRadioGroup
           v-model:value="localConfig.keyboardBookmark.source"
           size="small"

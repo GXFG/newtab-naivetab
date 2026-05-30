@@ -58,16 +58,19 @@ const onMouseDownKey = (event: MouseEvent, keyCode: string) => {
   if (isDragMode.value) {
     return
   }
-  // 避免拖拽模式下页面级的拖拽监听拿不到事件，无法进入拖动流程
-  // 阻止默认行为（例如浏览器中键的滚轮模式切换）
-  event.preventDefault()
-  // 阻止事件冒泡
-  event.stopPropagation()
   const { button, shiftKey, altKey } = event
   // 忽略鼠标右键
   if (button === 2) {
     return
   }
+  // 侧键（前进/后退）留给键盘外壳的 layer 切换处理，不拦截
+  if (button === 3 || button === 4) {
+    return
+  }
+  // 阻止默认行为（例如浏览器中键的滚轮模式切换）
+  event.preventDefault()
+  // 阻止左键/中键事件冒泡，避免触发拖拽等其他行为
+  event.stopPropagation()
   const url = keycapBookmarkUrl.value
   if (url.length === 0) {
     return

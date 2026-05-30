@@ -105,7 +105,9 @@ const chunkedPreviewMap = computed((): Record<string, Array<ImageRow>> => {
   for (const source of Object.keys(previewImageListMap.value)) {
     const shouldAppendLoadMore = source === 'pexels'
     map[source] = chunkArray(
-      previewImageListMap.value[source],
+      previewImageListMap.value[
+        source as keyof typeof previewImageListMap.value
+      ] as any,
       3,
       shouldAppendLoadMore,
     )

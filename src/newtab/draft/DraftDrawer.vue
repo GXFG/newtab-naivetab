@@ -56,7 +56,7 @@ const handleDraftDrawerMouseLeave = () => {
 
 // Draft
 const handleDraftMouseDown = async (e: MouseEvent) => {
-  localConfig[moveState.currDragTarget.code].enabled = true
+  localConfig[moveState.currDragTarget.code as WidgetCodes].enabled = true
   await nextTick()
   // 以光标位置为组件的中心开始拖拽
   // ⚠️  必须 await startDrag 完成（它内部需要 nextTick 等 DOM 渲染），
@@ -93,8 +93,9 @@ const handleDraftMouseUp = (e: MouseEvent) => {
     mouseUpTask(e)
   }
   const isEnabled = !state.isCursorInDraftDrawer
-  const wasEnabled = localConfig[moveState.currDragTarget.code].enabled
-  localConfig[moveState.currDragTarget.code].enabled = isEnabled
+  const wasEnabled =
+    localConfig[moveState.currDragTarget.code as WidgetCodes].enabled
+  localConfig[moveState.currDragTarget.code as WidgetCodes].enabled = isEnabled
   if (!isEnabled) {
     return
   }

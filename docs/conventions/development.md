@@ -10,7 +10,7 @@
 - `&` 只允许用于伪类/伪元素（`&:hover`）或嵌套完整类名（`&.parent-class`）
 - Widget 样式外层使用 `#widgetCode`（由 WidgetWrap 自动设置 id）
 
-CSS 踩坑（`&--modifier` 禁止、`v-bind()` 禁止、`rgba()` + `var()` 等）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#css--样式)。
+CSS 踩坑（`&--modifier` 禁止、`v-bind()` 禁止、`rgba()` + `var()` 等）详见 [pitfalls-css.md](../../.claude/rules/pitfalls-css.md)。
 
 - **禁止在 scoped CSS 中使用 Naive UI 的 `--n-*` 变量**（`--n-primary-color`、`--n-text-color` 等），使用项目自有 token 或 `customPrimaryColor` 注入（详见下方 CSS 变量对照表）
 
@@ -93,6 +93,7 @@ const cssVars = computed(() => ({
 - 用户可见提示用 `showToast`（统一 toast 模块）/ `window.$notification`
 - 内部异常用 `log` 记录
 - catch 块返回失败标志，不抛原始异常
+- **禁止空 catch 块**：ESLint `no-empty` 强制，静默降级时必须在 catch 块内加注释说明原因
 
 ### Chrome API
 

@@ -20,7 +20,7 @@ export const PRESERVE_FIELDS = [
 
 export const WIDGET_CONFIG = {
   enabled: true,
-  source: BookmarkSource.INTERNAL,
+  source: BookmarkSource.BROWSER,
   isGlobalShortcutEnabled: true,
   noModifierMode: false,
   shortcutInInputElement: true,

@@ -66,8 +66,9 @@ import.meta.glob 扫描 → 构建 defaultConfig → createLocalConfig()
 - `handleAppUpdate` 使用 `if` 而非 `if-else`，确保跨多版本旧用户能依次执行所有迁移
 - 末尾的 `updateSetting()` 是异步执行（不 await），整理配置结构但不阻塞首屏渲染
 - 每次修改配置结构都**必须同步升 `package.json` 版本号**
+- **版本快照**：调用方（App.vue）在 `setupPageConfigSync` 之前通过 `getLocalVersion()` 快照本地版本号，传入 `handleAppUpdate(localVersion)`。避免 `loadRemoteConfig` 合并云端数据后 `localConfig.general.version` 被覆盖为新版本，导致迁移被误跳过
 
-配置迁移最佳实践（含各场景正确/错误做法对照表）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#配置迁移黄金法则)。
+配置迁移最佳实践（含各场景正确/错误做法对照表）详见 [pitfalls-config.md](../../.claude/rules/pitfalls-config.md#配置迁移黄金法则)。
 
 ### 配置兼容性快照测试
 
@@ -93,7 +94,7 @@ npx vitest run src/logic/__tests__/config-snapshot.test.ts
 
 ## mergeState 合并函数
 
-以 `state`（默认配置）为模板，过滤 `acceptState` 中的未知/废弃字段。完整合并规则（含 keymap 直接替换、数组直接替换等特殊行为）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#mergestate-合并陷阱)。
+以 `state`（默认配置）为模板，过滤 `acceptState` 中的未知/废弃字段。完整合并规则（含 keymap 直接替换、数组直接替换等特殊行为）详见 [pitfalls-config.md](../../.claude/rules/pitfalls-config.md#mergestate-合并陷阱)。
 
 ## 主题与颜色系统
 
@@ -139,7 +140,7 @@ colorMixWithAlpha(color: string, alpha: number): string
 
 ## 常见坑点
 
-详见 [pitfalls.md](../../.claude/rules/pitfalls.md#配置系统)。以下为配置系统特有陷阱：
+详见 [pitfalls-config.md](../../.claude/rules/pitfalls-config.md)。以下为配置系统特有陷阱：
 
 ### 页面焦点元素重载守卫
 

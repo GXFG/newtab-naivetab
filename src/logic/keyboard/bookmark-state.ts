@@ -4,6 +4,7 @@
  *   setting / components 跨层消费。包含：系统书签获取、初始化、层切换、数据刷新。
  *   不依赖任何 UI Widget 或 Vue 组件。
  * @dependencies bookmark/api.ts（getBrowserBookmark）、bookmark/parser.ts（解析）、
+ *   bookmark/bookmark-export.ts（首次安装自动创建书签层）、
  *   keyboard/keyboard-layout.ts（键盘布局）、keyboard/keyboard-constants.ts（常量）
  * @consumers widgets/keyboardBookmark/logic.ts、components/BaseNaiveBookmarkManager.vue、
  *   components/BaseSystemBookmarkManager.vue、components/BaseBookmarkLayerTabSwitcher.vue
@@ -11,18 +12,27 @@
  */
 import { ref, reactive, computed } from 'vue'
 import { requestPermission, checkPermission } from '@/logic/utils/permission'
+import {
+  createLayerBookmarkFolders,
+  exportKeymapToBrowser,
+} from '@/logic/keyboard/bookmark-export'
 import { padUrlHttps } from '@/logic/utils/common'
 import { addVisibilityTask, addPageFocusTask } from '@/logic/task'
 import { getBrowserBookmark } from '@/logic/bookmark/api'
-import { parseBookmarkFolder, extractDomainName } from '@/logic/bookmark/parser'
+import {
+  parseBookmarkFolder,
+  extractDomainName,
+  findFolderByPath,
+} from '@/logic/bookmark/parser'
 import { keyboardCurrentModelAllKeyList } from '@/logic/keyboard/keyboard-layout'
 import { localConfig } from '@/logic/config/state'
 import {
   SYSTEM_KEYMAP_STORAGE_KEY,
   DEFAULT_LAYER_SOURCE_FOLDER,
   ACTIVE_LAYER_STORAGE_KEY,
+  KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER,
 } from '@/logic/keyboard/keyboard-constants'
-import { BookmarkSource } from '@/common/widget-constants'
+import { BookmarkSource, LAYER_FOLDER_NAMES } from '@/common/widget-constants'
 import { MSG_SWITCH_BOOKMARK_LAYER_UI } from '@/types/messages'
 
 /**
@@ -41,8 +51,10 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       | undefined
     if (newKeymap) {
       state.systemKeymap = newKeymap
+      persistKeymapToLocal(newKeymap)
     } else {
       state.systemKeymap = {}
+      persistKeymapToLocal({})
     }
   }
 
@@ -56,6 +68,11 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       | undefined
     if (typeof newLayer === 'number') {
       cachedActiveLayer.value = newLayer
+      try {
+        localStorage.setItem(ACTIVE_LAYER_STORAGE_KEY, String(newLayer))
+      } catch {
+        /* localStorage 写入失败，静默降级 */
+      }
     }
   }
 })
@@ -84,9 +101,39 @@ export const state = reactive({
   systemBookmarks: [] as BookmarkNode[],
   isLoadPageLoading: false,
   currSelectKeyCode: '',
-  /** 系统书签解析出的 keymap（仅内存，不持久化到 localConfig）*/
+  /** 系统书签解析出的 keymap。内存 state + localStorage 缓存（首屏同步读取）+ chrome.storage.local 持久化（跨上下文共享） */
   systemKeymap: {} as Record<string, TBookmarkEntry>,
 })
+
+// 模块加载时从 localStorage 同步恢复缓存，确保组件首次渲染即有数据。
+// localConfig 已通过 useStorageLocal 同步就绪（source=BROWSER），activeKeymap
+// 在首次渲染时直接取 state.systemKeymap，不能等异步 chrome.storage.local.get。
+try {
+  const cached = localStorage.getItem(SYSTEM_KEYMAP_STORAGE_KEY)
+  if (cached) {
+    state.systemKeymap = JSON.parse(cached)
+  }
+} catch {
+  /* localStorage 读取失败，静默降级 */
+}
+
+try {
+  const cached = localStorage.getItem(ACTIVE_LAYER_STORAGE_KEY)
+  if (cached !== null) {
+    cachedActiveLayer.value = JSON.parse(cached)
+  }
+} catch {
+  /* localStorage 读取失败，静默降级 */
+}
+
+/** 将 systemKeymap 持久化到 localStorage，供下次模块加载同步读取 */
+const persistKeymapToLocal = (keymap: Record<string, TBookmarkEntry>) => {
+  try {
+    localStorage.setItem(SYSTEM_KEYMAP_STORAGE_KEY, JSON.stringify(keymap))
+  } catch {
+    /* localStorage 读取失败，静默降级 */
+  }
+}
 
 export const getSystemBookmarkForKeyboard = async () => {
   if (localConfig.keyboardBookmark.source !== BookmarkSource.BROWSER) {
@@ -115,6 +162,7 @@ export const getSystemBookmarkForKeyboard = async () => {
     chrome.storage.local.set({
       [SYSTEM_KEYMAP_STORAGE_KEY]: state.systemKeymap,
     })
+    persistKeymapToLocal(state.systemKeymap)
   } catch (e) {
     console.warn(e)
     window.$dialog.create({
@@ -139,7 +187,47 @@ export const getSystemBookmarkForKeyboard = async () => {
 
 export const initKeyboardData = async () => {
   await loadActiveLayer()
+  await initFirstOpenBookmarkLayers()
   getSystemBookmarkForKeyboard()
+}
+
+/**
+ * 首次安装时自动创建书签层文件夹并导出默认书签到浏览器书签栏。
+ * 仅在 isFirstOpen && source === BROWSER 时执行。
+ * bookmarks API 异常时回退到 INTERNAL 模式（bookmarks 为必需权限，安装时已授予）。
+ */
+const initFirstOpenBookmarkLayers = async (): Promise<void> => {
+  if (!localConfig.general.isFirstOpen) return
+  if (localConfig.keyboardBookmark.source !== BookmarkSource.BROWSER) return
+
+  try {
+    const tree = await chrome.bookmarks.getTree()
+    const topFolder = findFolderByPath(tree, KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER)
+
+    // 已有 NaiveTab 文件夹（如重装场景），跳过创建和导出，仅回填 sourceFolderPath
+    // 确保层切换正常工作（getCurrentLayerFolderTitle 的 fallback 仅适用于 layer1）
+    if (topFolder) {
+      LAYER_FOLDER_NAMES.forEach((name, i) => {
+        if (localConfig.keyboardBookmark.layers[i]) {
+          localConfig.keyboardBookmark.layers[i].sourceFolderPath =
+            `${KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER}/${name}`
+        }
+      })
+      return
+    }
+
+    // 全新用户：创建文件夹 → 回填路径 → 导出默认书签
+    const paths = await createLayerBookmarkFolders()
+    paths.forEach((path, i) => {
+      if (localConfig.keyboardBookmark.layers[i]) {
+        localConfig.keyboardBookmark.layers[i].sourceFolderPath = path
+      }
+    })
+    await exportKeymapToBrowser(localConfig.keyboardBookmark.keymap)
+  } catch (e) {
+    console.warn('[keyboardBookmark] First-open layer init failed:', e)
+    localConfig.keyboardBookmark.source = BookmarkSource.INTERNAL
+  }
 }
 
 /**
@@ -155,6 +243,14 @@ export const switchLayer = async (layerIndex: number): Promise<void> => {
   if (!layers?.[layerIndex]?.sourceFolderPath) {
     console.warn(`[keyboardBookmark] Layer ${layerIndex} is not configured`)
     return
+  }
+
+  // 乐观更新：立即更新本地状态，UI 瞬间响应，不等 SW 异步回调
+  cachedActiveLayer.value = layerIndex
+  try {
+    localStorage.setItem(ACTIVE_LAYER_STORAGE_KEY, String(layerIndex))
+  } catch {
+    /* localStorage 读取失败，静默降级 */
   }
 
   chrome.runtime.sendMessage({

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { localConfig } from '@/logic/config/state'
-import { ICONS } from '@/logic/constants/icons'
 import {
   SettingHeaderBar,
   SettingFormWrap,

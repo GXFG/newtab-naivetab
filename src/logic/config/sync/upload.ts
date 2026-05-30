@@ -125,6 +125,10 @@ export const uploadConfigFn = async (field: ConfigField) => {
     // 修复了错误的 syncId），但数据实际已同步。标记 syncStatus='failed' 是为了
     // UI 显示同步异常，下次 handleMissedUploadConfig 会触发重试 → 再次被 MD5 去重
     // 拦截 → resolve(true) → retryCount 不增加 → 不会无限循环。
+    //
+    // 另一种触发场景：syncConfigFromOnChange（Popup onChanged）覆盖 Newtab 本地修改后，
+    // deep watcher 重新置 dirty=true，但数据 MD5 与 Popup syncId 一致。详见 state.ts
+    // syncConfigFromOnChange 注释。
     if (prevSyncId === currConfigMd5) {
       setTimeout(() => {
         status.loading = false
@@ -221,6 +225,7 @@ export const uploadConfigFn = async (field: ConfigField) => {
           status.lastError = error.message || 'unknown'
           setTimeout(() => resolve(false), 100)
         } else {
+          log(`Upload config-${field} done`)
           configSizeMap[field] = finalBytes
           status.dirty = false
           status.retryCount = 0
@@ -274,6 +279,10 @@ const genWatchUploadConfigFn = (field: ConfigField) => {
     localState.value.isUploadConfigStatusMap[field].localModifiedTime =
       Date.now()
     localState.value.isUploadConfigStatusMap[field].loading = true
+    // 用户主动修改时重置重试计数，给新数据全新的重试配额。
+    // 不重置会导致：retryCount≥3 时 handleMissedUploadConfig 拒绝重试，
+    // 用户修改可能永远无法在下次启动时被补救上传。
+    localState.value.isUploadConfigStatusMap[field].retryCount = 0
     log(`Upload config-${field} ready`)
     debounceFn()
   }

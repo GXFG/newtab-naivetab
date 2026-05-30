@@ -13,7 +13,7 @@ import { setLocale } from '@/common/i18n'
 import { localConfig, localState } from '@/logic/config/state'
 import { customPrimaryColor } from './style'
 
-const NATIVE_UI_LOCALE_MAP = {
+const NATIVE_UI_LOCALE_MAP: Record<string, typeof zhCN> = {
   'zh-CN': zhCN,
   'en-US': enUS,
 }
@@ -84,5 +84,8 @@ watch(
 )
 
 export const currDayjsLang = computed(
-  () => DAYJS_LANG_MAP[localConfig.general.timeLang] || 'en',
+  () =>
+    DAYJS_LANG_MAP[
+      localConfig.general.timeLang as keyof typeof DAYJS_LANG_MAP
+    ] || 'en',
 )

@@ -12,13 +12,55 @@ import {
   FontField,
   ToggleColorField,
 } from '@/setting/fields'
+
+const CUSTOM_VALUE = '__custom__'
+const PRESET_VALUES = ['HH:mm:ss', 'HH:mm', 'hh:mm:ss', 'hh:mm']
+
+const formatOptions = computed(() => [
+  { label: window.$t('clock.format24'), value: 'HH:mm:ss' },
+  { label: window.$t('clock.format24NoSec'), value: 'HH:mm' },
+  { label: window.$t('clock.format12'), value: 'hh:mm:ss' },
+  { label: window.$t('clock.format12NoSec'), value: 'hh:mm' },
+  { label: window.$t('clock.formatCustom'), value: CUSTOM_VALUE },
+])
+
+// 初始化：当前 format 若不是预设，说明用户之前用过自定义格式
+const isCustomMode = ref(
+  !PRESET_VALUES.includes(localConfig.clockDigital.format),
+)
+
+const selectedOption = computed(() => {
+  if (isCustomMode.value) return CUSTOM_VALUE
+  if (PRESET_VALUES.includes(localConfig.clockDigital.format))
+    return localConfig.clockDigital.format
+  return CUSTOM_VALUE
+})
+
+const handleFormatChange = (value: string) => {
+  if (value === CUSTOM_VALUE) {
+    isCustomMode.value = true
+  } else {
+    isCustomMode.value = false
+    localConfig.clockDigital.format = value
+  }
+}
 </script>
 
 <template>
   <SettingFormWrap widget-code="clockDigital">
     <!-- 功能配置 -->
     <SettingFormSection section-key="common.behavior">
+      <SettingFormItem :label="$t('clock.format')">
+        <NSelect
+          :value="selectedOption"
+          class="setting__fill-input"
+          size="small"
+          :options="formatOptions"
+          @update:value="handleFormatChange"
+        />
+      </SettingFormItem>
       <SettingFormItem
+        v-if="isCustomMode"
         :label="$t('common.format')"
         :tip-content="URL_DAYJS_FORMAT"
         :tip-link="URL_DAYJS_FORMAT"
@@ -26,6 +68,7 @@ import {
         <NInput
           v-model:value="localConfig.clockDigital.format"
           size="small"
+          :placeholder="$t('clock.formatCustomTip')"
         />
       </SettingFormItem>
 

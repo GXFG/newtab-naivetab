@@ -18,6 +18,8 @@ import WidgetWrap from '../WidgetWrap.vue'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
 import KeyboardKeycapWidget from './KeyboardKeycapWidget.vue'
 import { WIDGET_CODE } from './config'
+import { useKeyboardLayerWheel } from '@/composables/useKeyboardLayerWheel'
+import { useKeyboardLayerMouseButtons } from '@/composables/useKeyboardLayerMouseButtons'
 
 const isRender = getIsWidgetRender(WIDGET_CODE)
 
@@ -80,6 +82,21 @@ const containerClass = computed(() => ({
   'keyboardBookmark__container--drag': isDragMode.value,
   'keyboardBookmark__container--hover': !isDragMode.value,
 }))
+
+const { handleWheel } = useKeyboardLayerWheel()
+const { handleMouseDown: handleMouseLayerBtn } = useKeyboardLayerMouseButtons()
+
+/** 拖拽模式下禁止滚轮切层 */
+const onWheel = (e: WheelEvent) => {
+  if (isDragMode.value) return
+  handleWheel(e)
+}
+
+/** 拖拽模式下禁止鼠标按键切层 */
+const onMouseDown = (e: MouseEvent) => {
+  if (isDragMode.value) return
+  handleMouseLayerBtn(e)
+}
 </script>
 
 <template>
@@ -89,6 +106,8 @@ const containerClass = computed(() => ({
       :keys="currKeyboardConfig.keys"
       :extra-class="containerClass"
       class="keyboardBookmark__container"
+      @wheel="onWheel"
+      @mousedown="onMouseDown"
     >
       <template #keycap="{ code }">
         <KeyboardKeycapWidget :key-code="code" />
@@ -115,6 +134,14 @@ const containerClass = computed(() => ({
     background-color: transparent !important;
     &:hover {
       background-color: var(--nt-bg-moveable-widget-main) !important;
+    }
+
+    /* 拖拽模式下禁用键帽 hover 抬起/滤镜效果 */
+    .row__keycap:hover,
+    .row__keycap--active,
+    .row__keycap--move {
+      filter: none !important;
+      transform: none !important;
     }
   }
 }

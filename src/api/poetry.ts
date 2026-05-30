@@ -1,5 +1,4 @@
 import request from './request'
-import { localConfig } from '@/logic/config/state'
 
 export const getPoetryTokenData = (): Promise<{
   status: string

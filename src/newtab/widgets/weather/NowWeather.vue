@@ -100,10 +100,17 @@ const onOpenWeather = () => {
 }
 
 const temperatureUnit = computed(
-  () => WEATHER_TEMPERATURE_UNIT_MAP[localConfig.weather.temperatureUnit],
+  () =>
+    WEATHER_TEMPERATURE_UNIT_MAP[
+      localConfig.weather
+        .temperatureUnit as keyof typeof WEATHER_TEMPERATURE_UNIT_MAP
+    ],
 )
 const speedUnit = computed(
-  () => WEATHER_SPEED_UNIT_MAP[localConfig.weather.speedUnit],
+  () =>
+    WEATHER_SPEED_UNIT_MAP[
+      localConfig.weather.speedUnit as keyof typeof WEATHER_SPEED_UNIT_MAP
+    ],
 )
 </script>
 

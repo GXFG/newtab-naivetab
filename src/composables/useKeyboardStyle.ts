@@ -295,7 +295,10 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
   /** keycap 图标区（justify-content + padding，依据是否显示名称分支） */
   const getKeycapIconStyle = (code: string): string => {
     const textAlign = getCustomTextAlign(code)
-    const justifyContent = TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP[textAlign]
+    const justifyContent =
+      TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP[
+        textAlign as keyof typeof TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP
+      ]
     let style = `justify-content: ${justifyContent};`
     if (localConfig.keyboardCommon.isNameVisible) {
       if (justifyContent !== 'center')
