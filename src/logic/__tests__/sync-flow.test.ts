@@ -267,9 +267,10 @@ describe('loadRemoteConfig sync branches', () => {
         general: { version: '2.3.0', lang: 'en' },
       }),
     )
-    // 同步状态应更新：syncId 设为过滤后数据的 MD5（防止 watch 触发多余上传）
-    expect(mockIsUploadConfigStatusMap.general.syncId).toBeTruthy()
-    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
+    // 合并后标记 dirty=true，交由 handleMissedUploadConfig 统一上传愈合云端。
+    // syncId 保持为云端值，不自行重算，避免与 uploadConfigFn MD5 检查冲突。
+    expect(mockIsUploadConfigStatusMap.general.syncId).toBe(remoteSyncId)
+    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(true)
     expect(mockIsUploadConfigStatusMap.general.loading).toBe(false)
     expect(mockIsUploadConfigStatusMap.general.retryCount).toBe(0)
     expect(mockIsUploadConfigStatusMap.general.lastError).toBe('')
@@ -314,10 +315,10 @@ describe('loadRemoteConfig sync branches', () => {
         general: { version: '2.3.0', lang: 'fr' },
       }),
     )
-    // dirty 应被清除，syncId 设为过滤后数据的 MD5
-    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
+    // 合并后标记 dirty=true，交由 handleMissedUploadConfig 统一上传愈合云端
+    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(true)
     expect(mockIsUploadConfigStatusMap.general.loading).toBe(false)
-    expect(mockIsUploadConfigStatusMap.general.syncId).toBeTruthy()
+    expect(mockIsUploadConfigStatusMap.general.syncId).toBe(remoteSyncId)
     expect(mockIsUploadConfigStatusMap.general.retryCount).toBe(0)
     expect(mockIsUploadConfigStatusMap.general.lastError).toBe('')
     expect(mockIsUploadConfigStatusMap.general.syncStatus).toBe('idle')

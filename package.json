@@ -2,7 +2,7 @@
   "name": "newtab-naivetab",
   "displayName": "NaiveTab - Visual Keyboard New Tab",
   "type": "module",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "private": true,
   "packageManager": "pnpm@11.4.0",
   "description": "Visual keyboard for bookmarks & browser commands — one-press access. Drag & drop layout, full customization, focus mode, and cloud sync.",

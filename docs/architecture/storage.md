@@ -108,7 +108,7 @@ interface UploadStatusItem {
 
 **双重防循环机制：**
 - **第一道防线 `pendingWrites`**：upload.ts 在 set 前 add MD5，state.ts 的 onChanged 先检查 pendingWrites，命中则跳过。从架构上消除自身写入的时序竞态。
-- **第二道防线 `syncId`**：兜底处理其他上下文（popup 等）的写入，内容相同则跳过。
+- **第二道防线 `syncId`**：兜底处理其他上下文（popup 等）的写入，内容相同则跳过。**MD5 相同时会同时清除 dirty（数据已确认同步）**，避免 `handleMissedUploadConfig` 每页加载都触发无效重试。
 
 ### flushConfigSync
 
@@ -134,7 +134,8 @@ interface UploadStatusItem {
 loadRemoteConfig
     ├── 云端无该字段 → uploadConfigFn 初始化
     ├── syncId 相同 → 跳过
-    ├── 本地 dirty = false → 版本感知合并（以版本较新方为模板）
+    ├── 本地 dirty = false → 版本感知合并 → updateSetting → 更新 syncId
+    │       └── 合并后 MD5 ≠ 云端 syncId → 上传愈合云端（heal upload）
     ├── dirty = true 且 localModifiedTime > syncTime → 上传本地
     └── dirty = true 且 localModifiedTime <= syncTime → 版本感知合并
 ```
@@ -143,12 +144,14 @@ loadRemoteConfig
 
 **loadRemoteConfig 合并后的 syncId 处理：** `updateSetting` 完成后，用 `getUploadConfigData(field)` 的 MD5 重新设置 syncId + dirty=false。原因是 `mergeState` 会过滤掉云端数据中的未知字段，导致最终 `localConfig` 的 MD5 与云端原始 syncId 不同。如果不重新设置，watch 触发的防抖上传会因 MD5 不匹配而多余上传一次。
 
+**heal upload（愈合上传）：** 合并后若本地 MD5 与云端 syncId 不同（`mergeState` 改变了数据结构），`loadRemoteConfig` 会调用 `uploadConfigFn` 将合并结果上传到云端。这确保云端数据与本地一致，避免每次启动都因 syncId 不匹配而重复合并。
+
 ### Dirty 标记生命周期
 
 - **设置**：用户本地修改任何配置字段时立即设置
-- **清除**：上传成功后 / 云端拉取合并后 / popup onChanged 同步后
+- **清除**：上传成功后 / 云端拉取合并后 / popup onChanged 同步后 / **MD5 去重匹配后（数据已确认同步）**
 - **持久化**：存储在 localStorage 的 `l-state` 中，页面刷新后保留
-- **故障恢复**：启动时 `handleMissedUploadConfig` 重试 `loading=true` 以及 `dirty=true` 且 `retryCount < 3` 的字段。每个字段在整个 session 生命周期中最多自动重试 3 次，超过后保留 `dirty` 和 `lastError` 标记，用户可手动触发同步
+- **故障恢复**：启动时 `handleMissedUploadConfig` 重试 `loading=true` 以及 `dirty=true` 且 `retryCount < 3` 的字段（含 size exceeded 路径）。每个字段在整个 session 生命周期中最多自动重试 3 次，超过后保留 `dirty` 和 `lastError` 标记，用户可手动触发同步
 
 ## Chrome 配额管理
 
@@ -245,7 +248,11 @@ databaseStore(storeName, type: 'add'|'put'|'get'|'delete', payload): Promise<...
 
 ### uploadConfigFn 返回值语义
 
-`uploadConfigFn` 返回 `Promise<boolean>`：`true` 表示上传成功，`false` 表示失败（包括 MD5 去重跳过前的内容不变返回 `true`、大小超限返回 `false`、`chrome.storage.sync.set` 回调报错返回 `false`）。调用方（如 `flushConfigSync`、`BaseNaiveBookmarkManager`）依赖此返回值区分成功/失败。
+`uploadConfigFn` 返回 `Promise<boolean>`：
+- `true`：无需重试（上传成功、MD5 去重跳过）
+- `false`：需要重试（`chrome.storage.sync.set` 回调报错、大小超限）
+
+调用方（如 `flushConfigSync`、`BaseNaiveBookmarkManager`）依赖此返回值区分成功/失败。`handleMissedUploadConfig` 不检查返回值，依赖 `dirty` 和 `retryCount` 状态决定下次是否重试。
 
 ### pendingWrites 内存泄漏说明
 
@@ -276,9 +283,10 @@ databaseStore(storeName, type: 'add'|'put'|'get'|'delete', payload): Promise<...
 ### syncStatus 状态流转
 
 ```
-idle → syncing → success → idle（成功路径）
-           → failed（网络错误等，retryCount++）
-           → quota-exceeded（大小超限，不可重试）
+idle → syncing → success → idle（成功路径，dirty 清除，retryCount 归零）
+           → failed（网络错误等，dirty 保留，retryCount++）
+           → quota-exceeded（大小超限，dirty 保留，retryCount++，最多重试 3 次）
+           → idle（MD5 去重匹配，数据已同步，dirty 同时清除）
 
-failed → syncing → ...（下次启动自动重试，最多 3 次）
+failed → syncing → ...（下次启动 handleMissedUploadConfig 自动重试，最多 3 次）
 ```
