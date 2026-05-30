@@ -222,15 +222,19 @@ describe('flushConfigSync', () => {
     expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
   })
 
-  it('skips upload when MD5 matches (content unchanged)', async () => {
-    // syncId 与当前内容的 MD5 相同 → MD5 去重跳过上传
+  it('skips upload and clears dirty when MD5 matches (content unchanged)', async () => {
+    // syncId 与当前内容的 MD5 相同 → MD5 去重跳过上传，同时清除 dirty
     mockIsUploadConfigStatusMap.general.syncId = `md5-${JSON.stringify(mockLocalConfig.general).length}`
+    mockIsUploadConfigStatusMap.general.dirty = true
 
     const result = await flushConfigSync('general')
 
     expect(result).toBe(true)
     // MD5 去重：不实际调用 chrome.storage.sync.set
     expect(mockUploadSetCalls).toHaveLength(0)
+    // dirty 应被清除，避免 handleMissedUploadConfig 每页加载都无效重试
+    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
+    expect(mockIsUploadConfigStatusMap.general.syncStatus).toBe('idle')
   })
 
   it('initializes statusMap when field has no entry', async () => {

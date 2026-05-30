@@ -83,12 +83,11 @@ const SYNC_KEY_MAP: Record<SyncField, string> = {
  *
  * 若 Newtab 已有 dirty=true 的本地修改（2000ms 防抖尚未触发上传），此时 Popup 的
  * flushConfigSync 写入触发 onChanged，本函数会：
- *   1. 将 localConfig[field] 替换为 Popup 的数据（第 119 行）→ Newtab 本地修改丢失
- *   2. 设置 dirty=false（第 114 行）
- *   3. 第 119 行的赋值触发 deep watcher → genWatchUploadConfigFn 再次置 dirty=true
- *   4. 后续 uploadConfigFn 检测 MD5 与 Popup syncId 相同 → 跳过上传
- *   5. dirty 保持 true，syncStatus='failed' → 每次启动 handleMissedUploadConfig 重试
- *      → MD5 去重拦截 → 循环（不产生实际网络请求，仅多一行 log）
+ *   1. 将 localConfig[field] 替换为 Popup 的数据（第 135 行）→ Newtab 本地修改丢失
+ *   2. 设置 dirty=false（第 130 行）
+ *   3. 第 135 行的赋值触发 deep watcher → genWatchUploadConfigFn 再次置 dirty=true
+ *   4. 后续 uploadConfigFn 检测 MD5 与 Popup syncId 相同 → 跳过上传 + 清除 dirty
+ *      → syncStatus='idle' → handleMissedUploadConfig 不再无效重试
  *
  * 触发条件苛刻：需在 2000ms 窗口内同时在 Newtab 和 Popup 修改 keyboardBookmark 或
  * keyboardCommand（唯二有跨上下文 onChanged 同步的字段）。概率极低，且丢失的是
