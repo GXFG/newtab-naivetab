@@ -14,6 +14,8 @@
  *     state.ts 的 onChanged 先检查 pendingWrites 再走 syncId 守卫，从架构上消除时序依赖
  *   - getUploadConfigData 对 keyboardBookmark 的 keymap 做过滤裁剪，计算 MD5 时必须
  *     使用此函数而非直接 JSON.stringify(localConfig)，否则 MD5 去重会失效
+ *   - MD5 去重路径会同时清除 dirty（数据已确认同步），避免 handleMissedUploadConfig 每次启动无效重试
+ *   - size exceeded 路径会递增 retryCount（同 set 失败路径），3 次后自动停止重试
  * @see docs/architecture/storage.md#防抖写入机制
  */
 import md5 from 'crypto-js/md5'
@@ -121,18 +123,20 @@ export const uploadConfigFn = async (field: ConfigField) => {
     // retryCount 不会增加（只在 chrome.storage.sync.set 回调报错时递增，第 208 行），
     // 因此不会产生多余网络请求或消耗重试配额。
     //
-    // dirty=true 但 MD5 相同：说明 syncId 与本地数据不一致（如 loadRemoteConfig
-    // 修复了错误的 syncId），但数据实际已同步。标记 syncStatus='failed' 是为了
-    // UI 显示同步异常，下次 handleMissedUploadConfig 会触发重试 → 再次被 MD5 去重
-    // 拦截 → resolve(true) → retryCount 不增加 → 不会无限循环。
+    // dirty=true 但 MD5 相同：说明数据实际已同步，只是 syncId 与本地数据不一致
+    // （如 loadRemoteConfig 修复了错误的 syncId，或 handleAppUpdate → updateSetting
+    // 触发 watch 置 dirty 但数据未变）。同时清除 dirty 避免 handleMissedUploadConfig
+    // 每页加载都触发无效重试。
     //
     // 另一种触发场景：syncConfigFromOnChange（Popup onChanged）覆盖 Newtab 本地修改后，
     // deep watcher 重新置 dirty=true，但数据 MD5 与 Popup syncId 一致。详见 state.ts
     // syncConfigFromOnChange 注释。
     if (prevSyncId === currConfigMd5) {
+      log(`Upload config-${field} skip (unchanged)`)
       setTimeout(() => {
         status.loading = false
-        status.syncStatus = status.dirty ? 'failed' : 'idle'
+        status.dirty = false
+        status.syncStatus = 'idle'
         resolve(true)
       }, 100)
       return
@@ -172,6 +176,7 @@ export const uploadConfigFn = async (field: ConfigField) => {
         )
         status.loading = false
         status.syncStatus = 'quota-exceeded'
+        status.retryCount++
         status.lastError = `size:${finalBytes}`
         resolve(false)
         return

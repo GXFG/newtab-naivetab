@@ -349,6 +349,128 @@ describe('loadRemoteConfig — local dirty but remote newer → merge', () => {
   })
 })
 
+// ── loadRemoteConfig: merge marks dirty=true for handleMissedUploadConfig ──
+// 验证合并后不自行上传，而是标记 dirty=true 交给下一步统一处理
+
+describe('loadRemoteConfig — merge marks dirty for recovery', () => {
+  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+
+  beforeEach(async () => {
+    vi.resetModules()
+    const { localState } = await import('@/logic/config/state')
+    localState.value.isUploadConfigStatusMap = {
+      general: { loading: false, dirty: false, localModifiedTime: 0, syncTime: 100, syncId: 'oldLocal' },
+    }
+    // 云端 syncId 不同，但数据结构只是多了个 extra 字段
+    const payload = JSON.stringify({
+      syncTime: 200,
+      syncId: 'cloudMd5xyz',
+      appVersion: '2.5.0',
+      data: { version: '2.5.0', extraCloudField: 'val' },
+    })
+    vi.spyOn(chrome.storage.sync, 'get').mockImplementation((_keys, cb) => {
+      cb({ 'naive-tab-general': payload })
+    })
+    const mod = await import('@/logic/config/sync/loader')
+    loadRemoteConfig = mod.loadRemoteConfig
+  })
+
+  it('sets dirty=true and keeps syncId as targetSyncId (cloud value)', async () => {
+    const result = await loadRemoteConfig()
+    expect(result).toBe(true)
+
+    const { localState } = await import('@/logic/config/state')
+    const status = localState.value.isUploadConfigStatusMap.general
+    // 核心：合并后标记 dirty=true，交给下一步 handleMissedUploadConfig 上传
+    expect(status.dirty).toBe(true)
+    // syncId 保持为云端原始值，不自行重算——避免与 uploadConfigFn MD5 检查冲突
+    expect(status.syncId).toBe('cloudMd5xyz')
+    // 状态已重置干净，等待上传
+    expect(status.loading).toBe(false)
+    expect(status.syncStatus).toBe('idle')
+    expect(status.retryCount).toBe(0)
+  })
+})
+
+// ── handleMissedUploadConfig: dirty + retryCount guard ──
+
+describe('handleMissedUploadConfig — dirty and retryCount guard', () => {
+  let handleMissedUploadConfig: typeof import('@/logic/config/sync/upload')['handleMissedUploadConfig']
+
+  it('skips fields with dirty=true but retryCount >= 3', async () => {
+    vi.resetModules()
+    const { localState } = await import('@/logic/config/state')
+    localState.value.isUploadConfigStatusMap = {
+      general: { loading: false, dirty: true, localModifiedTime: Date.now(), syncTime: 100, syncId: 'willNotRetry', retryCount: 3, lastError: 'persistent error', syncStatus: 'failed' },
+    }
+    const mod = await import('@/logic/config/sync/upload')
+    handleMissedUploadConfig = mod.handleMissedUploadConfig
+
+    await handleMissedUploadConfig()
+
+    // retryCount=3 超过上限，不应触发上传
+    const status = localState.value.isUploadConfigStatusMap.general
+    expect(status.dirty).toBe(true) // 仍然是 dirty（没上传）
+    expect(status.retryCount).toBe(3) // 计数不变
+    expect(status.syncId).toBe('willNotRetry') // syncId 不变（未进入 uploadConfigFn）
+  })
+
+  it('uploads fields with dirty=true and retryCount < 3', async () => {
+    vi.resetModules()
+    const { localState } = await import('@/logic/config/state')
+    localState.value.isUploadConfigStatusMap = {
+      general: { loading: false, dirty: true, localModifiedTime: Date.now(), syncTime: 100, syncId: 'oldNeedUpload', retryCount: 1, lastError: '', syncStatus: 'failed' },
+    }
+    const mod = await import('@/logic/config/sync/upload')
+    handleMissedUploadConfig = mod.handleMissedUploadConfig
+
+    await handleMissedUploadConfig()
+
+    // retryCount<3，触发上传
+    const status = localState.value.isUploadConfigStatusMap.general
+    expect(status.loading).toBe(false)
+    // 上传后 dirty 取决于 uploadConfigFn 的结果：
+    // MD5 匹配 → dirty=false  |  上传成功 → dirty=false  |  上传失败 → dirty=true
+    // 默认 mock chrome 数据为空，syncId='oldNeedUpload', currConfigMd5 由 defaultConfig 决定
+    // 由于 prevSyncId 大概率 ≠ currConfigMd5，会上传成功 → dirty=false
+    expect(status.dirty).toBe(false)
+  })
+})
+
+// ── handleMissedUploadConfig: dirty=true + MD5 match clears dirty ──
+
+describe('handleMissedUploadConfig — MD5 match clears dirty', () => {
+  let handleMissedUploadConfig: typeof import('@/logic/config/sync/upload')['handleMissedUploadConfig']
+
+  it('clears dirty when uploadConfigFn MD5 matches (data already synced)', async () => {
+    vi.resetModules()
+    const { localState, localConfig } = await import('@/logic/config/state')
+    // 先让 uploadConfigFn 计算一次真实 MD5，然后用它作为 syncId
+    // 这样下次调用时 MD5 匹配 → dirty 应被清除
+    const mod = await import('@/logic/config/sync/upload')
+    const { uploadConfigFn } = mod
+
+    // 首次上传：获得真实 syncId
+    await uploadConfigFn('general')
+    const syncedId = localState.value.isUploadConfigStatusMap.general.syncId
+    expect(syncedId).toBeTruthy()
+
+    // 模拟：数据未变但 dirty 被标记为 true（如 loadRemoteConfig 合并后）
+    localState.value.isUploadConfigStatusMap.general.dirty = true
+    localState.value.isUploadConfigStatusMap.general.loading = false
+    localState.value.isUploadConfigStatusMap.general.retryCount = 0
+
+    handleMissedUploadConfig = mod.handleMissedUploadConfig
+    await handleMissedUploadConfig()
+
+    // MD5 匹配 → dirty 应被清除
+    const status = localState.value.isUploadConfigStatusMap.general
+    expect(status.dirty).toBe(false)
+    expect(status.syncId).toBe(syncedId)
+    expect(status.syncStatus).toBe('idle')
+  })
+})
+
 // ── loadRemoteKeyboardConfig ──
 
 describe('loadRemoteKeyboardConfig', () => {
