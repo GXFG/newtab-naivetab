@@ -36,7 +36,7 @@ export const getStyleField = (
   return computed(() => {
     const fieldList = field.split('.')
     let targetValue: any = fieldList.reduce(
-      (r, c) => r[c],
+      (r: any, c) => r[c],
       localConfig[configCode],
     )
 

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { globalState } from '@/logic/store/state'
-import { customPrimaryColor } from '@/logic/store/style'
 import { localState } from '@/logic/config/state'
 import { gaProxy } from '@/logic/utils/gtag'
 import { settingsList, SETTING_GROUPS } from './registry'
@@ -31,7 +30,6 @@ const activeComponent = computed(() => {
  * 因此 nav 背景和 divider 文字背景使用项目自己的 token，确保 drawer/page 双模式一致。
  */
 const cssVars = computed(() => ({
-  '--nt-primary-color': customPrimaryColor.value,
   '--nt-setting-nav-bg':
     localState.value.currAppearanceCode === 0 ? '#fff' : 'rgb(24, 24, 28)',
 }))

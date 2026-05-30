@@ -6,8 +6,6 @@ import SponsorToastItem from './SponsorToastItem.vue'
 
 const paymentList = ['wechat', 'alipay']
 
-const groupList = ['wechat', 'qq']
-
 const catCounter = useStorage('naivetab-cat-counter', 0)
 const toasts = ref<{ id: string; message: string }[]>([])
 
@@ -100,46 +98,91 @@ const removeToast = (id: string) => {
 <style scoped>
 /* ── Intro ── */
 .sponsor__intro {
-  margin: 14px 0 10px;
-  padding: 14px 16px;
+  position: relative;
+  margin: 8px 0 16px;
+  padding: 18px 20px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--n-tab-border-color);
-  background: linear-gradient(
-    135deg,
-    rgba(16, 152, 173, 0.04) 0%,
-    transparent 60%
-  );
+  border: 1px solid rgba(16, 152, 173, 0.1);
+  background:
+    radial-gradient(
+      ellipse at 85% 20%,
+      rgba(16, 152, 173, 0.05) 0%,
+      transparent 50%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(16, 152, 173, 0.04) 0%,
+      rgba(16, 152, 173, 0.01) 100%
+    );
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 4px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+
+  /* 左侧渐变装饰条 */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: linear-gradient(180deg, #1098ad, #18a058);
+    opacity: 0.35;
+  }
+
+  /* 右下角光晕 */
+  &::after {
+    content: '';
+    position: absolute;
+    right: -24px;
+    bottom: -24px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at center,
+      rgba(16, 152, 173, 0.07) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
 
   .intro__lines {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
   }
 
   .intro__line {
     font-size: var(--text-base);
-    line-height: 1.55;
+    line-height: 1.65;
     opacity: var(--opacity-primary);
-    padding-left: 12px;
+    padding-left: 16px;
     position: relative;
 
     &::before {
       content: '';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 3px;
-      height: 3px;
+      top: 10px;
+      width: 4px;
+      height: 4px;
       border-radius: 50%;
-      background: rgba(16, 152, 173, 0.6);
+      background: rgba(16, 152, 173, 0.45);
+      box-shadow: 0 0 4px rgba(16, 152, 173, 0.2);
     }
   }
 
   .intro__highlight {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed var(--n-tab-border-color);
+    position: relative;
+    z-index: 1;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gray-alpha-10);
     text-align: center;
     font-size: var(--text-base);
     font-weight: 600;
@@ -155,42 +198,87 @@ const removeToast = (id: string) => {
 .sponsor__qr-row {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  gap: 20px;
   margin: 16px 0;
 }
 
 .qr__card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 14px 14px 12px;
+  gap: 12px;
+  padding: 20px 18px 16px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--n-tab-border-color);
-  background: var(--n-color);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-alpha-06);
+  background: linear-gradient(
+    160deg,
+    var(--gray-alpha-02) 0%,
+    var(--gray-alpha-04) 100%
+  );
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 12px 32px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  cursor: default;
   transition:
-    box-shadow var(--transition-base),
     border-color var(--transition-base),
+    box-shadow var(--transition-base),
     transform var(--transition-spring);
 
+  /* 顶部品牌色装饰条 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    border-radius: 0 0 2px 2px;
+    opacity: 0.4;
+    transition: opacity var(--transition-base);
+  }
+
+  &.qr__card--wechat::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #09bb07 25%,
+      #09bb07 75%,
+      transparent
+    );
+  }
+
+  &.qr__card--alipay::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #1677ff 25%,
+      #1677ff 75%,
+      transparent
+    );
+  }
+
   &:hover {
-    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 20px rgba(0, 0, 0, 0.07),
+      0 16px 40px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  &:hover::before {
+    opacity: 0.65;
   }
 
   &.qr__card--wechat:hover {
-    border-color: rgba(9, 187, 7, 0.35);
-    box-shadow:
-      var(--shadow-md),
-      0 0 0 3px rgba(9, 187, 7, 0.06);
+    border-color: rgba(9, 187, 7, 0.25);
   }
 
   &.qr__card--alipay:hover {
-    border-color: rgba(22, 119, 255, 0.35);
-    box-shadow:
-      var(--shadow-md),
-      0 0 0 3px rgba(22, 119, 255, 0.06);
+    border-color: rgba(22, 119, 255, 0.25);
   }
 }
 
@@ -200,6 +288,14 @@ const removeToast = (id: string) => {
   height: 148px;
   border-radius: var(--radius-lg);
   overflow: hidden;
+  transition: transform var(--transition-spring);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+
+  .qr__card:hover & {
+    transform: scale(1.03);
+  }
 
   .qr__img {
     width: 100%;
@@ -216,38 +312,75 @@ const removeToast = (id: string) => {
     background: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.12) 0%,
-      transparent 50%
+      transparent 55%
     );
     pointer-events: none;
+  }
+
+  /* 扫描线 */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 5%;
+    width: 90%;
+    height: 16px;
+    top: -16px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 25%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0.06) 75%,
+      transparent 100%
+    );
+    border-radius: 50%;
+    box-shadow:
+      0 0 10px rgba(255, 255, 255, 0.3),
+      0 0 24px rgba(255, 255, 255, 0.12);
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+  }
+
+  .qr__card:hover &::after {
+    opacity: 1;
+    animation: qrScan 1.2s ease-in-out;
   }
 }
 
 .qr__label {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: var(--text-sm);
   font-weight: 500;
   opacity: var(--opacity-secondary);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
 }
 
 .label__dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: currentColor;
-  opacity: 0.5;
+  transition: box-shadow var(--transition-base);
 
   .qr__card--wechat & {
     background: #09bb07;
-    opacity: 1;
+    box-shadow: 0 0 5px rgba(9, 187, 7, 0.3);
   }
 
   .qr__card--alipay & {
     background: #1677ff;
-    opacity: 1;
+    box-shadow: 0 0 5px rgba(22, 119, 255, 0.3);
+  }
+
+  .qr__card--wechat:hover & {
+    box-shadow: 0 0 8px rgba(9, 187, 7, 0.5);
+  }
+
+  .qr__card--alipay:hover & {
+    box-shadow: 0 0 8px rgba(22, 119, 255, 0.5);
   }
 }
 
@@ -255,7 +388,7 @@ const removeToast = (id: string) => {
 .sponsor__footer {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 16px;
   padding-bottom: 4px;
 }
 
@@ -282,25 +415,26 @@ const removeToast = (id: string) => {
 
 .footer__skip-btn {
   font-size: 14px;
-  transition: transform var(--transition-spring);
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--shadow-sm);
+  }
 
   &:active {
     transform: scale(0.95);
   }
+}
 
-  &::after {
-    content: '✨';
-    position: absolute;
-    right: -8px;
-    top: -8px;
-    font-size: 20px;
-    opacity: 0;
-    transition: opacity var(--transition-slow);
-    pointer-events: none;
+/* ── Keyframes ── */
+@keyframes qrScan {
+  0% {
+    top: -16px;
   }
-
-  &:hover::after {
-    opacity: 1;
+  100% {
+    top: 100%;
   }
 }
 </style>

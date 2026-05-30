@@ -45,6 +45,17 @@ const buildMenuList = (): MenuItem[] => {
     ? window.$t(`setting.${state.currTargetCode}`)
     : window.$t('setting.general')
   const list: MenuItem[] = [
+    // 书签键盘右键时增加键盘配置入口
+    ...(state.currTargetCode === 'keyboardBookmark'
+      ? [
+          {
+            label: window.$t('setting.keyboardCommon'),
+            key: 'keyboardConfig',
+            icon: ICONS.keyboardCommon,
+            disabled: isDragMode.value,
+          },
+        ]
+      : []),
     {
       label: targetLabel + window.$t('common.setting'),
       key: 'setting',
@@ -153,6 +164,9 @@ const menuActionMap: Record<string, () => void | Promise<void>> = {
     switchSettingDrawerVisible(true)
     globalState.currSettingTabCode = 'general'
     gaProxy('click', ['rightMenu', 'changeWallpaper'])
+  },
+  keyboardConfig: () => {
+    openSettingPane('keyboardCommon')
   },
   aboutSponsor: () => {
     openSettingPane('aboutSponsor')

@@ -164,7 +164,6 @@ const ntGeneralActiveBorderColor = computed(() =>
 )
 
 const cssVars = computed(() => ({
-  '--nt-general-color': customPrimaryColor.value,
   '--nt-general-active-color': ntGeneralActiveColor.value,
   '--nt-general-active-border-color': ntGeneralActiveBorderColor.value,
 }))
@@ -513,7 +512,7 @@ const cssVars = computed(() => ({
   }
 
   .site__item--active {
-    color: var(--nt-general-color) !important;
+    color: var(--nt-primary-color) !important;
     background-color: var(--nt-general-active-color);
     border-color: var(--nt-general-active-border-color);
     transform: scale(1.06);

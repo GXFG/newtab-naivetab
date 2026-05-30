@@ -42,6 +42,35 @@ interface KeyboardConfigItem {
   marginBottom?: number // default 0
 }
 
+/** 键盘铭牌：用户自定义的文字叠加层 */
+interface TNameplate {
+  id: string
+  text: string
+  x: number
+  y: number
+  fontFamily: string
+  fontSize: number
+  fontWeight: number
+  color: [string, string]
+  backgroundColor: [string, string]
+  borderEnabled: boolean
+  borderRadius: number
+  borderWidth: number
+  borderColor: [string, string]
+  shadowEnabled: boolean
+  shadowOffsetX: number
+  shadowOffsetY: number
+  shadowBlur: number
+  shadowColor: [string, string]
+  textShadowEnabled: boolean
+  textShadowOffsetX: number
+  textShadowOffsetY: number
+  textShadowBlur: number
+  textShadowColor: [string, string]
+  rotation: number
+  padding: number
+}
+
 type BookmarkNode = chrome.bookmarks.BookmarkTreeNode
 
 interface TBookmarkEntry {

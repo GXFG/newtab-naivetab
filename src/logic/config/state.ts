@@ -61,6 +61,9 @@ export const localState = useStorageLocal('l-state', defaultLocalState)
  */
 export const flushConfigToLocalStorage = () => {
   for (const key of Object.keys(localConfig)) {
-    localStorage.setItem(`c-${key}`, JSON.stringify(localConfig[key]))
+    localStorage.setItem(
+      `c-${key}`,
+      JSON.stringify(localConfig[key as keyof typeof defaultConfig]),
+    )
   }
 }

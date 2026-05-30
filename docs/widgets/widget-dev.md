@@ -101,7 +101,7 @@ localConfig[code].layout = {
 
 ### widget__wrap style 注入限制
 
-`widget__wrap` div 的 `:style` 已被 `widgetStyle` 用于注入定位 CSS 变量，**禁止再 `:style` 绑定**。详见 [pitfalls.md](../../.claude/rules/pitfalls.md#vue-组件)。
+`widget__wrap` div 的 `:style` 已被 `widgetStyle` 用于注入定位 CSS 变量，**禁止再 `:style` 绑定**。详见 [pitfalls-vue.md](../../.claude/rules/pitfalls-vue.md)。
 
 ## 4. 定时任务系统
 
@@ -194,7 +194,7 @@ watch(isRender, (value) => {
 
 ## 7. 常见坑点
 
-详见 [pitfalls.md](../../.claude/rules/pitfalls.md) 和 `/add-widget` 技能。以下为 Widget 特有陷阱：
+详见 [pitfalls.md](../../.claude/rules/pitfalls.md)（踩坑索引）和 `/add-widget` 技能。以下为 Widget 特有陷阱：
 
 ### Widget 根容器 class 命名
 

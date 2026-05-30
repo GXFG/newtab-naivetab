@@ -7,7 +7,6 @@ import { widgetsRegistry } from '@/newtab/widgets/registry'
 import { WIDGET_GROUPS } from '@/common/widget-constants'
 import { SettingHeaderBar, SettingFormSection } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
-import { ICONS } from '@/logic/constants/icons'
 import { gaProxy } from '@/logic/utils/gtag'
 
 const widgetGroups = computed(() =>
@@ -46,7 +45,6 @@ const cssVars = computed(() => ({
   '--nt-focus-primary-bg-hover': primaryBgHover.value,
   '--nt-focus-primary-border': primaryBorder.value,
   '--nt-focus-primary-icon-bg': primaryIconBg.value,
-  '--nt-focus-custom-primary-color': customPrimaryColor.value,
 }))
 
 /**
@@ -62,10 +60,7 @@ const cssVars = computed(() => ({
     <SettingHeaderBar :title="$t('setting.focusMode')" />
 
     <div class="setting__pane-content">
-      <SettingFormSection
-        :title="$t('generalSetting.focusWidgets')"
-        :icon="ICONS.fullscreen"
-      >
+      <SettingFormSection section-key="common.behavior">
         <SwitchField
           v-model="localState.isFocusMode"
           :label="$t('generalSetting.enableFocusMode')"
@@ -185,7 +180,7 @@ const cssVars = computed(() => ({
 
     .focus__icon-wrap {
       background-color: var(--nt-focus-primary-icon-bg);
-      color: var(--nt-focus-custom-primary-color);
+      color: var(--nt-primary-color);
     }
 
     .focus__label {

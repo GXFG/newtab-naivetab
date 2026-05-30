@@ -113,12 +113,12 @@
   },
   "sponsor": {
     "title": "🔥「Caffeinated Commit: Code Brewed with 200% ☕️ Power」",
-    "content1": "🎉 Hey! Finally have you aboard the NaiveTab~",
-    "content2": "Every time you click 'new tab', feel the warmth behind this tiny tool – forged through my late-night coding marathons and co-crafted by efficiency warriors like you 🐱✨",
+    "content1": "🎉 Hey! Finally have you aboard NaiveTab~ (my cat sent me to say hi 🐱)",
+    "content2": "Every time you click 'new tab', feel the warmth behind this tool — forged through my late-night coding marathons, supervised by a cat who walks on the keyboard 🚨, and co-crafted by efficiency warriors like you ✨",
     "content3": "🐱 If NaiveTab saved your fingers a few clicks 🖱...",
-    "content4": "Care to fuel my code engine with coffee☕️ / boba🧋?",
-    "content5": "Funds💰 breakdown: 50% wild new features 🧠 / 50% cat food reserves 🐱🥫 (my code-review partner needs snacks!)",
-    "content6": "👉 Scan to Refuel 👈",
+    "content4": "Care to fuel me with coffee ☕️ / boba 🧋? The cat wants a sip too 🐱",
+    "content5": "Budget is transparent 💰: 50% wild new features 🧠 / 50% cat food fund 🐱🥫 (my code-review partner's food bowl won't fill itself!)",
+    "content6": "👉 Go ahead, scan to support 👈",
     "confirm": "⏳ Maybe after my next paycheck",
     "alipay": "Alipay",
     "wechat": "WeChat"
@@ -292,6 +292,7 @@
   },
   "keyboardBookmark": {
     "bookmarkSource": "Bookmarks source",
+    "bookmarkSourceTips": "We recommend the \"Browser\" source for multi-layer bookmarks, and no sync size limits.",
     "systemBrowser": "Browser",
     "thisExtension": "This extension",
     "listenBackgroundKeystrokes": "Global Hotkeys",
@@ -328,7 +329,29 @@
     "createLayerFolders": "Create Layers",
     "createLayerFoldersSuccess": "Created 4 bookmark layers under NaiveTab/ in bookmarks bar",
     "createLayerFoldersFailed": "Failed to create layers, please check bookmarks permission",
-    "layerFoldersTip": "Binds each layer to a bookmark folder. Configure bookmarks via the keyboard widget below or the browser extension popup."
+    "layerFoldersTip": "Binds each layer to a bookmark folder, or select an existing folder. Configure bookmarks via the keyboard widget below or the browser extension popup.",
+    "layerWheelTip": "Use mouse wheel, touchpad scroll, or mouse forward/back buttons on the keyboard to quickly switch bookmark layers"
+  },
+  "keyboardNameplate": {
+    "label": "Keyboard Nameplate",
+    "add": "Add Nameplate",
+    "textContent": "Text Content",
+    "text": "Text",
+    "textPlaceholder": "Enter text",
+    "font": "Font",
+    "fontWeight": "Font Weight",
+    "textColor": "Text Color",
+    "backgroundColor": "BG Color",
+    "rotation": "Rotation",
+    "padding": "Padding",
+    "shadow": "Shadow",
+    "shadowOffsetX": "X",
+    "shadowOffsetY": "Y",
+    "shadowBlur": "Blur",
+    "textShadow": "Text Shadow",
+    "dragHint": "Enter edit layout to drag nameplates on the keyboard",
+    "emptyHint": "No nameplates yet. Click Add Nameplate to create one",
+    "selectHint": "Select a nameplate above to edit its style"
   },
   "bookmarkFolder": {
     "defaultDisplayFolderTitle": "Expand Folder",
@@ -346,6 +369,13 @@
     "itemStyle": "Item Style"
   },
   "clock": {
+    "format": "Time Format",
+    "format24": "24-hour (with seconds)",
+    "format24NoSec": "24-hour (no seconds)",
+    "format12": "12-hour (with seconds)",
+    "format12NoSec": "12-hour (no seconds)",
+    "formatCustom": "Custom",
+    "formatCustomTip": "Uses dayjs format syntax, e.g. hh:mm A",
     "showColon": "Show Colon",
     "colonBlink": "Colon Blink",
     "apMark": "a.m./p.m.",
@@ -369,6 +399,17 @@
     "showLabel": "Show Bottom Label",
     "labelLeftPlaceholder": "Left",
     "labelRightPlaceholder": "Right"
+  },
+  "date": {
+    "format": "Date Format",
+    "formatYMDLong": "Year-Month-Day Weekday",
+    "formatYMD": "Year-Month-Day",
+    "formatYMDSlash": "Year/Month/Day",
+    "formatYMDCN": "Month Day, Year Weekday",
+    "formatMD": "Month-Day",
+    "formatMDShort": "Month Day Weekday",
+    "formatCustom": "Custom",
+    "formatCustomTip": "Uses dayjs format syntax, e.g. MMMM D, YYYY"
   },
   "search": {
     "searchBar": "Search Bar",
@@ -436,7 +477,13 @@
     "activeBgColorLabel": "Active Background Color",
     "defaultBgColorLabel": "Default Background Color",
     "percentageLabel": "Percentage",
-    "decimalLabel": "Decimal"
+    "decimalLabel": "Decimal",
+    "format": "Date Format",
+    "formatDot": "Year.Month.Day",
+    "formatMDSlash": "Month/Day",
+    "formatMonthDay": "Month Day",
+    "formatCustom": "Custom",
+    "formatCustomTip": "Uses dayjs format syntax"
   },
   "weather": {
     "city": "City",

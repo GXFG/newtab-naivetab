@@ -35,24 +35,26 @@ const handleAnimationEnd = () => {
   font-family: 'HarmonyOS Sans', system-ui;
   font-size: 13px;
   opacity: 0;
-  background: rgba(20, 20, 20, 0.72);
-  backdrop-filter: blur(12px);
-  color: #fff;
+  background: rgba(24, 24, 28, 0.9);
+  backdrop-filter: blur(20px) saturate(1.5);
+  color: rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-pill);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.25),
-    var(--shadow-inset);
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
   white-space: nowrap;
-  transform: translateY(14px) scale(0.94);
+  will-change: transform, opacity;
+  transform: translateY(10px) scale(0.95);
   animation:
-    toastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-    toastOut 0.5s ease 2.2s forwards;
+    toastIn 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards,
+    toastOut 0.35s ease 2.4s forwards;
 
   .item__emoji {
     font-size: 1.15em;
     line-height: 1;
-    animation: emojiJump 0.5s ease-in-out 2;
+    animation: emojiJump 0.45s ease-in-out 1;
     flex-shrink: 0;
   }
 

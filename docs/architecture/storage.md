@@ -112,7 +112,7 @@ interface UploadStatusItem {
 
 ### flushConfigSync
 
-跳过防抖，立即执行上传。用于 popup 关闭前强制同步、导入配置后、用户手动触发同步。详见 [pitfalls.md](../../.claude/rules/pitfalls.md#popup-修改配置后必须-flushsync)。
+跳过防抖，立即执行上传。用于 popup 关闭前强制同步、导入配置后、用户手动触发同步。详见 [pitfalls-config.md](../../.claude/rules/pitfalls-config.md#popup-修改配置后必须-flushsync)。
 
 ## Gzip 压缩
 
@@ -229,7 +229,7 @@ databaseStore(storeName, type: 'add'|'put'|'get'|'delete', payload): Promise<...
 
 ## 常见坑点
 
-上传相关的通用陷阱（`checkWriteRate` 调用位置、`syncId` 赋值时机、popup 必须 `flushSync` 等）详见 [pitfalls.md](../../.claude/rules/pitfalls.md#配置系统)。以下为 storage 特有陷阱：
+上传相关的通用陷阱（`checkWriteRate` 调用位置、`syncId` 赋值时机、popup 必须 `flushSync` 等）详见 [pitfalls-config.md](../../.claude/rules/pitfalls-config.md)。以下为 storage 特有陷阱：
 
 ### 压缩前必须判断 field 类型
 
@@ -266,6 +266,8 @@ databaseStore(storeName, type: 'add'|'put'|'get'|'delete', payload): Promise<...
 2. `dirty=true` 且 `retryCount < 3`：上次上传失败后未达重试上限的字段
 
 上传失败时 `retryCount` 递增（最多 3 次），成功时归零。超过 3 次后保留 `dirty` 和 `lastError` 标记，用户可手动触发同步。
+
+**用户主动修改时 `retryCount` 重置为 0**，确保新数据获得全新的重试配额，不会因历史失败次数而影响 `handleMissedUploadConfig` 的启动补救。
 
 ### cancelAllDebounce
 

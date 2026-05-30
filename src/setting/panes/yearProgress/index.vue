@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { URL_DAYJS_FORMAT } from '@/logic/constants/urls'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
 import {
@@ -15,6 +14,46 @@ import {
   FontField,
   ToggleColorField,
 } from '@/setting/fields'
+
+const CUSTOM_VALUE = '__custom__'
+const PRESET_VALUES = [
+  'YYYY.MM.DD',
+  'YYYY-MM-DD',
+  'YYYY/MM/DD',
+  'MM-DD',
+  'MM/DD',
+  'MMM D',
+]
+
+const formatOptions = computed(() => [
+  { label: window.$t('yearProgress.formatDot'), value: 'YYYY.MM.DD' },
+  { label: window.$t('date.formatYMD'), value: 'YYYY-MM-DD' },
+  { label: window.$t('date.formatYMDSlash'), value: 'YYYY/MM/DD' },
+  { label: window.$t('date.formatMD'), value: 'MM-DD' },
+  { label: window.$t('yearProgress.formatMDSlash'), value: 'MM/DD' },
+  { label: window.$t('yearProgress.formatMonthDay'), value: 'MMM D' },
+  { label: window.$t('yearProgress.formatCustom'), value: CUSTOM_VALUE },
+])
+
+const isCustomMode = ref(
+  !PRESET_VALUES.includes(localConfig.yearProgress.format),
+)
+
+const selectedOption = computed(() => {
+  if (isCustomMode.value) return CUSTOM_VALUE
+  if (PRESET_VALUES.includes(localConfig.yearProgress.format))
+    return localConfig.yearProgress.format
+  return CUSTOM_VALUE
+})
+
+const handleFormatChange = (value: string) => {
+  if (value === CUSTOM_VALUE) {
+    isCustomMode.value = true
+  } else {
+    isCustomMode.value = false
+    localConfig.yearProgress.format = value
+  }
+}
 </script>
 
 <template>
@@ -56,16 +95,21 @@ import {
       <SwitchField
         v-model="localConfig.yearProgress.isDateEnabled"
         :label="$t('setting.date')"
-        :tip-content="URL_DAYJS_FORMAT"
-        :tip-link="URL_DAYJS_FORMAT"
       >
         <template #extra>
-          <!-- 日期格式占位符为通用示例，无需 i18n -->
+          <NSelect
+            :value="selectedOption"
+            class="setting__fill-input"
+            size="small"
+            :options="formatOptions"
+            @update:value="handleFormatChange"
+          />
           <NInput
+            v-if="isCustomMode"
             v-model:value="localConfig.yearProgress.format"
             class="setting__fill-input"
             size="small"
-            placeholder="MM-DD"
+            :placeholder="$t('yearProgress.formatCustomTip')"
           />
         </template>
       </SwitchField>

@@ -12,7 +12,9 @@ export const getCityLookup = (
   return request({
     url: 'https://geoapi.qweather.com/v2/city/lookup',
     params: {
-      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      lang: WEATHER_LANG_MAP[
+        localConfig.general.lang as keyof typeof WEATHER_LANG_MAP
+      ],
       key: localConfig.weather.apiKey,
       location,
     },
@@ -27,7 +29,9 @@ export const getWeatherForecast = (): Promise<{
   return request({
     url: 'https://devapi.qweather.com/v7/weather/3d',
     params: {
-      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      lang: WEATHER_LANG_MAP[
+        localConfig.general.lang as keyof typeof WEATHER_LANG_MAP
+      ],
       key: localConfig.weather.apiKey,
       location: localConfig.weather.city.id,
     },
@@ -58,7 +62,9 @@ export const getWeatherNow = (): Promise<{
   return request({
     url: 'https://devapi.qweather.com/v7/weather/now',
     params: {
-      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      lang: WEATHER_LANG_MAP[
+        localConfig.general.lang as keyof typeof WEATHER_LANG_MAP
+      ],
       key: localConfig.weather.apiKey,
       location: localConfig.weather.city.id,
     },
@@ -70,7 +76,9 @@ export const getWeatherIndices = () => {
   return request({
     url: 'https://devapi.qweather.com/v7/indices/1d',
     params: {
-      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      lang: WEATHER_LANG_MAP[
+        localConfig.general.lang as keyof typeof WEATHER_LANG_MAP
+      ],
       key: localConfig.weather.apiKey,
       location: localConfig.weather.city.id,
       type: '1,3,7,8,10',
@@ -98,7 +106,9 @@ export const getWeatherAirNow = (): Promise<{
   return request({
     url: 'https://devapi.qweather.com/v7/air/now',
     params: {
-      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      lang: WEATHER_LANG_MAP[
+        localConfig.general.lang as keyof typeof WEATHER_LANG_MAP
+      ],
       key: localConfig.weather.apiKey,
       location: localConfig.weather.city.id,
     },
@@ -113,7 +123,9 @@ export const getWeatherWarning = (): Promise<{
   return request({
     url: 'https://devapi.qweather.com/v7/warning/now',
     params: {
-      lang: WEATHER_LANG_MAP[localConfig.general.lang],
+      lang: WEATHER_LANG_MAP[
+        localConfig.general.lang as keyof typeof WEATHER_LANG_MAP
+      ],
       key: localConfig.weather.apiKey,
       location: localConfig.weather.city.id,
     },

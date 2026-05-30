@@ -251,7 +251,6 @@ const handleOpenUserGuide = () => {
   font-family: 'Arial Rounded MT Bold', system-ui, sans-serif;
   margin: 0;
   line-height: 1.2;
-  color: var(--n-text-color);
 }
 
 .hero__tagline {
@@ -267,7 +266,7 @@ const handleOpenUserGuide = () => {
   gap: 5px;
   padding: 3px 10px;
   border-radius: var(--radius-pill);
-  background: var(--n-tab-border-color);
+  background: var(--gray-alpha-08);
   font-size: var(--text-sm);
   opacity: var(--opacity-primary);
   font-family: 'SF Mono', 'Consolas', monospace;
@@ -321,15 +320,14 @@ const handleOpenUserGuide = () => {
   gap: 6px;
   padding: 12px 8px 10px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--n-tab-border-color);
-  background: transparent;
+  border: 1px solid var(--gray-alpha-08);
+  background: var(--gray-alpha-03);
   cursor: pointer;
   transition:
     background-color var(--transition-base),
     border-color var(--transition-base),
     box-shadow var(--transition-base),
     transform var(--transition-spring);
-  color: var(--n-text-color);
   outline: none;
 
   &:hover {
@@ -353,7 +351,7 @@ const handleOpenUserGuide = () => {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-lg);
-  background: var(--n-tab-border-color);
+  background: var(--gray-alpha-08);
   transition: background-color var(--transition-base);
 
   .action__card:hover & {

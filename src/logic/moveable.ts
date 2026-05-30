@@ -251,9 +251,9 @@ const handleMouseTaskListener = (isInit: boolean) => {
   }
   for (const eventName of Object.keys(mouseTaskMap)) {
     if (isInit) {
-      bodyEle.addEventListener(eventName, mouseTaskMap[eventName])
+      bodyEle.addEventListener(eventName, (mouseTaskMap as any)[eventName])
     } else {
-      bodyEle.removeEventListener(eventName, mouseTaskMap[eventName])
+      bodyEle.removeEventListener(eventName, (mouseTaskMap as any)[eventName])
     }
   }
 }

@@ -163,7 +163,7 @@ const hasOverrides = computed(
 
 .emphasis-key-setting__tips {
   font-size: 12px;
-  color: var(--n-text-color-3);
+  opacity: var(--opacity-muted);
 }
 
 /* ── 图例 ── */

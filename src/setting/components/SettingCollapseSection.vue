@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
-import { customPrimaryColor } from '@/logic/store/style'
 
 const props = withDefaults(
   defineProps<{
@@ -21,10 +20,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:expanded', name: string, isExpanded: boolean): void
 }>()
-
-const cssVars = computed(() => ({
-  '--nt-collapse-stripe': customPrimaryColor.value,
-}))
 
 const bodyRef = ref<HTMLElement>()
 
@@ -85,10 +80,7 @@ const onAfterLeave = () => {
 </script>
 
 <template>
-  <div
-    class="setting-collapse-section"
-    :style="cssVars"
-  >
+  <div class="setting-collapse-section">
     <!-- 可点击的标题区域 -->
     <div
       class="section__header"
@@ -169,7 +161,7 @@ const onAfterLeave = () => {
       width: 3px;
       height: 60%;
       border-radius: 2px;
-      background: var(--nt-collapse-stripe);
+      background: var(--nt-primary-color);
       transition: opacity var(--transition-base);
     }
 

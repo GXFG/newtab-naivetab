@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash git push*",
+      "Bash git commit*",
+      "Bash git reset --hard*",
+      "Bash git branch -D*",
+      "Bash rm -rf*"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
+  }
+}

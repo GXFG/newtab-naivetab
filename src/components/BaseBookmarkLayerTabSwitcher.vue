@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { localConfig } from '@/logic/config/state'
 import { cachedActiveLayer, switchLayer } from '@/logic/keyboard/bookmark-state'
+import Tips from '@/components/Tips.vue'
 
 /**
  * 有配置的层列表（sourceFolderPath 非空）
@@ -35,6 +36,7 @@ const configuredLayers = computed(() => {
     >
       {{ layer.title }}
     </span>
+    <Tips :content="$t('keyboardBookmark.layerWheelTip')" />
   </div>
 </template>
 
@@ -68,9 +70,23 @@ const configuredLayers = computed(() => {
     }
 
     &.layer-tab--active {
-      color: var(--nt-popup-custom-primary-color, var(--n-color-target));
-      background-color: var(--gray-alpha-12);
+      color: var(--nt-primary-color);
+      background-color: color-mix(
+        in srgb,
+        var(--nt-primary-color) 15%,
+        transparent
+      );
+      animation: layer-tab-active-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+  }
+}
+
+@keyframes layer-tab-active-pop {
+  0% {
+    transform: scale(0.85);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 </style>

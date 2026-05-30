@@ -12,9 +12,8 @@
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
     "jsx": "preserve",
     "typeRoots": [
       "node_modules/@types",

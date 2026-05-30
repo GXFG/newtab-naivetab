@@ -150,7 +150,7 @@ export const exportSetting = () => {
 }
 
 export const resetSetting = async () => {
-  chrome.storage.sync.clear()
+  await chrome.storage.sync.clear()
   localStorage.clear()
   await clearDatabase()
   location.reload()

@@ -156,7 +156,7 @@ if (lastIsDraftDrawerVisible) {
 
 ### 1. WidgetWrap 的 style 由系统控制
 
-`widget__wrap` div 的 `style` 由 `WidgetWrap` 组件自动注入定位值，不可再对其进行 `:style` 绑定。这是项目规则之一（见 `pitfalls.md`）。
+`widget__wrap` div 的 `style` 由 `WidgetWrap` 组件自动注入定位值，不可再对其进行 `:style` 绑定。这是项目规则之一（见 `pitfalls-vue.md`）。
 
 ### 2. 删除区域检测的边界
 

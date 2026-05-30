@@ -113,12 +113,12 @@
   },
   "sponsor": {
     "title": "🔥「续命模式激活！今日代码含 ☕️ 量 200%」",
-    "content1": "🎉 嘿！终于等到你加入NaiveTab~",
-    "content2": "每天按下「新建标签页」时，希望你能感受到这个小工具背后的温度——它是我这个码农深夜爆肝的成果，更是和你一样的效率控们共同打磨的浏览器搭档✨",
-    "content3": "🐱如果NaiveTab让你少点击了那么几次鼠标🖱...",
-    "content4": "要不要考虑请我喝杯咖啡☕️ / 奶茶🧋续命？",
-    "content5": "资金💰流向透明：50%续命开发新脑洞🧠 / 50%给我的猫🐱买罐罐🥫 (code-review伙伴需要零食！)",
-    "content6": "👉 扫码投喂 👈",
+    "content1": "🎉 嘿！终于等到你加入 NaiveTab~（猫主子让我来打个招呼🐱）",
+    "content2": "每天按下「新建标签页」时，希望你能感受到这个工具背后的温度——它是我深夜爆肝的成果，也是🐱猫主子趴键盘监工🚨的产物，更是和你一样的效率控们一起打磨的浏览器搭档✨",
+    "content3": "🐱 如果 NaiveTab 让你少摸了几次鼠标🖱...",
+    "content4": "要不要请我喝杯咖啡☕️ / 奶茶🧋续个命？猫主子那份也拜托了🐱",
+    "content5": "资金流向透明💰：50% 继续爆肝新功能🧠 / 50% 给🐱猫买罐罐🥫（code-review 搭档的罐罐不能断！）",
+    "content6": "👉 可以扫码投喂了 👈",
     "confirm": "下次一定",
     "alipay": "支付宝",
     "wechat": "微信"
@@ -292,6 +292,7 @@
   },
   "keyboardBookmark": {
     "bookmarkSource": "书签来源",
+    "bookmarkSourceTips": "推荐使用「浏览器」数据源，支持多层书签、且无同步大小限制。",
     "systemBrowser": "浏览器",
     "thisExtension": "本扩展程序",
     "listenBackgroundKeystrokes": "全局快捷键",
@@ -328,7 +329,29 @@
     "createLayerFolders": "一键创建书签层",
     "createLayerFoldersSuccess": "已创建 4 个书签层，可在书签栏 NaiveTab/ 下查看",
     "createLayerFoldersFailed": "创建书签层失败，请检查书签权限",
-    "layerFoldersTip": "此处仅为每层绑定对应的书签文件夹，具体书签配置需在「下方键盘组件」或「浏览器扩展弹窗」中完成"
+    "layerFoldersTip": "此处仅为每层绑定对应的书签文件夹，也可自行选择已有文件夹。具体书签配置需在「下方键盘组件」或「扩展弹窗」中完成",
+    "layerWheelTip": "在键盘上使用鼠标滚轮、触控板滑动或鼠标前进后退键即可快速切换书签层"
+  },
+  "keyboardNameplate": {
+    "label": "键盘铭牌",
+    "add": "添加铭牌",
+    "textContent": "文字内容",
+    "text": "文字",
+    "textPlaceholder": "输入文字内容",
+    "font": "字体",
+    "fontWeight": "字重",
+    "textColor": "文字颜色",
+    "backgroundColor": "背景色",
+    "rotation": "旋转角度",
+    "padding": "内边距",
+    "shadow": "阴影",
+    "shadowOffsetX": "水平",
+    "shadowOffsetY": "垂直",
+    "shadowBlur": "模糊",
+    "textShadow": "文字阴影",
+    "dragHint": "开启“编辑布局“后，可在键盘上拖拽铭牌调整位置",
+    "emptyHint": "暂无铭牌，点击上方「添加铭牌」创建",
+    "selectHint": "请在上方选择一个铭牌以编辑样式"
   },
   "bookmarkFolder": {
     "defaultDisplayFolderTitle": "默认展开文件夹",
@@ -346,6 +369,13 @@
     "itemStyle": "项目样式"
   },
   "clock": {
+    "format": "时间格式",
+    "format24": "24 小时制（有秒）",
+    "format24NoSec": "24 小时制（无秒）",
+    "format12": "12 小时制（有秒）",
+    "format12NoSec": "12 小时制（无秒）",
+    "formatCustom": "自定义",
+    "formatCustomTip": "使用 dayjs 格式语法，如 HH时mm分ss秒",
     "showColon": "显示冒号",
     "colonBlink": "冒号呼吸动画",
     "apMark": "a.m./p.m.",
@@ -369,6 +399,17 @@
     "showLabel": "显示底部标签",
     "labelLeftPlaceholder": "左侧",
     "labelRightPlaceholder": "右侧"
+  },
+  "date": {
+    "format": "日期格式",
+    "formatYMDLong": "年-月-日 星期",
+    "formatYMD": "年-月-日",
+    "formatYMDSlash": "年/月/日",
+    "formatYMDCN": "月 日, 年 星期",
+    "formatMD": "月-日",
+    "formatMDShort": "月 日 星期",
+    "formatCustom": "自定义",
+    "formatCustomTip": "使用 dayjs 格式语法，如 YYYY年MM月DD日 dddd"
   },
   "search": {
     "searchBar": "搜索引擎",
@@ -436,7 +477,13 @@
     "activeBgColorLabel": "激活背景色",
     "defaultBgColorLabel": "默认背景色",
     "percentageLabel": "百分比",
-    "decimalLabel": "小数位"
+    "decimalLabel": "小数位",
+    "format": "日期格式",
+    "formatDot": "年.月.日",
+    "formatMDSlash": "月/日",
+    "formatMonthDay": "月 日",
+    "formatCustom": "自定义",
+    "formatCustomTip": "使用 dayjs 格式语法"
   },
   "weather": {
     "city": "城市",

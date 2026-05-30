@@ -318,13 +318,11 @@ const handleCommandSelect = (cmd: TCommandName) => {
               <template #trigger>
                 <NButton
                   quaternary
-                  size="tiny"
+                  size="small"
+                  type="error"
                   class="selector__close"
                 >
-                  <Icon
-                    :icon="ICONS.deleteBin"
-                    class="close__icon"
-                  />
+                  <Icon :icon="ICONS.deleteBin" />
                 </NButton>
               </template>
               {{
@@ -394,7 +392,7 @@ const handleCommandSelect = (cmd: TCommandName) => {
 
 .command-binding__tip {
   font-size: 12px;
-  color: var(--n-text-color-3);
+  opacity: var(--opacity-muted);
   text-align: center;
   padding: 10px 0;
 }
@@ -414,8 +412,8 @@ const handleCommandSelect = (cmd: TCommandName) => {
 .command-binding__selector {
   padding: 12px;
   border-radius: 8px;
-  background-color: var(--n-color);
-  border: 1px solid var(--n-border-color);
+  background-color: var(--gray-alpha-05);
+  border: 1px solid var(--gray-alpha-08);
 }
 
 .selector__header {
@@ -438,13 +436,14 @@ const handleCommandSelect = (cmd: TCommandName) => {
 .category-group__label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--n-text-color-2);
+  opacity: var(--opacity-secondary);
   margin-bottom: 4px;
 }
 
 /* 命令选择器中的 radio 使用 auto 宽度，配合 2 列网格布局 */
 :deep(.category-group__options .n-radio) {
   width: auto;
+  padding-left: 8px;
 }
 
 .category-group__options {
@@ -466,30 +465,30 @@ const handleCommandSelect = (cmd: TCommandName) => {
 
 /* 增强选中命令的视觉反馈 */
 :deep(.category-group__options .n-radio.n-radio--checked) {
-  position: relative;
   background: var(--gray-alpha-08);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--n-primary-color);
-  padding-left: 5px;
-  font-weight: 600;
-  color: var(--n-text-color);
   transition: all var(--transition-fast);
 }
 
 :deep(.category-group__options .n-radio.n-radio--checked .n-radio__label) {
   font-weight: 600;
-  color: var(--n-text-color);
+  color: var(--nt-primary-color);
 }
 
 :deep(.category-group__options .n-radio.n-radio--checked .n-radio__dot) {
-  border-color: var(--n-primary-color);
-  background-color: var(--n-primary-color);
+  border-color: var(--nt-primary-color);
+}
+
+:deep(.category-group__options .n-radio:hover:not(.n-radio--checked)) {
+  background: var(--gray-alpha-08);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
 }
 
 .selector__key {
   font-size: 13px;
   font-weight: 700;
-  color: var(--n-primary-color);
+  color: var(--nt-primary-color);
   padding: 2px 8px;
   border-radius: var(--radius-sm);
   background-color: var(--gray-alpha-06);
@@ -498,30 +497,12 @@ const handleCommandSelect = (cmd: TCommandName) => {
 
 .selector__binding {
   font-size: 12px;
-  color: var(--n-text-color-3);
-  font-family: var(--n-font-family), monospace;
+  opacity: var(--opacity-muted);
+  font-family: var(--nt-app-font-family), monospace;
   letter-spacing: 0.3px;
 }
 
 .selector__close {
   margin-left: auto;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-sm);
-}
-
-.selector__close:hover {
-  background-color: var(--gray-alpha-10);
-}
-
-.close__icon {
-  font-size: 16px;
-  color: var(--n-text-color-3);
-  transition: color var(--transition-fast);
-}
-
-.selector__close:hover .close__icon {
-  color: var(--n-text-color);
 }
 </style>

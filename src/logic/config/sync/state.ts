@@ -28,7 +28,7 @@ export const isUploadConfigLoading = computed(() => {
   }
   let isLoading = false
   for (const key of Object.keys(localState.value.isUploadConfigStatusMap)) {
-    if (localState.value.isUploadConfigStatusMap[key].loading) {
+    if (localState.value.isUploadConfigStatusMap[key as ConfigField].loading) {
       isLoading = true
       break
     }
@@ -50,7 +50,8 @@ export const lastSyncTime = computed(() => {
   }
   let maxTime = 0
   for (const key of Object.keys(localState.value.isUploadConfigStatusMap)) {
-    const t = localState.value.isUploadConfigStatusMap[key].syncTime
+    const t =
+      localState.value.isUploadConfigStatusMap[key as ConfigField].syncTime
     if (t > maxTime) maxTime = t
   }
   return maxTime ? dayjs(maxTime).format('YYYY-MM-DD HH:mm:ss') : '0'
@@ -77,13 +78,29 @@ const SYNC_KEY_MAP: Record<SyncField, string> = {
  * chrome.storage.onChanged 在 popup 调用 flushConfigSync 写入后触发。
  * parseStoredData 自动处理 gzip 压缩数据。
  * 双重防护：先检查 pendingWrites（自身发起的写入），再检查 syncId 守卫（兜底）。
+ *
+ * ## 已知行为：Popup 覆盖 Newtab 本地修改
+ *
+ * 若 Newtab 已有 dirty=true 的本地修改（2000ms 防抖尚未触发上传），此时 Popup 的
+ * flushConfigSync 写入触发 onChanged，本函数会：
+ *   1. 将 localConfig[field] 替换为 Popup 的数据（第 119 行）→ Newtab 本地修改丢失
+ *   2. 设置 dirty=false（第 114 行）
+ *   3. 第 119 行的赋值触发 deep watcher → genWatchUploadConfigFn 再次置 dirty=true
+ *   4. 后续 uploadConfigFn 检测 MD5 与 Popup syncId 相同 → 跳过上传
+ *   5. dirty 保持 true，syncStatus='failed' → 每次启动 handleMissedUploadConfig 重试
+ *      → MD5 去重拦截 → 循环（不产生实际网络请求，仅多一行 log）
+ *
+ * 触发条件苛刻：需在 2000ms 窗口内同时在 Newtab 和 Popup 修改 keyboardBookmark 或
+ * keyboardCommand（唯二有跨上下文 onChanged 同步的字段）。概率极低，且丢失的是
+ * Newtab 侧尚未上传的中间修改，Popup 侧的修改（用户更近的主动操作）被保留。
+ * 当前选择接受此 tradeoff，不引入 skip flag 机制增加复杂度。
  */
 const syncConfigFromOnChange = (
   changes: chrome.storage.StorageChange,
   field: SyncField,
 ) => {
   const key = SYNC_KEY_MAP[field]
-  const change = changes[key]
+  const change = (changes as any)[key]
   if (!change) return
 
   const raw = change.newValue as string
@@ -141,14 +158,20 @@ export const setupLocalStorageSyncListener = () => {
     if (!e.newValue) return
     const newConfig = JSON.parse(e.newValue)
     const field = e.key === 'l-state' ? 'state' : e.key.replace('c-', '')
-    if (field !== 'state' && localConfig[field]) {
+    if (field !== 'state' && localConfig[field as ConfigField]) {
       // 注意：使用 JSON.stringify 比较存在 key 顺序不同的误判可能，最坏情况是多
       // 执行一次 mergeState（不会导致数据错误，mergeState 以默认配置为模板会产出
       // 相同结果）。如果未来发现频繁不必要的 merge，可替换为深比较函数。
-      if (JSON.stringify(localConfig[field]) === JSON.stringify(newConfig)) {
+      if (
+        JSON.stringify(localConfig[field as ConfigField]) ===
+        JSON.stringify(newConfig)
+      ) {
         return
       }
-      localConfig[field] = mergeState(localConfig[field], newConfig)
+      localConfig[field as ConfigField] = mergeState(
+        localConfig[field as ConfigField],
+        newConfig,
+      ) as any
     }
   })
 }

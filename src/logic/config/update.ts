@@ -68,7 +68,9 @@ export const handleStateResetAndUpdate = () => {
         field,
       )
     ) {
-      localState.value.isUploadConfigStatusMap[field] = { ...defaultStatus }
+      localState.value.isUploadConfigStatusMap[field as ConfigField] = {
+        ...defaultStatus,
+      }
       log(`isUploadConfigStatusMap add field: ${field}`)
     }
   }
@@ -95,10 +97,10 @@ export const updateSetting = (
 
         // 批量处理子字段，减少循环内的操作
         for (const subField of subFields) {
-          if (acceptState[configField][subField] !== undefined) {
-            localConfig[configField][subField] = mergeState(
-              defaultConfig[configField][subField],
-              acceptState[configField][subField],
+          if ((acceptState[configField] as any)[subField] !== undefined) {
+            ;(localConfig[configField] as any)[subField] = mergeState(
+              (defaultConfig[configField] as any)[subField],
+              (acceptState[configField] as any)[subField],
             )
             // console.log(`${configField}-${subField}`, localConfig[configField][subField], '=', defaultConfig[configField][subField], '<-', acceptState[configField][subField])
           }
@@ -116,9 +118,13 @@ export const updateSetting = (
 
 /**
  * 处理应用版本升级迁移
+ *
+ * @param localVersion 可选，调用方在 setupPageConfigSync 之前快照的本地版本号。
+ *   传入此参数可避免 loadRemoteConfig 合并云端数据后 localConfig.general.version
+ *   被覆盖导致迁移被跳过。不传则退化为从 getLocalVersion() 读取。
  */
-export const handleAppUpdate = () => {
-  const version = getLocalVersion()
+export const handleAppUpdate = (localVersion?: string) => {
+  const version = localVersion ?? getLocalVersion()
   log('Version', version)
   if (!compareLeftVersionLessThanRightVersions(version, window.appVersion)) {
     return
@@ -218,12 +224,13 @@ export const handleAppUpdate = () => {
       const localKeyboardConfig = JSON.parse(localKeyboardData)
       const keyboardBookmarkFields = Object.keys(defaultConfig.keyboardBookmark)
       for (const field of keyboardBookmarkFields) {
-        localConfig.keyboardBookmark[field] = localKeyboardConfig[field]
+        ;(localConfig.keyboardBookmark as any)[field] =
+          localKeyboardConfig[field]
       }
 
       const keyboardCommonFields = Object.keys(defaultConfig.keyboardCommon)
       for (const field of keyboardCommonFields) {
-        localConfig.keyboardCommon[field] = localKeyboardConfig[field]
+        ;(localConfig.keyboardCommon as any)[field] = localKeyboardConfig[field]
       }
       localStorage.removeItem('c-keyboard')
     }
@@ -233,7 +240,8 @@ export const handleAppUpdate = () => {
       const localCommandShortcutConfig = JSON.parse(localCommandShortcutData)
       const keyboardCommandFields = Object.keys(defaultConfig.keyboardCommand)
       for (const field of keyboardCommandFields) {
-        localConfig.keyboardCommand[field] = localCommandShortcutConfig[field]
+        ;(localConfig.keyboardCommand as any)[field] =
+          localCommandShortcutConfig[field]
       }
       localStorage.removeItem('c-commandShortcut')
     }
@@ -285,6 +293,9 @@ export const handleAppUpdate = () => {
     }
     delete (localConfig.general as any).backgroundImageNames
     delete (localConfig.general as any).backgroundNetworkSourceType
+  }
+  if (compareLeftVersionLessThanRightVersions(version, '2.5.0')) {
+    localConfig.keyboardCommon.nameplates = []
   }
 
   // 更新local版本号

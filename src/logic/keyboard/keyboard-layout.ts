@@ -24,7 +24,8 @@ function applyWklMode(keys: TKeyDefinition[]): TKeyDefinition[] {
   )
 }
 
-/** macOS 修饰键交换：Option ↔ Command（仅非 WKL 模式） */
+/** macOS 修饰键交换：只交换 code 和 label，不交换几何信息（x/y/w/h），
+ *  避免 Meta/Alt 宽度不一致的布局（如 HHKB）出现样式错位 */
 function applyMacSwap(keys: TKeyDefinition[]): TKeyDefinition[] {
   if (!isMacOS) return keys
   const maxY = Math.max(...keys.map((k) => k.y))
@@ -33,9 +34,9 @@ function applyMacSwap(keys: TKeyDefinition[]): TKeyDefinition[] {
     const keyA = lastRowKeys.find((k) => k.code === a)
     const keyB = lastRowKeys.find((k) => k.code === b)
     if (keyA && keyB) {
-      const xA = keyA.x
-      keyA.x = keyB.x
-      keyB.x = xA
+      ;[keyA.code, keyB.code] = [keyB.code, keyA.code]
+      ;[keyA.label, keyB.label] = [keyB.label, keyA.label]
+      ;[keyA.textAlign, keyB.textAlign] = [keyB.textAlign, keyA.textAlign]
     }
   }
   swap('MetaLeft', 'AltLeft')

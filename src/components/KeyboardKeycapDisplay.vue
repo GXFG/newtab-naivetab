@@ -226,8 +226,8 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
     /* 底部半透明渐变，保留键帽内容的可见性 */
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, var(--nt-kb-primary-color) 8%, transparent) 0%,
-      color-mix(in srgb, var(--nt-kb-primary-color) 22%, transparent) 100%
+      color-mix(in srgb, var(--nt-primary-color) 8%, transparent) 0%,
+      color-mix(in srgb, var(--nt-primary-color) 22%, transparent) 100%
     );
 
     /* 玻璃模糊 + 饱和度增强 */
@@ -244,7 +244,7 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
       background: linear-gradient(
         90deg,
         transparent,
-        color-mix(in srgb, var(--nt-kb-primary-color) 60%, white),
+        color-mix(in srgb, var(--nt-primary-color) 60%, white),
         transparent
       );
       border-radius: 1px;
@@ -253,20 +253,19 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
     /* 多层边框 + 扩散光晕 */
     box-shadow:
       inset 0 0 0 1px
-        color-mix(in srgb, var(--nt-kb-primary-color) 50%, transparent),
+        color-mix(in srgb, var(--nt-primary-color) 50%, transparent),
       inset 0 0 12px
-        color-mix(in srgb, var(--nt-kb-primary-color) 12%, transparent),
-      0 0 10px color-mix(in srgb, var(--nt-kb-primary-color) 25%, transparent),
-      0 0 20px color-mix(in srgb, var(--nt-kb-primary-color) 12%, transparent);
+        color-mix(in srgb, var(--nt-primary-color) 12%, transparent),
+      0 0 10px color-mix(in srgb, var(--nt-primary-color) 25%, transparent),
+      0 0 20px color-mix(in srgb, var(--nt-primary-color) 12%, transparent);
 
     /* 选中图标 */
     .select__icon {
       width: 60%;
       height: 60%;
-      color: var(--nt-kb-primary-color);
+      color: var(--nt-primary-color);
       filter: drop-shadow(
-        0 1px 4px
-          color-mix(in srgb, var(--nt-kb-primary-color) 45%, transparent)
+        0 1px 4px color-mix(in srgb, var(--nt-primary-color) 45%, transparent)
       );
       animation: selectPopIn 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -294,7 +293,7 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
       display: flex;
       justify-content: center;
       align-items: center;
-      color: var(--nt-kb-primary-color);
+      color: var(--nt-primary-color);
       font-size: 190%;
     }
 

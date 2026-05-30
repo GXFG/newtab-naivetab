@@ -20,6 +20,7 @@ import { ICONS } from '@/logic/constants/icons'
         v-model:value="localConfig.keyboardCommon.keycapType"
         size="small"
         direction="horizontal"
+        class="keyboard-style-radio__group--triple"
       >
         <NRadio
           v-for="item in KEYCAP_TYPE_OPTION"
@@ -36,6 +37,7 @@ import { ICONS } from '@/logic/constants/icons'
         v-model:value="localConfig.keyboardCommon.splitSpace"
         size="small"
         direction="horizontal"
+        class="keyboard-style-radio__group--triple"
       >
         <NRadio
           v-for="item in SPLIT_SPACE_OPTION"
@@ -57,12 +59,12 @@ import { ICONS } from '@/logic/constants/icons'
         v-model:value="localConfig.keyboardCommon.keyboardType"
         size="small"
         direction="horizontal"
+        class="keyboard-style-radio__group"
       >
         <NRadio
           v-for="item in KEYBOARD_TYPE_OPTION"
           :key="item.value"
           :value="item.value"
-          class="keyboard-style-radio__item"
         >
           {{ item.label }}
         </NRadio>
@@ -72,7 +74,14 @@ import { ICONS } from '@/logic/constants/icons'
 </template>
 
 <style scoped>
-.keyboard-style-radio__item {
-  width: 20%;
+/* radio group 用 grid 等分列，不受 SettingPaneContent 中 width:auto 影响 */
+:deep(.keyboard-style-radio__group) {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+:deep(.keyboard-style-radio__group--triple) {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
 </style>

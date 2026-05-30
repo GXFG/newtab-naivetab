@@ -16,8 +16,8 @@
  *     - 模板字符串调用 $t(`...`) → 提醒无法静态校验
  *
  * 用法：
- *   pnpm exec esno scripts/validate-registries.ts          # 全量校验
- *   pnpm exec esno scripts/validate-registries.ts i18n     # 仅校验 i18n
+ *   pnpm exec esno scripts/check/validate-registries.ts          # 全量校验
+ *   pnpm exec esno scripts/check/validate-registries.ts i18n     # 仅校验 i18n
  */
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-const ROOT = resolve(__dirname, '..')
+const ROOT = resolve(__dirname, '../..')
 const SRC = resolve(ROOT, 'src')
 
 // ─── 工具函数 ───────────────────────────────────────────────
@@ -66,17 +66,6 @@ const extractArrayItems = (source: string, varName: string): string[] => {
 // 从源码中提取 WidgetConfigByCode 的 keys
 const extractRegistryKeys = (source: string): string[] => {
   const regex = /export type WidgetConfigByCode\s*=\s*\{([\s\S]*?)\}/
-  const match = source.match(regex)
-  if (!match) return []
-  return match[1]
-    .split('\n')
-    .map((line) => line.trim().match(/^(\w+):/)?.[1])
-    .filter(Boolean) as string[]
-}
-
-// 从源码中提取 ICONS 的 keys
-const extractIconKeys = (source: string): string[] => {
-  const regex = /export const ICONS\s*=\s*\{([\s\S]*?)\n\}/
   const match = source.match(regex)
   if (!match) return []
   return match[1]

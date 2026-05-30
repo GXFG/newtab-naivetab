@@ -223,6 +223,7 @@ export const KEYBOARD_COMMON_CONFIG = {
     'rgba(148,163,184,1.0)',
   ],
   emphasisKeyOverrides: {} as Record<string, 0 | 1 | 2>,
+  nameplates: [] as TNameplate[],
 }
 
 export const defaultConfig = {

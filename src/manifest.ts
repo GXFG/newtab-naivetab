@@ -23,14 +23,16 @@ export async function getManifest() {
     },
     permissions: [
       'storage',
+      'bookmarks',
       'tabs',
       'scripting',
       'sessions',
       'tabGroups',
       'system.display',
+      'notifications',
     ],
     host_permissions: ['*://*/*'],
-    optional_permissions: ['bookmarks', 'notifications'],
+    optional_permissions: [],
     chrome_url_overrides: {
       newtab: '/dist/newtab/index.html',
     },
