@@ -12,6 +12,7 @@ import {
   URL_EDGE_STORE,
   URL_FIREFOX_STORE,
 } from '@/logic/constants/urls'
+import { FONT_LIST } from '@/logic/constants/fonts'
 import { createTab } from '@/logic/utils/common'
 
 export const globalState = reactive({
@@ -32,8 +33,7 @@ export const globalState = reactive({
   isBackgroundDrawerAutoOpen: false,
 })
 
-const initAvailableFontList = async () => {
-  const { FONT_LIST } = await import('@/logic/constants/fonts')
+export const initAvailableFontList = async () => {
   const fontCheck = new Set(FONT_LIST.sort())
   await document.fonts.ready
   const availableList: Set<string> = new Set()

@@ -11,9 +11,8 @@ const isDrawerMode = computed(() => globalState.settingMode === 'drawer')
 
 /**
  * 预览模式：鼠标悬停时让抽屉透明化，用户可实时看到下方 newtab 页面的效果。
- * 通过切换 body.setting-preview-active CSS 类实现，对应样式在 styles/global.css 中：
+ * 通过切换 body.setting-preview-active CSS 类实现，对应样式在 styles/setting-utils.css 中：
  * - 抽屉透明度设为 0
- * - 遮罩背景变为透明
  * 鼠标离开后自动恢复，不影响任何配置数据。
  */
 const isPreviewing = ref(false)
@@ -78,29 +77,24 @@ const openInNewTab = () => {
       </template>
     </div>
 
-    <!-- 右侧：关闭按钮（仅抽屉模式） -->
-    <div
+    <!-- 右侧：关闭按钮（仅抽屉模式），与 NTDrawer close 设计一致 -->
+    <button
       v-if="isDrawerMode"
-      class="header-bar__action header-bar__action--close"
+      type="button"
+      class="reka-drawer__close reka-focus-visible setting-header-bar__close"
       @click="globalState.isSettingDrawerVisible = false"
     >
-      <Icon
-        :icon="ICONS.close"
-        class="action__icon"
-      />
-    </div>
+      <Icon :icon="ICONS.close" />
+    </button>
   </div>
 </template>
 
 <style scoped>
 .setting-header-bar {
   padding: var(--space-3) var(--space-4);
-  z-index: 2000;
-  position: sticky;
-  top: 0;
   width: 100%;
-  background-color: var(--n-color);
-  border-bottom: 1px solid var(--n-tab-border-color, var(--gray-alpha-15));
+  background-color: var(--nt-setting-nav-bg, #fff);
+  border-bottom: 1px solid var(--nt-gray-light);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -126,14 +120,14 @@ const openInNewTab = () => {
     gap: var(--space-1);
     padding: 4px var(--space-2);
     border-radius: var(--radius-md);
-    border: 1px solid var(--n-tab-border-color, var(--gray-alpha-15));
+    border: 1px solid var(--nt-gray-moderate);
     cursor: pointer;
     transition:
       background-color var(--transition-base),
       border-color var(--transition-base),
       color var(--transition-base),
       box-shadow var(--transition-base);
-    color: var(--gray-alpha-85);
+    color: var(--nt-text-primary);
     user-select: none;
     flex-shrink: 0;
 
@@ -149,9 +143,9 @@ const openInNewTab = () => {
     }
 
     &:hover {
-      background-color: var(--n-tab-border-color, var(--gray-alpha-15));
+      background-color: var(--nt-gray-moderate);
       border-color: transparent;
-      color: var(--gray-alpha-85);
+      color: var(--nt-text-primary);
       box-shadow: var(--shadow-sm);
     }
 
@@ -185,25 +179,40 @@ const openInNewTab = () => {
       }
     }
 
-    &.header-bar__action--close {
-      &:hover {
+    &.header-bar__action--active {
+      background-color: color-mix(
+        in srgb,
+        var(--nt-primary-color) 10%,
+        transparent
+      );
+      border-color: color-mix(
+        in srgb,
+        var(--nt-primary-color) 40%,
+        transparent
+      );
+      color: var(--nt-primary-color);
+      box-shadow: 0 0 0 2px
+        color-mix(in srgb, var(--nt-primary-color) 12%, transparent);
+      :root[data-theme='dark'] & {
         background-color: color-mix(
           in srgb,
-          var(--color-error) 8%,
+          var(--nt-primary-color) 15%,
           transparent
         );
-        border-color: color-mix(in srgb, var(--color-error) 35%, transparent);
-        color: var(--color-error);
-        :root[data-theme='dark'] & {
-          background-color: color-mix(
-            in srgb,
-            var(--color-error) 15%,
-            transparent
-          );
-          border-color: color-mix(in srgb, var(--color-error) 45%, transparent);
-        }
+        border-color: color-mix(
+          in srgb,
+          var(--nt-primary-color) 45%,
+          transparent
+        );
+        box-shadow: 0 0 0 2px
+          color-mix(in srgb, var(--nt-primary-color) 18%, transparent);
       }
     }
+  }
+
+  /* close 按钮微调：对齐 header 右侧，与 NTDrawer close 一致 */
+  .setting-header-bar__close {
+    margin-left: var(--space-2);
   }
 }
 </style>

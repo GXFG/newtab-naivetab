@@ -1,0 +1,103 @@
+/* ============================================================
+ * Popover（Apple 风格：毛玻璃面板 + 阴影浮层 + 箭头）
+ *
+ * 对标 Apple HIG popover：圆角面板 + 投影深度 + 淡入动效。
+ *   由 NTPopover.vue 封装 Reka Popover 系列原语。
+ * ============================================================ */
+
+/* 1. Trigger wrapper — flex 填满父宽，Reka 锚点需盒子，min-width:0 保证 text-overflow 不溢出 */
+.reka-popover__trigger {
+  display: flex;
+  min-width: 0;
+}
+
+/* 2. Content — 白色面板 + 阴影 + 圆角（原则1：立体层次） */
+.reka-popover {
+  --popover-bg: var(--reka-surface-bg);
+
+  position: relative;
+  padding: var(--space-2) var(--space-3);  /* 最小内边距，避免内容贴边 */
+  border-radius: var(--radius-lg);
+  background-color: var(--popover-bg);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  max-width: 420px;
+  z-index: 9999;
+
+  /* 默认：popover 在 trigger 上方（placement=top），从下方弹入 */
+  animation: reka-popover-in-up 240ms var(--transition-spring-bounce) backwards;
+  transform-origin: bottom center;
+}
+
+/* Popover 在 trigger 下方 → 从上方弹入 */
+.reka-popover[data-side='bottom'] {
+  animation-name: reka-popover-in-down;
+  transform-origin: top center;
+}
+
+/* Popover 在 trigger 左侧 → 从右侧弹入 */
+.reka-popover[data-side='left'] {
+  animation-name: reka-popover-in-rightward;
+  transform-origin: right center;
+}
+
+/* Popover 在 trigger 右侧 → 从左侧弹入 */
+.reka-popover[data-side='right'] {
+  animation-name: reka-popover-in-leftward;
+  transform-origin: left center;
+}
+
+@keyframes reka-popover-in-up {
+  from { opacity: 0; transform: scale(0.92) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes reka-popover-in-down {
+  from { opacity: 0; transform: scale(0.92) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes reka-popover-in-rightward {
+  from { opacity: 0; transform: scale(0.92) translateX(6px); }
+  to   { opacity: 1; transform: scale(1) translateX(0); }
+}
+@keyframes reka-popover-in-leftward {
+  from { opacity: 0; transform: scale(0.92) translateX(-6px); }
+  to   { opacity: 1; transform: scale(1) translateX(0); }
+}
+
+/* 关闭动画：data-state='closed' 时触发，Presence 等 animationend 后卸载 DOM */
+.reka-popover[data-state='closed'] {
+  animation: reka-popover-out 150ms ease forwards;
+}
+
+@keyframes reka-popover-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.96); }
+}
+
+/* 3. Arrow — 8×6 小三角，fill 匹配面板背景 */
+.reka-popover__arrow {
+  fill: var(--popover-bg);
+}
+
+/* ============================================================
+ * 深色模式覆盖
+ * ============================================================ */
+:root[data-theme='dark'] .reka-popover,
+.dark .reka-popover {
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-popover {
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+}

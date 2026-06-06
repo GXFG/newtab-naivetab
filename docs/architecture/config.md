@@ -14,7 +14,7 @@
 | `src/logic/config/reset.ts` | Widget 配置重置（quick/full 模式） |
 | `src/logic/store/state.ts` | `globalState` 定义 + UI 操作函数 |
 | `src/logic/store/style.ts` | `getStyleField` / `colorMixWithAlpha` |
-| `src/logic/store/theme.ts` | 主题、语言、`themeOverrides` |
+| `src/logic/store/theme.ts` | 主题、语言、外观模式切换 |
 | `src/logic/store/dom.ts` | 全屏同步 / DOM 样式监听 |
 
 > 存储与同步机制详见 [storage.md](storage.md)。
@@ -101,7 +101,7 @@ npx vitest run src/logic/__tests__/config-snapshot.test.ts
 ### 双元素数组驱动
 
 所有颜色字段必须是 `[浅色值, 深色值]` 数组。`currAppearanceCode`（0=浅色，1=深色）驱动自动切换：
-- `appearance === 'auto'` 时，跟随系统 `useOsTheme()`
+- `appearance === 'auto'` 时，跟随系统 `matchMedia('(prefers-color-scheme: dark)')`
 - `'light'` / `'dark'` 时，强制指定
 
 ### getStyleField

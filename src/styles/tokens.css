@@ -1,11 +1,23 @@
 /* ============================================================
    Design Language: CSS Tokens
 
-   统一全局设计常量，供各组件复用，保障视觉一致性。
+   全局设计常量，供所有组件通过 var() 引用。
 
-   - 静态量（间距、圆角、过渡、阴影、字号、透明度等）
-   - 动态颜色（随 light/dark 主题切换的 --nt-* / --nt-cm-* 变量）
-   - 所有组件都应使用这些变量，禁止硬编码魔数或颜色字面量
+   三区结构（判断标准：这个值在深色模式下会变吗？）：
+     Zone 1 — Primitives     → 不随主题变化（间距/圆角/字体/透明度/过渡/阴影 + Reka 通用）
+     Zone 2 — Colors Light   → 浅色模式颜色值
+     Zone 3 — Colors Dark    → 深色模式覆盖
+
+   命名规范：
+     --{category}-{variant}  通用 Token（--space-4, --radius-pill, --transition-bg）
+     --nt-gray-{weight}        中性灰透明通道
+     --color-{name}          语义色
+     --reka-{name}           Reka UI 专用 Token
+     --nt-{module}-{name}    NaiveTab 业务模块色（JS 动态注入的 --nt-primary-color 不在此文件）
+   ============================================================ */
+
+/* ============================================================
+   1. Primitives — 不随主题变化
    ============================================================ */
 :root {
   /* --- Spacing --- */
@@ -24,18 +36,6 @@
   --radius-2xl: 16px;
   --radius-pill: 999px;
 
-  /* --- Transition Timing --- */
-  --transition-fast: 150ms ease;
-  --transition-base: 200ms ease;
-  --transition-slow: 300ms ease;
-  --transition-spring: 300ms cubic-bezier(0.34, 1.06, 0.64, 1);
-
-  /* --- Shadow (constant) --- */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.07);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-
   /* --- Font Size --- */
   --text-xs: 11px;
   --text-sm: 12px;
@@ -43,75 +43,85 @@
   --text-md: 15px;
   --text-lg: 16px;
 
-  /* --- Opacity Levels --- */
+  /* --- Opacity --- */
   --opacity-muted: 0.45;
   --opacity-secondary: 0.65;
   --opacity-primary: 0.85;
 
-  /* --- Neutral Gray Alpha Tokens ---
-     用法：直接使用 --gray-alpha-xx，如 var(--gray-alpha-05)
-     浅色模式：rgba(128, 128, 128, 0.xx)
-     深色模式：通过 :root[data-theme='dark'] 覆盖为 rgba(255, 255, 255, 0.xx)
-     避免在各处硬编码 rgba(128, 128, 128, 0.xx)
+  /* --- Shadows --- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.07);
+  /* --- Transitions ---
+     分时策略（对标 Radix Themes 120/140/160ms）：
+       bg 120ms — 背景/边框色，最快响应
+       shadow 140ms — 深度变化，稍慢
+       switch 280ms — 位移弹簧，明显回弹
   */
-  --gray-alpha-03: rgba(128, 128, 128, 0.03);
-  --gray-alpha-05: rgba(128, 128, 128, 0.05);
-  --gray-alpha-06: rgba(128, 128, 128, 0.06);
-  --gray-alpha-08: rgba(128, 128, 128, 0.08);
-  --gray-alpha-10: rgba(128, 128, 128, 0.10);
-  --gray-alpha-12: rgba(128, 128, 128, 0.12);
-  --gray-alpha-15: rgba(128, 128, 128, 0.15);
-  --gray-alpha-20: rgba(128, 128, 128, 0.20);
-  --gray-alpha-35: rgba(128, 128, 128, 0.35);
-  --gray-alpha-55: rgba(128, 128, 128, 0.55);
-  --gray-alpha-65: rgba(128, 128, 128, 0.65);
-  --gray-alpha-70: rgba(128, 128, 128, 0.70);
-  --gray-alpha-75: rgba(128, 128, 128, 0.75);
-  --gray-alpha-85: rgba(128, 128, 128, 0.85);
+  --transition-bg: 120ms ease;
+  --transition-shadow: 140ms ease;
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+  --transition-spring: 300ms cubic-bezier(0.34, 1.06, 0.64, 1);
+  --transition-switch: 280ms cubic-bezier(0.25, 1.1, 0.5, 1);       /* 小型控件弹簧（thumb/dot/checkmark） */
+  --transition-spring-bounce: 280ms cubic-bezier(0.34, 1.56, 0.64, 1); /* 大型面板弹簧（popover/dialog），明显 overshoot */
+  --transition-drawer: 300ms cubic-bezier(0.32, 0.72, 0, 1);            /* 侧滑抽屉，快启 + 平滑减速，无回弹 */
 
-  /* --- Semantic Colors ---
-     错误/警告色，用于录制中、重置按钮、关闭按钮等场景
-  */
-  --color-error: #d03050;
+  /* --- Reka UI: Interactive --- */
+  --reka-cursor-interactive: pointer;
+  --reka-cursor-disabled: not-allowed;
 
-}
-
-/* --- Neutral Gray Alpha Tokens (Dark Mode Override) ---
-   深色模式下将中性灰色切换为白色通道，保持相同的透明度感知
-*/
-:root[data-theme='dark'],
-.dark {
-  --gray-alpha-03: rgba(255, 255, 255, 0.03);
-  --gray-alpha-05: rgba(255, 255, 255, 0.05);
-  --gray-alpha-06: rgba(255, 255, 255, 0.06);
-  --gray-alpha-08: rgba(255, 255, 255, 0.08);
-  --gray-alpha-10: rgba(255, 255, 255, 0.10);
-  --gray-alpha-12: rgba(255, 255, 255, 0.12);
-  --gray-alpha-15: rgba(255, 255, 255, 0.15);
-  --gray-alpha-20: rgba(255, 255, 255, 0.20);
-  --gray-alpha-35: rgba(255, 255, 255, 0.35);
-  --gray-alpha-55: rgba(255, 255, 255, 0.55);
-  --gray-alpha-65: rgba(255, 255, 255, 0.65);
-  --gray-alpha-70: rgba(255, 255, 255, 0.70);
-  --gray-alpha-75: rgba(255, 255, 255, 0.75);
-  --gray-alpha-85: rgba(255, 255, 255, 0.85);
-
-  /* --- Semantic Colors (Dark Mode) --- */
-  --color-error: rgba(208, 48, 80, 0.9);
+  /* --- Reka UI: Shared Visuals --- */
+  --reka-border-width: 1.5px;
+  --reka-disabled-filter: saturate(0.65) brightness(0.92);
+  --reka-focus-ring: 0 0 0 1px color-mix(in srgb, var(--nt-primary-color) 15%, transparent),
+                     0 0 0 4px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+  --reka-shadow-halo: 0 0 0 2px color-mix(in srgb, var(--nt-gray-medium) 50%, transparent);
+  --reka-shadow-halo-primary: 0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
 }
 
 /* ============================================================
-   Dynamic Color Tokens (Theme-aware)
-
-   所有随 light/dark 主题切换的颜色必须在此处注册。
-   :root 定义浅色值，:root[data-theme='dark'], .dark 覆盖深色值。
-   深色模式复用浅色值的字段不在 dark 块中重复定义，自然继承。
-
-   组件中直接使用 var(--nt-*) 引用，禁止 JS 中转。
+   2. Colors — Light（浅色模式）
    ============================================================ */
-
 :root {
-  /* ── Moveable (拖拽编辑) ── */
+  /* --- Neutral Gray Alpha ---
+     浅色：rgba(128, 128, 128, opacity)
+     深色：由 Zone 3 覆盖为 rgba(255, 255, 255, opacity)
+
+     分段使用指南（对标 Radix gray-a 分级）：
+       Tier 1 — 微背景（03~05）    : 几乎不可见的底色，大面积区域
+       Tier 2 — 结构元素（06~12）   : 边框、分割线、微妙背景
+       Tier 3 — 明显表面（15~35）   : 清晰底色、hover/active 状态
+       Tier 4 — 结构装饰（55、85）    : 边框、图标底色等（文字颜色用 --nt-text-*）
+  */
+  /* Tier 1 — 微背景 */
+  --nt-gray-ghost: rgba(128, 128, 128, 0.05);
+  --nt-gray-minimal: rgba(128, 128, 128, 0.08);
+  --nt-gray-light: rgba(128, 128, 128, 0.10);
+  --nt-gray-moderate: rgba(128, 128, 128, 0.15);
+  --nt-gray-medium: rgba(128, 128, 128, 0.20);
+  --nt-gray-heavy: rgba(128, 128, 128, 0.35);
+  --nt-gray-solid: rgba(128, 128, 128, 0.85);
+
+  /* --- Text Colors（浅色：黑底透明，语义化文字层级） --- */
+  --nt-text-primary: rgba(0, 0, 0, 0.88);     /* 主文字：标签、标题 */
+  --nt-text-secondary: rgba(0, 0, 0, 0.62);   /* 次要文字：描述、副标题 */
+  --nt-text-tertiary: rgba(0, 0, 0, 0.45);    /* 提示文字：placeholder、tip */
+
+  /* --- Brand Accent --- */
+  --nt-accent-brand: #1098ad; /* 品牌 teal，配合 color-mix(in srgb, var(--nt-accent-brand) X%, transparent) 使用 */
+
+  /* --- Semantic --- */
+  --color-error: #d03050;
+  --color-success: #2e8b57;
+  --color-info: #2563eb;
+  --color-warning: #f0a020;
+
+  /* --- Reka UI: Surface --- */
+  --reka-surface-bg: white;
+
+  /* --- NaiveTab: Moveable (拖拽编辑) --- */
   --nt-auxiliary-line-main: #40a9ff;
   --nt-auxiliary-line-bound: #ff7875;
   --nt-auxiliary-line-widget: #69c0ff;
@@ -120,12 +130,7 @@
   --nt-moveable-tool-delete-btn-color: #ffa39e;
   --nt-bg-moveable-tool-drawer: rgba(32, 32, 32, 0.55);
 
-  /* ── Popup Keyboard ── */
-  --nt-popup-keyboard-border: rgb(224, 224, 230);
-  --nt-popup-keyboard-hover-bg: rgba(209, 213, 219, 1);
-  --nt-popup-keyboard-active-bg: rgba(209, 213, 219, 0.85);
-
-  /* ── Context Menu ── */
+  /* --- NaiveTab: Context Menu --- */
   --nt-cm-bg: rgba(252, 252, 253, 0.92);
   --nt-cm-border: rgba(0, 0, 0, 0.08);
   --nt-cm-shadow: rgba(0, 0, 0, 0.14);
@@ -140,14 +145,44 @@
   --nt-cm-danger-hover: rgba(217, 48, 37, 0.08);
 }
 
+/* ============================================================
+   3. Colors — Dark（深色模式覆盖）
+
+   规则：浅色值在 Zone 2 :root 定义，深色值在此区块覆盖。
+        不变的值不重复定义，自然继承浅色值。
+        新增 Token 时：先在 Zone 2 写浅色 → 再在此处写深色。
+   ============================================================ */
 :root[data-theme='dark'],
 .dark {
-  /* ── Popup Keyboard ── */
-  --nt-popup-keyboard-border: rgba(73, 73, 77, 1);
-  --nt-popup-keyboard-hover-bg: rgba(73, 73, 77, 1);
-  --nt-popup-keyboard-active-bg: rgba(73, 73, 77, 0.8);
+  /* --- Neutral Gray → White Alpha --- */
+  --nt-gray-ghost: rgba(255, 255, 255, 0.05);
+  --nt-gray-minimal: rgba(255, 255, 255, 0.08);
+  --nt-gray-light: rgba(255, 255, 255, 0.10);
+  --nt-gray-moderate: rgba(255, 255, 255, 0.15);
+  --nt-gray-medium: rgba(255, 255, 255, 0.20);
+  --nt-gray-heavy: rgba(255, 255, 255, 0.35);
+  --nt-gray-solid: rgba(255, 255, 255, 0.85);
 
-  /* ── Context Menu ── */
+  /* --- Text Colors（深色：白底透明） --- */
+  --nt-text-primary: rgba(255, 255, 255, 0.90);   /* 主文字 */
+  --nt-text-secondary: rgba(255, 255, 255, 0.65);  /* 次要文字 */
+  --nt-text-tertiary: rgba(255, 255, 255, 0.42);   /* 提示文字 */
+
+  /* --- Shadows（深色背景需更高不透明度黑色才能产生深度感） --- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.20);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+
+  /* --- Semantic --- */
+  --color-error: rgba(208, 48, 80, 0.9);
+  --color-success: #3cb371;
+  --color-info: #60a5fa;
+  --color-warning: #f5b342;
+
+  /* --- Reka UI: Surface --- */
+  --reka-surface-bg: #1e1e22;
+
+  /* --- NaiveTab: Context Menu --- */
   --nt-cm-bg: rgba(28, 28, 32, 0.82);
   --nt-cm-border: rgba(255, 255, 255, 0.12);
   --nt-cm-shadow: rgba(0, 0, 0, 0.36);

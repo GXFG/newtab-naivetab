@@ -98,7 +98,6 @@ vi.doMock('@/logic/utils/util', () => ({
   },
 }))
 
-vi.doMock('naive-ui', () => ({ NButton: { name: 'NButton' } }))
 
 // localStorage mock
 const localStorageMock: Record<string, string> = {}

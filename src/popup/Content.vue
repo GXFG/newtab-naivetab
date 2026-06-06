@@ -6,8 +6,7 @@ import {
   loadActiveLayer,
   getSystemBookmarkForKeyboard,
 } from '@/logic/keyboard/bookmark-state'
-import PopupConfigSystemBookmark from '@/popup/PopupConfigSystemBookmark.vue'
-import PopupConfigNaiveBookmark from '@/popup/PopupConfigNaiveBookmark.vue'
+import PopupConfigBookmark from '@/popup/PopupConfigBookmark.vue'
 
 const isSystemBookmark = computed(() => {
   return localConfig.keyboardBookmark.source === BookmarkSource.BROWSER
@@ -31,6 +30,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <PopupConfigNaiveBookmark v-if="!isSystemBookmark" />
-  <PopupConfigSystemBookmark v-else />
+  <PopupConfigBookmark />
 </template>

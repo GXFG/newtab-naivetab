@@ -33,6 +33,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const hasImage = computed(
@@ -163,7 +167,7 @@ const cssVars = computed(() => ({
     :class="{ 'image__wrap--active': isCurrSelectedImage }"
     :style="cssVars"
   >
-    <NSpin :show="isCurrSelectedImage && isImageLoading">
+    <NTSpin :show="props.loading || (isCurrSelectedImage && isImageLoading)">
       <div
         v-if="!hasImage || isImageError"
         class="image__empty"
@@ -191,7 +195,7 @@ const cssVars = computed(() => ({
         @error="onImageError"
         @click="onSelectImage()"
       />
-    </NSpin>
+    </NTSpin>
 
     <div
       v-if="isCurrSelectedImage"
@@ -207,7 +211,7 @@ const cssVars = computed(() => ({
       v-if="isToolbarVisible"
       class="image__toolbar"
     >
-      <NPopover
+      <NTPopover
         v-if="props.data.desc && props.data.desc.length !== 0"
         trigger="hover"
         placement="top"
@@ -218,7 +222,7 @@ const cssVars = computed(() => ({
           </div>
         </template>
         <p class="toolbar__desc">{{ props.data.desc }}</p>
-      </NPopover>
+      </NTPopover>
 
       <div
         class="toolbar__icon"
@@ -243,7 +247,7 @@ const cssVars = computed(() => ({
       </div>
 
       <!-- delete -->
-      <NPopconfirm
+      <NTPopconfirm
         v-if="props.delete"
         @positive-click="onUnFavoriteImage()"
       >
@@ -253,7 +257,7 @@ const cssVars = computed(() => ({
           </div>
         </template>
         {{ $t('common.confirm') }}?
-      </NPopconfirm>
+      </NTPopconfirm>
     </div>
   </div>
 </template>
@@ -267,7 +271,7 @@ const cssVars = computed(() => ({
   cursor: pointer;
   overflow: hidden;
   outline: 1.5px solid transparent;
-  background-color: var(--gray-alpha-08);
+  background-color: var(--nt-gray-minimal);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition:
     outline 0.2s ease,
@@ -275,9 +279,7 @@ const cssVars = computed(() => ({
     transform 0.18s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-    outline: 1.5px solid var(--gray-alpha-35);
+    transform: scale(1.03);
 
     .image__toolbar {
       opacity: 1;

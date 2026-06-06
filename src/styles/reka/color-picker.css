@@ -1,0 +1,144 @@
+/* ============================================================
+ * Color Picker（颜色选择器，基于 Reka UI Color 原语）
+ *
+ * 布局：ColorArea（SV 面板）→ Hue Slider（色相条）→ Swatches（预设色板）
+ *
+ * 设计意图：
+ *   area      → 2D 渐变面板 + 白色圆形指示器（十字准星）
+ *   slider    → 彩虹渐变条 + 白色圆形滑块
+ *   swatches  → 预设色块网格 + 选中环高亮
+ *   dark      → 边框/阴影切换
+ * ============================================================ */
+
+/* ---- ColorArea：SV 拾取面板 ---- */
+.reka-color-picker__area {
+  display: block;
+  width: 180px;
+  height: 180px;
+  border-radius: var(--radius-md);
+  /* overflow: hidden 确保渐变不超出圆角 */
+}
+
+.reka-color-picker__area-area {
+  position: relative;  /* 为 thumb absolute 定位建立包含块 */
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* ---- ColorAreaThumb：十字准星圆形指示器 ---- */
+.reka-color-picker__area-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+  /* Reka 自动通过 transform 定位 thumb，不要设 position */
+}
+
+/* ---- ColorSlider：色相条 ---- */
+.reka-color-picker__hue-slider {
+  display: block;
+  position: relative;  /* 为 thumb 的 absolute 定位建立包含块 */
+  width: 180px;
+  height: 12px;
+  margin-top: 8px;
+  border-radius: var(--radius-pill);
+}
+
+.reka-color-picker__hue-track {
+  display: block;  /* ColorSliderTrack 渲染为 span，inline 忽略宽高 */
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* ---- ColorSliderThumb：色相条滑块 ---- */
+.reka-color-picker__hue-thumb {
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  margin-top: -8px;  /* 垂直居中：Reka 只设了 translateX(-50%)，不含 translateY */
+  border-radius: 50%;
+  background-color: white;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* ---- ColorSwatchPicker：预设色板 ---- */
+.reka-color-picker__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  width: 180px;
+}
+
+.reka-color-picker__swatch-item {
+  all: unset;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  cursor: var(--reka-cursor-interactive);
+  box-sizing: border-box;
+  border: 2px solid var(--nt-gray-light);
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+.reka-color-picker__swatch-item:hover {
+  border-color: var(--nt-gray-medium);
+}
+
+.reka-color-picker__swatch-item[data-state='checked'] {
+  border-color: var(--nt-primary-color);
+  box-shadow: 0 0 0 1px var(--nt-primary-color);
+}
+
+.reka-color-picker__swatch-color {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ *
+ * Thumb 背景降纯 + 阴影切换为白色通道。
+ * ============================================================ */
+:root[data-theme='dark'] .reka-color-picker__area-thumb,
+.dark .reka-color-picker__area-thumb {
+  background-color: #f0f0f0;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 1px 3px rgba(255, 255, 255, 0.15);
+}
+
+:root[data-theme='dark'] .reka-color-picker__hue-thumb,
+.dark .reka-color-picker__hue-thumb {
+  background-color: #f0f0f0;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 1px 3px rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-color-picker__swatch-item {
+    border: 2px solid ButtonText;
+  }
+  .reka-color-picker__swatch-item[data-state='checked'] {
+    border-color: Highlight;
+  }
+}

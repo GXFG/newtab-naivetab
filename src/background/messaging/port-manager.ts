@@ -10,6 +10,12 @@
  * 消息接收双路径：
  * 1. Port 路径（主力）：CS 通过 connect('naivetab-shortcut') 建立长连接
  * 2. sendMessage 路径（兜底）：Port 不可用时 CS 降级为 chrome.runtime.sendMessage
+ *
+ * ⚠️ 消息来源差异（修改 handler 前必读）：
+ * - 书签消息：只有 CS 发送（newtab 书签直接 openPage，不走 Port）
+ * - 命令消息：CS 和 newtab 都会发送（newtab 的 SW 命令走 Port → SW）
+ * - 结论：handler 中的检查条件如果只应在 CS 端生效（如 isGlobalShortcutEnabled），
+ *   必须放在 CS 入口处，不能放在 SW handler 中，否则会误杀 newtab 消息。
  */
 
 import { log, padUrlHttps } from '@/logic/utils/common'
@@ -80,7 +86,8 @@ const handleSwitchBookmarkLayerFromUI = async (layerIndex: number) => {
  */
 const handleBookmarkShortcutKeydown = (key: string, _tabId: number) => {
   const config = getCachedKeyboardBookmarkConfig()
-  if (!config.isGlobalShortcutEnabled) return
+  // isGlobalShortcutEnabled 由 CS 端自行检查后才发送消息，SW 只检查总开关 isEnabled
+  if (config.isEnabled === false) return
 
   const keymap = isInLayerSwitchCooldown()
     ? {} // 切层冷却期内禁用书签快捷键，避免打开旧层书签
@@ -104,7 +111,9 @@ export const handleCommandShortcutKeydown = (
   execSwCommand: (command: TSwCommandName, tabId: number) => void,
 ) => {
   const config = getCachedKeyboardCommandConfig()
-  if (!config.isEnabled) return
+  // isGlobalShortcutEnabled 由 CS 端自行检查后才发送消息，SW 只检查总开关 isEnabled
+  // newtab 端的命令消息也走 Port → SW，因此 SW 不能检查 isGlobalShortcutEnabled
+  if (config.isEnabled === false) return
   if (!config.keymap) return
 
   const entry = config.keymap[key] as TCommandEntry | undefined

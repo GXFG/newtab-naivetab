@@ -15,7 +15,7 @@ import { ref, computed, onMounted } from 'vue'
 import { localConfig } from '@/logic/config/state'
 import { normalizeDomain } from '@/logic/shortcut/utils'
 import { flushConfigSync } from '@/logic/config/sync/upload'
-import { NSwitch } from 'naive-ui'
+import NTSwitch from '@/components/ui/NTSwitch.vue'
 import Tips from '@/components/Tips.vue'
 import { showToast } from '@/common/toast'
 
@@ -117,22 +117,20 @@ const toggleBlacklist = (field: 'keyboardBookmark' | 'keyboardCommand') => {
       <span class="domain-filter__switch-label">{{
         $t('popupDomainFilter.commandShortcut')
       }}</span>
-      <NSwitch
-        size="small"
-        :loading="isSyncing"
+      <NTSwitch
         :value="inCommandBlacklist"
-        :class="{ 'domain-filter__switch--active': inCommandBlacklist }"
+        :loading="isSyncing"
+        type="error"
         @update:value="toggleBlacklist('keyboardCommand')"
       />
 
       <span class="domain-filter__switch-label">{{
         $t('popupDomainFilter.bookmarkShortcut')
       }}</span>
-      <NSwitch
-        size="small"
-        :loading="isSyncing"
+      <NTSwitch
         :value="inBookmarkBlacklist"
-        :class="{ 'domain-filter__switch--active': inBookmarkBlacklist }"
+        :loading="isSyncing"
+        type="error"
         @update:value="toggleBlacklist('keyboardBookmark')"
       />
     </div>
@@ -145,10 +143,10 @@ const toggleBlacklist = (field: 'keyboardBookmark' | 'keyboardCommand') => {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 18px;
+  padding: 5px 20px;
   font-size: 12px;
-  border-top: 1px solid var(--nt-popup-keyboard-border, var(--gray-alpha-10));
-  background: var(--gray-alpha-2, rgba(0, 0, 0, 0.015));
+  border-top: 1px solid var(--nt-gray-light);
+  background: var(--nt-gray-ghost);
 }
 
 .domain-filter__info {
@@ -165,7 +163,7 @@ const toggleBlacklist = (field: 'keyboardBookmark' | 'keyboardCommand') => {
 
   .domain-filter__hostname {
     font-weight: 500;
-    color: var(--n-text-color);
+    color: var(--nt-text-primary);
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -173,7 +171,7 @@ const toggleBlacklist = (field: 'keyboardBookmark' | 'keyboardCommand') => {
   }
 
   .domain-filter__label {
-    color: var(--gray-alpha-8);
+    color: var(--nt-text-tertiary);
     flex-shrink: 0;
   }
 }
@@ -185,12 +183,8 @@ const toggleBlacklist = (field: 'keyboardBookmark' | 'keyboardCommand') => {
   flex-shrink: 0;
 
   .domain-filter__switch-label {
-    color: var(--gray-alpha-8);
+    color: var(--nt-text-secondary);
     font-size: 12px;
-  }
-
-  .domain-filter__switch--active :deep(.n-switch__rail) {
-    background-color: #ef4444;
   }
 }
 

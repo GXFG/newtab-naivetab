@@ -82,6 +82,7 @@ const initMain = () => {
   // -- 运行时状态 --
   let keymap: Record<string, TBookmarkEntry> = {}
   let isEnabled = false
+  let isGlobalShortcutEnabled = false
   let globalShortcutModifiers: TShortcutModifier[] = []
   let shortcutInInputElement = false
   let urlBlacklist: string[] = []
@@ -94,6 +95,7 @@ const initMain = () => {
   // -- 命令快捷键运行时状态 --
   let commandKeymap: Record<string, TCommandEntry> = {}
   let commandIsEnabled = false
+  let commandGlobalShortcutEnabled = false
   let commandModifiers: TShortcutModifier[] = []
   let keyboardCommandInInputElement = false
   let commandUrlBlacklist: string[] = []
@@ -104,6 +106,7 @@ const initMain = () => {
    */
   const updateConfig = (cfg: {
     isEnabled?: boolean
+    isGlobalShortcutEnabled?: boolean
     globalShortcutModifiers?: TShortcutModifier[]
     shortcutInInputElement?: boolean
     keymap?: Record<string, TBookmarkEntry>
@@ -112,6 +115,8 @@ const initMain = () => {
     source?: number
   }) => {
     if (cfg.isEnabled !== undefined) isEnabled = cfg.isEnabled
+    if (cfg.isGlobalShortcutEnabled !== undefined)
+      isGlobalShortcutEnabled = cfg.isGlobalShortcutEnabled
     if (cfg.globalShortcutModifiers !== undefined)
       globalShortcutModifiers = cfg.globalShortcutModifiers
     if (cfg.shortcutInInputElement !== undefined)
@@ -123,6 +128,7 @@ const initMain = () => {
     if (cfg.source !== undefined) source = cfg.source
     debug('bookmark config updated', {
       isEnabled,
+      isGlobalShortcutEnabled,
       globalShortcutModifiers,
       keymapCount: Object.keys(keymap).length,
     })
@@ -133,6 +139,7 @@ const initMain = () => {
    */
   const updateCommandConfig = (cfg: {
     isEnabled?: boolean
+    isGlobalShortcutEnabled?: boolean
     modifiers?: TShortcutModifier[]
     shortcutInInputElement?: boolean
     keymap?: Record<string, TCommandEntry>
@@ -140,6 +147,8 @@ const initMain = () => {
     noModifierMode?: boolean
   }) => {
     if (cfg.isEnabled !== undefined) commandIsEnabled = cfg.isEnabled
+    if (cfg.isGlobalShortcutEnabled !== undefined)
+      commandGlobalShortcutEnabled = cfg.isGlobalShortcutEnabled
     if (cfg.modifiers !== undefined) commandModifiers = cfg.modifiers
     if (cfg.shortcutInInputElement !== undefined)
       keyboardCommandInInputElement = cfg.shortcutInInputElement
@@ -149,6 +158,7 @@ const initMain = () => {
       commandNoModifierMode = cfg.noModifierMode
     debug('command config updated', {
       isEnabled: commandIsEnabled,
+      isGlobalShortcutEnabled: commandGlobalShortcutEnabled,
       modifiers: commandModifiers,
       keymapCount: Object.keys(commandKeymap).length,
     })
@@ -173,7 +183,8 @@ const initMain = () => {
       if (raw) {
         const parsed = await parseStoredData(raw)
         updateConfig({
-          isEnabled: parsed.data.isGlobalShortcutEnabled ?? false,
+          isEnabled: parsed.data.isEnabled ?? true,
+          isGlobalShortcutEnabled: parsed.data.isGlobalShortcutEnabled ?? true,
           globalShortcutModifiers: parsed.data.globalShortcutModifiers ?? [],
           shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
           keymap: parsed.data.keymap ?? {},
@@ -183,6 +194,7 @@ const initMain = () => {
         })
         debug('bookmark config loaded from storage', {
           isEnabled,
+          isGlobalShortcutEnabled,
           globalShortcutModifiers,
           keymapCount: Object.keys(keymap).length,
         })
@@ -220,7 +232,8 @@ const initMain = () => {
       if (raw) {
         const parsed = await parseStoredData(raw)
         updateCommandConfig({
-          isEnabled: parsed.data.isEnabled ?? false,
+          isEnabled: parsed.data.isEnabled ?? true,
+          isGlobalShortcutEnabled: parsed.data.isGlobalShortcutEnabled ?? true,
           modifiers: parsed.data.modifiers ?? [],
           shortcutInInputElement: parsed.data.shortcutInInputElement ?? false,
           keymap: parsed.data.keymap ?? {},
@@ -229,6 +242,7 @@ const initMain = () => {
         })
         debug('command config loaded from storage', {
           isEnabled: commandIsEnabled,
+          isGlobalShortcutEnabled: commandGlobalShortcutEnabled,
           modifiers: commandModifiers,
           keymapCount: Object.keys(commandKeymap).length,
         })
@@ -263,7 +277,9 @@ const initMain = () => {
         parseStoredData(keyboardRaw)
           .then((parsed) => {
             updateConfig({
-              isEnabled: parsed.data.isGlobalShortcutEnabled ?? false,
+              isEnabled: parsed.data.isEnabled ?? true,
+              isGlobalShortcutEnabled:
+                parsed.data.isGlobalShortcutEnabled ?? true,
               globalShortcutModifiers:
                 parsed.data.globalShortcutModifiers ?? [],
               shortcutInInputElement:
@@ -281,6 +297,7 @@ const initMain = () => {
         // 配置被删除，重置为默认状态
         updateConfig({
           isEnabled: false,
+          isGlobalShortcutEnabled: false,
           globalShortcutModifiers: [],
           shortcutInInputElement: true,
           keymap: {},
@@ -298,7 +315,9 @@ const initMain = () => {
         parseStoredData(commandRaw)
           .then((parsed) => {
             updateCommandConfig({
-              isEnabled: parsed.data.isEnabled ?? false,
+              isEnabled: parsed.data.isEnabled ?? true,
+              isGlobalShortcutEnabled:
+                parsed.data.isGlobalShortcutEnabled ?? true,
               modifiers: parsed.data.modifiers ?? [],
               shortcutInInputElement:
                 parsed.data.shortcutInInputElement ?? false,
@@ -314,6 +333,7 @@ const initMain = () => {
         // 配置被删除，重置为默认状态
         updateCommandConfig({
           isEnabled: false,
+          isGlobalShortcutEnabled: false,
           modifiers: [],
           shortcutInInputElement: true,
           keymap: {},
@@ -592,7 +612,8 @@ const initMain = () => {
   const handleKeydown = (e: KeyboardEvent) => {
     // scroll 命令的 e.repeat 放行：按住 J/K 持续滚动
     if (e.repeat) {
-      if (!commandIsEnabled || !commandKeymap) return
+      if (!commandIsEnabled || !commandGlobalShortcutEnabled || !commandKeymap)
+        return
       if (tryLocalScroll(e, e.code)) return
       return
     }
@@ -602,7 +623,7 @@ const initMain = () => {
 
     const bookmarkCode = matchShortcut(
       e,
-      isEnabled,
+      isEnabled && isGlobalShortcutEnabled,
       globalShortcutModifiers,
       shortcutInInputElement,
       urlBlacklist,
@@ -611,7 +632,7 @@ const initMain = () => {
     )
     const commandCode = matchShortcut(
       e,
-      commandIsEnabled,
+      commandIsEnabled && commandGlobalShortcutEnabled,
       commandModifiers,
       keyboardCommandInInputElement,
       commandUrlBlacklist,

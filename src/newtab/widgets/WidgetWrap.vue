@@ -510,8 +510,9 @@ watch(
 
 /* 非激活状态的 hover 高亮 */
 .widget-bg-hover:hover {
-  background-color: var(--nt-bg-moveable-widget-main);
-  box-shadow: 0 2px 12px rgba(100, 181, 246, 0.25);
+  background-color: var(--nt-bg-moveable-widget-main) !important;
+  box-shadow: 0 2px 12px rgba(100, 181, 246, 0.25) !important;
+  transition: none !important;
 }
 
 /* 当前选中（mousedown）激活态 */

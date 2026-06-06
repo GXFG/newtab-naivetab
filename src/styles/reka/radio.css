@@ -1,0 +1,172 @@
+/* ============================================================
+ * Radio（对标 Radix Themes 伪元素双环结构）
+ *
+ * 视觉结构：外圈（__circle） + 内点（__circle::after scale 0.4）。
+ *   与 Switch/Checkbox 共享 6 条设计原则。
+ *
+ * 状态覆盖顺序：
+ *   base → hover → active → focus-visible → checked → disabled
+ *
+ * 设计意图速查：
+ *   base     → 外圈 border + inset shadow（原则1：立体层次）
+ *   hover    → 边框加深 + 外侧微光环（原则1：层次递进）
+ *   active   → 内点微缩（原则2：局部反馈）
+ *   checked  → 外圈主题色填充 + 内点弹簧弹出（原则4+6：通透+弹簧律动）
+ *   disabled → 整体降透明度（原则1：层次退化）
+ *   dark     → 内阴影换白色通道（原则5：双模式自适应）
+ * ============================================================ */
+
+/* RadioGroup — flex 容器，响应 orientation */
+.reka-radio-group {
+  display: flex;
+  gap: 16px;
+}
+.reka-radio-group[data-orientation='vertical'] {
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 1. base — inline-flex 行内布局，外圈 16px 正圆 + border + 内阴影 */
+.reka-radio {
+  --radio-size: 16px;
+
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  outline: none;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  cursor: var(--reka-cursor-interactive);
+}
+
+/* 2. radio__circle — 外圈（对标 Radix ::before 伪元素），正圆 border + 凹槽阴影 */
+.reka-radio__circle {
+  position: relative;
+  width: var(--radio-size);
+  height: var(--radio-size);
+  border-radius: 50%;
+  border: var(--reka-border-width) solid var(--nt-gray-heavy);
+  background-color: var(--reka-surface-bg);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.02);
+  flex-shrink: 0;
+  transition: background-color var(--transition-bg),
+              border-color var(--transition-bg),
+              box-shadow var(--transition-shadow);
+}
+
+/* 3. hover — 边框加深 + 外侧微光环（原则1：层次递进） */
+.reka-radio:not(:disabled):hover .reka-radio__circle {
+  border-color: var(--nt-gray-heavy);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.02),
+              var(--reka-shadow-halo);
+}
+
+/* 4. active — 内点微缩（原则2：局部反馈） */
+.reka-radio:not(:disabled):active .reka-radio__circle::after {
+  transform: translate(-50%, -50%) scale(0.7);
+}
+
+/* 5. focus-visible — 使用通用 .reka-focus-visible class */
+
+/* 6. checked — 外圈主题色填充 + 微脉冲（原则4+6）。
+   时序设计（对标 Apple HIG）：外圈先变色 → 60ms 后内点弹簧弹出。
+   脉冲动画仅作用于 checked 瞬间，不干扰 transition。 */
+.reka-radio[data-state='checked'] .reka-radio__circle {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--nt-primary-color) 90%, white) 0%,
+    color-mix(in srgb, var(--nt-primary-color) 100%, black) 100%
+  );
+  border-color: transparent;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--nt-primary-color) 25%, rgba(0, 0, 0, 0.08));
+  animation: reka-radio-check-pulse 350ms cubic-bezier(0.34, 1.06, 0.64, 1);
+}
+
+@keyframes reka-radio-check-pulse {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* checked + hover — 主题色微暗 + 光环 */
+.reka-radio[data-state='checked']:not(:disabled):hover .reka-radio__circle {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 85%, black);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--nt-primary-color) 25%, rgba(0, 0, 0, 0.08)),
+              var(--reka-shadow-halo-primary);
+}
+
+/* 7. disabled — 整体降透明度 */
+.reka-radio:disabled {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+.reka-radio:disabled[data-state='checked'] .reka-radio__circle {
+  filter: var(--reka-disabled-filter);
+}
+
+/* 8. label — 对标 Apple HIG：常态次要文本（微透），hover/active 恢复主要文本（不透）。
+   opacity 方案：不依赖色值，浅色/深色模式都生效，无布局位移。 */
+.reka-radio__label {
+  font-size: var(--text-base);  /* 14px 标准表单字号 */
+  line-height: 1;
+  transition: opacity var(--transition-bg);
+}
+.reka-radio:not(:disabled):hover .reka-radio__label,
+.reka-radio:not(:disabled):active .reka-radio__label {
+  opacity: 0.8;
+}
+
+/* 9. radio__circle::after — 内点（对标 Radix ::after），40% 尺寸，弹簧缩放入场。
+   时序设计：checked 时延迟 60ms（等外圈变色完成再弹出），unchecked 时无延迟（即时收缩）。 */
+.reka-radio__circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background-color: white;
+  transform: translate(-50%, -50%) scale(0);
+  /* unchecked 收缩：无延迟，即时响应 */
+  transition: transform var(--transition-switch);
+}
+.reka-radio[data-state='checked'] .reka-radio__circle::after {
+  transform: translate(-50%, -50%) scale(1);
+  /* checked 弹出：60ms 延迟，等外圈变色完成 */
+  transition: transform var(--transition-switch) 60ms;
+}
+
+/* ============================================================
+ * Radio 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+
+:root[data-theme='dark'] .reka-radio__circle,
+.dark .reka-radio__circle {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.03),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+
+:root[data-theme='dark'] .reka-radio[data-state='checked'] .reka-radio__circle,
+.dark .reka-radio[data-state='checked'] .reka-radio__circle {
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(255, 255, 255, 0.06));
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-radio__circle {
+    border: 1px solid ButtonText;
+  }
+  .reka-radio[data-state='checked'] .reka-radio__circle {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+  .reka-radio__circle::after {
+    background-color: HighlightText;
+  }
+}

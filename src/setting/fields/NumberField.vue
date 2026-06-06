@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import SettingFormItem from '@/setting/components/SettingFormItem.vue'
 
 const props = withDefaults(
@@ -23,15 +24,14 @@ const modelValue = defineModel<number>({ required: true })
 <template>
   <SettingFormItem :label="label">
     <div class="slider-input">
-      <NSlider
+      <NTSlider
         v-if="props.showSlider"
         v-model:value="modelValue"
         :step="props.step"
         :min="props.min"
         :max="props.max"
-        :tooltip="false"
       />
-      <NInputNumber
+      <NTInputNumber
         v-model:value="modelValue"
         class="setting__num-input"
         size="small"

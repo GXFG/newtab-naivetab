@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { NSwitch } from 'naive-ui'
 import SettingFormItem from '@/setting/components/SettingFormItem.vue'
+import NTSwitch from '@/components/ui/NTSwitch.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -36,11 +36,9 @@ const modelValue = defineModel<boolean>({ required: true })
         <slot name="extra" />
       </div>
     </Transition>
-    <NSwitch
-      :value="modelValue"
-      size="small"
+    <NTSwitch
+      v-model:value="modelValue"
       :disabled="disabled"
-      @update:value="modelValue = $event"
     />
   </SettingFormItem>
 </template>

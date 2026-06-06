@@ -275,7 +275,6 @@ const onHandleInputBlur = () => {
 <template>
   <BrowserBookmarkPicker
     v-model:show="bookmarkState.isBookmarkModalVisible"
-    width="60%"
     @select="onHandleSelectBookmark"
   />
 
@@ -332,7 +331,7 @@ const onHandleInputBlur = () => {
         <div class="form__config">
           <!-- URL/名称输入（popup 失焦时同步，newtab 不触发同步） -->
           <div class="form__field form__field--url">
-            <NInput
+            <NTInput
               size="small"
               :value="getCurrKeymapUrl()"
               :placeholder="$t('keyboardCommon.urlLabel')"
@@ -345,7 +344,7 @@ const onHandleInputBlur = () => {
           </div>
 
           <div class="form__field form__field--name">
-            <NInput
+            <NTInput
               size="small"
               :value="getCurrKeymapName()"
               :placeholder="
@@ -364,67 +363,64 @@ const onHandleInputBlur = () => {
           <div class="form__field form__field--actions">
             <!-- 填入当前标签页 URL（仅在拿到有效 http/https URL 时显示） -->
             <template v-if="pendingUrl">
-              <NPopconfirm
+              <NTPopconfirm
                 v-if="isOverwritingUrl"
                 @positive-click="onHandleApplyCurrentTabUrl"
               >
                 <template #trigger>
-                  <NButton
-                    quaternary
+                  <NTButton
+                    variant="ghost"
                     size="small"
-                    class="setting__btn"
                   >
                     <Icon
                       :icon="ICONS.currentLocation"
                       class="btn__icon"
                     />
-                  </NButton>
+                  </NTButton>
                 </template>
                 {{ $t('generalSetting.overwriteUrlConfirm') }}
-              </NPopconfirm>
-              <NButton
+              </NTPopconfirm>
+              <NTButton
                 v-else
-                quaternary
+                variant="ghost"
                 size="small"
-                class="setting__btn"
                 @click="onHandleApplyCurrentTabUrl"
               >
                 <Icon
                   :icon="ICONS.currentLocation"
                   class="btn__icon"
                 />
-              </NButton>
+              </NTButton>
             </template>
 
-            <NButton
-              quaternary
+            <NTButton
+              variant="ghost"
               size="small"
-              class="action-btn"
               @click="onOpenBookmarkPicker()"
             >
               <Icon
                 :icon="ICONS.bookmarkPlus"
                 class="btn__icon"
               />
-            </NButton>
+            </NTButton>
 
-            <NPopconfirm @positive-click="onHandleDeleteKey">
+            <NTPopconfirm @positive-click="onHandleDeleteKey">
               <template #trigger>
-                <NButton
-                  quaternary
+                <NTButton
+                  type="error"
+                  variant="ghost"
                   size="small"
-                  class="action-btn"
                   :disabled="
                     !bookmarkState.keyCode ||
                     !getBookmarkConfigUrl(bookmarkState.keyCode)
                   "
                 >
                   <Icon :icon="ICONS.deleteBin" />
-                </NButton>
+                </NTButton>
               </template>
               {{ $t('common.delete') }}
               {{ getCustomLabel(bookmarkState.keyCode) }}？
-            </NPopconfirm>
+            </NTPopconfirm>
           </div>
         </div>
       </template>
@@ -480,46 +476,38 @@ const onHandleInputBlur = () => {
         display: flex;
         flex-direction: column;
         gap: 6px;
-
-        .setting__btn {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          border-radius: var(--radius-md);
-
-          .btn__icon {
-            font-size: 16px;
-          }
+        .btn__icon {
+          font-size: 16px;
         }
       }
-
-      .form__field--url {
-        flex: 1;
-        min-width: 0;
-      }
-
-      .form__field--name {
-        flex: 0 0 auto;
-        width: 140px;
-      }
-
-      .form__field--actions {
-        flex-direction: row;
-        flex: 0 0 auto;
-        align-self: flex-end;
-        display: flex;
-        gap: 2px;
-      }
     }
 
-    .form__placeholder {
+    .form__field--url {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .form__field--name {
+      flex: 0 0 auto;
+      width: 140px;
+    }
+
+    .form__field--actions {
+      flex-direction: row;
+      flex: 0 0 auto;
+      align-self: flex-end;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--n-text-color-3);
-      font-size: 13px;
-      user-select: none;
+      gap: 2px;
     }
+  }
+
+  .form__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--nt-text-tertiary);
+    font-size: 13px;
+    user-select: none;
   }
 }
 </style>

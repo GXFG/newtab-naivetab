@@ -1,0 +1,187 @@
+/* ============================================================
+ * Reka UI 新组件 CSS 模板
+ *
+ * ⚠️ 不参与编译，禁止 @import。
+ *    使用时复制内容到 src/styles/reka/{name}.css → 填空。
+ *
+ * 同步规则：
+ *   - 改 src/styles/reka/ 中的实际组件 → 检查此模板是否需要更新
+ *   - 改此模板 → 检查已有组件是否需要回补
+ *
+ * 使用方式：
+ *   1. 全局替换 {name} → 组件名（如 radio、toggle、slider）
+ *   2. 设 --{name}-size 为组件尺寸
+ *   3. 替换 /* TODO */ 占位符为具体值
+ *   4. 删除不需要的状态块（如 loading、label）
+ *
+ * ⚠️ 关键规则（遗漏会导致 bug）：
+ *   - 所有 :hover 必须带 :not(:disabled)
+ *   - 所有 :active 必须带 :not(:disabled)
+ *   - all:unset 后第一行设 display
+ *   - 每个 rgba(0,0,0,...) 阴影都要有深色模式 white channel 覆盖
+ *   - 禁止 v-bind() 在 style 中动态绑定，用 :style + computed + var() 替代
+ *   - 文字颜色不设 color，继承页面标准色；纯白标签除外
+ * ============================================================ */
+
+/* ============================================================
+ * {Name} 组件样式
+ *
+ * 状态覆盖：base → hover → active → focus-visible → checked → disabled → loading
+ *
+ * 设计意图：
+ *   base     → 尺寸 + 凹槽内阴影（原则1：立体层次）
+ *   hover    → 底色深一档 + 外侧微光环（原则1：层次递进）
+ *   active   → 仅指示器形变，容器不动（原则2：局部反馈）
+ *   checked  → 主题色微渐变 + 指示器阴影染色（原则3+4：光着色+通透）
+ *   disabled → 整体降透明度 + checked 用 filter 保色
+ *   loading  → 指示器脉冲动画（按需）
+ *   dark     → 内阴影换白色通道 + 指示器降纯（原则5：双模式自适应）
+ * ============================================================ */
+
+/* ---- 1. base — 尺寸 + 凹槽内阴影 ---- */
+.reka-{name} {
+  /* 几何变量（对标 Radix Themes 变量链） */
+  --{name}-size: /* TODO: 尺寸 */;
+
+  /* 3 条必须属性（所有 Reka 组件通用） */
+  all: unset;
+  display: inline-block;       /* ① 覆盖 all:unset 的 display:inline */
+  outline: none;               /* ② 禁止浏览器默认 focus outline */
+  box-sizing: border-box;      /* ③ border 含在宽高内 */
+
+  /* flex-shrink: 0; — 固定尺寸控件（Switch/Checkbox/Radio）使用；
+                         弹性宽度控件（Slider）不设 */
+  position: relative;
+  width: var(--{name}-size);
+  height: var(--{name}-size);
+  border-radius: var(--radius-pill);
+  background-color: /* TODO: 未选中底色 */;
+  border: var(--reka-border-width) solid /* TODO: 未选中边框色 */;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  transition: background-color var(--transition-bg),
+              box-shadow var(--transition-shadow);
+  cursor: var(--reka-cursor-interactive);
+}
+
+/* ---- 2. hover — 底色微深 + 外侧微光环（必须 :not(:disabled)） ---- */
+.reka-{name}:not(:disabled):hover {
+  background-color: /* TODO: hover 底色 */;
+  box-shadow: /* 继承 base 内阴影 + 外侧光环 */;
+}
+
+/* ---- 3. active — 仅指示器形变，容器不动（必须 :not(:disabled)） ---- */
+.reka-{name}:not(:disabled):active {
+  /* TODO: 容器底色微调 */
+}
+.reka-{name}:not(:disabled):active .reka-{name}__indicator {
+  /* TODO: 指示器微扩/微缩 */
+}
+
+/* ---- 4. focus-visible — 使用通用 .reka-focus-visible class（自动引用 --reka-focus-ring） ---- */
+
+/* ---- 5. checked — 主题色微渐变 + 指示器阴影染色 ---- */
+.reka-{name}[data-state='checked'] {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--nt-primary-color) 92%, white) 0%,
+    color-mix(in srgb, var(--nt-primary-color) 100%, black) 100%
+  );
+  box-shadow: /* TODO: checked 阴影 */;
+}
+.reka-{name}[data-state='checked'] .reka-{name}__indicator {
+  /* 指示器选中态：阴影染主题色（原则3：环境光着色） */
+  box-shadow: /* TODO: color-mix(in srgb, var(--nt-primary-color) 30%, ...) */;
+}
+
+/* ---- 6. checked + hover — 主题色微暗 + 光环（必须 :not(:disabled)） ---- */
+.reka-{name}[data-state='checked']:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 85%, black);
+  box-shadow: /* 继承 checked 阴影 + 主题色光环 */;
+}
+
+/* ---- 7. disabled — 整体降透明度 + checked 用 filter 保色 ---- */
+.reka-{name}:disabled {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+.reka-{name}:disabled[data-state='checked'] {
+  filter: var(--reka-disabled-filter);
+}
+
+/* ---- 8. loading — 指示器脉冲动画（按需） ---- */
+.reka-{name}[data-loading] {
+  cursor: var(--reka-cursor-disabled);
+}
+.reka-{name}[data-loading] .reka-{name}__indicator {
+  animation: reka-{name}-loading-pulse 1.2s ease-in-out infinite;
+}
+@keyframes reka-{name}-loading-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---- 子元素：指示器 ---- */
+.reka-{name}__indicator {
+  all: unset;
+  display: block;
+  /* TODO: 尺寸、颜色、阴影、transition */
+}
+
+/* ---- 子元素：文本标签（如有，对标 Apple HIG opacity 次要→主要） ---- */
+.reka-{name}__label {
+  font-size: var(--text-base);
+  line-height: 1;
+  opacity: 0.85;
+  transition: opacity var(--transition-bg);
+}
+.reka-{name}:not(:disabled):hover .reka-{name}__label,
+.reka-{name}:not(:disabled):active .reka-{name}__label {
+  opacity: 1;
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ *
+ * 核心规则：浅色用黑半透阴影，深色用白半透阴影。
+ *   每个 rgba(0,0,0,...) 都要在此处写对应的 rgba(255,255,255,...)
+ * ============================================================ */
+
+/* 容器内阴影 → white channel */
+:root[data-theme='dark'] .reka-{name},
+.dark .reka-{name} {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.04),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+}
+
+/* checked 阴影 → white channel */
+:root[data-theme='dark'] .reka-{name}[data-state='checked'],
+.dark .reka-{name}[data-state='checked'] {
+  box-shadow: /* TODO: white channel checked 阴影 */;
+}
+
+/* 指示器降纯 + 阴影换 white channel */
+:root[data-theme='dark'] .reka-{name}__indicator,
+.dark .reka-{name}__indicator {
+  background-color: #f0f0f0;
+  box-shadow: /* TODO: white channel 阴影 */;
+}
+
+/* ============================================================
+ * 强制色彩模式（对标 Radix Themes）
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-{name} {
+    border: 1px solid ButtonText;
+  }
+  .reka-{name}[data-state='checked'] {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+  .reka-{name}__indicator {
+    background-color: ButtonFace;
+  }
+  .reka-{name}[data-state='checked'] .reka-{name}__indicator {
+    background-color: HighlightText;
+  }
+}

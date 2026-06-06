@@ -297,6 +297,13 @@ export const handleAppUpdate = (localVersion?: string) => {
   if (compareLeftVersionLessThanRightVersions(version, '2.5.0')) {
     localConfig.keyboardCommon.nameplates = []
   }
+  if (compareLeftVersionLessThanRightVersions(version, '2.5.2')) {
+    localConfig.keyboardBookmark.isEnabled =
+      (localConfig.keyboardBookmark as any).isEnabled ?? true
+    localConfig.keyboardCommand.isGlobalShortcutEnabled =
+      (localConfig.keyboardCommand as any).isGlobalShortcutEnabled ?? true
+    localConfig.memo.padding = defaultConfig.memo.padding
+  }
 
   // 更新local版本号
   localConfig.general.version = window.appVersion

@@ -32,19 +32,18 @@ const beginsList = computed(() => [
       :icon="ICONS.settings"
     >
       <SettingFormItem :label="$t('calendar.weekBeginsOn')">
-        <NRadioGroup
+        <NTRadioGroup
           v-model:value="localConfig.calendar.weekBeginsOn"
-          size="small"
           direction="horizontal"
         >
-          <NRadio
+          <NTRadio
             v-for="item in beginsList"
             :key="item.value"
             :value="item.value"
           >
             {{ item.label }}
-          </NRadio>
-        </NRadioGroup>
+          </NTRadio>
+        </NTRadioGroup>
       </SettingFormItem>
 
       <SwitchField

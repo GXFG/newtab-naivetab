@@ -24,7 +24,6 @@ import BaseBookmarkLayerTabSwitcher from '@/components/BaseBookmarkLayerTabSwitc
 import BrowserBookmarkPicker from '@/components/BrowserBookmarkPicker.vue'
 import GlobalShortcutRecorder from '@/components/GlobalShortcutRecorder.vue'
 import UrlBlacklistInput from '@/components/UrlBlacklistInput.vue'
-import { NRadioGroup, NButton } from 'naive-ui'
 import {
   SettingHeaderBar,
   SettingFormWrap,
@@ -213,6 +212,23 @@ const handleCreateLayerFolders = async () => {
 /**
  * 导出书签到浏览器
  */
+/** NTPopconfirm 显示状态——文件夹已存在时需用户确认 */
+const showExportConfirm = ref(false)
+
+/** 导出确认提示内容 */
+const exportConfirmContent = computed(() => {
+  const exportPath = `${KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER}/layer1`
+  return (
+    window
+      .$t('keyboardBookmark.exportFolderExists')
+      .replace('__folder__', exportPath) +
+    '\n' +
+    window
+      .$t('keyboardBookmark.exportClearConfirm')
+      .replace('__folder__', exportPath)
+  )
+})
+
 const handleExportToBrowser = async () => {
   const keymap = localConfig.keyboardBookmark.keymap
 
@@ -229,29 +245,14 @@ const handleExportToBrowser = async () => {
   const existingFolder = findFolderByPath(tree, `${EXPORT_FOLDER_PATH}/layer1`)
 
   if (existingFolder && existingFolder.children?.length) {
-    const exportPath = `${KEYBOARD_BOOKMARK_TOP_LEVEL_FOLDER}/layer1`
-    const dialogContent =
-      window
-        .$t('keyboardBookmark.exportFolderExists')
-        .replace('__folder__', exportPath) +
-      '\n' +
-      window
-        .$t('keyboardBookmark.exportClearConfirm')
-        .replace('__folder__', exportPath)
-
-    window.$dialog.create({
-      title: window.$t('keyboardBookmark.exportFolderExistsTitle'),
-      content: dialogContent,
-      positiveText: window.$t('keyboardBookmark.exportClearAndRebuild'),
-      negativeText: window.$t('keyboardBookmark.exportCancel'),
-      onPositiveClick: () => doExport(keymap),
-    })
+    showExportConfirm.value = true
   } else {
     await doExport(keymap)
   }
 }
 
 const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
+  showExportConfirm.value = false
   try {
     const count = Object.values(keymap).filter((e) => e?.url).length
     await exportKeymapToBrowser(keymap)
@@ -280,20 +281,19 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
         :label="$t('keyboardBookmark.bookmarkSource')"
         :tip-content="$t('keyboardBookmark.bookmarkSourceTips')"
       >
-        <NRadioGroup
+        <NTRadioGroup
           v-model:value="localConfig.keyboardBookmark.source"
-          size="small"
           direction="horizontal"
           @update:value="handleBookmarkSourceChange"
         >
-          <NRadio
+          <NTRadio
             v-for="item in bookmarkSourceList"
             :key="item.value"
             :value="item.value"
           >
             {{ item.label }}
-          </NRadio>
-        </NRadioGroup>
+          </NTRadio>
+        </NTRadioGroup>
       </SettingFormItem>
 
       <SettingFormItem
@@ -307,14 +307,14 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
           />
           {{ $t('keyboardBookmark.browserBookmarkSuggestion') }}
         </span>
-        <NButton
+        <NTButton
           size="tiny"
-          secondary
+          variant="secondary"
           round
           @click="handleSwitchToBrowserBookmark"
         >
           {{ $t('keyboardBookmark.switchToBrowser') }}
-        </NButton>
+        </NTButton>
       </SettingFormItem>
 
       <SwitchField
@@ -329,17 +329,38 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
           :label="$t('keyboardBookmark.exportToBrowserBookmark')"
           :tip-content="$t('keyboardBookmark.exportToBrowserBookmarkDesc')"
         >
-          <NButton
-            class="setting__btn setting__btn--primary"
+          <NTPopconfirm
+            v-if="showExportConfirm"
+            :show="true"
+            :positive-text="$t('keyboardBookmark.exportClearAndRebuild')"
+            :negative-text="$t('keyboardBookmark.exportCancel')"
+            @positive-click="doExport(localConfig.keyboardBookmark.keymap)"
+            @negative-click="showExportConfirm = false"
+          >
+            <template #trigger>
+              <NTButton
+                type="primary"
+                size="tiny"
+                variant="secondary"
+                round
+              >
+                <Icon :icon="ICONS.exportFile" />
+                {{ $t('common.export') }}
+              </NTButton>
+            </template>
+            {{ exportConfirmContent }}
+          </NTPopconfirm>
+          <NTButton
+            v-else
             type="primary"
             size="tiny"
-            secondary
+            variant="secondary"
             round
             @click="handleExportToBrowser"
           >
             <Icon :icon="ICONS.exportFile" />
             {{ $t('common.export') }}
-          </NButton>
+          </NTButton>
         </SettingFormItem>
       </template>
     </SettingFormSection>
@@ -354,17 +375,16 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
         :tip-content="$t('keyboardBookmark.layerFoldersTip')"
       >
         <SettingFormItem v-if="showCreateLayerButton">
-          <NButton
-            class="setting__btn setting__btn--primary"
+          <NTButton
             type="primary"
             size="tiny"
-            secondary
+            variant="secondary"
             round
             @click="handleCreateLayerFolders"
           >
             <Icon :icon="ICONS.add" />
             {{ $t('keyboardBookmark.createLayerFolders') }}
-          </NButton>
+          </NTButton>
         </SettingFormItem>
 
         <template
@@ -392,14 +412,14 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
                   {{ $t('keyboardBookmark.notConfigured') }}
                 </span>
               </span>
-              <NButton
+              <NTButton
                 size="small"
-                text
+                variant="text"
                 :disabled="!layer.sourceFolderPath"
                 @click="onClearLayerFolder(idx)"
               >
                 <Icon :icon="ICONS.closeCircleLine" />
-              </NButton>
+              </NTButton>
             </SettingFormItem>
             <SettingFormItem
               v-if="idx + 1 < localConfig.keyboardBookmark.layers.length"
@@ -434,16 +454,16 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
                   {{ $t('keyboardBookmark.notConfigured') }}
                 </span>
               </span>
-              <NButton
+              <NTButton
                 size="small"
-                text
+                variant="text"
                 :disabled="
                   !localConfig.keyboardBookmark.layers[idx + 1].sourceFolderPath
                 "
                 @click="onClearLayerFolder(idx + 1)"
               >
                 <Icon :icon="ICONS.closeCircleLine" />
-              </NButton>
+              </NTButton>
             </SettingFormItem>
           </SettingFormInlineRow>
         </template>
@@ -456,12 +476,17 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
       :icon="ICONS.keyboardCmdKey"
     >
       <SwitchField
-        v-model="localConfig.keyboardBookmark.isGlobalShortcutEnabled"
-        :label="$t('keyboardBookmark.listenBackgroundKeystrokes')"
-        :tip-content="$t('keyboardBookmark.shortcutNote')"
+        v-model="localConfig.keyboardBookmark.isEnabled"
+        :label="$t('keyboardBookmark.enableShortcut')"
       />
 
-      <template v-if="localConfig.keyboardBookmark.isGlobalShortcutEnabled">
+      <template v-if="localConfig.keyboardBookmark.isEnabled">
+        <SwitchField
+          v-model="localConfig.keyboardBookmark.isGlobalShortcutEnabled"
+          :label="$t('keyboardBookmark.listenBackgroundKeystrokes')"
+          :tip-content="$t('keyboardBookmark.shortcutNote')"
+        />
+
         <SwitchField
           v-model="localConfig.keyboardBookmark.shortcutInInputElement"
           :label="$t('keyboardBookmark.shortcutInInputElement')"
@@ -506,6 +531,7 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
       </div>
       <BaseSystemBookmarkManager :base-size="keyboardBaseSize" />
     </template>
+
     <BaseNaiveBookmarkManager
       v-if="localConfig.keyboardBookmark.source === BookmarkSource.INTERNAL"
       :base-size="keyboardBaseSize"
@@ -559,7 +585,7 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
   display: inline-flex;
   align-items: center;
   font-size: 14px;
-  color: var(--n-text-color);
+  color: var(--nt-text-primary);
   flex: 1;
   min-width: 0;
   cursor: pointer;
@@ -569,17 +595,17 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
 }
 
 .layer-folder-name:hover {
-  background-color: var(--gray-alpha-10);
-  color: var(--n-text-color-hover, var(--n-text-color));
+  background-color: var(--nt-gray-light);
+  color: var(--nt-text-primary);
 }
 
 .layer-folder-name:active {
   transform: scale(0.98);
-  background-color: var(--gray-alpha-12);
+  background-color: var(--nt-gray-light);
 }
 
 .layer-folder-name--placeholder {
-  color: var(--gray-alpha-09);
+  color: var(--nt-text-tertiary);
 }
 
 .layer-switcher-wrap {

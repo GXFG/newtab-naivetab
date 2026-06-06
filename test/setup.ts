@@ -138,7 +138,6 @@ globalThis.window.$notification = {
   success: vi.fn(),
 } as any
 
-globalThis.window.$dialog = {} as any
 globalThis.window.$loadingBar = {} as any
 
 // ── Browser API Polyfills ──

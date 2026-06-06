@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { RecycleScroller } from 'vue-virtual-scroller'
-import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import { useVirtualList } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
+import NTSwitch from '@/components/ui/NTSwitch.vue'
+import NTTabs from '@/components/ui/NTTabs.vue'
+import NTTabsPane from '@/components/ui/NTTabsPane.vue'
+import NTDrawer from '@/components/ui/NTDrawer.vue'
 import { ICONS } from '@/logic/constants/icons'
 import {
   LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M,
@@ -128,6 +131,18 @@ const onCloseModal = () => {
   emit('update:show', false)
 }
 
+/** NTDrawer 双向绑定桥梁：ref 同步 props.show，关闭时 emit */
+const drawerOpen = ref(props.show)
+watch(
+  () => props.show,
+  (val) => {
+    drawerOpen.value = val
+  },
+)
+watch(drawerOpen, (val) => {
+  if (!val) onCloseModal()
+})
+
 const backgroundImageSourceList = computed(() => [
   { label: window.$t('common.local'), value: BACKGROUND_IMAGE_SOURCE.LOCAL },
   {
@@ -223,6 +238,32 @@ const handleBackgroundImageCustomUrlBlur = () => {
   }
 }
 
+const tabSources = computed(() => Object.keys(previewImageListMap.value))
+const activeTabSource = ref(tabSources.value[0] || '')
+
+// 同步 activeTabSource：当 previewImageListMap 首次加载完成时自动选中第一个 tab
+watch(tabSources, (sources) => {
+  if (sources.length > 0 && !activeTabSource.value) {
+    activeTabSource.value = sources[0]
+  }
+})
+
+const activeChunkedList = computed(() => {
+  return chunkedPreviewMap.value[activeTabSource.value] ?? []
+})
+
+const {
+  list: virtualRows,
+  containerProps,
+  wrapperProps,
+  scrollTo,
+} = useVirtualList(activeChunkedList, { itemHeight: 110 })
+
+// 切换 tab 时滚动回顶部
+watch(activeTabSource, () => {
+  scrollTo(0)
+})
+
 const isPexelsLoadingMore = ref(false)
 
 const loadMorePexels = async () => {
@@ -249,228 +290,214 @@ const loadMorePexels = async () => {
 
 <template>
   <!-- BackgroundDrawer: bing & favorite -->
-  <NDrawer
-    :show="props.show"
+  <NTDrawer
+    v-model:open="drawerOpen"
     :width="SECOND_MODAL_WIDTH"
     :height="350"
     :placement="localConfig.general.drawerPlacement"
-    show-mask="transparent"
-    to="#background__drawer"
-    @update:show="onCloseModal()"
+    :title="$t('generalSetting.selectBackgroundImageLabel')"
+    closable
   >
-    <NDrawerContent
-      :title="$t('generalSetting.selectBackgroundImageLabel')"
-      closable
-    >
-      <div class="drawer__content">
-        <!-- current -->
-        <div class="content__config-section">
-          <div class="content__config">
-            <SettingFormSection
-              :title="$t('keyboardCommon.backgroundPicker')"
-              :icon="ICONS.imageSquare"
+    <div class="drawer__content">
+      <!-- current -->
+      <SettingFormSection
+        :title="$t('keyboardCommon.backgroundPicker')"
+        :icon="ICONS.imageSquare"
+      >
+        <!-- origin -->
+        <SettingFormItem :label="$t('common.origin')">
+          <NTRadioGroup
+            v-model:value="localConfig.general.backgroundImageSource"
+            direction="horizontal"
+          >
+            <NTRadio
+              v-for="item in backgroundImageSourceList"
+              :key="item.value"
+              :value="item.value"
             >
-              <!-- origin -->
-              <SettingFormItem :label="$t('common.origin')">
-                <NRadioGroup
-                  v-model:value="localConfig.general.backgroundImageSource"
-                  size="small"
-                  direction="horizontal"
-                >
-                  <NRadio
-                    v-for="item in backgroundImageSourceList"
-                    :key="item.value"
-                    :value="item.value"
-                  >
-                    {{ item.label }}
-                  </NRadio>
-                </NRadioGroup>
-              </SettingFormItem>
+              {{ item.label }}
+            </NTRadio>
+          </NTRadioGroup>
+        </SettingFormItem>
 
-              <!-- local -->
-              <SettingFormItem
-                v-if="
-                  localConfig.general.backgroundImageSource ===
-                  BACKGROUND_IMAGE_SOURCE.LOCAL
-                "
-                :label="$t('common.select')"
-                :tip-content="$t('generalSetting.localBackgroundTips')"
-              >
-                <div class="form__local">
-                  <p
-                    v-if="imageState.currBackgroundImageFileName"
-                    class="local__filename"
-                  >
-                    <Icon
-                      :icon="ICONS.imageSquare"
-                      class="filename__icon"
-                    />
-                    <span class="filename__text">
-                      {{ imageState.currBackgroundImageFileName }}
-                    </span>
-                  </p>
-                  <NButton
-                    type="primary"
-                    size="tiny"
-                    secondary
-                    class="setting__btn setting__btn--primary"
-                    @click="onSelectBackgroundImage"
-                  >
-                    <template #icon>
-                      <Icon :icon="ICONS.importFile" />
-                    </template>
-                    {{ $t('common.import') }}
-                  </NButton>
-                  <input
-                    ref="bgImageFileInputEl"
-                    style="display: none"
-                    type="file"
-                    accept="image/*"
-                    @change="onBackgroundImageFileChange"
-                  />
-                </div>
-              </SettingFormItem>
-
-              <!-- network -->
-              <template
-                v-else-if="
-                  localConfig.general.backgroundImageSource ===
-                  BACKGROUND_IMAGE_SOURCE.NETWORK
-                "
-              >
-                <SettingFormItem :label="$t('common.custom')">
-                  <NSwitch
-                    v-model:value="
-                      localConfig.general.isBackgroundImageCustomUrlEnabled
-                    "
-                    size="small"
-                    @update:value="handleCustomUrlUpdate"
-                  />
-                </SettingFormItem>
-                <SettingFormItem
-                  v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
-                  label="URL"
-                >
-                  <!-- URL 协议前缀为通用格式，无需 i18n -->
-                  <NInput
-                    v-model:value="
-                      localConfig.general.backgroundImageCustomUrls[
-                        localState.currAppearanceCode
-                      ]
-                    "
-                    class="setting__fill-input"
-                    type="text"
-                    placeholder="https://"
-                    @blur="handleBackgroundImageCustomUrlBlur"
-                  />
-                </SettingFormItem>
-              </template>
-              <!-- 网络（未开启自定义），每日一图时展示 -->
-              <SettingFormItem
-                v-if="
-                  localConfig.general.backgroundImageSource !==
-                    BACKGROUND_IMAGE_SOURCE.LOCAL &&
-                  !localConfig.general.isBackgroundImageCustomUrlEnabled
-                "
-                :label="$t('common.uhd')"
-              >
-                <NSwitch
-                  v-model:value="localConfig.general.backgroundImageHighQuality"
-                  size="small"
-                />
-              </SettingFormItem>
-
-              <!-- 当前背景图 -->
-              <SettingFormItem
-                :label="$t('generalSetting.currentBackgroundImageLabel')"
-              >
-                <div class="current__image">
-                  <NSpin :show="isImageLoading">
-                    <BackgroundDrawerImageElement
-                      :lazy="false"
-                      :data="{
-                        url: currentBackgroundPreviewUrl,
-                      }"
-                    />
-                  </NSpin>
-                </div>
-              </SettingFormItem>
-            </SettingFormSection>
-          </div>
-        </div>
-
-        <!-- list 仅来源为网络 且 非定制Url时展示 -->
-        <NSpin
+        <!-- local -->
+        <SettingFormItem
           v-if="
             localConfig.general.backgroundImageSource ===
-              BACKGROUND_IMAGE_SOURCE.NETWORK &&
+            BACKGROUND_IMAGE_SOURCE.LOCAL
+          "
+          :label="$t('common.select')"
+          :tip-content="$t('generalSetting.localBackgroundTips')"
+        >
+          <div class="form__local">
+            <p
+              v-if="imageState.currBackgroundImageFileName"
+              class="local__filename"
+            >
+              <Icon
+                :icon="ICONS.imageSquare"
+                class="filename__icon"
+              />
+              <span class="filename__text">
+                {{ imageState.currBackgroundImageFileName }}
+              </span>
+            </p>
+            <NTButton
+              type="primary"
+              size="tiny"
+              variant="secondary"
+              @click="onSelectBackgroundImage"
+            >
+              <Icon :icon="ICONS.importFile" />
+              {{ $t('common.import') }}
+            </NTButton>
+            <input
+              ref="bgImageFileInputEl"
+              style="display: none"
+              type="file"
+              accept="image/*"
+              @change="onBackgroundImageFileChange"
+            />
+          </div>
+        </SettingFormItem>
+
+        <!-- network -->
+        <template
+          v-else-if="
+            localConfig.general.backgroundImageSource ===
+            BACKGROUND_IMAGE_SOURCE.NETWORK
+          "
+        >
+          <SettingFormItem :label="$t('common.custom')">
+            <NTSwitch
+              v-model:value="
+                localConfig.general.isBackgroundImageCustomUrlEnabled
+              "
+              @update:value="handleCustomUrlUpdate"
+            />
+          </SettingFormItem>
+          <SettingFormItem
+            v-if="localConfig.general.isBackgroundImageCustomUrlEnabled"
+            label="URL"
+          >
+            <!-- URL 协议前缀为通用格式，无需 i18n -->
+            <NTInput
+              v-model:value="
+                localConfig.general.backgroundImageCustomUrls[
+                  localState.currAppearanceCode
+                ]
+              "
+              class="setting__fill-input"
+              type="text"
+              placeholder="https://"
+              @blur="handleBackgroundImageCustomUrlBlur"
+            />
+          </SettingFormItem>
+        </template>
+        <!-- 网络（未开启自定义），每日一图时展示 -->
+        <SettingFormItem
+          v-if="
+            localConfig.general.backgroundImageSource !==
+              BACKGROUND_IMAGE_SOURCE.LOCAL &&
             !localConfig.general.isBackgroundImageCustomUrlEnabled
           "
-          :show="isImageGalleryLoading"
-          class="image-list__spin"
+          :label="$t('common.uhd')"
         >
-          <NTabs
-            type="line"
-            animated
-          >
-            <NTabPane
-              v-for="source of Object.keys(previewImageListMap)"
-              :key="source"
-              :tab="$t(`common.${source}`)"
-              :name="source"
+          <NTSwitch
+            v-model:value="localConfig.general.backgroundImageHighQuality"
+          />
+        </SettingFormItem>
+
+        <!-- 当前背景图 -->
+        <SettingFormItem
+          :label="$t('generalSetting.currentBackgroundImageLabel')"
+        >
+          <div class="current__image">
+            <BackgroundDrawerImageElement
+              :loading="isImageLoading"
+              :lazy="false"
+              :data="{
+                url: currentBackgroundPreviewUrl,
+              }"
+            />
+          </div>
+        </SettingFormItem>
+      </SettingFormSection>
+
+      <!-- list 仅来源为网络 且 非定制Url时展示 -->
+      <NTSpin
+        v-if="
+          localConfig.general.backgroundImageSource ===
+            BACKGROUND_IMAGE_SOURCE.NETWORK &&
+          !localConfig.general.isBackgroundImageCustomUrlEnabled
+        "
+        :show="isImageGalleryLoading"
+        class="image-list__spin"
+      >
+        <NTTabs
+          v-model:value="activeTabSource"
+          animated
+        >
+          <NTTabsPane
+            v-for="source of tabSources"
+            :key="source"
+            :tab="$t(`common.${source}`)"
+            :name="source"
+          />
+        </NTTabs>
+
+        <div
+          v-bind="containerProps"
+          class="picker__images"
+        >
+          <div v-bind="wrapperProps">
+            <div
+              v-for="{ data: row } in virtualRows"
+              :key="row.key"
             >
-              <div class="tab__wrap">
-                <RecycleScroller
-                  v-slot="{ item: row }"
-                  class="picker__images"
-                  :items="chunkedPreviewMap[source]"
-                  :item-size="100"
-                  key-field="key"
+              <div
+                v-if="row.isLoadMore"
+                class="pexels__load-more"
+              >
+                <NTButton
+                  type="primary"
+                  size="tiny"
+                  variant="secondary"
+                  round
+                  :loading="isPexelsLoadingMore"
+                  :disabled="(imageLocalState.pexels.currentPage || 1) > 100"
+                  @click="loadMorePexels"
                 >
-                  <div
-                    v-if="row.isLoadMore"
-                    class="pexels__load-more"
-                  >
-                    <NButton
-                      size="tiny"
-                      round
-                      :loading="isPexelsLoadingMore"
-                      :disabled="
-                        (imageLocalState.pexels.currentPage || 1) > 100
-                      "
-                      @click="loadMorePexels"
-                    >
-                      {{
-                        (imageLocalState.pexels.currentPage || 1) > 100
-                          ? $t('common.loaded')
-                          : $t('common.loadMore')
-                      }}
-                    </NButton>
-                  </div>
-                  <div
-                    v-else
-                    class="image__row"
-                  >
-                    <div
-                      v-for="(item, colIdx) in row.items"
-                      :key="`${row.key}-${item.name}-${colIdx}`"
-                      class="image__item"
-                    >
-                      <BackgroundDrawerImageElement
-                        :data="item"
-                        select
-                        :delete="source === 'favorite'"
-                      />
-                    </div>
-                  </div>
-                </RecycleScroller>
+                  <Icon :icon="ICONS.add" />
+                  {{
+                    (imageLocalState.pexels.currentPage || 1) > 100
+                      ? $t('common.loaded')
+                      : $t('common.loadMore')
+                  }}
+                </NTButton>
               </div>
-            </NTabPane>
-          </NTabs>
-        </NSpin>
-      </div>
-    </NDrawerContent>
-  </NDrawer>
+              <div
+                v-else
+                class="image__row"
+              >
+                <div
+                  v-for="(item, colIdx) in row.items"
+                  :key="`${row.key}-${item.name}-${colIdx}`"
+                  class="image__item"
+                >
+                  <BackgroundDrawerImageElement
+                    :data="item"
+                    select
+                    :delete="activeTabSource === 'favorite'"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </NTSpin>
+    </div>
+  </NTDrawer>
 </template>
 
 <style>
@@ -478,29 +505,26 @@ const loadMorePexels = async () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: 15px;
 
-  .n-tabs {
+  .reka-tabs {
     display: flex;
     flex-direction: column;
     height: 100%;
 
-    .n-tabs-nav {
+    .reka-tabs__list {
       position: sticky;
       top: -17px;
       z-index: 1;
-      background-color: var(--n-tab-color-segment);
+      background-color: var(--nt-gray-minimal);
       flex-shrink: 0;
     }
 
-    .n-tabs-pane-wrapper {
+    .reka-tabs__panels {
       flex: 1;
       min-height: 0;
       overflow: hidden;
     }
-  }
-
-  .content__config-section {
-    display: flex;
   }
 
   .form__local {
@@ -508,22 +532,18 @@ const loadMorePexels = async () => {
     align-items: center;
     gap: 8px;
 
-    .setting__btn {
-      flex-shrink: 0;
-    }
-
     .local__filename {
       display: flex;
       align-items: center;
       gap: 5px;
       min-width: 0;
       flex: 1;
-      padding: 5px 10px;
+      padding: 3px 10px;
       border-radius: 5px;
-      background-color: var(--n-color-target);
-      border: 1px solid var(--n-border-color);
+      background-color: var(--nt-gray-minimal);
+      border: 1px solid var(--nt-gray-moderate);
       font-size: 12px;
-      color: var(--n-text-color-3);
+      color: var(--nt-text-tertiary);
       margin: 0;
       overflow: hidden;
 
@@ -540,15 +560,10 @@ const loadMorePexels = async () => {
     }
   }
 
-  .content__config {
-    margin-right: 18px;
-    flex: 1;
-  }
-
   .current__image {
     margin-top: 4px;
-    width: 200px;
-    min-height: 92px;
+    width: 150px;
+    min-height: 85px;
     border-radius: 6px;
     overflow: hidden;
   }
@@ -557,34 +572,33 @@ const loadMorePexels = async () => {
     flex: 1;
     margin-top: 4px;
     min-height: 0;
-    height: 0;
+    display: flex;
+    flex-direction: column;
 
-    .n-spin-content {
-      height: 100%;
+    .reka-tabs {
+      height: auto;
+      flex-shrink: 0;
     }
   }
 
   .picker__images {
-    /* 这里必须指定高度 */
-    height: calc(100vh - 320px);
-    .vue-recycle-scroller__item-view {
-      padding: 4px;
-    }
+    flex: 1;
+    min-height: 0;
+    margin-top: 8px;
+    overflow: auto;
+
     .image__row {
       display: flex;
       gap: 8px;
+      padding: 4px;
     }
     .image__item {
       flex: 0 0 calc((100% - 16px) / 3);
       aspect-ratio: 16 / 9;
       min-height: 70px;
+      overflow: hidden;
+      border-radius: 6px;
     }
-  }
-
-  .tab__wrap {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
   }
 
   .pexels__load-more {

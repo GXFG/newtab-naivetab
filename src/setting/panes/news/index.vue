@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
@@ -31,8 +32,10 @@ const allNewsSources = computed<NewsSourceItem[]>(() => [
   { label: window.$t('news.v2ex'), value: 'v2ex' },
 ])
 
-const isSourceSelected = (value: string) =>
-  (localConfig.news.sourceList as string[]).includes(value)
+/** 同步当前 tab 为列表第一个源，列表空时回退到 baidu */
+function syncCurrTab() {
+  state.currNewsTabValue = localConfig.news.sourceList[0] || 'baidu'
+}
 
 const toggleSource = (value: NewsSources) => {
   const list = localConfig.news.sourceList
@@ -42,33 +45,43 @@ const toggleSource = (value: NewsSources) => {
   } else {
     list.splice(idx, 1)
   }
-  state.currNewsTabValue = list[0] || 'baidu'
+  syncCurrTab()
 }
 
-const moveUp = (value: string) => {
-  const list = localConfig.news.sourceList as string[]
+const moveUp = (value: NewsSources) => {
+  const list = localConfig.news.sourceList
   const idx = list.indexOf(value)
   if (idx <= 0) return
   list.splice(idx - 1, 0, list.splice(idx, 1)[0])
+  syncCurrTab()
 }
 
-const moveDown = (value: string) => {
-  const list = localConfig.news.sourceList as string[]
+const moveDown = (value: NewsSources) => {
+  const list = localConfig.news.sourceList
   const idx = list.indexOf(value)
   if (idx === -1 || idx >= list.length - 1) return
   list.splice(idx + 1, 0, list.splice(idx, 1)[0])
+  syncCurrTab()
 }
 
-const selectedSources = computed<NewsSourceItem[]>(
-  () =>
-    (localConfig.news.sourceList as string[])
-      .map((v) => allNewsSources.value.find((s) => s.value === v))
-      .filter(Boolean) as NewsSourceItem[],
-)
-
-const unselectedSources = computed<NewsSourceItem[]>(() =>
-  allNewsSources.value.filter((s) => !isSourceSelected(s.value)),
-)
+/** 单一选择列表：已选源在前（sourceList顺序），未选源在后（默认顺序） */
+const allSourcesOrdered = computed(() => {
+  const sourceList = localConfig.news.sourceList as string[]
+  const selected = sourceList
+    .map((v, i) => {
+      const item = allNewsSources.value.find((s) => s.value === v)
+      return item
+        ? { ...item, selected: true as const, selectedIndex: i }
+        : null
+    })
+    .filter(Boolean)
+  const unselected = allNewsSources.value
+    .filter((s) => !sourceList.includes(s.value))
+    .map((s) => ({ ...s, selected: false as const, selectedIndex: -1 }))
+  return [...selected, ...unselected] as Array<
+    NewsSourceItem & { selected: boolean; selectedIndex: number }
+  >
+})
 </script>
 
 <template>
@@ -86,66 +99,51 @@ const unselectedSources = computed<NewsSourceItem[]>(() =>
       >
         <div class="news-source-sorter">
           <div
-            v-for="(item, index) in selectedSources"
+            v-for="item in allSourcesOrdered"
             :key="item.value"
-            class="sorter__item sorter__item--selected"
+            class="sorter__item"
+            :class="{ 'sorter__item--unselected': !item.selected }"
           >
-            <NCheckbox
-              :checked="true"
-              size="small"
-              @update:checked="toggleSource(item.value)"
+            <NTCheckbox
+              :value="item.selected"
+              @update:value="toggleSource(item.value)"
             />
             <span class="item__label">{{ item.label }}</span>
-            <div class="item__actions">
-              <NButton
-                quaternary
+            <div
+              v-if="item.selected"
+              class="item__actions"
+            >
+              <NTButton
+                variant="ghost"
                 size="tiny"
-                :disabled="index === 0"
+                :disabled="item.selectedIndex === 0"
                 @click="moveUp(item.value)"
               >
                 <Icon
                   :icon="ICONS.newsArrowUp"
                   class="action__icon"
                 />
-              </NButton>
-              <NButton
-                quaternary
+              </NTButton>
+              <NTButton
+                variant="ghost"
                 size="tiny"
-                :disabled="index === selectedSources.length - 1"
+                :disabled="
+                  item.selectedIndex === localConfig.news.sourceList.length - 1
+                "
                 @click="moveDown(item.value)"
               >
                 <Icon
                   :icon="ICONS.newsArrowDown"
                   class="action__icon"
                 />
-              </NButton>
+              </NTButton>
             </div>
-          </div>
-
-          <NDivider
-            v-if="selectedSources.length > 0 && unselectedSources.length > 0"
-            class="news-source-divider"
-          />
-
-          <div
-            v-for="item in unselectedSources"
-            :key="item.value"
-            class="sorter__item sorter__item--unselected"
-          >
-            <NCheckbox
-              :checked="false"
-              size="small"
-              @update:checked="toggleSource(item.value)"
-            />
-            <span class="item__label item__label--dimmed">{{
-              item.label
-            }}</span>
           </div>
         </div>
       </SettingFormItem>
 
       <SettingFormItem :label="$t('news.refreshInterval')">
-        <NInputNumber
+        <NTInputNumber
           v-model:value="localConfig.news.refreshIntervalTime"
           class="setting__num-input--unit"
           size="small"
@@ -155,7 +153,7 @@ const unselectedSources = computed<NewsSourceItem[]>(() =>
         >
           <!-- min 为国际通用单位缩写，无需 i18n -->
           <template #suffix> min </template>
-        </NInputNumber>
+        </NTInputNumber>
       </SettingFormItem>
     </SettingFormSection>
 
@@ -264,7 +262,7 @@ const unselectedSources = computed<NewsSourceItem[]>(() =>
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 4px;
+  height: 32px;
   border-radius: 6px;
 }
 
@@ -284,10 +282,5 @@ const unselectedSources = computed<NewsSourceItem[]>(() =>
   .action__icon {
     font-size: 20px;
   }
-}
-
-.news-source-divider {
-  width: 100%;
-  margin: 4px 0;
 }
 </style>

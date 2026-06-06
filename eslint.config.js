@@ -60,8 +60,6 @@ export default defineConfig(
       'object-curly-newline': 'off',
       'arrow-body-style': 'off',
       'prefer-destructuring': 'off',
-      'import/prefer-default-export': 'off',
-      'import/extensions': 'off',
       'vue/html-self-closing': 'off',
       'vue/singleline-html-element-content-newline': 'off',
       'vue/multi-word-component-names': 'off',

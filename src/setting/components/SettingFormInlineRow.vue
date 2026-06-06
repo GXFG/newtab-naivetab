@@ -24,12 +24,12 @@ defineProps<{
 
 <style scoped>
 .setting-inline-row-wrap {
-  border-bottom: 1px solid var(--gray-alpha-10);
+  border-bottom: 1px solid var(--nt-gray-light);
 
   .inline-row__title {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--n-text-color-3);
+    color: var(--nt-text-tertiary);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 8px 0 0 14px;
@@ -46,7 +46,7 @@ defineProps<{
 
     /* 相邻子元素之间用垂直分割线 */
     > *:not(:last-child) {
-      border-right: 1px solid var(--gray-alpha-10);
+      border-right: 1px solid var(--nt-gray-light);
     }
 
     /* 边框由外层 .setting-inline-row-wrap 统一提供，去掉内部圆角 */

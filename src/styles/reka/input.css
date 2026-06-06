@@ -1,0 +1,197 @@
+/* ============================================================
+ * Input（输入框，对标 NTSelect trigger + NTAutoComplete input）
+ *
+ * 基于原生 <input> / <textarea>，视觉与 NTSelect/NTAutoComplete 保持一致。
+ *
+ * 设计意图：
+ *   base     → 输入框样式（对标 select trigger）+ clear 按钮 + 字数统计
+ *   hover    → 边框深一档
+ *   focus    → 主题色边框 + 光环
+ *   disabled → 降透明度
+ *   textarea → 固定行高 + autosize 支持
+ *   dark     → 边框/阴影切换
+ *
+ * 字数统计：
+ *   绝对定位在输入框内部右侧（单行垂直居中，多行底部对齐），不撑高容器。
+ * ============================================================ */
+
+/* ---- Root：输入框容器 ---- */
+.reka-input {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  min-width: 100px;
+  box-sizing: border-box;
+}
+
+/* ---- Native Input / Textarea ---- */
+.reka-input__native {
+  all: unset;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--reka-surface-bg);
+  font-size: var(--text-base);
+  line-height: 32px;  /* 与 height 一致，垂直居中文本 */
+  cursor: text;
+  outline: none;
+  /* border 用 inset box-shadow 替代，外光环预留 2px 透明，focus 时着色无抖动 */
+  box-shadow: inset 0 0 0 1px var(--nt-gray-medium),
+              0 0 0 2px transparent;
+  transition: box-shadow var(--transition-fast);
+}
+
+/* placeholder 颜色 */
+.reka-input__native::placeholder {
+  opacity: var(--opacity-secondary);
+}
+
+/* ---- Small ---- */
+.reka-input--small .reka-input__native {
+  height: 28px;
+  padding: 0 8px;
+  line-height: 28px;  /* 与 height 一致 */
+}
+
+/* ---- Hover ---- */
+.reka-input__native:not(:disabled):hover {
+  box-shadow: inset 0 0 0 1px var(--nt-gray-heavy),
+              0 0 0 2px transparent;
+}
+
+/* ---- Focus：1px inset 内边框着色 + token 外光环 ---- */
+.reka-input__native:not(:disabled):focus {
+  box-shadow: inset 0 0 0 1px var(--nt-primary-color),
+              0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+}
+
+/* ---- Disabled ---- */
+.reka-input--disabled .reka-input__native {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+/* 可清除时预留清除按钮空间 */
+.reka-input--clearable .reka-input__native {
+  padding-right: 28px;
+}
+
+/* ---- Textarea ---- */
+.reka-input--textarea .reka-input__native {
+  height: auto;
+  min-height: 32px;
+  padding: 6px var(--space-3);
+  line-height: 1.5;
+  resize: vertical;
+  overflow: auto;
+}
+
+.reka-input--textarea.reka-input--small .reka-input__native {
+  min-height: 28px;
+  padding: 4px 8px;
+}
+
+/* ---- Clear Button ---- */
+.reka-input__clear {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: var(--opacity-secondary);
+  transition: opacity var(--transition-fast),
+              background-color var(--transition-fast);
+}
+
+.reka-input__clear:hover {
+  opacity: var(--opacity-primary);
+  background-color: var(--nt-gray-minimal);
+}
+
+.reka-input__clear-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---- 字数统计（绝对定位在输入框内部，不撑高容器）---- */
+
+/* 单行：右侧垂直居中 */
+.reka-input__count {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--text-xs);
+  line-height: 1;
+  opacity: var(--opacity-secondary);
+  pointer-events: none;
+}
+
+/* 多行：右下角对齐 */
+.reka-input--textarea .reka-input__count {
+  top: auto;
+  bottom: 6px;
+  transform: none;
+}
+
+/* 为 count 预留右侧空间 */
+.reka-input--show-count .reka-input__native {
+  padding-right: 60px;
+}
+
+.reka-input--show-count.reka-input--small .reka-input__native {
+  padding-right: 54px;
+}
+
+/* clearable + showCount 共存时，count 往左让位给清除按钮 */
+.reka-input--clearable.reka-input--show-count .reka-input__native {
+  padding-right: 88px;
+}
+
+.reka-input--clearable.reka-input--show-count.reka-input--small .reka-input__native {
+  padding-right: 82px;
+}
+
+.reka-input--clearable .reka-input__count {
+  right: 32px;
+}
+
+/* textarea 不需要额外 clearable offset（清除按钮在顶部居中，count 在底部，不冲突）*/
+.reka-input--textarea.reka-input--clearable .reka-input__count {
+  right: 8px;
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+:root[data-theme='dark'] .reka-input__native,
+.dark .reka-input__native {
+  /* 使用 nt-gray-* token，已在 tokens.css 中自动切换深浅 */
+}
+
+:root[data-theme='dark'] .reka-input__clear:hover,
+.dark .reka-input__clear:hover {
+  background-color: var(--nt-gray-moderate);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-input__native {
+    border: 1px solid ButtonText;
+  }
+  .reka-input__clear {
+    border: 1px solid ButtonText;
+  }
+}

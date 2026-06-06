@@ -46,3 +46,20 @@
 ## ESC 逐层关闭 Drawer
 
 Setting 面板打开时按 ESC 需逐层关闭子 Drawer 再关主面板。完整实现（`drawerStack` 栈结构、`useDrawerStack` composable、关闭路径、已注册子 Drawer 列表）详见 [setting.md](../docs/architecture/setting.md#drawer-stack-架构)。
+
+---
+
+## 跨上下文影响分析
+
+项目运行在 4 个独立上下文：**newtab**（Vue 页面）、**CS**（Content Script 注入普通网页）、**SW**（Service Worker 后台）、**popup**（扩展弹窗）。修改共享代码时必须逐一验证：
+
+| 共享模块 | 影响范围 | 验证要点 |
+|----------|----------|----------|
+| `config/` 配置结构 | 4 个上下文 | newtab 的 `localConfig`、CS 的 `loadConfig()` + `onChanged`、SW 的 `cache.ts` 缓存、popup 的 flushSync |
+| `keyboard/` 键盘逻辑 | newtab + CS + SW | keymap 缓存、bookmark-state 的持久化、systemKeymap 的 storage.local |
+| `shortcut/` 快捷键匹配 | newtab + CS + SW | `matchShortcut` 参数传递、Port 消息、sendMessage 降级 |
+| `utils/` 工具函数 | 取决于调用方 | 确认所有调用方的上下文限制（如 CS 不可用 `localStorage`、SW 不可用 DOM API） |
+
+**Why：** 不同上下文的 API 可用性和数据加载方式不同。例如 `chrome.storage.sync.get` 在 CS 中可用（~5-20ms），但在 SW 中初始缓存来自 `defaultConfig` 的内存副本——如果只改 newtab 端而漏了 SW 缓存加载路径，SW 会拿到旧结构。
+
+**How to apply：** 改完代码后，对每个受影响的上下文自问：这个上下文如何加载该数据？初始值是什么？旧数据缺失新字段时行为是否正确？

@@ -562,7 +562,6 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
         return false
       },
     }))
-    vi.doMock('naive-ui', () => ({ NButton: { name: 'NButton' } }))
 
     window.appVersion = APP_VERSION
     window.$t = vi.fn((key: string) => key)

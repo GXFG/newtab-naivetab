@@ -1,0 +1,172 @@
+/* ============================================================
+ * Tag（对标 Apple 标签 + Radix Themes Badge 变体体系）
+ *
+ * Apple 风格：半透底色 + 微妙阴影 + 圆润药丸形。
+ *   悬停时加深阴影，关闭按钮圆形 × 有缩放动画。
+ * ============================================================ */
+
+/* 1. base — inline-flex 药丸形，半透底色 + 微妙阴影（原则1：立体层次） */
+.reka-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  min-height: 22px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);       /* 12px，比之前 11px 清晰 */
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  /* 灰底药丸：不设 color，继承页面标准文本色 */
+  background: var(--nt-gray-light);
+  border: 1px solid var(--nt-gray-medium);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color var(--transition-bg),
+              box-shadow var(--transition-bg);
+}
+
+/* 2. hover — 阴影加深，边框微显（仅非交互标签，hover 作为微反馈） */
+.reka-tag:hover {
+  border-color: var(--nt-gray-heavy);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* 3. primary — 主题色填充 + 微渐变通透感（原则4：通透质感） */
+.reka-tag--primary {
+  color: white;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--nt-primary-color) 95%, white) 0%,
+    color-mix(in srgb, var(--nt-primary-color) 100%, black) 100%
+  );
+  border-color: transparent;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(0, 0, 0, 0.1));
+}
+
+.reka-tag--primary:hover {
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--nt-primary-color) 35%, rgba(0, 0, 0, 0.12));
+}
+
+/* 3b. success/error/info — 语义色变体，引用 tokens.css --color-* */
+.reka-tag--success {
+  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 10%, var(--reka-surface-bg));
+  border-color: color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+.reka-tag--success:hover {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-success) 20%, rgba(0, 0, 0, 0.08));
+}
+.reka-tag--error {
+  color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 10%, var(--reka-surface-bg));
+  border-color: color-mix(in srgb, var(--color-error) 25%, transparent);
+}
+.reka-tag--error:hover {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-error) 20%, rgba(0, 0, 0, 0.08));
+}
+.reka-tag--info {
+  color: var(--color-info);
+  background: color-mix(in srgb, var(--color-info) 10%, var(--reka-surface-bg));
+  border-color: color-mix(in srgb, var(--color-info) 25%, transparent);
+}
+.reka-tag--info:hover {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-info) 20%, rgba(0, 0, 0, 0.08));
+}
+
+/* 语义色 close button 适配 */
+.reka-tag--success .reka-tag__close:hover,
+.reka-tag--info .reka-tag__close:hover {
+  background-color: color-mix(in srgb, currentColor 15%, transparent);
+}
+.reka-tag--error .reka-tag__close:hover {
+  background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+}
+
+/* 4. bordered — 默认有边框；bordered=false 去掉边框 */
+.reka-tag:not(.reka-tag--bordered) {
+  border-color: transparent;
+}
+
+/* 5. close button — 16px 圆形 ×，hover 缩放 + 底色出现 */
+.reka-tag__close {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: inherit;
+  opacity: var(--opacity-muted);
+  transition: opacity var(--transition-bg),
+              background-color var(--transition-bg),
+              transform var(--transition-switch);
+}
+.reka-tag__close:hover {
+  opacity: 1;
+  background-color: var(--nt-gray-moderate);
+  transform: scale(1.12);
+}
+.reka-tag__close:active {
+  transform: scale(0.92);
+}
+
+.reka-tag--primary .reka-tag__close {
+  opacity: var(--opacity-secondary);
+}
+.reka-tag--primary .reka-tag__close:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* 6. close icon — 10×10 SVG，微调视觉居中 */
+.reka-tag__close-icon {
+  width: 10px;
+  height: 10px;
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+:root[data-theme='dark'] .reka-tag,
+.dark .reka-tag {
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.04);
+}
+:root[data-theme='dark'] .reka-tag:hover,
+.dark .reka-tag:hover {
+  box-shadow: 0 1px 3px rgba(255, 255, 255, 0.06);
+}
+:root[data-theme='dark'] .reka-tag--primary,
+.dark .reka-tag--primary {
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(255, 255, 255, 0.06));
+}
+
+/* 深色：语义变体阴影切换 white channel */
+:root[data-theme='dark'] .reka-tag--success:hover,
+.dark .reka-tag--success:hover {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-success) 20%, rgba(255, 255, 255, 0.06));
+}
+:root[data-theme='dark'] .reka-tag--error:hover,
+.dark .reka-tag--error:hover {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-error) 20%, rgba(255, 255, 255, 0.06));
+}
+:root[data-theme='dark'] .reka-tag--info:hover,
+.dark .reka-tag--info:hover {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-info) 20%, rgba(255, 255, 255, 0.06));
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-tag {
+    border: 1px solid ButtonText;
+  }
+  .reka-tag--primary {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+}

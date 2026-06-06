@@ -9,6 +9,8 @@ import { WIDGET_CODE } from './config'
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')
 const customFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'vmin')
+const customCountFontSize = getStyleField(WIDGET_CODE, 'fontSize', 'vmin', 0.7)
+const customPadding = getStyleField(WIDGET_CODE, 'padding', 'vmin')
 const customBorderRadius = getStyleField(WIDGET_CODE, 'borderRadius', 'vmin')
 const customBackgroundColor = getStyleField(WIDGET_CODE, 'backgroundColor')
 const customBackgroundBlur = getStyleField(WIDGET_CODE, 'backgroundBlur', 'px')
@@ -22,7 +24,9 @@ const memoStyle = computed(() => ({
   '--nt-memo-font-family': customFontFamily.value,
   '--nt-memo-font-color': customFontColor.value,
   '--nt-memo-font-size': customFontSize.value,
+  '--nt-memo-count-font-size': customCountFontSize.value,
   '--nt-memo-border-radius': customBorderRadius.value,
+  '--nt-memo-padding': customPadding.value,
   '--nt-memo-background-color': customBackgroundColor.value,
   '--nt-memo-background-blur': customBackgroundBlur.value,
   '--nt-memo-border-width': customBorderWidth.value,
@@ -72,18 +76,21 @@ watch(
       }"
     >
       <div class="memo_wrap">
-        <NInput
-          v-model:value="localConfig.memo.content"
+        <textarea
+          v-model="localConfig.memo.content"
           class="memo__input"
           :class="{ 'memo__input--move': isDragMode }"
-          type="textarea"
           placeholder=" "
-          autosize
-          :show-count="localConfig.memo.countEnabled"
           @focus="onFocus"
           @blur="onBlur"
           @input="handleMemoInput"
         />
+        <span
+          v-if="localConfig.memo.countEnabled"
+          class="memo__count"
+        >
+          {{ localConfig.memo.content?.length ?? 0 }}
+        </span>
       </div>
     </div>
   </WidgetWrap>
@@ -139,61 +146,59 @@ watch(
       z-index: 1;
     }
 
-    .n-input__border {
-      border: 0 !important;
-    }
-    .n-input,
-    .n-input--focus {
-      border-radius: var(--nt-memo-border-radius);
-    }
-
     .memo_wrap {
       position: relative;
       z-index: 1;
+      width: var(--nt-memo-width);
+      height: var(--nt-memo-height);
+      padding: var(--nt-memo-padding);
+      font-size: var(--nt-memo-font-size);
+      font-family: inherit;
+      caret-color: var(--nt-memo-font-color);
+      color: var(--nt-memo-font-color);
 
-      .n-input--textarea {
-        background-color: transparent !important;
-      }
       .memo__input {
-        padding: 0 8px;
-        width: var(--nt-memo-width);
-        height: var(--nt-memo-height);
-        font-size: var(--nt-memo-font-size);
-        .n-input__textarea-el {
-          caret-color: var(--nt-memo-font-color);
-          color: var(--nt-memo-font-color);
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-          letter-spacing: 0.2px;
-          line-height: 1.6;
-        }
-        .n-input__border,
-        .n-input__state-border {
-          border: 0 !important;
-          box-shadow: none !important;
-          outline: none !important;
-          /* 防止 state-border 的 transition 动画产生竖向闪烁条 */
-          transition: none !important;
-        }
-        .n-input-word-count {
-          color: var(--nt-memo-font-color) !important;
-          opacity: 0.45;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-          letter-spacing: 0.2px;
-          transition: opacity 0.18s ease;
-        }
+        all: unset;
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        letter-spacing: 0.2px;
+        line-height: 1;
+        border: 0;
+        border-radius: var(--nt-memo-border-radius);
+        background: transparent;
+        outline: none;
+        resize: none;
+        overflow: hidden;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+      }
+      .memo__input::placeholder {
+        opacity: 0;
       }
       .memo__input--move {
         cursor: move !important;
-        .n-input__textarea-el {
-          cursor: move !important;
-        }
+      }
+      .memo__count {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        padding: var(--nt-memo-padding);
+        font-size: var(--nt-memo-count-font-size);
+        opacity: 0.45;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        letter-spacing: 0.2px;
+        transition: opacity 0.18s ease;
       }
     }
   }
 
   /* 聚焦时字数统计更明显 */
   .memo__container:focus-within {
-    .n-input-word-count {
+    .memo__count {
       opacity: 0.65;
     }
   }
@@ -213,11 +218,6 @@ watch(
       0 6px 32px var(--nt-memo-shadow-color),
       0 2px 8px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  }
-
-  /* fix left space */
-  .n-input__textarea-el {
-    left: 2px !important;
   }
 }
 </style>

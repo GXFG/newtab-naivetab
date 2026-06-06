@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { v4 as uuidv4 } from 'uuid'
+import { Icon } from '@iconify/vue'
 import { useStorage } from '@vueuse/core'
+import { ICONS } from '@/logic/constants/icons'
 import { SettingHeaderBar } from '@/setting/components'
 import SponsorToastItem from './SponsorToastItem.vue'
 
@@ -15,7 +16,7 @@ const randomCat = () => catEmojis[Math.floor(Math.random() * catEmojis.length)]
 const onNextTime = () => {
   catCounter.value += 1
   toasts.value.push({
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     message: `${randomCat()} ${window.$t('about.cannedHope')} +${catCounter.value}`,
   })
 }
@@ -76,20 +77,17 @@ const removeToast = (id: string) => {
           />
         </div>
 
-        <NButton
-          class="footer__skip-btn setting__btn setting__btn--primary"
+        <NTButton
           type="primary"
-          size="tiny"
-          secondary
+          size="small"
+          variant="secondary"
           @click="onNextTime"
         >
-          <template #icon>
-            <div class="icon__wrap">
-              <fa6-regular:face-sad-cry />
-            </div>
-          </template>
+          <div class="icon__wrap">
+            <Icon :icon="ICONS.faceSadCry" />
+          </div>
           {{ $t('sponsor.confirm') }}
-        </NButton>
+        </NTButton>
       </div>
     </div>
   </div>
@@ -102,17 +100,17 @@ const removeToast = (id: string) => {
   margin: 8px 0 16px;
   padding: 18px 20px;
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(16, 152, 173, 0.1);
+  border: 1px solid color-mix(in srgb, var(--nt-accent-brand) 10%, transparent);
   background:
     radial-gradient(
       ellipse at 85% 20%,
-      rgba(16, 152, 173, 0.05) 0%,
+      color-mix(in srgb, var(--nt-accent-brand) 5%, transparent) 0%,
       transparent 50%
     ),
     linear-gradient(
       135deg,
-      rgba(16, 152, 173, 0.04) 0%,
-      rgba(16, 152, 173, 0.01) 100%
+      color-mix(in srgb, var(--nt-accent-brand) 4%, transparent) 0%,
+      color-mix(in srgb, var(--nt-accent-brand) 1%, transparent) 100%
     );
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.03),
@@ -128,7 +126,7 @@ const removeToast = (id: string) => {
     bottom: 18px;
     width: 3px;
     border-radius: 0 3px 3px 0;
-    background: linear-gradient(180deg, #1098ad, #18a058);
+    background: var(--nt-accent-brand);
     opacity: 0.35;
   }
 
@@ -143,7 +141,7 @@ const removeToast = (id: string) => {
     border-radius: 50%;
     background: radial-gradient(
       circle at center,
-      rgba(16, 152, 173, 0.07) 0%,
+      color-mix(in srgb, var(--nt-accent-brand) 7%, transparent) 0%,
       transparent 70%
     );
     pointer-events: none;
@@ -172,8 +170,9 @@ const removeToast = (id: string) => {
       width: 4px;
       height: 4px;
       border-radius: 50%;
-      background: rgba(16, 152, 173, 0.45);
-      box-shadow: 0 0 4px rgba(16, 152, 173, 0.2);
+      background: color-mix(in srgb, var(--nt-accent-brand) 45%, transparent);
+      box-shadow: 0 0 4px
+        color-mix(in srgb, var(--nt-accent-brand) 20%, transparent);
     }
   }
 
@@ -182,11 +181,11 @@ const removeToast = (id: string) => {
     z-index: 1;
     margin-top: 14px;
     padding-top: 14px;
-    border-top: 1px solid var(--gray-alpha-10);
+    border-top: 1px solid var(--nt-gray-light);
     text-align: center;
     font-size: var(--text-base);
     font-weight: 600;
-    background: linear-gradient(90deg, #1098ad, #18a058);
+    background: linear-gradient(90deg, var(--nt-accent-brand), #18a058);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -210,11 +209,11 @@ const removeToast = (id: string) => {
   gap: 12px;
   padding: 20px 18px 16px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--gray-alpha-06);
+  border: 1px solid var(--nt-gray-minimal);
   background: linear-gradient(
     160deg,
-    var(--gray-alpha-02) 0%,
-    var(--gray-alpha-04) 100%
+    var(--nt-gray-ghost) 0%,
+    var(--nt-gray-ghost) 100%
   );
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
@@ -411,21 +410,6 @@ const removeToast = (id: string) => {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-}
-
-.footer__skip-btn {
-  font-size: 14px;
-  transition:
-    transform var(--transition-spring),
-    box-shadow var(--transition-base);
-
-  &:hover {
-    box-shadow: var(--shadow-sm);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
 }
 
 /* ── Keyframes ── */

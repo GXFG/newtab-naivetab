@@ -23,7 +23,7 @@ body {
 }
 
 /* Prevent SVG icons from receiving focus, avoiding aria-hidden a11y warnings
-   when Naive UI modals/drawers restore focus to a hidden background element */
+   when modals/drawers restore focus to a hidden background element */
 svg.iconify,
 svg[role="img"],
 svg[aria-hidden="true"] {
@@ -31,8 +31,7 @@ svg[aria-hidden="true"] {
 }
 
 /* Drag mode disabled input */
-.n-input.n-input--disabled .n-input__input-el,
-.n-input.n-input--disabled .n-input__textarea-el {
+.reka-input--disabled .reka-input__native {
   cursor: move;
 }
 
@@ -46,13 +45,3 @@ svg[aria-hidden="true"] {
   }
 }
 
-/* Setting preview mode: hover preview button to make drawer transparent */
-body.setting-preview-active #setting .drawer-wrap {
-  transition: opacity 0.3s ease;
-  opacity: 0;
-}
-
-body.setting-preview-active .n-drawer-mask {
-  transition: background-color 0.3s ease;
-  background-color: transparent;
-}

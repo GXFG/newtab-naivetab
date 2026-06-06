@@ -1,0 +1,135 @@
+/* ============================================================
+ * Slider（Apple 风格：细轨 + 圆滑 thumb + 光环反馈）
+ *
+ * 对标 Apple macOS 滑块：hover/active 通过 box-shadow 光环反馈，
+ *   thumb 自身不缩放，避免与 Reka inline transform 冲突。
+ * ============================================================ */
+
+/* 1. Root — flex 行容器，20px 高度保证 thumb 点击区 */
+.reka-slider {
+  all: unset;
+  display: flex;
+  box-sizing: border-box;
+  outline: none;
+  --slider-thumb-size: 16px;
+  --slider-track-height: 4px;
+
+  position: relative;
+  align-items: center;
+  width: 100%;
+  min-width: 80px;
+  height: 20px;
+  cursor: var(--reka-cursor-interactive);
+  touch-action: none;
+}
+.reka-slider:disabled {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+/* 2. Track — 4px 圆角轨道 */
+.reka-slider__track {
+  position: relative;
+  width: 100%;
+  height: var(--slider-track-height);
+  border-radius: var(--radius-pill);
+  background-color: var(--nt-gray-moderate);
+}
+
+/* 3. Range — 主题色填充区间 */
+.reka-slider__range {
+  position: absolute;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--nt-primary-color) 90%, white),
+    var(--nt-primary-color)
+  );
+}
+
+/* 4. Thumb — 16px 正圆白色把手，hover/active 用光环放大（不 scale，不和 Reka transform 冲突） */
+.reka-slider__thumb {
+  all: unset;
+  display: block;
+  box-sizing: border-box;
+  width: var(--slider-thumb-size);
+  height: var(--slider-thumb-size);
+  border-radius: 50%;
+  background-color: white;
+  /* 三层阴影：接触 + 投影 + 发丝 */
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  transition: background-color var(--transition-bg),
+              box-shadow var(--transition-shadow);
+}
+
+/* hover：光环出现（第四层阴影，2px 扩散），背景微变 */
+.reka-slider__thumb:not(:disabled):hover {
+  cursor: grab;
+  background-color: #f5f5f5;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 0 0 0.5px rgba(0, 0, 0, 0.06),
+    0 0 0 4px color-mix(in srgb, var(--nt-primary-color) 15%, transparent);
+}
+
+/* active：光环扩大 + 背景加深 */
+.reka-slider__thumb:not(:disabled):active {
+  cursor: grabbing;
+  background-color: #ebebeb;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 0 0 0.5px rgba(0, 0, 0, 0.06),
+    0 0 0 6px color-mix(in srgb, var(--nt-primary-color) 20%, transparent);
+}
+
+/* focus-visible：焦点环 */
+.reka-slider__thumb:focus-visible {
+  box-shadow: var(--reka-focus-ring);
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+:root[data-theme='dark'] .reka-slider__thumb,
+.dark .reka-slider__thumb {
+  background-color: #f0f0f0;
+  box-shadow:
+    0 1px 3px rgba(255, 255, 255, 0.06),
+    0 2px 8px rgba(255, 255, 255, 0.08),
+    0 0 0 0.5px rgba(255, 255, 255, 0.06);
+}
+:root[data-theme='dark'] .reka-slider__thumb:hover,
+.dark .reka-slider__thumb:hover {
+  background-color: #e0e0e0;
+  box-shadow:
+    0 1px 3px rgba(255, 255, 255, 0.06),
+    0 2px 8px rgba(255, 255, 255, 0.08),
+    0 0 0 0.5px rgba(255, 255, 255, 0.06),
+    0 0 0 4px color-mix(in srgb, var(--nt-primary-color) 20%, rgba(255, 255, 255, 0.06));
+}
+:root[data-theme='dark'] .reka-slider__thumb:not(:disabled):active,
+.dark .reka-slider__thumb:not(:disabled):active {
+  background-color: #d5d5d5;
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-slider__track {
+    border: 1px solid ButtonText;
+  }
+  .reka-slider__range {
+    background-color: Highlight;
+  }
+  .reka-slider__thumb {
+    background-color: ButtonFace;
+    border: 1px solid ButtonText;
+  }
+}

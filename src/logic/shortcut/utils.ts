@@ -76,11 +76,21 @@ export function formatModifierKeys(keys: string[]): string {
 
 /**
  * 检查键盘事件的 target 是否为输入类元素。
- * 检查顺序（与 Vimium C 一致）：
+ *
+ * 采用双路径检测（参考 Vimium C 的 findNewEditable + 原始 Vimium 的 event.target 检查）：
  * 1. document.designMode（文档级状态，提前判断）
- * 2. document.activeElement（浏览器焦点状态，焦点转移竞态下更新最快）
- * 3. composedPath（Shadow DOM 穿透，补全 activeElement 未更新时的漏判）
+ * 2. document.activeElement（优先，浏览器焦点状态）—— 焦点转移竞态下更新最快，
+ *    点击输入框后立即按键时 focus 事件先于 keydown，activeElement 已更新
+ * 3. composedPath（兜底，Shadow DOM 穿透）—— 当 activeElement 指向 Shadow Host
+ *    而非 Shadow Root 内实际 input 时，composedPath 包含完整事件路径
+ *
+ * 仅用 composedPath：点击后立即按键，keydown 的 target 可能仍是旧元素 → 漏判
+ * 仅用 activeElement：Shadow DOM 内 input 的 activeElement 可能指向 host → 漏判
+ *
  * 支持 input/textarea/select/contenteditable/embed/object 等。
+ * contenteditable 使用 element.isContentEditable（DOM 只读属性，自动处理继承链），
+ * 而非 getAttribute('contenteditable')。
+ * input 需排除不可编辑 type：button/checkbox/radio/file/hidden/image/submit/reset/color/range。
  */
 export function isInInputElement(e: KeyboardEvent): boolean {
   // 文档级可编辑模式提前判断，避免在 composedPath 循环中重复检查

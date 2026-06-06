@@ -69,7 +69,7 @@ const resolvedTitle = computed(
   .section__header {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--n-text-color-3);
+    color: var(--nt-text-secondary);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     padding-bottom: 8px;
@@ -84,7 +84,7 @@ const resolvedTitle = computed(
   }
 
   .section__body {
-    border: 1px solid var(--gray-alpha-08);
+    border: 1px solid var(--nt-gray-minimal);
     border-radius: var(--radius-lg);
     overflow: hidden;
 
@@ -100,7 +100,7 @@ const resolvedTitle = computed(
       gap: var(--space-1);
       padding: var(--space-3) var(--space-3);
       font-size: var(--text-xs);
-      color: var(--n-text-color-3);
+      color: var(--nt-text-secondary);
       line-height: 1.5;
       opacity: var(--opacity-muted);
 

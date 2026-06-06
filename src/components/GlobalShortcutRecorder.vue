@@ -17,7 +17,6 @@ import {
   formatModifierKeys,
   type TShortcutModifier,
 } from '@/logic/shortcut/utils'
-import { NButton } from 'naive-ui'
 import { showToast } from '@/common/toast'
 import { onUnmounted } from 'vue'
 
@@ -204,8 +203,8 @@ onUnmounted(() => {
       }}</span>
     </div>
 
-    <NButton
-      quaternary
+    <NTButton
+      variant="ghost"
       size="tiny"
       :class="[
         'recorder__toggle-btn',
@@ -223,7 +222,7 @@ onUnmounted(() => {
         :icon="ICONS.stop"
         class="toggle__icon toggle__icon--stop"
       />
-    </NButton>
+    </NTButton>
   </div>
 </template>
 
@@ -272,7 +271,7 @@ onUnmounted(() => {
   min-width: 32px;
   padding: 0;
   transition: all var(--transition-fast);
-  border: 1px solid var(--n-border-color);
+  border: 1px solid var(--nt-gray-medium);
 }
 
 .recorder__toggle-btn:hover {

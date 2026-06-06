@@ -197,13 +197,13 @@ const handlerDeleteMouseUp = () => {
           @click="handleExitDragMode"
         >
           <div class="done__esc" />
-          <NButton
+          <NTButton
             class="done__exit"
             type="primary"
             size="small"
           >
             <p>{{ $t('rightMenu.doneEdit') }}</p>
-          </NButton>
+          </NTButton>
         </div>
         <p class="header__tips">{{ $t('prompts.widgetDrawerTips') }}</p>
       </div>
@@ -377,10 +377,10 @@ const handlerDeleteMouseUp = () => {
       align-items: center;
       height: 52px;
       width: 100%;
-      border-bottom: 1px solid var(--gray-alpha-08);
+      border-bottom: 1px solid var(--nt-gray-minimal);
       background: linear-gradient(
         180deg,
-        var(--gray-alpha-04) 0%,
+        var(--nt-gray-ghost) 0%,
         transparent 100%
       );
       border-top-left-radius: 16px;
@@ -425,7 +425,7 @@ const handlerDeleteMouseUp = () => {
       overflow-y: auto;
       /* 自定义滚动条 */
       scrollbar-width: thin;
-      scrollbar-color: var(--gray-alpha-15) transparent;
+      scrollbar-color: var(--nt-gray-moderate) transparent;
       &::-webkit-scrollbar {
         width: 4px;
       }
@@ -433,7 +433,7 @@ const handlerDeleteMouseUp = () => {
         background: transparent;
       }
       &::-webkit-scrollbar-thumb {
-        background: var(--gray-alpha-15);
+        background: var(--nt-gray-moderate);
         border-radius: 2px;
       }
       .content__group {
@@ -468,11 +468,11 @@ const handlerDeleteMouseUp = () => {
         width: 8vw;
         height: 78px;
         font-size: 12px;
-        border: 1px solid var(--gray-alpha-12);
+        border: 1px solid var(--nt-gray-light);
         border-radius: var(--radius-xl);
         cursor: move;
         user-select: none;
-        background: var(--gray-alpha-04);
+        background: var(--nt-gray-ghost);
         transition:
           background 180ms ease,
           border-color 180ms ease,
@@ -531,7 +531,7 @@ const handlerDeleteMouseUp = () => {
           height: 20px;
           line-height: 20px;
           text-align: center;
-          border-top: 1px solid var(--gray-alpha-08);
+          border-top: 1px solid var(--nt-gray-minimal);
           opacity: 0.8;
           letter-spacing: 0.02em;
           font-size: 11px;

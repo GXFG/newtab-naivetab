@@ -1,9 +1,7 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
+import { SelectFont } from '@/setting/fields'
 import { localConfig } from '@/logic/config/state'
-import {
-  availableFontOptions,
-  fontSelectRenderLabel,
-} from '@/logic/store/style'
 import KeyboardEmphasisKeySetting from './KeyboardEmphasisKeySetting.vue'
 import { SettingFormInlineRow, SettingFormSection } from '@/setting/components'
 import { ICONS } from '@/logic/constants/icons'
@@ -80,14 +78,12 @@ import {
       :label="$t('keyboardCommon.keycapKeyFont')"
     >
       <template #extra>
-        <NSelect
+        <SelectFont
           v-model:value="localConfig.keyboardCommon.keycapKeyFontFamily"
           class="setting__fill-input"
           size="small"
-          :options="availableFontOptions"
-          :render-label="fontSelectRenderLabel"
         />
-        <NInputNumber
+        <NTInputNumber
           v-model:value="localConfig.keyboardCommon.keycapKeyFontSize"
           class="setting__num-input"
           size="small"
@@ -103,14 +99,12 @@ import {
       :label="$t('keyboardCommon.nameFont')"
     >
       <template #extra>
-        <NSelect
+        <SelectFont
           v-model:value="localConfig.keyboardCommon.keycapBookmarkFontFamily"
           class="setting__fill-input"
           size="small"
-          :options="availableFontOptions"
-          :render-label="fontSelectRenderLabel"
         />
-        <NInputNumber
+        <NTInputNumber
           v-model:value="localConfig.keyboardCommon.keycapBookmarkFontSize"
           class="setting__num-input"
           size="small"

@@ -8,7 +8,6 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
-import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import Markdown from 'unplugin-vue-markdown/vite'
 import postcssPresetEnv from 'postcss-preset-env'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -62,7 +61,6 @@ export const sharedConfig: UserConfig = {
         IconsResolver({
           prefix: '',
         }),
-        NaiveUiResolver(),
       ],
     }),
     Icons(), // https://github.com/antfu/unplugin-icons
@@ -84,14 +82,15 @@ export const sharedConfig: UserConfig = {
       },
     },
 
-    // visualizer(), // 打包分析工具，需要时启用
+    // 打包分析工具，通过 pnpm analyze 触发
+    ...(process.env.ANALYZE ? [visualizer()] : []),
   ],
   optimizeDeps: {
     include: [
       'vue',
       '@vueuse/core',
       'webextension-polyfill',
-      'naive-ui',
+      'reka-ui',
       'vue-i18n',
     ],
     exclude: ['vue-demi'],
@@ -130,9 +129,6 @@ export default defineConfig(({ command }) => ({
         manualChunks(id) {
           // 浏览器扩展从本地磁盘加载，无网络请求开销，chunk 不宜过多
           if (id.includes('node_modules')) {
-            if (id.includes('naive-ui')) {
-              return 'vendor-naive-ui'
-            }
             if (id.includes('lunar-typescript')) {
               return 'vendor-lunar'
             }

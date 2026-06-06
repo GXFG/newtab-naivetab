@@ -362,7 +362,7 @@ watch(
     cursor: pointer;
   }
   .folder__item--hover:hover {
-    transform: translateY(-2px) scale(1.03);
+    transform: translateY(-1px) scale(1.03);
     background: rgba(255, 255, 255, 0.14);
     border-color: rgba(255, 255, 255, 0.18);
     box-shadow:

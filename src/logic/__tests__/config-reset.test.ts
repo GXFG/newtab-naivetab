@@ -177,11 +177,10 @@ describe('resetWidgetConfig — quick mode', () => {
     expect(mock.keyboardBookmark.enabled).toBe(false)
     // layout preserved
     expect(mock.keyboardBookmark.layout).toEqual({ x: 3, y: 7 })
-    // preserve fields (source, keymap) preserved
+    // preserve fields (source, keymap, isEnabled, noModifierMode etc.) preserved
     expect(mock.keyboardBookmark.source).toBe(1)
     expect(mock.keyboardBookmark.keymap).toEqual({ KeyB: { url: 'https://custom.com', name: 'Custom' } })
-    // non-preserve fields reset
-    expect(mock.keyboardBookmark.isEnabled).toBeUndefined()
+    expect(mock.keyboardBookmark.isEnabled).toBe(true)
   })
 
   it('preserves preserve fields even when they are deep objects', () => {

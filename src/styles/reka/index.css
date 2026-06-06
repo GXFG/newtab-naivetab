@@ -1,0 +1,34 @@
+/* ============================================================
+ * Reka UI — 组件样式聚合入口
+ *
+ * https://reka-ui.com/llms.txt
+ *
+ * 一个组件一个文件（对标 Radix Themes 目录结构）。
+ * 新增组件时在此 @import 即可。
+ * ============================================================ */
+
+/* 共享规则：焦点环 */
+@import './common.css';
+
+/* 表单控件 */
+@import './switch.css';
+@import './checkbox.css';
+@import './radio.css';
+@import './tag.css';
+@import './slider.css';
+@import './popover.css';
+@import './popconfirm.css';
+@import './tooltip.css';
+@import './spin.css';
+@import './button.css';
+@import './card.css';
+@import './tabs.css';
+@import './drawer.css';
+@import './modal.css';
+@import './select.css';
+@import './dropdown.css';
+@import './number-field.css';
+@import './tree.css';
+@import './color-picker.css';
+@import './auto-complete.css';
+@import './input.css';

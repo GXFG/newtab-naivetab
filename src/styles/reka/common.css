@@ -1,0 +1,23 @@
+/* ============================================================
+ * Reka UI — 共享样式
+ *
+ * 全线组件共用的规则，独立于具体组件。
+ * 组件样式见 src/styles/reka/{name}.css。
+ * ============================================================ */
+
+/* --- 通用焦点环 ---
+   引用 --reka-focus-ring Token，全线组件一致。
+   双层结构：内圈紧贴 → 2px 呼吸空间 → 外圈扩散，仅 Tab 键触发。 */
+.reka-focus-visible:focus-visible {
+  outline: none;
+  box-shadow: var(--reka-focus-ring);
+}
+
+/* --- 强制色彩模式（共享） ---
+   禁用 box-shadow 焦点环，改用系统 outline。 */
+@media (forced-colors: active) {
+  .reka-focus-visible:focus-visible {
+    outline: 2px solid Highlight;
+    box-shadow: none;
+  }
+}

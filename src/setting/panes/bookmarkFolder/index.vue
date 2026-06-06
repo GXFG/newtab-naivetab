@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
@@ -105,30 +106,29 @@ const onResetFolder = () => {
           />
           <span class="crumb__text">{{ folderCrumb }}</span>
         </div>
-        <NButton
+        <NTButton
           type="primary"
           size="tiny"
-          secondary
-          class="setting__btn setting__btn--primary"
+          round
+          variant="secondary"
           @click="onOpenPicker"
         >
           <Icon :icon="ICONS.bookmarkPlus" />&nbsp;{{ $t('common.select') }}
-        </NButton>
-        <NButton
+        </NTButton>
+        <NTButton
           size="tiny"
-          secondary
+          variant="secondary"
           round
-          class="setting__btn setting__btn--default"
           @click="onResetFolder"
         >
           <Icon :icon="ICONS.restoreTwotone" />&nbsp;{{
             $t('generalSetting.resetSettingValue')
           }}
-        </NButton>
+        </NTButton>
       </SettingFormItem>
 
       <SettingFormItem :label="$t('bookmarkFolder.layoutColumns')">
-        <NInputNumber
+        <NTInputNumber
           v-model:value="localConfig.bookmarkFolder.gridColumns"
           class="setting__num-input"
           size="small"
@@ -296,7 +296,7 @@ const onResetFolder = () => {
   min-height: 25px;
   padding: 0 10px;
   border-radius: 6px;
-  background-color: var(--gray-alpha-08);
+  background-color: var(--nt-gray-minimal);
 }
 .crumb__icon {
   font-size: 16px;

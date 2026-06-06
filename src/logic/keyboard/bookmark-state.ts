@@ -11,7 +11,6 @@
  * @see docs/features/bookmark.md
  */
 import { ref, reactive, computed } from 'vue'
-import { requestPermission, checkPermission } from '@/logic/utils/permission'
 import {
   createLayerBookmarkFolders,
   exportKeymapToBrowser,
@@ -140,11 +139,6 @@ export const getSystemBookmarkForKeyboard = async () => {
     return
   }
   try {
-    const granted = await checkPermission('bookmarks')
-    if (!granted) {
-      throw new Error('bookmarks permission not granted')
-    }
-
     const sourceFolderPath = getCurrentLayerFolderTitle()
 
     const base = await getBrowserBookmark()
@@ -165,23 +159,10 @@ export const getSystemBookmarkForKeyboard = async () => {
     persistKeymapToLocal(state.systemKeymap)
   } catch (e) {
     console.warn(e)
-    window.$dialog.create({
-      title: window.$t('common.confirm'),
-      content: window.$t('browserPermission.bookmark'),
-      closable: false,
-      closeOnEsc: false,
-      maskClosable: false,
-      positiveText: window.$t('common.allow'),
-      negativeText: window.$t('common.deny'),
-      onPositiveClick: async () => {
-        const granted = await requestPermission('bookmarks')
-        if (!granted) return
-        getSystemBookmarkForKeyboard()
-      },
-      onNegativeClick: () => {
-        localConfig.keyboardBookmark.source = BookmarkSource.INTERNAL
-      },
-    })
+    // bookmarks 为必需权限，安装时已授予，不可能因权限问题走到这里。
+    // 异常原因可能是书签树解析失败、API 异常等，
+    // 静默降级到 INTERNAL 模式，与 initFirstOpenBookmarkLayers 行为一致。
+    localConfig.keyboardBookmark.source = BookmarkSource.INTERNAL
   }
 }
 

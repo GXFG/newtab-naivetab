@@ -12,6 +12,8 @@ import {
 import { localConfig } from '@/logic/config/state'
 import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
+import NTTabs from '@/components/ui/NTTabs.vue'
+import NTTabsPane from '@/components/ui/NTTabsPane.vue'
 import { WIDGET_CODE } from './config'
 
 const customMargin = getStyleField(WIDGET_CODE, 'margin', 'vmin')
@@ -49,7 +51,7 @@ const newsStyle = computed(() => ({
   '--nt-n-background-blur': customBackgroundBlur.value,
 }))
 
-// NPopover 是 teleport 组件，不继承父级 CSS 变量，需显式传宽度
+// NTPopover 是 teleport 组件，不继承父级 CSS 变量，需显式传宽度
 const newsPopoverStyle = computed(() => ({
   width: customWidth.value,
   lineHeight: '1.5',
@@ -64,8 +66,11 @@ const selectNewsSourceList = computed(() =>
   })),
 )
 
-const handleChangeCurrTab = (value: NewsSources) => {
-  state.currNewsTabValue = value
+const handleChangeCurrTab = (value?: NewsSources | string | number) => {
+  if (isDragMode.value || !value) {
+    return
+  }
+  state.currNewsTabValue = value as NewsSources
   gaProxy('click', ['news', 'changeTab'])
 }
 
@@ -128,15 +133,13 @@ watch(isRender, (value) => {
       }"
     >
       <div class="news__wrap">
-        <NTabs
+        <NTTabs
           :value="state.currNewsTabValue"
-          type="segment"
           animated
           justify-content="space-evenly"
-          @before-leave="() => !isDragMode"
           @update:value="handleChangeCurrTab"
         >
-          <NTabPane
+          <NTTabsPane
             v-for="source in selectNewsSourceList"
             :key="source.value"
             :name="source.value"
@@ -174,8 +177,8 @@ watch(isRender, (value) => {
                     {{ index + 1 }}
                   </p>
 
-                  <n-popover
-                    :delay="500"
+                  <NTPopover
+                    :delay="300"
                     trigger="hover"
                     :disabled="isDragMode"
                     :style="newsPopoverStyle"
@@ -195,23 +198,26 @@ watch(isRender, (value) => {
                       </div>
                     </template>
                     <span>{{ item.desc }}</span>
-                  </n-popover>
+                  </NTPopover>
                 </div>
               </template>
               <div
                 v-else
                 class="content__empty"
               >
-                <NButton
-                  ghost
+                <NTButton
+                  type="primary"
+                  variant="secondary"
+                  size="small"
+                  round
                   @click="onRetryNews(source.value)"
                 >
                   {{ $t('news.loginOrRefresh') }}
-                </NButton>
+                </NTButton>
               </div>
             </div>
-          </NTabPane>
-        </NTabs>
+          </NTTabsPane>
+        </NTTabs>
       </div>
     </div>
   </WidgetWrap>
@@ -231,47 +237,27 @@ watch(isRender, (value) => {
     will-change: transform;
     /* 显式触发合成层，配合 overflow:hidden + border-radius 消除边缘竖向闪烁 */
     transform: translateZ(0);
+
     .news__wrap {
       width: var(--nt-n-width);
-      .n-tabs .n-tab-pane {
-        padding: 0 !important;
+      /* Widget 自定义 tab 容器背景色，融入 Widget 背景 */
+      .reka-tabs__list {
+        margin: var(--nt-n-margin);
+        background-color: var(--nt-n-background-color);
       }
-      /* segment */
-      .n-tabs .n-tabs-nav.n-tabs-nav--segment-type {
-        padding: 6px 8px 4px !important;
-        .n-tabs-rail {
-          background-color: transparent !important;
-          border-radius: 8px !important;
-          .n-tabs-capsule {
-            background-color: var(
-              --nt-n-tab-active-background-color
-            ) !important;
-            border-radius: 6px !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-            /* 提前升为独立合成层，消除 translateX 动画在父合成层边缘产生的竖向闪烁 */
-            will-change: transform;
-            backface-visibility: hidden;
-          }
-          .n-tabs-tab {
-            border-radius: 6px !important;
-            transition: color 0.2s ease !important;
-          }
-        }
-      }
-      /* line bottom border */
-      .n-tabs .n-tabs-nav.n-tabs-nav--line-type .n-tabs-nav-scroll-content {
-        border-bottom: var(--nt-n-border-width) solid var(--nt-n-border-color) !important;
-      }
-      .n-tabs-tab__label {
+      /* Widget 自定义 tab 字号 */
+      .reka-tabs__trigger {
         font-size: var(--nt-n-font-size);
-        font-weight: 500;
+      }
+      /* Widget 自定义 pill 背景色，未配置时回退白色 */
+      .reka-tabs__indicator {
+        background-color: var(--nt-n-tab-active-background-color, white);
       }
       .news__content {
         height: var(--nt-n-height);
         color: var(--nt-n-font-color);
         font-size: var(--nt-n-font-size);
         overflow-y: scroll;
-        padding: 2px 8px 6px;
         box-sizing: border-box;
         &::-webkit-scrollbar {
           display: none;
@@ -279,7 +265,7 @@ watch(isRender, (value) => {
         .content__item {
           display: flex;
           align-items: center;
-          padding: var(--nt-n-margin) 4px;
+          padding: var(--nt-n-margin);
           width: 100%;
           border-radius: 6px;
           transition:
@@ -302,6 +288,9 @@ watch(isRender, (value) => {
           }
           .row__index__3 {
             color: #faa90e;
+          }
+          .reka-popover__trigger {
+            width: 100%;
           }
           .row__content {
             flex: 1;

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
+import NTSelect from '@/components/ui/NTSelect.vue'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
 import {
@@ -76,7 +78,7 @@ const handleFormatChange = (value: string) => {
           :label="$t('yearProgress.percentageLabel')"
         >
           <template #extra>
-            <NInputNumber
+            <NTInputNumber
               v-model:value="localConfig.yearProgress.percentageDecimal"
               class="setting__num-input--unit"
               size="small"
@@ -87,7 +89,7 @@ const handleFormatChange = (value: string) => {
               <template #prefix>
                 {{ $t('yearProgress.decimalLabel') }}
               </template>
-            </NInputNumber>
+            </NTInputNumber>
           </template>
         </SwitchField>
       </SettingFormInlineRow>
@@ -97,14 +99,14 @@ const handleFormatChange = (value: string) => {
         :label="$t('setting.date')"
       >
         <template #extra>
-          <NSelect
+          <NTSelect
             :value="selectedOption"
             class="setting__fill-input"
             size="small"
             :options="formatOptions"
             @update:value="handleFormatChange"
           />
-          <NInput
+          <NTInput
             v-if="isCustomMode"
             v-model:value="localConfig.yearProgress.format"
             class="setting__fill-input"

@@ -1,0 +1,188 @@
+/* ============================================================
+ * AutoComplete（自动完成，基于 Reka UI Combobox 原语）
+ *
+ * 对标 NTSelect 输入框样式，保持视觉一致。
+ *
+ * 设计意图：
+ *   anchor  → 输入框容器 + 加载图标
+ *   input   → 输入框样式（对标 select trigger）
+ *   content → 下拉面板 + 淡入动画
+ *   item    → hover 高亮
+ *   dark    → 面板底色、边框、阴影切换
+ * ============================================================ */
+
+/* ---- Root ---- */
+.reka-autocomplete {
+  display: block;
+  width: 100%;
+}
+
+/* ---- Anchor：输入框 + 加载图标容器 ---- */
+.reka-autocomplete__anchor {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+/* ---- Input：对标 select trigger 样式 ---- */
+.reka-autocomplete__input {
+  all: unset;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--reka-surface-bg);
+  font-size: var(--text-base);
+  line-height: 32px;
+  cursor: text;
+  outline: none;
+  /* border 用 inset box-shadow 替代，外光环预留 2px 透明，focus 时着色无抖动 */
+  box-shadow: inset 0 0 0 1px var(--nt-gray-medium),
+              0 0 0 2px transparent;
+  transition: box-shadow var(--transition-fast);
+}
+
+/* ---- Small 尺寸 ---- */
+.reka-autocomplete--small .reka-autocomplete__input {
+  height: 28px;
+  padding: 0 8px;
+  line-height: 28px;
+}
+
+/* ---- Hover ---- */
+.reka-autocomplete__input:not(:disabled):hover {
+  box-shadow: inset 0 0 0 1px var(--nt-gray-heavy),
+              0 0 0 2px transparent;
+}
+
+/* ---- Focus / Open ---- */
+/* focus：CSS :focus 伪类，无 JS 延迟 */
+.reka-autocomplete__input:not(:disabled):focus {
+  box-shadow: inset 0 0 0 1px var(--nt-primary-color),
+              0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+}
+
+/* open（下拉展开时） */
+.reka-autocomplete__input:not(:disabled)[data-state='open'] {
+  box-shadow: inset 0 0 0 1px var(--nt-primary-color),
+              0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+}
+
+/* ---- Disabled ---- */
+.reka-autocomplete__input[data-disabled] {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+/* ---- 加载旋转图标 ---- */
+.reka-autocomplete__loading-icon {
+  position: absolute;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  animation: reka-autocomplete-spin 0.8s linear infinite;
+  pointer-events: none;
+  opacity: var(--opacity-secondary);
+}
+
+@keyframes reka-autocomplete-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Content：下拉面板 ---- */
+.reka-autocomplete__content {
+  min-width: var(--reka-combobox-trigger-width);
+  background-color: var(--reka-surface-bg);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 0 0 1px var(--nt-gray-light),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  /* Presence mount 直接 open，必须用 animation */
+  animation: reka-autocomplete-in 200ms var(--transition-spring-bounce) backwards;
+  transform-origin: var(--reka-combobox-content-transform-origin);
+}
+
+@keyframes reka-autocomplete-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 关闭态 */
+.reka-autocomplete__content[data-state='closed'] {
+  animation: reka-autocomplete-out 150ms ease forwards;
+}
+
+@keyframes reka-autocomplete-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.95); }
+}
+
+/* ---- Viewport：滚动容器 ---- */
+.reka-autocomplete__viewport {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+/* ---- Item：选项 ---- */
+.reka-autocomplete__item {
+  all: unset;
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  cursor: var(--reka-cursor-interactive);
+  transition: background-color var(--transition-fast);
+  min-width: 0;
+}
+
+.reka-autocomplete__item[data-highlighted] {
+  background-color: var(--nt-gray-minimal);
+}
+
+.reka-autocomplete__item[data-state='checked'] {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 10%, transparent);
+}
+
+/* ---- Item Label ---- */
+.reka-autocomplete__item-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Empty：无结果 ---- */
+.reka-autocomplete__empty {
+  padding: 12px 10px;
+  text-align: center;
+  font-size: var(--text-sm);
+  opacity: var(--opacity-secondary);
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+:root[data-theme='dark'] .reka-autocomplete__content,
+.dark .reka-autocomplete__content {
+  box-shadow:
+    0 0 0 1px var(--nt-gray-light),
+    0 4px 16px rgba(255, 255, 255, 0.06),
+    0 1px 4px rgba(255, 255, 255, 0.03);
+}
+
+:root[data-theme='dark'] .reka-autocomplete__item[data-highlighted],
+.dark .reka-autocomplete__item[data-highlighted] {
+  background-color: var(--nt-gray-moderate);
+}

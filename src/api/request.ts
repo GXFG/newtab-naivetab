@@ -23,7 +23,7 @@ const responseHandler = (response: AxiosResponse) => {
 
 const responseErrorHandler = (error: AxiosError) => {
   const msg = `${error.message}: ${error.config?.url}`
-  console.error(msg)
+  console.warn(msg)
   // 网络错误提示由调用方决定是否使用 showToast 展示给用户
   return Promise.reject(error)
 }

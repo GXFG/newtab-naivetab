@@ -1,0 +1,63 @@
+/* ============================================================
+ * Tooltip — 文字提示（Apple 风格：深色底 + 轻阴影 + 淡入）
+ * ============================================================ */
+
+.reka-tooltip__trigger {
+  display: inline-flex;
+  /* inline-flex 适合按钮等行内触发器，不影响父布局 */
+}
+
+.reka-tooltip {
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  background-color: var(--nt-gray-solid);
+  color: var(--reka-surface-bg);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  max-width: 240px;
+  z-index: 10000;  /* 高于右键菜单 (9999) */
+
+  /* animation-fill-mode: backwards — 动画开始前保持 from 状态，防止首帧闪白 */
+  animation: reka-tooltip-in 180ms var(--transition-switch) backwards;
+}
+
+@keyframes reka-tooltip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 关闭动画：data-state='closed' 时触发，Presence 等 animationend 后卸载 DOM */
+.reka-tooltip[data-state='closed'] {
+  animation: reka-tooltip-out 120ms ease forwards;
+}
+
+@keyframes reka-tooltip-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.92); }
+}
+
+/* ============================================================
+ * 深色模式覆盖
+ * ============================================================ */
+:root[data-theme='dark'] .reka-tooltip,
+.dark .reka-tooltip {
+  background-color: var(--nt-gray-medium);
+  color: var(--nt-text-primary);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-tooltip {
+    border: 1px solid ButtonText;
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+}

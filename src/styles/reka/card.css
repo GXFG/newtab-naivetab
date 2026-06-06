@@ -1,0 +1,66 @@
+/* ============================================================
+ * Card — 卡片容器（Apple 风格：圆角 + 轻阴影 + 头/身/脚分区）
+ * ============================================================ */
+
+.reka-card {
+  border-radius: var(--radius-xl);
+  background-color: var(--reka-surface-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.reka-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--nt-gray-light);
+}
+
+.reka-card__header-extra {
+  flex-shrink: 0;
+}
+
+.reka-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-base);
+  font-weight: 500;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 13px;
+    border-radius: 2px;
+    background-color: var(--nt-primary-color);
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+}
+
+.reka-card__body {
+  padding: 0 var(--space-6);
+  line-height: 1.5;
+}
+
+.reka-card__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--nt-gray-light);
+}
+
+/* ============================================================
+ * 深色模式（--shadow-sm 已内置双模式切换，无需额外覆盖）
+ * ============================================================ */
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-card {
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+}

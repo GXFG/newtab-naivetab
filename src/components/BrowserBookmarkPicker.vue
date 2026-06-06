@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import type { TreeOption } from 'naive-ui'
-import { h, reactive, type PropType } from 'vue'
+import { reactive, type PropType } from 'vue'
 import { SECOND_MODAL_WIDTH } from '@/logic/constants/app'
 import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark/api'
 import { ICONS } from '@/logic/constants/icons'
+import NTDrawer from '@/components/ui/NTDrawer.vue'
+import NTTree from '@/components/ui/NTTree.vue'
 import { useDrawerStack } from '@/composables/useDrawerStack'
+
+interface TreeOption {
+  key: string
+  label: string
+  children?: TreeOption[]
+  isFolder?: boolean
+  url?: string
+  id?: string
+  title?: string
+  path?: string
+  [key: string]: any
+}
 
 const props = defineProps({
   show: {
@@ -13,8 +26,8 @@ const props = defineProps({
     required: true,
   },
   width: {
-    type: String,
-    default: `${SECOND_MODAL_WIDTH}`,
+    type: Number,
+    default: SECOND_MODAL_WIDTH,
   },
   selectType: {
     type: String as PropType<'bookmark' | 'folder'>,
@@ -53,7 +66,7 @@ const handleUpdateShow = (value: boolean) => {
 }
 
 /**
- * 构建 Naive UI TreeOption 数据
+ * 构建树节点数据
  * selectType='folder' 时过滤掉所有书签节点，只保留文件夹
  */
 const buildTreeOptions = (
@@ -85,18 +98,6 @@ const buildTreeOptions = (
       if (filteredChildren.length) {
         curr.children = filteredChildren
       }
-      curr.prefix = () =>
-        h(
-          'div',
-          { style: 'margin-top: 3px;font-size: 16px;' },
-          h(Icon, { icon: ICONS.folderOutline }),
-        )
-    } else {
-      curr.prefix = () =>
-        h('img', {
-          style: 'width: 14px; height: 14px',
-          src: getFaviconFromUrl(item.url || ''),
-        })
     }
     res.push(curr)
   }
@@ -122,28 +123,22 @@ useDrawerStack('browser-bookmark-picker', toRef(props, 'show'), onClose)
 </script>
 
 <template>
-  <NDrawer
+  <NTDrawer
     class="browser__bookmark-picker"
-    :show="props.show"
+    :open="props.show"
     :width="props.width"
-    show-mask="transparent"
-    @update:show="handleUpdateShow"
+    :title="$t('generalSetting.browserBookmark')"
+    closable
+    @update:open="handleUpdateShow"
   >
-    <NDrawerContent
-      :title="$t('generalSetting.browserBookmark')"
-      closable
-      :header-style="{ padding: '11px', fontSize: '14px' }"
-      :body-style="{ padding: '10px 20px' }"
-    >
-      <n-input v-model:value="state.treePattern" />
-      <NTree
+    <div class="bookmark-picker__body">
+      <NTInput v-model:value="state.treePattern" />
+      <NTTree
         :data="state.bookmarks"
         :pattern="state.treePattern"
         :show-irrelevant-nodes="false"
         key-field="key"
         label-field="label"
-        :selectable="false"
-        :keyboard="false"
         block-line
         block-node
         show-line
@@ -151,18 +146,37 @@ useDrawerStack('browser-bookmark-picker', toRef(props, 'show'), onClose)
         :default-expanded-keys="state.defaultExpandedKeys"
         :node-props="state.nodeProps"
         style="margin-top: 5px"
-      />
-    </NDrawerContent>
-  </NDrawer>
+      >
+        <!-- 节点图标：文件夹用 folder 图标，书签用 favicon -->
+        <template #prefix="{ option }">
+          <template v-if="option.isFolder">
+            <Icon
+              :icon="ICONS.folderOutline"
+              style="margin-top: 3px; font-size: 16px"
+            />
+          </template>
+          <template v-else>
+            <img
+              :src="getFaviconFromUrl(option.url || '')"
+              style="width: 14px; height: 14px"
+            />
+          </template>
+        </template>
+      </NTTree>
+    </div>
+  </NTDrawer>
 </template>
 
 <style>
 .browser__bookmark-picker {
-  .n-tree .n-tree-node-content .n-tree-node-content__text {
+  .reka-tree__label {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     cursor: pointer;
   }
+}
+.bookmark-picker__body {
+  padding: 10px 15px;
 }
 </style>

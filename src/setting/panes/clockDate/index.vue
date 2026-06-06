@@ -50,7 +50,7 @@ watch(
 <template>
   <SettingHeaderBar :title="$t('setting.clockDate')" />
 
-  <div class="setting__clockData">
+  <div class="setting__pane-content">
     <SettingCollapseSection
       name="clockDigital"
       :title="$t('setting.clockDigital')"
@@ -102,9 +102,3 @@ watch(
     </SettingCollapseSection>
   </div>
 </template>
-
-<style scoped>
-.setting__clockData {
-  padding: 8px 12px;
-}
-</style>

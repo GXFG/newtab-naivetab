@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTSelect from '@/components/ui/NTSelect.vue'
 import { URL_DAYJS_FORMAT } from '@/logic/constants/urls'
 import { localConfig } from '@/logic/config/state'
 import {
@@ -51,7 +52,7 @@ const handleFormatChange = (value: string) => {
     <!-- 功能配置 -->
     <SettingFormSection section-key="common.behavior">
       <SettingFormItem :label="$t('clock.format')">
-        <NSelect
+        <NTSelect
           :value="selectedOption"
           class="setting__fill-input"
           size="small"
@@ -65,7 +66,7 @@ const handleFormatChange = (value: string) => {
         :tip-content="URL_DAYJS_FORMAT"
         :tip-link="URL_DAYJS_FORMAT"
       >
-        <NInput
+        <NTInput
           v-model:value="localConfig.clockDigital.format"
           size="small"
           :placeholder="$t('clock.formatCustomTip')"

@@ -1,0 +1,200 @@
+/* ============================================================
+ * Drawer（侧滑抽屉，对标 iOS/macOS Sheets）
+ *
+ * 基于 Reka Dialog 原语，通过 placement 变体实现四个方向的侧滑。
+ * Presence mount 时 data-state 直接为 "open"，因此入场动画必须
+ * 使用 animation + backwards。
+ *
+ * ESC 和外部点击由 drawerStack 统一管理，Reka 内置事件被 prevent。
+ *
+ * 设计意图速查：
+ *   base     → 固定定位面板 + 投影 + 圆角
+ *   header   → 标题左 + 关闭按钮右，底部分割线
+ *   animation→ 方向感知 translateX/Y 侧滑进入
+ *   dark     → 面板底色切换，投影换白色通道
+ * ============================================================ */
+
+/* --- Overlay：不渲染（pointer-down-outside 已 prevent） --- */
+
+/* --- Content：侧滑面板 --- */
+.reka-drawer {
+  position: fixed;
+  background-color: var(--reka-surface-bg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--drawer-z, 1000);
+  outline: none;  /* DialogContent 默认 focus outline */
+}
+
+/* placement: right（默认） — 默认 off-screen，open 时滑入 */
+.reka-drawer--right {
+  top: 0;
+  right: 0;
+  height: 100%;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  transform: translateX(100%);
+}
+
+/* placement: left */
+.reka-drawer--left {
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  transform: translateX(-100%);
+}
+
+/* placement: top */
+.reka-drawer--top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  transform: translateY(-100%);
+}
+
+/* placement: bottom */
+.reka-drawer--bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  transform: translateY(100%);
+}
+
+/* ============================================================
+ * 动画：CSS transition（基于属性值变化，比 animation 重启更可靠）
+ *
+ * forceMount 让 DialogContent 始终 DOM 常驻，data-state 在
+ * open ↔ closed 之间切换 transform 目标值。transition 在两次
+ * 值之间自动插值，双向都生效。
+ *
+ * 初始挂载时 data-state='closed'，transform 直接取 off-screen
+ * 值（无前值可过渡 → 无动画 → 不闪）。
+ * ============================================================ */
+
+/* 打开态：滑入 */
+.reka-drawer--right.reka-drawer--open,
+.reka-drawer--left.reka-drawer--open {
+  transform: translateX(0);
+  transition: transform var(--transition-drawer);
+}
+
+.reka-drawer--top.reka-drawer--open,
+.reka-drawer--bottom.reka-drawer--open {
+  transform: translateY(0);
+  transition: transform var(--transition-drawer);
+}
+
+/* 关闭态：滑出 */
+.reka-drawer--right.reka-drawer--closed {
+  transform: translateX(100%);
+  transition: transform var(--transition-drawer);
+  pointer-events: none;
+}
+
+.reka-drawer--left.reka-drawer--closed {
+  transform: translateX(-100%);
+  transition: transform var(--transition-drawer);
+  pointer-events: none;
+}
+
+.reka-drawer--top.reka-drawer--closed {
+  transform: translateY(-100%);
+  transition: transform var(--transition-drawer);
+  pointer-events: none;
+}
+
+.reka-drawer--bottom.reka-drawer--closed {
+  transform: translateY(100%);
+  transition: transform var(--transition-drawer);
+  pointer-events: none;
+}
+
+/* ============================================================
+ * Header：标题 + 关闭按钮
+ * ============================================================ */
+.reka-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--nt-gray-light);
+  flex-shrink: 0;
+}
+
+.reka-drawer__header-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin: 0;
+  color: inherit;
+}
+
+/* 关闭按钮 */
+.reka-drawer__close {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  cursor: var(--reka-cursor-interactive);
+  color: var(--nt-text-secondary);
+  background-color: var(--nt-gray-minimal);
+  flex-shrink: 0;
+  font-size: 18px;
+  transition: background-color var(--transition-bg),
+              color var(--transition-fast);
+}
+
+.reka-drawer__close:not(:disabled):hover {
+  background-color: var(--nt-gray-light);
+  color: var(--nt-text-primary);
+}
+
+/* --- Body：内容区（flex 列容器，传递高度约束给子元素） --- */
+.reka-drawer__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden auto;
+}
+
+/* ============================================================
+ * 深色模式覆盖
+ * ============================================================ */
+:root[data-theme='dark'] .reka-drawer,
+.dark .reka-drawer {
+  /* --shadow-lg 已内置双模式值，此处仅覆盖背景色 */
+  background-color: var(--nt-setting-nav-bg, rgb(24, 24, 28));
+}
+
+:root[data-theme='dark'] .reka-drawer__header,
+.dark .reka-drawer__header {
+  border-bottom-color: var(--nt-gray-minimal);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-drawer {
+    border: 1px solid ButtonText;
+  }
+}
+
+/* 屏幕阅读器专用：视觉隐藏 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

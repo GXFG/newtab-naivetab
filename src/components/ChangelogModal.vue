@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import NTModal from '@/components/ui/NTModal.vue'
 import { ICONS } from '@/logic/constants/icons'
 import { defineAsyncComponent, computed } from 'vue'
 import { localConfig } from '@/logic/config/state'
@@ -23,11 +24,11 @@ const onConfirm = () => {
 </script>
 
 <template>
-  <NModal
-    :show="globalState.isChangelogModalVisible"
+  <NTModal
+    v-model:open="globalState.isChangelogModalVisible"
     :mask-closable="false"
   >
-    <NCard
+    <NTCard
       class="card__wrap"
       :title="$t('about.changelogTitle')"
     >
@@ -49,30 +50,28 @@ const onConfirm = () => {
         <p v-else>-</p>
       </div>
 
-      <div class="card__footer">
-        <NButton
-          class="footer__btn setting__btn setting__btn--primary"
+      <template #footer>
+        <NTButton
           type="primary"
           size="small"
-          secondary
+          variant="secondary"
           @click="onConfirm()"
         >
-          <template #icon>
-            <div class="icon__wrap">
-              <Icon :icon="ICONS.checkCircle" />
-            </div>
-          </template>
+          <div class="icon__wrap">
+            <Icon :icon="ICONS.checkCircle" />
+          </div>
           {{ $t('common.confirm') }}
-        </NButton>
-      </div>
-    </NCard>
-  </NModal>
+        </NTButton>
+      </template>
+    </NTCard>
+  </NTModal>
 </template>
 
 <style scoped>
 .card__wrap {
   width: 600px;
   .changelog__content {
+    padding: 15px 0;
     :deep(h1) {
       display: none;
     }
@@ -123,14 +122,5 @@ const onConfirm = () => {
 :root[data-theme='dark'] .notice__content,
 .dark .notice__content {
   color: rgba(255, 255, 255, 0.9);
-}
-
-.card__footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 15px;
-  .footer__btn {
-    margin: 0 10px;
-  }
 }
 </style>
