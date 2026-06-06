@@ -77,29 +77,25 @@ const onRandomTheme = () => {
     <SettingFormSection section-key="common.behavior">
       <SettingFormItem :label="$t('keyboardCommon.presetTheme')">
         <div class="theme__actions">
-          <NButton
+          <NTButton
             type="primary"
             size="tiny"
-            secondary
-            class="setting__btn setting__btn--primary"
+            variant="secondary"
+            round
             @click="state.isPresetThemeDrawerVisible = true"
           >
-            <template #icon>
-              <Icon icon="mdi:palette-outline" />
-            </template>
+            <Icon icon="mdi:palette-outline" />
             {{ $t('common.select') }}
-          </NButton>
-          <NButton
+          </NTButton>
+          <NTButton
             size="tiny"
-            secondary
-            class="setting__btn"
+            variant="secondary"
+            round
             @click="onRandomTheme"
           >
-            <template #icon>
-              <Icon icon="mdi:shuffle" />
-            </template>
+            <Icon icon="mdi:shuffle" />
             {{ $t('keyboardCommon.randomTheme') }}
-          </NButton>
+          </NTButton>
         </div>
       </SettingFormItem>
     </SettingFormSection>

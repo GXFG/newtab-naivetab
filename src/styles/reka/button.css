@@ -1,0 +1,224 @@
+/* ============================================================
+ * Button（Apple 风格：圆润 + 微阴影 + 交互反馈）
+ * ============================================================ */
+
+/* 1. base */
+.reka-button {
+  all: unset;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-bg),
+              box-shadow var(--transition-bg),
+              opacity var(--transition-bg),
+              transform var(--transition-switch);
+}
+/* Apple 风格：solid/secondary hover 微浮 + active 按下弹簧回弹。
+   text/ghost 无位移动画——它们是内联元素，位移会破坏布局稳定性。 */
+.reka-button--solid:hover:not(:disabled),
+.reka-button--secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.reka-button--solid:active:not(:disabled),
+.reka-button--secondary:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none !important;
+}
+.reka-button:disabled {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+.reka-button:focus-visible {
+  box-shadow: var(--reka-focus-ring);
+}
+.reka-button--round {
+  border-radius: var(--radius-pill);
+}
+
+/* 2. text / ghost — 无背景变体，放在 sizes 前面，size 的 padding 优先级更高 */
+.reka-button--text {
+  background: none;
+  border: none;
+}
+.reka-button--primary.reka-button--text { color: var(--nt-primary-color); }
+.reka-button--error.reka-button--text   { color: var(--color-error); }
+.reka-button--text:hover:not(:disabled) { background-color: var(--nt-gray-minimal); }
+.reka-button--error.reka-button--text:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
+}
+.reka-button--primary.reka-button--text:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 10%, transparent);
+}
+
+.reka-button--ghost {
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+}
+.reka-button--primary.reka-button--ghost { color: var(--nt-primary-color); }
+.reka-button--error.reka-button--ghost   { color: var(--color-error); }
+.reka-button--warning.reka-button--ghost { color: var(--color-warning); }
+.reka-button--ghost:hover:not(:disabled) {
+  background-color: var(--nt-gray-light);
+}
+.reka-button--error.reka-button--ghost:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
+}
+
+/* 3. sizes */
+.reka-button--tiny {
+  height: 22px;
+  padding: 0 6px;
+  font-size: var(--text-xs);
+}
+.reka-button--small {
+  height: 28px;
+  padding: 0 10px;
+  font-size: var(--text-sm);
+}
+.reka-button--medium {
+  height: 34px;
+  padding: 0 14px;
+  font-size: var(--text-sm);
+}
+.reka-button--large {
+  height: 40px;
+  padding: 0 18px;
+  font-size: var(--text-base);
+}
+
+/* 4. solid variant */
+.reka-button--default.reka-button--solid {
+  color: var(--nt-text-primary);
+  background-color: var(--nt-gray-light);
+  border: 1px solid var(--nt-gray-medium);
+}
+.reka-button--default.reka-button--solid:hover:not(:disabled) {
+  background-color: var(--nt-gray-moderate);
+}
+.reka-button--default.reka-button--solid:active:not(:disabled) {
+  background-color: var(--nt-gray-medium);
+}
+
+.reka-button--primary.reka-button--solid {
+  color: white;
+  background-color: var(--nt-primary-color);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(0, 0, 0, 0.18)),
+              0 1px 1px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(0, 0, 0, 0.1)),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.reka-button--primary.reka-button--solid:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 85%, black);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(0, 0, 0, 0.24)),
+              0 1px 2px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(0, 0, 0, 0.14)),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.reka-button--error.reka-button--solid {
+  color: white;
+  background-color: var(--color-error);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-error) 30%, rgba(0, 0, 0, 0.2)),
+              0 1px 1px color-mix(in srgb, var(--color-error) 30%, rgba(0, 0, 0, 0.12)),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.reka-button--error.reka-button--solid:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-error) 85%, black);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--color-error) 30%, rgba(0, 0, 0, 0.28)),
+              0 1px 2px color-mix(in srgb, var(--color-error) 30%, rgba(0, 0, 0, 0.16)),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.reka-button--warning.reka-button--solid {
+  color: white;
+  background-color: var(--color-warning);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-warning) 20%, transparent),
+              0 1px 1px color-mix(in srgb, var(--color-warning) 12%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.reka-button--warning.reka-button--solid:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-warning) 85%, black);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--color-warning) 28%, transparent),
+              0 1px 2px color-mix(in srgb, var(--color-warning) 16%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* 5. secondary variant — 浅色底 + 主题色文字 */
+.reka-button--default.reka-button--secondary {
+  background-color: var(--nt-gray-minimal);
+  border: 1px solid var(--nt-gray-light);
+}
+.reka-button--default.reka-button--secondary:hover:not(:disabled) {
+  background-color: var(--nt-gray-light);
+}
+
+.reka-button--primary.reka-button--secondary {
+  color: var(--nt-primary-color);
+  background-color: color-mix(in srgb, var(--nt-primary-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+}
+.reka-button--primary.reka-button--secondary:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 18%, transparent);
+}
+
+.reka-button--error.reka-button--secondary {
+  color: var(--color-error);
+  background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-error) 25%, transparent);
+}
+.reka-button--error.reka-button--secondary:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-error) 18%, transparent);
+}
+
+.reka-button--warning.reka-button--secondary {
+  color: var(--color-warning);
+  background-color: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 25%, transparent);
+}
+.reka-button--warning.reka-button--secondary:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-warning) 18%, transparent);
+}
+
+/* 6. loading spinner */
+.reka-button__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--nt-gray-medium);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: reka-button-spin 0.6s linear infinite;
+}
+@keyframes reka-button-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+ * 深色模式
+ * ============================================================ */
+:root[data-theme='dark'] .reka-button--default.reka-button--solid,
+.dark .reka-button--default.reka-button--solid {
+  color: var(--nt-text-primary);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-button {
+    border: 1px solid ButtonText;
+  }
+  .reka-button--primary {
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+}

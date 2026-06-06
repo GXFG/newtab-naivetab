@@ -16,37 +16,35 @@ import { ICONS } from '@/logic/constants/icons'
     :icon="ICONS.keyboardLabel"
   >
     <SettingFormItem :label="$t('keyboardCommon.keycapVisualType')">
-      <NRadioGroup
+      <NTRadioGroup
         v-model:value="localConfig.keyboardCommon.keycapType"
-        size="small"
         direction="horizontal"
         class="keyboard-style-radio__group--triple"
       >
-        <NRadio
+        <NTRadio
           v-for="item in KEYCAP_TYPE_OPTION"
           :key="item.value"
           :value="item.value"
         >
           {{ item.label }}
-        </NRadio>
-      </NRadioGroup>
+        </NTRadio>
+      </NTRadioGroup>
     </SettingFormItem>
 
     <SettingFormItem :label="$t('keyboardCommon.splitSpace')">
-      <NRadioGroup
+      <NTRadioGroup
         v-model:value="localConfig.keyboardCommon.splitSpace"
-        size="small"
         direction="horizontal"
         class="keyboard-style-radio__group--triple"
       >
-        <NRadio
+        <NTRadio
           v-for="item in SPLIT_SPACE_OPTION"
           :key="item.value"
           :value="item.value"
         >
           {{ item.label }}
-        </NRadio>
-      </NRadioGroup>
+        </NTRadio>
+      </NTRadioGroup>
     </SettingFormItem>
 
     <SwitchField
@@ -55,20 +53,19 @@ import { ICONS } from '@/logic/constants/icons'
     />
 
     <SettingFormItem :label="$t('keyboardCommon.keyboardType')">
-      <NRadioGroup
+      <NTRadioGroup
         v-model:value="localConfig.keyboardCommon.keyboardType"
-        size="small"
         direction="horizontal"
         class="keyboard-style-radio__group"
       >
-        <NRadio
+        <NTRadio
           v-for="item in KEYBOARD_TYPE_OPTION"
           :key="item.value"
           :value="item.value"
         >
           {{ item.label }}
-        </NRadio>
-      </NRadioGroup>
+        </NTRadio>
+      </NTRadioGroup>
     </SettingFormItem>
   </SettingFormSection>
 </template>

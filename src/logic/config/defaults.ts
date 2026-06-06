@@ -124,6 +124,7 @@ const widgetsDefaultConfig = (() => {
  */
 export const KEYBOARD_COMMAND_CONFIG = {
   isEnabled: true,
+  isGlobalShortcutEnabled: true,
   noModifierMode: false,
   shortcutInInputElement: true,
   urlBlacklist: [] as string[],

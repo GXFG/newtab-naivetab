@@ -43,22 +43,6 @@
 
 popup 修改书签等配置后**必须调用 `flushConfigSync`** 强制同步，否则 popup 销毁后防抖回调不会执行，配置丢失。
 
-## checkWriteRate 必须在 MD5 去重之后调用
-
-`checkWriteRate` 记录的是实际 `chrome.storage.sync.set` 调用次数，必须在 MD5 去重、大小检查**之后**、`set` 调用**之前**执行。
-
-**Why：** 如果在函数入口调用，被 MD5 去重拦截的调用、被大小检查拦截的调用也会虚增计数器，导致用户收到假的"写入速率即将超限"警告。
-
-**How to apply：** 确保 `checkWriteRate` 在所有可能提前 return 的检查之后执行。
-
-## syncId 必须在 set 调用前设置
-
-`uploadConfigFn` 中 `syncId` 必须在 `chrome.storage.sync.set` **调用前**设置，不能写在回调中。
-
-**Why：** `chrome.storage.sync.set` 写入完成后，`chrome.storage.onChanged` 事件可能在 `set` 回调执行前就触发（事件分发与回调调度是独立的 microtask）。如果 syncId 尚未更新，`setupKeyboardSyncListener` 的 syncId 守卫会失效，导致自己上传的配置又触发本地配置被覆盖 → Vue watch → 第二次上传。
-
-**How to apply：** 修改上传逻辑时，`syncId`/`syncTime` 赋值必须放在 `chrome.storage.sync.set` 调用之前，回调中只保留错误处理和 `dirty` 清理。
-
 ## `chrome.storage.local.get` 异步时序不可靠，首屏数据必须用 `localStorage` 同步读取
 
 `chrome.storage.local.get()` 是异步 API，Promise 在微任务队列中 resolve。而 `useStorageLocal` 从 `localStorage` **同步**读取，Vue 组件首次渲染时依赖的 `localConfig` 值（如 `source=BROWSER`）已就绪。
@@ -76,3 +60,44 @@ popup 修改书签等配置后**必须调用 `flushConfigSync`** 强制同步，
 | 跨上下文共享（SW/CS） | `chrome.storage.local` + `onChanged` 监听 | `localStorage`（SW/CS 不可用） |
 
 参考实现：`src/logic/keyboard/bookmark-state.ts` 中 `persistKeymapToLocal` + 模块顶层 `localStorage.getItem`。
+
+## 新增配置字段后的验证清单
+
+每次新增持久化配置字段后，必须逐项检查：
+
+### 1. 所有消费者上下文
+
+配置字段跨 4 个上下文，新增字段后每个上下文都要验证：
+
+| 上下文 | 检查点 |
+|--------|--------|
+| newtab | `localConfig.xxx.yyy` 读取路径是否正确，缺失时行为是否符合预期 |
+| CS | `loadConfig()` 和 `onChanged` 两处是否都加载了新字段，`?? defaultValue` 是否合理 |
+| SW | `cache.ts` 初始缓存（`defaultConfig`）+ `onChanged` 更新，**布尔值必须用 `=== false` 而非 `!` 判空**（旧配置缺失字段时 `undefined` 会被 `!` 转为 `true` 导致误拦截） |
+| popup | 是否读取了该字段，需要注意 popup 关闭后防抖回调丢失的 `flushSync` 问题 |
+
+### 2. 布尔字段的判空方式
+
+```
+// ❌ 错误：旧配置缺失该字段时，undefined 被 ! 转为 true
+if (!config.isNewField) return
+
+// ✅ 正确：仅显式 false 时拦截
+if (config.isNewField === false) return
+```
+
+**Why：** 老用户的 `chrome.storage.sync` 中可能存着旧版 gzip 配置，解压后不含新字段。SW/CS 读取后该字段为 `undefined`。`!undefined` 为 `true`，导致功能被意外关闭。
+
+### 3. 旧迁移链路干扰
+
+新增字段后，检查 `handleAppUpdate` 中**所有更早版本的迁移分支**是否会覆盖新字段。尤其关注：
+
+- `Object.keys(defaultConfig.xxx)` 遍历 + `localStorageConfig[field]` 赋值的模式（如 v2.2.2 的 `keyboard → keyboardBookmark` 迁移），老 localStorage 数据不含新字段时会写入 `undefined`
+- 解决方案：确保新迁移分支在旧分支**之后**执行，用 `?? defaultValue` 兜底
+
+### 4. 测试文件同步
+
+- 修改 `PRESERVE_FIELDS` 后，检查 `config-reset.test.ts` 中 quick reset 相关断言的期望值
+- 修改 `defaultConfig` 后，检查 `config-snapshot.test.ts` 的必需字段断言
+- 新增迁移分支后，检查 `handle-app-update.test.ts` 是否需要补充用例
+- 全局搜索新字段名，确认测试 mock 是否需要补充该字段

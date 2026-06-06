@@ -125,7 +125,7 @@ const speedUnit = computed(
       class="now__icon-section"
       @click="onOpenWeather()"
     >
-      <NPopover
+      <NTPopover
         :show="weatherIndicesInfo.length > 0 && state.isIndicesVisible"
         trigger="manual"
       >
@@ -142,7 +142,7 @@ const speedUnit = computed(
         <p class="weather__indices">
           {{ weatherIndicesInfo }}
         </p>
-      </NPopover>
+      </NTPopover>
     </div>
 
     <!-- 右侧信息区域 -->
@@ -157,7 +157,7 @@ const speedUnit = computed(
               v-if="isWeatherWarning"
               class="warning__trigger"
             >
-              <NPopover
+              <NTPopover
                 :style="{ width: '500px' }"
                 :show="isMounted && warningVisible"
                 trigger="manual"
@@ -185,7 +185,7 @@ const speedUnit = computed(
                     <Icon :icon="ICONS.closeCircleLine" />
                   </div>
                 </div>
-              </NPopover>
+              </NTPopover>
             </div>
           </div>
 

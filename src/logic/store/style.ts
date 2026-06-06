@@ -72,46 +72,6 @@ export const customPrimaryColor = getStyleField('general', 'primaryColor')
 export const getIsWidgetRender = (widgetCode: WidgetCodes) =>
   computed(() => localConfig[widgetCode].enabled)
 
-export const fontSelectRenderLabel = (option: SelectStringItem) => {
-  return [
-    h(
-      'div',
-      {
-        title: option.label,
-        style: {
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontSize: '13px',
-        },
-      },
-      [
-        h(
-          'span',
-          {
-            style: {
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              textOverflow: 'ellipsis',
-            },
-          },
-          option.label,
-        ),
-        h(
-          'span',
-          {
-            style: {
-              fontFamily: option.label,
-            },
-          },
-          'abc-ABC-123',
-        ),
-      ],
-    ),
-  ]
-}
-
 export const availableFontOptions = computed(() => {
   const otherFonts = globalState.availableFontList.filter(
     (font) => font !== 'system',

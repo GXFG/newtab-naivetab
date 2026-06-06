@@ -6,6 +6,7 @@ import {
   type KeycapThemeKey,
 } from '@/logic/keyboard/themes'
 import { localConfig, localState } from '@/logic/config/state'
+import NTDrawer from '@/components/ui/NTDrawer.vue'
 import { useDrawerStack } from '@/composables/useDrawerStack'
 
 const props = defineProps({
@@ -20,6 +21,18 @@ const emit = defineEmits(['update:show'])
 const onCloseModal = () => {
   emit('update:show', false)
 }
+
+/** NTDrawer 双向绑定桥梁：ref 同步 props.show，关闭时 emit */
+const drawerOpen = ref(props.show)
+watch(
+  () => props.show,
+  (val) => {
+    drawerOpen.value = val
+  },
+)
+watch(drawerOpen, (val) => {
+  if (!val) onCloseModal()
+})
 
 // ESC 逐层关闭支持
 useDrawerStack('preset-theme-drawer', toRef(props, 'show'), onCloseModal)
@@ -101,65 +114,59 @@ const getKeycapStyle = (themeKey: string, type: 'main' | 'e1' | 'e2') => {
 </script>
 
 <template>
-  <NDrawer
-    :show="props.show"
+  <NTDrawer
+    v-model:open="drawerOpen"
     :width="SECOND_MODAL_WIDTH"
     :height="350"
     :placement="localConfig.general.drawerPlacement"
-    show-mask="transparent"
-    to="#preset-theme__drawer"
-    @update:show="onCloseModal()"
+    :title="$t('keyboardCommon.selectPresetThemeLabel')"
+    closable
   >
-    <NDrawerContent
-      :title="$t('keyboardCommon.selectPresetThemeLabel')"
-      closable
-    >
-      <div class="theme__sections">
-        <section
-          v-for="group in presetThemeGroups"
-          :key="group.key"
-          class="theme__section"
-        >
-          <div class="section__header">
-            <span class="section__label">{{ $t(group.labelKey) }}</span>
-            <span class="section__count">{{
-              Object.keys(group.themes).length
-            }}</span>
-          </div>
+    <div class="theme__sections">
+      <section
+        v-for="group in presetThemeGroups"
+        :key="group.key"
+        class="theme__section"
+      >
+        <div class="section__header">
+          <span class="section__label">{{ $t(group.labelKey) }}</span>
+          <span class="section__count">{{
+            Object.keys(group.themes).length
+          }}</span>
+        </div>
 
-          <div class="theme__container">
+        <div class="theme__container">
+          <div
+            v-for="[themeKey, theme] in Object.entries(group.themes)"
+            :key="themeKey"
+            class="theme__item"
+            :style="`background-color: ${theme.shellColor}`"
+            @click="onSelectPresetTheme(themeKey as KeycapThemeKey)"
+          >
+            <span
+              class="theme__title"
+              :style="getKeycapStyle(themeKey, 'main')"
+              >{{ theme.label }}</span
+            >
+
             <div
-              v-for="[themeKey, theme] in Object.entries(group.themes)"
-              :key="themeKey"
-              class="theme__item"
-              :style="`background-color: ${theme.shellColor}`"
-              @click="onSelectPresetTheme(themeKey as KeycapThemeKey)"
+              v-for="(row, ri) in KB_ROWS"
+              :key="ri"
+              class="keyboard__row"
             >
               <span
-                class="theme__title"
-                :style="getKeycapStyle(themeKey, 'main')"
-                >{{ theme.label }}</span
+                v-for="(key, ki) in row"
+                :key="ki"
+                class="keycap"
+                :style="`${getKeycapStyle(themeKey, key.t)};grid-column:span ${key.span}`"
+                >{{ key.k }}</span
               >
-
-              <div
-                v-for="(row, ri) in KB_ROWS"
-                :key="ri"
-                class="keyboard__row"
-              >
-                <span
-                  v-for="(key, ki) in row"
-                  :key="ki"
-                  class="keycap"
-                  :style="`${getKeycapStyle(themeKey, key.t)};grid-column:span ${key.span}`"
-                  >{{ key.k }}</span
-                >
-              </div>
             </div>
           </div>
-        </section>
-      </div>
-    </NDrawerContent>
-  </NDrawer>
+        </div>
+      </section>
+    </div>
+  </NTDrawer>
 </template>
 
 <style scoped>
@@ -167,7 +174,7 @@ const getKeycapStyle = (themeKey: string, type: 'main' | 'e1' | 'e2') => {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 2px;
+  padding: 15px;
 }
 
 .theme__section {
@@ -200,7 +207,7 @@ const getKeycapStyle = (themeKey: string, type: 'main' | 'e1' | 'e2') => {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  background-color: var(--gray-alpha-08);
+  background-color: var(--nt-gray-minimal);
 }
 
 .theme__container {

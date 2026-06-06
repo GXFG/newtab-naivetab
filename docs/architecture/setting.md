@@ -7,7 +7,7 @@
 | `src/setting/SettingPaneContent.vue` | 设置面板核心内容：NTabs 左侧导航 + 分组分隔线 + 组件渲染 |
 | `src/setting/index.vue` | 抽屉模式入口（newtab 右键菜单触发） |
 | `src/options/Content.vue` | 全屏模式入口（`chrome://extensions` → 选项） |
-| `src/setting/registry.ts` | 面板注册中心：SETTING_GROUPS 分组配置 + 异步组件加载 |
+| `src/setting/registry.ts` | 面板注册中心：SETTING_GROUPS 分组配置 + 静态组件注册（PANE_MAP） |
 | `src/setting/components/SettingFormWrap.vue` | 面板容器：统一 .setting\_\_pane-content 样式 + 底部重置按钮 |
 | `src/setting/components/SettingFormItem.vue` | 表单项原子组件：label + control + Tips 布局 |
 | `src/setting/components/SettingFormSection.vue` | 分组容器：section header + body（自动绘制内部分隔线） |
@@ -24,7 +24,7 @@
 
 | 模式 | 入口 | 容器 | 宽度 |
 |------|------|------|------|
-| **抽屉模式** | newtab 右键菜单 | `setting/index.vue`（NDrawer 包裹） | 750px |
+| **抽屉模式** | newtab 右键菜单 | `setting/index.vue`（NTDrawer 包裹） | 750px |
 | **全屏模式** | `chrome://extensions` → 选项 | `options/Content.vue`（页面布局） | 居中自适应 |
 
 `globalState.settingMode` 区分当前模式（`'drawer'` / `'options'`）。
@@ -34,7 +34,7 @@
 ```
 ┌─────────────┐        ┌──────────────────┐
 │  newtab右键  │───────>│  drawer 模式      │
-│  "设置"     │        │  NDrawer 悬浮      │
+│  "设置"     │        │  NTDrawer 悬浮      │
 └─────────────┘        │  750px 宽         │
                        └──────────────────┘
 
@@ -82,9 +82,11 @@ export const SETTING_GROUPS: SettingGroup[] = [
 
 **图标注册类型安全**：`SETTING_ICON_META` 的类型为 `Record<settingPanes, SettingIconMeta>`，TypeScript 编译时强制要求所有 `settingPanes` 值都必须有对应图标。新增面板时若遗漏注册，TS 会在编译期报错，不会等到运行时空指针。
 
-### 异步加载
+### 静态注册
 
-每个面板通过 `defineAsyncComponent` 异步加载，目录名默认与 code 一致，不一致时通过 `PANE_DIR_MAP` 映射。加载时打印 `console.time` 便于性能分析。
+所有面板组件在 `registry.ts` 顶部静态 import，通过 `PANE_MAP`（`Record<settingPanes, Component>`）映射。浏览器扩展中所有文件都在本地磁盘，无需 `defineAsyncComponent` 做代码分割——该优化只对网络加载有意义。
+
+**类型安全**：`PANE_MAP` 的 key 类型为 `settingPanes` 联合类型，新增面板时若遗漏注册组件，TS 会在编译期报错。
 
 ### 新增面板步骤
 
@@ -97,7 +99,7 @@ export const SETTING_GROUPS: SettingGroup[] = [
 
 ```
 SettingPaneContent          ← 最外层，NTabs 导航 + 分组逻辑
-  └─ NTabPane (per item)
+  └─ NTTabsPane (per item)
        └─ [pane component]  ← 各 Widget 的具体设置
             ├─ SettingHeaderBar          ← 标题栏（sticky 定位）
             ├─ SettingFormWrap           ← 面板容器（统一样式 + 重置按钮）
@@ -161,7 +163,7 @@ SettingPaneContent          ← 最外层，NTabs 导航 + 分组逻辑
   :label="$t('some.label')"
 >
   <template #extra>
-    <NInput v-model:value="config.someValue" size="small" />
+    <NTInput v-model:value="config.someValue" size="small" />
   </template>
 </SwitchField>
 ```
@@ -175,13 +177,13 @@ SettingPaneContent          ← 最外层，NTabs 导航 + 分组逻辑
 
 ### disabled 状态处理
 
-**注意**：`SettingFormItem` 不接受 `disabled` prop（根元素是 div，不支持 disabled 属性）。禁用状态应由内部 Field 组件各自处理。`FontField` 和 `ToggleColorField` 内部已将 `disabled` 传递给所有子组件（`CustomColorPicker`、`NSelect`、`NInputNumber`、`NSwitch`）。
+**注意**：`SettingFormItem` 不接受 `disabled` prop（根元素是 div，不支持 disabled 属性）。禁用状态应由内部 Field 组件各自处理。`FontField` 和 `ToggleColorField` 内部已将 `disabled` 传递给所有子组件（`CustomColorPicker`、`NTSelect`、`NTInputNumber`、`NTSwitch`）。
 
 ## 布局约定
 
 ### SettingFormSection 分隔线
 
-`SettingFormSection` 的 body 容器有 `border: 1px solid var(--gray-alpha-08)` 外边框，内部每个 `SettingFormItem` 通过 `::after` 伪元素绘制底线，最后一个不显示。
+`SettingFormSection` 的 body 容器有 `border: 1px solid var(--nt-gray-minimal)` 外边框，内部每个 `SettingFormItem` 通过 `::after` 伪元素绘制底线，最后一个不显示。
 
 ### header 与 form 间距
 
@@ -229,8 +231,8 @@ onLeave:  maxHeight: scrollHeight → 0  (在 rAF 中执行)
 
 | Widget 类型 | 重置行为 |
 |-------------|---------|
-| 有 `PRESERVE_FIELDS` | NDropdown 提供"快速重置"和"完全重置"两个选项 |
-| 无 `PRESERVE_FIELDS` | NPopconfirm 确认后执行完全重置 |
+| 有 `PRESERVE_FIELDS` | NTDropdown 提供"快速重置"和"完全重置"两个选项 |
+| 无 `PRESERVE_FIELDS` | NTPopconfirm 确认后执行完全重置 |
 
 **i18n key 约定**：reset 按钮文案拼接 `setting.{widgetCode}`，新增 Widget 时须在 locales 文件的 `setting` 命名空间下添加对应翻译。
 
@@ -238,9 +240,7 @@ onLeave:  maxHeight: scrollHeight → 0  (在 rAF 中执行)
 
 ## 预览功能
 
-`SettingHeaderBar` 的预览按钮通过 hover 事件切换 `document.body` 的 `setting-preview-active` 类。对应 CSS 在 `styles/setting-utils.css` 中：
-- 抽屉透明度设为 0
-- 遮罩背景变为透明
+`SettingHeaderBar` 的预览按钮通过 hover 事件切换 `document.body` 的 `setting-preview-active` 类。对应 CSS 在 `styles/setting-utils.css` 中，将 `#setting .reka-drawer` 的 `opacity` 设为 0 实现透视效果。
 
 用户可实时看到下方 newtab 页面的效果，鼠标离开后自动恢复，不影响任何配置数据。
 
@@ -292,7 +292,7 @@ useDrawerStack('background-drawer', toRef(props, 'show'), onCloseModal)
 
 | 组件 | Code | 挂载点 |
 |------|------|--------|
-| `BrowserBookmarkPicker` | `browser-bookmark-picker` | teleport 到 body（Naive UI 默认） |
+| `BrowserBookmarkPicker` | `browser-bookmark-picker` | NTDrawer（Reka Dialog） |
 | `BackgroundDrawer` | `background-drawer` | `#background__drawer` |
 | `PresetThemeDrawer` | `preset-theme-drawer` | `#preset-theme__drawer` |
 

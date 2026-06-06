@@ -8,12 +8,7 @@ import { isDev, log, port, r, BROWSER_DIR } from './utils'
  * Stub index.html to use Vite in development
  */
 async function stubIndexHtml() {
-  const views = [
-    'newtab',
-    'popup',
-    'background',
-    'options',
-  ]
+  const views = ['newtab', 'popup', 'background', 'options']
 
   for (const view of views) {
     await fs.ensureDir(r(`${BROWSER_DIR}/dist/${view}`))
@@ -21,7 +16,10 @@ async function stubIndexHtml() {
 
     data = data
       .replace('"./main.ts"', `"http://localhost:${port}/${view}/main.ts"`)
-      .replace('<div id="app"></div>', '<div id="app">Vite server did not start</div>')
+      .replace(
+        '<div id="app"></div>',
+        '<div id="app">Vite server did not start</div>',
+      )
 
     data += `<style type="text/css">
         @media (prefers-color-scheme: dark) {
@@ -37,17 +35,21 @@ async function stubIndexHtml() {
           }
         }
       </style>`
-    await fs.writeFile(r(`${BROWSER_DIR}/dist/${view}/index.html`), data, 'utf-8')
+    await fs.writeFile(
+      r(`${BROWSER_DIR}/dist/${view}/index.html`),
+      data,
+      'utf-8',
+    )
     log('PRE', `stub ${view}`)
   }
 }
 
 function writeManifest() {
-  execSync('esno ./scripts/manifest.ts', { stdio: 'inherit' })
+  execSync('tsx ./scripts/manifest.ts', { stdio: 'inherit' })
 }
 
 function writeLocales() {
-  execSync('esno ./scripts/locale.ts', { stdio: 'inherit' })
+  execSync('tsx ./scripts/locale.ts', { stdio: 'inherit' })
 }
 
 fs.ensureDirSync(r(BROWSER_DIR))
@@ -60,16 +62,13 @@ writeLocales()
 
 if (isDev) {
   stubIndexHtml()
-  chokidar.watch(r('src/**/*.html'))
-    .on('change', () => {
-      stubIndexHtml()
-    })
-  chokidar.watch([r('src/manifest.ts'), r('package.json')])
-    .on('change', () => {
-      writeManifest()
-    })
-  chokidar.watch(r('src/_locales'))
-    .on('change', () => {
-      writeLocales()
-    })
+  chokidar.watch(r('src/**/*.html')).on('change', () => {
+    stubIndexHtml()
+  })
+  chokidar.watch([r('src/manifest.ts'), r('package.json')]).on('change', () => {
+    writeManifest()
+  })
+  chokidar.watch(r('src/_locales')).on('change', () => {
+    writeLocales()
+  })
 }

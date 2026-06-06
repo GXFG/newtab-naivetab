@@ -16,8 +16,8 @@
  *     - 模板字符串调用 $t(`...`) → 提醒无法静态校验
  *
  * 用法：
- *   pnpm exec esno scripts/check/validate-registries.ts          # 全量校验
- *   pnpm exec esno scripts/check/validate-registries.ts i18n     # 仅校验 i18n
+ *   pnpm exec tsx scripts/check/validate-registries.ts          # 全量校验
+ *   pnpm exec tsx scripts/check/validate-registries.ts i18n     # 仅校验 i18n
  */
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs'

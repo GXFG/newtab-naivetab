@@ -277,22 +277,27 @@ watch(isDragMode, () => {
         alt=""
       />
       <div class="search__input-wrap">
-        <NInput
-          v-model:value="state.searchValue"
+        <input
+          v-model="state.searchValue"
           type="text"
-          size="large"
-          class="input__main"
-          :class="{ 'input__main--move': isDragMode }"
+          class="search__input"
+          :class="{ 'search__input--move': isDragMode }"
           :placeholder="
             localConfig.search.placeholder || localConfig.search.urlName
           "
-          :loading="state.isSuggestLoading"
-          clearable
           @focus="handleSearchFocus"
           @blur="handleSearchBlur"
           @input="handleSearchInput"
           @keydown="handleSearchKeydown"
         />
+        <button
+          v-if="state.searchValue"
+          type="button"
+          class="input__clear"
+          @click="onClearValue"
+        >
+          <Icon :icon="ICONS.closeCircleLine" />
+        </button>
       </div>
       <Transition name="search-dropdown">
         <div
@@ -317,20 +322,19 @@ watch(isDragMode, () => {
           </div>
         </div>
       </Transition>
-      <NButton
+      <button
         v-if="localConfig.search.iconEnabled"
+        type="button"
         class="input__search"
         :class="{ 'input__search--move': isDragMode }"
-        size="large"
-        :loading="state.isSearching"
-        text
+        :disabled="state.isSearching"
         @click="onSearch"
       >
         <Icon
           :icon="ICONS.searchAction"
           class="search__icon"
         />
-      </NButton>
+      </button>
     </div>
   </WidgetWrap>
 </template>
@@ -413,75 +417,58 @@ watch(isDragMode, () => {
       display: flex;
       align-items: center;
     }
-    .n-input__border,
-    .n-input__state-border {
-      border: 0 !important;
-      box-shadow: none !important;
-    }
-    .n-input,
-    .n-input--focus {
-      border-radius: var(--nt-s-border-radius) !important;
-    }
-    .input__main {
+    .search__input {
+      all: unset;
       width: 100%;
       height: var(--nt-s-height);
       font-size: var(--nt-s-font-size);
-      background-color: transparent;
-      /* 覆盖 Naive UI NInput 内部结构，嵌套深度超出 4 层规范属合理例外 */
-      .n-input-wrapper {
-        padding: 0;
-        .n-input__input-el {
-          height: var(--nt-s-height);
-          color: var(--nt-s-font-color) !important;
-          caret-color: var(--nt-s-font-color);
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-        }
-        .n-input__placeholder {
-          color: var(--nt-s-font-color);
-          opacity: 0.4;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-        .n-input__suffix {
-          .n-base-clear {
-            color: var(--nt-s-font-color);
-            opacity: 0;
-            transform: scale(0.8);
-            transition:
-              opacity 0.18s ease,
-              transform 0.15s ease;
-          }
-        }
-      }
-      /* 有内容时清除按钮渐现 */
-      &:not(.n-input--empty) {
-        .n-input__suffix .n-base-clear {
-          opacity: 0.45;
-          transform: scale(1);
-          &:hover {
-            opacity: 0.9;
-            transform: scale(1.15);
-          }
-        }
+      font-family: inherit;
+      color: var(--nt-s-font-color) !important;
+      caret-color: var(--nt-s-font-color);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      background: transparent;
+      &::placeholder {
+        color: var(--nt-s-font-color);
+        opacity: 0.4;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       }
     }
-    .input__main--move {
+    .search__input--move {
       cursor: move !important;
-      .n-input__input-el {
-        cursor: move !important;
+    }
+    .input__clear {
+      all: unset;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--nt-s-font-color);
+      opacity: 0.45;
+      cursor: pointer;
+      font-size: calc(var(--nt-s-font-size) * 0.85);
+      transition:
+        opacity var(--transition-bg),
+        transform var(--transition-bg);
+      &:hover {
+        opacity: 0.9;
+        transform: scale(1.15);
       }
     }
     .input__search {
+      all: unset;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       position: relative;
       z-index: 1;
       flex-shrink: 0;
-      width: auto;
       margin-left: var(--nt-s-padding);
       color: var(--nt-s-font-color) !important;
       opacity: 0.65;
       cursor: pointer;
       transition:
-        opacity 0.18s ease,
-        transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+        opacity var(--transition-bg),
+        transform var(--transition-switch);
       .search__icon {
         font-size: var(--nt-s-font-size);
         display: block;
@@ -490,43 +477,21 @@ watch(isDragMode, () => {
       }
       &:hover {
         opacity: 1;
-        transform: scale(1.12);
+        transform: scale(1.1);
         .search__icon {
           filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
         }
       }
       &:active {
         transform: scale(0.95);
-        transition-duration: 0.08s;
       }
-      /* 搜索加载中隐藏图标，显示 spinner */
-      &.n-button--loading {
-        opacity: 0.5;
-        .search__icon {
-          opacity: 0;
-          transform: scale(0.8);
-          transition:
-            opacity 0.15s ease,
-            transform 0.15s ease;
-        }
-        .n-base-loading {
-          .n-base-loading__icon {
-            color: var(--nt-s-font-color) !important;
-          }
-        }
+      &:disabled {
+        opacity: 0.4;
+        cursor: default;
       }
     }
     .input__search--move {
       cursor: move !important;
-      &:hover {
-        transform: none;
-      }
-      &:active {
-        transform: none;
-      }
-      &.n-button--loading:hover {
-        transform: none;
-      }
     }
 
     /* 自定义下拉建议列表 — 玻璃质感 */

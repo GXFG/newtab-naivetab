@@ -9,6 +9,8 @@ import {
   SettingFormSection,
   SettingFormInlineRow,
 } from '@/setting/components'
+import NTSelect from '@/components/ui/NTSelect.vue'
+import NTSelectItem from '@/components/ui/NTSelectItem.vue'
 import {
   NumberField,
   SwitchField,
@@ -34,12 +36,13 @@ watch(
   },
 )
 
-const onChangeSearch = (value: string, option: SelectStringItem) => {
+const onChangeSearch = (value: string) => {
   if (value === 'custom') {
     localConfig.search.urlName = 'custom'
     return
   }
-  localConfig.search.urlName = option.label
+  const option = searchEngineList.value.find((o: any) => o.value === value)
+  localConfig.search.urlName = option?.label || ''
   localConfig.search.urlValue = value
 }
 
@@ -53,38 +56,6 @@ const searchEngineList = computed(() => {
     ...SEARCH_ENGINE_LIST,
   ] as Array<{ label: string; value: string; faviconUrl: string }>
 })
-
-const searchSelectRenderLabel = (option: {
-  label: string
-  value: string
-  faviconUrl?: string
-}) => {
-  return [
-    h(
-      'div',
-      {
-        style: {
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-        },
-      },
-      [
-        option.faviconUrl
-          ? h('img', {
-              style: {
-                marginRight: '10px',
-                width: '15px',
-                height: '15px',
-              },
-              src: option.faviconUrl,
-            })
-          : h('div', { style: { marginRight: '10px', width: '15px' } }),
-        h('span', {}, option.label),
-      ],
-    ),
-  ]
-}
 </script>
 
 <template>
@@ -97,13 +68,53 @@ const searchSelectRenderLabel = (option: {
       :icon="ICONS.searchAction"
     >
       <SettingFormItem :label="$t('search.searchEngine')">
-        <NSelect
+        <NTSelect
           v-model:value="state.searchEngine"
           :options="searchEngineList"
-          :render-label="searchSelectRenderLabel"
           size="small"
           @update:value="onChangeSearch"
-        />
+        >
+          <template #label="{ option, placeholder }">
+            <template v-if="option">
+              <span class="reka-select__label-row">
+                <img
+                  v-if="option.faviconUrl"
+                  :src="option.faviconUrl"
+                  class="reka-select__favicon"
+                />
+                <span
+                  v-else
+                  class="reka-select__favicon reka-select__favicon--empty"
+                />
+                <span class="reka-select__value">{{ option.label }}</span>
+              </span>
+            </template>
+            <span
+              v-else
+              class="reka-select__value reka-select__value--placeholder"
+            >
+              {{ placeholder }}
+            </span>
+          </template>
+          <NTSelectItem
+            v-for="item in searchEngineList"
+            :key="item.value"
+            :value="item.value"
+          >
+            <span class="reka-select__label-row">
+              <img
+                v-if="item.faviconUrl"
+                :src="item.faviconUrl"
+                class="reka-select__favicon"
+              />
+              <span
+                v-else
+                class="reka-select__favicon reka-select__favicon--empty"
+              />
+              <span>{{ item.label }}</span>
+            </span>
+          </NTSelectItem>
+        </NTSelect>
       </SettingFormItem>
 
       <Transition name="setting-slide">
@@ -112,7 +123,7 @@ const searchSelectRenderLabel = (option: {
           :label="$t('search.customEngine')"
         >
           <!-- 自定义搜索引擎 URL 示例，无需 i18n -->
-          <NInput
+          <NTInput
             v-model:value="localConfig.search.urlValue"
             type="text"
             size="small"
@@ -122,7 +133,7 @@ const searchSelectRenderLabel = (option: {
       </Transition>
 
       <SettingFormItem :label="$t('search.placeholder')">
-        <NInput
+        <NTInput
           v-model:value="localConfig.search.placeholder"
           type="text"
           size="small"
@@ -152,7 +163,7 @@ const searchSelectRenderLabel = (option: {
         :label="$t('search.searchEngineIcon')"
       >
         <template #extra>
-          <NInput
+          <NTInput
             v-model:value="localConfig.search.searchEngineIconUrl"
             size="small"
             :placeholder="$t('search.searchEngineIconUrlPlaceholder')"

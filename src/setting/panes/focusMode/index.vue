@@ -7,6 +7,7 @@ import { widgetsRegistry } from '@/newtab/widgets/registry'
 import { WIDGET_GROUPS } from '@/common/widget-constants'
 import { SettingHeaderBar, SettingFormSection } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
+import NTSwitch from '@/components/ui/NTSwitch.vue'
 import { gaProxy } from '@/logic/utils/gtag'
 
 const widgetGroups = computed(() =>
@@ -56,58 +57,62 @@ const cssVars = computed(() => ({
 </script>
 
 <template>
-  <div :style="cssVars">
-    <SettingHeaderBar :title="$t('setting.focusMode')" />
+  <SettingHeaderBar :title="$t('setting.focusMode')" />
 
-    <div class="setting__pane-content">
-      <SettingFormSection section-key="common.behavior">
-        <SwitchField
-          v-model="localState.isFocusMode"
-          :label="$t('generalSetting.enableFocusMode')"
-          :tip-content="$t('generalSetting.focusModeTips')"
-        />
-      </SettingFormSection>
+  <div
+    class="setting__pane-content"
+    :style="cssVars"
+  >
+    <SettingFormSection section-key="common.behavior">
+      <SwitchField
+        v-model="localState.isFocusMode"
+        :label="$t('generalSetting.enableFocusMode')"
+        :tip-content="$t('generalSetting.focusModeTips')"
+      />
+    </SettingFormSection>
 
-      <div class="focus__groups">
-        <div
-          v-for="group in widgetGroups"
-          :key="group.label"
-          class="focus__group"
-        >
-          <p class="focus__group-label">
-            {{ group.label }}
-          </p>
-          <div class="focus__grid">
+    <div class="focus__groups">
+      <div
+        v-for="group in widgetGroups"
+        :key="group.label"
+        class="focus__group"
+      >
+        <p class="focus__group-label">
+          {{ group.label }}
+        </p>
+        <div class="focus__grid">
+          <div
+            v-for="meta in group.items"
+            :key="meta.code"
+            class="focus__item"
+            :class="{
+              'focus__item--active':
+                localConfig.general.focusVisibleWidgetMap[meta.code],
+            }"
+            @click="
+              localConfig.general.focusVisibleWidgetMap[meta.code] =
+                !localConfig.general.focusVisibleWidgetMap[meta.code]
+            "
+          >
+            <div class="focus__icon-wrap">
+              <Icon
+                class="focus__icon"
+                :icon="meta.iconName"
+                :style="{ fontSize: meta.iconSize + 'px' }"
+              />
+            </div>
+            <span class="focus__label">{{ $t(meta.widgetLabel) }}</span>
+            <!-- 用原生 div 包裹保证 .stop 可靠生效，
+                   组件上的 @click.stop 经 fallthrough 链可能丢失 -->
             <div
-              v-for="meta in group.items"
-              :key="meta.code"
-              class="focus__item"
-              :class="{
-                'focus__item--active':
-                  localConfig.general.focusVisibleWidgetMap[meta.code],
-              }"
-              @click="
-                localConfig.general.focusVisibleWidgetMap[meta.code] =
-                  !localConfig.general.focusVisibleWidgetMap[meta.code]
-              "
+              class="focus__switch-wrap"
+              @click.stop
             >
-              <div class="focus__icon-wrap">
-                <Icon
-                  class="focus__icon"
-                  :icon="meta.iconName"
-                  :style="{ fontSize: meta.iconSize + 'px' }"
-                />
-              </div>
-              <span class="focus__label">{{ $t(meta.widgetLabel) }}</span>
-              <div class="focus__switch-wrap">
-                <NSwitch
-                  v-model:value="
-                    localConfig.general.focusVisibleWidgetMap[meta.code]
-                  "
-                  size="small"
-                  @click.stop
-                />
-              </div>
+              <NTSwitch
+                v-model:value="
+                  localConfig.general.focusVisibleWidgetMap[meta.code]
+                "
+              />
             </div>
           </div>
         </div>
@@ -154,7 +159,7 @@ const cssVars = computed(() => ({
   padding: 10px 12px;
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
-  background-color: var(--gray-alpha-06);
+  background-color: var(--nt-gray-minimal);
   cursor: pointer;
   transition:
     background-color var(--transition-base),
@@ -164,8 +169,8 @@ const cssVars = computed(() => ({
   user-select: none;
 
   &:hover {
-    background-color: var(--gray-alpha-10);
-    border-color: var(--gray-alpha-15);
+    background-color: var(--nt-gray-light);
+    border-color: var(--nt-gray-moderate);
     box-shadow: var(--shadow-sm);
     transform: translateY(-1px);
   }
@@ -202,8 +207,8 @@ const cssVars = computed(() => ({
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
-  background-color: var(--gray-alpha-10);
-  color: var(--gray-alpha-70);
+  background-color: var(--nt-gray-light);
+  color: var(--nt-text-secondary);
   transition:
     background-color var(--transition-base),
     color var(--transition-base);

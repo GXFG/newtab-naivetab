@@ -152,11 +152,6 @@ describe('config/update', () => {
       ),
     }))
 
-    // Mock vue naive-ui components
-    vi.doMock('naive-ui', () => ({
-      NButton: { name: 'NButton' },
-    }))
-
     // Set window globals
     window.appVersion = '2.2.5'
     window.$t = vi.fn((key: string) => key)

@@ -1,7 +1,8 @@
 /**
  * @module store/dom
- * @description DOM 副作用 — 全屏状态同步、CSS 变量（背景色/字体色/主色）的动态注入。
+ * @description DOM 副作用 — 全屏状态同步、深色模式 data-theme 属性、CSS 变量的动态注入。
  *   通过 watch 响应 localConfig.general.backgroundColor / fontColor / primaryColor 变化。
+ *   data-theme 属性控制深色模式，所有 CSS token 通过 [data-theme='dark'] 选择器切换。
  * @dependencies config/state.ts、state.ts（globalState）、style.ts（getStyleField、customPrimaryColor）
  * @consumers newtab/App.vue（onMounted 中调用 setupDomSync）
  * @see docs/architecture/config.md#主题与颜色系统
@@ -34,6 +35,19 @@ let domStyleWatchers: Array<() => void> | null = null
 
 export const initDomStyleWatchers = () => {
   if (domStyleWatchers) return
+
+  // data-theme 属性：替代 n-config-provider :theme 控制深色模式
+  const themeAttrStop = watch(
+    () => localState.value.currAppearanceCode,
+    (code) => {
+      document.documentElement.setAttribute(
+        'data-theme',
+        code === 1 ? 'dark' : 'light',
+      )
+    },
+    { immediate: true },
+  )
+
   const pageTitleStop = watch(
     () => localConfig.general.pageTitle,
     () => {
@@ -41,6 +55,7 @@ export const initDomStyleWatchers = () => {
     },
     { immediate: true },
   )
+
   const cssVarsStop = watch(
     [
       () => localConfig.general.backgroundColor,
@@ -67,7 +82,7 @@ export const initDomStyleWatchers = () => {
       deep: true,
     },
   )
-  domStyleWatchers = [pageTitleStop, cssVarsStop]
+  domStyleWatchers = [themeAttrStop, pageTitleStop, cssVarsStop]
 }
 
 export const cleanupDomStyleWatchers = () => {

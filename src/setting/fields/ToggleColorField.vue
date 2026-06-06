@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import SettingFormItem from '@/setting/components/SettingFormItem.vue'
 import CustomColorPicker from '@/components/CustomColorPicker.vue'
+import NTSwitch from '@/components/ui/NTSwitch.vue'
 import { useDualThemeColor } from './useDualThemeColor'
 
 defineProps<{
@@ -8,7 +10,7 @@ defineProps<{
   disabled?: boolean
 }>()
 
-const enable = defineModel<boolean>('enable')
+const enable = defineModel<boolean>('enable', { required: true })
 const color = defineModel<string | string[]>('color')
 const width = defineModel<number>('width')
 
@@ -24,7 +26,7 @@ const showWidthInput = computed(() => width.value !== undefined)
 
 <template>
   <!-- 注意：不传 :disabled 给 SettingFormItem（div 不支持 disabled 属性），
-       禁用状态由子组件（NSwitch / CustomColorPicker / NInputNumber）各自处理 -->
+       禁用状态由子组件（Switch / CustomColorPicker / NTInputNumber）各自处理 -->
   <SettingFormItem :label="label">
     <Transition name="setting-slide">
       <div
@@ -36,7 +38,7 @@ const showWidthInput = computed(() => width.value !== undefined)
           :disabled="disabled"
           @update:value="updateValue"
         />
-        <NInputNumber
+        <NTInputNumber
           v-if="showWidthInput"
           v-model:value="width"
           class="setting__num-input"
@@ -47,9 +49,8 @@ const showWidthInput = computed(() => width.value !== undefined)
         />
       </div>
     </Transition>
-    <NSwitch
+    <NTSwitch
       v-model:value="enable"
-      size="small"
       :disabled="disabled"
     />
   </SettingFormItem>

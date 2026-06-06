@@ -352,7 +352,6 @@ const getKeycapTitle = (code: string) => {
 <template>
   <BrowserBookmarkPicker
     v-model:show="bindState.isBookmarkPickerVisible"
-    width="60%"
     @select="onSelectBookmark"
   />
 
@@ -411,7 +410,7 @@ const getKeycapTitle = (code: string) => {
         <div class="form__config">
           <!-- URL 输入（source=1 数据存储在浏览器书签，不存在 chrome.storage.sync 8KB 限制，无需 maxlength） -->
           <div class="form__field form__field--url">
-            <NInput
+            <NTInput
               size="small"
               :value="getCurrKeymapUrl()"
               :placeholder="$t('keyboardCommon.urlLabel')"
@@ -423,7 +422,7 @@ const getKeycapTitle = (code: string) => {
 
           <!-- 名称输入 -->
           <div class="form__field form__field--name">
-            <NInput
+            <NTInput
               size="small"
               :value="getCurrKeymapName()"
               :placeholder="
@@ -442,69 +441,65 @@ const getKeycapTitle = (code: string) => {
           <div class="form__field form__field--actions">
             <!-- 填入当前页 URL -->
             <template v-if="pendingUrl">
-              <NPopconfirm
+              <NTPopconfirm
                 v-if="isOverwritingUrl"
                 @positive-click="onApplyCurrentTabUrl"
               >
                 <template #trigger>
-                  <NButton
-                    quaternary
+                  <NTButton
+                    variant="ghost"
                     size="small"
-                    class="setting__btn"
                   >
                     <Icon
                       :icon="ICONS.currentLocation"
                       class="btn__icon"
                     />
-                  </NButton>
+                  </NTButton>
                 </template>
                 {{ $t('generalSetting.overwriteUrlConfirm') }}
-              </NPopconfirm>
-              <NButton
+              </NTPopconfirm>
+              <NTButton
                 v-else
-                quaternary
+                variant="ghost"
                 size="small"
-                class="setting__btn"
                 @click="onApplyCurrentTabUrl"
               >
                 <Icon
                   :icon="ICONS.currentLocation"
                   class="btn__icon"
                 />
-              </NButton>
+              </NTButton>
             </template>
             <!-- 绑定书签 -->
-            <NButton
-              quaternary
+            <NTButton
+              variant="ghost"
               size="small"
-              class="action-btn"
               @click="onOpenBookmarkPicker()"
             >
               <Icon
                 :icon="ICONS.bookmarkPlus"
                 class="btn__icon"
               />
-            </NButton>
+            </NTButton>
             <!-- 解绑 -->
-            <NPopconfirm @positive-click="onUnbind">
+            <NTPopconfirm @positive-click="onUnbind">
               <template #trigger>
-                <NButton
-                  quaternary
-                  size="small"
-                  class="action-btn"
-                  :loading="bindState.isUnbinding"
+                <NTButton
                   type="error"
+                  variant="ghost"
+                  size="small"
+                  :loading="bindState.isUnbinding"
                   :disabled="!currBinding"
                 >
                   <Icon
                     :icon="ICONS.deleteBin"
                     class="btn__icon"
                   />
-                </NButton>
+                </NTButton>
               </template>
               {{ $t('common.delete') }}
               {{ getCustomLabel(bindState.keyCode) }}？
-            </NPopconfirm>
+            </NTPopconfirm>
           </div>
         </div>
       </template>
@@ -561,16 +556,8 @@ const getKeycapTitle = (code: string) => {
       display: flex;
       flex-direction: column;
       gap: 6px;
-
-      .setting__btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: var(--radius-md);
-
-        .btn__icon {
-          font-size: 16px;
-        }
+      .btn__icon {
+        font-size: 16px;
       }
     }
 
@@ -598,16 +585,9 @@ const getKeycapTitle = (code: string) => {
     align-items: center;
     justify-content: center;
     width: 100%;
-    color: var(--n-text-color-3);
+    color: var(--nt-text-tertiary);
     font-size: 13px;
     user-select: none;
   }
-}
-
-.action-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: var(--radius-md);
 }
 </style>

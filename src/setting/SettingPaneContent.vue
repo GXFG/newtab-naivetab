@@ -7,7 +7,7 @@ import { settingsList, SETTING_GROUPS } from './registry'
 
 const props = withDefaults(
   defineProps<{
-    /** 'drawer': NDrawer 容器内；'page': 全屏页面 */
+    /** 'drawer': Drawer 容器内；'page': 全屏页面 */
     layout?: 'drawer' | 'page'
   }>(),
   {
@@ -25,9 +25,8 @@ const activeComponent = computed(() => {
 })
 
 /**
- * 注入 CSS 变量，替代不可靠的 Naive UI --n-* 变量。
- * Naive UI 通过 teleport 渲染 Drawer 时 --n-* 变量可能不存在或拿到错误值，
- * 因此 nav 背景和 divider 文字背景使用项目自己的 token，确保 drawer/page 双模式一致。
+ * 注入 CSS 变量，nav 背景和 divider 文字背景使用项目 token，
+ * 确保 drawer/page 双模式一致。
  */
 const cssVars = computed(() => ({
   '--nt-setting-nav-bg':
@@ -101,9 +100,10 @@ const groupLabelMap = computed(() => {
       class="setting-tabs__content"
     >
       <KeepAlive>
-        <div :key="globalState.currSettingTabCode">
-          <component :is="activeComponent" />
-        </div>
+        <component
+          :is="activeComponent"
+          :key="globalState.currSettingTabCode"
+        />
       </KeepAlive>
     </div>
   </div>
@@ -124,12 +124,12 @@ const groupLabelMap = computed(() => {
   .setting-tabs__nav {
     flex-shrink: 0;
     padding: 10px 8px;
-    background: var(--nt-setting-nav-bg, var(--n-color));
-    border-right: 1px solid var(--n-tab-border-color, var(--gray-alpha-15));
+    background: var(--nt-setting-nav-bg);
+    border-right: 1px solid var(--nt-gray-moderate);
     overflow-y: auto;
     user-select: none;
     scrollbar-width: thin;
-    scrollbar-color: var(--n-tab-border-color, transparent) transparent;
+    scrollbar-color: var(--nt-gray-medium) transparent;
 
     &::-webkit-scrollbar {
       width: 4px;
@@ -140,7 +140,7 @@ const groupLabelMap = computed(() => {
     }
 
     &::-webkit-scrollbar-thumb {
-      background: var(--n-tab-border-color, var(--gray-alpha-20));
+      background: var(--nt-gray-medium);
       border-radius: var(--radius-pill);
     }
   }
@@ -160,7 +160,7 @@ const groupLabelMap = computed(() => {
     letter-spacing: 0.1px;
 
     &:hover {
-      background: var(--gray-alpha-08);
+      background: var(--nt-gray-minimal);
     }
 
     &.setting-tabs__nav-item--active {
@@ -177,7 +177,7 @@ const groupLabelMap = computed(() => {
         font-weight: 600;
       }
 
-      /* 左侧激活指示线（替代 NTabs type="line" 的竖线） */
+      /* 左侧激活指示线 */
       &::before {
         content: '';
         position: absolute;
@@ -193,7 +193,7 @@ const groupLabelMap = computed(() => {
 
     /* 分组分隔线 */
     &.setting-tabs__nav-item--group-start {
-      margin-top: 20px;
+      margin-top: 30px;
       position: relative;
 
       .group-divider {
@@ -211,8 +211,8 @@ const groupLabelMap = computed(() => {
           padding: 0 10px;
           font-size: 10px;
           font-weight: 500;
-          color: var(--gray-alpha-55);
-          background: var(--nt-setting-nav-bg, var(--n-color));
+          color: var(--nt-text-tertiary);
+          background: var(--nt-setting-nav-bg);
           letter-spacing: 0.5px;
           text-transform: uppercase;
         }
@@ -227,8 +227,8 @@ const groupLabelMap = computed(() => {
           background: linear-gradient(
             90deg,
             transparent,
-            var(--n-tab-border-color, var(--gray-alpha-35)) 20%,
-            var(--n-tab-border-color, var(--gray-alpha-35)) 80%,
+            var(--nt-gray-heavy) 20%,
+            var(--nt-gray-heavy) 80%,
             transparent
           );
           opacity: 1;
@@ -259,12 +259,17 @@ const groupLabelMap = computed(() => {
   /* ── 右侧内容区 ── */
   .setting-tabs__content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
     min-width: 0;
     min-height: 0;
     overflow: auto;
+    background: var(--nt-setting-nav-bg);
     user-select: none;
     scrollbar-width: thin;
-    scrollbar-color: var(--n-tab-border-color, var(--gray-alpha-20)) transparent;
+    scrollbar-color: var(--nt-gray-medium) transparent;
 
     &::-webkit-scrollbar {
       width: 4px;
@@ -275,14 +280,9 @@ const groupLabelMap = computed(() => {
     }
 
     &::-webkit-scrollbar-thumb {
-      background: var(--n-tab-border-color, var(--gray-alpha-20));
+      background: var(--nt-gray-medium);
       border-radius: var(--radius-pill);
     }
-  }
-
-  /* 子组件内 Naive UI 组件样式 */
-  :deep(.n-radio) {
-    width: auto;
   }
 
   :deep(.n-divider:not(.n-divider--vertical)) {
@@ -301,40 +301,11 @@ const groupLabelMap = computed(() => {
 
 <style>
 /* ============================================================
-   drawer 模式专用（非 scoped，需穿透 NDrawer）
-   ============================================================ */
-#setting {
-  .n-drawer
-    .n-drawer-content.n-drawer-content--native-scrollbar
-    .n-drawer-body-content-wrapper {
-    padding: 0 !important;
-    display: flex;
-    overflow: hidden;
-  }
-
-  .drawer-wrap {
-    box-shadow: var(--shadow-lg) !important;
-  }
-}
-
-/* ============================================================
-   pane 组件根元素撑满内容区（非 scoped 以跨组件作用域）
-   ============================================================ */
-.setting-tabs__content > div {
-  width: 100%;
-  min-width: 0;
-}
-
-.setting-tabs__content > div > * {
-  width: 100%;
-  min-width: 0;
-}
-
-/* ============================================================
    page 模式专用（options 页面）
    ============================================================ */
 #setting-tabs--page.setting-tabs {
-  height: 100vh;
+  flex: 1;
+  min-height: 0;
 }
 
 #setting-tabs--page .setting-tabs__content {

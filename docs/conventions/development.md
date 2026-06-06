@@ -12,35 +12,7 @@
 
 CSS 踩坑（`&--modifier` 禁止、`v-bind()` 禁止、`rgba()` + `var()` 等）详见 [pitfalls-css.md](../../.claude/rules/pitfalls-css.md)。
 
-- **禁止在 scoped CSS 中使用 Naive UI 的 `--n-*` 变量**（`--n-primary-color`、`--n-text-color` 等），使用项目自有 token 或 `customPrimaryColor` 注入（详见下方 CSS 变量对照表）
-
-**Naive UI → 项目 token 对照表：**
-
-| 禁止使用 | 替换为 |
-|----------|--------|
-| `var(--n-primary-color)` | 通过 `customPrimaryColor` + `cssVars` 注入（见下方示例） |
-| `var(--n-text-color)` | `var(--gray-alpha-85)` |
-| `var(--n-text-color-2)` | `var(--gray-alpha-65)` |
-| `var(--n-text-color-3)` | `var(--gray-alpha-55)` |
-| `var(--n-tab-border-color)` | `var(--n-tab-border-color, var(--gray-alpha-15))`（加 fallback） |
-
-主题色注入模式：
-
-```ts
-import { customPrimaryColor } from '@/logic/store/style'
-
-const cssVars = computed(() => ({
-  '--nt-primary-color': customPrimaryColor.value,
-}))
-```
-
-```html
-<div :style="cssVars">...</div>
-```
-
-```css
-.el--active { color: var(--nt-primary-color); }
-```
+- **使用项目 Token**：颜色用 `--nt-*` 系列（`--nt-primary-color`、`--nt-text-primary`、`--nt-gray-*` 等），详见 [tokens.css](../../src/styles/tokens.css)
 
 ### Vue 组件
 
@@ -56,7 +28,7 @@ const cssVars = computed(() => ({
 
 ### 导入顺序
 
-1. 第三方库（vue、naive-ui、@vueuse）
+1. 第三方库（vue、reka-ui、@vueuse）
 2. 内部模块（@/logic/*、@/types/*）
 3. 相对路径（./、../）
 

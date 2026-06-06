@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { NConfigProvider } from 'naive-ui'
-import { nativeUILang, currTheme, themeOverrides } from '@/logic/store/theme'
 import {
   registerGlobalErrorHandler,
   registerVueErrorHandler,
@@ -23,13 +21,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <NConfigProvider
-    :locale="nativeUILang"
-    :theme="currTheme"
-    :theme-overrides="themeOverrides"
-  >
-    <Content />
-  </NConfigProvider>
+  <Content />
 </template>
 
 <style>

@@ -5,7 +5,7 @@
  * - Content Script：closed Shadow DOM 隔离样式
  * - Newtab / Popup / Options：同样用 Shadow DOM，避免 Widget/页面样式污染
  *
- * 零外部依赖，不引入 naive-ui。
+ * 零外部依赖。
  */
 
 import logoSvg from '@/assets/img/logo.svg?raw'

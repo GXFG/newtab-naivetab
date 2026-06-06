@@ -50,12 +50,12 @@ import {
         :label="$t('clock.showLabel')"
       >
         <template #extra>
-          <NInput
+          <NTInput
             v-model:value="localConfig.clockNeon.labelLeft"
             size="small"
             :placeholder="$t('clock.labelLeftPlaceholder')"
           />
-          <NInput
+          <NTInput
             v-model:value="localConfig.clockNeon.labelRight"
             size="small"
             :placeholder="$t('clock.labelRightPlaceholder')"

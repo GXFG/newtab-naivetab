@@ -90,12 +90,12 @@ describe('store (isolated exports)', () => {
       SETTING_KEYBOARD_BASE_SIZE: 35,
     }))
 
-    vi.doMock('naive-ui', () => ({
-      enUS: { name: 'enUS' },
-      zhCN: { name: 'zhCN' },
-      darkTheme: { name: 'darkTheme' },
-      useOsTheme: vi.fn(() => ref('light')),
-    }))
+    // theme.ts 用原生 matchMedia 检测 OS 主题
+    window.matchMedia = vi.fn().mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })
 
     // Set up document.fullscreenElement mock
     Object.defineProperty(document, 'fullscreenElement', {

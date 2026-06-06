@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import { ref, computed, watch } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
 import { ICONS } from '@/logic/constants/icons'
 import { FAVORITE_SWATCHE_MAX_COUNT } from '@/logic/constants/app'
 import { localConfig } from '@/logic/config/state'
-
+import NTPopover from '@/components/ui/NTPopover.vue'
+import NTColorPicker from '@/components/ui/NTColorPicker.vue'
 import { showToast } from '@/common/toast'
 
 const props = defineProps({
@@ -25,15 +28,26 @@ const cssVars = computed(() => ({
 
 const emit = defineEmits(['update:value'])
 
-const handleColorUpdate = (value: string) => {
+/** 拖拽中的即时色值（驱动面板实时反馈，不触发父级更新） */
+const draftColor = ref(props.value)
+
+/** 外部值变化时同步 draft（如点击色板预设） */
+watch(
+  () => props.value,
+  (val) => {
+    draftColor.value = val
+  },
+)
+
+/** 防抖 emit，拖拽结束后才通知父级 */
+const debouncedEmit = useDebounceFn((value: string) => {
   emit('update:value', value)
-}
+}, 100)
 
-const isPickerVisible = ref(false)
-
-const handleUpdatePopoverShow = async (value: boolean) => {
-  await nextTick()
-  isPickerVisible.value = value
+/** 拖拽时即时更新 draft 实现实时反馈，防抖后 emit */
+const handleColorUpdate = (value: string) => {
+  draftColor.value = value
+  debouncedEmit(value)
 }
 
 const isFavorite = computed(() =>
@@ -61,11 +75,10 @@ const removeFavoriteColor = () => {
 </script>
 
 <template>
-  <n-popover
-    id="custom-color-picker"
-    placement="top"
+  <NTPopover
     trigger="click"
-    @update:show="handleUpdatePopoverShow"
+    placement="top"
+    class="custom-color-picker"
   >
     <template #trigger>
       <div
@@ -76,83 +89,63 @@ const removeFavoriteColor = () => {
     </template>
 
     <div class="color-picker__container">
-      <NColorPicker
-        :value="props.value"
-        :show="isPickerVisible"
+      <NTColorPicker
+        :value="draftColor"
         :swatches="localConfig.general.swatcheColors"
-        placement="top"
         @update:value="handleColorUpdate"
       />
+
       <div class="picker__favorite">
-        <NButton
-          v-if="!isFavorite"
+        <NTButton
           type="primary"
-          text
-          class="favorite__btn"
-          @click="addFavoriteColor"
+          variant="text"
+          size="small"
+          @click="isFavorite ? removeFavoriteColor() : addFavoriteColor()"
         >
-          <Icon
-            :icon="ICONS.favoriteLine"
-            class="btn__icon"
-          />
-        </NButton>
-        <NButton
-          v-else
-          type="primary"
-          text
-          class="favorite__btn"
-          @click="removeFavoriteColor"
-        >
-          <Icon
-            :icon="ICONS.favoriteSolid"
-            class="btn__icon"
-          />
-        </NButton>
+          <Icon :icon="isFavorite ? ICONS.favoriteSolid : ICONS.favoriteLine" />
+          <span class="btn__label">
+            {{
+              isFavorite
+                ? $t('common.removeFavoriteColor')
+                : $t('common.addFavoriteColor')
+            }}
+          </span>
+        </NTButton>
       </div>
     </div>
-  </n-popover>
+  </NTPopover>
 </template>
 
 <style>
+.custom-color-picker {
+  padding: var(--space-3);
+}
+
 .color-picker__entry {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   border-radius: 50%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--nt-gray-light);
   background-color: var(--nt-color-picker-entry-bg);
   cursor: pointer;
 }
 
-#custom-color-picker {
-  padding: 10px !important;
-  .v-binder-follower-content {
-    transform: translateX(10px) translateY(10px) !important;
-  }
-  .n-color-picker-panel {
-    margin: 0 !important;
-    box-shadow: none !important;
-    border: var(--n-border);
-  }
+.color-picker__container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  .color-picker__container {
-    position: relative;
-    width: 240px;
-    height: 399px;
-    .n-color-picker {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 213px;
-    }
-    .picker__favorite {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      .favorite__btn {
-        font-size: 18px;
-      }
-    }
+.picker__favorite {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+  margin-top: 2px;
+  border-top: 1px solid var(--nt-gray-light);
+  .reka-button {
+    color: var(--var-text-primary);
   }
 }
 </style>

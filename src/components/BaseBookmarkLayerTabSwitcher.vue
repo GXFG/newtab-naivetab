@@ -45,13 +45,14 @@ const configuredLayers = computed(() => {
   display: flex;
   gap: 6px;
   align-items: center;
+  line-height: 1;
 
   .layer-tab {
     font-size: 12px;
-    padding: 3px 10px;
+    padding: 8px 10px;
     border-radius: 6px;
     cursor: pointer;
-    color: var(--n-text-color-3);
+    color: var(--nt-text-tertiary);
     font-weight: 600;
     transition: all 0.15s ease;
     white-space: nowrap;
@@ -61,8 +62,8 @@ const configuredLayers = computed(() => {
     user-select: none;
 
     &:hover {
-      background-color: var(--gray-alpha-10);
-      color: var(--n-text-color);
+      background-color: var(--nt-gray-light);
+      color: var(--nt-text-primary);
     }
 
     &:active {

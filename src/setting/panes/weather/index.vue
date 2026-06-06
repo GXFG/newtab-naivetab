@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
+import NTAutoComplete from '@/components/ui/NTAutoComplete.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { getCityLookup } from '@/api'
@@ -71,13 +73,13 @@ const onSelectCity = (cityId: string) => {
       :icon="ICONS.temp"
     >
       <SettingFormItem :label="$t('weather.city')">
-        <NInput
+        <NTInput
           v-if="!state.isEditCityModel"
           v-model:value="localConfig.weather.city.name"
           size="small"
           :disabled="true"
         />
-        <NAutoComplete
+        <NTAutoComplete
           v-else
           v-model:value="state.keyword"
           :options="state.cityList"
@@ -87,11 +89,10 @@ const onSelectCity = (cityId: string) => {
           @select="onSelectCity"
         />
 
-        <NButton
+        <NTButton
           type="primary"
-          class="setting__btn setting__btn--primary"
-          size="tiny"
-          secondary
+          size="small"
+          variant="secondary"
           @click="state.isEditCityModel = !state.isEditCityModel"
         >
           <template v-if="state.isEditCityModel">
@@ -106,7 +107,7 @@ const onSelectCity = (cityId: string) => {
               class="item__icon"
             />
           </template>
-        </NButton>
+        </NTButton>
       </SettingFormItem>
 
       <SettingFormItem
@@ -114,7 +115,7 @@ const onSelectCity = (cityId: string) => {
         :tip-content="URL_QWEATHER_START"
         :tip-link="URL_QWEATHER_START"
       >
-        <NInput
+        <NTInput
           v-model:value="localConfig.weather.apiKey"
           size="small"
         />
@@ -125,14 +126,13 @@ const onSelectCity = (cityId: string) => {
         :label="$t('weather.icon')"
       >
         <template #extra>
-          <NSlider
+          <NTSlider
             v-model:value="localConfig.weather.iconSize"
             :step="1"
             :min="30"
             :max="200"
-            :tooltip="false"
           />
-          <NInputNumber
+          <NTInputNumber
             v-model:value="localConfig.weather.iconSize"
             class="setting__num-input"
             size="small"

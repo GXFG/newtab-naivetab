@@ -71,9 +71,9 @@ src/api/search.ts                # getBaiduSugrec + getSearchSuggestion（统一
 
 ### 2.2 自定义下拉建议列表
 
-早期版本使用 Naive UI `NDropdown`，后改为手动实现。原因：
-- NDropdown 是 teleport 组件，不继承父级 CSS 变量
-- 无法完全定制玻璃质感样式（backdrop-filter、伪元素高光）
+下拉建议列表为手动实现，不依赖第三方组件。原因：
+- Teleport 组件不继承父级 CSS 变量
+- 需要完全定制玻璃质感样式（backdrop-filter、伪元素高光）
 - 键盘导航与 input 事件有冲突
 
 自定义下拉列表通过 `Transition` + `v-if` 控制显隐，配合 `onClickOutside`（VueUse）关闭。
@@ -163,9 +163,9 @@ background: color-mix(in srgb, rgb(30, 30, 30) calc(var(--nt-s-dropdown-opacity)
 
 此特性需 Chrome 115+，本扩展 manifest 最小版本已满足要求，无需 fallback。
 
-### 3.4 CSS 嵌套深度例外
+### 3.4 CSS 嵌套深度
 
-覆盖 Naive UI `NInput` 内部结构时（`.input__main > .n-input-wrapper > .n-input__input-el`），嵌套层级超过 4 层规范。这是覆盖第三方组件内部 DOM 结构的必要代价，属合理例外。
+搜索输入框使用 NTInput 组件，样式覆盖通过 `.reka-input__native` 类，嵌套深度在规范范围内。
 
 ### 3.5 深色模式
 
@@ -218,16 +218,16 @@ try {
 ```vue
 <!-- ❌ 错误：只有模板属性，没有 script 声明 -->
 <template>
-  <NInput ref="inputRef" />
+  <NTInput ref="inputRef" />
 </template>
 
 <!-- ✅ 正确：script 中声明对应 ref -->
 <script setup lang="ts">
-const inputRef = ref<InstanceType<typeof NInput> | null>(null)
+const inputRef = ref<InstanceType<typeof NTInput> | null>(null)
 </script>
 
 <template>
-  <NInput ref="inputRef" />
+  <NTInput ref="inputRef" />
 </template>
 ```
 

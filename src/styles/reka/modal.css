@@ -1,0 +1,107 @@
+/* ============================================================
+ * Modal（居中模态框 + 半透明遮罩）
+ *
+ * 基于 Reka Dialog 原语。DialogOverlay 提供遮罩层，
+ * DialogContent 居中定位，淡入 + 微缩放入场。
+ *
+ * 设计意图速查：
+ *   overlay  → 半透明遮罩 + 淡入动画
+ *   content  → 居中面板 + 淡入 + scale(0.96→1)
+ *   dark     → 遮罩色调适配深色背景
+ * ============================================================ */
+
+/* --- Overlay：半透明遮罩 --- */
+/* z-index 策略：Modal 固定 2000/2100，始终高于 Drawer（动态 --drawer-z，最大 depth ~1300）。
+   Modal 始终在顶层，不需要 Drawer 的动态叠加管理。 */
+.reka-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background-color: rgba(0, 0, 0, 0.35);
+  animation: reka-modal-overlay-in 200ms ease-out backwards;
+}
+
+/* 不可点击关闭 */
+.reka-modal__overlay:not(.reka-modal__overlay--closable) {
+  pointer-events: none;
+}
+
+@keyframes reka-modal-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* 关闭动画：data-state='closed' 时触发，Presence 等 animationend 后卸载 DOM */
+.reka-modal__overlay[data-state='closed'] {
+  animation: reka-modal-overlay-out 180ms ease forwards;
+}
+
+@keyframes reka-modal-overlay-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* --- Content：居中面板 --- */
+.reka-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2100;
+  outline: none;
+  animation: reka-modal-content-in 280ms var(--transition-spring-bounce) backwards;
+}
+
+@keyframes reka-modal-content-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* 关闭动画：data-state='closed' 时触发，Presence 等 animationend 后卸载 DOM */
+.reka-modal[data-state='closed'] {
+  animation: reka-modal-content-out 180ms ease forwards;
+}
+
+@keyframes reka-modal-content-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+/* --- Title --- */
+.reka-modal__title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ============================================================
+ * 深色模式
+ * ============================================================ */
+:root[data-theme='dark'] .reka-modal__overlay,
+.dark .reka-modal__overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-modal__overlay {
+    background-color: Canvas;
+  }
+  .reka-modal {
+    border: 1px solid ButtonText;
+  }
+}

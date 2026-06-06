@@ -23,10 +23,10 @@ const onClick = () => {
 </script>
 
 <template>
-  <NPopover trigger="hover">
+  <NTPopover trigger="hover">
     <template #trigger>
-      <NButton
-        text
+      <NTButton
+        variant="text"
         class="tips__btn"
         @click="onClick()"
       >
@@ -34,13 +34,13 @@ const onClick = () => {
           :icon="ICONS.questionBold"
           class="btn__icon"
         />
-      </NButton>
+      </NTButton>
     </template>
 
     <p class="tips-content">
       {{ `${link ? `${$t('prompts.linkTips')}\n ` : ''}${props.content}` }}
     </p>
-  </NPopover>
+  </NTPopover>
 </template>
 
 <style scoped>

@@ -1,0 +1,84 @@
+/* ============================================================
+ * Dropdown（下拉菜单）
+ *
+ * 基于 Reka UI DropdownMenu 原语。Content 为 Popper 定位的弹出菜单。
+ *
+ * 设计意图速查：
+ *   content  → 弹出面板 + 阴影 + 淡入动画
+ *   item     → hover 高亮 + icon 可选
+ *   dark     → 面板底色 + 阴影切换
+ * ============================================================ */
+
+/* --- Content：弹出菜单面板 --- */
+.reka-dropdown__content {
+  z-index: 4000;
+  min-width: 160px;
+  padding: 4px;
+  border-radius: var(--radius-md);
+  background-color: var(--reka-surface-bg);
+  box-shadow: 0 0 0 1px var(--nt-gray-light),
+              0 4px 16px rgba(0, 0, 0, 0.08),
+              0 1px 4px rgba(0, 0, 0, 0.04);
+  animation: reka-dropdown-content-in 240ms var(--transition-spring-bounce) backwards;
+}
+
+@keyframes reka-dropdown-content-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 关闭动画：data-state='closed' 时触发，Presence 等 animationend 后卸载 DOM */
+.reka-dropdown__content[data-state='closed'] {
+  animation: reka-dropdown-content-out 150ms ease forwards;
+}
+
+@keyframes reka-dropdown-content-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
+/* --- Item：菜单项 --- */
+.reka-dropdown__item {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  line-height: 1.2;
+  cursor: var(--reka-cursor-interactive);
+  color: inherit;
+  user-select: none;
+}
+
+.reka-dropdown__item[data-highlighted]:not([data-disabled]) {
+  background-color: var(--nt-gray-minimal);
+  outline: none;
+}
+
+.reka-dropdown__item[data-disabled] {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+.reka-dropdown__item-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+/* --- Arrow：小三角 --- */
+.reka-dropdown__arrow {
+  fill: var(--reka-surface-bg);
+}
+
+/* ============================================================
+ * 深色模式
+ * ============================================================ */
+:root[data-theme='dark'] .reka-dropdown__content,
+.dark .reka-dropdown__content {
+  box-shadow: 0 0 0 1px var(--nt-gray-light),
+              0 4px 16px rgba(0, 0, 0, 0.35),
+              0 0 0 0.5px rgba(255, 255, 255, 0.06);
+}

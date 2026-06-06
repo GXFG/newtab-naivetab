@@ -20,10 +20,13 @@
 | 文件重命名/移动/删除/拆分 | 所有引用路径（`grep` 旧路径）、`docs/` 文件索引、`CLAUDE.md` |
 | 模块职责变更 | 对应 `docs/` 文档 + 源码顶部 `@module` 注释 |
 | 新增/修改/删除函数或公共 API | 源码顶部注释（独立文档仅在有架构影响时才更新） |
-| 修改配置结构（字段增删改） | `config.md` 迁移表 + `update.ts` 顶部注释 |
+| 修改配置结构（字段增删改） | `config.md` 迁移表 + `update.ts` 顶部注释 + 测试文件（`config-reset.test.ts`、`handle-app-update.test.ts`、`config-snapshot.test.ts`） |
 | 新增/修改陷阱或易错点 | `.claude/rules/pitfalls.md`（索引）→ 对应领域文件 |
 | 架构偏离（依赖关系变化、新模块） | 对应 `docs/` 架构图 + `CLAUDE.md` 目录结构表 |
 | 编码风格/约定的变更 | `development.md` |
+| 修改 `PRESERVE_FIELDS` | `config-reset.test.ts` 中 quick reset 断言 |
+| 修改 `defaultConfig` 结构 | `config-snapshot.test.ts` 必需字段断言 |
+| **修改 Reka 组件 CSS（`reka-ui.css`）** | **`reka-template.css`** — 模板必须与实际组件保持同步 |
 
 ## 检查清单
 
@@ -33,3 +36,5 @@
 3. `docs/` 中是否有文档提及该模块或函数？（优先查对应文档索引表）
 4. `CLAUDE.md` 的目录结构表是否需要更新？
 5. 是否引入了新的已知陷阱需要记录到对应 `pitfalls-*.md`？
+6. 是否涉及配置结构 / PRESERVE_FIELDS / defaultConfig？→ 检查测试文件是否需要同步更新
+7. 是否修改了 Reka 组件 CSS？→ **必须检查 `reka-template.css` 是否需要同步更新**

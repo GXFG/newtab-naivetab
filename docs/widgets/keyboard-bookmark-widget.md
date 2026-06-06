@@ -16,7 +16,8 @@
 {
   enabled: true,                              // Widget 是否启用
   source: 2,                                  // 1=浏览器书签, 2=自定义 keymap
-  isGlobalShortcutEnabled: true,              // 全局快捷键开关
+  isEnabled: true,                            // 总开关（newtab + CS）
+  isGlobalShortcutEnabled: true,              // CS 端开关（关闭后仅 newtab 可用）
   noModifierMode: false,                      // 无修饰键模式
   shortcutInInputElement: true,               // 输入框内是否触发全局快捷键
   globalShortcutModifiers: ['alt'],           // 全局快捷键修饰键
@@ -33,7 +34,7 @@
 }
 ```
 
-**PRESERVE_FIELDS** = `['source', 'isGlobalShortcutEnabled', 'noModifierMode', 'shortcutInInputElement', 'globalShortcutModifiers', 'urlBlacklist', 'keymap', 'layers']` — 快速重置时保护用户数据。
+**PRESERVE_FIELDS** = `['source', 'isEnabled', 'isGlobalShortcutEnabled', 'noModifierMode', 'shortcutInInputElement', 'globalShortcutModifiers', 'urlBlacklist', 'keymap', 'layers']` — 快速重置时保护用户数据。
 
 **activeLayer**（当前激活层索引）不存储在 `localConfig` 中（会被云同步），而是以模块级变量 + `chrome.storage.local` 独立 key（`ACTIVE_LAYER_STORAGE_KEY`，值为 `'naive-tab-activeLayer'`）管理，设备级持久化、不同步。
 

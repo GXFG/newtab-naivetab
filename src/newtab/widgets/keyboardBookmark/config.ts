@@ -9,6 +9,7 @@ import {
 
 export const PRESERVE_FIELDS = [
   'source',
+  'isEnabled',
   'isGlobalShortcutEnabled',
   'noModifierMode',
   'shortcutInInputElement',
@@ -21,6 +22,7 @@ export const PRESERVE_FIELDS = [
 export const WIDGET_CONFIG = {
   enabled: true,
   source: BookmarkSource.BROWSER,
+  isEnabled: true,
   isGlobalShortcutEnabled: true,
   noModifierMode: false,
   shortcutInInputElement: true,

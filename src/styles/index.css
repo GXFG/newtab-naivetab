@@ -2,7 +2,8 @@
 @import url('./tokens.css');
 @import url('./global.css');
 @import url('./animations.css');
+@import url('./reka/index.css');
 @import url('./font.css');
-@import url('./setting-utils.css');
-@import url('./qweather-icons.css');
 @import url('./driver.css');
+@import url('./qweather-icons.css');
+@import url('./setting-utils.css');

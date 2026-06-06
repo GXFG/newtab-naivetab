@@ -11,6 +11,7 @@ export const FAVORITE_SWATCHE_MAX_COUNT = 24
 
 export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
 
+/** 二级 Drawer 宽度，应小于父级 NTDrawer */
 export const SECOND_MODAL_WIDTH = 570
 
 export const TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP = {
@@ -32,8 +33,8 @@ export const DAYJS_LANG_MAP = {
 // 焦点元素选择器映射
 export const FOCUS_ELEMENT_SELECTOR_MAP = {
   root: '#app',
-  search: '#search .n-input__input-el',
-  memo: '#memo .n-input__textarea-el',
+  search: '#search .search__input',
+  memo: '#memo .memo__input',
   keyboardBookmark: '#keyboardBookmark',
 }
 

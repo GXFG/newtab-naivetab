@@ -28,6 +28,9 @@ const isRender = getIsWidgetRender(WIDGET_CODE)
  * 使用 matchShortcut 统一匹配（自动处理 isInInputElement、urlBlacklist、e.repeat）。
  * 通过 task 显式优先级保证命令(0)先于书签(10)执行。
  *
+ * isEnabled 为总开关，isGlobalShortcutEnabled 仅控制 CS（普通网页）端是否拦截，
+ * newtab 页面内只需检查 isEnabled。
+ *
  * keyboardCurrentModelAllKeyList 前置过滤：限定只有当前键盘布局中"可见"的键才能
  * 触发书签快捷键。这是有意设计——newtab 页面有可视化键盘 UI，快捷键行为应与 UI 展示
  * 的按键一致（如 key61 布局不包含 F13，按 F13 不应触发书签）。
@@ -40,7 +43,7 @@ const keyboardTask = (e: KeyboardEvent) => {
 
   const bookmarkCode = matchShortcut(
     e,
-    localConfig.keyboardBookmark.isGlobalShortcutEnabled,
+    localConfig.keyboardBookmark.isEnabled,
     localConfig.keyboardBookmark.globalShortcutModifiers,
     localConfig.keyboardBookmark.shortcutInInputElement,
     localConfig.keyboardBookmark.urlBlacklist,

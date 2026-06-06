@@ -6,7 +6,6 @@
  * 标题由外层 SettingFormItem label 提供，组件内只负责折叠切换和内容区。
  */
 
-import { NInput, NTag } from 'naive-ui'
 import { normalizeDomain } from '@/logic/shortcut/utils'
 
 const model = defineModel<string[]>({ default: [] })
@@ -64,7 +63,7 @@ const handleBlur = () => {
       :class="{ 'blacklist__content--collapsed': collapsed }"
     >
       <div class="blacklist__content-inner">
-        <NInput
+        <NTInput
           v-model:value="inputText"
           type="textarea"
           :placeholder="placeholder"
@@ -76,7 +75,7 @@ const handleBlur = () => {
           v-if="model.length > 0"
           class="blacklist-preview"
         >
-          <NTag
+          <NTTag
             v-for="(domain, i) in model"
             :key="i"
             :bordered="false"
@@ -84,7 +83,7 @@ const handleBlur = () => {
             @close="model = model.filter((_, idx) => idx !== i)"
           >
             {{ domain }}
-          </NTag>
+          </NTTag>
         </div>
       </div>
     </div>
@@ -113,14 +112,14 @@ const handleBlur = () => {
 
 .toggle__count {
   font-size: 12px;
-  color: var(--n-text-color, var(--text-color));
+  color: var(--nt-text-primary);
   opacity: 0.6;
 }
 
 .toggle__arrow {
   font-size: 10px;
   line-height: 1;
-  color: var(--n-text-color, var(--text-color));
+  color: var(--nt-text-primary);
   opacity: 0.5;
   transition: transform 0.2s ease;
 }

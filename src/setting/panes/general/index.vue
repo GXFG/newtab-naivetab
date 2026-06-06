@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTSelect from '@/components/ui/NTSelect.vue'
 import { Icon } from '@iconify/vue'
 import { useI18n } from 'vue-i18n'
 import i18n from '@/common/i18n'
@@ -170,307 +171,298 @@ const cssVars = computed(() => ({
 </script>
 
 <template>
-  <div :style="cssVars">
-    <BackgroundDrawer
-      :show="state.isBackgroundDrawerVisible"
-      @update:show="onBackgroundDrawerClose"
-    />
+  <BackgroundDrawer
+    :show="state.isBackgroundDrawerVisible"
+    @update:show="onBackgroundDrawerClose"
+  />
 
-    <SettingHeaderBar :title="$t('setting.general')" />
+  <SettingHeaderBar :title="$t('setting.general')" />
 
-    <SettingFormWrap
-      widget-code="general"
-      hide-reset
+  <SettingFormWrap
+    widget-code="general"
+    hide-reset
+    :style="cssVars"
+  >
+    <!-- 页面设置 -->
+    <SettingFormSection
+      :title="$t('generalSetting.pageSettings')"
+      :icon="ICONS.fullscreen"
     >
-      <!-- 页面设置 -->
-      <SettingFormSection
-        :title="$t('generalSetting.pageSettings')"
-        :icon="ICONS.fullscreen"
-      >
-        <SettingFormItem :label="$t('generalSetting.pageTitle')">
-          <NInput
-            v-model:value="localConfig.general.pageTitle"
-            type="text"
-            size="small"
-          />
-        </SettingFormItem>
-
-        <SwitchField
-          v-model="localConfig.general.isLoadPageAnimationEnabled"
-          :label="$t('generalSetting.loadPageAnimation')"
-        >
-          <template #extra>
-            <NRadioGroup
-              v-model:value="localConfig.general.loadPageAnimationType"
-              size="small"
-              direction="horizontal"
-              class="setting__control-group"
-            >
-              <NRadio
-                v-for="item in loadPageAnimationTypeList"
-                :key="item.value"
-                :value="item.value"
-              >
-                {{ item.label }}
-              </NRadio>
-            </NRadioGroup>
-          </template>
-        </SwitchField>
-      </SettingFormSection>
-
-      <!-- 焦点与导航 -->
-      <SettingFormSection
-        :title="$t('generalSetting.focusNavigation')"
-        :icon="ICONS.focus"
-      >
-        <SettingFormItem
-          :label="$t('generalSetting.defaultFocus')"
-          :tip-content="$t('generalSetting.defaultFocusTips')"
-        >
-          <NSelect
-            v-model:value="localConfig.general.openPageFocusElement"
-            :options="focusElementList"
-            size="small"
-          />
-        </SettingFormItem>
-
-        <SettingFormItem
-          :label="$t('common.drawerSite')"
-          class="drawer__site_wrap--compact"
-        >
-          <div class="drawer__site--compact">
-            <div
-              v-for="(item, index) in drawerPlacementList"
-              :key="index"
-              class="site__item"
-              :class="{
-                'site__item--active':
-                  localConfig.general.drawerPlacement === item.value,
-              }"
-              :style="item.style"
-              @click="localConfig.general.drawerPlacement = item.value"
-            >
-              <Icon :icon="item.icon" />
-            </div>
-          </div>
-        </SettingFormItem>
-      </SettingFormSection>
-
-      <!-- 字体与色彩 -->
-      <SettingFormSection
-        :title="$t('generalSetting.fontColor')"
-        :icon="ICONS.palette"
-      >
-        <FontField
-          v-model:font-family="localConfig.general.fontFamily"
-          v-model:font-color="localConfig.general.fontColor"
-          v-model:font-size="localConfig.general.fontSize"
-          :label="$t('common.font')"
+      <SettingFormItem :label="$t('generalSetting.pageTitle')">
+        <NTInput
+          v-model:value="localConfig.general.pageTitle"
+          type="text"
+          size="small"
         />
+      </SettingFormItem>
 
-        <SettingFormItem :label="$t('common.appearance')">
-          <NRadioGroup
-            v-model:value="localConfig.general.appearance"
-            size="small"
+      <SwitchField
+        v-model="localConfig.general.isLoadPageAnimationEnabled"
+        :label="$t('generalSetting.loadPageAnimation')"
+      >
+        <template #extra>
+          <NTRadioGroup
+            v-model:value="localConfig.general.loadPageAnimationType"
             direction="horizontal"
           >
-            <NRadio
-              v-for="item in themeList"
+            <NTRadio
+              v-for="item in loadPageAnimationTypeList"
               :key="item.value"
               :value="item.value"
             >
               {{ item.label }}
-            </NRadio>
-          </NRadioGroup>
-        </SettingFormItem>
+            </NTRadio>
+          </NTRadioGroup>
+        </template>
+      </SwitchField>
+    </SettingFormSection>
 
-        <SettingFormInlineRow>
-          <ColorField
-            v-model="localConfig.general.primaryColor"
-            :label="$t('common.primaryColor')"
-          />
-
-          <ColorField
-            v-model="localConfig.general.backgroundColor"
-            :label="$t('common.backgroundColor')"
-          />
-        </SettingFormInlineRow>
-      </SettingFormSection>
-
-      <!-- 背景图 -->
-      <SettingFormSection
-        :title="$t('generalSetting.bgImage')"
-        :icon="ICONS.imageSquare"
+    <!-- 焦点与导航 -->
+    <SettingFormSection
+      :title="$t('generalSetting.focusNavigation')"
+      :icon="ICONS.focus"
+    >
+      <SettingFormItem
+        :label="$t('generalSetting.defaultFocus')"
+        :tip-content="$t('generalSetting.defaultFocusTips')"
       >
-        <SwitchField
-          v-model="localConfig.general.isBackgroundImageEnabled"
-          :label="$t('common.backgroundImage')"
+        <NTSelect
+          v-model:value="localConfig.general.openPageFocusElement"
+          :options="focusElementList"
+          size="small"
+        />
+      </SettingFormItem>
+
+      <SettingFormItem
+        :label="$t('common.drawerSite')"
+        class="drawer__site_wrap--compact"
+      >
+        <div class="drawer__site--compact">
+          <div
+            v-for="(item, index) in drawerPlacementList"
+            :key="index"
+            class="site__item"
+            :class="{
+              'site__item--active':
+                localConfig.general.drawerPlacement === item.value,
+            }"
+            :style="item.style"
+            @click="localConfig.general.drawerPlacement = item.value"
+          >
+            <Icon :icon="item.icon" />
+          </div>
+        </div>
+      </SettingFormItem>
+    </SettingFormSection>
+
+    <!-- 字体与色彩 -->
+    <SettingFormSection
+      :title="$t('generalSetting.fontColor')"
+      :icon="ICONS.palette"
+    >
+      <FontField
+        v-model:font-family="localConfig.general.fontFamily"
+        v-model:font-color="localConfig.general.fontColor"
+        v-model:font-size="localConfig.general.fontSize"
+        :label="$t('common.font')"
+      />
+
+      <SettingFormItem :label="$t('common.appearance')">
+        <NTRadioGroup
+          v-model:value="localConfig.general.appearance"
+          direction="horizontal"
         >
-          <template #extra>
-            <NButton
-              class="setting__btn setting__btn--primary"
-              type="primary"
+          <NTRadio
+            v-for="item in themeList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </NTRadio>
+        </NTRadioGroup>
+      </SettingFormItem>
+
+      <SettingFormInlineRow>
+        <ColorField
+          v-model="localConfig.general.primaryColor"
+          :label="$t('common.primaryColor')"
+        />
+
+        <ColorField
+          v-model="localConfig.general.backgroundColor"
+          :label="$t('common.backgroundColor')"
+        />
+      </SettingFormInlineRow>
+    </SettingFormSection>
+
+    <!-- 背景图 -->
+    <SettingFormSection
+      :title="$t('generalSetting.bgImage')"
+      :icon="ICONS.imageSquare"
+    >
+      <SwitchField
+        v-model="localConfig.general.isBackgroundImageEnabled"
+        :label="$t('common.backgroundImage')"
+      >
+        <template #extra>
+          <NTButton
+            type="primary"
+            size="tiny"
+            variant="secondary"
+            round
+            @click="openBackgroundDrawer()"
+          >
+            <Icon :icon="ICONS.selectFinger" />&nbsp;{{ $t('common.select') }}
+          </NTButton>
+        </template>
+      </SwitchField>
+
+      <SettingFormInlineRow>
+        <NumberField
+          v-model="localConfig.general.bgBlur"
+          :label="$t('common.blur')"
+          :step="0.01"
+          :min="0"
+          :max="50"
+        />
+
+        <NumberField
+          v-model="localConfig.general.bgOpacity"
+          :label="$t('common.opacity')"
+          :step="0.01"
+          :min="0"
+          :max="1"
+        />
+      </SettingFormInlineRow>
+
+      <SwitchField
+        v-model="localConfig.general.isParallaxEnabled"
+        :label="$t('generalSetting.parallax')"
+        :tip-content="$t('generalSetting.parallaxTips')"
+      />
+
+      <Transition name="setting-slide">
+        <NumberField
+          v-if="localConfig.general.isParallaxEnabled"
+          v-model="localConfig.general.parallaxIntensity"
+          :label="$t('generalSetting.parallaxIntensity')"
+          :step="1"
+          :min="0"
+          :max="20"
+          show-slider
+        />
+      </Transition>
+    </SettingFormSection>
+
+    <!-- 语言与时间 -->
+    <SettingFormSection
+      :title="$t('generalSetting.languageTime')"
+      :icon="ICONS.calendar"
+    >
+      <SettingFormInlineRow>
+        <SettingFormItem :label="$t('generalSetting.language')">
+          <NTSelect
+            v-model:value="locale"
+            :options="state.i18nList"
+            size="small"
+            @update:value="onChangeLocale"
+          />
+        </SettingFormItem>
+        <SettingFormItem :label="$t('generalSetting.timeLanguage')">
+          <NTSelect
+            v-model:value="localConfig.general.timeLang"
+            :options="state.i18nList"
+            size="small"
+          />
+        </SettingFormItem>
+      </SettingFormInlineRow>
+    </SettingFormSection>
+
+    <!-- 数据管理 -->
+    <SettingFormSection
+      :title="$t('generalSetting.dataManagement')"
+      :icon="ICONS.restoreTwotone"
+    >
+      <StorageVisualization
+        :sync-time="lastSyncTime"
+        :is-loading="isUploadConfigLoading"
+        :total-bytes="totalBytes"
+        :top-large-items="topLargeItems"
+        :sorted-entries="sortedEntries"
+      />
+
+      <SettingFormItem
+        :label="$t('generalSetting.importExportSettingsLabel')"
+        :tip-content="$t('generalSetting.importExportSettingsTips')"
+      >
+        <NTButton
+          type="primary"
+          size="tiny"
+          variant="secondary"
+          round
+          :loading="globalState.isImportSettingLoading"
+          @click="onImportSetting"
+        >
+          <Icon :icon="ICONS.importFile" />
+          {{ $t('generalSetting.importSettingsValue') }}
+        </NTButton>
+        <input
+          ref="importSettingInputEl"
+          style="display: none"
+          type="file"
+          accept=".json"
+          @change="onImportFileChange"
+        />
+        <NTButton
+          type="primary"
+          size="tiny"
+          variant="secondary"
+          round
+          @click="exportSetting"
+        >
+          <Icon :icon="ICONS.exportFile" />
+          {{ $t('generalSetting.exportSettingValue') }}
+        </NTButton>
+      </SettingFormItem>
+
+      <SettingFormItem
+        :label="$t('generalSetting.clearStorageLabel')"
+        :tip-content="$t('generalSetting.clearStorageTips')"
+      >
+        <NTButton
+          type="warning"
+          size="tiny"
+          variant="secondary"
+          round
+          :loading="globalState.isClearStorageLoading"
+          @click="refreshSetting()"
+        >
+          <Icon :icon="ICONS.clearOutlined" />
+          {{ $t('generalSetting.clearStorageValue') }}
+        </NTButton>
+      </SettingFormItem>
+
+      <SettingFormItem
+        :label="$t('generalSetting.resetSettingLabel')"
+        :tip-content="$t('generalSetting.resetSettingTips')"
+      >
+        <NTPopconfirm @positive-click="resetSetting">
+          <template #trigger>
+            <NTButton
+              type="error"
               size="tiny"
-              secondary
+              variant="secondary"
               round
-              @click="openBackgroundDrawer()"
             >
-              <Icon :icon="ICONS.selectFinger" />&nbsp;{{ $t('common.select') }}
-            </NButton>
+              <Icon :icon="ICONS.restoreTwotone" />
+              {{ $t('generalSetting.resetAllSettingValue') }}
+            </NTButton>
           </template>
-        </SwitchField>
-
-        <SettingFormInlineRow>
-          <NumberField
-            v-model="localConfig.general.bgBlur"
-            :label="$t('common.blur')"
-            :step="0.01"
-            :min="0"
-            :max="50"
-          />
-
-          <NumberField
-            v-model="localConfig.general.bgOpacity"
-            :label="$t('common.opacity')"
-            :step="0.01"
-            :min="0"
-            :max="1"
-          />
-        </SettingFormInlineRow>
-
-        <SwitchField
-          v-model="localConfig.general.isParallaxEnabled"
-          :label="$t('generalSetting.parallax')"
-          :tip-content="$t('generalSetting.parallaxTips')"
-        />
-
-        <Transition name="setting-slide">
-          <NumberField
-            v-if="localConfig.general.isParallaxEnabled"
-            v-model="localConfig.general.parallaxIntensity"
-            :label="$t('generalSetting.parallaxIntensity')"
-            :step="1"
-            :min="0"
-            :max="20"
-            show-slider
-          />
-        </Transition>
-      </SettingFormSection>
-
-      <!-- 语言与时间 -->
-      <SettingFormSection
-        :title="$t('generalSetting.languageTime')"
-        :icon="ICONS.calendar"
-      >
-        <SettingFormInlineRow>
-          <SettingFormItem :label="$t('generalSetting.language')">
-            <NSelect
-              v-model:value="locale"
-              :options="state.i18nList"
-              size="small"
-              @update:value="onChangeLocale"
-            />
-          </SettingFormItem>
-          <SettingFormItem :label="$t('generalSetting.timeLanguage')">
-            <NSelect
-              v-model:value="localConfig.general.timeLang"
-              :options="state.i18nList"
-              size="small"
-            />
-          </SettingFormItem>
-        </SettingFormInlineRow>
-      </SettingFormSection>
-
-      <!-- 数据管理 -->
-      <SettingFormSection
-        :title="$t('generalSetting.dataManagement')"
-        :icon="ICONS.restoreTwotone"
-      >
-        <StorageVisualization
-          :sync-time="lastSyncTime"
-          :is-loading="isUploadConfigLoading"
-          :total-bytes="totalBytes"
-          :top-large-items="topLargeItems"
-          :sorted-entries="sortedEntries"
-        />
-
-        <SettingFormItem
-          :label="$t('generalSetting.importExportSettingsLabel')"
-          :tip-content="$t('generalSetting.importExportSettingsTips')"
-        >
-          <NButton
-            class="setting__btn setting__btn--primary"
-            type="primary"
-            size="tiny"
-            secondary
-            round
-            :loading="globalState.isImportSettingLoading"
-            @click="onImportSetting"
-          >
-            <template #icon><Icon :icon="ICONS.importFile" /></template>
-            {{ $t('generalSetting.importSettingsValue') }}
-          </NButton>
-          <input
-            ref="importSettingInputEl"
-            style="display: none"
-            type="file"
-            accept=".json"
-            @change="onImportFileChange"
-          />
-          <NButton
-            class="setting__btn setting__btn--primary"
-            type="primary"
-            size="tiny"
-            secondary
-            round
-            @click="exportSetting"
-          >
-            <template #icon><Icon :icon="ICONS.exportFile" /></template>
-            {{ $t('generalSetting.exportSettingValue') }}
-          </NButton>
-        </SettingFormItem>
-
-        <SettingFormItem
-          :label="$t('generalSetting.clearStorageLabel')"
-          :tip-content="$t('generalSetting.clearStorageTips')"
-        >
-          <NButton
-            class="setting__btn setting__btn--warning"
-            type="warning"
-            size="tiny"
-            secondary
-            round
-            :loading="globalState.isClearStorageLoading"
-            @click="refreshSetting()"
-          >
-            <template #icon><Icon :icon="ICONS.clearOutlined" /></template>
-            {{ $t('generalSetting.clearStorageValue') }}
-          </NButton>
-        </SettingFormItem>
-
-        <SettingFormItem
-          :label="$t('generalSetting.resetSettingLabel')"
-          :tip-content="$t('generalSetting.resetSettingTips')"
-        >
-          <NPopconfirm @positive-click="resetSetting">
-            <template #trigger>
-              <NButton
-                class="setting__btn setting__btn--error"
-                type="error"
-                size="tiny"
-                secondary
-                round
-              >
-                <template #icon><Icon :icon="ICONS.restoreTwotone" /></template>
-                {{ $t('generalSetting.resetAllSettingValue') }}
-              </NButton>
-            </template>
-            {{ $t('generalSetting.confirmResetAll') }}
-          </NPopconfirm>
-        </SettingFormItem>
-      </SettingFormSection>
-    </SettingFormWrap>
-  </div>
+          {{ $t('generalSetting.confirmResetAll') }}
+        </NTPopconfirm>
+      </SettingFormItem>
+    </SettingFormSection>
+  </SettingFormWrap>
 </template>
 
 <style scoped>
@@ -484,8 +476,8 @@ const cssVars = computed(() => ({
   gap: 4px;
   padding: 3px;
   border-radius: var(--radius-lg);
-  background: var(--gray-alpha-06);
-  border: 1px solid var(--gray-alpha-10);
+  background: var(--nt-gray-minimal);
+  border: 1px solid var(--nt-gray-light);
 
   .site__item {
     display: flex;
@@ -502,11 +494,11 @@ const cssVars = computed(() => ({
       color var(--transition-base),
       border-color var(--transition-base),
       transform var(--transition-fast);
-    color: var(--gray-alpha-55);
+    color: var(--nt-text-tertiary);
 
     &:hover {
-      background-color: var(--gray-alpha-12);
-      color: var(--gray-alpha-85);
+      background-color: var(--nt-gray-light);
+      color: var(--nt-text-primary);
       transform: scale(1.06);
     }
   }

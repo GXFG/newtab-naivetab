@@ -29,6 +29,14 @@ import {
 
     <!-- 外观 -->
     <SettingFormSection section-key="common.appearance">
+      <NumberField
+        v-model="localConfig.memo.padding"
+        :label="$t('common.padding')"
+        :min="0"
+        :max="60"
+        :step="1"
+      />
+
       <SettingFormInlineRow>
         <NumberField
           v-model="localConfig.memo.width"

@@ -1,10 +1,8 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
+import SelectFont from './SelectFont.vue'
 import SettingFormItem from '@/setting/components/SettingFormItem.vue'
 import CustomColorPicker from '@/components/CustomColorPicker.vue'
-import {
-  availableFontOptions,
-  fontSelectRenderLabel,
-} from '@/logic/store/style'
 import { useDualThemeColor } from './useDualThemeColor'
 
 defineProps<{
@@ -26,21 +24,19 @@ const { currentValue, updateValue } = useDualThemeColor(
 
 <template>
   <!-- 注意：不传 :disabled 给 SettingFormItem（div 不支持 disabled 属性），
-       禁用状态由各子组件（CustomColorPicker / NSelect / NInputNumber）各自处理 -->
+       禁用状态由各子组件（CustomColorPicker / NTSelect / NTInputNumber）各自处理 -->
   <SettingFormItem :label="label">
     <CustomColorPicker
       :value="currentValue"
       :disabled="disabled"
       @update:value="updateValue"
     />
-    <NSelect
+    <SelectFont
       v-model:value="fontFamily"
-      :options="availableFontOptions"
-      :render-label="fontSelectRenderLabel"
       size="small"
       :disabled="disabled"
     />
-    <NInputNumber
+    <NTInputNumber
       v-model:value="fontSize"
       class="setting__num-input"
       size="small"

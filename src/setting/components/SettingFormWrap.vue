@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { h } from 'vue'
 import { Icon } from '@iconify/vue'
+import NTDropdown from '@/components/ui/NTDropdown.vue'
 import { ICONS } from '@/logic/constants/icons'
 import {
   resetWidgetConfig,
@@ -64,7 +65,7 @@ const resetOptions = computed(() => [
             {
               style: {
                 fontSize: '12px',
-                color: 'var(--n-text-color-3)',
+                color: 'var(--nt-text-tertiary)',
                 lineHeight: '1.2',
               },
             },
@@ -98,7 +99,7 @@ const resetOptions = computed(() => [
             {
               style: {
                 fontSize: '12px',
-                color: 'var(--n-text-color-3)',
+                color: 'var(--nt-text-tertiary)',
                 lineHeight: '1.2',
               },
             },
@@ -127,7 +128,7 @@ const handleResetSelect = (key: string) => {
 <template>
   <div
     :id="props.id || undefined"
-    class="setting-form-wrap"
+    class="setting-form-wrap setting__pane-content"
   >
     <slot />
 
@@ -135,10 +136,9 @@ const handleResetSelect = (key: string) => {
       v-if="hasCode && !props.hideReset"
       class="form-wrap__reset-wrap"
     >
-      <NDropdown
+      <NTDropdown
         v-if="showPreserve"
         :options="resetOptions"
-        placement="top-end"
         @select="handleResetSelect"
       >
         <div class="reset-btn">
@@ -152,8 +152,8 @@ const handleResetSelect = (key: string) => {
             }}"</span
           >
         </div>
-      </NDropdown>
-      <NPopconfirm
+      </NTDropdown>
+      <NTPopconfirm
         v-else
         @positive-click="resetWidgetConfig(props.widgetCode, 'full')"
       >
@@ -171,15 +171,13 @@ const handleResetSelect = (key: string) => {
           </div>
         </template>
         <span>{{ $t('generalSetting.confirmReset') }}</span>
-      </NPopconfirm>
+      </NTPopconfirm>
     </div>
   </div>
 </template>
 
 <style scoped>
 .setting-form-wrap {
-  padding: 14px;
-
   .form-wrap__reset-wrap {
     display: flex;
     justify-content: flex-end;

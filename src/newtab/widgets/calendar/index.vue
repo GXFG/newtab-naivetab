@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTSelect from '@/components/ui/NTSelect.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
@@ -476,7 +477,7 @@ const onToggleDetailPopover = (date?: string) => {
     >
       <div class="calendar__options">
         <div class="options__item">
-          <NSelect
+          <NTSelect
             v-model:value="state.currYear"
             class="item__select_year"
             size="small"
@@ -486,10 +487,10 @@ const onToggleDetailPopover = (date?: string) => {
           />
         </div>
         <div class="options__item">
-          <NButton
+          <button
+            type="button"
             class="item__btn"
             :class="{ 'item__btn--move': isDragMode }"
-            text
             :disabled="isDragMode"
             @click="onPrevMonth()"
           >
@@ -497,18 +498,18 @@ const onToggleDetailPopover = (date?: string) => {
               :icon="ICONS.angleLeft"
               class="btn__icon"
             />
-          </NButton>
-          <NSelect
+          </button>
+          <NTSelect
             v-model:value="state.currMonth"
             class="item__select_month"
             size="small"
             :options="monthsList"
             :disabled="isDragMode"
-            @update:value="(v) => onDateChange('month', v)"
+            @update:value="(v: number) => onDateChange('month', v)"
           />
-          <NButton
+          <button
+            type="button"
             class="item__btn"
-            text
             :disabled="isDragMode"
             :class="{ 'item__btn--move': isDragMode }"
             @click="onNextMonth()"
@@ -517,13 +518,13 @@ const onToggleDetailPopover = (date?: string) => {
               :icon="ICONS.angleRight"
               class="btn__icon"
             />
-          </NButton>
+          </button>
         </div>
         <div class="options__item options__reset">
-          <NButton
+          <button
             v-show="isResetBtnVisible"
+            type="button"
             class="item__btn"
-            text
             :disabled="isDragMode"
             :class="{ 'item__btn--move': isDragMode }"
             @click="onReset()"
@@ -532,7 +533,7 @@ const onToggleDetailPopover = (date?: string) => {
               :icon="ICONS.arrowBackward"
               class="btn__icon"
             />
-          </NButton>
+          </button>
         </div>
       </div>
 
@@ -563,7 +564,7 @@ const onToggleDetailPopover = (date?: string) => {
               :key="item.date"
               @click="onToggleDetailPopover(item.date)"
             >
-              <NPopover
+              <NTPopover
                 style="max-width: 350px"
                 display-directive="if"
                 :show="state.currDetailDate === item.date"
@@ -623,7 +624,7 @@ const onToggleDetailPopover = (date?: string) => {
                   <div class="detail__row">
                     <p class="row__tag row__tag--yi">易</p>
                     <div class="row__value">
-                      <n-tag
+                      <NTTag
                         v-for="yiItem in detailInfo.yi"
                         :key="yiItem"
                         class="tag__item"
@@ -632,13 +633,13 @@ const onToggleDetailPopover = (date?: string) => {
                         :bordered="false"
                       >
                         {{ yiItem }}
-                      </n-tag>
+                      </NTTag>
                     </div>
                   </div>
                   <div class="detail__row">
                     <p class="row__tag row__tag--ji">忌</p>
                     <div class="row__value">
-                      <n-tag
+                      <NTTag
                         v-for="yiItem in detailInfo.ji"
                         :key="yiItem"
                         class="tag__item"
@@ -647,13 +648,13 @@ const onToggleDetailPopover = (date?: string) => {
                         :bordered="false"
                       >
                         {{ yiItem }}
-                      </n-tag>
+                      </NTTag>
                     </div>
                   </div>
                   <div class="detail__row">
                     <p class="row__label">吉神</p>
                     <div class="row__value">
-                      <n-tag
+                      <NTTag
                         v-for="yiItem in detailInfo.jishen"
                         :key="yiItem"
                         class="tag__item"
@@ -662,13 +663,13 @@ const onToggleDetailPopover = (date?: string) => {
                         :bordered="false"
                       >
                         {{ yiItem }}
-                      </n-tag>
+                      </NTTag>
                     </div>
                   </div>
                   <div class="detail__row">
                     <p class="row__label">凶煞</p>
                     <div class="row__value">
-                      <n-tag
+                      <NTTag
                         v-for="yiItem in detailInfo.xiongsha"
                         :key="yiItem"
                         class="tag__item"
@@ -676,11 +677,11 @@ const onToggleDetailPopover = (date?: string) => {
                         :bordered="false"
                       >
                         {{ yiItem }}
-                      </n-tag>
+                      </NTTag>
                     </div>
                   </div>
                 </div>
-              </NPopover>
+              </NTPopover>
             </li>
           </ul>
         </Transition>
@@ -742,24 +743,26 @@ const onToggleDetailPopover = (date?: string) => {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      .n-base-selection-label {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-      }
       .options__item {
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 5px;
         .item__btn {
+          all: unset;
           display: flex;
           justify-content: center;
           align-items: center;
-          width: 2.2vmin;
-          height: 2.2vmin;
+          width: 2.4vmin;
+          min-width: 2.4vmin;
+          height: 2.4vmin;
+          min-height: 2.4vmin;
+          flex-shrink: 0;
           border-radius: 50%;
           cursor: pointer;
           transition: background-color 150ms ease-in-out;
           &:hover {
-            background-color: var(--gray-alpha-15);
+            background-color: var(--nt-gray-moderate);
           }
           &.item__btn--move {
             cursor: move !important;
@@ -772,9 +775,9 @@ const onToggleDetailPopover = (date?: string) => {
             color: var(--nt-cal-customFontColor_btn);
           }
         }
-        .n-base-selection-input__content {
-          color: var(--nt-cal-customFontColor) !important;
-          font-size: var(--nt-cal-customFontSize) !important;
+        .reka-select__trigger {
+          color: var(--nt-cal-customFontColor);
+          font-size: var(--nt-cal-customFontSize);
         }
         .item__select_year {
           width: 84px;
@@ -874,7 +877,7 @@ const onToggleDetailPopover = (date?: string) => {
         }
       }
       .body__item--hover:hover {
-        background-color: var(--gray-alpha-15);
+        background-color: var(--nt-gray-moderate);
       }
       .body__item--work {
         background-color: var(--nt-cal-customWorkItemBackgroundColor);
@@ -1005,9 +1008,6 @@ const onToggleDetailPopover = (date?: string) => {
       .tag__item {
         margin: 2px 3px;
       }
-      .n-tag {
-        border-radius: 4px;
-      }
     }
   }
 }
@@ -1019,7 +1019,7 @@ const onToggleDetailPopover = (date?: string) => {
   align-items: center;
   max-height: var(--nt-cal-customDestivalCountdownItemHeight);
   overflow-y: auto;
-  border-top: 1px solid var(--gray-alpha-12);
+  border-top: 1px solid var(--nt-gray-light);
   -ms-overflow-style: none;
   scrollbar-width: none;
   .festival__item {

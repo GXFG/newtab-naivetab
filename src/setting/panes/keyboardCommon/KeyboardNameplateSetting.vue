@@ -1,17 +1,19 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import { Icon } from '@iconify/vue'
 import {
   SettingFormSection,
   SettingFormItem,
   SettingFormInlineRow,
 } from '@/setting/components'
-import { ColorField, NumberField, ToggleColorField } from '@/setting/fields'
+import {
+  ColorField,
+  NumberField,
+  ToggleColorField,
+  SelectFont,
+} from '@/setting/fields'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
-import {
-  availableFontOptions,
-  fontSelectRenderLabel,
-} from '@/logic/store/style'
 
 const FONT_WEIGHT_OPTIONS = [
   { label: 'Thin (100)', value: 100 },
@@ -119,7 +121,7 @@ const deleteOverlay = (id: string) => {
 <template>
   <!-- 铭牌列表 -->
   <div class="nameplate-list">
-    <NTag
+    <NTTag
       v-for="overlay in overlays"
       :key="overlay.id"
       :type="overlay.id === selectedId ? 'primary' : 'default'"
@@ -129,18 +131,16 @@ const deleteOverlay = (id: string) => {
       @close="deleteOverlay(overlay.id)"
     >
       {{ overlay.text || '…' }}
-    </NTag>
+    </NTTag>
 
-    <NButton
+    <NTButton
       size="small"
-      quaternary
+      variant="ghost"
       @click="addOverlay"
     >
-      <template #icon>
-        <Icon :icon="ICONS.add" />
-      </template>
+      <Icon :icon="ICONS.add" />
       {{ $t('keyboardNameplate.add') }}
-    </NButton>
+    </NTButton>
   </div>
 
   <!-- 拖拽提示 -->
@@ -159,7 +159,7 @@ const deleteOverlay = (id: string) => {
       icon="mdi:format-text"
     >
       <SettingFormItem :label="$t('keyboardNameplate.text')">
-        <NInput
+        <NTInput
           v-model:value="draftText"
           size="small"
           :placeholder="$t('keyboardNameplate.textPlaceholder')"
@@ -167,14 +167,11 @@ const deleteOverlay = (id: string) => {
       </SettingFormItem>
 
       <SettingFormItem :label="$t('keyboardNameplate.font')">
-        <NSelect
-          :value="selectedOverlay.fontFamily"
-          :options="availableFontOptions"
-          :render-label="fontSelectRenderLabel"
+        <SelectFont
+          v-model:value="selectedOverlay.fontFamily"
           size="small"
-          @update:value="selectedOverlay.fontFamily = $event ?? 'system'"
         />
-        <NInputNumber
+        <NTInputNumber
           :value="selectedOverlay.fontSize"
           size="small"
           :step="1"
@@ -185,7 +182,7 @@ const deleteOverlay = (id: string) => {
       </SettingFormItem>
 
       <SettingFormItem :label="$t('keyboardNameplate.fontWeight')">
-        <NSelect
+        <NTSelect
           :value="selectedOverlay.fontWeight"
           :options="FONT_WEIGHT_OPTIONS"
           size="small"
@@ -349,7 +346,7 @@ const deleteOverlay = (id: string) => {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-8) var(--space-4);
-  color: var(--gray-alpha-40);
+  color: var(--nt-text-tertiary);
   text-align: center;
   font-size: 13px;
 
@@ -365,12 +362,12 @@ const deleteOverlay = (id: string) => {
   gap: 4px;
   padding: 0 0 var(--space-2);
   font-size: var(--text-xs);
-  color: var(--gray-alpha-50);
+  color: var(--nt-text-tertiary);
 
   .tip__icon {
     flex-shrink: 0;
     font-size: 12px;
-    color: var(--gray-alpha-40);
+    color: var(--nt-text-tertiary);
   }
 }
 </style>

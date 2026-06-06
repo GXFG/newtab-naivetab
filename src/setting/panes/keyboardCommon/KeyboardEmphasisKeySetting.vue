@@ -83,14 +83,15 @@ const hasOverrides = computed(
       <span class="emphasis-key-setting__tips">{{
         $t('keyboardCommon.emphasisKeyGroupTips')
       }}</span>
-      <NButton
+      <NTButton
         v-if="hasOverrides"
+        type="primary"
         size="tiny"
-        secondary
+        variant="secondary"
         @click="handleReset"
       >
         {{ $t('keyboardCommon.emphasisKeyGroupReset') }}
-      </NButton>
+      </NTButton>
     </div>
 
     <!-- 图例 -->
@@ -157,6 +158,7 @@ const hasOverrides = computed(
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin: 5px 0;
   gap: 8px;
   height: 24px;
 }

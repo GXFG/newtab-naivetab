@@ -14,7 +14,6 @@ interface Window {
    */
   __naivetabGlobalShortcutInit: boolean
   $t: (key: string) => string
-  $dialog: DialogApiInjection
 }
 
 type WidgetCodes = import('@/common/widget-constants').WidgetCodes

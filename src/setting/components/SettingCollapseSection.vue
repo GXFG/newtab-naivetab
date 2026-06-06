@@ -149,7 +149,7 @@ const onAfterLeave = () => {
     user-select: none;
     position: relative;
     transition: background-color var(--transition-base);
-    color: var(--n-text-color-3);
+    color: var(--nt-text-primary);
 
     /* 左侧色条，主题色 */
     &::before {
@@ -159,7 +159,7 @@ const onAfterLeave = () => {
       top: 50%;
       transform: translateY(-50%);
       width: 3px;
-      height: 60%;
+      height: 40%;
       border-radius: 2px;
       background: var(--nt-primary-color);
       transition: opacity var(--transition-base);
@@ -172,31 +172,29 @@ const onAfterLeave = () => {
       left: 8px;
       right: 8px;
       height: 1px;
-      background: var(--gray-alpha-06);
+      background: var(--nt-gray-minimal);
       transition: opacity var(--transition-base);
     }
 
     &:hover {
-      background-color: var(--gray-alpha-08);
+      background-color: var(--nt-gray-minimal);
 
       .header__indicator {
-        background-color: var(--gray-alpha-12);
+        background-color: var(--nt-gray-light);
       }
     }
 
     &.section__header--expanded {
-      color: var(--n-text-color-2);
-
       &::after {
         opacity: 0;
       }
 
       &:hover {
-        background-color: var(--gray-alpha-05);
+        background-color: var(--nt-gray-ghost);
       }
 
       .header__chevron {
-        color: var(--n-text-color-2);
+        color: var(--nt-text-primary);
       }
     }
 
@@ -232,7 +230,7 @@ const onAfterLeave = () => {
 
       .header__chevron {
         font-size: var(--text-base);
-        color: var(--n-text-color-3);
+        color: var(--nt-text-primary);
         transform: rotate(0deg);
         transition:
           transform var(--transition-spring),
@@ -250,7 +248,7 @@ const onAfterLeave = () => {
     margin-top: 6px;
     padding: 0 13px;
     border-radius: var(--radius-lg);
-    border-bottom: 1px solid var(--gray-alpha-06);
+    border-bottom: 1px solid var(--nt-gray-minimal);
     overflow: hidden;
 
     /* 内部 SettingFormItem 分隔线 */
@@ -263,7 +261,7 @@ const onAfterLeave = () => {
         bottom: 0;
         left: 14px;
         right: 14px;
-        border-bottom: 1px solid var(--gray-alpha-06);
+        border-bottom: 1px solid var(--nt-gray-minimal);
       }
 
       &:last-child::after {

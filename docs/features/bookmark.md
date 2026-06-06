@@ -65,7 +65,8 @@ interface BookmarkItem {
 {
   enabled: true,                              // Widget 是否启用
   source: 2,                                  // 1=浏览器书签, 2=自定义 keymap
-  isGlobalShortcutEnabled: true,              // 全局快捷键开关
+  isEnabled: true,                            // 总开关（newtab + CS）
+  isGlobalShortcutEnabled: true,              // CS 端开关（关闭后仅 newtab 可用）
   shortcutInInputElement: true,               // 输入框内是否触发
   globalShortcutModifiers: ['alt'],           // 修饰键
   urlBlacklist: string[],                     // URL 黑名单
@@ -81,7 +82,7 @@ interface BookmarkItem {
 }
 ```
 
-**PRESERVE_FIELDS** = `['source', 'isGlobalShortcutEnabled', 'noModifierMode', 'shortcutInInputElement', 'globalShortcutModifiers', 'urlBlacklist', 'keymap', 'layers']` — 快速重置时保护用户数据。
+**PRESERVE_FIELDS** = `['source', 'isEnabled', 'isGlobalShortcutEnabled', 'noModifierMode', 'shortcutInInputElement', 'globalShortcutModifiers', 'urlBlacklist', 'keymap', 'layers']` — 快速重置时保护用户数据。
 
 ---
 
@@ -287,7 +288,7 @@ loadAndCacheKeyboardBookmarkConfig()     // 启动加载，5s 超时
 ```ts
 handleBookmarkShortcutKeydown(key: string, _tabId: number): void
   1. 读取缓存配置（无 I/O）
-  2. 检查 isGlobalShortcutEnabled
+  2. 检查 isEnabled（SW 端只检查总开关，isGlobalShortcutEnabled 由 CS 端负责拦截）
   3. 查找 keymap[key].url
   4. chrome.tabs.create({ url: padUrlHttps(entry.url) })
 ```

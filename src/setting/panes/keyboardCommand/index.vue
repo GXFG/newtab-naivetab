@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
-import { NPopconfirm } from 'naive-ui'
 import { localConfig } from '@/logic/config/state'
 import { getSettingKeyboardSize } from '@/logic/store/style'
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
@@ -227,36 +226,46 @@ const handleCommandSelect = (cmd: TCommandName) => {
         :label="$t('keyboardCommand.enabled')"
       />
 
-      <SwitchField
-        v-model="localConfig.keyboardCommand.shortcutInInputElement"
-        :label="$t('keyboardCommand.shortcutInInputElement')"
-        :tip-content="$t('keyboardCommand.shortcutInInputElementTips')"
-        :warning-message="noModifierInInputWarning"
-      />
-
-      <SettingFormItem
-        :label="$t('keyboardCommand.urlBlacklist')"
-        :tip-content="$t('generalSetting.urlBlacklistTips')"
-      >
-        <UrlBlacklistInput v-model="localConfig.keyboardCommand.urlBlacklist" />
-      </SettingFormItem>
-
-      <SwitchField
-        v-model="localConfig.keyboardCommand.noModifierMode"
-        :label="$t('keyboardCommand.noModifierMode')"
-        :tip-content="$t('keyboardCommand.noModifierModeDesc')"
-      />
-
-      <SettingFormItem
-        :label="$t('keyboardCommand.globalModifier')"
-        :tip-content="getGlobalModifierTip()"
-        :warning-message="modifierWarnings"
-      >
-        <GlobalShortcutRecorder
-          v-model="localConfig.keyboardCommand.modifiers"
-          :disabled="localConfig.keyboardCommand.noModifierMode"
+      <template v-if="localConfig.keyboardCommand.isEnabled">
+        <SwitchField
+          v-model="localConfig.keyboardCommand.isGlobalShortcutEnabled"
+          :label="$t('keyboardCommand.listenBackgroundKeystrokes')"
+          :tip-content="$t('keyboardBookmark.shortcutNote')"
         />
-      </SettingFormItem>
+
+        <SwitchField
+          v-model="localConfig.keyboardCommand.shortcutInInputElement"
+          :label="$t('keyboardCommand.shortcutInInputElement')"
+          :tip-content="$t('keyboardCommand.shortcutInInputElementTips')"
+          :warning-message="noModifierInInputWarning"
+        />
+
+        <SettingFormItem
+          :label="$t('keyboardCommand.urlBlacklist')"
+          :tip-content="$t('generalSetting.urlBlacklistTips')"
+        >
+          <UrlBlacklistInput
+            v-model="localConfig.keyboardCommand.urlBlacklist"
+          />
+        </SettingFormItem>
+
+        <SwitchField
+          v-model="localConfig.keyboardCommand.noModifierMode"
+          :label="$t('keyboardCommand.noModifierMode')"
+          :tip-content="$t('keyboardCommand.noModifierModeDesc')"
+        />
+
+        <SettingFormItem
+          :label="$t('keyboardCommand.globalModifier')"
+          :tip-content="getGlobalModifierTip()"
+          :warning-message="modifierWarnings"
+        >
+          <GlobalShortcutRecorder
+            v-model="localConfig.keyboardCommand.modifiers"
+            :disabled="localConfig.keyboardCommand.noModifierMode"
+          />
+        </SettingFormItem>
+      </template>
     </SettingFormSection>
 
     <!-- 可视化键盘绑定区域 -->
@@ -308,22 +317,24 @@ const handleCommandSelect = (cmd: TCommandName) => {
           class="command-binding__selector"
         >
           <div class="selector__header">
-            <span class="selector__key">{{
-              getCustomLabel(selectedKeyCode)
-            }}</span>
-            <span class="selector__binding">{{
-              formatBinding(selectedKeyCode)
-            }}</span>
-            <NPopconfirm @positive-click="handleDeleteBinding">
+            <div>
+              <span class="selector__key">{{
+                getCustomLabel(selectedKeyCode)
+              }}</span>
+              <span class="selector__binding">{{
+                formatBinding(selectedKeyCode)
+              }}</span>
+            </div>
+            <NTPopconfirm @positive-click="handleDeleteBinding">
               <template #trigger>
-                <NButton
-                  quaternary
+                <NTButton
+                  variant="ghost"
                   size="small"
                   type="error"
                   class="selector__close"
                 >
                   <Icon :icon="ICONS.deleteBin" />
-                </NButton>
+                </NTButton>
               </template>
               {{
                 $t('keyboardCommand.confirmDelete').replace(
@@ -331,7 +342,7 @@ const handleCommandSelect = (cmd: TCommandName) => {
                   getCustomLabel(selectedKeyCode),
                 )
               }}
-            </NPopconfirm>
+            </NTPopconfirm>
           </div>
 
           <div class="selector__categories">
@@ -343,16 +354,15 @@ const handleCommandSelect = (cmd: TCommandName) => {
               <div class="category-group__label">
                 {{ $t(cat.categoryKey) }}
               </div>
-              <NRadioGroup
+              <NTRadioGroup
                 :value="getBoundCommand(selectedKeyCode)"
                 class="category-group__options"
                 @update:value="handleCommandSelect"
               >
-                <NRadio
+                <NTRadio
                   v-for="cmd in cat.commands"
                   :key="cmd.value"
                   :value="cmd.value"
-                  size="small"
                 >
                   <p class="cmd-label-wrap">
                     <Icon
@@ -361,8 +371,8 @@ const handleCommandSelect = (cmd: TCommandName) => {
                     />
                     <span>{{ cmd.label }}</span>
                   </p>
-                </NRadio>
-              </NRadioGroup>
+                </NTRadio>
+              </NTRadioGroup>
             </div>
           </div>
         </div>
@@ -412,19 +422,20 @@ const handleCommandSelect = (cmd: TCommandName) => {
 .command-binding__selector {
   padding: 12px;
   border-radius: 8px;
-  background-color: var(--gray-alpha-05);
-  border: 1px solid var(--gray-alpha-08);
+  background-color: var(--nt-gray-ghost);
+  border: 1px solid var(--nt-gray-minimal);
 }
 
 .selector__header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
   padding: 8px 10px;
   border-radius: var(--radius-md);
-  background: var(--gray-alpha-05);
-  border: 1px solid var(--gray-alpha-08);
+  background: var(--nt-gray-ghost);
+  border: 1px solid var(--nt-gray-minimal);
 }
 
 .selector__categories {
@@ -438,12 +449,6 @@ const handleCommandSelect = (cmd: TCommandName) => {
   font-weight: 600;
   opacity: var(--opacity-secondary);
   margin-bottom: 4px;
-}
-
-/* 命令选择器中的 radio 使用 auto 宽度，配合 2 列网格布局 */
-:deep(.category-group__options .n-radio) {
-  width: auto;
-  padding-left: 8px;
 }
 
 .category-group__options {
@@ -463,39 +468,18 @@ const handleCommandSelect = (cmd: TCommandName) => {
   }
 }
 
-/* 增强选中命令的视觉反馈 */
-:deep(.category-group__options .n-radio.n-radio--checked) {
-  background: var(--gray-alpha-08);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-}
-
-:deep(.category-group__options .n-radio.n-radio--checked .n-radio__label) {
-  font-weight: 600;
-  color: var(--nt-primary-color);
-}
-
-:deep(.category-group__options .n-radio.n-radio--checked .n-radio__dot) {
-  border-color: var(--nt-primary-color);
-}
-
-:deep(.category-group__options .n-radio:hover:not(.n-radio--checked)) {
-  background: var(--gray-alpha-08);
-  border-radius: var(--radius-md);
-  transition: background var(--transition-fast);
-}
-
 .selector__key {
   font-size: 13px;
   font-weight: 700;
   color: var(--nt-primary-color);
   padding: 2px 8px;
   border-radius: var(--radius-sm);
-  background-color: var(--gray-alpha-06);
+  background-color: var(--nt-gray-minimal);
   letter-spacing: 0.5px;
 }
 
 .selector__binding {
+  margin-left: 5px;
   font-size: 12px;
   opacity: var(--opacity-muted);
   font-family: var(--nt-app-font-family), monospace;

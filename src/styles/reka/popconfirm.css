@@ -1,0 +1,72 @@
+/* ============================================================
+ * Popconfirm — 确认弹出层（基于 Popover + 操作按钮）
+ *
+ * 内部使用 NTPopover，在此覆盖内容区按钮样式。
+ * ============================================================ */
+
+.reka-popconfirm {
+  min-width: 180px;
+}
+
+.reka-popconfirm__body {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: inherit;
+}
+
+.reka-popconfirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.reka-popconfirm__btn {
+  all: unset;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-bg);
+}
+
+.reka-popconfirm__btn--cancel {
+  color: var(--nt-text-primary);
+  background-color: var(--nt-gray-minimal);
+}
+.reka-popconfirm__btn--cancel:hover {
+  background-color: var(--nt-gray-moderate);
+}
+
+.reka-popconfirm__btn--confirm {
+  color: white;
+  background-color: var(--nt-primary-color);
+}
+.reka-popconfirm__btn--confirm:hover {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 85%, black);
+}
+
+/* ============================================================
+ * 深色模式覆盖
+ * ============================================================ */
+:root[data-theme='dark'] .reka-popconfirm__btn--cancel,
+.dark .reka-popconfirm__btn--cancel {
+  color: var(--nt-text-primary);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-popconfirm__btn {
+    border: 1px solid ButtonText;
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+  .reka-popconfirm__btn--confirm {
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+}

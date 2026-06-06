@@ -281,7 +281,7 @@ chrome.storage sync key:  naive-tab-keyboardCommand
 | 配置字段 | `keyboardBookmark` | `keyboardCommand` | `keyboardBookmark`（同书签快捷键） |
 | 存储 key | `c-keyboardBookmark` | `c-keyboardCommand` | `c-keyboardBookmark` |
 | 云同步 key | `naive-tab-keyboardBookmark` | `naive-tab-keyboardCommand` | `naive-tab-keyboardBookmark` |
-| 启用开关 | `keyboardBookmark.isGlobalShortcutEnabled` | `keyboardCommand.isEnabled` | `keyboardBookmark.enabled`（Widget 开关） |
+| 启用开关 | `keyboardBookmark.isEnabled`（总开关）+ `keyboardBookmark.isGlobalShortcutEnabled`（CS 开关） | `keyboardCommand.isEnabled`（总开关）+ `keyboardCommand.isGlobalShortcutEnabled`（CS 开关） | `keyboardBookmark.enabled`（Widget 开关） |
 | 无修饰键模式 | `keyboardBookmark.noModifierMode`（默认 `false`） | `keyboardCommand.noModifierMode`（默认 `false`） | 使用 `keyboardBookmark.noModifierMode` |
 | 修饰键 | `keyboardBookmark.globalShortcutModifiers`（默认 `['alt']`，数组） | `keyboardCommand.modifiers`（默认 `['shift', 'alt']`，数组） | ❌ 不响应修饰键 |
 | Keymap | `keyboardBookmark.keymap: Record<string, TBookmarkEntry>` | `keyboardCommand.keymap: Record<string, TCommandEntry>` | 复用 `keyboardBookmark.keymap` |
@@ -353,7 +353,7 @@ newtab 页面的 URL 为 `chrome-extension://<id>/dist/newtab.html`，`location.
 | 场景 | 处理方式 |
 |------|----------|
 | 按键按住不放（repeat 事件） | 非 scroll 命令：`e.repeat` 过滤，不重复触发<br>scroll 命令：`tryLocalScroll` 放行，启动 rAF 动画循环（按住加速、松开减速，不依赖 OS repeat） |
-| 未启用全局快捷键 | CS/SW 双重 `isEnabled` 校验 |
+| 未启用全局快捷键 | CS 端 `isEnabled && isGlobalShortcutEnabled` 校验；SW 仅检查 `isEnabled`；newtab 仅检查 `isEnabled` |
 | 输入元素中误触发 | CS: `isInInputElement(e)` 检查 `composedPath()` + `shortcutInInputElement` 配置<br>newtab: `isInputFocused` 上游屏蔽 |
 | 修饰键不匹配 | `eventMask !== configMask` 位掩码严格相等 |
 | 主键不在白名单 | `ALLOWED_SET.has(e.code)` |

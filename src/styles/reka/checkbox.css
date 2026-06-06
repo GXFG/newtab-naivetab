@@ -1,0 +1,150 @@
+/* ============================================================
+ * Checkbox（macOS 风格，参照 Switch 设计原则）
+ *
+ * 设计思路不同于 Switch。Checkbox 是"容器"而非"滑块"：
+ *   方盒为凹槽（内阴影），勾号为指示器（缩放弹出）。
+ *   遵循 6 条设计原则，深色模式自适应。
+ *
+ * 状态覆盖顺序：
+ *   base → hover → active → focus-visible → checked → disabled
+ *
+ * 设计意图速查：
+ *   base     → 16px 方盒 + 凹槽内阴影 + 边框（原则1：立体层次）
+ *   hover    → 边框加深 + 外侧微光环（原则1：层次递进）
+ *   active   → 仅勾号微缩，方盒不动（原则2：局部反馈）
+ *   checked  → 主题色填充 + 勾号弹簧弹出（原则4+6：通透+弹簧律动）
+ *   disabled → 整体降透明度（原则1：层次退化）
+ *   dark     → 内阴影换白色通道（原则5：双模式自适应）
+ * ============================================================ */
+
+/* 1. base — 16px 方盒 + 凹槽内阴影 + 边框（原则1：容器凹陷） */
+.reka-checkbox {
+  /* 几何变量：改 --checkbox-size 联动勾号尺寸 */
+  --checkbox-size: 16px;
+  --checkbox-check-size: 12px;
+
+  all: unset;
+  outline: none;  /* 禁止浏览器默认 focus outline（:focus 时也会出现） */
+  box-sizing: border-box;  /* border 包含在 width/height 内，避免 content-box 导致尺寸膨胀 */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border-radius: var(--radius-sm);
+  background-color: var(--reka-surface-bg);
+  border: var(--reka-border-width) solid var(--nt-gray-heavy);
+  /* 内阴影营造方盒凹槽感 */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.02);
+  transition: background-color var(--transition-bg),
+              border-color var(--transition-bg),
+              box-shadow var(--transition-shadow);
+  flex-shrink: 0;
+  cursor: var(--reka-cursor-interactive);
+}
+
+/* 2. hover — 边框加深 + 外侧微光环（原则1：层次递进）。
+   排除 disabled，disabled 由下方 :disabled:hover 单独处理。 */
+.reka-checkbox:not(:disabled):hover {
+  border-color: var(--nt-gray-heavy);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.02),
+              var(--reka-shadow-halo);
+}
+
+/* 3. active — 仅勾号微缩，方盒底色微调（原则2：局部反馈）。
+   注意：只对已选中态生效，避免未选中时 scale(0.85) 让勾号短暂可见。 */
+.reka-checkbox[data-state='checked']:not(:disabled):active .reka-checkbox__check {
+  transform: scale(0.85);
+}
+.reka-checkbox:not(:disabled):active {
+  background-color: var(--nt-gray-light);
+}
+
+/* 4. focus-visible — 使用通用 .reka-focus-visible class */
+
+/* 5. checked — 主题色填充 + 移除边框（原则4：通透质感） */
+.reka-checkbox[data-state='checked'] {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--nt-primary-color) 90%, white) 0%,
+    color-mix(in srgb, var(--nt-primary-color) 100%, black) 100%
+  );
+  border-color: transparent;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06),
+              0 1px 2px color-mix(in srgb, var(--nt-primary-color) 25%, rgba(0, 0, 0, 0.08));
+}
+
+/* 6. checked + hover — 主题色微暗 + 光环（排除 disabled） */
+.reka-checkbox[data-state='checked']:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 85%, black);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06),
+              0 1px 2px color-mix(in srgb, var(--nt-primary-color) 25%, rgba(0, 0, 0, 0.08)),
+              var(--reka-shadow-halo-primary);
+}
+
+/* 7. disabled — 整体降透明度 + 移除交互光标 */
+.reka-checkbox:disabled {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+.reka-checkbox:disabled:hover {
+  border-color: var(--nt-gray-heavy);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.02);
+}
+/* disabled + checked：filter 保色，与 Switch 策略统一 */
+.reka-checkbox:disabled[data-state='checked'] {
+  filter: var(--reka-disabled-filter);
+}
+
+/* check — 勾号 SVG，始终在 DOM 中以固定 12×12 渲染。
+   未选中时 opacity:0 + scale(0) 隐藏，选中时弹簧弹出。
+   避免 CheckboxIndicator 的 Presence 挂载/卸载导致布局抖动。 */
+.reka-checkbox__check {
+  width: var(--checkbox-check-size);
+  height: var(--checkbox-check-size);
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity var(--transition-bg),
+              transform var(--transition-switch);
+}
+.reka-checkbox[data-state='checked'] .reka-checkbox__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================================
+ * Checkbox 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+
+:root[data-theme='dark'] .reka-checkbox,
+.dark .reka-checkbox {
+  border-color: var(--nt-gray-heavy);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.03),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+
+:root[data-theme='dark'] .reka-checkbox[data-state='checked'],
+.dark .reka-checkbox[data-state='checked'] {
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.04),
+              0 1px 2px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(255, 255, 255, 0.06));
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-checkbox {
+    border: 1px solid ButtonText;
+  }
+  .reka-checkbox[data-state='checked'] {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+  .reka-checkbox__check path {
+    stroke: HighlightText;
+  }
+}

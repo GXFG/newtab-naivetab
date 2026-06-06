@@ -119,7 +119,7 @@ const warnings = computed(() => {
   border-radius: var(--radius-md);
 
   &:hover {
-    background-color: var(--gray-alpha-05);
+    background-color: var(--nt-gray-ghost);
   }
 }
 
@@ -145,7 +145,7 @@ const warnings = computed(() => {
   }
 
   &:not(:has(+ .tip-inline)):not(:has(+ .warning-list)) {
-    border-bottom: 1px solid var(--gray-alpha-10);
+    border-bottom: 1px solid var(--nt-gray-light);
   }
 }
 
@@ -155,10 +155,9 @@ const warnings = computed(() => {
   gap: var(--space-1);
   padding: 0 0 var(--space-3) var(--space-3);
   font-size: var(--text-xs);
-  color: var(--n-text-color-3);
+  color: var(--nt-text-secondary);
   line-height: 1.5;
-  opacity: var(--opacity-muted);
-  border-bottom: 1px solid var(--gray-alpha-10);
+  border-bottom: 1px solid var(--nt-gray-light);
 
   .tip__icon {
     flex-shrink: 0;
@@ -221,7 +220,7 @@ const warnings = computed(() => {
   align-items: center;
   gap: var(--space-1);
   font-size: var(--text-base);
-  color: var(--n-text-color-2);
+  color: var(--nt-text-primary);
   cursor: default;
   user-select: none;
 
@@ -240,5 +239,8 @@ const warnings = computed(() => {
   gap: var(--space-2);
   min-width: 0;
   min-height: 28px;
+  :deep(.reka-popover__trigger) {
+    flex-shrink: 0;
+  }
 }
 </style>

@@ -1,0 +1,193 @@
+/* ============================================================
+ * Tree（树形组件，基于 Reka UI TreeRoot + TreeItem）
+ *
+ * 状态覆盖：base → hover → active → expanded → matched
+ *
+ * 设计意图：
+ *   base      → 层级缩进 + 行高 + 字体
+ *   hover     → 整行底色微亮（blockLine 模式）
+ *   expanded  → chevron 旋转 90°
+ *   matched   → label 高亮标记（搜索过滤命中）
+ *   dark      → hover 底色切换、文本颜色适配
+ * ============================================================ */
+
+/* ---- TreeRoot：树形容器 ---- */
+.reka-tree {
+  --tree-indent: 20px;
+  --tree-row-height: 32px;
+  --tree-font-size: var(--text-base);
+  --tree-chevron-size: 16px;
+
+  all: unset;
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--tree-font-size);
+  line-height: 1.4;
+}
+
+/* ---- TreeItem：单个树节点 ---- */
+.reka-tree__item {
+  all: unset;
+  display: block;
+  list-style: none;
+}
+
+/* ---- 节点内容行 ---- */
+.reka-tree__node {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--tree-row-height);
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+/* ---- Toggle：展开/折叠按钮 ---- */
+.reka-tree__toggle {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tree-chevron-size);
+  height: var(--tree-chevron-size);
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  cursor: var(--reka-cursor-interactive);
+  transition: background-color var(--transition-fast);
+}
+
+.reka-tree__toggle:not(:disabled):hover {
+  background-color: var(--nt-gray-light);
+}
+
+/* ---- Chevron 图标 + 展开旋转动画 ---- */
+.reka-tree__chevron {
+  width: 100%;
+  height: 100%;
+  opacity: var(--opacity-secondary);
+  transition: transform var(--transition-fast),
+              opacity var(--transition-fast);
+}
+
+/* TreeItem 展开时 chevron 旋转 90°（利用 Reka 内置的 data-expanded 属性） */
+.reka-tree__item[data-expanded] .reka-tree__chevron {
+  transform: rotate(90deg);
+  opacity: var(--opacity-primary);
+}
+
+/* ---- Toggle 占位（叶子节点对齐）---- */
+.reka-tree__toggle-placeholder {
+  width: var(--tree-chevron-size);
+  height: var(--tree-chevron-size);
+  flex-shrink: 0;
+}
+
+/* ---- Prefix：节点图标 ---- */
+.reka-tree__prefix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.reka-tree__prefix :deep(img) {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---- Label：节点文本 ---- */
+.reka-tree__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--tree-font-size);
+}
+
+/* ============================================================
+ * 变体：blockLine — hover 整行高亮
+ * ============================================================ */
+.reka-tree--block-line .reka-tree__node:not(:active):hover {
+  background-color: var(--nt-gray-light);
+}
+
+/* ============================================================
+ * 变体：blockNode — 整行可点击（节点撑满整行宽度）
+ * ============================================================ */
+.reka-tree--block-node .reka-tree__node {
+  width: 100%;
+}
+
+/* ============================================================
+ * 变体：showLine — 连接线
+ * ============================================================ */
+.reka-tree--show-line .reka-tree__item {
+  position: relative;
+}
+
+/* 缩进层级连接线：在非最后一层的节点左侧画竖线 */
+.reka-tree--show-line .reka-tree__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--tree-indent) * var(--data-indent, 0) + 12px);
+  top: var(--tree-row-height);
+  bottom: 0;
+  width: 1px;
+  background-color: var(--nt-gray-light);
+}
+
+/* ============================================================
+ * 变体：expandOnClick — 点击整行时展开/折叠
+ * ============================================================ */
+.reka-tree--expand-on-click .reka-tree__item--folder .reka-tree__node {
+  cursor: pointer;
+}
+
+/* ============================================================
+ * 匹配高亮（搜索过滤命中）
+ * ============================================================ */
+.reka-tree__item--matched .reka-tree__label {
+  color: var(--nt-primary-color);
+  font-weight: 500;
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ *
+ * 核心规则：hover/连接线背景色从黑半透切换为白半透。
+ * ============================================================ */
+:root[data-theme='dark'] .reka-tree--block-line .reka-tree__node:not(:active):hover,
+.dark .reka-tree--block-line .reka-tree__node:not(:active):hover {
+  background-color: var(--nt-gray-medium);
+}
+
+:root[data-theme='dark'] .reka-tree__toggle:not(:disabled):hover,
+.dark .reka-tree__toggle:not(:disabled):hover {
+  background-color: var(--nt-gray-medium);
+}
+
+:root[data-theme='dark'] .reka-tree--show-line .reka-tree__item:not(:last-child)::before,
+.dark .reka-tree--show-line .reka-tree__item:not(:last-child)::before {
+  background-color: var(--nt-gray-medium);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-tree__node:hover {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+  .reka-tree--show-line .reka-tree__item:not(:last-child)::before {
+    background-color: ButtonText;
+  }
+}

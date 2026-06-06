@@ -8,8 +8,8 @@
  *  2. &--modifier BEM 拼接（禁止，postcss-preset-env 不支持）
  *
  * 用法：
- *   pnpm exec esno scripts/check/check-patterns.ts                    # 检查 src/ 下所有文件
- *   pnpm exec esno scripts/check/check-patterns.ts src/components/    # 检查指定路径
+ *   pnpm exec tsx scripts/check/check-patterns.ts                    # 检查 src/ 下所有文件
+ *   pnpm exec tsx scripts/check/check-patterns.ts src/components/    # 检查指定路径
  */
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs'

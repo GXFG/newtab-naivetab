@@ -1,5 +1,6 @@
 import '../styles/reset.css'
 import '../styles/tokens.css'
+import '../styles/reka/index.css'
 import { createApp } from 'vue'
 import i18n from '@/common/i18n'
 import App from './App.vue'

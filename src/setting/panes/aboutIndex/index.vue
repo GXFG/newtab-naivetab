@@ -60,6 +60,7 @@ const handleOpenUserGuide = () => {
         />
         {{ $t('about.userHelp') }}
       </p>
+
       <div class="section__grid">
         <button
           class="action__card"
@@ -112,6 +113,7 @@ const handleOpenUserGuide = () => {
         />
         {{ $t('about.feedback') }}
       </p>
+
       <div class="section__grid">
         <button
           class="action__card"
@@ -175,10 +177,10 @@ const handleOpenUserGuide = () => {
   margin: 8px 0 12px;
   background: linear-gradient(
     135deg,
-    rgba(16, 152, 173, 0.08) 0%,
-    rgba(16, 152, 173, 0.02) 100%
+    color-mix(in srgb, var(--nt-accent-brand) 8%, transparent) 0%,
+    color-mix(in srgb, var(--nt-accent-brand) 2%, transparent) 100%
   );
-  border: 1px solid rgba(16, 152, 173, 0.12);
+  border: 1px solid color-mix(in srgb, var(--nt-accent-brand) 12%, transparent);
 }
 
 .hero__bg-pattern {
@@ -187,12 +189,12 @@ const handleOpenUserGuide = () => {
   background-image:
     radial-gradient(
       circle at 20% 80%,
-      rgba(16, 152, 173, 0.06) 0%,
+      color-mix(in srgb, var(--nt-accent-brand) 6%, transparent) 0%,
       transparent 50%
     ),
     radial-gradient(
       circle at 80% 20%,
-      rgba(16, 152, 173, 0.04) 0%,
+      color-mix(in srgb, var(--nt-accent-brand) 4%, transparent) 0%,
       transparent 50%
     );
   pointer-events: none;
@@ -221,7 +223,7 @@ const handleOpenUserGuide = () => {
   border-radius: 24px;
   background: radial-gradient(
     circle at 50% 40%,
-    rgba(16, 152, 173, 0.22),
+    color-mix(in srgb, var(--nt-accent-brand) 22%, transparent),
     transparent 70%
   );
   filter: blur(8px);
@@ -266,7 +268,7 @@ const handleOpenUserGuide = () => {
   gap: 5px;
   padding: 3px 10px;
   border-radius: var(--radius-pill);
-  background: var(--gray-alpha-08);
+  background: var(--nt-gray-minimal);
   font-size: var(--text-sm);
   opacity: var(--opacity-primary);
   font-family: 'SF Mono', 'Consolas', monospace;
@@ -320,8 +322,8 @@ const handleOpenUserGuide = () => {
   gap: 6px;
   padding: 12px 8px 10px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--gray-alpha-08);
-  background: var(--gray-alpha-03);
+  border: 1px solid var(--nt-gray-minimal);
+  background: var(--nt-gray-ghost);
   cursor: pointer;
   transition:
     background-color var(--transition-base),
@@ -331,11 +333,11 @@ const handleOpenUserGuide = () => {
   outline: none;
 
   &:hover {
-    background: rgba(16, 152, 173, 0.06);
-    border-color: rgba(16, 152, 173, 0.3);
+    background: color-mix(in srgb, var(--nt-accent-brand) 6%, transparent);
+    border-color: color-mix(in srgb, var(--nt-accent-brand) 30%, transparent);
     box-shadow:
       var(--shadow-sm),
-      0 0 0 3px rgba(16, 152, 173, 0.06);
+      0 0 0 3px color-mix(in srgb, var(--nt-accent-brand) 6%, transparent);
     transform: translateY(-1px);
   }
 
@@ -351,11 +353,11 @@ const handleOpenUserGuide = () => {
   width: 32px;
   height: 32px;
   border-radius: var(--radius-lg);
-  background: var(--gray-alpha-08);
+  background: var(--nt-gray-minimal);
   transition: background-color var(--transition-base);
 
   .action__card:hover & {
-    background: rgba(16, 152, 173, 0.12);
+    background: color-mix(in srgb, var(--nt-accent-brand) 12%, transparent);
   }
 }
 
@@ -364,6 +366,7 @@ const handleOpenUserGuide = () => {
 }
 
 .card__icon {
+  color: var(--nt-text-primary);
   font-size: 16px;
   transition: transform var(--transition-spring);
 
@@ -376,6 +379,7 @@ const handleOpenUserGuide = () => {
   font-size: var(--text-sm);
   line-height: 1;
   white-space: nowrap;
+  color: var(--nt-text-primary);
   opacity: var(--opacity-primary);
 }
 

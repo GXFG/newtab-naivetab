@@ -37,7 +37,7 @@ const isDownloadVisible = computed(
   () => !isDragMode.value && localConfig.general.isBackgroundImageEnabled,
 )
 
-// 与 NDropdown 版本相同：用 ref + watch 避免点击后状态变化导致列表重算
+// 与 NTDropdown 版本相同：用 ref + watch 避免点击后状态变化导致列表重算
 const buildMenuList = (): MenuItem[] => {
   const isFocusMode = localState.value.isFocusMode
   const isHoverWidget = state.currTargetCode !== ''
@@ -308,7 +308,7 @@ onUnmounted(() => {
         <!-- 底部图标行：更换壁纸 & 下载壁纸 | 买杯咖啡 & 关于 -->
         <div class="ctx-menu__footer">
           <template v-if="isDownloadVisible">
-            <n-tooltip
+            <NTTooltip
               trigger="hover"
               placement="bottom"
             >
@@ -323,8 +323,8 @@ onUnmounted(() => {
                 </button>
               </template>
               {{ $t('rightMenu.changeWallpaper') }}
-            </n-tooltip>
-            <n-tooltip
+            </NTTooltip>
+            <NTTooltip
               trigger="hover"
               placement="bottom"
             >
@@ -339,12 +339,12 @@ onUnmounted(() => {
                 </button>
               </template>
               {{ $t('rightMenu.downloadWallpaper') }}
-            </n-tooltip>
+            </NTTooltip>
 
             <div class="ctx-menu__footer-divider" />
           </template>
 
-          <n-tooltip
+          <NTTooltip
             trigger="hover"
             placement="bottom"
           >
@@ -359,8 +359,8 @@ onUnmounted(() => {
               </button>
             </template>
             {{ $t('setting.aboutSponsor') }}
-          </n-tooltip>
-          <n-tooltip
+          </NTTooltip>
+          <NTTooltip
             trigger="hover"
             placement="bottom"
           >
@@ -375,7 +375,7 @@ onUnmounted(() => {
               </button>
             </template>
             {{ $t('setting.aboutIndex') }}
-          </n-tooltip>
+          </NTTooltip>
         </div>
       </div>
     </Transition>
@@ -489,7 +489,7 @@ onUnmounted(() => {
 }
 
 .ctx-menu__item:hover::before {
-  border-color: var(--gray-alpha-12);
+  border-color: var(--nt-gray-light);
 }
 
 .ctx-menu__item:active {
@@ -498,7 +498,7 @@ onUnmounted(() => {
 
 .ctx-menu__item:hover {
   background: var(--nt-cm-hover-bg);
-  box-shadow: 0 1px 4px var(--gray-alpha-06);
+  box-shadow: 0 1px 4px var(--nt-gray-minimal);
 }
 
 /* ---- 图标前缀 ---- */
@@ -614,7 +614,7 @@ onUnmounted(() => {
 .ctx-menu__footer-icon:hover {
   color: var(--nt-cm-icon-hover);
   background: var(--nt-cm-hover-bg);
-  box-shadow: 0 1px 4px var(--gray-alpha-08);
+  box-shadow: 0 1px 4px var(--nt-gray-minimal);
 }
 
 .ctx-menu__footer-icon:active {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { NConfigProvider, NDialogProvider } from 'naive-ui'
 import { log } from '@/logic/utils/common'
 import { gaProxy } from '@/logic/utils/gtag'
 import {
@@ -31,7 +30,6 @@ import {
   cleanupDomStyleWatchers,
 } from '@/logic/store/dom'
 import { getStyleField } from '@/logic/store/style'
-import { nativeUILang, currTheme, themeOverrides } from '@/logic/store/theme'
 import { handleAppUpdate, getLocalVersion } from '@/logic/config/update'
 import { initBackgroundImage } from '@/logic/image/service'
 import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'
@@ -77,7 +75,7 @@ const handleFocusPage = () => {
     if (focusEle && focusEle.focus) {
       focusEle.focus()
     }
-  }, 0)
+  }, 200)
 }
 
 const onDot = () => {
@@ -201,26 +199,21 @@ const onAnimationEnd = () => {
 </script>
 
 <template>
-  <NConfigProvider
+  <div
     v-if="!shouldReloadForFocus"
     id="container"
     :class="pageAnimationClass"
-    :locale="nativeUILang"
-    :theme="currTheme"
-    :theme-overrides="themeOverrides"
     :style="appStyle"
     @animationend="onAnimationEnd"
   >
-    <NDialogProvider>
-      <div
-        id="container__main"
-        tabindex="100"
-        @focus="onPageFocus"
-      >
-        <Content />
-      </div>
-    </NDialogProvider>
-  </NConfigProvider>
+    <div
+      id="container__main"
+      tabindex="100"
+      @focus="onPageFocus"
+    >
+      <Content />
+    </div>
+  </div>
 </template>
 
 <style>

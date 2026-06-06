@@ -1,0 +1,259 @@
+/* ============================================================
+ * Select（下拉选择器，对标 shadcn/ui Select + Naive UI NSelect）
+ *
+ * 基于 Reka UI Select 原语。Trigger 为按钮式输入框，
+ * Content 为 Popper 定位的下拉面板。
+ *
+ * 设计意图速查：
+ *   trigger  → 输入框样式 + chevron 图标
+ *   content  → 弹出面板 + thin scrollbar + 淡入动画
+ *   item     → hover/选中高亮 + check 固定占位（防 Presence 抖动）
+ *   dark     → 面板底色、边框、阴影切换
+ * ============================================================ */
+
+/* --- Trigger：选择器触发按钮 --- */
+.reka-select__trigger {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 90px;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--reka-surface-bg);
+  font-size: var(--text-base);
+  line-height: 32px;
+  cursor: var(--reka-cursor-interactive);
+  outline: none;
+  /* border 用 inset box-shadow 替代，不占盒模型，focus 时颜色切换无布局抖动 */
+  box-shadow: inset 0 0 0 1px var(--nt-gray-medium),
+              0 0 0 2px transparent;
+  transition: box-shadow var(--transition-fast);
+}
+
+.reka-select__trigger--small {
+  height: 28px;
+  padding: 0 8px;
+}
+
+.reka-select__trigger:not(:disabled):hover {
+  box-shadow: inset 0 0 0 1px var(--nt-gray-heavy),
+              0 0 0 2px transparent;
+}
+
+/* focus（键盘 Tab 聚焦时，下拉未打开也显示焦点环） */
+.reka-select__trigger:not(:disabled):focus {
+  box-shadow: inset 0 0 0 1px var(--nt-primary-color),
+              0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+}
+
+/* open（点击打开下拉时，Reka 内置 data-state） */
+.reka-select__trigger:not(:disabled)[data-state='open'] {
+  box-shadow: inset 0 0 0 1px var(--nt-primary-color),
+              0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+}
+
+.reka-select__trigger[data-disabled] {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+/* --- Value：选中值文本 --- */
+.reka-select__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;  /* flex 子元素收缩底线 */
+  color: inherit;
+}
+
+.reka-select__value[data-placeholder],
+.reka-select__value--placeholder {
+  color: var(--nt-text-secondary);
+}
+
+/* --- Label row：icon + label 同行 flex 容器 --- */
+.reka-select__label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.reka-select__label-row--between {
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* --- Preview：字体预览 --- */
+.reka-select__preview {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--nt-text-secondary);
+}
+
+/* --- Favicon：搜索引擎图标（#label 插槽用） --- */
+.reka-select__favicon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.reka-select__favicon--empty {
+  display: inline-block;
+}
+
+/* --- Icon：chevron 箭头（chevronRight 旋转 90° → 向下） --- */
+.reka-select__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: var(--nt-text-tertiary);
+  transform: rotate(90deg);
+  transition: transform 200ms ease;
+}
+
+.reka-select__trigger[data-state='open'] .reka-select__icon {
+  transform: rotate(-90deg);
+}
+
+/* --- Content：下拉面板 --- */
+.reka-select__content {
+  z-index: 3000;
+  min-width: var(--reka-select-trigger-width);
+  max-height: 280px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding: 4px;
+  border-radius: var(--radius-lg);
+  outline: none;
+  background-color: var(--reka-surface-bg);
+  /* border 用 box-shadow 替代——不占盒模型，避免 Popper 重算导致抖动 */
+  box-shadow: 0 0 0 1px var(--nt-gray-light),
+              0 4px 16px rgba(0, 0, 0, 0.08),
+              0 1px 4px rgba(0, 0, 0, 0.04);
+  animation: reka-select-content-in 240ms var(--transition-spring-bounce) backwards;
+  scrollbar-width: thin;
+}
+
+@keyframes reka-select-content-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 关闭动画：data-state='closed' 时触发，Presence 等 animationend 后卸载 DOM */
+.reka-select__content[data-state='closed'] {
+  animation: reka-select-content-out 150ms ease forwards;
+}
+
+@keyframes reka-select-content-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
+.reka-select__content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.reka-select__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reka-select__content::-webkit-scrollbar-thumb {
+  background: var(--nt-gray-moderate);
+  border-radius: 4px;
+}
+
+/* --- Item：选项 --- */
+.reka-select__item {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  line-height: 1.2;
+  cursor: var(--reka-cursor-interactive);
+  color: inherit;
+  user-select: none;
+}
+
+.reka-select__item[data-highlighted]:not([data-disabled]) {
+  background-color: var(--nt-gray-minimal);
+  outline: none;
+}
+
+.reka-select__item[data-state='checked'] {
+  color: var(--nt-primary-color);
+  font-weight: 500;
+  background-color: color-mix(in srgb, var(--nt-primary-color) 6%, transparent);
+}
+
+/* checked + highlighted 叠加更深 */
+.reka-select__item[data-state='checked'][data-highlighted]:not([data-disabled]) {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 10%, transparent);
+}
+
+.reka-select__item[data-disabled] {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+/* --- Item Text：溢出省略 --- */
+.reka-select__item-text {
+  flex: 1;  /* 撑满 indicator 之外的全部空间 */
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* --- Indicator：选中勾号（固定 16px 宽，Prevent Presence 导致文字抖动） --- */
+.reka-select__indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: var(--nt-primary-color);
+}
+
+/* ============================================================
+ * 深色模式
+ * ============================================================ */
+:root[data-theme='dark'] .reka-select__trigger,
+.dark .reka-select__trigger {
+  box-shadow: inset 0 0 0 1px var(--nt-gray-light),
+              0 0 0 2px transparent;
+}
+
+:root[data-theme='dark'] .reka-select__trigger:not(:disabled):hover,
+.dark .reka-select__trigger:not(:disabled):hover {
+  box-shadow: inset 0 0 0 1px var(--nt-gray-moderate),
+              0 0 0 2px transparent;
+}
+
+:root[data-theme='dark'] .reka-select__content,
+.dark .reka-select__content {
+  box-shadow: 0 0 0 1px var(--nt-gray-light),
+              0 4px 16px rgba(0, 0, 0, 0.35),
+              0 0 0 0.5px rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme='dark'] .reka-select__item[data-highlighted]:not([data-disabled]),
+.dark .reka-select__item[data-highlighted]:not([data-disabled]) {
+  background-color: var(--nt-gray-light);
+}

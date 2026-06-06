@@ -1,0 +1,249 @@
+/* ============================================================
+ * Switch（iOS 26 + macOS 26 融合风格，后续组件参考此模板）
+ *
+ * 设计参考：macOS 桌面端紧凑比例 + iOS 滑块立体阴影与弹簧动效。
+ * 遵循 reka-ui.md 6 条设计原则（立体层次/局部反馈/环境光着色/通透质感/双模式自适应/弹簧律动）。
+ *
+ * 状态覆盖顺序：
+ *   base → hover → active → focus-visible → checked → disabled → loading
+ *
+ * 设计意图速查：
+ *   base     → 尺寸 + 凹槽内阴影（原则1：立体层次）
+ *   hover    → 底色深一档 + 外侧微光环（原则1：层次递进）
+ *   active   → 仅 thumb 微扩，轨道不变（原则2：局部反馈）
+ *   checked  → 主题色微渐变 + thumb 阴影染色（原则3+4：光着色+通透）
+ *   disabled → 整体降透明度，阴影打薄（原则1：层次退化）
+ *   loading  → thumb 呼吸脉冲，与 disabled 区分
+ *   dark     → 内阴影换白色通道 + thumb 降纯（原则5：双模式自适应）
+ * ============================================================ */
+.reka-switch {
+  /* 几何变量（对标 Radix Themes 变量链）：改 --switch-height 联动所有尺寸 */
+  --switch-height: 22px;
+  --switch-width: 40px;
+  --switch-thumb-size: 18px;
+  --switch-thumb-offset: 2px;
+
+  all: unset;
+  display: inline-block;  /* 覆盖 all:unset 重置的 display:inline，保证 width/height 生效 */
+  outline: none;  /* 禁止浏览器默认 focus outline（:focus 时也会出现） */
+  box-sizing: border-box;  /* border 包含在 width/height 内 */
+  position: relative;
+  width: var(--switch-width);
+  height: var(--switch-height);
+  border-radius: var(--radius-pill);
+  background-color: var(--nt-gray-medium);
+  /* 内阴影营造轨道凹槽感，是平面→立体的关键 */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  transition: background-color var(--transition-bg),
+              box-shadow var(--transition-shadow);
+  flex-shrink: 0;
+  cursor: var(--reka-cursor-interactive);
+}
+
+/* hover：未选中时底色微微加深 + 微弱光环（排除 disabled/loading） */
+.reka-switch:not(:disabled):hover {
+  background-color: var(--nt-gray-heavy);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.04),
+              var(--reka-shadow-halo);
+}
+
+/* active：仅 thumb 微扩（模拟按压形变），轨道底色加深反馈。
+   排除 disabled/loading 状态（disabled 已有 :disabled 规则降透明度）。 */
+.reka-switch:not(:disabled):active {
+  background-color: var(--nt-gray-heavy);
+}
+.reka-switch:not(:disabled):active .reka-switch__thumb {
+  width: 20px;
+}
+.reka-switch[data-state='checked']:not(:disabled):active {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 80%, black);
+}
+
+/* focus-visible：使用通用 .reka-focus-visible class */
+
+/* checked：主题色填充 + 微弱上下渐变（模拟圆形管道立体感） */
+.reka-switch[data-state='checked'] {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--nt-primary-color) 92%, white) 0%,
+    color-mix(in srgb, var(--nt-primary-color) 100%, black) 100%
+  );
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+}
+
+/* checked + hover：主题色微暗 + 光环（排除 disabled/loading） */
+.reka-switch[data-state='checked']:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--nt-primary-color) 85%, black);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.06),
+              var(--reka-shadow-halo-primary);
+}
+
+/* error：checked 时使用 --color-error 替代主题色，表示破坏性/危险操作 */
+.reka-switch--error[data-state='checked'] {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-error) 92%, white) 0%,
+    color-mix(in srgb, var(--color-error) 100%, black) 100%
+  );
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+}
+/* error + checked + hover：error 色微暗 + 光环（必须 :not(:disabled)） */
+.reka-switch--error[data-state='checked']:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--color-error) 85%, black);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.06),
+              0 0 0 3px color-mix(in srgb, var(--color-error) 20%, transparent);
+}
+/* error + checked + active：error 色更深（必须 :not(:disabled)） */
+.reka-switch--error[data-state='checked']:not(:disabled):active {
+  background-color: color-mix(in srgb, var(--color-error) 80%, black);
+}
+/* error + checked：thumb 阴影染 error 色（原则3：环境光着色） */
+.reka-switch--error[data-state='checked'] .reka-switch__thumb {
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.04),
+    0 2px 5px color-mix(in srgb, var(--color-error) 30%, rgba(0, 0, 0, 0.15)),
+    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+}
+
+/* disabled（非 loading）：整体降透明度 */
+.reka-switch:disabled:not([data-loading]) {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+/* disabled + checked：降饱和而非降透明度，保持主题色辨识度（对标 Radix Themes filter 策略） */
+.reka-switch:disabled:not([data-loading])[data-state='checked'] {
+  filter: var(--reka-disabled-filter);
+}
+
+.reka-switch:disabled:not([data-loading]) .reka-switch__thumb {
+  background-color: var(--nt-gray-moderate);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03),
+              0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* loading：thumb 脉冲动画，与 disabled 视觉区分 */
+.reka-switch[data-loading] {
+  cursor: var(--reka-cursor-disabled);
+}
+.reka-switch[data-loading] .reka-switch__thumb {
+  animation: reka-switch-loading-pulse 1.2s ease-in-out infinite;
+}
+@keyframes reka-switch-loading-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* thumb：大号正圆白色滑块，三层立体阴影（接触+主体+环境），弹性滑动 */
+.reka-switch__thumb {
+  all: unset;
+  display: block;
+  width: var(--switch-thumb-size);
+  height: var(--switch-thumb-size);
+  border-radius: var(--radius-pill);
+  background-color: white;
+  /* 多层阴影模拟真实光照：接触面 → 主体投影 → 边缘发丝光 */
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.06),
+    0 2px 5px rgba(0, 0, 0, 0.15),
+    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  transition: transform var(--transition-switch),
+              width 120ms ease;
+  transform: translateX(var(--switch-thumb-offset));
+  will-change: transform;
+}
+/* 选中态：thumb 阴影染上主题色，模拟环境光着色 */
+.reka-switch[data-state='checked'] .reka-switch__thumb {
+  transform: translateX(calc(var(--switch-width) - var(--switch-thumb-size) - var(--switch-thumb-offset)));
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.04),
+    0 2px 5px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(0, 0, 0, 0.15)),
+    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ *
+ * 核心规则：浅色用黑半透阴影（暗影深度），深色用白半透阴影（微光环抱）。
+ *   黑色阴影在深色背景上不可见，必须切换为白色通道。
+ * ============================================================ */
+
+/* 深色模式轨道：内阴影用半透明白色 */
+:root[data-theme='dark'] .reka-switch,
+.dark .reka-switch {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.04),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+}
+:root[data-theme='dark'] .reka-switch[data-state='checked'],
+.dark .reka-switch[data-state='checked'] {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.04),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}
+
+/* 深色模式 thumb：背景降纯 + 阴影切换为白色通道（微光环抱替代暗影深度） */
+:root[data-theme='dark'] .reka-switch__thumb,
+.dark .reka-switch__thumb {
+  background-color: #f0f0f0;
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.06),
+    0 2px 6px rgba(255, 255, 255, 0.08),
+    0 0 0 0.5px rgba(255, 255, 255, 0.10);
+}
+
+/* 深色模式 checked thumb：阴影亮部染主题色，暗部换白色 */
+:root[data-theme='dark'] .reka-switch[data-state='checked'] .reka-switch__thumb,
+.dark .reka-switch[data-state='checked'] .reka-switch__thumb {
+  box-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.04),
+    0 2px 6px color-mix(in srgb, var(--nt-primary-color) 35%, rgba(255, 255, 255, 0.10)),
+    0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}
+
+/* 深色模式 disabled thumb：阴影退化 */
+:root[data-theme='dark'] .reka-switch:disabled:not([data-loading]) .reka-switch__thumb,
+.dark .reka-switch:disabled:not([data-loading]) .reka-switch__thumb {
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.02),
+              0 1px 3px rgba(255, 255, 255, 0.04);
+}
+
+/* 深色模式 error checked：内阴影换白色通道 */
+:root[data-theme='dark'] .reka-switch--error[data-state='checked'],
+.dark .reka-switch--error[data-state='checked'] {
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.04),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}
+/* 深色模式 error checked thumb：阴影换白色通道 */
+:root[data-theme='dark'] .reka-switch--error[data-state='checked'] .reka-switch__thumb,
+.dark .reka-switch--error[data-state='checked'] .reka-switch__thumb {
+  box-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.04),
+    0 2px 6px color-mix(in srgb, var(--color-error) 35%, rgba(255, 255, 255, 0.10)),
+    0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-switch {
+    border: 1px solid ButtonText;
+  }
+  .reka-switch[data-state='checked'] {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+  .reka-switch__thumb {
+    background-color: ButtonFace;
+    border: 1px solid ButtonText;
+  }
+  .reka-switch[data-state='checked'] .reka-switch__thumb {
+    background-color: HighlightText;
+    border-color: HighlightText;
+  }
+}

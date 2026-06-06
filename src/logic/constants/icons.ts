@@ -120,6 +120,7 @@ export const ICONS = {
   record: 'fluent:record-12-regular',
   stop: 'fluent:record-stop-12-regular',
   close: 'mdi:close',
+  faceSadCry: 'fa6-regular:face-sad-cry',
 }
 
 export const COMMAND_ICONS = {

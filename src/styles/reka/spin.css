@@ -1,0 +1,56 @@
+/* ============================================================
+ * Spin — 加载动画（Apple 风格：细环旋转 + 毛玻璃遮罩）
+ * ============================================================ */
+
+.reka-spin {
+  position: relative;
+  display: block;
+  height: 100%;  /* 确保 flex 子元素时继承父容器高度 */
+  /* inline-block → block：避免 inline 格式化上下文中 baseline 对齐引入额外高度间隙 */
+}
+
+.reka-spin__indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* 旋转环：20px，2.5px 宽，轨道可见 + 主题色顶部 */
+.reka-spin__indicator::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--nt-gray-medium);
+  border-top-color: var(--nt-primary-color);
+  border-radius: 50%;
+  animation: reka-spin-rotate 0.8s linear infinite;
+}
+
+@keyframes reka-spin-rotate {
+  to { transform: rotate(360deg); }
+}
+
+/* active 时毛玻璃遮罩 */
+.reka-spin--active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--reka-surface-bg);
+  opacity: 0.6;
+  backdrop-filter: blur(2px);
+  z-index: 0;
+  border-radius: inherit;
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-spin__indicator::after {
+    border-color: ButtonFace;
+    border-top-color: Highlight;
+  }
+}

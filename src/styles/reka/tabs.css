@@ -1,0 +1,191 @@
+/* ============================================================
+ * Tabs（Segment 胶囊风格，对标 iOS Segmented Control）
+ *
+ * 设计参考：iOS 26 Segmented Control — 凹槽容器 + 滑动 pill 指示器。
+ * Reka 通过 CSS 变量 --reka-tabs-indicator-position/size 驱动 indicator
+ * 定位，页面用 left/width + transition 实现物理滑动。
+ *
+ * 遵循 reka-ui.md 6 条设计原则。
+ *
+ * 关键设计决策：
+ *   - unmountOnHide=false：所有 pane 常驻 DOM，CSS 显隐控制，消除
+ *     "旧内容卸载→新内容挂载"之间的一帧白屏间隙
+ *   - indicator 曲线用 ease-out（cubic-bezier(0.2, 0, 0, 1)），
+ *     避免 spring-bounce 的回弹延迟感。Apple Segmented Control
+ *     实际也是快启动、无回弹的阻尼曲线
+ *   - 面板动画纯 translateX（方向感知），不动 opacity，避免 opacity:0
+ *     时父容器背景透出造成的"闪白"
+ * ============================================================ */
+
+/* --- TabsRoot wrapper --- */
+.reka-tabs {
+  --tabs-radius: var(--radius-lg);
+  --tabs-trigger-radius: var(--radius-md);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- TabsList：凹槽容器 --- */
+.reka-tabs__list {
+  all: unset;
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
+  align-items: center;
+  padding: var(--space-1) var(--space-1);
+  border-radius: var(--tabs-radius);
+  background-color: var(--nt-gray-light);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06),
+              inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+/* --- TabsIndicator：共享滑动 pill ---
+   left/width 消费 Reka 注入的 CSS 变量实现物理滑动。
+   过渡曲线用快启动的 ease-out，无回弹，接近 Apple 实际手感。 --- */
+.reka-tabs__indicator {
+  position: absolute;
+  top: var(--space-1);
+  height: calc(100% - 8px);
+  left: var(--reka-tabs-indicator-position);
+  width: var(--reka-tabs-indicator-size);
+  border-radius: var(--tabs-trigger-radius);
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04),
+              0 2px 6px rgba(0, 0, 0, 0.10),
+              0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  z-index: 0;
+}
+
+/* --- TabsTrigger：tab 按钮（只控制文字，不设背景） --- */
+.reka-tabs__trigger {
+  all: unset;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 28px;
+  padding: 0 var(--space-3);
+  border-radius: var(--tabs-trigger-radius);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  cursor: var(--reka-cursor-interactive);
+  z-index: 1;
+}
+
+/* hover：未选中时底色微微显现 */
+.reka-tabs__trigger:not(:disabled):not([data-state='active']):hover {
+  background-color: var(--nt-gray-minimal);
+}
+
+/* focus-visible：使用通用 .reka-focus-visible class */
+
+/* active：只加粗文字。不设 color（继承页面/Widget 文字色）。
+   pill 外观由 indicator 负责，字重是辅助信号。 */
+.reka-tabs__trigger[data-state='active'] {
+  font-weight: 600;
+}
+
+/* disabled */
+.reka-tabs__trigger:disabled {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
+}
+
+/* ============================================================
+ * animated 模式：indicator 快启动滑动
+ *
+ * 曲线选择 cubic-bezier(0.2, 0, 0, 1)：x1=0.2 让动画立即启动
+ * （对比 spring-bounce x1=0.34 慢半拍），x2=y2=0,1 为 smooth
+ * deceleration。200ms 足够感知位移但不拖沓。
+ *
+ * font-weight 不做 transition：普通字体不支持字重插值，浏览器
+ * 在过渡中点瞬间跳变，视觉上等同于无过渡。
+ * ============================================================ */
+.reka-tabs[data-animated='true'] .reka-tabs__indicator {
+  transition: left var(--transition-base),
+              width var(--transition-base);
+}
+
+/* ============================================================
+ * TabsContent：常驻 DOM + CSS 显隐 + 方向感知水平滑动
+ *
+ * unmountOnHide=false 让所有 pane 一直在 DOM 中，切换时新旧内容
+ * 在同一帧完成 data-state 更新 → 无卸载间隙 → 无白屏闪烁。
+ *
+ * 动画方向由 TabsRoot 的 data-direction 属性控制（NTTabs 组件
+ * 在 watch 中比较新旧 tab 索引自动设置）：
+ *   forward  → 从右侧滑入（用户向右切换）
+ *   backward → 从左侧滑入（用户向左切换）
+ *
+ * 只用 translateX，不动 opacity：避免 opacity:0 时父容器背景透出
+ * 造成闪白（news widget 的 --nt-n-background-color 通常为白色/浅色）。
+ * ============================================================ */
+
+/* 非激活面板：完全隐藏 */
+.reka-tabs__content:not([data-state='active']) {
+  display: none;
+}
+
+/* forward（→）：从右侧滑入 */
+.reka-tabs[data-direction='forward'] .reka-tabs__content[data-state='active'] {
+  animation: reka-tabs-slide-in-right 180ms cubic-bezier(0.2, 0, 0, 1) backwards;
+}
+
+/* backward（←）：从左侧滑入 */
+.reka-tabs[data-direction='backward'] .reka-tabs__content[data-state='active'] {
+  animation: reka-tabs-slide-in-left 180ms cubic-bezier(0.2, 0, 0, 1) backwards;
+}
+
+@keyframes reka-tabs-slide-in-right {
+  from { transform: translateX(16px); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes reka-tabs-slide-in-left {
+  from { transform: translateX(-16px); }
+  to   { transform: translateX(0); }
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+
+:root[data-theme='dark'] .reka-tabs__list,
+.dark .reka-tabs__list {
+  background-color: var(--nt-gray-minimal);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.04),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme='dark'] .reka-tabs__indicator,
+.dark .reka-tabs__indicator {
+  background-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.04),
+              0 2px 6px rgba(255, 255, 255, 0.06),
+              0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-tabs__list {
+    border: 1px solid ButtonText;
+  }
+  .reka-tabs__indicator {
+    background-color: Highlight;
+    border: 1px solid Highlight;
+  }
+  .reka-tabs__trigger[data-state='active'] {
+    color: HighlightText;
+  }
+}

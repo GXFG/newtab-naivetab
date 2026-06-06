@@ -33,13 +33,16 @@ const barWidth = (bytes: number) =>
 
 <template>
   <!-- 同步时间 -->
-  <div class="storage__row">
+  <div
+    class="storage__row"
+    style="align-items: center"
+  >
     <label class="storage__label">
       {{ $t('generalSetting.syncTime') }}
       <Tips :content="$t('generalSetting.syncTimeTips')" />
     </label>
     <div class="storage__control">
-      <NSpin
+      <NTSpin
         :show="props.isLoading"
         size="small"
       >
@@ -50,7 +53,7 @@ const barWidth = (bytes: number) =>
           />
           <span class="sync-time__text">{{ props.syncTime }}</span>
         </div>
-      </NSpin>
+      </NTSpin>
     </div>
   </div>
 
@@ -151,7 +154,7 @@ const barWidth = (bytes: number) =>
     bottom: 0;
     left: 14px;
     right: 14px;
-    border-bottom: 1px solid var(--gray-alpha-06);
+    border-bottom: 1px solid var(--nt-gray-minimal);
   }
 }
 
@@ -161,8 +164,8 @@ const barWidth = (bytes: number) =>
   align-items: center;
   gap: var(--space-1);
   width: 120px;
+  color: var(--nt-text-primary);
   font-size: var(--text-base);
-  opacity: var(--opacity-secondary);
   cursor: default;
   user-select: none;
 }
@@ -180,7 +183,7 @@ const barWidth = (bytes: number) =>
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 9px;
+  padding: 5px 9px;
   border-radius: var(--radius-pill);
   background: rgba(56, 168, 102, 0.1);
   border: 1px solid rgba(56, 168, 102, 0.22);
@@ -227,9 +230,9 @@ const barWidth = (bytes: number) =>
   transition: background-color var(--transition-fast);
 
   &:hover {
-    background: var(--gray-alpha-10);
+    background: var(--nt-gray-light);
     .storage-panel__arrow {
-      color: var(--gray-alpha-70);
+      color: var(--nt-text-secondary);
     }
   }
 
@@ -242,7 +245,7 @@ const barWidth = (bytes: number) =>
 
 .storage-panel__arrow {
   font-size: 16px;
-  color: var(--gray-alpha-55);
+  color: var(--nt-text-tertiary);
   transition:
     transform var(--transition-base),
     color var(--transition-fast);
@@ -285,12 +288,12 @@ const barWidth = (bytes: number) =>
   padding: 3px 6px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  background: var(--gray-alpha-05);
+  background: var(--nt-gray-ghost);
   cursor: default;
   transition: background-color var(--transition-fast);
 
   &:hover {
-    background: var(--gray-alpha-10);
+    background: var(--nt-gray-light);
   }
 
   &.storage-panel__list-item--warn {
@@ -338,7 +341,7 @@ const barWidth = (bytes: number) =>
   .list-item__field {
     font-size: 11px;
     font-family: monospace;
-    color: var(--gray-alpha-75);
+    color: var(--nt-text-secondary);
     width: 100px;
     flex-shrink: 0;
     overflow: hidden;
@@ -351,21 +354,21 @@ const barWidth = (bytes: number) =>
     height: 4px;
     max-width: 150px;
     border-radius: 2px;
-    background: var(--gray-alpha-15);
+    background: var(--nt-gray-moderate);
     overflow: hidden;
   }
 
   .list-item__bar {
     height: 100%;
     border-radius: 2px;
-    background: rgba(16, 152, 173, 0.7);
+    background: color-mix(in srgb, var(--nt-accent-brand) 70%, transparent);
     transition: width var(--transition-base);
   }
 
   .list-item__bytes {
     font-size: 11px;
     font-variant-numeric: tabular-nums;
-    color: var(--gray-alpha-65);
+    color: var(--nt-text-secondary);
     width: 45px;
     text-align: right;
     flex-shrink: 0;

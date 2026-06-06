@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import { localConfig } from '@/logic/config/state'
 import { ICONS } from '@/logic/constants/icons'
 import {
@@ -60,7 +61,7 @@ const durationSeconds = computed({
 
       <SettingFormItem :label="$t('countdown.defaultDuration')">
         <div class="duration__inputs">
-          <NInputNumber
+          <NTInputNumber
             v-if="localConfig.countdown.showHours"
             v-model:value="durationHours"
             class="setting__num-input"
@@ -71,8 +72,8 @@ const durationSeconds = computed({
           >
             <!-- 时间单位后缀为国际通用符号，无需 i18n -->
             <template #suffix> h </template>
-          </NInputNumber>
-          <NInputNumber
+          </NTInputNumber>
+          <NTInputNumber
             v-model:value="durationMinutes"
             class="setting__num-input"
             size="small"
@@ -82,8 +83,8 @@ const durationSeconds = computed({
           >
             <!-- 时间单位后缀为国际通用符号，无需 i18n -->
             <template #suffix> m </template>
-          </NInputNumber>
-          <NInputNumber
+          </NTInputNumber>
+          <NTInputNumber
             v-model:value="durationSeconds"
             class="setting__num-input"
             size="small"
@@ -93,12 +94,12 @@ const durationSeconds = computed({
           >
             <!-- 时间单位后缀为国际通用符号，无需 i18n -->
             <template #suffix> s </template>
-          </NInputNumber>
+          </NTInputNumber>
         </div>
       </SettingFormItem>
 
       <SettingFormItem :label="$t('countdown.label')">
-        <NInput
+        <NTInput
           v-model:value="localConfig.countdown.label"
           size="small"
           clearable
