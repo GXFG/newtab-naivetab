@@ -7,7 +7,6 @@ import { getCityLookup } from '@/api'
 import { URL_QWEATHER_START } from '@/logic/constants/urls'
 import { localConfig } from '@/logic/config/state'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormSection,
@@ -61,8 +60,6 @@ const onSelectCity = (cityId: string) => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.weather')" />
-
   <SettingFormWrap
     id="weather__setting"
     widget-code="weather"

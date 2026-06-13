@@ -27,6 +27,8 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
 
   /* --- Border Radius --- */
   --radius-sm: 4px;
@@ -36,12 +38,14 @@
   --radius-2xl: 16px;
   --radius-pill: 999px;
 
-  /* --- Font Size --- */
-  --text-xs: 11px;
-  --text-sm: 12px;
-  --text-base: 14px;
-  --text-md: 15px;
-  --text-lg: 16px;
+  /* --- Font Size ---
+     实际值由 JS 根据 general.fontSize 动态注入 --nt-font-* 变量。
+     此处的 fallback 值仅在 JS 未加载时生效，与 fontSize=14 默认值一致。 */
+  --text-xs: var(--nt-font-xs, 11px);
+  --text-sm: var(--nt-font-sm, 12px);
+  --text-base: var(--nt-font-base, 14px);
+  --text-md: var(--nt-font-md, 15px);
+  --text-lg: var(--nt-font-lg, 16px);
 
   /* --- Opacity --- */
   --opacity-muted: 0.45;
@@ -64,9 +68,9 @@
   --transition-base: 200ms ease;
   --transition-slow: 300ms ease;
   --transition-spring: 300ms cubic-bezier(0.34, 1.06, 0.64, 1);
-  --transition-switch: 280ms cubic-bezier(0.25, 1.1, 0.5, 1);       /* 小型控件弹簧（thumb/dot/checkmark） */
+  --transition-switch: 280ms cubic-bezier(0.25, 1.1, 0.5, 1); /* 小型控件弹簧（thumb/dot/checkmark） */
   --transition-spring-bounce: 280ms cubic-bezier(0.34, 1.56, 0.64, 1); /* 大型面板弹簧（popover/dialog），明显 overshoot */
-  --transition-drawer: 300ms cubic-bezier(0.32, 0.72, 0, 1);            /* 侧滑抽屉，快启 + 平滑减速，无回弹 */
+  --transition-drawer: 300ms cubic-bezier(0.32, 0.72, 0, 1); /* 侧滑抽屉，快启 + 平滑减速，无回弹 */
 
   /* --- Reka UI: Interactive --- */
   --reka-cursor-interactive: pointer;
@@ -75,10 +79,13 @@
   /* --- Reka UI: Shared Visuals --- */
   --reka-border-width: 1.5px;
   --reka-disabled-filter: saturate(0.65) brightness(0.92);
-  --reka-focus-ring: 0 0 0 1px color-mix(in srgb, var(--nt-primary-color) 15%, transparent),
-                     0 0 0 4px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
-  --reka-shadow-halo: 0 0 0 2px color-mix(in srgb, var(--nt-gray-medium) 50%, transparent);
-  --reka-shadow-halo-primary: 0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+  --reka-focus-ring:
+    0 0 0 1px color-mix(in srgb, var(--nt-primary-color) 15%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+  --reka-shadow-halo: 0 0 0 2px
+    color-mix(in srgb, var(--nt-gray-medium) 50%, transparent);
+  --reka-shadow-halo-primary: 0 0 0 2px
+    color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
 }
 
 /* ============================================================
@@ -98,16 +105,16 @@
   /* Tier 1 — 微背景 */
   --nt-gray-ghost: rgba(128, 128, 128, 0.05);
   --nt-gray-minimal: rgba(128, 128, 128, 0.08);
-  --nt-gray-light: rgba(128, 128, 128, 0.10);
+  --nt-gray-light: rgba(128, 128, 128, 0.1);
   --nt-gray-moderate: rgba(128, 128, 128, 0.15);
-  --nt-gray-medium: rgba(128, 128, 128, 0.20);
+  --nt-gray-medium: rgba(128, 128, 128, 0.2);
   --nt-gray-heavy: rgba(128, 128, 128, 0.35);
   --nt-gray-solid: rgba(128, 128, 128, 0.85);
 
   /* --- Text Colors（浅色：黑底透明，语义化文字层级） --- */
-  --nt-text-primary: rgba(0, 0, 0, 0.88);     /* 主文字：标签、标题 */
-  --nt-text-secondary: rgba(0, 0, 0, 0.62);   /* 次要文字：描述、副标题 */
-  --nt-text-tertiary: rgba(0, 0, 0, 0.45);    /* 提示文字：placeholder、tip */
+  --nt-text-primary: rgba(0, 0, 0, 0.88); /* 主文字：标签、标题 */
+  --nt-text-secondary: rgba(0, 0, 0, 0.62); /* 次要文字：描述、副标题 */
+  --nt-text-tertiary: rgba(0, 0, 0, 0.45); /* 提示文字：placeholder、tip */
 
   /* --- Brand Accent --- */
   --nt-accent-brand: #1098ad; /* 品牌 teal，配合 color-mix(in srgb, var(--nt-accent-brand) X%, transparent) 使用 */
@@ -128,7 +135,27 @@
   --nt-bg-moveable-widget-main: rgba(100, 181, 246, 0.5);
   --nt-bg-moveable-widget-active: rgba(100, 181, 246, 0.7);
   --nt-moveable-tool-delete-btn-color: #ffa39e;
-  --nt-bg-moveable-tool-drawer: rgba(32, 32, 32, 0.55);
+  --nt-bg-moveable-tool-drawer: rgba(255, 255, 255, 0.78);
+
+  /* --- NaiveTab: Moveable Shadows --- */
+  --nt-moveable-shadow-resize: 0 1px 4px rgba(0, 0, 0, 0.1);
+  --nt-moveable-shadow-resize-hover: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --nt-moveable-shadow-hover: 0 2px 12px rgba(100, 181, 246, 0.25);
+  --nt-moveable-shadow-active: 0 4px 16px rgba(100, 181, 246, 0.35);
+  --nt-moveable-shadow-drag: 0 8px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(100, 181, 246, 0.3);
+  --nt-moveable-shadow-delete: 0 4px 24px rgba(255, 80, 80, 0.55);
+  --nt-moveable-shadow-delete-peak: 0 6px 32px rgba(255, 60, 60, 0.7);
+
+  /* --- NaiveTab: Moveable Tool Drawer --- */
+  --nt-moveable-tool-drawer-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12), 0 -1px 6px rgba(0, 0, 0, 0.06);
+  --nt-moveable-tool-drawer-switch-shadow: -3px -4px 10px rgba(0, 0, 0, 0.08), 3px -4px 10px rgba(0, 0, 0, 0.08);
+  --nt-moveable-tool-drawer-highlight: rgba(0, 0, 0, 0.06);
+  --nt-moveable-tool-drawer-highlight-center: rgba(0, 0, 0, 0.1);
+  --nt-moveable-tool-drawer-switch-highlight: rgba(0, 0, 0, 0.08);
+  --nt-moveable-tool-drawer-card-highlight: rgba(0, 0, 0, 0.03);
+  --nt-moveable-tool-drawer-esc-filter: invert(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+  --nt-moveable-tool-delete-icon-shadow: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  --nt-moveable-tool-delete-icon-hover-shadow: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.2));
 
   /* --- NaiveTab: Context Menu --- */
   --nt-cm-bg: rgba(252, 252, 253, 0.92);
@@ -143,6 +170,9 @@
   --nt-cm-danger-text: #d93025;
   --nt-cm-danger-icon: rgba(217, 48, 37, 0.6);
   --nt-cm-danger-hover: rgba(217, 48, 37, 0.08);
+
+  /* --- NaiveTab: Setting --- */
+  --nt-setting-nav-bg: #fff;
 }
 
 /* ============================================================
@@ -157,20 +187,20 @@
   /* --- Neutral Gray → White Alpha --- */
   --nt-gray-ghost: rgba(255, 255, 255, 0.05);
   --nt-gray-minimal: rgba(255, 255, 255, 0.08);
-  --nt-gray-light: rgba(255, 255, 255, 0.10);
+  --nt-gray-light: rgba(255, 255, 255, 0.1);
   --nt-gray-moderate: rgba(255, 255, 255, 0.15);
-  --nt-gray-medium: rgba(255, 255, 255, 0.20);
+  --nt-gray-medium: rgba(255, 255, 255, 0.2);
   --nt-gray-heavy: rgba(255, 255, 255, 0.35);
   --nt-gray-solid: rgba(255, 255, 255, 0.85);
 
   /* --- Text Colors（深色：白底透明） --- */
-  --nt-text-primary: rgba(255, 255, 255, 0.90);   /* 主文字 */
-  --nt-text-secondary: rgba(255, 255, 255, 0.65);  /* 次要文字 */
-  --nt-text-tertiary: rgba(255, 255, 255, 0.42);   /* 提示文字 */
+  --nt-text-primary: rgba(255, 255, 255, 0.9); /* 主文字 */
+  --nt-text-secondary: rgba(255, 255, 255, 0.65); /* 次要文字 */
+  --nt-text-tertiary: rgba(255, 255, 255, 0.42); /* 提示文字 */
 
   /* --- Shadows（深色背景需更高不透明度黑色才能产生深度感） --- */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.20);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
 
   /* --- Semantic --- */
@@ -195,4 +225,31 @@
   --nt-cm-danger-text: #ff6b6b;
   --nt-cm-danger-icon: rgba(255, 107, 107, 0.7);
   --nt-cm-danger-hover: rgba(255, 80, 80, 0.15);
+
+  /* --- NaiveTab: Setting --- */
+  --nt-setting-nav-bg: rgb(24, 24, 28);
+
+  /* --- NaiveTab: Moveable Shadows（深色白半透阴影，防止黑色阴影融入暗背景） --- */
+  --nt-moveable-shadow-resize: 0 1px 4px rgba(255, 255, 255, 0.06);
+  --nt-moveable-shadow-resize-hover: 0 2px 8px rgba(255, 255, 255, 0.1);
+  --nt-moveable-shadow-hover: 0 2px 12px rgba(100, 181, 246, 0.2);
+  --nt-moveable-shadow-active: 0 4px 16px rgba(100, 181, 246, 0.3);
+  --nt-moveable-shadow-drag: 0 8px 32px rgba(255, 255, 255, 0.08), 0 2px 8px rgba(100, 181, 246, 0.25);
+  --nt-moveable-shadow-delete: 0 4px 24px rgba(255, 80, 80, 0.45);
+  --nt-moveable-shadow-delete-peak: 0 6px 32px rgba(255, 60, 60, 0.6);
+
+  /* --- NaiveTab: Moveable Tool Drawer --- */
+  --nt-bg-moveable-tool-drawer: rgba(18, 18, 22, 0.72);
+  --nt-moveable-tool-drawer-shadow: 0 -4px 24px rgba(255, 255, 255, 0.05), 0 -1px 6px rgba(255, 255, 255, 0.03);
+  --nt-moveable-tool-drawer-switch-shadow: -3px -4px 10px rgba(255, 255, 255, 0.04), 3px -4px 10px rgba(255, 255, 255, 0.04);
+  --nt-moveable-tool-drawer-highlight: rgba(255, 255, 255, 0.12);
+  --nt-moveable-tool-drawer-highlight-center: rgba(255, 255, 255, 0.2);
+  --nt-moveable-tool-drawer-switch-highlight: rgba(255, 255, 255, 0.2);
+  --nt-moveable-tool-drawer-card-highlight: rgba(255, 255, 255, 0.05);
+  --nt-moveable-tool-drawer-esc-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  --nt-moveable-tool-delete-icon-shadow: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  --nt-moveable-tool-delete-icon-hover-shadow: drop-shadow(0 2px 12px rgba(255, 255, 255, 0.4));
+  /* 注意：delete-icon-shadow 深色模式仍用黑半透阴影。
+     删除图标位于红底删除区上，黑阴影提供立体深度感；
+     hover 态切换为白半透光晕吸引注意。非通用规则，不适用于普通 UI 阴影。 */
 }

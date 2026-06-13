@@ -31,7 +31,7 @@ const onClick = () => {
         @click="onClick()"
       >
         <Icon
-          :icon="ICONS.questionBold"
+          :icon="ICONS.info"
           class="btn__icon"
         />
       </NTButton>

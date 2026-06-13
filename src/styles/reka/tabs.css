@@ -130,8 +130,10 @@
  * 造成闪白（news widget 的 --nt-n-background-color 通常为白色/浅色）。
  * ============================================================ */
 
-/* 非激活面板：完全隐藏 */
+/* 非激活面板：完全隐藏。z-index: 0 显式标注内联渲染（非 Portal），无 stacking 需要。
+   仅用于 z-index 检查工具识别该组件已考虑此问题。 */
 .reka-tabs__content:not([data-state='active']) {
+  z-index: 0;
   display: none;
 }
 

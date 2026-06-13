@@ -122,7 +122,7 @@ watch(
   user-select: none;
 
   .clockDigital__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     text-align: center;
     font-family: var(--nt-cd-font-family);

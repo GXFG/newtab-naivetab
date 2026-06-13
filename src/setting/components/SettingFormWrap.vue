@@ -2,6 +2,7 @@
 import { h } from 'vue'
 import { Icon } from '@iconify/vue'
 import NTDropdown from '@/components/ui/NTDropdown.vue'
+import NTButton from '@/components/ui/NTButton.vue'
 import { ICONS } from '@/logic/constants/icons'
 import {
   resetWidgetConfig,
@@ -38,6 +39,20 @@ const showPreserve = computed(() => hasPreserveFields(props.widgetCode))
 
 const renderIcon = (iconName: string) => () =>
   h(Icon, { icon: iconName, size: 16 })
+
+const renderResetBtn = () =>
+  h(
+    NTButton,
+    { type: 'error', size: 'tiny', variant: 'secondary', round: true },
+    () => [
+      h(Icon, { icon: ICONS.restoreTwotone }),
+      h(
+        'span',
+        {},
+        `${window.$t('generalSetting.resetSettingValue')} "${window.$t('setting.' + props.widgetCode)}"`,
+      ),
+    ],
+  )
 
 const resetOptions = computed(() => [
   {
@@ -141,34 +156,14 @@ const handleResetSelect = (key: string) => {
         :options="resetOptions"
         @select="handleResetSelect"
       >
-        <div class="reset-btn">
-          <Icon
-            :icon="ICONS.restoreTwotone"
-            class="btn__icon"
-          />
-          <span class="btn__label"
-            >{{ $t('generalSetting.resetSettingValue') }} "{{
-              $t('setting.' + props.widgetCode)
-            }}"</span
-          >
-        </div>
+        <component :is="renderResetBtn" />
       </NTDropdown>
       <NTPopconfirm
         v-else
         @positive-click="resetWidgetConfig(props.widgetCode, 'full')"
       >
         <template #trigger>
-          <div class="reset-btn">
-            <Icon
-              :icon="ICONS.restoreTwotone"
-              class="btn__icon"
-            />
-            <span class="btn__label"
-              >{{ $t('generalSetting.resetSettingValue') }} "{{
-                $t('setting.' + props.widgetCode)
-              }}"</span
-            >
-          </div>
+          <component :is="renderResetBtn" />
         </template>
         <span>{{ $t('generalSetting.confirmReset') }}</span>
       </NTPopconfirm>
@@ -183,62 +178,6 @@ const handleResetSelect = (key: string) => {
     justify-content: flex-end;
     margin-top: var(--space-4);
     margin-bottom: var(--space-4);
-  }
-
-  .reset-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    padding: 4px var(--space-3);
-    border-radius: var(--radius-md);
-    border: 1px dashed color-mix(in srgb, var(--color-error) 30%, transparent);
-    cursor: pointer;
-    transition:
-      background-color var(--transition-base),
-      border-color var(--transition-base),
-      color var(--transition-base),
-      box-shadow var(--transition-base);
-    color: color-mix(in srgb, var(--color-error) 60%, transparent);
-    user-select: none;
-    :root[data-theme='dark'] & {
-      border-color: color-mix(in srgb, var(--color-error) 45%, transparent);
-      color: color-mix(in srgb, var(--color-error) 75%, transparent);
-    }
-
-    .btn__icon {
-      font-size: var(--text-xs);
-      flex-shrink: 0;
-      transition: transform var(--transition-slow);
-    }
-
-    .btn__label {
-      font-size: var(--text-xs);
-      line-height: 1;
-      letter-spacing: 0.1px;
-    }
-
-    &:hover {
-      background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
-      border-color: color-mix(in srgb, var(--color-error) 50%, transparent);
-      border-style: solid;
-      color: var(--color-error);
-      box-shadow: 0 0 0 2px
-        color-mix(in srgb, var(--color-error) 10%, transparent);
-      :root[data-theme='dark'] & {
-        background-color: color-mix(
-          in srgb,
-          var(--color-error) 15%,
-          transparent
-        );
-        border-color: color-mix(in srgb, var(--color-error) 65%, transparent);
-        box-shadow: 0 0 0 2px
-          color-mix(in srgb, var(--color-error) 18%, transparent);
-      }
-
-      .btn__icon {
-        transform: rotate(-30deg);
-      }
-    }
   }
 }
 </style>

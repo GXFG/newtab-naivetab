@@ -2,6 +2,13 @@ export const WIDGET_CODE = 'memo'
 
 export const PRESERVE_FIELDS = ['content']
 
+export const SCALABLE_FIELDS = {
+  width: { min: 100, max: 600 },
+  height: { min: 100, max: 600 },
+  padding: { min: 2, max: 30 },
+  borderRadius: { min: 0, max: 20 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   countEnabled: true,

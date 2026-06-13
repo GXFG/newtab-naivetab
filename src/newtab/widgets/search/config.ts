@@ -1,5 +1,15 @@
 export const WIDGET_CODE = 'search'
 
+export const SCALABLE_FIELDS = {
+  width: { min: 150, max: 800 },
+  height: { min: 20, max: 100 },
+  padding: { min: 5, max: 60 },
+  borderRadius: { min: 0, max: 100 },
+  fontSize: { min: 8, max: 40 },
+  dropdownFontSize: { min: 8, max: 30 },
+  dropdownBorderRadius: { min: 0, max: 30 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: true,
   isNewTabOpen: false,

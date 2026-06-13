@@ -306,7 +306,7 @@ const colonBlinkEnabled = computed(
   user-select: none;
 
   .clockFlip__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     display: flex;
     justify-content: center;

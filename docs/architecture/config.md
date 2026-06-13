@@ -113,6 +113,34 @@ getStyleField(configCode: ConfigField, field: string, unit?: string, ratio?: num
 - 自动处理双元素数组颜色切换
 - 数字值可拼接单位（`px`、`vmin`），`vmin` 时自动 ×0.1
 - 返回 `computed`，调用时不需要再包 `computed`
+- `ratio` 参数在单位转换前应用，用于相对缩放（如 `fontSize × 0.9` 作为副标题字号）
+
+#### 缩放设计：vmin / px 三层分类
+
+Widget 尺寸属性按视觉语义分为三层：
+
+| 层级 | 属性 | 单位 | 原因 |
+|------|------|------|------|
+| **主体尺寸** | fontSize, width, height, padding, blockSize | `vmin` | 定义 Widget 视觉体量，随屏幕等比缩放 |
+| **比例属性** | borderRadius, blockMargin | `vmin` | 与主体尺寸保持比例关系，换屏幕不失调 |
+| **物理细节** | borderWidth, backgroundBlur, cardGap, glowIntensity | `px` | 1px 边框永远是 1px，模糊永远是 N 像素 |
+
+**0.1 系数**：选择 0.1 是为了让 config 值在 1080p 屏幕上 ≈ px（`fontSize: 18 → 1.8vmin ≈ 19px`），使配置值对人类直觉友好，同时 Widget 随屏幕等比缩放。
+
+少数例外有其理由：`weather` 的 fontSize 信息密集故用 px；`countdown` 的 labelFontSize（标签文字）用 px 保持可读；`clockFlip`/`clockNeon` 的 borderRadius 是精密视觉元素用 px。
+
+#### scaleMode 缩放模式
+
+用户可通过 `general.scaleMode` 切换全局缩放策略：
+
+| 模式 | 行为 | 设计哲学 | 适用场景 |
+|------|------|----------|----------|
+| `'auto'`（默认） | vmin 随屏幕等比缩放 | Dashboard/海报——屏幕越大元素越大 | 展示型 Widget（时钟、日历） |
+| `'fixed'` | vmin 自动转为 px，所有屏幕统一 | App/文档——屏幕越大留白越多 | 文本密集型场景 |
+
+- px 单位**不受** scaleMode 影响（物理细节永远固定）
+- 切换 scaleMode 时无需修改各 Widget 配置，`getStyleField` 内部透明处理
+- 老用户默认 `'auto'`，保持既有体验
 
 ### CSS 自定义变量注入
 

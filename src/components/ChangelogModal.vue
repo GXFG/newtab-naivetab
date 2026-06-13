@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import NTModal from '@/components/ui/NTModal.vue'
+import NTNotice from '@/components/ui/NTNotice.vue'
 import { ICONS } from '@/logic/constants/icons'
 import { defineAsyncComponent, computed } from 'vue'
 import { localConfig } from '@/logic/config/state'
@@ -27,100 +28,58 @@ const onConfirm = () => {
   <NTModal
     v-model:open="globalState.isChangelogModalVisible"
     :mask-closable="false"
+    :title="$t('about.changelogTitle')"
+    :width="600"
   >
-    <NTCard
-      class="card__wrap"
-      :title="$t('about.changelogTitle')"
-    >
+    <template #body-header>
       <div
         v-if="showBreakingChangeNotice"
-        class="breaking-notice"
+        class="changelog__notice"
       >
-        <Icon
-          :icon="ICONS.warning"
-          class="notice__icon"
+        <NTNotice
+          type="warning"
+          :content="$t('prompts.breakingChangeNotice')"
         />
-        <div class="notice__content">
-          {{ $t('prompts.breakingChangeNotice') }}
+      </div>
+    </template>
+
+    <ChangeLogMd
+      v-if="ChangeLogMd"
+      class="changelog__content"
+    />
+    <p v-else>-</p>
+
+    <template #footer>
+      <NTButton
+        type="primary"
+        size="tiny"
+        variant="secondary"
+        @click="onConfirm()"
+      >
+        <div class="icon__wrap">
+          <Icon :icon="ICONS.checkCircle" />
         </div>
-      </div>
-
-      <div class="modal__content changelog__content">
-        <ChangeLogMd v-if="ChangeLogMd" />
-        <p v-else>-</p>
-      </div>
-
-      <template #footer>
-        <NTButton
-          type="primary"
-          size="small"
-          variant="secondary"
-          @click="onConfirm()"
-        >
-          <div class="icon__wrap">
-            <Icon :icon="ICONS.checkCircle" />
-          </div>
-          {{ $t('common.confirm') }}
-        </NTButton>
-      </template>
-    </NTCard>
+        {{ $t('common.confirm') }}
+      </NTButton>
+    </template>
   </NTModal>
 </template>
 
 <style scoped>
-.card__wrap {
-  width: 600px;
-  .changelog__content {
-    padding: 15px 0;
-    :deep(h1) {
-      display: none;
-    }
-    :deep(h2) {
-      margin: 15px 0 2px 0;
-      font-size: 15px;
-      font-weight: bold;
-    }
+.changelog__content {
+  white-space: pre-line;
+  padding: 15px 0;
+  :deep(h1) {
+    display: none;
+  }
+  :deep(h2) {
+    margin: 15px 0 2px 0;
+    font-size: 15px;
+    font-weight: bold;
   }
 }
 
-.breaking-notice {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  background-color: rgba(250, 173, 20, 0.08);
-  border: 1px solid rgba(250, 173, 20, 0.3);
-  border-radius: var(--radius-lg);
-}
-
-.notice__icon {
-  flex-shrink: 0;
-  font-size: 20px;
-  color: #d97706;
-}
-
-:root[data-theme='dark'] .breaking-notice,
-.dark .breaking-notice {
-  background-color: rgba(250, 173, 20, 0.12);
-  border-color: rgba(250, 173, 20, 0.4);
-}
-
-:root[data-theme='dark'] .notice__icon,
-.dark .notice__icon {
-  color: #f59e0b;
-}
-
-.notice__content {
-  flex: 1;
-  min-width: 0;
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.85);
-  line-height: 1.6;
-}
-
-:root[data-theme='dark'] .notice__content,
-.dark .notice__content {
-  color: rgba(255, 255, 255, 0.9);
+.changelog__notice {
+  margin: 13px 0;
 }
 </style>

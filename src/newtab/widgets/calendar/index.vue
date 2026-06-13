@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import NTSelect from '@/components/ui/NTSelect.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
@@ -141,6 +142,14 @@ const calendarStyle = computed(() => ({
   '--nt-cal-customRestLabelFontSize': customDestivalCountdownRestFontSize.value,
 }))
 
+/** Popover 渲染在 Portal 中，需显式传入日历自定义字体变量 */
+const detailPopoverStyle = computed(() => ({
+  maxWidth: '350px',
+  '--nt-cal-customFontFamily': customFontFamily.value,
+  '--nt-cal-customFontColor': customFontColor.value,
+  '--nt-cal-customFontSize': customFontSize.value,
+}))
+
 const todayDayjs = dayjs()
 
 const slideDirection = ref<'left' | 'right'>('left')
@@ -253,9 +262,10 @@ const holidayTypeToDesc = computed(() => ({
 }))
 
 /**
- * dateEle: dayjs widget
+ * 纯函数：根据日期和类型生成日期项数据，不修改外部状态。
+ * @returns 日期项对象，isNotCurrMonth 由 type 决定
  */
-const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
+const genDateItem = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
   const shortDate = dateEle.format('MM.DD')
   const targetDateEle = new Date(formatDate)
@@ -292,7 +302,7 @@ const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
     dayType = CalendarDayType.REST
   }
 
-  const param = {
+  return {
     date: formatDate,
     shortDate,
     day: dateEle.get('date'),
@@ -304,32 +314,28 @@ const genDateList = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
     festivalCountdownDay,
     isNotCurrMonth: type !== 'main',
   }
-  if (type === 'start') {
-    state.dateList.unshift(param)
-  } else {
-    state.dateList.push(param)
-  }
 }
 
 const onRender = () => {
-  state.dateList = []
-
   const currMonthFirstDate = `${state.currYear}-${state.currMonth}-01`
   let currMonthFirstDateWeek = dayjs(currMonthFirstDate).day()
   currMonthFirstDateWeek =
     currMonthFirstDateWeek === 0 ? 7 : currMonthFirstDateWeek // 1234567
 
-  // padStart
+  // padStart — 上月末尾填充日期
   let padStartCount = currMonthFirstDateWeek - 1
   if (localConfig.calendar.weekBeginsOn === 7) {
     // begins on sunday
     padStartCount = currMonthFirstDateWeek === 7 ? 0 : currMonthFirstDateWeek
   }
+  const startDates: ReturnType<typeof genDateItem>[] = []
   for (let index = 0; index < padStartCount; index += 1) {
     const dateEle = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
-    genDateList('start', dateEle)
+    startDates.push(genDateItem('start', dateEle))
   }
+  startDates.reverse() // 让日期从远到近排列
 
+  // main — 当月日期
   const currMonthLastDate = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
     .subtract(1, 'day')
     .format('YYYY-MM-DD')
@@ -339,26 +345,29 @@ const onRender = () => {
   let currMonthLastDateWeek = dayjs(currMonthLastDate).day()
   currMonthLastDateWeek =
     currMonthLastDateWeek === 0 ? 7 : currMonthLastDateWeek
-  // add main
+  const mainDates: ReturnType<typeof genDateItem>[] = []
   for (let index = 0; index < currMonthLastDay; index += 1) {
     const dateEle = dayjs(`${state.currYear}-${state.currMonth}-${index + 1}`)
-    genDateList('main', dateEle)
+    mainDates.push(genDateItem('main', dateEle))
   }
 
-  // padEnd
+  // padEnd — 下月开头填充日期
   let padEndCount = 7 - currMonthLastDateWeek
   if (localConfig.calendar.weekBeginsOn === 7) {
     // begins on sunday
     padEndCount = currMonthLastDateWeek === 7 ? 6 : 6 - currMonthLastDateWeek
   }
-  if (state.dateList.length + padEndCount === 35) {
+  if (startDates.length + mainDates.length + padEndCount === 35) {
     // 确保整体为6行
     padEndCount += 7
   }
+  const endDates: ReturnType<typeof genDateItem>[] = []
   for (let index = 0; index < padEndCount; index += 1) {
     const dateEle = dayjs(currMonthLastDate).add(index + 1, 'day')
-    genDateList('end', dateEle)
+    endDates.push(genDateItem('end', dateEle))
   }
+
+  state.dateList = [...startDates, ...mainDates, ...endDates]
 }
 
 onMounted(() => {
@@ -437,14 +446,33 @@ const detailInfo = reactive({
   xiongsha: [] as string[],
 })
 
-const onToggleDetailPopover = (date?: string) => {
+/**
+ * 日期格子的交互入口，支持两种调用路径：
+ *   1. @pointerdown 在 <li> 上 → 切换/打开日期，先于 Reka 的 document pointerdown 执行
+ *   2. @clickoutside 在 NTPopover 上 → 仅当该 Popover 所属日期仍是当前打开日期时才关闭，
+ *      避免 A 的 clickoutside 误关刚打开的 B（每个日期格子有独立 NTPopover 实例）
+ */
+const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
   if (isDragMode.value) {
     return
   }
-  if (!date) {
+  if (!date) return
+
+  if (source === 'clickoutside') {
+    // 仅关闭「自己所属日期」的 popover，不误伤已切换到的新日期
+    if (state.currDetailDate === date) {
+      state.currDetailDate = ''
+    }
+    return
+  }
+
+  // @pointerdown：toggle 关闭或打开新日期
+  if (state.currDetailDate === date) {
     state.currDetailDate = ''
     return
   }
+
+  // 打开新日期
   const targetDateEle = new Date(date)
   const lunarEle = Lunar.fromDate(targetDateEle)
   const solarEle = Solar.fromDate(targetDateEle)
@@ -562,15 +590,15 @@ const onToggleDetailPopover = (date?: string) => {
             <li
               v-for="item in state.dateList"
               :key="item.date"
-              @click="onToggleDetailPopover(item.date)"
+              @pointerdown="onToggleDetailPopover(item.date)"
             >
               <NTPopover
-                style="max-width: 350px"
+                :style="detailPopoverStyle"
                 display-directive="if"
                 :show="state.currDetailDate === item.date"
                 :title="item.date"
                 trigger="manual"
-                @clickoutside="onToggleDetailPopover()"
+                @clickoutside="onToggleDetailPopover(item.date, 'clickoutside')"
               >
                 <template #trigger>
                   <div
@@ -609,20 +637,38 @@ const onToggleDetailPopover = (date?: string) => {
 
                 <!-- detail -->
                 <div class="calendar__detail">
-                  <p class="detail__date">
-                    {{ detailInfo.date }}
-                    {{ detailInfo.xingzuo }}
-                  </p>
-                  <p class="detail__date">
-                    {{ detailInfo.lunar }}
-                  </p>
-                  <p class="detail__festival">
-                    {{
-                      `${detailInfo.lunarFestivals} ${detailInfo.solarFestivals}`
-                    }}
-                  </p>
-                  <div class="detail__row">
-                    <p class="row__tag row__tag--yi">易</p>
+                  <div class="detail__header">
+                    <p class="detail__date">
+                      {{ detailInfo.date }}
+                      <span class="detail__xingzuo">
+                        {{ detailInfo.xingzuo }}
+                      </span>
+                    </p>
+                    <p class="detail__lunar">
+                      {{ detailInfo.lunar }}
+                    </p>
+                    <p
+                      v-if="
+                        detailInfo.lunarFestivals.trim() ||
+                        detailInfo.solarFestivals.trim()
+                      "
+                      class="detail__festival"
+                    >
+                      {{
+                        [
+                          detailInfo.lunarFestivals.trim(),
+                          detailInfo.solarFestivals.trim(),
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')
+                      }}
+                    </p>
+                  </div>
+                  <div
+                    v-if="detailInfo.yi.length"
+                    class="detail__row"
+                  >
+                    <p class="row__tag row__tag--yi">{{ $t('calendar.yi') }}</p>
                     <div class="row__value">
                       <NTTag
                         v-for="yiItem in detailInfo.yi"
@@ -636,47 +682,56 @@ const onToggleDetailPopover = (date?: string) => {
                       </NTTag>
                     </div>
                   </div>
-                  <div class="detail__row">
-                    <p class="row__tag row__tag--ji">忌</p>
+                  <div
+                    v-if="detailInfo.ji.length"
+                    class="detail__row"
+                  >
+                    <p class="row__tag row__tag--ji">{{ $t('calendar.ji') }}</p>
                     <div class="row__value">
                       <NTTag
-                        v-for="yiItem in detailInfo.ji"
-                        :key="yiItem"
+                        v-for="jiItem in detailInfo.ji"
+                        :key="jiItem"
                         class="tag__item"
                         type="error"
                         size="small"
                         :bordered="false"
                       >
-                        {{ yiItem }}
+                        {{ jiItem }}
                       </NTTag>
                     </div>
                   </div>
-                  <div class="detail__row">
-                    <p class="row__label">吉神</p>
+                  <div
+                    v-if="detailInfo.jishen.length"
+                    class="detail__row"
+                  >
+                    <p class="row__label">{{ $t('calendar.jishen') }}</p>
                     <div class="row__value">
                       <NTTag
-                        v-for="yiItem in detailInfo.jishen"
-                        :key="yiItem"
+                        v-for="shenItem in detailInfo.jishen"
+                        :key="shenItem"
                         class="tag__item"
                         type="info"
                         size="small"
                         :bordered="false"
                       >
-                        {{ yiItem }}
+                        {{ shenItem }}
                       </NTTag>
                     </div>
                   </div>
-                  <div class="detail__row">
-                    <p class="row__label">凶煞</p>
+                  <div
+                    v-if="detailInfo.xiongsha.length"
+                    class="detail__row"
+                  >
+                    <p class="row__label">{{ $t('calendar.xiongsha') }}</p>
                     <div class="row__value">
                       <NTTag
-                        v-for="yiItem in detailInfo.xiongsha"
-                        :key="yiItem"
+                        v-for="shaItem in detailInfo.xiongsha"
+                        :key="shaItem"
                         class="tag__item"
                         size="small"
                         :bordered="false"
                       >
-                        {{ yiItem }}
+                        {{ shaItem }}
                       </NTTag>
                     </div>
                   </div>
@@ -687,35 +742,37 @@ const onToggleDetailPopover = (date?: string) => {
         </Transition>
       </div>
 
-      <div
+      <NTScrollArea
         v-if="localConfig.calendar.festivalCountdown"
-        class="calendar__festival__list"
+        class="calendar__festival__scroll"
       >
-        <div
-          v-for="item in festivalList"
-          :key="item.date"
-          :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('calendar.festivalCountdownDaySuffix')}`"
-          class="festival__item"
-        >
-          <div class="item__left">
-            <p class="left__date">{{ item.shortDate }}</p>
-            <p
-              v-if="item.type === CalendarDayType.REST"
-              class="left__rest"
-            >
-              {{ $t('calendar.rest') }}
-            </p>
-            <p class="left__desc">
-              {{ item.desc }}
-            </p>
-          </div>
+        <div class="calendar__festival__list">
+          <div
+            v-for="item in festivalList"
+            :key="item.date"
+            :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('calendar.festivalCountdownDaySuffix')}`"
+            class="festival__item"
+          >
+            <div class="item__left">
+              <p class="left__date">{{ item.shortDate }}</p>
+              <p
+                v-if="item.type === CalendarDayType.REST"
+                class="left__rest"
+              >
+                {{ $t('calendar.rest') }}
+              </p>
+              <p class="left__desc">
+                {{ item.desc }}
+              </p>
+            </div>
 
-          <div class="item__right">
-            <p class="right__count">{{ item.festivalCountdownDay }}</p>
-            <p class="right__unit">{{ $t('common.day') }}</p>
+            <div class="item__right">
+              <p class="right__count">{{ item.festivalCountdownDay }}</p>
+              <p class="right__unit">{{ $t('common.day') }}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </NTScrollArea>
     </div>
   </WidgetWrap>
 </template>
@@ -726,7 +783,7 @@ const onToggleDetailPopover = (date?: string) => {
   font-size: var(--nt-cal-customFontSize);
   font-family: var(--nt-cal-customFontFamily);
   .calendar__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     width: var(--nt-cal-customContainerWidth);
     text-align: center;
@@ -919,13 +976,15 @@ const onToggleDetailPopover = (date?: string) => {
       .body__item--today {
         background-color: var(--nt-cal-customTodayItemBackgroundColor);
         .item__label--today {
-          left: auto !important;
-          right: 2px !important;
+          left: auto;
+          right: 2px;
           color: var(--nt-cal-customTodayLabelFontColor);
           background-color: var(--nt-cal-customTodayLabelBackgroundColor);
         }
         .item__day {
           color: var(--nt-cal-customTodayDayFontColor);
+          border-radius: 50%;
+          padding: 1px 6px;
         }
         .item__desc {
           color: var(--nt-cal-customTodayDescFontColor);
@@ -961,21 +1020,41 @@ const onToggleDetailPopover = (date?: string) => {
 }
 
 .calendar__detail {
+  font-family: var(--nt-cal-customFontFamily);
+  color: var(--nt-cal-customFontColor);
+  font-size: var(--nt-cal-customFontSize);
   line-height: 1.6;
+  .detail__header {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--nt-gray-light);
+  }
   .detail__date {
     text-align: center;
+    font-weight: 500;
+  }
+  .detail__xingzuo {
+    margin-left: 4px;
+    opacity: 0.6;
+    font-size: 0.9em;
+  }
+  .detail__lunar {
+    text-align: center;
+    opacity: 0.7;
+    font-size: 0.9em;
   }
   .detail__festival {
-    color: rgba(250, 82, 82, 1);
+    color: var(--color-error);
     text-align: center;
     font-weight: 600;
+    margin-top: 2px;
   }
   .detail__row {
     display: flex;
     margin: 4px 0;
     .row__tag {
       flex: 0 0 auto;
-      margin: 3px 10px 3px 2px;
+      margin: 3px 14px 3px 2px;
       width: 20px;
       height: 20px;
       line-height: 20px;
@@ -986,10 +1065,10 @@ const onToggleDetailPopover = (date?: string) => {
       font-weight: 600;
     }
     .row__tag--yi {
-      background-color: rgb(0, 128, 0);
+      background-color: var(--color-success);
     }
     .row__tag--ji {
-      background-color: rgba(250, 82, 82, 1);
+      background-color: var(--color-error);
     }
     .row__label {
       flex: 0 0 auto;
@@ -1012,16 +1091,19 @@ const onToggleDetailPopover = (date?: string) => {
   }
 }
 
+/* NTScrollArea 外层：接管高度约束和分隔线。height 必须有确定值，否则 Reka viewport 的 height:100% 无法解析 */
+.calendar__festival__scroll {
+  height: var(--nt-cal-customDestivalCountdownItemHeight);
+  max-height: var(--nt-cal-customDestivalCountdownItemHeight);
+  border-top: 1px solid var(--nt-gray-light);
+}
+
+/* 内层：flex 布局 + padding，不再处理滚动 */
 .calendar__festival__list {
   padding: 0.8% 0 1.5%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  max-height: var(--nt-cal-customDestivalCountdownItemHeight);
-  overflow-y: auto;
-  border-top: 1px solid var(--nt-gray-light);
-  -ms-overflow-style: none;
-  scrollbar-width: none;
   .festival__item {
     padding: 0.4% 3%;
     display: flex;

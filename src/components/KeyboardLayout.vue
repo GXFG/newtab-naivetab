@@ -18,12 +18,9 @@
  */
 
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'
+import { toCssUnit, unitToPx } from '@/logic/store/style'
 import { localConfig, localState } from '@/logic/config/state'
 import { isDragMode, moveState } from '@/logic/moveable'
-
-/** 将数值按单位转成 CSS 字符串 */
-const toUnit = (value: number, unit: 'vmin' | 'px'): string =>
-  unit === 'vmin' ? `${value * 0.1}vmin` : `${value}px`
 
 const props = withDefaults(
   defineProps<{
@@ -44,13 +41,8 @@ const { getLayoutKeyStyle, layoutCssVars, base } = useKeyboardStyle(
   props.baseSize,
 )
 
-/** 1 键盘单位对应的实际 CSS 像素数，拖拽时用于精确跟踪鼠标位移 */
-const keyboardUnitToPx = computed(() => {
-  if (props.unit === 'px') return base.value
-  return (
-    (base.value * 0.1 * Math.min(window.innerWidth, window.innerHeight)) / 100
-  )
-})
+/** 1 键盘单位对应的实际 CSS 像素数，委托给 unitToPx 统一处理 scaleMode */
+const keyboardUnitToPx = computed(() => unitToPx(base.value, props.unit))
 
 // ── 显示开关 ─────────────────────────────────────────────────────────────────
 const isShellVisible = computed(() => localConfig.keyboardCommon.isShellVisible)
@@ -120,16 +112,16 @@ const getNameplateStyle = (np: TNameplate): string => {
     : 'none'
 
   return [
-    `left: ${toUnit(left, props.unit)};`,
-    `top: ${toUnit(top, props.unit)};`,
-    `font-size: ${toUnit(fontSize, props.unit)};`,
+    `left: ${toCssUnit(left, props.unit)};`,
+    `top: ${toCssUnit(top, props.unit)};`,
+    `font-size: ${toCssUnit(fontSize, props.unit)};`,
     `font-family: ${np.fontFamily};`,
     `font-weight: ${np.fontWeight};`,
     `color: ${np.color[code]};`,
     `background-color: ${np.backgroundColor[code]};`,
     `border: ${border};`,
     `border-radius: ${np.borderRadius}px;`,
-    `padding: ${toUnit(padding, props.unit)};`,
+    `padding: ${toCssUnit(padding, props.unit)};`,
     `transform: rotate(${np.rotation}deg);`,
     `box-shadow: ${shadow};`,
     `text-shadow: ${textShadow};`,
@@ -233,8 +225,8 @@ const onNameplateMouseDown = (e: MouseEvent, np: TNameplate) => {
     :style="[
       layoutCssVars,
       {
-        width: toUnit(containerWidthCss, props.unit),
-        height: toUnit(containerHeightCss, props.unit),
+        width: toCssUnit(containerWidthCss, props.unit),
+        height: toCssUnit(containerHeightCss, props.unit),
       },
     ]"
   >

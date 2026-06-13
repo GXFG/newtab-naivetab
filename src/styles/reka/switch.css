@@ -18,9 +18,9 @@
  * ============================================================ */
 .reka-switch {
   /* 几何变量（对标 Radix Themes 变量链）：改 --switch-height 联动所有尺寸 */
-  --switch-height: 22px;
-  --switch-width: 40px;
-  --switch-thumb-size: 18px;
+  --switch-height: 20px;
+  --switch-width: 36px;
+  --switch-thumb-size: 16px;
   --switch-thumb-offset: 2px;
 
   all: unset;
@@ -55,7 +55,7 @@
   background-color: var(--nt-gray-heavy);
 }
 .reka-switch:not(:disabled):active .reka-switch__thumb {
-  width: 20px;
+  width: 18px;
 }
 .reka-switch[data-state='checked']:not(:disabled):active {
   background-color: color-mix(in srgb, var(--nt-primary-color) 80%, black);

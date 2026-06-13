@@ -46,7 +46,7 @@ watch(isRender, (value) => {
 /* id 由 WidgetWrap 自动设为 WIDGET_CODE */
 #myWidget {
   .myWidget__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;  /* 必须：配合拖拽定位 */
     /* 在此使用 v-bind(customFontColor) 等 CSS 变量 */
   }

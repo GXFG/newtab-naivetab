@@ -4,9 +4,10 @@
  * 统一计算键盘键帽 / 外壳 / 定位板所需的所有样式变量。
  * - widget（newtab）使用 `vmin` 单位，baseSize 由 `keycapSize * 0.1` 得到的 vmin 数值
  * - popup 使用固定 `px` 基准（默认 40px），直接传入 baseSize 数字
+ * - 受 general.scaleMode 控制：fixed 时 vmin 转为 px
  *
  * 调用方通过 `unit` 参数区分两种场景：
- *   - `'vmin'`：widget 场景，内部乘以 0.1 再拼上 vmin
+ *   - `'vmin'`：widget 场景，内部乘以 0.1 再拼上 vmin（fixed 模式时跳过缩放用 px）
  *   - `'px'`：popup 场景，直接拼上 px
  *
  * 这样两侧的视觉计算公式完全一致，改一处即可同步更新。
@@ -16,20 +17,9 @@ import { TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP } from '@/logic/constants/app'
 import { KEYBOARD_CODE_TO_DEFAULT_CONFIG } from '@/logic/keyboard/keyboard-constants'
 import { currKeyboardConfig } from '@/logic/keyboard/keyboard-layout'
 import { localConfig } from '@/logic/config/state'
-import { getStyleField } from '@/logic/store/style'
+import { getStyleField, toCssUnit } from '@/logic/store/style'
 
 type Unit = 'vmin' | 'px'
-
-/**
- * 将数值按照单位规则转成 CSS 字符串。
- * - vmin：value × 0.1 + 'vmin'（与 getStyleField 内部规则一致）
- * - px ：value + 'px'
- *
- * 配置值以 px 量级存储（如 keycapSize: 58 ≈ 58px），×0.1 转为 vmin，
- * 依赖约定：1vmin ≈ 10px（基准视口宽度 1000px 下）。
- */
-const toUnit = (value: number, unit: Unit): string =>
-  unit === 'vmin' ? `${value * 0.1}vmin` : `${value}px`
 
 // ─────────────────────────────────────────────────────────────────────────────
 export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
@@ -112,9 +102,11 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
   // ── 键帽尺寸 ──────────────────────────────────────────────────────────────
 
   /** 内边距基准（文本区 / 图标区 / stage flat 统一使用 8% base） */
-  const keycapInnerPaddingCss = computed(() => toUnit(0.08 * base.value, unit))
+  const keycapInnerPaddingCss = computed(() =>
+    toCssUnit(0.08 * base.value, unit),
+  )
 
-  const keycapBaseSizeCss = computed(() => toUnit(base.value, unit))
+  const keycapBaseSizeCss = computed(() => toCssUnit(base.value, unit))
 
   const keycapBorderWidthCss = computed(
     () => `${localConfig.keyboardCommon.keycapBorderWidth}px`,
@@ -123,72 +115,74 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
   const borderRadiusCss = computed(() => {
     const r = localConfig.keyboardCommon.keycapBorderRadius
     const s = localConfig.keyboardCommon.keycapSize
-    return toUnit((r / s) * base.value, unit)
+    return toCssUnit((r / s) * base.value, unit)
   })
 
   const keycapPaddingCss = computed(() => {
     const p = localConfig.keyboardCommon.keycapPadding
     const s = localConfig.keyboardCommon.keycapSize
-    return toUnit((p / s) * base.value, unit)
+    return toCssUnit((p / s) * base.value, unit)
   })
 
   const keycapKeyFontSizeCss = computed(() => {
     const s = localConfig.keyboardCommon.keycapSize
     const fs = localConfig.keyboardCommon.keycapKeyFontSize
-    return toUnit((fs / s) * base.value, unit)
+    return toCssUnit((fs / s) * base.value, unit)
   })
 
   const keycapBookmarkFontSizeCss = computed(() => {
     const s = localConfig.keyboardCommon.keycapSize
     const fs = localConfig.keyboardCommon.keycapBookmarkFontSize
-    return toUnit((fs / s) * base.value, unit)
+    return toCssUnit((fs / s) * base.value, unit)
   })
 
   // ── Keycap 立体边缘（GMK / DSA 键帽型别）─────────────────────────────────
   // GMK：仿 Cherry 高度，顶面向内收窄，底部边缘较厚
   const GMK_EDGE = 0.03
-  const gmkTopBorderCss = computed(() => toUnit(GMK_EDGE * base.value, unit))
-  const gmkHBorderCss = computed(() => toUnit(GMK_EDGE * 6 * base.value, unit))
+  const gmkTopBorderCss = computed(() => toCssUnit(GMK_EDGE * base.value, unit))
+  const gmkHBorderCss = computed(() =>
+    toCssUnit(GMK_EDGE * 6 * base.value, unit),
+  )
   const gmkBotBorderCss = computed(() =>
-    toUnit(GMK_EDGE * 7 * base.value, unit),
+    toCssUnit(GMK_EDGE * 7 * base.value, unit),
   )
   const gmkStageMarginTopCss = computed(() =>
-    toUnit(GMK_EDGE * 0.3 * base.value, unit),
+    toCssUnit(GMK_EDGE * 0.3 * base.value, unit),
   )
   const gmkStageMarginLeftCss = computed(() =>
-    toUnit(GMK_EDGE * 1.5 * base.value, unit),
+    toCssUnit(GMK_EDGE * 1.5 * base.value, unit),
   )
   const gmkStageHeightCss = computed(() =>
-    toUnit((1 - GMK_EDGE * 8) * base.value, unit),
+    toCssUnit((1 - GMK_EDGE * 8) * base.value, unit),
   )
 
   // DSA：球面均等高度，四边等宽边缘
   const DSA_EDGE = 0.18
-  const dsaBorderCss = computed(() => toUnit(DSA_EDGE * base.value, unit))
+  const dsaBorderCss = computed(() => toCssUnit(DSA_EDGE * base.value, unit))
   const dsaStageMargCss = computed(() =>
-    toUnit((DSA_EDGE / 3.8) * base.value, unit),
+    toCssUnit((DSA_EDGE / 3.8) * base.value, unit),
   )
   const dsaStageHeightCss = computed(() =>
-    toUnit((1 - DSA_EDGE * 1.7) * base.value, unit),
+    toCssUnit((1 - DSA_EDGE * 1.7) * base.value, unit),
   )
 
   // ── Shell 尺寸 ────────────────────────────────────────────────────────────
   const shellVPaddingCss = computed(() => {
     const p = localConfig.keyboardCommon.shellVerticalPadding
     const s = localConfig.keyboardCommon.keycapSize
-    return toUnit((p / s) * base.value, unit)
+    return toCssUnit((p / s) * base.value, unit)
   })
   const shellHPaddingCss = computed(() => {
     const p = localConfig.keyboardCommon.shellHorizontalPadding
     const s = localConfig.keyboardCommon.keycapSize
-    return toUnit((p / s) * base.value, unit)
+    return toCssUnit((p / s) * base.value, unit)
   })
 
   // ── Plate 尺寸 ────────────────────────────────────────────────────────────
   const platePaddingCss = computed(() => {
     const p = localConfig.keyboardCommon.platePadding
     const s = localConfig.keyboardCommon.keycapSize
-    return toUnit((p / s) * base.value, unit)
+    return toCssUnit((p / s) * base.value, unit)
   })
 
   // ── 触感凸起尺寸（随 base size 等比缩放，约 4% 基准高度） ──────────────────
@@ -221,7 +215,7 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
 
   /** 获取键帽宽度（CSS 字符串，含单位） */
   const getKeycapWidthCss = (code: string, addRatio = 0): string =>
-    toUnit(getKeycapWidthValue(code, addRatio), unit)
+    toCssUnit(getKeycapWidthValue(code, addRatio), unit)
 
   /**
    * 计算键盘第一行的总宽度（含 shell 左右 padding + 2px border 补偿）。
@@ -260,7 +254,7 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
     if (keycapType === 'gmk') {
       style += `margin-top: -${gmkStageMarginTopCss.value};`
       style += `margin-left: -${gmkStageMarginLeftCss.value};`
-      style += `width: ${toUnit(getKeycapWidthValue(code, -(GMK_EDGE * 10)), unit)};`
+      style += `width: ${toCssUnit(getKeycapWidthValue(code, -(GMK_EDGE * 10)), unit)};`
       if (isVerticallyExpanded) {
         // 纵向扩展键：stage 撑满 wrapper 全部高度
         style += `height: calc(100% + ${gmkStageMarginTopCss.value});`
@@ -272,10 +266,10 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
       style += `margin: -${dsaStageMargCss.value};`
       if (isVerticallyExpanded) {
         // 纵向扩展键：stage 撑满 wrapper 全部高度
-        style += `width: ${toUnit(getKeycapWidthValue(code, -(DSA_EDGE * 1.7)), unit)};`
+        style += `width: ${toCssUnit(getKeycapWidthValue(code, -(DSA_EDGE * 1.7)), unit)};`
         style += `height: calc(100% + ${dsaStageMargCss.value} * 2);`
       } else {
-        style += `width: ${toUnit(getKeycapWidthValue(code, -(DSA_EDGE * 1.7)), unit)};`
+        style += `width: ${toCssUnit(getKeycapWidthValue(code, -(DSA_EDGE * 1.7)), unit)};`
         style += `height: ${dsaStageHeightCss.value};`
       }
       if (isSpace) style += spaceGradient
@@ -349,7 +343,7 @@ export const useKeyboardStyle = (unit: Unit, baseSizeOverride?: number) => {
     const offsetY = (padY / s) * base.value
     const left = keyDef.x * base.value + offsetX
     const top = keyDef.y * base.value + offsetY
-    return `left: ${toUnit(left, unit)}; top: ${toUnit(top, unit)}; width: ${toUnit(w * base.value, unit)}; height: ${toUnit(h * base.value, unit)};`
+    return `left: ${toCssUnit(left, unit)}; top: ${toCssUnit(top, unit)}; width: ${toCssUnit(w * base.value, unit)}; height: ${toCssUnit(h * base.value, unit)};`
   }
 
   // ── 按压位移（随 base size 等比缩放，约 4.3% 基准） ─────────────────────

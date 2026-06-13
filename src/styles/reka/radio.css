@@ -112,11 +112,12 @@
 .reka-radio__label {
   font-size: var(--text-base);  /* 14px 标准表单字号 */
   line-height: 1;
-  transition: opacity var(--transition-bg);
+  transition: opacity var(--transition-bg),
+              text-shadow var(--transition-shadow);
 }
 .reka-radio:not(:disabled):hover .reka-radio__label,
 .reka-radio:not(:disabled):active .reka-radio__label {
-  opacity: 0.8;
+  text-shadow: 0 0 2px color-mix(in srgb, var(--nt-primary-color) 40%, transparent);
 }
 
 /* 9. radio__circle::after — 内点（对标 Radix ::after），40% 尺寸，弹簧缩放入场。
@@ -153,6 +154,13 @@
 :root[data-theme='dark'] .reka-radio[data-state='checked'] .reka-radio__circle,
 .dark .reka-radio[data-state='checked'] .reka-radio__circle {
   box-shadow: 0 1px 2px color-mix(in srgb, var(--nt-primary-color) 30%, rgba(255, 255, 255, 0.06));
+}
+
+:root[data-theme='dark'] .reka-radio:not(:disabled):hover .reka-radio__label,
+.dark .reka-radio:not(:disabled):hover .reka-radio__label,
+:root[data-theme='dark'] .reka-radio:not(:disabled):active .reka-radio__label,
+.dark .reka-radio:not(:disabled):active .reka-radio__label {
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 /* ============================================================

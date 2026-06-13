@@ -304,6 +304,20 @@ export const handleAppUpdate = (localVersion?: string) => {
       (localConfig.keyboardCommand as any).isGlobalShortcutEnabled ?? true
     localConfig.memo.padding = defaultConfig.memo.padding
   }
+  if (compareLeftVersionLessThanRightVersions(version, '2.6.0')) {
+    localConfig.general.scaleMode = 'auto'
+    localConfig.general.isAutoPrimaryColor = false
+    localConfig.general.isAutoBackgroundColor = false
+    localConfig.general.shimmerBackgroundEffect =
+      (localConfig.general as any).shimmerBackgroundEffect ?? 'aurora'
+    localConfig.general.shimmerBackgroundColors = (localConfig.general as any)
+      .shimmerBackgroundColors ?? [
+      ['#D1ADFF', '#98D69B', '#FAE390', '#FFACD8', '#7DD5FF', '#C8E6C9'],
+      ['#6B4FAE', '#4A7A4D', '#B8A050', '#B06080', '#4080A0', '#4A6F5A'],
+    ]
+    localConfig.general.shimmerAnimationSpeed =
+      (localConfig.general as any).shimmerAnimationSpeed ?? 1
+  }
 
   // 更新local版本号
   localConfig.general.version = window.appVersion

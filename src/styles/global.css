@@ -8,7 +8,7 @@ body {
   height: 100vh;
   overflow: hidden;
   font-family: arial, sans-serif;
-  font-size: 14px;
+  font-size: var(--nt-font-base, 14px);
   color: var(--nt-text-color-main) !important;
   background-color: var(--nt-bg-main) !important;
   -webkit-font-smoothing: antialiased;
@@ -33,15 +33,5 @@ svg[aria-hidden="true"] {
 /* Drag mode disabled input */
 .reka-input--disabled .reka-input__native {
   cursor: move;
-}
-
-/* Modal scroll */
-.modal__content {
-  height: 40vh;
-  white-space: pre-line;
-  overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
 

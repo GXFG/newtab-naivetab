@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { useDebounceFn, onClickOutside } from '@vueuse/core'
@@ -308,18 +309,20 @@ watch(isDragMode, () => {
           "
           class="search__dropdown"
         >
-          <div
-            v-for="(item, index) in state.suggestList"
-            :key="item.key"
-            class="search__dropdown-item"
-            :class="{
-              'search__dropdown-item--pending':
-                state.currSuggestIndex === index,
-            }"
-            @mousedown.prevent="handleSelectSuggest(item.key)"
-          >
-            {{ item.label }}
-          </div>
+          <NTScrollArea>
+            <div
+              v-for="(item, index) in state.suggestList"
+              :key="item.key"
+              class="search__dropdown-item"
+              :class="{
+                'search__dropdown-item--pending':
+                  state.currSuggestIndex === index,
+              }"
+              @mousedown.prevent="handleSelectSuggest(item.key)"
+            >
+              {{ item.label }}
+            </div>
+          </NTScrollArea>
         </div>
       </Transition>
       <button
@@ -345,7 +348,7 @@ watch(isDragMode, () => {
   user-select: none;
 
   .search__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     width: var(--nt-s-width);
     padding: 0 var(--nt-s-padding);
@@ -501,8 +504,9 @@ watch(isDragMode, () => {
       left: 0;
       width: 100%;
       max-height: min(280px, 50vh);
-      overflow-y: auto;
-      scrollbar-width: none;
+      /* flex 列布局：让 NTScrollArea 撑满并接管滚动 */
+      display: flex;
+      flex-direction: column;
       /* 圆角比输入框稍小，视觉上收敛 */
       border-radius: calc(var(--nt-s-dropdown-radius));
       backdrop-filter: blur(calc(var(--nt-s-background-blur) * 1.2))
@@ -543,8 +547,12 @@ watch(isDragMode, () => {
         );
         z-index: 2;
       }
-      &::-webkit-scrollbar {
-        display: none;
+
+      /* NTScrollArea 在 dropdown 内的适配：flex:1 撑满 + min-height:0 允许收缩 */
+      .search__dropdown :deep(.reka-scroll-area) {
+        height: auto;
+        flex: 1;
+        min-height: 0;
       }
 
       .search__dropdown-item {

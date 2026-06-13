@@ -1,5 +1,13 @@
 export const WIDGET_CODE = 'clockNeon'
 
+export const SCALABLE_FIELDS = {
+  fontSize: { min: 16, max: 200 },
+  paddingVertical: { min: 4, max: 80 },
+  paddingHorizontal: { min: 8, max: 120 },
+  glowIntensity: { min: 2, max: 80 },
+  borderRadius: { min: 2, max: 40 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   layout: {

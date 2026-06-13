@@ -94,6 +94,7 @@
 
 /* ---- Content：下拉面板 ---- */
 .reka-autocomplete__content {
+  z-index: 3000;
   min-width: var(--reka-combobox-trigger-width);
   background-color: var(--reka-surface-bg);
   border-radius: var(--radius-md);

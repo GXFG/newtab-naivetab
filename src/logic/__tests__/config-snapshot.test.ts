@@ -19,7 +19,9 @@ import { reactive, ref } from 'vue'
  * @see .claude/rules/pitfalls.md#配置迁移黄金法则
  */
 
-const APP_VERSION = '2.3.2'
+import pkg from '../../../package.json'
+
+const APP_VERSION = pkg.version
 
 // ── Widget 默认配置（从 defaults.ts 同步） ──
 // 通过 import.meta.glob 扫描各 widget 的 config.ts，与 defaults.ts 聚合方式一致
@@ -315,7 +317,7 @@ function assertUserDataPreserved(config: Record<string, any>, fixture: Record<st
 // ── 核心断言：迁移后包含当前所有必需字段 ──
 function assertRequiredFieldsPresent(config: Record<string, any>) {
   // general 必需字段
-  const generalRequiredFields = ['version', 'lang', 'appearance', 'fontFamily', 'primaryColor', 'backgroundColor']
+  const generalRequiredFields = ['version', 'lang', 'appearance', 'fontFamily', 'isAutoPrimaryColor', 'isAutoBackgroundColor', 'primaryColor', 'backgroundColor', 'shimmerBackgroundEffect', 'shimmerBackgroundColors', 'shimmerAnimationSpeed']
   for (const field of generalRequiredFields) {
     expect(config.general).toHaveProperty(field)
   }
@@ -467,6 +469,8 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
         appearance: 'auto', pageTitle: '新标签页', fontFamily: 'system', fontSize: 14,
         fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
         primaryColor: ['rgba(58, 115, 195, 1)', 'rgba(100, 160, 230, 1)'],
+        isAutoPrimaryColor: false,
+        isAutoBackgroundColor: false,
         backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'],
         bgOpacity: 1, bgBlur: 0,
         openPageFocusElement: 'keyboardBookmark',
@@ -544,6 +548,7 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
         currAppearanceCode: 0,
         isUploadConfigStatusMap: {},
         isFocusMode: false,
+        widgetInteractionOrder: [],
       },
       KEYBOARD_COMMON_CONFIG: defaultConfigMock.keyboardCommon,
     }))

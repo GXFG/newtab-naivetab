@@ -1,6 +1,6 @@
 # CSS & 样式踩坑
 
-> pre-commit 已集成 `pnpm check-patterns` 自动检查 `v-bind()` 和 `&--modifier` 违规。
+> pre-commit 已集成 `pnpm check-patterns` 自动检查 `v-bind()`、`&--modifier` 和 **Reka 组件 z-index 遗漏**。
 
 ## `&--modifier` 禁止
 
@@ -61,6 +61,18 @@ Reka UI 组件的阴影（`box-shadow`）在浅色模式使用 `rgba(0,0,0,...)`
 ```
 
 完整对照表见 [reka-ui.md](../../docs/architecture/reka-ui.md#深色模式防遗漏)。
+
+## Reka Portal Content 遗漏 z-index
+
+Reka 的 Portal Content 组件（`SelectContent`、`ComboboxContent`、`PopoverContent`、`DropdownMenuContent`、`TooltipContent`、`DialogContent` 等）渲染到 `document.body`，处于同一堆叠上下文。缺少 `z-index` 会导致下拉面板被其他元素遮挡。
+
+**Why：** 所有 Portal 内容都挂载在 body 下，是兄弟节点。如果没有显式 `z-index`，渲染顺序决定堆叠——后渲染的覆盖先渲染的，导致下拉面板可能藏在 Dialog、Popover 等后面。
+
+**How to apply：**
+- 新增 Reka 组件时，如果包含 Portal Content（`__content` / `__overlay`），**必须在第一个 `__content` / `__overlay` 规则块中设置 `z-index`**
+- 值参考 [z-index 层级体系](../../docs/architecture/reka-ui.md#z-index-层级体系)：表单下拉 3000、菜单 4000、Popover 9999、Tooltip 10000
+- pre-commit 已集成自动检查：`check-patterns.ts` 会扫描 `src/styles/reka/*.css`，缺少 z-index 的 `__content`/`__overlay` 规则会报错阻断提交
+- 内联渲染（如 Tabs）的 `__content` 不需要全局 z-index，但需显式标注 `z-index: 0` 并通过注释说明，既通过检查又表明已考虑此问题
 
 ## Reka Content 动画：入场用 animation + backwards，退场用 [data-state='closed']
 

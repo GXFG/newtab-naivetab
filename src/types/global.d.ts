@@ -24,7 +24,7 @@ type ConfigField =
   | 'keyboardBookmark'
   | 'keyboardCommand'
 type EleTargetCode = WidgetCodes | 'draft-common'
-type EleTargetType = 'widget' | 'draft'
+type EleTargetType = 'widget' | 'draft' | 'widget-resize'
 
 type settingPanes =
   | 'general'

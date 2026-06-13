@@ -205,7 +205,7 @@ const digitDelays = ['0s', '0.4s', '1.2s', '0.8s', '2.1s', '0.6s']
   user-select: none;
 
   .clockNeon__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     display: flex;
     justify-content: center;

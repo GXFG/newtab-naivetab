@@ -23,6 +23,9 @@
 
 .reka-popconfirm__btn {
   all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 4px 12px;
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
@@ -35,7 +38,7 @@
   color: var(--nt-text-primary);
   background-color: var(--nt-gray-minimal);
 }
-.reka-popconfirm__btn--cancel:hover {
+.reka-popconfirm__btn--cancel:not(:disabled):hover {
   background-color: var(--nt-gray-moderate);
 }
 
@@ -43,7 +46,7 @@
   color: white;
   background-color: var(--nt-primary-color);
 }
-.reka-popconfirm__btn--confirm:hover {
+.reka-popconfirm__btn--confirm:not(:disabled):hover {
   background-color: color-mix(in srgb, var(--nt-primary-color) 85%, black);
 }
 

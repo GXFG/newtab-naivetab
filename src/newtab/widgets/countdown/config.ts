@@ -1,5 +1,11 @@
 export const WIDGET_CODE = 'countdown'
 
+export const SCALABLE_FIELDS = {
+  size: { min: 80, max: 400 },
+  clockFontSize: { min: 12, max: 100 },
+  strokeWidth: { min: 1, max: 20 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   layout: {

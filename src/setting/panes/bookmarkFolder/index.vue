@@ -7,7 +7,6 @@ import { getBrowserBookmark } from '@/logic/bookmark/api'
 import { requestPermission } from '@/logic/utils/permission'
 import { showToast } from '@/common/toast'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormSection,
@@ -87,8 +86,6 @@ const onResetFolder = () => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.bookmarkFolder')" />
-
   <SettingFormWrap
     id="bookmarkFolder__setting"
     widget-code="bookmarkFolder"

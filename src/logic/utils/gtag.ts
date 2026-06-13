@@ -91,6 +91,7 @@ export const gaProxy = async (
   names: string[],
   payload = {},
 ) => {
+  if (__DEV__) return
   let clientId: string = ''
   let sessionId: string = ''
   try {
@@ -209,6 +210,7 @@ export const gaReportError = async (
   error: unknown,
   context?: string,
 ) => {
+  if (__DEV__) return
   const errorName = extractErrorName(error)
   const message = error instanceof Error ? error.message : String(error)
   const hash = buildErrorHash(type, location, message)

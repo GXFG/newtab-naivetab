@@ -124,7 +124,7 @@ const onMouseDown = (e: MouseEvent) => {
   user-select: none;
 
   .keyboardBookmark__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     overflow: hidden;
   }

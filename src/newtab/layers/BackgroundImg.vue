@@ -15,6 +15,8 @@
  */
 import { localConfig } from '@/logic/config/state'
 import { imageState, isImageLoading } from '@/logic/image/state'
+import { BACKGROUND_IMAGE_SOURCE } from '@/logic/image/constants'
+import BackgroundShimmer from './BackgroundShimmer.vue'
 
 // 视差效果：鼠标移动时背景轻微偏移
 const parallaxX = ref(0)
@@ -64,7 +66,9 @@ let rafId: number | null = null
 const handleMouseMove = (e: MouseEvent) => {
   if (
     !localConfig.general.isParallaxEnabled ||
-    !localConfig.general.isBackgroundImageEnabled
+    !localConfig.general.isBackgroundImageEnabled ||
+    localConfig.general.backgroundImageSource ===
+      BACKGROUND_IMAGE_SOURCE.SHIMMER
   ) {
     return
   }
@@ -90,7 +94,9 @@ const handleMouseMove = (e: MouseEvent) => {
 const handleMouseLeave = () => {
   if (
     !localConfig.general.isParallaxEnabled ||
-    !localConfig.general.isBackgroundImageEnabled
+    !localConfig.general.isBackgroundImageEnabled ||
+    localConfig.general.backgroundImageSource ===
+      BACKGROUND_IMAGE_SOURCE.SHIMMER
   ) {
     return
   }
@@ -116,7 +122,9 @@ const updateEventListeners = (enable: boolean) => {
 watch(
   () =>
     localConfig.general.isParallaxEnabled &&
-    localConfig.general.isBackgroundImageEnabled,
+    localConfig.general.isBackgroundImageEnabled &&
+    localConfig.general.backgroundImageSource !==
+      BACKGROUND_IMAGE_SOURCE.SHIMMER,
   (enabled) => {
     updateEventListeners(enabled)
   },
@@ -125,7 +133,9 @@ watch(
 onMounted(() => {
   updateEventListeners(
     localConfig.general.isParallaxEnabled &&
-      localConfig.general.isBackgroundImageEnabled,
+      localConfig.general.isBackgroundImageEnabled &&
+      localConfig.general.backgroundImageSource !==
+        BACKGROUND_IMAGE_SOURCE.SHIMMER,
   )
 })
 
@@ -164,8 +174,24 @@ watch(
 </script>
 
 <template>
-  <!-- 存储 css 变量 -->
-  <div id="background">
+  <!-- 幻彩（纯 CSS 动画背景） -->
+  <BackgroundShimmer
+    v-if="
+      localConfig.general.isBackgroundImageEnabled &&
+      localConfig.general.backgroundImageSource ===
+        BACKGROUND_IMAGE_SOURCE.SHIMMER
+    "
+  />
+
+  <!-- 静态图片背景 -->
+  <div
+    v-if="
+      localConfig.general.isBackgroundImageEnabled &&
+      localConfig.general.backgroundImageSource !==
+        BACKGROUND_IMAGE_SOURCE.SHIMMER
+    "
+    id="background"
+  >
     <!-- 视差效果容器：base64 小图 -->
     <div
       id="background__container"
@@ -198,6 +224,17 @@ watch(
 </template>
 
 <style>
+#background__shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 #background {
   #background__container {
     z-index: 1;

@@ -34,12 +34,22 @@ onMounted(async () => {
 
 <style scoped>
 .options-page {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 8px 20px;
+  padding: var(--space-2) var(--space-5);
+  max-width: 1200px;
   height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  #setting-board--page.setting-board {
+    flex: 1;
+    min-height: 0;
+    border-radius: var(--radius-lg);
+  }
+
+  #setting-board--page .setting-board__content {
+    padding: 0 var(--space-4) 50px var(--space-4);
+  }
 }
 </style>

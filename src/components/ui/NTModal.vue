@@ -19,6 +19,8 @@ import {
   DialogDescription,
 } from 'reka-ui'
 import { computed, toRefs } from 'vue'
+import NTScrollArea from '@/components/ui/NTScrollArea.vue'
+import NTCard from '@/components/ui/NTCard.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -62,21 +64,30 @@ const onClose = () => {
         @escape-key-down.prevent="onClose"
         @pointer-down-outside.prevent="maskClosable ? onClose : undefined"
       >
-        <DialogTitle
-          v-if="title"
-          class="reka-modal__title"
-        >
-          {{ title }}
-        </DialogTitle>
-        <DialogTitle
-          v-else
-          class="sr-only"
-        >
-          Dialog
+        <!-- a11y: 始终提供 sr-only title/description -->
+        <DialogTitle class="sr-only">
+          {{ title || 'Dialog' }}
         </DialogTitle>
         <DialogDescription class="sr-only" />
 
-        <slot />
+        <NTCard :title="title">
+          <template
+            v-if="$slots['header-extra']"
+            #header-extra
+          >
+            <slot name="header-extra" />
+          </template>
+
+          <slot name="body-header" />
+
+          <NTScrollArea class="reka-modal__body">
+            <slot />
+          </NTScrollArea>
+
+          <template #footer>
+            <slot name="footer" />
+          </template>
+        </NTCard>
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

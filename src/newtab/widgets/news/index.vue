@@ -14,6 +14,7 @@ import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import NTTabs from '@/components/ui/NTTabs.vue'
 import NTTabsPane from '@/components/ui/NTTabsPane.vue'
+import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import { WIDGET_CODE } from './config'
 
 const customMargin = getStyleField(WIDGET_CODE, 'margin', 'vmin')
@@ -145,7 +146,7 @@ watch(isRender, (value) => {
             :name="source.value"
             :tab="source.label"
           >
-            <div
+            <NTScrollArea
               class="news__content"
               :class="{
                 'news__content--hover': !isDragMode,
@@ -215,7 +216,7 @@ watch(isRender, (value) => {
                   {{ $t('news.loginOrRefresh') }}
                 </NTButton>
               </div>
-            </div>
+            </NTScrollArea>
           </NTTabsPane>
         </NTTabs>
       </div>
@@ -228,7 +229,7 @@ watch(isRender, (value) => {
   font-family: var(--nt-n-font-family);
   user-select: none;
   .news__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     border-radius: var(--nt-n-border-radius);
     background-color: var(--nt-n-background-color);
@@ -257,11 +258,7 @@ watch(isRender, (value) => {
         height: var(--nt-n-height);
         color: var(--nt-n-font-color);
         font-size: var(--nt-n-font-size);
-        overflow-y: scroll;
         box-sizing: border-box;
-        &::-webkit-scrollbar {
-          display: none;
-        }
         .content__item {
           display: flex;
           align-items: center;

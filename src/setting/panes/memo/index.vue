@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { localConfig } from '@/logic/config/state'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormSection,
   SettingFormInlineRow,
@@ -16,8 +15,6 @@ import {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.memo')" />
-
   <SettingFormWrap widget-code="memo">
     <!-- 功能配置 -->
     <SettingFormSection section-key="common.behavior">

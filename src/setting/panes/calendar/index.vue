@@ -2,7 +2,6 @@
 import { localConfig } from '@/logic/config/state'
 import { ICONS } from '@/logic/constants/icons'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormInlineRow,
@@ -23,8 +22,6 @@ const beginsList = computed(() => [
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.calendar')" />
-
   <SettingFormWrap widget-code="calendar">
     <!-- 日历配置 -->
     <SettingFormSection

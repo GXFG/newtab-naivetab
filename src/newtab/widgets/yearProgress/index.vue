@@ -204,7 +204,7 @@ onMounted(() => {
   font-size: var(--nt-yp-font-size);
   user-select: none;
   .yearProgress__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     display: flex;
     justify-content: center;

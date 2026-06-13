@@ -14,7 +14,6 @@ import {
   openExtensionsStorePage,
   globalState,
 } from '@/logic/store/state'
-import { SettingHeaderBar } from '@/setting/components'
 
 const appVersion = computed(() => window.appVersion)
 
@@ -28,8 +27,6 @@ const handleOpenUserGuide = () => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.aboutIndex')" />
-
   <div class="setting__pane-content">
     <!-- Hero 区域 -->
     <div class="about__hero">

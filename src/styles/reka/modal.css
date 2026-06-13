@@ -49,6 +49,8 @@
   transform: translate(-50%, -50%);
   z-index: 2100;
   outline: none;
+  /* 防止内容过长溢出屏幕 */
+  overflow: hidden;
   animation: reka-modal-content-in 280ms var(--transition-spring-bounce) backwards;
 }
 
@@ -79,11 +81,12 @@
   }
 }
 
-/* --- Title --- */
-.reka-modal__title {
-  font-size: var(--text-md);
-  font-weight: 600;
-  margin: 0;
+/* --- Body：内容滚动区域 --- */
+/* ScrollArea 必须获得确定高度才能正常溢出滚动。
+   双类选择器确保优先级高于 scroll-area.css 的 height: 100%。
+   默认 50vh，消费者可通过外层 class 覆盖。 */
+.reka-modal__body.reka-scroll-area {
+  height: 50vh;
 }
 
 /* ============================================================

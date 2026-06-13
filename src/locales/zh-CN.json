@@ -91,7 +91,7 @@
     "noImageAvailable": "暂无图片",
     "favoriteLimit": "收藏已达上限",
     "widgetDrawerTips": "将组件拖到工作区",
-    "breakingChangeNotice": "请重点关注下方日志中标记为 `!` 的变更"
+    "breakingChangeNotice": "请重点关注下方日志中标记为 ! 的变更"
   },
   "rightMenu": {
     "deleteWidget": "删除组件",
@@ -101,7 +101,7 @@
     "focusMode": "专注模式",
     "editFocusMode": "编辑专注模式",
     "downloadWallpaper": "下载壁纸",
-    "changeWallpaper": "更换壁纸"
+    "changeWallpaper": "背景图"
   },
   "popup": {
     "configNaivetab": "NaiveTab 配置",
@@ -145,7 +145,7 @@
     "keyboardAndBookmark": "键盘 & 书签",
     "bookmark": "书签",
     "tool": "工具",
-    "other": "其他"
+    "other": "支持"
   },
   "setting": {
     "general": "通用",
@@ -181,6 +181,9 @@
     "focusBrowserDefault": "默认（浏览器地址栏）",
     "focusRoot": "根元素",
     "loadPageAnimation": "载入动画",
+    "autoPrimaryColor": "自动主题色",
+    "autoBackgroundColor": "自动背景色",
+    "autoColorTips": "开启后根据壁纸自动设置，并禁止手动选色。",
     "fadeIn": "淡入",
     "zoomIn": "缩放",
     "newTabOpen": "在新标签页打开",
@@ -197,6 +200,7 @@
     "browserBookmark": "浏览器书签",
     "selectBackgroundImageLabel": "选择背景图",
     "currentBackgroundImageLabel": "当前背景图",
+    "shimmerBackground": "幻彩",
     "syncStorageSize": "存储用量",
     "syncStorageSizeTips": "各项配置在 Chrome 同步存储中的占用大小，单项上限 8KB",
     "syncSizeWarning": "__field__ 配置接近同步上限（__size__KB / 8KB），建议减少书签数量",
@@ -230,7 +234,11 @@
     "fullReset": "完全重置",
     "fullResetDesc": "重置所有设置到默认值",
     "confirmReset": "确认重置该组件设置到默认值？",
-    "confirmResetAll": "确定要重置全部设置？"
+    "confirmResetAll": "确定要重置全部设置？",
+    "scaleMode": "缩放适配",
+    "scaleModeAuto": "自动缩放",
+    "scaleModeFixed": "固定尺寸",
+    "scaleModeTips": "自动缩放：组件随屏幕等比缩放，大屏元素更大；固定尺寸：所有屏幕统一大小"
   },
   "keyboardCommon": {
     "keycapKeyFont": "按键字体",
@@ -292,6 +300,46 @@
       "copyPageUrl": "已复制-页面URL",
       "copyPageTitle": "已复制-页面标题",
       "switchToLayer": "已切换至 __n__"
+    }
+  },
+  "shimmerBackground": {
+    "title": "幻彩",
+    "effect": "效果",
+    "preset": "预设方案",
+    "colors": "颜色",
+    "randomColors": "随机配色",
+    "noPreview": "幻彩无预览",
+    "speed": "动画速度",
+    "speeds": {
+      "slow": "慢速",
+      "normal": "正常",
+      "fast": "快速"
+    },
+    "effects": {
+      "aurora": "极光",
+      "fluid": "流体",
+      "waves": "波浪",
+      "drift": "色彩漂移",
+      "blobs": "墨团",
+      "mesh": "网格渐变",
+      "noise": "噪点纹理",
+      "ripple": "涟漪",
+      "nebula": "星云",
+      "veil": "光纱",
+      "prism": "棱镜",
+      "stardust": "星尘",
+      "lava": "熔岩",
+      "mist": "烟霞"
+    },
+    "presets": {
+      "aurora": "极光",
+      "sunset": "日落",
+      "ocean": "海洋",
+      "neon": "霓虹",
+      "forest": "森林",
+      "galaxy": "星系",
+      "spring": "春日",
+      "midnight": "午夜"
     }
   },
   "keyboardBookmark": {
@@ -449,6 +497,10 @@
     "workLabelBackgroundColorLabel": "工作日标签背景色",
     "dayFontLabel": "日期字体",
     "descFontLabel": "描述字体",
+    "yi": "宜",
+    "ji": "忌",
+    "jishen": "吉神",
+    "xiongsha": "凶煞",
     "month": {
       "january": "一月",
       "february": "二月",

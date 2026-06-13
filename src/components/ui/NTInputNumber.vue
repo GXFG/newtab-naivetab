@@ -53,10 +53,15 @@ const clamp = (val: number | null | undefined): number => {
 }
 
 /**
- * safeValue — Reka 与父组件之间的隔离层。
- * Reka 的 applyInputValue 会在清空时设 undefined，
- * 通过 safeValue 拦截 → 钳制后写入 modelValue，
- * 避免 undefined 泄露到父组件触发 Vue prop type check 警告。
+ * safeValue — Reka 与父组件之间的双向同步+钳制层。
+ *
+ * Reka 的 NumberFieldRoot 直接通过 v-model 写入 modelValue。
+ * 清空输入框时 Reka 可能 emit undefined，watch(modelValue) 将其同步到 safeValue，
+ * watch(safeValue) 再钳制后写回 modelValue（如 undefined → props.min ?? 0）。
+ * handleFocusout 是额外兜底：直接钳制 safeValue 触发第二轮写回。
+ *
+ * 注意：此机制在 watch 链中运行，modelValue 短暂变为 undefined 再被钳制。
+ * 实际不可见（微任务级），但若需彻底阻断 undefined，可将 v-model 改为 v-model="safeValue"。
  */
 const safeValue = ref<number | undefined>(modelValue.value ?? undefined)
 
@@ -82,12 +87,14 @@ watch(safeValue, (val) => {
     >
       <NumberFieldInput class="reka-number-field__input" />
       <slot name="suffix" />
-      <NumberFieldIncrement class="reka-number-field__btn reka-focus-visible">
-        <Icon :icon="ICONS.countdownSpinUp" />
-      </NumberFieldIncrement>
-      <NumberFieldDecrement class="reka-number-field__btn reka-focus-visible">
-        <Icon :icon="ICONS.countdownSpinDown" />
-      </NumberFieldDecrement>
+      <div class="reka-number-field__spins">
+        <NumberFieldIncrement class="reka-number-field__btn reka-focus-visible">
+          <Icon :icon="ICONS.chevronUp" />
+        </NumberFieldIncrement>
+        <NumberFieldDecrement class="reka-number-field__btn reka-focus-visible">
+          <Icon :icon="ICONS.chevronDown" />
+        </NumberFieldDecrement>
+      </div>
     </NumberFieldRoot>
   </div>
 </template>

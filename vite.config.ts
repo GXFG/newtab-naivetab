@@ -4,8 +4,6 @@ import { resolve } from 'node:path'
 import { defineConfig, type UserConfig, type PluginOption } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
-import Icons from 'unplugin-icons/vite'
-import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import Markdown from 'unplugin-vue-markdown/vite'
@@ -56,14 +54,7 @@ export const sharedConfig: UserConfig = {
       // generate `components.d.ts` for ts support with Volar
       dts: r('src/components.d.ts'),
       deep: true,
-      resolvers: [
-        // auto import icons
-        IconsResolver({
-          prefix: '',
-        }),
-      ],
     }),
-    Icons(), // https://github.com/antfu/unplugin-icons
 
     /**
      * Firefox 构建时需要注入 favicon link，否则标签页上没有图标
@@ -138,7 +129,7 @@ export default defineConfig(({ command }) => ({
 
           // 业务代码统一归入 main chunk，避免碎片化
           if (
-            ['src/components', 'src/logic', 'src/lib', '~icon'].some((pkg) =>
+            ['src/components', 'src/logic', 'src/lib'].some((pkg) =>
               id.includes(pkg),
             )
           ) {

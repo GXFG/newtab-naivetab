@@ -4,7 +4,6 @@ import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormInlineRow,
@@ -85,8 +84,6 @@ const allSourcesOrdered = computed(() => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.news')" />
-
   <SettingFormWrap widget-code="news">
     <!-- 新闻源 -->
     <SettingFormSection

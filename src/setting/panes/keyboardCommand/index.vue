@@ -21,7 +21,6 @@ import UrlBlacklistInput from '@/components/UrlBlacklistInput.vue'
 import { showToast } from '@/common/toast'
 import {
   SettingFormWrap,
-  SettingHeaderBar,
   SettingFormSection,
   SettingFormItem,
 } from '@/setting/components'
@@ -213,8 +212,6 @@ const handleCommandSelect = (cmd: TCommandName) => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.keyboardCommand')" />
-
   <SettingFormWrap widget-code="keyboardCommand">
     <!-- 基础设置 -->
     <SettingFormSection
