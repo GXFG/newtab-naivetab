@@ -34,8 +34,12 @@ export const globalState = reactive({
 })
 
 export const initAvailableFontList = async () => {
-  const fontCheck = new Set(FONT_LIST.sort())
-  await document.fonts.ready
+  const fontCheck = new Set([...FONT_LIST].sort())
+  // 等待 @font-face 本地字体加载，超时 3s 兜底（系统字体无需等待即可检测）
+  await Promise.race([
+    document.fonts.ready,
+    new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+  ])
   const availableList: Set<string> = new Set()
   for (const font of fontCheck.values()) {
     if (font === 'system') {
@@ -46,7 +50,7 @@ export const initAvailableFontList = async () => {
       availableList.add(font)
     }
   }
-  globalState.availableFontList = [...availableList.values()]
+  globalState.availableFontList = [...availableList]
 }
 
 export const switchSettingDrawerVisible = (status: boolean) => {

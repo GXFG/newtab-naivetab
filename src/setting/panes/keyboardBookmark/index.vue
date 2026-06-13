@@ -25,7 +25,6 @@ import BrowserBookmarkPicker from '@/components/BrowserBookmarkPicker.vue'
 import GlobalShortcutRecorder from '@/components/GlobalShortcutRecorder.vue'
 import UrlBlacklistInput from '@/components/UrlBlacklistInput.vue'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormSection,
@@ -269,8 +268,6 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.keyboardBookmark')" />
-
   <SettingFormWrap widget-code="keyboardBookmark">
     <!-- 功能配置 -->
     <SettingFormSection

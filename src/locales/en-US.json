@@ -91,7 +91,7 @@
     "noImageAvailable": "No image available",
     "favoriteLimit": "Favorites limit reached",
     "widgetDrawerTips": "Drag widgets to workspace",
-    "breakingChangeNotice": "Please pay attention to changes marked with `!` below"
+    "breakingChangeNotice": "Please pay attention to changes marked with ! below"
   },
   "rightMenu": {
     "deleteWidget": "Delete widget",
@@ -101,7 +101,7 @@
     "focusMode": "Focus Mode",
     "editFocusMode": "Edit Focus Mode",
     "downloadWallpaper": "Download Wallpaper",
-    "changeWallpaper": "Change Wallpaper"
+    "changeWallpaper": "Wallpaper"
   },
   "popup": {
     "configNaivetab": "NaiveTab Config",
@@ -145,7 +145,7 @@
     "keyboardAndBookmark": "Keyboard & Bookmark",
     "bookmark": "Bookmark",
     "tool": "Tool",
-    "other": "Other"
+    "other": "Support"
   },
   "setting": {
     "general": "General",
@@ -181,6 +181,9 @@
     "focusBrowserDefault": "Default (Browser address bar)",
     "focusRoot": "Root element",
     "loadPageAnimation": "Load animation",
+    "autoPrimaryColor": "Auto primary color",
+    "autoBackgroundColor": "Auto background color",
+    "autoColorTips": "Automatically set based on current wallpaper. Manual selection is disabled while active.",
     "fadeIn": "Fade in",
     "zoomIn": "Zoom in",
     "newTabOpen": "Open in newtab",
@@ -191,12 +194,13 @@
     "focusModeTips": "In Focus Mode, only selected widgets are visible",
     "focusWidgets": "Visible Widgets",
     "parallax": "Parallax effect",
-    "parallaxTips": "Background moves slightly with mouse cursor, adds depth and dynamic feel",
+    "parallaxTips": "Background moves slightly with mouse cursor, adds depth and shimmer feel",
     "parallaxIntensity": "Parallax intensity",
     "photoOfTheDay": "Daily Bing Wallpaper",
     "browserBookmark": "Browser Bookmark",
     "selectBackgroundImageLabel": "Select Background Image",
     "currentBackgroundImageLabel": "Current Background Image",
+    "shimmerBackground": "Shimmer",
     "syncStorageSize": "Storage usage",
     "syncStorageSizeTips": "Sync storage usage per config item. Each item is limited to 8KB",
     "syncSizeWarning": "__field__ config is approaching sync limit (__size__KB / 8KB), consider reducing bookmarks",
@@ -230,7 +234,11 @@
     "fullReset": "Full Reset",
     "fullResetDesc": "Reset all settings to defaults",
     "confirmReset": "Confirm resetting this widget's settings to defaults?",
-    "confirmResetAll": "Confirm resetting all settings?"
+    "confirmResetAll": "Confirm resetting all settings?",
+    "scaleMode": "Scale Mode",
+    "scaleModeAuto": "Auto Scale",
+    "scaleModeFixed": "Fixed Size",
+    "scaleModeTips": "Auto: Widgets scale proportionally with screen size; Fixed: Consistent pixel size across all screens"
   },
   "keyboardCommon": {
     "keycapKeyFont": "Keycap Font",
@@ -294,8 +302,48 @@
       "switchToLayer": "Switched to __n__"
     }
   },
+  "shimmerBackground": {
+    "title": "Shimmer",
+    "effect": "Effect",
+    "preset": "Preset",
+    "colors": "Colors",
+    "randomColors": "Random Colors",
+    "noPreview": "Shimmer has no preview",
+    "speed": "Speed",
+    "speeds": {
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast"
+    },
+    "effects": {
+      "aurora": "Aurora",
+      "fluid": "Fluid",
+      "waves": "Waves",
+      "drift": "Drift",
+      "blobs": "Blobs",
+      "mesh": "Mesh",
+      "noise": "Noise",
+      "ripple": "Ripple",
+      "nebula": "Nebula",
+      "veil": "Veil",
+      "prism": "Prism",
+      "stardust": "Stardust",
+      "lava": "Lava",
+      "mist": "Mist"
+    },
+    "presets": {
+      "aurora": "Aurora",
+      "sunset": "Sunset",
+      "ocean": "Ocean",
+      "neon": "Neon",
+      "forest": "Forest",
+      "galaxy": "Galaxy",
+      "spring": "Spring",
+      "midnight": "Midnight"
+    }
+  },
   "keyboardBookmark": {
-    "bookmarkSource": "Bookmarks source",
+    "bookmarkSource": "Source",
     "enableShortcut": "Enable Bookmark Shortcuts",
     "bookmarkSourceTips": "We recommend the \"Browser\" source for multi-layer bookmarks, and no sync size limits.",
     "systemBrowser": "Browser",
@@ -449,6 +497,10 @@
     "workLabelBackgroundColorLabel": "Work Label Background Color",
     "dayFontLabel": "Day Font",
     "descFontLabel": "Description Font",
+    "yi": "Yi",
+    "ji": "Ji",
+    "jishen": "Lucky",
+    "xiongsha": "Bane",
     "month": {
       "january": "January",
       "february": "February",

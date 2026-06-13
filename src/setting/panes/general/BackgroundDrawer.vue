@@ -34,6 +34,7 @@ import { getPexelsImagesData } from '@/api/image'
 import { log } from '@/logic/utils/common'
 import { SettingFormItem, SettingFormSection } from '@/setting/components'
 import BackgroundDrawerImageElement from './BackgroundDrawerImageElement.vue'
+import BackgroundShimmerSettings from './BackgroundShimmerSettings.vue'
 
 /**
  * 当前背景图的实际预览 URL，根据来源类型动态计算：
@@ -76,6 +77,11 @@ const currentBackgroundPreviewUrl = computed(() => {
     if (todayImage?.name) {
       return getImageUrlFromName(IMAGE_NETWORK_SOURCE.BING, todayImage.name)
     }
+    return ''
+  }
+
+  // 幻彩：无预览图片
+  if (source === BACKGROUND_IMAGE_SOURCE.SHIMMER) {
     return ''
   }
 
@@ -152,6 +158,10 @@ const backgroundImageSourceList = computed(() => [
   {
     label: window.$t('generalSetting.photoOfTheDay'),
     value: BACKGROUND_IMAGE_SOURCE.BING_PHOTO,
+  },
+  {
+    label: window.$t('generalSetting.shimmerBackground'),
+    value: BACKGROUND_IMAGE_SOURCE.SHIMMER,
   },
 ])
 
@@ -394,11 +404,24 @@ const loadMorePexels = async () => {
             />
           </SettingFormItem>
         </template>
-        <!-- 网络（未开启自定义），每日一图时展示 -->
+
+        <!-- 幻彩（纯 CSS 动画背景） -->
+        <template
+          v-else-if="
+            localConfig.general.backgroundImageSource ===
+            BACKGROUND_IMAGE_SOURCE.SHIMMER
+          "
+        >
+          <BackgroundShimmerSettings />
+        </template>
+
+        <!-- 网络（未开启自定义），每日一图时展示（幻彩不展示 UHD） -->
         <SettingFormItem
           v-if="
             localConfig.general.backgroundImageSource !==
               BACKGROUND_IMAGE_SOURCE.LOCAL &&
+            localConfig.general.backgroundImageSource !==
+              BACKGROUND_IMAGE_SOURCE.SHIMMER &&
             !localConfig.general.isBackgroundImageCustomUrlEnabled
           "
           :label="$t('common.uhd')"
@@ -410,6 +433,10 @@ const loadMorePexels = async () => {
 
         <!-- 当前背景图 -->
         <SettingFormItem
+          v-if="
+            localConfig.general.backgroundImageSource !==
+            BACKGROUND_IMAGE_SOURCE.SHIMMER
+          "
           :label="$t('generalSetting.currentBackgroundImageLabel')"
         >
           <div class="current__image">

@@ -10,6 +10,7 @@ import {
 } from '@/logic/utils/permission'
 import { useStorageLocal } from '@/composables/useStorageLocal'
 import { ICONS } from '@/logic/constants/icons'
+import { isDragMode } from '@/logic/moveable'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -115,7 +116,7 @@ const onDocumentMousedown = (e: MouseEvent) => {
 }
 
 const startEdit = () => {
-  if (countdownState.value.isRunning) return
+  if (isDragMode.value || countdownState.value.isRunning) return
   editH.value = Number(hh.value)
   editM.value = Number(mm.value)
   editS.value = Number(ss.value)
@@ -169,7 +170,7 @@ const tick = () => {
 
 // ─── 控制操作 ───
 const handleStart = () => {
-  if (countdownState.value.remainingSeconds <= 0) return
+  if (isDragMode.value || countdownState.value.remainingSeconds <= 0) return
   requestPermissionAsync('notifications')
   countdownState.value.startedAt = Date.now()
   countdownState.value.initialRemaining = countdownState.value.remainingSeconds
@@ -177,12 +178,13 @@ const handleStart = () => {
 }
 
 const handlePause = () => {
-  if (!countdownState.value.isRunning) return
+  if (isDragMode.value || !countdownState.value.isRunning) return
   tick()
   countdownState.value.isRunning = false
 }
 
 const handleReset = () => {
+  if (isDragMode.value) return
   countdownState.value.isRunning = false
   countdownState.value.remainingSeconds =
     localConfig[WIDGET_CODE].defaultDuration
@@ -295,7 +297,10 @@ const strokeDashoffset = computed(
         <div
           v-if="!isEditing"
           class="countdown__time"
-          :class="{ 'countdown__time--editable': !countdownState.isRunning }"
+          :class="{
+            'countdown__time--editable':
+              !isDragMode && !countdownState.isRunning,
+          }"
           @click="startEdit"
         >
           <template v-if="localConfig.countdown.showHours">
@@ -400,7 +405,7 @@ const strokeDashoffset = computed(
           <button
             v-if="!isFinished && !isEditing"
             class="control__btn control__btn--main"
-            :disabled="countdownState.remainingSeconds <= 0"
+            :disabled="isDragMode || countdownState.remainingSeconds <= 0"
             @click="countdownState.isRunning ? handlePause() : handleStart()"
           >
             <Icon
@@ -420,6 +425,7 @@ const strokeDashoffset = computed(
               !isFinished
             "
             class="control__btn control__btn--reset"
+            :disabled="isDragMode"
             @click="handleReset"
           >
             <Icon :icon="ICONS.countdownRestore" />
@@ -435,7 +441,7 @@ const strokeDashoffset = computed(
   user-select: none;
 
   .countdown__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     width: var(--nt-cd-size);
     height: var(--nt-cd-size);

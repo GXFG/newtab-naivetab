@@ -1,5 +1,13 @@
 export const WIDGET_CODE = 'calendar'
 
+export const SCALABLE_FIELDS = {
+  width: { min: 16, max: 120 },
+  fontSize: { min: 6, max: 40 },
+  dayFontSize: { min: 8, max: 50 },
+  descFontSize: { min: 4, max: 30 },
+  borderRadius: { min: 0, max: 20 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: true,
   weekBeginsOn: 1,
@@ -29,7 +37,7 @@ export const WIDGET_CONFIG = {
   borderWidth: 1,
   borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
   isShadowEnabled: true,
-  shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(14, 30, 37, 0.12)'],
+  shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(255, 255, 255, 0.06)'],
   holidayFontColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
   todayDayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
   todayDescFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],

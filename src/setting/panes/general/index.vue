@@ -9,17 +9,11 @@ import {
   refreshSetting,
   resetSetting,
 } from '@/logic/config/sync/manage'
-import {
-  configSizeMap,
-  lastSyncTime,
-  isUploadConfigLoading,
-} from '@/logic/config/sync/state'
 import { localConfig } from '@/logic/config/state'
 import { globalState } from '@/logic/store/state'
 import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
 import { ICONS } from '@/logic/constants/icons'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormSection,
@@ -68,6 +62,11 @@ const drawerPlacementList = [
   icon: string
   style: Record<string, string>
 }[]
+
+const scaleModeList = computed(() => [
+  { label: window.$t('generalSetting.scaleModeAuto'), value: 'auto' },
+  { label: window.$t('generalSetting.scaleModeFixed'), value: 'fixed' },
+])
 
 const focusElementList = computed(() => [
   { label: window.$t('generalSetting.focusBrowserDefault'), value: 'default' },
@@ -141,22 +140,6 @@ const onImportFileChange = (e: Event) => {
   }
 }
 
-const sortedEntries = computed(() => {
-  return Object.entries(configSizeMap).sort((a, b) => b[1] - a[1])
-})
-
-const totalBytes = computed(() => {
-  let total = 0
-  for (const bytes of Object.values(configSizeMap)) {
-    total += bytes
-  }
-  return total
-})
-
-const topLargeItems = computed(() => {
-  return sortedEntries.value.slice(0, 3)
-})
-
 const ntGeneralActiveColor = computed(() =>
   colorMixWithAlpha(customPrimaryColor.value, 0.12),
 )
@@ -175,8 +158,6 @@ const cssVars = computed(() => ({
     :show="state.isBackgroundDrawerVisible"
     @update:show="onBackgroundDrawerClose"
   />
-
-  <SettingHeaderBar :title="$t('setting.general')" />
 
   <SettingFormWrap
     widget-code="general"
@@ -215,6 +196,24 @@ const cssVars = computed(() => ({
           </NTRadioGroup>
         </template>
       </SwitchField>
+
+      <SettingFormItem
+        :label="$t('generalSetting.scaleMode')"
+        :tip-content="$t('generalSetting.scaleModeTips')"
+      >
+        <NTRadioGroup
+          v-model:value="localConfig.general.scaleMode"
+          direction="horizontal"
+        >
+          <NTRadio
+            v-for="item in scaleModeList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </NTRadio>
+        </NTRadioGroup>
+      </SettingFormItem>
     </SettingFormSection>
 
     <!-- 焦点与导航 -->
@@ -286,11 +285,23 @@ const cssVars = computed(() => ({
         <ColorField
           v-model="localConfig.general.primaryColor"
           :label="$t('common.primaryColor')"
+          :disabled="localConfig.general.isAutoPrimaryColor"
         />
+        <SwitchField
+          v-model="localConfig.general.isAutoPrimaryColor"
+          :label="$t('generalSetting.autoPrimaryColor')"
+        />
+      </SettingFormInlineRow>
 
+      <SettingFormInlineRow :tip-content="$t('generalSetting.autoColorTips')">
         <ColorField
           v-model="localConfig.general.backgroundColor"
           :label="$t('common.backgroundColor')"
+          :disabled="localConfig.general.isAutoBackgroundColor"
+        />
+        <SwitchField
+          v-model="localConfig.general.isAutoBackgroundColor"
+          :label="$t('generalSetting.autoBackgroundColor')"
         />
       </SettingFormInlineRow>
     </SettingFormSection>
@@ -383,13 +394,7 @@ const cssVars = computed(() => ({
       :title="$t('generalSetting.dataManagement')"
       :icon="ICONS.restoreTwotone"
     >
-      <StorageVisualization
-        :sync-time="lastSyncTime"
-        :is-loading="isUploadConfigLoading"
-        :total-bytes="totalBytes"
-        :top-large-items="topLargeItems"
-        :sorted-entries="sortedEntries"
-      />
+      <StorageVisualization />
 
       <SettingFormItem
         :label="$t('generalSetting.importExportSettingsLabel')"

@@ -24,6 +24,12 @@ import {
 } from '@/logic/image/constants'
 import { imageState, imageLocalState, isImageLoading } from './state'
 import { updateBingImages } from './gallery'
+import {
+  extractAndApplyPrimaryColor,
+  extractAndApplyBackgroundColor,
+  extractPrimaryColorFromPalette,
+  extractBackgroundColorFromPalette,
+} from './extract-color'
 
 export const getCurrBackgroundImageStoreName = (): DatabaseStore => {
   return localConfig.general.backgroundImageSource ===
@@ -147,6 +153,14 @@ const validateImageFile = (file: File): Promise<boolean> => {
 
 export const downloadCurrentWallpaper = async () => {
   if (!localConfig.general.isBackgroundImageEnabled) return
+
+  // SHIMMER 来源无实际图片文件，不支持下载
+  if (
+    localConfig.general.backgroundImageSource ===
+    BACKGROUND_IMAGE_SOURCE.SHIMMER
+  ) {
+    return
+  }
 
   // 来源=0：本地上传，从 DB 重新创建 ObjectURL 用于下载（ObjectURL 刷新后失效，不能依赖 previewImageUrl）
   if (
@@ -310,6 +324,21 @@ const decodeAndApplyImage = (
       if (smallBase64) {
         safeSetFirstScreen(smallBase64)
       }
+      // 壁纸主题色/背景色自动提取：不阻塞首屏渲染
+      if (localConfig.general.isAutoPrimaryColor) {
+        extractAndApplyPrimaryColor(
+          img,
+          targetAppearanceCode,
+          localConfig.general.primaryColor as string[],
+        )
+      }
+      if (localConfig.general.isAutoBackgroundColor) {
+        extractAndApplyBackgroundColor(
+          img,
+          targetAppearanceCode,
+          localConfig.general.backgroundColor as string[],
+        )
+      }
       isImageLoading.value = false
       if (__DEV__) {
         console.log(
@@ -329,6 +358,26 @@ const decodeAndApplyImage = (
 }
 
 export const renderRawBackgroundImage = async () => {
+  // 幻彩由 BackgroundShimmer.vue 独立处理，不走 IndexedDB/图片渲染流程
+  if (
+    localConfig.general.backgroundImageSource ===
+    BACKGROUND_IMAGE_SOURCE.SHIMMER
+  ) {
+    isImageLoading.value = false
+    return
+  }
+
+  // 每日一图来源：确保 bing.list 已填充再渲染。
+  // 若用户一直使用幻彩/本地/网络来源，initBackgroundImage 不会调 updateBingImages，
+  // 导致切换过来时 bing.list 为空，getCurrNetworkBackgroundImageUrl 返回空 URL。
+  // updateBingImages 内部有 3 小时缓存，重复调用不会发起多余网络请求。
+  if (
+    localConfig.general.backgroundImageSource ===
+    BACKGROUND_IMAGE_SOURCE.BING_PHOTO
+  ) {
+    await updateBingImages()
+  }
+
   const start = performance.now()
   isImageLoading.value = true
   const targetAppearanceCode = localState.value.currAppearanceCode
@@ -523,10 +572,19 @@ export const initBackgroundImage = async () => {
 }
 
 // 不涉及资源变化，仅切换外观主题（浅色/深色），直接从 DB 取对应 appearanceCode 的数据
+// 幻彩来源由 BackgroundShimmer.vue 内部监听外观码变化更新 Canvas 颜色，
+// 此处仅触发自动主题色/背景色提取（色板已由 BackgroundShimmer 更新）
 watch(
   () => localState.value.currAppearanceCode,
   async () => {
     if (!localConfig.general.isBackgroundImageEnabled) {
+      return
+    }
+    if (
+      localConfig.general.backgroundImageSource ===
+      BACKGROUND_IMAGE_SOURCE.SHIMMER
+    ) {
+      applyAutoColorsFromPalette()
       return
     }
     renderRawBackgroundImage()
@@ -543,12 +601,55 @@ watch(
   async (enabled) => {
     if (enabled) {
       renderRawBackgroundImage()
+      // SHIMMER 来源下 renderRawBackgroundImage 不触发自动取色，
+      // 需额外调用 applyAutoColorsFromPalette 保证重新开启背景时同步主题色。
+      if (
+        localConfig.general.backgroundImageSource ===
+        BACKGROUND_IMAGE_SOURCE.SHIMMER
+      ) {
+        applyAutoColorsFromPalette()
+      }
     } else {
       // 关闭时重置加载状态，避免下次开启时显示残留的 loading 指示器
       isImageLoading.value = false
     }
   },
 )
+
+/**
+ * 从幻彩色板中提取主题色/背景色并写入配置。
+ * 仅在 SHIMMER 来源 + auto 开关开启时生效。
+ * 多处 watcher 复用的共享逻辑：来源切换、色板变化、auto 开关开启。
+ */
+const applyAutoColorsFromPalette = () => {
+  const palette =
+    localConfig.general.shimmerBackgroundColors[
+      localState.value.currAppearanceCode
+    ]
+  if (!palette || palette.length === 0) return
+
+  if (localConfig.general.isAutoPrimaryColor) {
+    const color = extractPrimaryColorFromPalette(
+      palette,
+      localState.value.currAppearanceCode,
+    )
+    if (color) {
+      localConfig.general.primaryColor[localState.value.currAppearanceCode] =
+        color
+    }
+  }
+
+  if (localConfig.general.isAutoBackgroundColor) {
+    const color = extractBackgroundColorFromPalette(
+      palette,
+      localState.value.currAppearanceCode,
+    )
+    if (color) {
+      localConfig.general.backgroundColor[localState.value.currAppearanceCode] =
+        color
+    }
+  }
+}
 
 // 涉及资源变化：切换来源、更换网络图片、画质开关、自定义 URL 开关/地址
 // 策略：仅在真正切换来源（oldSource !== newSource）时删除旧缓存，
@@ -571,6 +672,39 @@ watch(
   ) => {
     // 注意：_newNames / _oldNames 是 JSON.stringify 序列化的字符串，非数组本身
     if (!localConfig.general.isBackgroundImageEnabled) {
+      return
+    }
+    // 切换到幻彩时，无需任何 DB 操作，由 BackgroundShimmer.vue 独立处理。
+    // 注意：此处不清理 DB，旧来源的缓存会残留。切回非幻彩来源时需先删除再渲染。
+    if (newSource === BACKGROUND_IMAGE_SOURCE.SHIMMER) {
+      // 若自动取色已开启，立即从色板提取主题色/背景色
+      applyAutoColorsFromPalette()
+      return
+    }
+    // 从幻彩切换出来时，删除旧来源残留的 DB 缓存后渲染新来源。
+    // 切到幻彩时不会走 deleteCurrRawBackgroundImageInDB，DB 中可能还有旧网络/每日壁纸数据，
+    // 若不删除，renderRawBackgroundImage 会从 DB 读到旧缓存直接使用（skip 下载），导致显示过期图片。
+    if (oldSource === BACKGROUND_IMAGE_SOURCE.SHIMMER) {
+      // LOCAL 来源用 localBackgroundImages 表，deleteCurrRawBackgroundImageInDB
+      // 只删 currBackgroundImages（网络/每日壁纸表），不会误删用户上传的本地图片。
+      if (
+        localConfig.general.backgroundImageSource !==
+        BACKGROUND_IMAGE_SOURCE.LOCAL
+      ) {
+        await deleteCurrRawBackgroundImageInDB()
+      }
+      renderRawBackgroundImage()
+      // 切换到 LOCAL 来源时恢复 previewImageUrl（renderRawBackgroundImage 内不设此值）
+      if (
+        localConfig.general.backgroundImageSource ===
+        BACKGROUND_IMAGE_SOURCE.LOCAL
+      ) {
+        const dbData = await getCurrBackgroundImageFromDB()
+        if (dbData?.smallBase64) {
+          safeSetFirstScreen(dbData.smallBase64)
+          imageState.previewImageUrl = dbData.smallBase64
+        }
+      }
       return
     }
     // 仅在真正切换来源时删除旧来源的 DB 缓存（非 LOCAL 来源才删除）
@@ -628,4 +762,109 @@ watch(
     // 不必在此预加载，避免下载用户可能永远看不到的图片。
     renderRawBackgroundImage()
   },
+)
+
+// 自动提取主题色开关：开启时立即从当前壁纸提取，无需等待壁纸变更
+watch(
+  () => localConfig.general.isAutoPrimaryColor,
+  async (enabled) => {
+    if (!enabled) return
+
+    // 幻彩：从色板选色，无需 Canvas 解码
+    if (
+      localConfig.general.backgroundImageSource ===
+      BACKGROUND_IMAGE_SOURCE.SHIMMER
+    ) {
+      const palette =
+        localConfig.general.shimmerBackgroundColors[
+          localState.value.currAppearanceCode
+        ]
+      if (!palette || palette.length === 0) return
+      const color = extractPrimaryColorFromPalette(
+        palette,
+        localState.value.currAppearanceCode,
+      )
+      if (color) {
+        localConfig.general.primaryColor[localState.value.currAppearanceCode] =
+          color
+      }
+      return
+    }
+
+    if (!imageState.fullImageUrl) return
+
+    const img = new Image()
+    img.src = imageState.fullImageUrl
+    try {
+      await img.decode()
+    } catch {
+      // decode 失败（如 blob URL 已失效），静默降级
+      return
+    }
+    extractAndApplyPrimaryColor(
+      img,
+      localState.value.currAppearanceCode,
+      localConfig.general.primaryColor as string[],
+    )
+  },
+)
+
+// 自动提取背景色开关：开启时立即从当前壁纸提取
+watch(
+  () => localConfig.general.isAutoBackgroundColor,
+  async (enabled) => {
+    if (!enabled) return
+
+    // 幻彩：从色板选色，无需 Canvas 解码
+    if (
+      localConfig.general.backgroundImageSource ===
+      BACKGROUND_IMAGE_SOURCE.SHIMMER
+    ) {
+      const palette =
+        localConfig.general.shimmerBackgroundColors[
+          localState.value.currAppearanceCode
+        ]
+      if (!palette || palette.length === 0) return
+      const color = extractBackgroundColorFromPalette(
+        palette,
+        localState.value.currAppearanceCode,
+      )
+      if (color) {
+        localConfig.general.backgroundColor[
+          localState.value.currAppearanceCode
+        ] = color
+      }
+      return
+    }
+
+    if (!imageState.fullImageUrl) return
+
+    const img = new Image()
+    img.src = imageState.fullImageUrl
+    try {
+      await img.decode()
+    } catch {
+      return
+    }
+    extractAndApplyBackgroundColor(
+      img,
+      localState.value.currAppearanceCode,
+      localConfig.general.backgroundColor as string[],
+    )
+  },
+)
+
+// 幻彩色板变化时，若自动取色开启则实时更新 UI 主题色/背景色
+// 覆盖预设切换、随机配色、手动调色等场景，无需用户额外操作
+watch(
+  () => localConfig.general.shimmerBackgroundColors,
+  () => {
+    if (
+      localConfig.general.backgroundImageSource !==
+      BACKGROUND_IMAGE_SOURCE.SHIMMER
+    )
+      return
+    applyAutoColorsFromPalette()
+  },
+  { deep: true },
 )

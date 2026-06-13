@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { createTab } from '@/logic/utils/common'
@@ -181,65 +182,71 @@ watch(
         </button>
       </div>
       <!-- grid -->
-      <div
+      <NTScrollArea
         v-else
-        class="folder__grid"
-        :style="{
-          gridTemplateColumns: `repeat(${localConfig.bookmarkFolder.gridColumns}, 1fr)`,
-        }"
+        class="folder__scroll"
       >
-        <!-- back -->
         <div
-          v-if="state.selectedFolderTitles.length > 0"
-          class="folder__item"
-          :class="{
-            'folder__item--pointer': !isDragMode,
-            'folder__item--hover': !isDragMode,
+          class="folder__grid"
+          :style="{
+            gridTemplateColumns: `repeat(${localConfig.bookmarkFolder.gridColumns}, 1fr)`,
           }"
-          @click="onBack"
         >
-          <div class="folder__icon">
-            <Icon :icon="ICONS.arrowBackRounded" />
-          </div>
-          <div class="folder__label">
-            {{
-              state.selectedFolderTitles[state.selectedFolderTitles.length - 1]
-            }}
-          </div>
-        </div>
-
-        <div
-          v-for="(item, idx) in currFolderBookmarks"
-          :key="`${item.id}-${idx}`"
-          class="folder__item"
-          :class="{
-            'folder__item--pointer': !isDragMode,
-            'folder__item--hover': !isDragMode,
-          }"
-          :title="`${item.title} · ${item.url}`"
-          @click="onClickItem(item)"
-        >
-          <div class="folder__icon">
-            <Icon
-              v-if="item.children && localConfig.bookmarkFolder.isIconVisible"
-              :icon="ICONS.folderOutline"
-            />
-            <img
-              v-else-if="localConfig.bookmarkFolder.isIconVisible"
-              :src="getFaviconFromUrl(isBookmarkNode(item) ? item.url : '')"
-              :draggable="false"
-              alt=""
-            />
+          <!-- back -->
+          <div
+            v-if="state.selectedFolderTitles.length > 0"
+            class="folder__item"
+            :class="{
+              'folder__item--pointer': !isDragMode,
+              'folder__item--hover': !isDragMode,
+            }"
+            @click="onBack"
+          >
+            <div class="folder__icon">
+              <Icon :icon="ICONS.arrowBackRounded" />
+            </div>
+            <div class="folder__label">
+              {{
+                state.selectedFolderTitles[
+                  state.selectedFolderTitles.length - 1
+                ]
+              }}
+            </div>
           </div>
 
           <div
-            v-if="localConfig.bookmarkFolder.isNameVisible"
-            class="folder__label"
+            v-for="(item, idx) in currFolderBookmarks"
+            :key="`${item.id}-${idx}`"
+            class="folder__item"
+            :class="{
+              'folder__item--pointer': !isDragMode,
+              'folder__item--hover': !isDragMode,
+            }"
+            :title="`${item.title} · ${item.url}`"
+            @click="onClickItem(item)"
           >
-            {{ item.title }}
+            <div class="folder__icon">
+              <Icon
+                v-if="item.children && localConfig.bookmarkFolder.isIconVisible"
+                :icon="ICONS.folderOutline"
+              />
+              <img
+                v-else-if="localConfig.bookmarkFolder.isIconVisible"
+                :src="getFaviconFromUrl(isBookmarkNode(item) ? item.url : '')"
+                :draggable="false"
+                alt=""
+              />
+            </div>
+
+            <div
+              v-if="localConfig.bookmarkFolder.isNameVisible"
+              class="folder__label"
+            >
+              {{ item.title }}
+            </div>
           </div>
         </div>
-      </div>
+      </NTScrollArea>
     </div>
   </WidgetWrap>
 </template>
@@ -258,7 +265,7 @@ watch(
   user-select: none;
 
   .bookmarkFolder__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     display: flex;
     align-items: center;
@@ -266,7 +273,6 @@ watch(
     font-family: var(--nt-bf-font-family);
     color: var(--nt-bf-font-color);
     font-size: var(--nt-bf-font-size);
-    padding: var(--nt-bf-padding);
     width: var(--nt-bf-width);
     height: var(--nt-bf-height);
     background: var(--nt-bf-background-color);
@@ -303,6 +309,13 @@ watch(
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
+  /* NTScrollArea 外层：高度继承父级，父级已有确定高度 */
+  .folder__scroll {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* 内层：grid 布局，内容撑高度，滚动由外层 NTScrollArea 接管 */
   .folder__grid {
     position: relative;
     z-index: 1;
@@ -310,16 +323,7 @@ watch(
     gap: var(--nt-bf-item-gap);
     grid-auto-rows: var(--nt-bf-item-height);
     width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .folder__grid::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
+    padding: var(--nt-bf-padding);
   }
 
   .folder__item {

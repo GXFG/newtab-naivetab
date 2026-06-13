@@ -2,27 +2,28 @@
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
-import Tips from '@/components/Tips.vue'
-
-const props = defineProps<{
-  syncTime: string
-  isLoading: boolean
-  totalBytes: number
-  topLargeItems: [string, number][]
-  sortedEntries: [string, number][]
-}>()
+import { SettingFormItem } from '@/setting/components'
+import {
+  configSizeMap,
+  lastSyncTime,
+  isUploadConfigLoading,
+} from '@/logic/config/sync/state'
 
 const SYNC_QUOTA_BYTES_PER_ITEM = 8192
 const isExpanded = ref(false)
 
 const DEFAULT_VISIBLE = 2
 
+const sortedEntries = computed(() =>
+  Object.entries(configSizeMap).sort((a, b) => b[1] - a[1]),
+)
+
 // 默认展示的前 N 条最大配置项
 const visibleItems = computed(() =>
-  props.sortedEntries.slice(0, DEFAULT_VISIBLE),
+  sortedEntries.value.slice(0, DEFAULT_VISIBLE),
 )
 // 展开后展示的其余配置项
-const extraItems = computed(() => props.sortedEntries.slice(DEFAULT_VISIBLE))
+const extraItems = computed(() => sortedEntries.value.slice(DEFAULT_VISIBLE))
 
 // configSizeMap 的 field 映射到 i18n label，兜底展示原始 field 名
 const getFieldLabel = (field: string) => window.$t(`setting.${field}`) || field
@@ -33,45 +34,66 @@ const barWidth = (bytes: number) =>
 
 <template>
   <!-- 同步时间 -->
-  <div
-    class="storage__row"
-    style="align-items: center"
+  <SettingFormItem
+    :label="$t('generalSetting.syncTime')"
+    :tip-content="$t('generalSetting.syncTimeTips')"
   >
-    <label class="storage__label">
-      {{ $t('generalSetting.syncTime') }}
-      <Tips :content="$t('generalSetting.syncTimeTips')" />
-    </label>
-    <div class="storage__control">
-      <NTSpin
-        :show="props.isLoading"
-        size="small"
-      >
-        <div class="sync-time__badge">
-          <Icon
-            :icon="ICONS.check"
-            class="sync-time__icon"
-          />
-          <span class="sync-time__text">{{ props.syncTime }}</span>
-        </div>
-      </NTSpin>
-    </div>
-  </div>
+    <NTSpin
+      :show="isUploadConfigLoading"
+      size="small"
+    >
+      <div class="sync-time__badge">
+        <Icon
+          :icon="ICONS.check"
+          class="sync-time__icon"
+        />
+        <span class="sync-time__text">{{ lastSyncTime }}</span>
+      </div>
+    </NTSpin>
+  </SettingFormItem>
 
   <!-- 配置占用大小 -->
-  <div class="storage__row">
-    <label class="storage__label">
-      {{ $t('generalSetting.syncStorageSize') }}
-      <Tips :content="$t('generalSetting.syncStorageSizeTips')" />
-    </label>
-    <div class="storage__control">
-      <div class="storage-panel">
-        <!-- 默认展示前 2 条最大配置项 -->
+  <SettingFormItem
+    :label="$t('generalSetting.syncStorageSize')"
+    :tip-content="$t('generalSetting.syncStorageSizeTips')"
+    align-items="flex-start"
+  >
+    <div class="storage-panel">
+      <!-- 默认展示前 2 条最大配置项 -->
+      <div
+        v-if="visibleItems.length > 0"
+        class="storage-panel__list"
+      >
         <div
-          v-if="visibleItems.length > 0"
-          class="storage-panel__list"
+          v-for="[field, bytes] in visibleItems"
+          :key="field"
+          class="storage-panel__list-item"
+          :class="{
+            'storage-panel__list-item--warn': bytes > 7000,
+            'storage-panel__list-item--danger': bytes > 8000,
+          }"
+        >
+          <span class="list-item__field">{{ getFieldLabel(field) }}</span>
+          <div class="list-item__bar-wrap">
+            <div
+              class="list-item__bar"
+              :style="{ width: barWidth(bytes) }"
+            />
+          </div>
+          <span class="list-item__bytes"
+            >{{ (bytes / 1024).toFixed(1) }}KB</span
+          >
+        </div>
+      </div>
+
+      <!-- 展开后展示的其余配置项 -->
+      <Transition name="storage-expand">
+        <div
+          v-if="isExpanded"
+          class="storage-panel__list storage-panel__list--extra"
         >
           <div
-            v-for="[field, bytes] in visibleItems"
+            v-for="[field, bytes] in extraItems"
             :key="field"
             class="storage-panel__list-item"
             :class="{
@@ -79,7 +101,9 @@ const barWidth = (bytes: number) =>
               'storage-panel__list-item--danger': bytes > 8000,
             }"
           >
-            <span class="list-item__field">{{ getFieldLabel(field) }}</span>
+            <span class="list-item__field">
+              {{ getFieldLabel(field) }}
+            </span>
             <div class="list-item__bar-wrap">
               <div
                 class="list-item__bar"
@@ -91,93 +115,25 @@ const barWidth = (bytes: number) =>
             >
           </div>
         </div>
+      </Transition>
 
-        <!-- 展开后展示的其余配置项 -->
-        <Transition name="storage-expand">
-          <div
-            v-if="isExpanded"
-            class="storage-panel__list storage-panel__list--extra"
-          >
-            <div
-              v-for="[field, bytes] in extraItems"
-              :key="field"
-              class="storage-panel__list-item"
-              :class="{
-                'storage-panel__list-item--warn': bytes > 7000,
-                'storage-panel__list-item--danger': bytes > 8000,
-              }"
-            >
-              <span class="list-item__field">
-                {{ getFieldLabel(field) }}
-              </span>
-              <div class="list-item__bar-wrap">
-                <div
-                  class="list-item__bar"
-                  :style="{ width: barWidth(bytes) }"
-                />
-              </div>
-              <span class="list-item__bytes"
-                >{{ (bytes / 1024).toFixed(1) }}KB</span
-              >
-            </div>
-          </div>
-        </Transition>
-
-        <!-- 展开/收起箭头（底部居中） -->
-        <div
-          v-if="sortedEntries.length > DEFAULT_VISIBLE"
-          class="storage-panel__toggle"
-          :class="{ 'storage-panel__toggle--expanded': isExpanded }"
-          @click="isExpanded = !isExpanded"
-        >
-          <Icon
-            :icon="ICONS.countdownSpinDown"
-            class="storage-panel__arrow"
-          />
-        </div>
+      <!-- 展开/收起箭头（底部居中） -->
+      <div
+        v-if="sortedEntries.length > DEFAULT_VISIBLE"
+        class="storage-panel__toggle"
+        :class="{ 'storage-panel__toggle--expanded': isExpanded }"
+        @click="isExpanded = !isExpanded"
+      >
+        <Icon
+          :icon="ICONS.countdownSpinDown"
+          class="storage-panel__arrow"
+        />
       </div>
     </div>
-  </div>
+  </SettingFormItem>
 </template>
 
 <style scoped>
-/* ——— 行布局（对齐 SettingFormItem 的 label + control 结构） ——— */
-.storage__row {
-  display: flex;
-  align-items: flex-start;
-  padding: 10px 14px;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 14px;
-    right: 14px;
-    border-bottom: 1px solid var(--nt-gray-minimal);
-  }
-}
-
-.storage__label {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  width: 120px;
-  color: var(--nt-text-primary);
-  font-size: var(--text-base);
-  cursor: default;
-  user-select: none;
-}
-
-.storage__control {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  min-width: 0;
-}
-
 /* ——— 同步时间徽章 ——— */
 .sync-time__badge {
   display: inline-flex;

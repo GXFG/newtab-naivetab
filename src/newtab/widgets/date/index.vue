@@ -64,7 +64,7 @@ watch(
   user-select: none;
 
   .date__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     font-family: var(--nt-d-font-family);
     color: var(--nt-d-font-color);

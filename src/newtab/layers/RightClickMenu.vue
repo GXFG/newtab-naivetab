@@ -12,6 +12,7 @@ import { localConfig, localState } from '@/logic/config/state'
 import { toggleFullscreen } from '@/logic/store/dom'
 import { switchSettingDrawerVisible, globalState } from '@/logic/store/state'
 import { downloadCurrentWallpaper } from '@/logic/image/service'
+import { BACKGROUND_IMAGE_SOURCE } from '@/logic/image/constants'
 import { WIDGET_CODE_LIST, getWidgetSetting } from '@/common/widget-constants'
 
 const state = reactive({
@@ -32,7 +33,7 @@ interface MenuItem {
 }
 
 // ── 菜单列表冻结机制 ──
-// 下载壁纸可见性：开启背景图且非拖拽模式时显示
+// 下载壁纸可见性：开启背景图、非拖拽模式时显示
 const isDownloadVisible = computed(
   () => !isDragMode.value && localConfig.general.isBackgroundImageEnabled,
 )
@@ -325,6 +326,10 @@ onUnmounted(() => {
               {{ $t('rightMenu.changeWallpaper') }}
             </NTTooltip>
             <NTTooltip
+              v-if="
+                localConfig.general.backgroundImageSource !==
+                BACKGROUND_IMAGE_SOURCE.SHIMMER
+              "
               trigger="hover"
               placement="bottom"
             >

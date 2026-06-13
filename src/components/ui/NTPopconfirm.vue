@@ -17,6 +17,7 @@ const props = defineProps<{
   positiveText?: string
   negativeText?: string
   disabled?: boolean
+  placement?: 'top' | 'bottom' | 'left' | 'right'
 }>()
 
 const emit = defineEmits<{
@@ -43,7 +44,7 @@ const onNegative = () => {
   <NTPopover
     v-model:show="show"
     trigger="manual"
-    placement="top"
+    :placement="placement ?? 'top'"
     :disabled="disabled"
   >
     <template #trigger>

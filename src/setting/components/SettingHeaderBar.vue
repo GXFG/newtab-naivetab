@@ -1,4 +1,12 @@
 <script setup lang="ts">
+/**
+ * @module SettingHeaderBar
+ *
+ * Setting 面板右侧顶部标题栏，由 SettingPaneContent 统一渲染（各 pane 不再自行引用）。
+ *
+ * 功能：标题 + 预览按钮（hover 透视）+ 打开新标签页按钮 + 关闭按钮（仅 drawer 模式）。
+ * 该组件固定在滚动区域之外，不随下方内容滚动。
+ */
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { globalState } from '@/logic/store/state'
@@ -89,7 +97,7 @@ const openInNewTab = () => {
   </div>
 </template>
 
-<style scoped>
+<style>
 .setting-header-bar {
   padding: var(--space-3) var(--space-4);
   width: 100%;
@@ -163,50 +171,6 @@ const openInNewTab = () => {
       color: var(--nt-primary-color);
       box-shadow: 0 0 0 2px
         color-mix(in srgb, var(--nt-primary-color) 12%, transparent);
-      :root[data-theme='dark'] & {
-        background-color: color-mix(
-          in srgb,
-          var(--nt-primary-color) 15%,
-          transparent
-        );
-        border-color: color-mix(
-          in srgb,
-          var(--nt-primary-color) 45%,
-          transparent
-        );
-        box-shadow: 0 0 0 2px
-          color-mix(in srgb, var(--nt-primary-color) 18%, transparent);
-      }
-    }
-
-    &.header-bar__action--active {
-      background-color: color-mix(
-        in srgb,
-        var(--nt-primary-color) 10%,
-        transparent
-      );
-      border-color: color-mix(
-        in srgb,
-        var(--nt-primary-color) 40%,
-        transparent
-      );
-      color: var(--nt-primary-color);
-      box-shadow: 0 0 0 2px
-        color-mix(in srgb, var(--nt-primary-color) 12%, transparent);
-      :root[data-theme='dark'] & {
-        background-color: color-mix(
-          in srgb,
-          var(--nt-primary-color) 15%,
-          transparent
-        );
-        border-color: color-mix(
-          in srgb,
-          var(--nt-primary-color) 45%,
-          transparent
-        );
-        box-shadow: 0 0 0 2px
-          color-mix(in srgb, var(--nt-primary-color) 18%, transparent);
-      }
     }
   }
 
@@ -214,5 +178,17 @@ const openInNewTab = () => {
   .setting-header-bar__close {
     margin-left: var(--space-2);
   }
+}
+
+:root[data-theme='dark'] .setting-header-bar .header-bar__action--active,
+.dark .setting-header-bar .header-bar__action--active {
+  background-color: color-mix(
+    in srgb,
+    var(--nt-primary-color) 15%,
+    transparent
+  );
+  border-color: color-mix(in srgb, var(--nt-primary-color) 45%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--nt-primary-color) 18%, transparent);
 }
 </style>

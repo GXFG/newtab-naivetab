@@ -1,0 +1,224 @@
+/* ============================================================
+ * Accordion（手风琴，基于 Reka UI Accordion 原语）
+ *
+ * 用途：Setting 面板折叠区块。
+ *
+ * 状态覆盖：
+ *   base → open → disabled
+ *
+ * 设计意图：
+ *   trigger  → 标题栏 + 左侧主题色条 + 底部分割线 + chevron 旋转指示
+ *   content  → Reka CollapsibleContent 内置 max-height 动画
+ *   open     → 色条可见、分割线消失、chevron 旋转 90°
+ *   dark     → 背景色、边框色切换
+ * ============================================================ */
+
+/* ---- Root ---- */
+.reka-accordion {
+  display: block;
+}
+
+/* ---- Item ---- */
+.reka-accordion__item {
+  margin-bottom: 4px;
+}
+
+/* ---- Header（语义容器，无额外样式）---- */
+.reka-accordion__header {
+  all: unset;
+  display: block;
+}
+
+/* ---- Trigger：可点击标题栏 ---- */
+.reka-accordion__trigger {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  outline: none;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background-color var(--transition-base);
+  color: var(--nt-text-primary);
+
+  /* 左侧色条（主题色，默认隐藏，open 时显示） */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 40%;
+    border-radius: 2px;
+    background: var(--nt-primary-color);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  /* 底部分割线 */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+    right: 8px;
+    height: 1px;
+    background: var(--nt-gray-minimal);
+    transition: opacity var(--transition-base);
+  }
+
+  &:not(:disabled):hover {
+    background-color: var(--nt-gray-minimal);
+  }
+
+  &:not(:disabled):active {
+    background-color: var(--nt-gray-light);
+  }
+
+  &[data-state='open'] {
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      opacity: 0;
+    }
+
+    &:not(:disabled):hover {
+      background-color: var(--nt-gray-ghost);
+    }
+  }
+
+  &[data-disabled] {
+    opacity: var(--opacity-muted);
+    cursor: var(--reka-cursor-disabled);
+  }
+
+  /* ---- 标题文字区 ---- */
+  .reka-accordion__trigger-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .reka-accordion__trigger-icon {
+    font-size: var(--text-base);
+    flex-shrink: 0;
+  }
+
+  .reka-accordion__trigger-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ---- Chevron 指示器 ---- */
+  .reka-accordion__trigger-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-pill);
+    flex-shrink: 0;
+    transition: background-color var(--transition-base);
+  }
+
+  &:not([data-state='open']):not(:disabled):hover .reka-accordion__trigger-indicator {
+    background-color: var(--nt-gray-light);
+  }
+
+  .reka-accordion__chevron {
+    font-size: var(--text-base);
+    color: var(--nt-text-primary);
+    transform: rotate(0deg);
+    transition:
+      transform var(--transition-spring),
+      color var(--transition-base);
+  }
+
+  &[data-state='open'] .reka-accordion__chevron {
+    transform: rotate(90deg);
+  }
+}
+
+/* ---- Content：折叠内容区（内联渲染，非 Portal，z-index: 0 仅用于检查工具识别）---- */
+.reka-accordion__content {
+  z-index: 0;
+  overflow: hidden;
+
+  /* Reka CollapsibleContent 通过 CSS 变量驱动动画 */
+  &[data-state='open'] {
+    animation: reka-accordion-open 300ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+  }
+
+  &[data-state='closed'] {
+    animation: reka-accordion-close 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+
+@keyframes reka-accordion-open {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--reka-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes reka-accordion-close {
+  from {
+    height: var(--reka-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+/* ---- Body：内容内边距 ---- */
+.reka-accordion__body {
+  margin-top: 6px;
+  padding: 0 13px;
+  border-radius: var(--radius-lg);
+  border-bottom: 1px solid var(--nt-gray-minimal);
+
+  /* 内部 SettingFormItem 分隔线 */
+  .form-item {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 14px;
+      right: 14px;
+      border-bottom: 1px solid var(--nt-gray-minimal);
+    }
+
+    &:last-child::after {
+      display: none;
+    }
+  }
+}
+
+/* ============================================================
+ * 深色模式覆盖
+ * ============================================================ */
+:root[data-theme='dark'] .reka-accordion__trigger,
+.dark .reka-accordion__trigger {
+  &::after {
+    background: var(--nt-gray-light);
+  }
+}

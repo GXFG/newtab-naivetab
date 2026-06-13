@@ -1,5 +1,10 @@
 export const WIDGET_CODE = 'weather'
 
+export const SCALABLE_FIELDS = {
+  fontSize: { min: 6, max: 60 },
+  iconSize: { min: 16, max: 120 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   apiKey: '72db57326f9f494ab04d1d431bc127e9',

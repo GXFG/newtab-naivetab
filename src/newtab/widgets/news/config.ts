@@ -1,5 +1,12 @@
 export const WIDGET_CODE = 'news'
 
+export const SCALABLE_FIELDS = {
+  width: { min: 160, max: 600 },
+  height: { min: 140, max: 600 },
+  margin: { min: 0, max: 20 },
+  borderRadius: { min: 0, max: 20 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   sourceList: ['toutiao', 'baidu'] as NewsSources[],

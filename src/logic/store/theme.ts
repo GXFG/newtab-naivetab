@@ -20,13 +20,6 @@ osDarkQuery.addEventListener('change', (e) => {
 })
 
 watch(
-  () => localConfig.general.lang,
-  (lang) => {
-    setLocale(lang)
-  },
-)
-
-watch(
   [osTheme, () => localConfig.general.appearance],
   () => {
     if (localConfig.general.appearance === 'auto') {
@@ -45,6 +38,13 @@ watch(
   },
   {
     immediate: true,
+  },
+)
+
+watch(
+  () => localConfig.general.lang,
+  (lang) => {
+    setLocale(lang)
   },
 )
 

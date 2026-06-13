@@ -1,5 +1,15 @@
 export const WIDGET_CODE = 'bookmarkFolder'
 
+export const SCALABLE_FIELDS = {
+  width: { min: 150, max: 600 },
+  height: { min: 100, max: 400 },
+  padding: { min: 10, max: 200 },
+  borderRadius: { min: 0, max: 30 },
+  itemHeight: { min: 24, max: 120 },
+  itemBorderRadius: { min: 0, max: 30 },
+  iconSize: { min: 8, max: 40 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   isNewTabOpen: true,
@@ -19,7 +29,7 @@ export const WIDGET_CONFIG = {
     yOffsetValue: 50,
     yTranslateValue: -50,
   },
-  padding: 7,
+  padding: 78,
   width: 300,
   height: 175,
   borderRadius: 10,

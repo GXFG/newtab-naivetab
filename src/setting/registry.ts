@@ -24,7 +24,7 @@ import AboutIndexPane from './panes/aboutIndex/index.vue'
 /**
  * 设置面板元数据
  */
-type SettingMeta = {
+export type SettingMeta = {
   component: Component
   code: settingPanes
   iconName: string

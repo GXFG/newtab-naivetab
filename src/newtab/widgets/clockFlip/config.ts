@@ -1,5 +1,13 @@
 export const WIDGET_CODE = 'clockFlip'
 
+export const SCALABLE_FIELDS = {
+  width: { min: 20, max: 200 },
+  height: { min: 30, max: 300 },
+  fontSize: { min: 20, max: 200 },
+  cardGap: { min: 1, max: 30 },
+  borderRadius: { min: 2, max: 40 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: true,
   layout: {

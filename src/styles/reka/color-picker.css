@@ -1,11 +1,14 @@
 /* ============================================================
  * Color Picker（颜色选择器，基于 Reka UI Color 原语）
  *
- * 布局：ColorArea（SV 面板）→ Hue Slider（色相条）→ Swatches（预设色板）
+ * 布局：ColorArea（SV 面板）→ Hue Slider（色相条）
+ *      → Alpha Slider（透明度条）→ Input（颜色值输入）→ Swatches（预设色板）
  *
  * 设计意图：
  *   area      → 2D 渐变面板 + 白色圆形指示器（十字准星）
- *   slider    → 彩虹渐变条 + 白色圆形滑块
+ *   hue       → 彩虹渐变条 + 白色圆形滑块
+ *   alpha     → checkerboard 透出透明度 + 白/黑渐变 + 白色圆形滑块
+ *   input     → 等宽字体颜色值输入框，支持 hex/rgb/rgba
  *   swatches  → 预设色块网格 + 选中环高亮
  *   dark      → 边框/阴影切换
  * ============================================================ */
@@ -16,11 +19,11 @@
   width: 180px;
   height: 180px;
   border-radius: var(--radius-md);
-  /* overflow: hidden 确保渐变不超出圆角 */
+  overflow: hidden; /* 裁剪 ColorAreaThumb 超出圆角的部分（thumb 14px 圆形，边缘处一半溢出） */
 }
 
 .reka-color-picker__area-area {
-  position: relative;  /* 为 thumb absolute 定位建立包含块 */
+  position: relative; /* 为 thumb absolute 定位建立包含块 */
   width: 100%;
   height: 100%;
   border-radius: inherit;
@@ -43,7 +46,7 @@
 /* ---- ColorSlider：色相条 ---- */
 .reka-color-picker__hue-slider {
   display: block;
-  position: relative;  /* 为 thumb 的 absolute 定位建立包含块 */
+  position: relative; /* 为 thumb 的 absolute 定位建立包含块 */
   width: 180px;
   height: 12px;
   margin-top: 8px;
@@ -51,7 +54,7 @@
 }
 
 .reka-color-picker__hue-track {
-  display: block;  /* ColorSliderTrack 渲染为 span，inline 忽略宽高 */
+  display: block; /* ColorSliderTrack 渲染为 span，inline 忽略宽高 */
   width: 100%;
   height: 100%;
   border-radius: inherit;
@@ -64,7 +67,51 @@
   width: 16px;
   height: 16px;
   top: 50%;
-  margin-top: -8px;  /* 垂直居中：Reka 只设了 translateX(-50%)，不含 translateY */
+  margin-top: -8px; /* 垂直居中：Reka 只设了 translateX(-50%)，不含 translateY */
+  border-radius: 50%;
+  background-color: white;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* ---- ColorSlider：透明度条 ---- */
+.reka-color-picker__alpha-slider {
+  display: block;
+  position: relative; /* 为 thumb 的 absolute 定位建立包含块 */
+  width: 180px;
+  height: 12px;
+  margin-top: 8px;
+  border-radius: var(--radius-pill);
+  /* checkerboard 透出透明度，渐变层由 Reka Track 自动计算叠加 */
+  background-image:
+    linear-gradient(45deg, var(--nt-gray-light) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--nt-gray-light) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--nt-gray-light) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--nt-gray-light) 75%);
+  background-size: 8px 8px;
+  background-position:
+    0 0,
+    0 4px,
+    4px -4px,
+    -4px 0px;
+}
+
+.reka-color-picker__alpha-track {
+  display: block; /* ColorSliderTrack 渲染为 span，inline 忽略宽高 */
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* ---- ColorSliderThumb：透明度条滑块（与色相滑块共用尺寸） ---- */
+.reka-color-picker__alpha-thumb {
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  margin-top: -8px;
   border-radius: 50%;
   background-color: white;
   box-shadow:
@@ -86,34 +133,105 @@
   display: inline-block;
   width: 18px;
   height: 18px;
+  outline: none;
   border-radius: var(--radius-sm);
   cursor: var(--reka-cursor-interactive);
   box-sizing: border-box;
-  border: 2px solid var(--nt-gray-light);
-  transition: border-color var(--transition-fast),
-              box-shadow var(--transition-fast);
 }
 
-.reka-color-picker__swatch-item:hover {
-  border-color: var(--nt-gray-medium);
-}
-
-.reka-color-picker__swatch-item[data-state='checked'] {
-  border-color: var(--nt-primary-color);
-  box-shadow: 0 0 0 1px var(--nt-primary-color);
-}
-
+/*
+ * 交互效果全部通过子元素 .swatch-color 的 box-shadow 实现（与 input 体系一致）。
+ * 之所以放在子元素上：父元素的 inset box-shadow 会被子元素背景色覆盖（CSS 绘制顺序）。
+ * 子元素没有更深的后代，inset 完整可见。
+ */
 .reka-color-picker__swatch-color {
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 2px;
+  /* 与 input 一致的 box-shadow 体系：inset 内边框 + 外光环预留 2px 透明 */
+  box-shadow:
+    inset 0 0 0 2px var(--nt-gray-light),
+    0 0 0 2px transparent;
+  transition: box-shadow var(--transition-fast);
+}
+
+/* ListboxItem 渲染为 <div>，禁用态通过 data-disabled 属性表达，不用 :disabled */
+/* Hover 仅加深内边框，不出外光环（与 input hover 行为一致） */
+.reka-color-picker__swatch-item:not([data-disabled]):hover .reka-color-picker__swatch-color {
+  box-shadow:
+    inset 0 0 0 2px var(--nt-gray-medium),
+    0 0 0 2px color-mix(in srgb, var(--nt-gray-medium) 50%, transparent);
+}
+
+/* Checked：内边框主题色 + 外光环可见。50% 不透明度确保在白色等浅色色块上也能辨识 */
+.reka-color-picker__swatch-item[data-state='checked'] .reka-color-picker__swatch-color {
+  box-shadow:
+    inset 0 0 0 2px var(--nt-gray-solid),
+    0 0 0 2px color-mix(in srgb, var(--nt-gray-solid) 50%, transparent);
+}
+
+/* focus-visible：与 checked 相同，键盘导航时也有完整高亮 */
+.reka-color-picker__swatch-item:focus-visible .reka-color-picker__swatch-color {
+  box-shadow:
+    inset 0 0 0 2px var(--nt-gray-solid),
+    0 0 0 2px color-mix(in srgb, var(--nt-gray-solid) 50%, transparent);
+}
+
+/* checked + focus-visible：保持与 checked 一致的样式 */
+.reka-color-picker__swatch-item[data-state='checked']:focus-visible .reka-color-picker__swatch-color {
+  box-shadow:
+    inset 0 0 0 2px var(--nt-gray-solid),
+    0 0 0 2px color-mix(in srgb, var(--nt-gray-solid) 50%, transparent);
+}
+
+/* ---- 颜色值输入框（原生 input，支持 hex/rgb/rgba 输入） ---- */
+.reka-color-picker__input {
+  all: unset;
+  display: block;
+  box-sizing: border-box;
+  width: 180px;
+  height: 28px;
+  margin-top: 8px;
+  padding: 0 8px;
+  border-radius: var(--radius-md);
+  background-color: var(--reka-surface-bg);
+  font-size: var(--text-sm);
+  line-height: 28px;
+  font-family: var(--font-mono);
+  cursor: text;
+  /* border 用 inset box-shadow 替代，外光环预留 2px 透明，focus 时着色无抖动 */
+  box-shadow:
+    inset 0 0 0 1px var(--nt-gray-medium),
+    0 0 0 2px transparent;
+  transition: box-shadow var(--transition-fast);
+}
+
+.reka-color-picker__input::placeholder {
+  opacity: var(--opacity-secondary);
+}
+
+.reka-color-picker__input:not(:disabled):hover {
+  box-shadow:
+    inset 0 0 0 1px var(--nt-gray-heavy),
+    0 0 0 2px transparent;
+}
+
+.reka-color-picker__input:not(:disabled):focus {
+  box-shadow:
+    inset 0 0 0 1px var(--nt-primary-color),
+    0 0 0 2px color-mix(in srgb, var(--nt-primary-color) 25%, transparent);
+}
+
+.reka-color-picker__input:disabled {
+  opacity: var(--opacity-muted);
+  cursor: var(--reka-cursor-disabled);
 }
 
 /* ============================================================
  * 深色模式覆盖（原则5：双模式自适应）
  *
- * Thumb 背景降纯 + 阴影切换为白色通道。
+ * Thumb 背景降纯 + 阴影切换为白色通道 + input 适配。
  * ============================================================ */
 :root[data-theme='dark'] .reka-color-picker__area-thumb,
 .dark .reka-color-picker__area-thumb {
@@ -131,14 +249,36 @@
     0 1px 3px rgba(255, 255, 255, 0.15);
 }
 
+:root[data-theme='dark'] .reka-color-picker__alpha-thumb,
+.dark .reka-color-picker__alpha-thumb {
+  background-color: #f0f0f0;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 1px 3px rgba(255, 255, 255, 0.15);
+}
+
+/* 深色模式 checkerboard 颜色加深 */
+:root[data-theme='dark'] .reka-color-picker__alpha-slider,
+.dark .reka-color-picker__alpha-slider {
+  background-image:
+    linear-gradient(45deg, var(--nt-gray-moderate) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--nt-gray-moderate) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--nt-gray-moderate) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--nt-gray-moderate) 75%);
+}
+
 /* ============================================================
  * 强制色彩模式
  * ============================================================ */
 @media (forced-colors: active) {
+  /* forced-colors 下 box-shadow 被忽略，用 border 在父元素提供可见边框 */
   .reka-color-picker__swatch-item {
     border: 2px solid ButtonText;
   }
   .reka-color-picker__swatch-item[data-state='checked'] {
     border-color: Highlight;
+  }
+  .reka-color-picker__swatch-color {
+    box-shadow: none;
   }
 }

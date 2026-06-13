@@ -3,7 +3,6 @@ import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import { localConfig } from '@/logic/config/state'
 import { ICONS } from '@/logic/constants/icons'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormSection,
@@ -46,8 +45,6 @@ const durationSeconds = computed({
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.countdown')" />
-
   <SettingFormWrap widget-code="countdown">
     <!-- 计时器显示 -->
     <SettingFormSection

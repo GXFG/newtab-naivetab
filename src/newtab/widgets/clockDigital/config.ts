@@ -1,5 +1,11 @@
 export const WIDGET_CODE = 'clockDigital'
 
+export const SCALABLE_FIELDS = {
+  fontSize: { min: 50, max: 500 },
+  width: { min: 10, max: 200 },
+  'unit.fontSize': { min: 8, max: 120 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   format: 'HH:mm:ss',

@@ -1,5 +1,16 @@
 export const WIDGET_CODE = 'yearProgress'
 
+export const SCALABLE_FIELDS = {
+  width: { min: 200, max: 700 },
+  height: { min: 60, max: 300 },
+  padding: { min: 2, max: 30 },
+  borderRadius: { min: 0, max: 20 },
+  fontSize: { min: 8, max: 40 },
+  blockSize: { min: 1, max: 12 },
+  blockMargin: { min: 0, max: 5 },
+  blockRadius: { min: 0, max: 5 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   layout: {

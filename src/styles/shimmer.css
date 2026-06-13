@@ -1,0 +1,729 @@
+/* ============================================================
+ * 幻彩效果样式表（shimmer.css）
+ *
+ * 纯 CSS 动画背景，8 种效果，通过 .shimmer--{name} class 切换。
+ * 颜色由 BackgroundShimmer.vue 通过 :style 注入 CSS 变量
+ * --shimmer-c1 ～ --shimmer-c6。
+ *
+ * 动画通过 @property 注册自定义属性实现 GPU 合成线程动画
+ * （不触发主线程重排/重绘）。
+ *
+ * 暂停机制：visibilitychange 事件控制 animation-play-state。
+ * ============================================================ */
+
+/* ═══════════════════════════════════════════════════════════
+   可动画的 CSS 自定义属性
+   逐个注册，确保浏览器能合成线程插值。
+   ═══════════════════════════════════════════════════════════ */
+
+@property --shimmer-pos1 {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+@property --shimmer-pos2 {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 40%;
+}
+@property --shimmer-pos3 {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 60%;
+}
+@property --shimmer-size1 {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 100%;
+}
+@property --shimmer-size2 {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 60%;
+}
+@property --shimmer-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* === 新效果用属性 === */
+@property --shimmer-curtain-offset {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+@property --shimmer-lava-offset {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   基础容器
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   纹理叠加层（shimmer__texture）
+   全局应用于所有幻彩效果，作为兄弟 div 叠加在主效果上方。
+   提供颗粒感 + 暗角 + 微呼吸，提升整体质感。
+   主效果的 ::before/::after 不受影响（不同元素）。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer__texture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+  animation: shimmer-texture-breathe 15s ease-in-out infinite alternate;
+  animation-duration: calc(15s / var(--shimmer-speed, 1));
+}
+
+/* 1. 有机胶片颗粒（SVG feTurbulence） */
+.shimmer__texture::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: shimmer-noise-shift 0.8s steps(3) infinite;
+  animation-duration: calc(0.8s / var(--shimmer-speed, 1));
+}
+
+/* 2. 暗角光晕 */
+.shimmer__texture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.08) 100%);
+  pointer-events: none;
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ * 核心规则：浅色用黑半透暗角，深色用白半透微光。
+ * ============================================================ */
+
+/* 暗角光晕：浅色黑半透 → 深色白半透（微光环抱） */
+:root[data-theme='dark'] .shimmer__texture::after,
+.dark .shimmer__texture::after {
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(255, 255, 255, 0.04) 100%);
+}
+
+@keyframes shimmer-texture-breathe {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   1. 极光（Aurora）
+      巨大模糊椭圆缓慢旋转漂移，模拟极光在夜空中流动。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--aurora {
+  background:
+    radial-gradient(ellipse 80% 50% at var(--shimmer-pos1) 45%, var(--shimmer-c1), transparent 60%),
+    radial-gradient(ellipse 60% 40% at var(--shimmer-pos2) 55%, var(--shimmer-c2), transparent 50%),
+    radial-gradient(ellipse 50% 35% at var(--shimmer-pos3) 40%, var(--shimmer-c3), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 60%, var(--shimmer-c4), transparent 45%);
+  filter: blur(60px);
+  background-blend-mode: screen;
+  animation: shimmer-aurora 8s ease-in-out infinite alternate;
+  animation-duration: calc(8s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-aurora {
+  0% {
+    --shimmer-pos1: 10%;
+    --shimmer-pos2: 55%;
+    --shimmer-pos3: 80%;
+  }
+  100% {
+    --shimmer-pos1: 70%;
+    --shimmer-pos2: 30%;
+    --shimmer-pos3: 50%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   2. 流体（Fluid）
+      多层径向渐变中心缓慢漂移，模拟流体表面张力变形。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--fluid {
+  background:
+    radial-gradient(circle at 30% var(--shimmer-pos1), var(--shimmer-c1), transparent 45%),
+    radial-gradient(circle at 70% var(--shimmer-pos2), var(--shimmer-c2), transparent 40%),
+    radial-gradient(circle at var(--shimmer-pos3) 60%, var(--shimmer-c3), transparent 35%),
+    radial-gradient(circle at 50% 50%, var(--shimmer-c4), transparent 30%);
+  background-blend-mode: overlay;
+  animation: shimmer-fluid 10s ease-in-out infinite alternate;
+  animation-duration: calc(10s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-fluid {
+  0% {
+    --shimmer-pos1: 25%;
+    --shimmer-pos2: 30%;
+    --shimmer-pos3: 20%;
+  }
+  50% {
+    --shimmer-pos1: 50%;
+    --shimmer-pos2: 50%;
+    --shimmer-pos3: 50%;
+  }
+  100% {
+    --shimmer-pos1: 75%;
+    --shimmer-pos2: 70%;
+    --shimmer-pos3: 80%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   3. 波浪（Waves）
+      重复渐变条纹波动，模拟水面涟漪。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--waves {
+  background:
+    repeating-linear-gradient(
+      var(--shimmer-angle),
+      var(--shimmer-c1) 0%,
+      var(--shimmer-c2) 5%,
+      transparent 10%,
+      var(--shimmer-c3) 15%,
+      var(--shimmer-c1) 20%
+    );
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  animation: shimmer-waves-angle 10s linear infinite, shimmer-waves-pos 6s ease-in-out infinite alternate;
+  animation-duration: calc(10s / var(--shimmer-speed, 1)), calc(6s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-waves-angle {
+  0% {
+    --shimmer-angle: 0deg;
+  }
+  100% {
+    --shimmer-angle: 360deg;
+  }
+}
+
+@keyframes shimmer-waves-pos {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 60%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   4. 色彩漂移（Drift）
+      锥形渐变色相环缓慢旋转，冷暖色交替过渡。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--drift {
+  background:
+    conic-gradient(
+      from var(--shimmer-angle) at 50% 50%,
+      var(--shimmer-c1),
+      var(--shimmer-c2),
+      var(--shimmer-c3),
+      var(--shimmer-c4),
+      var(--shimmer-c5),
+      var(--shimmer-c6),
+      var(--shimmer-c1)
+    );
+  animation: shimmer-drift 20s linear infinite;
+  animation-duration: calc(20s / var(--shimmer-speed, 1));
+  filter: blur(40px);
+}
+
+@keyframes shimmer-drift {
+  0% {
+    --shimmer-angle: 0deg;
+  }
+  100% {
+    --shimmer-angle: 360deg;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   5. 墨团（Blobs）
+      ::before/::after 有机形状变形浮动，模拟菌落/墨团。
+      利用 border-radius + transform 变形 + filter blur 柔和边缘。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--blobs {
+  filter: blur(50px);
+}
+
+.shimmer--blobs::before,
+.shimmer--blobs::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  border-radius: 40%;
+  animation: shimmer-blobs 12s ease-in-out infinite alternate;
+  animation-duration: calc(12s / var(--shimmer-speed, 1));
+  pointer-events: none;
+}
+
+.shimmer--blobs::before {
+  background: var(--shimmer-c1);
+  top: -5%;
+  left: -5%;
+  animation-duration: calc(12s / var(--shimmer-speed, 1));
+}
+
+.shimmer--blobs::after {
+  background: var(--shimmer-c2);
+  bottom: -10%;
+  right: -5%;
+  animation-duration: calc(10s / var(--shimmer-speed, 1));
+  animation-delay: -3s;
+}
+
+/* 第三/第四墨团用额外层，通过 box-shadow 展示更多颜色 */
+.shimmer--blobs {
+  box-shadow:
+    inset 0 0 0 100vmax var(--shimmer-c3),
+    inset 50vmax 20vmax 0 0 var(--shimmer-c4),
+    inset -30vmax -10vmax 0 0 var(--shimmer-c5),
+    inset 10vmax -40vmax 0 0 var(--shimmer-c6);
+}
+
+@keyframes shimmer-blobs {
+  0% {
+    border-radius: 40%;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    border-radius: 30% 60% 40% 50%;
+    transform: translate(10%, 8%) scale(1.1) rotate(45deg);
+  }
+  50% {
+    border-radius: 50% 30% 60% 40%;
+    transform: translate(-5%, 15%) scale(0.9) rotate(90deg);
+  }
+  75% {
+    border-radius: 60% 40% 30% 50%;
+    transform: translate(8%, -5%) scale(1.05) rotate(135deg);
+  }
+  100% {
+    border-radius: 40% 50% 50% 30%;
+    transform: translate(-8%, 5%) scale(0.95) rotate(180deg);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   6. 网格渐变（Mesh）
+      多点径向渐变交织成网格状色彩分布，模拟 Mesh Gradient。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--mesh {
+  background:
+    radial-gradient(circle at var(--shimmer-pos1) 30%, var(--shimmer-c1), transparent 50%),
+    radial-gradient(circle at var(--shimmer-pos2) 20%, var(--shimmer-c2), transparent 45%),
+    radial-gradient(circle at var(--shimmer-pos3) 80%, var(--shimmer-c3), transparent 45%),
+    radial-gradient(circle at 20% 70%, var(--shimmer-c4), transparent 40%),
+    radial-gradient(circle at 50% 50%, var(--shimmer-c5), transparent 50%);
+  background-blend-mode: normal;
+  animation: shimmer-mesh 14s ease-in-out infinite alternate;
+  animation-duration: calc(14s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-mesh {
+  0% {
+    --shimmer-pos1: 20%;
+    --shimmer-pos2: 80%;
+    --shimmer-pos3: 70%;
+  }
+  50% {
+    --shimmer-pos1: 50%;
+    --shimmer-pos2: 50%;
+    --shimmer-pos3: 50%;
+  }
+  100% {
+    --shimmer-pos1: 80%;
+    --shimmer-pos2: 20%;
+    --shimmer-pos3: 30%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   7. 噪点纹理（Noise）
+      细微颗粒感叠加层，模拟胶片颗粒/纸张质感。
+      使用 SVG feTurbulence 作为背景图（非 filter 形式，性能更好）。
+      注意：noise 效果有两层噪声叠加——效果层自身的 ::after SVG 颗粒 +
+      全局 .shimmer__texture 纹理层的 ::before SVG 颗粒。这是有意设计，
+      noise 效果追求更重的颗粒质感，双层叠加达到预期视觉密度。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--noise {
+  background:
+    radial-gradient(ellipse at var(--shimmer-pos1) 50%, var(--shimmer-c1), var(--shimmer-c2), var(--shimmer-c3), var(--shimmer-c4)),
+    repeating-conic-gradient(var(--shimmer-c5) 0% 25%, transparent 0% 50%) 50% 50% / 60% 60%;
+  animation: shimmer-noise-grad 8s ease-in-out infinite alternate;
+  animation-duration: calc(8s / var(--shimmer-speed, 1));
+}
+
+.shimmer--noise::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  pointer-events: none;
+  animation: shimmer-noise-shift 0.5s steps(4) infinite;
+  animation-duration: calc(0.5s / var(--shimmer-speed, 1));
+  opacity: 0.5;
+}
+
+@keyframes shimmer-noise-grad {
+  0% {
+    --shimmer-pos1: 20%;
+    --shimmer-pos2: 60%;
+    --shimmer-pos3: 80%;
+  }
+  100% {
+    --shimmer-pos1: 60%;
+    --shimmer-pos2: 30%;
+    --shimmer-pos3: 40%;
+  }
+}
+
+@keyframes shimmer-noise-shift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(2%, 1%);
+  }
+  50% {
+    transform: translate(1%, 2%);
+  }
+  75% {
+    transform: translate(2%, 2%);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   8. 涟漪（Ripple）
+      同心圆扩散效果，模拟水面涟漪或声波。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--ripple {
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0%, var(--shimmer-c1) var(--shimmer-size1), transparent var(--shimmer-size2)),
+    radial-gradient(circle at 50% 50%, transparent 20%, var(--shimmer-c2) 40%, transparent 55%),
+    radial-gradient(circle at 50% 50%, var(--shimmer-c3), var(--shimmer-c4), var(--shimmer-c5));
+  background-size: 100% 100%;
+  animation: shimmer-ripple 6s ease-in-out infinite alternate;
+  animation-duration: calc(6s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-ripple {
+  0% {
+    --shimmer-size1: 20%;
+    --shimmer-size2: 30%;
+  }
+  50% {
+    --shimmer-size1: 40%;
+    --shimmer-size2: 55%;
+  }
+  100% {
+    --shimmer-size1: 25%;
+    --shimmer-size2: 40%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   9. 星云（Nebula）
+      多层大模糊椭圆弥漫效果，色彩在画面上缓慢漂移混合。
+      Screen 混合模式模拟星云发光，100px 模糊营造深邃感。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--nebula {
+  background:
+    radial-gradient(ellipse 80% 50% at var(--shimmer-pos1) 40%, var(--shimmer-c1), transparent 50%),
+    radial-gradient(ellipse 60% 60% at var(--shimmer-pos2) 60%, var(--shimmer-c2), transparent 45%),
+    radial-gradient(ellipse 50% 40% at var(--shimmer-pos3) 50%, var(--shimmer-c3), transparent 40%),
+    radial-gradient(ellipse 40% 50% at 30% 70%, var(--shimmer-c4), transparent 50%),
+    radial-gradient(ellipse 35% 55% at 70% 30%, var(--shimmer-c5), transparent 45%);
+  filter: blur(100px);
+  background-blend-mode: screen;
+  animation: shimmer-nebula 25s ease-in-out infinite alternate;
+  animation-duration: calc(25s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-nebula {
+  0% {
+    --shimmer-pos1: 15%;
+    --shimmer-pos2: 25%;
+    --shimmer-pos3: 40%;
+  }
+  50% {
+    --shimmer-pos1: 50%;
+    --shimmer-pos2: 60%;
+    --shimmer-pos3: 55%;
+  }
+  100% {
+    --shimmer-pos1: 75%;
+    --shimmer-pos2: 80%;
+    --shimmer-pos3: 65%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   10. 极光面纱（Veil）
+       垂直重复色带波动，模拟极光从天际垂落的面纱效果。
+       与 aurora（水平椭圆漂移）形成结构上的互补。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--veil {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--shimmer-c1) 0%,
+      transparent calc(var(--shimmer-curtain-offset) + 10%),
+      var(--shimmer-c2) calc(var(--shimmer-curtain-offset) + 20%),
+      transparent calc(var(--shimmer-curtain-offset) + 30%),
+      var(--shimmer-c3) calc(var(--shimmer-curtain-offset) + 40%),
+      transparent 50%
+    );
+  background-size: 300% 100%;
+  filter: blur(20px);
+  animation: shimmer-veil 10s ease-in-out infinite alternate;
+  animation-duration: calc(10s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-veil {
+  0% {
+    --shimmer-curtain-offset: 0%;
+  }
+  100% {
+    --shimmer-curtain-offset: 25%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   11. 棱镜（Prism）
+       线性光带在画面上旋转偏移，模拟光线穿过棱镜的色散。
+       与 drift（conic-gradient 色相环旋转）不同——Prism 是线性的。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--prism {
+  background:
+    linear-gradient(
+      var(--shimmer-angle),
+      var(--shimmer-c1) 0%,
+      var(--shimmer-c2) 10%,
+      var(--shimmer-c3) 20%,
+      transparent 33%,
+      var(--shimmer-c4) 50%,
+      var(--shimmer-c5) 60%,
+      var(--shimmer-c6) 70%,
+      transparent 83%,
+      var(--shimmer-c1) 100%
+    );
+  background-size: 300% 300%;
+  filter: blur(40px);
+  animation: shimmer-prism 16s linear infinite;
+  animation-duration: calc(16s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-prism {
+  0% {
+    --shimmer-angle: 0deg;
+  }
+  100% {
+    --shimmer-angle: 360deg;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   12. 星尘（Stardust）
+       深邃星空基底 + 星点闪烁 + 色彩尘埃云。
+       ::before 层用 SVG 散布微小星点，通过透明度动画模拟闪烁。
+       纹理层的噪点进一步强化"星际尘埃"质感。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--stardust {
+  background:
+    /* 深空基底 */
+    radial-gradient(ellipse 70% 60% at var(--shimmer-pos1) 40%, var(--shimmer-c1), transparent 60%),
+    radial-gradient(ellipse 50% 50% at var(--shimmer-pos2) 60%, var(--shimmer-c2), transparent 55%),
+    radial-gradient(ellipse 40% 45% at var(--shimmer-pos3) 30%, var(--shimmer-c3), transparent 50%);
+  background-blend-mode: screen;
+  animation: shimmer-stardust 25s ease-in-out infinite alternate;
+  animation-duration: calc(25s / var(--shimmer-speed, 1));
+}
+
+/* 星点场：SVG 散布的微小亮点 */
+.shimmer--stardust::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='12' r='0.5' fill='rgba(255,255,255,0.9)'/%3E%3Ccircle cx='25' cy='80' r='0.3' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='50' cy='22' r='0.7' fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='75' cy='115' r='0.4' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='105' cy='38' r='0.5' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='135' cy='88' r='0.3' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='165' cy='55' r='0.6' fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='185' cy='138' r='0.4' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='18' cy='168' r='0.5' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='55' cy='185' r='0.3' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='95' cy='155' r='0.6' fill='rgba(255,255,255,0.9)'/%3E%3Ccircle cx='145' cy='178' r='0.4' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='38' cy='48' r='0.3' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='85' cy='68' r='0.5' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='125' cy='108' r='0.4' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='175' cy='18' r='0.5' fill='rgba(255,255,255,0.7)'/%3E%3Ccircle cx='65' cy='145' r='0.3' fill='rgba(255,255,255,0.5)'/%3E%3Ccircle cx='155' cy='130' r='0.5' fill='rgba(255,255,255,0.8)'/%3E%3Ccircle cx='42' cy='95' r='0.4' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='112' cy='162' r='0.3' fill='rgba(255,255,255,0.5)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  pointer-events: none;
+  animation: shimmer-stardust-twinkle 6s ease-in-out infinite alternate;
+  animation-duration: calc(6s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-stardust {
+  0% {
+    --shimmer-pos1: 15%;
+    --shimmer-pos2: 30%;
+    --shimmer-pos3: 45%;
+  }
+  50% {
+    --shimmer-pos1: 45%;
+    --shimmer-pos2: 55%;
+    --shimmer-pos3: 40%;
+  }
+  100% {
+    --shimmer-pos1: 70%;
+    --shimmer-pos2: 40%;
+    --shimmer-pos3: 65%;
+  }
+}
+
+@keyframes shimmer-stardust-twinkle {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   13. 熔岩（Lava）
+       深色基底 + 流动亮色纹理，模拟熔岩在地表缓慢流淌。
+       两组不同角度的重复线性渐变叠加形成裂纹网络，
+       --shimmer-lava-offset 驱动整体流动。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--lava {
+  background:
+    /* 深色基底 */
+    radial-gradient(ellipse at 50% 50%, var(--shimmer-c4), var(--shimmer-c5) 50%, var(--shimmer-c6) 100%),
+    /* 裂纹方向 1 */
+    repeating-linear-gradient(
+      45deg,
+      transparent 0%,
+      var(--shimmer-c1) calc(var(--shimmer-lava-offset) + 3%),
+      transparent calc(var(--shimmer-lava-offset) + 7%),
+      var(--shimmer-c2) calc(var(--shimmer-lava-offset) + 11%),
+      transparent calc(var(--shimmer-lava-offset) + 16%)
+    ),
+    /* 裂纹方向 2 */
+    repeating-linear-gradient(
+      -30deg,
+      transparent 1%,
+      var(--shimmer-c3) calc(var(--shimmer-lava-offset) + 5%),
+      transparent calc(var(--shimmer-lava-offset) + 9%),
+      var(--shimmer-c1) calc(var(--shimmer-lava-offset) + 13%),
+      transparent calc(var(--shimmer-lava-offset) + 20%)
+    );
+  background-size: 100% 100%, 300% 300%, 300% 300%;
+  animation: shimmer-lava 8s ease-in-out infinite alternate;
+  animation-duration: calc(8s / var(--shimmer-speed, 1));
+  filter: blur(3px);
+}
+
+@keyframes shimmer-lava {
+  0% {
+    --shimmer-lava-offset: 0%;
+  }
+  100% {
+    --shimmer-lava-offset: 20%;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   14. 烟霞（Mist）
+       大范围柔和色块缓慢漂移，模拟晨雾/烟霞在山间缭绕。
+       150px 极大模糊 + normal 混合，营造朦胧柔和的氛围。
+   ═══════════════════════════════════════════════════════════ */
+
+.shimmer--mist {
+  background:
+    /* 基底雾层 */
+    radial-gradient(ellipse 100% 90% at 50% 50%, var(--shimmer-c4), transparent 60%),
+    /* 漂移雾团 */
+    radial-gradient(ellipse 60% 30% at var(--shimmer-pos1) 40%, var(--shimmer-c1), transparent 50%),
+    radial-gradient(ellipse 50% 35% at var(--shimmer-pos2) 55%, var(--shimmer-c2), transparent 45%),
+    radial-gradient(ellipse 40% 25% at var(--shimmer-pos3) 45%, var(--shimmer-c3), transparent 45%),
+    radial-gradient(ellipse 70% 20% at 65% 50%, var(--shimmer-c5), transparent 50%);
+  filter: blur(150px);
+  background-blend-mode: normal;
+  animation: shimmer-mist 22s ease-in-out infinite alternate;
+  animation-duration: calc(22s / var(--shimmer-speed, 1));
+}
+
+@keyframes shimmer-mist {
+  0% {
+    --shimmer-pos1: 15%;
+    --shimmer-pos2: 65%;
+    --shimmer-pos3: 30%;
+  }
+  50% {
+    --shimmer-pos1: 45%;
+    --shimmer-pos2: 40%;
+    --shimmer-pos3: 55%;
+  }
+  100% {
+    --shimmer-pos1: 75%;
+    --shimmer-pos2: 25%;
+    --shimmer-pos3: 70%;
+  }
+}

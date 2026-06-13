@@ -2,7 +2,6 @@
 import { Icon } from '@iconify/vue'
 import { useStorage } from '@vueuse/core'
 import { ICONS } from '@/logic/constants/icons'
-import { SettingHeaderBar } from '@/setting/components'
 import SponsorToastItem from './SponsorToastItem.vue'
 
 const paymentList = ['wechat', 'alipay']
@@ -27,8 +26,6 @@ const removeToast = (id: string) => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('sponsor.title')" />
-
   <div class="setting__pane-content">
     <!-- 文案卡片 -->
     <div class="sponsor__intro">

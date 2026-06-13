@@ -12,7 +12,7 @@ export const FAVORITE_SWATCHE_MAX_COUNT = 24
 export const LOCAL_BACKGROUND_IMAGE_MAX_SIZE_M = 15
 
 /** 二级 Drawer 宽度，应小于父级 NTDrawer */
-export const SECOND_MODAL_WIDTH = 570
+export const SECOND_MODAL_WIDTH = 590
 
 export const TEXT_ALIGN_TO_JUSTIFY_CONTENT_MAP = {
   left: 'flex-start',

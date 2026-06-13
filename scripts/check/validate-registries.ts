@@ -77,7 +77,8 @@ const extractRegistryKeys = (source: string): string[] => {
 // 从源码中提取 WIDGET_ICON_META 的 keys
 const extractWidgetIconMetaKeys = (source: string): string[] => {
   const regex =
-    /export const WIDGET_ICON_META\s*:\s*Record<WidgetCodes,\s*WidgetIconMeta>\s*=\s*\{([\s\S]*?)\n\}/
+    /export const WIDGET_ICON_META\s*:\s*Record<WidgetCodes,\s*WidgetIconMeta>\s*=\s*\{([\s\S]*?)\n\s*\}/
+
   const match = source.match(regex)
   if (!match) return []
   return match[1]
@@ -294,7 +295,7 @@ const checkI18nUsage = () => {
 
   // 提取所有引用的 i18n key
   const usedKeys = new Set<string>()
-  const dynamicPatterns: string[] = [] // 无法静态分析的模板字符串 key
+  const shimmerPatterns: string[] = [] // 无法静态分析的模板字符串 key
 
   for (const file of sourceFiles) {
     const content = readFileSync(file, 'utf-8')
@@ -312,7 +313,7 @@ const checkI18nUsage = () => {
       // 如果包含 ${ 说明是动态的
       if (pattern.includes('${')) {
         const relativePath = file.replace(ROOT + '/', '')
-        dynamicPatterns.push(`${relativePath}: \`${pattern}\``)
+        shimmerPatterns.push(`${relativePath}: \`${pattern}\``)
       }
     }
   }
@@ -346,17 +347,17 @@ const checkI18nUsage = () => {
   }
 
   // ── 报告动态模板字符串调用（无法静态校验） ──
-  if (dynamicPatterns.length > 0) {
-    warn(`${dynamicPatterns.length} 处使用模板字符串调用 $t，无法静态校验:`)
-    for (const p of dynamicPatterns.slice(0, 5)) {
+  if (shimmerPatterns.length > 0) {
+    warn(`${shimmerPatterns.length} 处使用模板字符串调用 $t，无法静态校验:`)
+    for (const p of shimmerPatterns.slice(0, 5)) {
       console.log(`     ${p}`)
     }
-    if (dynamicPatterns.length > 5) {
-      console.log(`     ... 等 ${dynamicPatterns.length} 处`)
+    if (shimmerPatterns.length > 5) {
+      console.log(`     ... 等 ${shimmerPatterns.length} 处`)
     }
   }
 
-  // 仅 missingKeys 阻断 pre-commit，unusedKeys 和 dynamicPatterns 仅警告
+  // 仅 missingKeys 阻断 pre-commit，unusedKeys 和 shimmerPatterns 仅警告
   if (missingKeys.length === 0) {
     ok('i18n key 使用校验通过')
   }

@@ -4,7 +4,6 @@ import NTSelect from '@/components/ui/NTSelect.vue'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormInlineRow,
   SettingFormSection,
@@ -59,8 +58,6 @@ const handleFormatChange = (value: string) => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.yearProgress')" />
-
   <SettingFormWrap widget-code="yearProgress">
     <!-- 左侧文字配置 -->
     <SettingFormSection

@@ -62,7 +62,7 @@ watch(isRender, (value) => {
 #weather {
   user-select: none;
   .weather__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     text-align: center;
     font-family: var(--nt-w-font-family);

@@ -1,0 +1,103 @@
+/* ============================================================
+ * ScrollArea（自定义滚动区域，基于 Reka UI ScrollArea 原语）
+ *
+ * 设计意图：
+ *   scrollbar → 透明 + padding 2px（防误触），8px 宽，hover 时 thumb 显现
+ *   thumb    → 圆角胶囊，中性灰底色，hover 加深，active 最实
+ *   dark     → thumb 暗色模式微调
+ * ============================================================ */
+
+/* ---- Root：仅需接管尺寸 ---- */
+.reka-scroll-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Viewport：内容容器 ---- */
+.reka-scroll-area__viewport {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Scrollbar：轨道 ---- */
+.reka-scroll-area__scrollbar {
+  display: flex;
+  user-select: none;
+  touch-action: none;
+  padding: 2px;
+  background: transparent;
+}
+
+/* 退场动画：Presence 监听到 animationend 后才卸载 DOM，确保平滑淡出 */
+.reka-scroll-area__scrollbar[data-state='hidden'] {
+  animation: reka-scrollbar-fade-out 150ms ease forwards;
+}
+
+@keyframes reka-scrollbar-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* 垂直滚动条 */
+.reka-scroll-area__scrollbar[data-orientation='vertical'] {
+  width: 8px;
+}
+
+/* 水平滚动条（预留） */
+.reka-scroll-area__scrollbar[data-orientation='horizontal'] {
+  flex-direction: column;
+  height: 8px;
+}
+
+/* ---- Thumb：滚动滑块 ---- */
+.reka-scroll-area__thumb {
+  position: relative;
+  flex: 1;
+  background: var(--nt-gray-medium);
+  border-radius: var(--radius-pill);
+  /* 最小高度由 Reka 动态计算（getThumbSize），此处保证可见性 */
+  min-height: 18px;
+  transition: background-color var(--transition-fast);
+  cursor: var(--reka-cursor-interactive);
+}
+
+/* Hover 加深 */
+.reka-scroll-area__thumb:hover {
+  background: var(--nt-gray-heavy);
+}
+
+/* Active 最实 */
+.reka-scroll-area__thumb:active {
+  background: var(--nt-gray-solid);
+}
+
+/* ---- Corner：两根滚动条交汇处 ---- */
+.reka-scroll-area__corner {
+  background: transparent;
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ * ============================================================ */
+:root[data-theme='dark'] .reka-scroll-area__thumb,
+.dark .reka-scroll-area__thumb {
+  background: var(--nt-gray-moderate);
+}
+
+:root[data-theme='dark'] .reka-scroll-area__thumb:hover,
+.dark .reka-scroll-area__thumb:hover {
+  background: var(--nt-gray-heavy);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-scroll-area__scrollbar {
+    background: ButtonFace;
+  }
+  .reka-scroll-area__thumb {
+    background: ButtonText;
+  }
+}

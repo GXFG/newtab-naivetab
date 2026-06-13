@@ -73,6 +73,7 @@ describe('store (isolated exports)', () => {
         currAppearanceCode: 0 as const,
         isUploadConfigStatusMap: { general: { dirty: false } },
         isFocusMode: false,
+        widgetInteractionOrder: [],
       },
     }))
 
@@ -200,20 +201,49 @@ describe('store (isolated exports)', () => {
       expect(result.value).toBe(28)
     })
 
-    it('converts number to vmin unit (with ×0.1 factor)', async () => {
+    it('converts vmin to damped calc() in auto mode', async () => {
       const { localConfig } = await import('@/logic/config/state')
+      localConfig.general.scaleMode = 'auto'
       localConfig.search.fontSize = 14
       const result = getStyleField('search', 'fontSize', 'vmin')
-      // 14 * 0.1 = 1.4 (floating point: 1.4000000000000001)
-      expect(result.value).toMatch(/^1\.4\d*vmin$/)
+      // VMIN_DAMPING=0.5: base=14×0.1=1.4, vmin=1.4×0.5=0.70, px=1.4×10.8×0.5=7.56
+      expect(result.value).toBe('calc(0.70vmin + 7.56px)')
     })
 
-    it('applies ratio + vmin together', async () => {
+    it('applies ratio before damping in auto mode', async () => {
       const { localConfig } = await import('@/logic/config/state')
+      localConfig.general.scaleMode = 'auto'
       localConfig.search.fontSize = 14
       const result = getStyleField('search', 'fontSize', 'vmin', 2)
-      // 14 * 2 * 0.1 = 2.8 (floating point: 2.8000000000000003)
-      expect(result.value).toMatch(/^2\.8\d*vmin$/)
+      // 14×2=28, base=28×0.1=2.8, vmin=2.8×0.5=1.40, px=2.8×10.8×0.5=15.12
+      expect(result.value).toBe('calc(1.40vmin + 15.12px)')
+    })
+
+    it('converts vmin to px when scaleMode is fixed (skip ×0.1)', async () => {
+      const { localConfig } = await import('@/logic/config/state')
+      localConfig.general.scaleMode = 'fixed'
+      localConfig.search.fontSize = 14
+      const result = getStyleField('search', 'fontSize', 'vmin')
+      // fixed 模式：不乘 0.1，直接拼接 px
+      expect(result.value).toBe('14px')
+    })
+
+    it('applies ratio in fixed mode (ratio applied, ×0.1 skipped)', async () => {
+      const { localConfig } = await import('@/logic/config/state')
+      localConfig.general.scaleMode = 'fixed'
+      localConfig.search.fontSize = 14
+      const result = getStyleField('search', 'fontSize', 'vmin', 2)
+      // 14 * 2 = 28px
+      expect(result.value).toBe('28px')
+    })
+
+    it('px unit is unaffected by scaleMode', async () => {
+      const { localConfig } = await import('@/logic/config/state')
+      localConfig.general.scaleMode = 'fixed'
+      localConfig.search.fontSize = 14
+      const result = getStyleField('search', 'fontSize', 'px')
+      // px 单位不受 scaleMode 影响
+      expect(result.value).toBe('14px')
     })
 
     it('appends px unit without scaling', async () => {

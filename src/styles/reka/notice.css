@@ -1,0 +1,129 @@
+/* ============================================================
+ * Notice（通知横幅）
+ *
+ * 纯展示组件，用于 breaking change 提示、表单校验错误、
+ * 操作成功反馈等信息展示场景。
+ *
+ * 设计意图：
+ *   - 半透语义色背景 + 边框，层次轻量不过度吸引注意力
+ *   - 图标色引用语义 token，深色模式自动适配
+ *   - 文字色使用 --nt-text-primary，深浅模式自动切换
+ * ============================================================ */
+
+/* 1. base — flex 行布局，圆角 + 半透底色 */
+.reka-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+}
+
+/* 2. icon — flex-shrink: 0 防止被压缩，字号与文字对齐 */
+.reka-notice__icon {
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+}
+
+/* 3. content — flex: 1 填充剩余空间。
+ * z-index: 0 — 内联渲染元素，非 Portal Content。显式设置以通过 check-patterns 检查。 */
+.reka-notice__content {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--nt-text-primary);
+  line-height: 1.6;
+  z-index: 0;
+}
+
+/* 4. bordered — 默认有边框；bordered=false 去掉边框 */
+.reka-notice:not(.reka-notice--bordered) {
+  border-color: transparent;
+}
+
+/* ============================================================
+ * 语义色变体（引用 tokens.css --color-*）
+ *
+ *   背景：color-mix(in srgb, var(--color-{type}) 8%, transparent)
+ *   边框：color-mix(in srgb, var(--color-{type}) 30%, transparent)
+ *   图标：var(--color-{type})
+ * ============================================================ */
+
+/* --- warning --- */
+.reka-notice--warning {
+  background-color: color-mix(in srgb, var(--color-warning) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-warning) 30%, transparent);
+}
+.reka-notice--warning .reka-notice__icon {
+  color: var(--color-warning);
+}
+
+/* --- info --- */
+.reka-notice--info {
+  background-color: color-mix(in srgb, var(--color-info) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-info) 30%, transparent);
+}
+.reka-notice--info .reka-notice__icon {
+  color: var(--color-info);
+}
+
+/* --- success --- */
+.reka-notice--success {
+  background-color: color-mix(in srgb, var(--color-success) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-success) 30%, transparent);
+}
+.reka-notice--success .reka-notice__icon {
+  color: var(--color-success);
+}
+
+/* --- error --- */
+.reka-notice--error {
+  background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
+}
+.reka-notice--error .reka-notice__icon {
+  color: var(--color-error);
+}
+
+/* ============================================================
+ * 深色模式覆盖（原则5：双模式自适应）
+ *
+ * 核心规则：深色背景下半透颜色更"透"，需提高不透明度
+ *   以保持和浅色模式一致的视觉存在感。
+ *   语义 token 已自动切换深色值（如 --color-warning 从 #f0a020 → #f5b342），
+ *   此处仅微调 color-mix 中的不透明度比例。
+ * ============================================================ */
+:root[data-theme='dark'] .reka-notice--warning,
+.dark .reka-notice--warning {
+  background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-warning) 40%, transparent);
+}
+
+:root[data-theme='dark'] .reka-notice--info,
+.dark .reka-notice--info {
+  background-color: color-mix(in srgb, var(--color-info) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-info) 40%, transparent);
+}
+
+:root[data-theme='dark'] .reka-notice--success,
+.dark .reka-notice--success {
+  background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
+}
+
+:root[data-theme='dark'] .reka-notice--error,
+.dark .reka-notice--error {
+  background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-error) 40%, transparent);
+}
+
+/* ============================================================
+ * 强制色彩模式
+ * ============================================================ */
+@media (forced-colors: active) {
+  .reka-notice {
+    border: 1px solid ButtonText;
+  }
+}

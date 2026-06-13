@@ -3,7 +3,6 @@ import { SEARCH_ENGINE_LIST } from '@/logic/constants/search'
 import { localConfig } from '@/logic/config/state'
 import { ICONS } from '@/logic/constants/icons'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormItem,
   SettingFormSection,
@@ -59,8 +58,6 @@ const searchEngineList = computed(() => {
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.search')" />
-
   <SettingFormWrap widget-code="search">
     <!-- 搜索引擎 -->
     <SettingFormSection

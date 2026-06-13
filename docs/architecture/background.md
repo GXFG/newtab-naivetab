@@ -6,19 +6,23 @@
 |------|------|
 | `src/logic/image/state.ts` | 响应式状态：图片库数据（bing/pexels）、图片渲染状态、加载标记 |
 | `src/logic/image/service.ts` | 核心逻辑：DB 读写、加载/渲染、图库管理、watch 监听 |
-| `src/newtab/layers/BackgroundImg.vue` | 渲染组件：双层渲染、视差效果、loading 指示器 |
-| `src/setting/panes/general/BackgroundDrawer.vue` | 设置抽屉：图片列表展示、虚拟滚动 |
-| `src/setting/panes/general/BackgroundDrawerImageElement.vue` | 图片原子组件：展示、选中、收藏、工具栏 |
-| `src/logic/image/constants.ts` | 来源类型常量 |
-| `src/logic/config/defaults.ts` | 背景相关默认配置字段 |
+| `src/newtab/layers/BackgroundImg.vue` | 渲染组件：双层渲染、幻彩背景、视差效果、loading 指示器 |
+| `src/newtab/layers/BackgroundShimmer.vue` | 幻彩背景（纯 CSS 动画）渲染组件 |
+| `src/setting/panes/general/BackgroundDrawer.vue` | 设置抽屉：图片列表展示、幻彩背景配置、虚拟滚动 |
+| `src/setting/panes/general/BackgroundShimmerSettings.vue` | 幻彩背景设置面板：预设/效果/颜色 |
+| `src/logic/image/constants.ts` | 来源类型常量（含 SHIMMER） |
+| `src/logic/shimmer-bg/constants.ts` | 幻彩背景效果类型常量 |
+| `src/logic/shimmer-bg/presets.ts` | 幻彩背景配色预设方案 |
+| `src/logic/config/defaults.ts` | 背景相关默认配置字段（含幻彩背景字段） |
 
-## 三种图片来源
+## 四种图片来源
 
 | 来源 | 值 | 说明 | 存储表 |
 |------|---|------|--------|
 | LOCAL | 0 | 用户本地上传 | `localBackgroundImages` |
 | NETWORK | 1 | Bing/Pexels 图库或自定义 URL | `currBackgroundImages` |
 | BING_PHOTO | 2 | Bing 每日一图，自动同步双外观 | `currBackgroundImages` |
+| SHIMMER | 3 | 幻彩背景（纯 CSS 动画，@property + @keyframes） | 无（颜色/效果在配置中持久化） |
 
 ## 大小图分离策略
 
@@ -247,12 +251,79 @@ BING_PHOTO 和 LOCAL 上传场景使用 `getOppositeAppearanceCode(code)` 同步
 
 Bing 每日一图的壁纸列表通过 `fetch('/assets/bing-wallpaper.md')` 读取本地打包的 Markdown 文件（打包时注入扩展），使用 `requestIdleCallback` 分批解析避免阻塞主线程。该文件仅加载一次，内容不变。
 
+## 幻彩背景（SHIMMER 来源）
+
+纯 CSS 动画背景，通过 `@property` 注册可动画属性 + `@keyframes` 实现 14 种视觉效果。
+零 JS 运行时开销（动画在 GPU 合成线程运行），颜色通过 CSS 变量实时注入。
+
+### 与静态图片的差异
+
+| 方面 | 静态图片（LOCAL/NETWORK/BING_PHOTO） | 幻彩背景（SHIMMER） |
+|------|--------------------------------------|---------------------|
+| 渲染方式 | CSS `background-image` + img decode | CSS `@property` + `@keyframes`（合成线程） |
+| 数据存储 | IndexedDB + localStorage | 无（颜色/效果在配置中持久化） |
+| 首屏策略 | 小图 base64 同步读取 | CSSOM 解析后即时渲染 |
+| 视差效果 | 支持 | **禁用**（动画背景不平移） |
+| 双外观颜色 | 不同图片 | 不同颜色组（`shimmerBackgroundColors[0/1]`）|
+
+### 渲染架构
+
+`BackgroundImg.vue` 在 SHIMMER 来源时渲染 `BackgroundShimmer.vue` 组件，隐藏图片层：
+
+```
+BackgroundShimmer.vue (导入 shimmer.css)
+  ├── #background__shimmer (--shimmer-speed，供子元素继承)
+  │     ├── .shimmer (--shimmer-c1~c6，:class=shimmer--{effect})
+  │     └── .shimmer__texture (纹理叠加层：颗粒感 + 暗角)
+  ├── template ref 控制 animationPlayState: paused / running
+  ├── onMounted 初始可见性检查 + visibilitychange 监听
+  ├── currAppearanceCode 变化 → 颜色 CSS 变量即时更新
+  └── 效果/颜色变化 → class/style 变化即时生效，无需重建
+```
+
+### 颜色模式
+
+每个外观独立配置 6 个颜色值，支持双外观切换：
+- `shimmerBackgroundColors[0]` = 浅色外观的 6 色数组
+- `shimmerBackgroundColors[1]` = 深色外观的 6 色数组
+
+### 配置字段
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `shimmerBackgroundEffect` | string | `'aurora'` | 14 种效果之一 |
+| `shimmerBackgroundColors` | `[string[6], string[6]]` | 极光预设 | 浅色/深色各 6 色 hex 值 |
+
+### 8 种效果
+
+| 效果 | 中文 | CSS 技术 |
+|------|------|----------|
+| `aurora` | 极光 | `@property` + `radial-gradient` + `filter: blur()` |
+| `fluid` | 流体 | `@property` + 多层 `radial-gradient` 漂移 |
+| `waves` | 波浪 | `repeating-linear-gradient` + 角度旋转 + 位移 |
+| `drift` | 色彩漂移 | `conic-gradient` + 色环旋转 |
+| `blobs` | 墨团 | `::before/::after` + `border-radius` 变形 + `filter: blur()` |
+| `mesh` | 网格渐变 | `@property` + 多点 `radial-gradient` 交织 |
+| `noise` | 噪点纹理 | SVG `feTurbulence` + 渐变底色 |
+| `ripple` | 涟漪 | `@property` + `background-size` 同心圆扩散 |
+
+### 预设方案（8 套）
+
+极光/日落/海洋/霓虹/森林/星系/春日/午夜，每套含浅色+深色各 6 色 + 推荐效果。
+预设选择是非持久化 UI 操作，选中后颜色写入 `shimmerBackgroundColors`。
+
+### 节能策略
+
+- 标签页后台时：`animationPlayState = 'paused'`（CSS 合成线程暂停动画）
+- 标签页回到前台：`animationPlayState = 'running'`
+- 纯 CSS 动画 0 CPU 开销，暂停/恢复零延迟
+
 ## 配置字段
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `isBackgroundImageEnabled` | boolean | 是否启用背景图 |
-| `backgroundImageSource` | 0/1/2 | 图片来源 |
+| `backgroundImageSource` | 0/1/2/3 | 图片来源（0=LOCAL, 1=NETWORK, 2=BING_PHOTO, 3=SHIMMER） |
 | `backgroundImageHighQuality` | boolean | UHD 画质 |
 | `backgroundImageList` | `[{networkSourceType, name}, ...]` | 浅色/深色模式图片配置（各含来源类型+图片名） |
 | `isBackgroundImageCustomUrlEnabled` | boolean | 自定义 URL 开关 |

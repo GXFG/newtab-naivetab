@@ -44,7 +44,6 @@ describe('config/update', () => {
         bookmarkFolder: { enabled: false },
         clockFlip: { enabled: true },
         weather: { enabled: false },
-        bookmarkFolder2: { enabled: false },
       }) as any,
       localState: ref({
         isUploadConfigStatusMap: {
@@ -83,6 +82,7 @@ describe('config/update', () => {
         clockFlip: { enabled: false },
       },
       defaultLocalState: {
+        widgetInteractionOrder: [],
         isUploadConfigStatusMap: {
           general: {
             dirty: false,
@@ -216,6 +216,38 @@ describe('config/update', () => {
     it('returns version from localConfig', () => {
       const version = getLocalVersion()
       expect(version).toBe('1.0.0')
+    })
+  })
+
+  describe('handleAppUpdate', () => {
+    it('v2.6.0 migration: sets shimmer/scaleMode fields for old config', async () => {
+      handleAppUpdate()
+
+      const { localConfig } = await import('@/logic/config/state')
+      expect(localConfig.general.scaleMode).toBe('auto')
+      expect(localConfig.general.isAutoPrimaryColor).toBe(false)
+      expect(localConfig.general.isAutoBackgroundColor).toBe(false)
+      expect(localConfig.general.shimmerBackgroundEffect).toBe('aurora')
+      expect(localConfig.general.shimmerBackgroundColors).toHaveLength(2)
+      expect(localConfig.general.shimmerAnimationSpeed).toBe(1)
+      // 升级后版本号更新为当前应用版本
+      expect(localConfig.general.version).toBe('2.2.5')
+    })
+
+    it('v2.6.0 migration: preserves existing shimmer values', async () => {
+      const { localConfig } = await import('@/logic/config/state')
+      // 预设已有 shimmer 值，迁移不应覆盖
+      localConfig.general = Object.assign(localConfig.general, {
+        shimmerBackgroundEffect: 'fluid',
+        shimmerBackgroundColors: [['#fff'], ['#000']],
+        shimmerAnimationSpeed: 2,
+      }) as any
+
+      handleAppUpdate()
+
+      expect(localConfig.general.shimmerBackgroundEffect).toBe('fluid')
+      expect(localConfig.general.shimmerBackgroundColors[0]).toEqual(['#fff'])
+      expect(localConfig.general.shimmerAnimationSpeed).toBe(2)
     })
   })
 })

@@ -9,12 +9,13 @@
  *   - PRESERVE_FIELDS 标记了 Widget 重置时保留的字段，新增 Widget 必须在 config.ts 中定义 PRESERVE_FIELDS
  * @see docs/architecture/config.md#三层配置架构
  */
-import type { WidgetConfigByCode } from '@/common/widget-constants'
+import type { WidgetCodes, WidgetConfigByCode } from '@/common/widget-constants'
 import { WIDGET_CODE_LIST } from '@/common/widget-constants'
 import {
   IMAGE_NETWORK_SOURCE,
   BACKGROUND_IMAGE_SOURCE,
 } from '@/logic/image/constants'
+import type { TShimmerEffect } from '@/logic/shimmer-bg/constants'
 import pkg from '../../../package.json'
 
 const UI_LANGUAGE = chrome.i18n.getUILanguage()
@@ -37,6 +38,7 @@ const generalConfig = {
   version: pkg.version,
   showBreakingChangeNotice: false,
   appearance: 'auto' as 'light' | 'dark' | 'auto',
+  scaleMode: 'auto' as 'auto' | 'fixed',
   pageTitle: CURR_LANG === 'zh-CN' ? '新标签页' : 'NaiveTab',
   lang: CURR_LANG,
   timeLang: CURR_LANG,
@@ -90,12 +92,21 @@ const generalConfig = {
   fontFamily: 'system',
   fontSize: 14,
   fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+  isAutoPrimaryColor: false,
+  isAutoBackgroundColor: false,
   primaryColor: ['rgba(58, 115, 195, 1)', 'rgba(100, 160, 230, 1)'],
   backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'],
   bgOpacity: 1,
   bgBlur: 0,
   isParallaxEnabled: true,
   parallaxIntensity: 5,
+  // 幻彩（纯 CSS 动画背景）字段
+  shimmerBackgroundEffect: 'aurora' as TShimmerEffect,
+  shimmerBackgroundColors: [
+    ['#D1ADFF', '#98D69B', '#FAE390', '#FFACD8', '#7DD5FF', '#C8E6C9'],
+    ['#6B4FAE', '#4A7A4D', '#B8A050', '#B06080', '#4080A0', '#4A6F5A'],
+  ] as [string[], string[]],
+  shimmerAnimationSpeed: 1,
   swatcheColors: [
     'rgba(255, 255, 255, 1)',
     'rgba(15, 23, 42, 1)',
@@ -263,4 +274,14 @@ export const defaultLocalState = {
   currAppearanceCode: 0 as 0 | 1,
   isUploadConfigStatusMap: genUploadConfigStatusMap(),
   isFocusMode: false, // 专注模式开关：频繁切换、仅本地生效，无需云同步
+  /**
+   * Widget 交互顺序（最近交互的排最末，即栈顶）
+   *
+   * 用于层叠管理：Widget 重叠时，最近交互的 Widget 获得最高 z-index。
+   * 交互来源于 mousedown，拖拽模式下不触发。
+   * 持久化到 localStorage（通过 localState 自动），不参与云同步。
+   *
+   * @see src/newtab/widgets/WidgetWrap.vue handleWidgetInteract
+   */
+  widgetInteractionOrder: [] as WidgetCodes[],
 }

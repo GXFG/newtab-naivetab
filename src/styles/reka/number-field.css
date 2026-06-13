@@ -39,14 +39,30 @@
   padding: 0 8px;
 }
 
+.reka-number-field--small .reka-number-field__spins {
+  margin-right: -8px;
+}
+
 /* --- Input --- */
 .reka-number-field__input {
   all: unset;
+  display: block;
   flex: 1;
   min-width: 0;
   font-size: var(--text-base);
   line-height: 1.2;
   color: inherit;
+}
+
+/* --- 增减按钮容器 --- */
+.reka-number-field__spins {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  flex-shrink: 0;
+  margin-right: calc(-1 * var(--space-3));
+  border-radius: 0 var(--radius-md) 0 var(--radius-md);
+  overflow: hidden;
 }
 
 /* --- 增减按钮 --- */
@@ -55,15 +71,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-sm);
+  width: 28px;
+  flex: 1;
   cursor: pointer;
   color: var(--nt-text-tertiary);
   flex-shrink: 0;
-  font-size: 16px;
+  font-size: var(--nt-font-base, 14px);
   transition: background-color var(--transition-fast),
               color var(--transition-fast);
+}
+
+.reka-number-field__btn:first-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+
+.reka-number-field__btn:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
 }
 
 .reka-number-field__btn:not(:disabled):hover {

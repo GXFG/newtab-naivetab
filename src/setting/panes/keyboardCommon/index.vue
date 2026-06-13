@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import {
-  SettingHeaderBar,
   SettingFormWrap,
   SettingFormSection,
   SettingFormItem,
-  SettingCollapseSection,
 } from '@/setting/components'
+import NTAccordion from '@/components/ui/NTAccordion.vue'
+import type { AccordionItemDef } from '@/components/ui/NTAccordion.vue'
 import { ICONS } from '@/logic/constants/icons'
 import {
   KEYCAP_PREINSTALL_MAP,
@@ -24,17 +24,34 @@ const state = reactive({
   isPresetThemeDrawerVisible: false,
 })
 
-const expandedNames = ref<string[]>([])
+const expandedName = ref('')
 
-const handleExpanded = (name: string, isExpanded: boolean) => {
-  if (isExpanded) {
-    if (!expandedNames.value.includes(name)) {
-      expandedNames.value.push(name)
-    }
-  } else {
-    expandedNames.value = expandedNames.value.filter((n) => n !== name)
-  }
-}
+const accordionItems: AccordionItemDef[] = [
+  {
+    value: 'keyboardStyle',
+    title: window.$t('keyboardCommon.keyboardConfigLabel'),
+    icon: ICONS.keyboardCommon,
+    content: KeyboardStyleSetting,
+  },
+  {
+    value: 'keycapSetting',
+    title: window.$t('keyboardCommon.keycapConfigLabel'),
+    icon: ICONS.keyboardKeycapLabel,
+    content: KeycapSetting,
+  },
+  {
+    value: 'shellSetting',
+    title: window.$t('keyboardCommon.shellPlateConfigLabel'),
+    icon: ICONS.keyboardShellLabel,
+    content: KeyboardShellSetting,
+  },
+  {
+    value: 'nameplateSetting',
+    title: window.$t('keyboardNameplate.label'),
+    icon: ICONS.keyboardNameplate,
+    content: KeyboardNameplateSetting,
+  },
+]
 
 /**
  * 从所有预设主题中随机选一个并应用
@@ -69,14 +86,21 @@ const onRandomTheme = () => {
 
 <template>
   <PresetThemeDrawer v-model:show="state.isPresetThemeDrawerVisible" />
-
-  <SettingHeaderBar :title="$t('setting.keyboardCommon')" />
-
   <SettingFormWrap widget-code="keyboardCommon">
     <!-- 功能配置 -->
     <SettingFormSection section-key="common.behavior">
       <SettingFormItem :label="$t('keyboardCommon.presetTheme')">
         <div class="theme__actions">
+          <NTButton
+            size="tiny"
+            variant="secondary"
+            round
+            @click="onRandomTheme"
+          >
+            <Icon icon="mdi:shuffle" />
+            {{ $t('keyboardCommon.randomTheme') }}
+          </NTButton>
+
           <NTButton
             type="primary"
             size="tiny"
@@ -87,58 +111,14 @@ const onRandomTheme = () => {
             <Icon icon="mdi:palette-outline" />
             {{ $t('common.select') }}
           </NTButton>
-          <NTButton
-            size="tiny"
-            variant="secondary"
-            round
-            @click="onRandomTheme"
-          >
-            <Icon icon="mdi:shuffle" />
-            {{ $t('keyboardCommon.randomTheme') }}
-          </NTButton>
         </div>
       </SettingFormItem>
     </SettingFormSection>
 
-    <SettingCollapseSection
-      name="keyboardStyle"
-      :title="$t('keyboardCommon.keyboardConfigLabel')"
-      :icon="ICONS.keyboardCommon"
-      :expanded="expandedNames.includes('keyboardStyle')"
-      @update:expanded="handleExpanded"
-    >
-      <KeyboardStyleSetting />
-    </SettingCollapseSection>
-
-    <SettingCollapseSection
-      name="keycapSetting"
-      :title="$t('keyboardCommon.keycapConfigLabel')"
-      :icon="ICONS.keyboardKeycapLabel"
-      :expanded="expandedNames.includes('keycapSetting')"
-      @update:expanded="handleExpanded"
-    >
-      <KeycapSetting />
-    </SettingCollapseSection>
-
-    <SettingCollapseSection
-      name="shellSetting"
-      :title="$t('keyboardCommon.shellPlateConfigLabel')"
-      :icon="ICONS.keyboardShellLabel"
-      :expanded="expandedNames.includes('shellSetting')"
-      @update:expanded="handleExpanded"
-    >
-      <KeyboardShellSetting />
-    </SettingCollapseSection>
-
-    <SettingCollapseSection
-      name="nameplateSetting"
-      :title="$t('keyboardNameplate.label')"
-      :icon="ICONS.keyboardNameplate"
-      :expanded="expandedNames.includes('nameplateSetting')"
-      @update:expanded="handleExpanded"
-    >
-      <KeyboardNameplateSetting />
-    </SettingCollapseSection>
+    <NTAccordion
+      v-model="expandedName"
+      :items="accordionItems"
+    />
   </SettingFormWrap>
 </template>
 

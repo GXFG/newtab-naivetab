@@ -1,6 +1,17 @@
 export const WIDGET_CODE = 'keyboardBookmark'
 
 import type { TShortcutModifier } from '@/logic/shortcut/utils'
+
+/**
+ * keyboardBookmark 的可缩放字段在 keyboardCommon 下，
+ * 通过 configSection 指定跨 section 引用。
+ * keycapSize 是主控尺寸，其他尺寸是其比例派生值。
+ */
+export const SCALABLE_FIELDS = {
+  keycapSize: { min: 30, max: 150, configSection: 'keyboardCommon' },
+  shellVerticalPadding: { min: 2, max: 60, configSection: 'keyboardCommon' },
+  shellHorizontalPadding: { min: 2, max: 60, configSection: 'keyboardCommon' },
+}
 import {
   MAX_LAYERS,
   BookmarkSource,

@@ -4,7 +4,7 @@
 
 | 文件 | 职责 |
 |------|------|
-| `src/setting/SettingPaneContent.vue` | 设置面板核心内容：NTabs 左侧导航 + 分组分隔线 + 组件渲染 |
+| `src/setting/SettingPaneContent.vue` | 设置面板核心布局：左侧导航 + 固定 HeaderBar + 内容滚动区域，支持 drawer/page 双模式 |
 | `src/setting/index.vue` | 抽屉模式入口（newtab 右键菜单触发） |
 | `src/options/Content.vue` | 全屏模式入口（`chrome://extensions` → 选项） |
 | `src/setting/registry.ts` | 面板注册中心：SETTING_GROUPS 分组配置 + 静态组件注册（PANE_MAP） |
@@ -12,8 +12,7 @@
 | `src/setting/components/SettingFormItem.vue` | 表单项原子组件：label + control + Tips 布局 |
 | `src/setting/components/SettingFormSection.vue` | 分组容器：section header + body（自动绘制内部分隔线） |
 | `src/setting/components/SettingFormInlineRow.vue` | 同行排列容器：多个 SettingFormItem 横向展示 |
-| `src/setting/components/SettingHeaderBar.vue` | 面板顶部标题栏：标题 + 预览 + 打开新标签页 + 关闭按钮 |
-| `src/setting/components/SettingCollapseSection.vue` | 折叠区域：手动 max-height 过渡 + transitionend 双兜底动画 |
+| `src/setting/components/SettingHeaderBar.vue` | 面板顶部标题栏（由 SettingPaneContent 统一渲染，各 pane 不再自行引用）：标题 + 预览 + 打开新标签页 + 关闭按钮 |
 | `src/setting/fields/*.vue` | 表单原子组件：ColorField / FontField / SliderField / SwitchField / ToggleColorField |
 | `src/setting/fields/index.ts` | fields 模块统一导出 |
 | `src/setting/panes/*/index.vue` | 各 Widget 的具体设置面板实现 |
@@ -98,19 +97,28 @@ export const SETTING_GROUPS: SettingGroup[] = [
 ## 组件层级结构
 
 ```
-SettingPaneContent          ← 最外层，NTabs 导航 + 分组逻辑
-  └─ NTTabsPane (per item)
-       └─ [pane component]  ← 各 Widget 的具体设置
-            ├─ SettingHeaderBar          ← 标题栏（sticky 定位）
-            ├─ SettingFormWrap           ← 面板容器（统一样式 + 重置按钮）
-            │    ├─ SettingFormSection   ← 分组区域（header + body + 分隔线）
-            │    │    ├─ SettingFormItem ← 表单项（label + control + Tips）
-            │    │    │    ├─ [Field 组件]
-            │    │    │    └─ Tips
-            │    │    └─ [其他自定义组件]
-            │    └─ 重置按钮区域
-            └─ [其他自定义布局]
+SettingPaneContent          ← 最外层，左侧导航 + 分组逻辑 + 固定 HeaderBar
+  ├─ 左侧 nav
+  │    └─ NTScrollArea → nav items（分组分隔线）
+  └─ 右侧内容区（flex column）
+       ├─ SettingHeaderBar          ← 固定在顶部，不参与滚动
+       │    ├─ 标题
+       │    ├─ 预览按钮（hover 透视）
+       │    ├─ 打开新标签页按钮
+       │    └─ 关闭按钮（仅 drawer 模式）
+       └─ NTScrollArea              ← 内容滚动区域（flex: 1）
+            └─ KeepAlive → [pane component]  ← 各 Widget 的具体设置
+                 ├─ SettingFormWrap           ← 面板容器（统一样式 + 重置按钮）
+                 │    ├─ SettingFormSection   ← 分组区域（header + body + 分隔线）
+                 │    │    ├─ SettingFormItem ← 表单项（label + control + Tips）
+                 │    │    │    ├─ [Field 组件]
+                 │    │    │    └─ Tips
+                 │    │    └─ [其他自定义组件]
+                 │    └─ 重置按钮区域
+                 └─ [其他自定义布局]
 ```
+
+> **注意**：各 pane 组件不再自行渲染 `SettingHeaderBar`，标题由 `SettingPaneContent` 根据 `currSettingTabCode` 从 registry 查找 labelKey 后统一传入。新增 pane 时只需在 `SETTING_GROUPS` 中配置 `labelKey` 即可。`general` 和 `keyboardCommon` 中的 Drawer 组件（`BackgroundDrawer`、`PresetThemeDrawer`）仍保留在各自 pane 内。
 
 ### 特殊面板模式
 
@@ -187,7 +195,7 @@ SettingPaneContent          ← 最外层，NTabs 导航 + 分组逻辑
 
 ### header 与 form 间距
 
-`SettingHeaderBar` 使用 `sticky` 定位贴在顶部。使用 `SettingFormWrap` 的面板由 `pane-content` 的 padding 自然产生间距。不使用 `SettingFormWrap` 的面板（如 clockDate）需要手动补偿 `margin-top`。
+`SettingHeaderBar` 由 `SettingPaneContent` 渲染在滚动区域之外，始终固定在右侧面板顶部。使用 `SettingFormWrap` 的面板由 `pane-content` 的 padding 自然产生与 header 的间距。不使用 `SettingFormWrap` 的面板（如 clockDate）需要手动补偿 `margin-top`。
 
 ### Transition 动画
 
@@ -203,21 +211,6 @@ SettingPaneContent          ← 最外层，NTabs 导航 + 分组逻辑
 ```
 
 用于开关展开子选项、条件显示额外内容等场景。`SwitchField` 的 `#extra` 插槽已自动包裹此 Transition。
-
-### SettingCollapseSection 折叠动画安全机制
-
-`SettingCollapseSection` 使用手动 `max-height` 过渡实现展开/收起动画，**不依赖 CSS `height: auto`**（浏览器不支持 transition 到 auto）。
-
-```
-onEnter:  maxHeight: 0 → scrollHeight
-onLeave:  maxHeight: scrollHeight → 0  (在 rAF 中执行)
-```
-
-**双兜底机制**：`transitionend` 监听 + `setTimeout` 超时兜底。
-- 正常情况：CSS transition 完成后 `transitionend` 触发，调用 `done()`
-- `prefers-reduced-motion` 场景：transition 被系统跳过，`transitionend` 永不触发，`setTimeout` 在动画时长 + 50ms 后调用 `done()`，防止 Vue Transition 卡死
-
-超时时间：enter 350ms / leave 300ms，对应 CSS transition 时长 300ms / 250ms。
 
 ### SettingFormItem 多控件模式
 

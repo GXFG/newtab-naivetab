@@ -25,7 +25,11 @@ export const ICONS = {
   countdownRestore: 'mdi:restore',
   countdownSpinUp: 'mdi:chevron-up',
   countdownSpinDown: 'mdi:chevron-down',
+  chevronUp: 'mdi:chevron-up',
+  chevronDown: 'mdi:chevron-down',
   chevronRight: 'mdi:chevron-right',
+  refresh: 'mdi:refresh',
+  shuffle: 'mdi:shuffle',
   // setting__label
   calendarHoliday: 'mdi:calendar-star',
   keyboardCommand: 'ic:twotone-keyboard-command-key',

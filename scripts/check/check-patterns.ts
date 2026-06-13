@@ -6,6 +6,7 @@
  * 检查项：
  *  1. v-bind() 在 <style> 中使用（禁止，应用 :style + computed + var()）
  *  2. &--modifier BEM 拼接（禁止，postcss-preset-env 不支持）
+ *  3. Reka Content/Overlay 组件缺少 z-index（portal 内容面板可能被遮挡）
  *
  * 用法：
  *   pnpm exec tsx scripts/check/check-patterns.ts                    # 检查 src/ 下所有文件
@@ -133,6 +134,89 @@ function collectFiles(dir: string): string[] {
   return results
 }
 
+/**
+ * 检查 3：Reka Portal Content/Overlay 是否缺少 z-index
+ *
+ * 扫描 src/styles/reka/ 下的 CSS 文件，按 __content / __overlay 类名分组，
+ * 检查每个类是否至少有一个规则块设置了 z-index。Portal 内容面板缺少
+ * z-index 会导致下拉面板被其他元素遮挡。
+ *
+ * 参考：docs/architecture/reka-ui.md#z-index-层级体系
+ */
+function checkRekaZIndex(): Violation[] {
+  const violations: Violation[] = []
+  const rekaCssDir = resolve(ROOT, 'src/styles/reka')
+
+  if (!existsSync(rekaCssDir)) return violations
+
+  const files = readdirSync(rekaCssDir)
+    .filter((f) => f.endsWith('.css') && f !== 'index.css')
+    .map((f) => resolve(rekaCssDir, f))
+
+  for (const filePath of files) {
+    let content: string
+    try {
+      content = readFileSync(filePath, 'utf-8')
+    } catch {
+      continue
+    }
+
+    // 收集所有 __content / __overlay 类名及其是否有 z-index
+    const classZIndex = new Map<
+      string,
+      { hasZIndex: boolean; firstLine: number }
+    >()
+
+    // 匹配包含 .reka-*__content 或 .reka-*__overlay 的 CSS 规则块
+    // 兼容深色模式等复合选择器（如 :root[data-theme='dark'] .reka-xxx__content）
+    const ruleRegex = /([^{]*(\.reka-\w+__(?:content|overlay))\b[^{]*)\{/g
+    let match: RegExpExecArray | null
+
+    while ((match = ruleRegex.exec(content)) !== null) {
+      const className = match[2]
+      const blockStart = match.index + match[0].length
+      const before = content.slice(0, match.index)
+      const lineNum = before.split('\n').length
+
+      // 找到匹配的 }
+      let depth = 1
+      let pos = blockStart
+      while (depth > 0 && pos < content.length) {
+        if (content[pos] === '{') depth++
+        else if (content[pos] === '}') depth--
+        pos++
+      }
+      const block = content.slice(blockStart, pos - 1)
+
+      const existing = classZIndex.get(className)
+      if (existing) {
+        // 已有记录，如果之前没有 z-index 但当前有，更新状态
+        if (!existing.hasZIndex && /z-index\s*:/.test(block)) {
+          existing.hasZIndex = true
+        }
+      } else {
+        classZIndex.set(className, {
+          hasZIndex: /z-index\s*:/.test(block),
+          firstLine: lineNum,
+        })
+      }
+    }
+
+    // 报告缺少 z-index 的类
+    for (const [className, info] of classZIndex) {
+      if (!info.hasZIndex) {
+        violations.push({
+          file: filePath,
+          line: info.firstLine,
+          message: `"${className}" 缺少 z-index（Portal 内容面板可能被遮挡，参考 docs/architecture/reka-ui.md#z-index-层级体系）`,
+        })
+      }
+    }
+  }
+
+  return violations
+}
+
 // --- main ---
 const args = process.argv.slice(2)
 const targetDirs = args.length > 0 ? args.map((a) => resolve(ROOT, a)) : [SRC]
@@ -144,6 +228,9 @@ for (const file of files) {
   if (!existsSync(file)) continue
   allViolations = allViolations.concat(checkFile(file))
 }
+
+// 额外检查：Reka 组件 z-index
+allViolations = allViolations.concat(checkRekaZIndex())
 
 if (allViolations.length > 0) {
   console.error('\n发现以下代码模式违规:\n')

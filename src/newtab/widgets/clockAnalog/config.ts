@@ -1,5 +1,9 @@
 export const WIDGET_CODE = 'clockAnalog'
 
+export const SCALABLE_FIELDS = {
+  width: { min: 100, max: 500 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: false,
   layout: {

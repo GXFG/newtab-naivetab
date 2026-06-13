@@ -6,6 +6,7 @@ import { useDualThemeColor } from './useDualThemeColor'
 const props = defineProps<{
   label: string
   tipContent?: string
+  disabled?: boolean
 }>()
 
 const modelValue = defineModel<string | string[]>({ required: true })
@@ -22,6 +23,7 @@ const { currentValue, updateValue } = useDualThemeColor(modelValue, (v) => {
   >
     <CustomColorPicker
       :value="currentValue"
+      :disabled="disabled"
       @update:value="updateValue"
     />
   </SettingFormItem>

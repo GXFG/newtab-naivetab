@@ -9,8 +9,10 @@ const customWidth = getStyleField(WIDGET_CODE, 'width', 'vmin')
 const numberScaleFontFamily = computed(
   () => localConfig.clockAnalog.numberScaleFontFamily,
 )
-const numberScaleFontSize = computed(
-  () => `${localConfig.clockAnalog.numberScaleFontSize}px`,
+const numberScaleFontSize = getStyleField(
+  WIDGET_CODE,
+  'numberScaleFontSize',
+  'px',
 )
 const numberScaleFontColor = computed(() => {
   const colors = localConfig.clockAnalog.numberScaleFontColor
@@ -244,7 +246,7 @@ addVisibilityTask(WIDGET_CODE, (hidden) => {
 #clockAnalog {
   user-select: none;
   .clockAnalog__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     text-align: center;
     .container__clock {

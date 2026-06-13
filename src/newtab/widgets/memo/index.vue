@@ -101,7 +101,7 @@ watch(
   font-family: var(--nt-memo-font-family);
 
   .memo__container {
-    z-index: 10;
+    z-index: var(--nt-z-index);
     position: absolute;
     border-radius: var(--nt-memo-border-radius);
     background-color: var(--nt-memo-background-color);

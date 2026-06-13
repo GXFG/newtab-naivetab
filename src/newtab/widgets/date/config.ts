@@ -1,5 +1,10 @@
 export const WIDGET_CODE = 'date'
 
+export const SCALABLE_FIELDS = {
+  fontSize: { min: 20, max: 200 },
+  letterSpacing: { min: 0, max: 20 },
+}
+
 export const WIDGET_CONFIG = {
   enabled: true,
   format: 'YYYY-MM-DD dddd',

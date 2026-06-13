@@ -5,10 +5,18 @@ import { localConfig, localState } from '@/logic/config/state'
 import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
 import { widgetsRegistry } from '@/newtab/widgets/registry'
 import { WIDGET_GROUPS } from '@/common/widget-constants'
-import { SettingHeaderBar, SettingFormSection } from '@/setting/components'
+import { ICONS } from '@/logic/constants/icons'
+import { SettingFormSection } from '@/setting/components'
 import { SwitchField } from '@/setting/fields'
 import NTSwitch from '@/components/ui/NTSwitch.vue'
 import { gaProxy } from '@/logic/utils/gtag'
+
+/** 与 WIDGET_GROUPS 按索引对应的分组图标 */
+const WIDGET_GROUP_ICONS = [
+  ICONS.clockAnalog,
+  ICONS.bookmarkKeyboard,
+  ICONS.tune,
+]
 
 const widgetGroups = computed(() =>
   WIDGET_GROUPS.map((group) => ({
@@ -57,8 +65,6 @@ const cssVars = computed(() => ({
 </script>
 
 <template>
-  <SettingHeaderBar :title="$t('setting.focusMode')" />
-
   <div
     class="setting__pane-content"
     :style="cssVars"
@@ -72,14 +78,13 @@ const cssVars = computed(() => ({
     </SettingFormSection>
 
     <div class="focus__groups">
-      <div
-        v-for="group in widgetGroups"
+      <SettingFormSection
+        v-for="(group, index) in widgetGroups"
         :key="group.label"
-        class="focus__group"
+        :title="group.label"
+        :icon="WIDGET_GROUP_ICONS[index]"
+        style="margin-bottom: 16px"
       >
-        <p class="focus__group-label">
-          {{ group.label }}
-        </p>
         <div class="focus__grid">
           <div
             v-for="meta in group.items"
@@ -116,7 +121,7 @@ const cssVars = computed(() => ({
             </div>
           </div>
         </div>
-      </div>
+      </SettingFormSection>
     </div>
   </div>
 </template>
@@ -125,30 +130,15 @@ const cssVars = computed(() => ({
 .focus__groups {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
   padding-bottom: 8px;
-}
-
-.focus__group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.focus__group-label {
-  padding-left: 2px;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.4;
-  user-select: none;
 }
 
 .focus__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 6px;
+  padding: 10px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -156,7 +146,7 @@ const cssVars = computed(() => ({
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 12px;
   border-radius: var(--radius-lg);
   border: 1px solid transparent;
   background-color: var(--nt-gray-minimal);
@@ -164,19 +154,13 @@ const cssVars = computed(() => ({
   transition:
     background-color var(--transition-base),
     border-color var(--transition-base),
-    box-shadow var(--transition-base),
-    transform var(--transition-fast);
+    box-shadow var(--transition-base);
   user-select: none;
 
   &:hover {
     background-color: var(--nt-gray-light);
     border-color: var(--nt-gray-moderate);
     box-shadow: var(--shadow-sm);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
   }
 
   &.focus__item--active {
@@ -204,9 +188,9 @@ const cssVars = computed(() => ({
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
+  width: 25px;
+  height: 25px;
+  border-radius: var(--radius-lg);
   background-color: var(--nt-gray-light);
   color: var(--nt-text-secondary);
   transition:
