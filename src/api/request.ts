@@ -1,7 +1,7 @@
 import axios, { AxiosResponse, AxiosError } from 'axios'
 
 const config = {
-  timeout: 8000,
+  timeout: 15000,
   headers: {},
   // withCredentials: true, // 跨域请求携带Cookie
 }

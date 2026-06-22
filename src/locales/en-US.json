@@ -72,12 +72,12 @@
     "sync": "Sync",
     "syncing": "Syncing",
     "update": "Update",
-    "applyCurrentTabUrl": "Apply current tab",
+    "applyCurrentTabUrl": "Apply current tab URL",
     "upload": "Upload",
     "day": "Day",
     "setting": "Setting",
     "login": "Login",
-    "behavior": "Behavior",
+    "behavior": "Config",
     "swInitializing": "Extension is initializing, please try again shortly"
   },
   "browserPermission": {
@@ -85,13 +85,13 @@
   },
   "prompts": {
     "linkTips": "Click the (?) icon for quick links",
-    "pleaseWait": "In progress, Please wait",
+    "pleaseWait": "Please wait, processing...",
     "imageTooLarge": "Image too large",
     "imageLoadFailed": "Failed to load",
     "noImageAvailable": "No image available",
     "favoriteLimit": "Favorites limit reached",
     "widgetDrawerTips": "Drag widgets to workspace",
-    "breakingChangeNotice": "Please pay attention to changes marked with ! below"
+    "breakingChangeNotice": "Please pay attention to changes marked with \"!\" below"
   },
   "rightMenu": {
     "deleteWidget": "Delete widget",
@@ -115,11 +115,11 @@
     "tip": "Shortcuts will be disabled on blocked domains."
   },
   "sponsor": {
-    "title": "🔥「Caffeinated Commit: Code Brewed with 200% ☕️ Power」",
-    "content1": "🎉 Hey! Finally have you aboard NaiveTab~ (my cat sent me to say hi 🐱)",
+    "title": "🔥「Code, now with 200% more ☕️」",
+    "content1": "🎉 Hey! Glad to have you aboard NaiveTab~ (my cat sent me to say hi 🐱)",
     "content2": "Every time you click 'new tab', feel the warmth behind this tool — forged through my late-night coding marathons, supervised by a cat who walks on the keyboard 🚨, and co-crafted by efficiency warriors like you ✨",
-    "content3": "🐱 If NaiveTab saved your fingers a few clicks 🖱...",
-    "content4": "Care to fuel me with coffee ☕️ / boba 🧋? The cat wants a sip too 🐱",
+    "content3": "🐱 If NaiveTab saved you a few clicks 🖱...",
+    "content4": "Fancy fueling me with a coffee ☕️ / boba 🧋? The cat wants a sip too 🐱",
     "content5": "Budget is transparent 💰: 50% wild new features 🧠 / 50% cat food fund 🐱🥫 (my code-review partner's food bowl won't fill itself!)",
     "content6": "👉 Go ahead, scan to support 👈",
     "confirm": "⏳ Maybe after my next paycheck",
@@ -153,7 +153,7 @@
     "keyboardCommon": "Keyboard Config",
     "keyboardCommand": "Command Keyboard",
     "keyboardBookmark": "Bookmark Keyboard",
-    "bookmarkFolder": "Folder Bookmark",
+    "bookmarkFolder": "Bookmark Folders",
     "bookmark": "Bookmark",
     "clockDate": "Clock/Date",
     "clock": "Clock",
@@ -189,7 +189,7 @@
     "newTabOpen": "Open in newtab",
     "language": "Main Language",
     "timeLanguage": "Time Language",
-    "localBackgroundTips": "Local file will not be synchronized",
+    "localBackgroundTips": "Local file will not be synced",
     "enableFocusMode": "Enable Focus Mode",
     "focusModeTips": "In Focus Mode, only selected widgets are visible",
     "focusWidgets": "Visible Widgets",
@@ -202,7 +202,7 @@
     "currentBackgroundImageLabel": "Current Background Image",
     "shimmerBackground": "Shimmer",
     "syncStorageSize": "Storage usage",
-    "syncStorageSizeTips": "Sync storage usage per config item. Each item is limited to 8KB",
+    "syncStorageSizeTips": "Sync storage usage per configuration item. Each item is limited to 8KB",
     "syncSizeWarning": "__field__ config is approaching sync limit (__size__KB / 8KB), consider reducing bookmarks",
     "syncSizeExceeded": "__field__ config exceeds sync limit (__size__KB / 8KB). Saved locally but cross-device sync is unavailable. Please reduce bookmarks or shorten URLs",
     "syncRateWarning": "Sync write rate is high (__count__ - __max__/min). Please wait before modifying settings to avoid browser limit",
@@ -228,7 +228,7 @@
     "resetSettingLabel": "Reset setting",
     "resetSettingValue": "Reset",
     "resetAllSettingValue": "Reset All Settings",
-    "resetSettingTips": "If you encounter an unsolvable problem, try resetting the settings and back up the current configuration",
+    "resetSettingTips": "If you encounter a persistent issue, try resetting the settings. Please back up the current configuration first",
     "quickReset": "Partial Reset",
     "quickResetDesc": "Keep user data, reset appearance and partial settings only",
     "fullReset": "Full Reset",
@@ -406,7 +406,7 @@
     "selectHint": "Select a nameplate above to edit its style"
   },
   "bookmarkFolder": {
-    "defaultDisplayFolderTitle": "Expand Folder",
+    "defaultDisplayFolderTitle": "Default expanded",
     "rootDirectory": "Root directory",
     "layoutColumns": "Columns",
     "showIcon": "Show icon",
@@ -464,7 +464,7 @@
     "formatCustomTip": "Uses dayjs format syntax, e.g. MMMM D, YYYY"
   },
   "search": {
-    "searchBar": "Search Bar",
+    "searchBar": "Search Engine",
     "searchBarStyle": "Search Bar Style",
     "suggestion": "Suggestions",
     "searchEngine": "Search engine",
