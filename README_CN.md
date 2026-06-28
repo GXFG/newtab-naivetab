@@ -11,7 +11,7 @@
     </a>
   </p>
   <p>
-    <a href="https://github.com/GXFG/newtab-naivetab/blob/main/README_EN.md">English</a> | 中文
+    <a href="https://github.com/GXFG/newtab-naivetab/blob/main/README.md">English</a> | 中文
   </p>
   <p>
     <img src="https://img.shields.io/badge/Vue%203-4FC08D?style=flat-square&logo=vue.js&logoColor=white" alt="Vue 3" />

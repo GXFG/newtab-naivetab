@@ -100,8 +100,8 @@ export default {
     a2: 'Chrome, Edge, Firefox, and all Chromium-based browsers (Brave, Opera, etc.).',
     q3: 'What is the difference between bookmark keyboard and regular bookmarks?',
     a3: 'The bookmark keyboard maps your bookmarks to a visual keyboard layout — press the corresponding key to open a site. Great for keyboard shortcut enthusiasts who want muscle-memory efficiency.',
-    q4: 'How do I customize the keyboard layout?',
-    a4: 'In the NaiveTab settings panel, you can choose from 20 keyboard layouts, 6 keycap themes, and freely drag widgets anywhere on screen.',
+    q4: 'What can keyboard shortcuts do?',
+    a4: 'NaiveTab lets you control your browser entirely from the keyboard: close/switch tabs, scroll pages, open new windows, manage tab groups, and more. You can view and customize all shortcuts in the settings panel for mouse-free efficiency.',
   },
   footer: {
     tagline: 'Keyboard is navigation, one key away.',
