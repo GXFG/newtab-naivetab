@@ -8,7 +8,7 @@
 
 import { normalizeDomain } from '@/logic/shortcut/utils'
 
-const model = defineModel<string[]>({ default: [] })
+const model = defineModel<string[]>({ default: () => [] })
 
 const MAX_COUNT = 20
 const MAX_LENGTH = 100

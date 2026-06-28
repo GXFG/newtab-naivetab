@@ -1,4 +1,4 @@
-name: Deploy VitePress site to Pages
+name: Deploy site to Pages
 on:
   push:
     branches: [main]
@@ -23,18 +23,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
         run: pnpm install
-      - name: Build with VitePress
+      - name: Build site
         run: pnpm run site:build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site/.vitepress/dist
+          path: site/dist
   deploy:
     environment:
       name: github-pages

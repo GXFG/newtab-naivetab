@@ -160,7 +160,7 @@ const handleOpenUserGuide = () => {
 
     <!-- 版权声明为品牌展示需要，无需 i18n -->
     <p class="about__copyright">
-      © {{ new Date().getFullYear() }} NaiveTab · All rights reserved.
+      © 2022 - {{ new Date().getFullYear() }} NaiveTab · Made By GXFG
     </p>
   </div>
 </template>

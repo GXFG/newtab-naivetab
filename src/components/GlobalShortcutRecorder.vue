@@ -26,7 +26,7 @@ let debounceTimer: ReturnType<typeof setTimeout> | null = null
 // 修饰键快照：记录 keydown 时捕获的修饰键状态，防止 keyup 清空集合后丢失用户选择
 let lastModifierSnapshot: TShortcutModifier[] = []
 
-const modifier = defineModel<TShortcutModifier[]>({ default: [] })
+const modifier = defineModel<TShortcutModifier[]>({ default: () => [] })
 
 const props = defineProps<{
   disabled?: boolean
