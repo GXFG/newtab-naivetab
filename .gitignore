@@ -20,6 +20,6 @@ src/auto-imports.d.ts
 src/components.d.ts
 stats.html
 
-# VitePress
-site/.vitepress/cache/
-site/.vitepress/dist/
+# Site
+site/dist/
+site/.DS_Store

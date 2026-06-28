@@ -448,7 +448,7 @@ const detailInfo = reactive({
 
 /**
  * 日期格子的交互入口，支持两种调用路径：
- *   1. @pointerdown 在 <li> 上 → 切换/打开日期，先于 Reka 的 document pointerdown 执行
+ *   1. @click 在 <li> 上 → 切换/打开日期
  *   2. @clickoutside 在 NTPopover 上 → 仅当该 Popover 所属日期仍是当前打开日期时才关闭，
  *      避免 A 的 clickoutside 误关刚打开的 B（每个日期格子有独立 NTPopover 实例）
  */
@@ -590,7 +590,7 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
             <li
               v-for="item in state.dateList"
               :key="item.date"
-              @pointerdown="onToggleDetailPopover(item.date)"
+              @click="onToggleDetailPopover(item.date)"
             >
               <NTPopover
                 :style="detailPopoverStyle"
