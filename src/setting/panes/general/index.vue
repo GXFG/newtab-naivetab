@@ -38,6 +38,16 @@ const state = reactive({
   isBackgroundDrawerVisible: false,
 })
 
+// 同步 isGaEnabled 到 chrome.storage.local，供 SW 上下文读取
+// （SW 不支持 localStorage，无法通过 localConfig 直接读取）
+watch(
+  () => localConfig.general.isGaEnabled,
+  (val) => {
+    chrome.storage.local.set({ 'ga-enabled': val })
+  },
+  { immediate: true },
+)
+
 const themeList = computed(() => [
   { label: window.$t('generalSetting.followSystem'), value: 'auto' },
   { label: window.$t('common.light'), value: 'light' },
@@ -466,6 +476,12 @@ const cssVars = computed(() => ({
           {{ $t('generalSetting.confirmResetAll') }}
         </NTPopconfirm>
       </SettingFormItem>
+
+      <SwitchField
+        v-model="localConfig.general.isGaEnabled"
+        :label="$t('generalSetting.enableAnalytics')"
+        :tip-content="$t('generalSetting.enableAnalyticsTips')"
+      />
     </SettingFormSection>
   </SettingFormWrap>
 </template>

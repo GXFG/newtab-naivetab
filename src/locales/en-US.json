@@ -238,7 +238,9 @@
     "scaleMode": "Scale Mode",
     "scaleModeAuto": "Auto Scale",
     "scaleModeFixed": "Fixed Size",
-    "scaleModeTips": "Auto: Widgets scale proportionally with screen size; Fixed: Consistent pixel size across all screens"
+    "scaleModeTips": "Auto: Widgets scale proportionally with screen size; Fixed: Consistent pixel size across all screens",
+    "enableAnalytics": "Product Improvement",
+    "enableAnalyticsTips": "Share basic anonymous usage data (feature usage, performance) to help improve NaiveTab. No personal info or browsing history is ever collected. You can turn this off anytime."
   },
   "keyboardCommon": {
     "keycapKeyFont": "Keycap Font",

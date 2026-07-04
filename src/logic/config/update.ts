@@ -318,6 +318,9 @@ export const handleAppUpdate = (localVersion?: string) => {
     localConfig.general.shimmerAnimationSpeed =
       (localConfig.general as any).shimmerAnimationSpeed ?? 1
   }
+  if (compareLeftVersionLessThanRightVersions(version, '2.6.2')) {
+    localConfig.general.isGaEnabled = localConfig.general.isGaEnabled ?? true
+  }
 
   // 更新local版本号
   localConfig.general.version = window.appVersion

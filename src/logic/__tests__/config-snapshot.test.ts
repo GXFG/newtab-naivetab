@@ -317,7 +317,7 @@ function assertUserDataPreserved(config: Record<string, any>, fixture: Record<st
 // ── 核心断言：迁移后包含当前所有必需字段 ──
 function assertRequiredFieldsPresent(config: Record<string, any>) {
   // general 必需字段
-  const generalRequiredFields = ['version', 'lang', 'appearance', 'fontFamily', 'isAutoPrimaryColor', 'isAutoBackgroundColor', 'primaryColor', 'backgroundColor', 'shimmerBackgroundEffect', 'shimmerBackgroundColors', 'shimmerAnimationSpeed']
+  const generalRequiredFields = ['version', 'lang', 'appearance', 'fontFamily', 'isAutoPrimaryColor', 'isAutoBackgroundColor', 'primaryColor', 'backgroundColor', 'shimmerBackgroundEffect', 'shimmerBackgroundColors', 'shimmerAnimationSpeed', 'isGaEnabled']
   for (const field of generalRequiredFields) {
     expect(config.general).toHaveProperty(field)
   }
