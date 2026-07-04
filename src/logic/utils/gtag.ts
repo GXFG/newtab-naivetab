@@ -21,7 +21,25 @@
  * - 模块名与动作名之间用下划线分隔（如 `setting_open`、`focusMode_toggle`）
  * - 模块名和动作名自身保持 camelCase（如 `keyboardBookmark_openPage`）
  * - press 事件的键码放在 payload 的 code 字段中，不放在事件名里
+ *
+ * ## 用户控制
+ * - gaProxy 和 gaReportError 通过 chrome.storage.local 读取 isGaEnabled（key: `ga-enabled`）
+ * - 默认值为 true（向后兼容），用户在「通用设置 → 数据管理」中可关闭
+ * - 不使用 localConfig（依赖 useStorageLocal → localStorage，SW 上下文不可用）
  */
+// 不使用 localConfig（它依赖 useStorageLocal → localStorage，SW 上下文不可用）。
+// 改为从 chrome.storage.local 读取，由 setting/panes/general/index.vue watch 同步写入。
+const GA_ENABLED_KEY = 'ga-enabled'
+
+const checkIsGaDisabled = async (): Promise<boolean> => {
+  try {
+    const result = await chrome.storage.local.get(GA_ENABLED_KEY)
+    return result[GA_ENABLED_KEY] === false
+  } catch {
+    return false // 读取失败时默认不禁用（向后兼容）
+  }
+}
+
 const getOrCreateClientId = async (): Promise<string> => {
   const result = await chrome.storage.local.get('clientId')
   let clientId = result.clientId as string | undefined
@@ -75,6 +93,8 @@ const getOrCreateSessionId = async () => {
 const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect'
 const MEASUREMENT_ID = 'G-83GHS69B9N'
 const API_SECRET = '4LhaOjgsQ4WK1zz5mkAmSQ'
+/** GA4 事件参与时长（毫秒）：最小交互事件默认 100ms，无此字段事件无法归因到 session */
+const DEFAULT_ENGAGEMENT_TIME_IN_MSEC = 100
 
 type TGaProxyType = 'view' | 'click' | 'move' | 'delete' | 'press'
 
@@ -92,6 +112,7 @@ export const gaProxy = async (
   payload = {},
 ) => {
   if (__DEV__) return
+  if (await checkIsGaDisabled()) return
   let clientId: string = ''
   let sessionId: string = ''
   try {
@@ -109,6 +130,7 @@ export const gaProxy = async (
         name: `${type}_${names.join('_')}`,
         params: {
           session_id: sessionId,
+          engagement_time_msec: DEFAULT_ENGAGEMENT_TIME_IN_MSEC,
           ...payload,
         },
       },
@@ -211,6 +233,7 @@ export const gaReportError = async (
   context?: string,
 ) => {
   if (__DEV__) return
+  if (await checkIsGaDisabled()) return
   const errorName = extractErrorName(error)
   const message = error instanceof Error ? error.message : String(error)
   const hash = buildErrorHash(type, location, message)

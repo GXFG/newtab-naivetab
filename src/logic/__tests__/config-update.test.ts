@@ -249,5 +249,24 @@ describe('config/update', () => {
       expect(localConfig.general.shimmerBackgroundColors[0]).toEqual(['#fff'])
       expect(localConfig.general.shimmerAnimationSpeed).toBe(2)
     })
+
+    it('v2.6.1 migration: defaults isGaEnabled to true for old config', async () => {
+      const { localConfig } = await import('@/logic/config/state')
+      // 模拟老用户配置不含 isGaEnabled
+      expect((localConfig.general as any).isGaEnabled).toBeUndefined()
+
+      handleAppUpdate()
+
+      expect(localConfig.general.isGaEnabled).toBe(true)
+    })
+
+    it('v2.6.1 migration: preserves existing isGaEnabled=false', async () => {
+      const { localConfig } = await import('@/logic/config/state')
+      ;(localConfig.general as any).isGaEnabled = false
+
+      handleAppUpdate()
+
+      expect(localConfig.general.isGaEnabled).toBe(false)
+    })
   })
 })

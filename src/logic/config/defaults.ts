@@ -107,6 +107,7 @@ const generalConfig = {
     ['#6B4FAE', '#4A7A4D', '#B8A050', '#B06080', '#4080A0', '#4A6F5A'],
   ] as [string[], string[]],
   shimmerAnimationSpeed: 1,
+  isGaEnabled: true,
   swatcheColors: [
     'rgba(255, 255, 255, 1)',
     'rgba(15, 23, 42, 1)',

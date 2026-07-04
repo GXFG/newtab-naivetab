@@ -238,7 +238,9 @@
     "scaleMode": "缩放适配",
     "scaleModeAuto": "自动缩放",
     "scaleModeFixed": "固定尺寸",
-    "scaleModeTips": "自动缩放：组件随屏幕等比缩放，大屏元素更大；固定尺寸：所有屏幕统一大小"
+    "scaleModeTips": "自动缩放：组件随屏幕等比缩放，大屏元素更大；固定尺寸：所有屏幕统一大小",
+    "enableAnalytics": "使用体验改进计划",
+    "enableAnalyticsTips": "开启后匿名分享基本使用数据（功能使用情况、性能指标），仅用于改进产品体验。不收集个人信息和浏览记录。可随时关闭。"
   },
   "keyboardCommon": {
     "keycapKeyFont": "按键字体",
