@@ -61,16 +61,16 @@ const handleOpenUserGuide = () => {
       <div class="section__grid">
         <button
           class="action__card"
-          :title="$t('about.userDocs')"
+          :title="$t('about.officialSite')"
           @click="createTab(URL_NAIVETAB_DOC_HOME)"
         >
           <span class="card__icon-wrap">
             <Icon
-              :icon="ICONS.bookOutline"
+              :icon="ICONS.website"
               class="card__icon"
             />
           </span>
-          <span class="card__label">{{ $t('about.userDocs') }}</span>
+          <span class="card__label">{{ $t('about.officialSite') }}</span>
         </button>
         <button
           class="action__card"

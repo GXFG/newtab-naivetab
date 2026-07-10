@@ -564,10 +564,15 @@
     "zhihu": "Zhihu",
     "weibo": "Weibo",
     "kr36": "36kr",
+    "bilibili": "Bilibili",
     "v2ex": "V2EX",
+    "github": "GitHub",
+    "hackernews": "Hacker",
     "urlActiveColorLabel": "URL Active Color",
     "labelActiveColorLabel": "Label Active Color",
-    "loginOrRefresh": "Login / Refresh"
+    "tapToRetry": "Tap to retry",
+    "loading": "Loading...",
+    "needLogin": "Please log in to __source__ in your browser first"
   },
   "countdown": {
     "timerDisplay": "Timer Display",
@@ -664,7 +669,7 @@
   "about": {
     "tagline": "Visual keyboard shortcuts for bookmarks and commands, one-tap access with muscle memory",
     "userHelp": "Help Center",
-    "userDocs": "User Docs",
+    "officialSite": "Official Site",
     "userGuide": "User Guide",
     "guideInNewtab": "User guide is only available in the new tab page",
     "changelog": "Changelog",

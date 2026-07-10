@@ -564,10 +564,15 @@
     "zhihu": "知乎",
     "weibo": "微博",
     "kr36": "36氪",
+    "bilibili": "B站",
     "v2ex": "V2EX",
+    "github": "GitHub",
+    "hackernews": "Hacker",
     "urlActiveColorLabel": "URL激活色",
     "labelActiveColorLabel": "标签激活色",
-    "loginOrRefresh": "登录 / 刷新"
+    "tapToRetry": "点击重试",
+    "loading": "加载中...",
+    "needLogin": "请先在浏览器中登录 __source__ 后重试"
   },
   "countdown": {
     "timerDisplay": "计时器显示",
@@ -664,7 +669,7 @@
   "about": {
     "tagline": "可视化键盘展示书签和浏览器指令，肌肉记忆一键直达",
     "userHelp": "使用帮助",
-    "userDocs": "用户文档",
+    "officialSite": "官方网站",
     "userGuide": "操作指南",
     "guideInNewtab": "操作指南需在新标签页中查看",
     "changelog": "更新日志",

@@ -33,8 +33,7 @@ watch(
       localConfig.general.appearance
     ] as 0 | 1
     localState.value.currAppearanceLabel = localConfig.general.appearance as
-      | 'light'
-      | 'dark'
+      'light' | 'dark'
   },
   {
     immediate: true,

@@ -15,7 +15,7 @@ import {
   FontField,
   ToggleColorField,
 } from '@/setting/fields'
-import { state } from '@/newtab/widgets/news/logic'
+import { state, onRetryNews } from '@/newtab/widgets/news/logic'
 
 type NewsSourceItem = {
   label: string
@@ -28,7 +28,10 @@ const allNewsSources = computed<NewsSourceItem[]>(() => [
   { label: window.$t('news.zhihu'), value: 'zhihu' },
   { label: window.$t('news.weibo'), value: 'weibo' },
   { label: window.$t('news.kr36'), value: 'kr36' },
+  { label: window.$t('news.bilibili'), value: 'bilibili' },
   { label: window.$t('news.v2ex'), value: 'v2ex' },
+  { label: window.$t('news.github'), value: 'github' },
+  { label: window.$t('news.hackernews'), value: 'hackernews' },
 ])
 
 /** 同步当前 tab 为列表第一个源，列表空时回退到 baidu */
@@ -41,7 +44,9 @@ const toggleSource = (value: NewsSources) => {
   const idx = list.indexOf(value)
   if (idx === -1) {
     list.push(value)
-  } else {
+    // 新开启的源立即拉取数据，不等下一次 updateNews 周期
+    onRetryNews(value)
+  } else if (list.length > 1) {
     list.splice(idx, 1)
   }
   syncCurrTab()
