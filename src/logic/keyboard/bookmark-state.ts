@@ -46,8 +46,7 @@ import { MSG_SWITCH_BOOKMARK_LAYER_UI } from '@/types/messages'
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'local' && changes[SYSTEM_KEYMAP_STORAGE_KEY]) {
     const newKeymap = changes[SYSTEM_KEYMAP_STORAGE_KEY].newValue as
-      | Record<string, TBookmarkEntry>
-      | undefined
+      Record<string, TBookmarkEntry> | undefined
     if (newKeymap) {
       state.systemKeymap = newKeymap
       persistKeymapToLocal(newKeymap)
@@ -63,8 +62,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   // 不再调用 getSystemBookmarkForKeyboard()（避免重复解析书签树）。
   if (areaName === 'local' && changes[ACTIVE_LAYER_STORAGE_KEY]) {
     const newLayer = changes[ACTIVE_LAYER_STORAGE_KEY].newValue as
-      | number
-      | undefined
+      number | undefined
     if (typeof newLayer === 'number') {
       cachedActiveLayer.value = newLayer
       try {

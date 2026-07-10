@@ -10,9 +10,11 @@
  * 视觉层级（从外到内）：
  *   row__keycap（键帽底座，含边框/阴影）
  *     └─ keycap__stage（键帽顶面，gmk/dsa/flat 三种型别）
- *          ├─ keycap__label  （键位标识，如 A / Enter）
- *          ├─ keycap__img    （书签图标 / 文件夹图标）
- *          └─ keycap__name   （书签名称）
+ *          ├─ keycap__label       （键位标识，如 A / Enter）
+ *          ├─ keycap__icon-area   （图标区容器 + loading 绝对定位锚点）
+ *          │    ├─ item__loading  （加载动画，CSS 细环 spinner）
+ *          │    └─ keycap__img    （书签 favicon / 命令图标）
+ *          └─ keycap__name        （书签名称）
  */
 
 import { Icon } from '@iconify/vue'
@@ -122,14 +124,6 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
       :class="stageClassName"
       :style="stageStyle"
     >
-      <!-- 加载动画（书签 favicon 加载中） -->
-      <div
-        v-if="isLoading"
-        class="item__loading"
-      >
-        <Icon :icon="ICONS.loading" />
-      </div>
-
       <!-- 键位标识（如 A / Enter / Shift） -->
       <p
         v-if="showCapKey"
@@ -139,31 +133,40 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
         {{ label || EMPTY_PLACEHOLDER }}
       </p>
 
-      <!-- 命令图标区：commandIcon 优先级最高，其次才是书签 favicon/矢量图标 -->
+      <!-- 图标区容器：flex 伸缩 + 相对定位锚点（loading 和 img 共用） -->
       <div
-        class="keycap__img"
+        class="keycap__icon-area"
         :style="iconStyle"
       >
-        <Transition
-          :name="enableTransition ? 'keycap-icon' : ''"
-          mode="out-in"
-        >
-          <!-- 命令图标：优先级最高，用于 keyboardCommand 设置面板 -->
-          <Icon
-            v-if="commandIcon"
-            :key="`cmd-${iconKey}`"
-            :icon="commandIcon"
-            class="img__command"
-          />
-          <!-- 书签 favicon -->
-          <img
-            v-else-if="showFavicon && iconSrc"
-            :key="`icon-${iconKey}`"
-            class="img__main"
-            :src="iconSrc"
-            :draggable="imgDraggable"
-          />
-        </Transition>
+        <!-- 加载动画：Apple 风格细环 spinner -->
+        <div
+          v-if="isLoading"
+          class="item__loading"
+        />
+
+        <!-- 图标内容（overflow: hidden 裁剪超出的 favicon） -->
+        <div class="keycap__img">
+          <Transition
+            :name="enableTransition ? 'keycap-icon' : ''"
+            mode="out-in"
+          >
+            <!-- 命令图标：优先级最高，用于 keyboardCommand 设置面板 -->
+            <Icon
+              v-if="commandIcon"
+              :key="`cmd-${iconKey}`"
+              :icon="commandIcon"
+              class="img__command"
+            />
+            <!-- 书签 favicon -->
+            <img
+              v-else-if="showFavicon && iconSrc"
+              :key="`icon-${iconKey}`"
+              class="img__main"
+              :src="iconSrc"
+              :draggable="imgDraggable"
+            />
+          </Transition>
+        </div>
       </div>
 
       <!-- 书签名称 -->
@@ -283,20 +286,6 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
     color: inherit;
     background-color: inherit;
 
-    /* 加载旋转图标，绝对定位居中覆盖 */
-    .item__loading {
-      z-index: 1;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: var(--nt-primary-color);
-      font-size: 190%;
-    }
-
     /* 键位标识（左上角小字） */
     .keycap__label {
       flex: 0 0 auto;
@@ -308,8 +297,8 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
       font-weight: 500;
     }
 
-    /* 图标区（居中弹性伸缩，transform scale 由 --nt-kb-favicon-size 控制大小） */
-    .keycap__img {
+    /* 图标区容器：弹性伸缩 + 绝对定位锚点 */
+    .keycap__icon-area {
       flex: 1 1 0;
       min-height: 0;
       width: 100%;
@@ -317,21 +306,54 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      position: relative;
 
-      .img__main {
-        height: 100%;
-        transform: scale(var(--nt-kb-favicon-size));
+      /* 加载动画：Apple 风格细环 spinner，aspect-ratio 保证正圆，::after 分离旋转 */
+      .item__loading {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: clamp(10px, min(38%, 18px), 18px);
+        aspect-ratio: 1;
+
+        &::after {
+          content: '';
+          display: block;
+          width: 100%;
+          height: 100%;
+          border: 1.5px solid
+            color-mix(in srgb, var(--nt-primary-color) 10%, transparent);
+          border-top-color: var(--nt-primary-color);
+          border-radius: 50%;
+          animation: keycap-loading-spin 0.6s linear infinite;
+        }
       }
 
-      .img__type {
-        height: 100%;
+      /* 图标内容：overflow 裁剪超出的 favicon（transform scale 由 --nt-kb-favicon-size 控制） */
+      .keycap__img {
         width: 100%;
-        transform: scale(var(--nt-kb-favicon-size));
-      }
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
 
-      .img__command {
-        transform: scale(var(--nt-kb-favicon-size));
+        .img__main {
+          height: 100%;
+          transform: scale(var(--nt-kb-favicon-size));
+        }
+
+        .img__type {
+          height: 100%;
+          width: 100%;
+          transform: scale(var(--nt-kb-favicon-size));
+        }
+
+        .img__command {
+          transform: scale(var(--nt-kb-favicon-size));
+        }
       }
     }
 
@@ -432,6 +454,13 @@ const nameKey = computed(() => `${props.name || 'noname'}-${props.keyCode}`)
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* 加载动画：细环旋转 */
+@keyframes keycap-loading-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

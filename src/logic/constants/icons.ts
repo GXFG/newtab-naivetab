@@ -76,6 +76,7 @@ export const ICONS = {
   palette: 'mdi:palette-outline',
   resize: 'mdi:resize',
   // about & info
+  website: 'mdi:web',
   bookOutline: 'material-symbols:book-2-outline',
   devGuideOutline: 'material-symbols:developer-guide-outline-rounded',
   newReleases: 'ic:outline-new-releases',

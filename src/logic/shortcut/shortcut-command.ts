@@ -304,9 +304,7 @@ type TCsCommandName =
  * 依赖 localConfig / globalState，只能在 newtab 页面执行；CS 侧静默忽略。
  */
 export type TNewtabCommandName =
-  | 'toggleFocusMode'
-  | 'toggleDragMode'
-  | 'toggleSettingDrawer'
+  'toggleFocusMode' | 'toggleDragMode' | 'toggleSettingDrawer'
 
 /**
  * SW 命令名称（TCommandName 排除 CS 命令和 newtab 命令）

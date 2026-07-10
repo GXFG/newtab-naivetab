@@ -29,4 +29,6 @@ export const NEWS_SOURCE_MAP = {
   kr36: 'https://36kr.com/hot-list/catalog',
   v2ex: 'https://www.v2ex.com/?tab=hot',
   bilibili: 'https://www.bilibili.com/v/popular/rank/all',
+  github: 'https://github.com/trending',
+  hackernews: 'https://news.ycombinator.com/news',
 }

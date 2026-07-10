@@ -1,6 +1,26 @@
 import type { KeycapTheme } from './interface'
 
 export const KEYCAP_CLASSIC_MAP = {
+  defaultLight: {
+    label: 'Default Light',
+    shellColor: 'rgba(225, 219, 209, 1.0)',
+    mainFontColor: 'rgba(60,65,70,1.0)',
+    mainBackgroundColor: 'rgba(235,238,240,1.0)',
+    emphasisOneFontColor: 'rgba(235,238,240,1.0)',
+    emphasisOneBackgroundColor: 'rgba(80,85,90,1.0)',
+    emphasisTwoFontColor: 'rgba(60,65,70,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(160,165,170,1.0)',
+  },
+  defaultDark: {
+    label: 'Default Dark',
+    shellColor: 'rgba(51,65,85,1.0)',
+    mainFontColor: 'rgba(226,232,240,1.0)',
+    mainBackgroundColor: 'rgba(71,85,105,1.0)',
+    emphasisOneFontColor: 'rgba(226,232,240,1.0)',
+    emphasisOneBackgroundColor: 'rgba(30,41,59,1.0)',
+    emphasisTwoFontColor: 'rgba(30,41,59,1.0)',
+    emphasisTwoBackgroundColor: 'rgba(148,163,184,1.0)',
+  },
   light: {
     label: 'Light',
     shellColor: 'rgba(73, 73, 73, 0.85)',

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { gaProxy } from '@/logic/utils/gtag'
 import { createTab } from '@/logic/utils/common'
+import { NEWS_SOURCE_MAP } from '@/logic/constants/urls'
 import { isDragMode } from '@/logic/moveable'
 import {
   state,
@@ -8,6 +9,8 @@ import {
   updateNews,
   onRetryNews,
   handleWatchNewsConfigChange,
+  isSourceLoading,
+  isSourceAuthError,
 } from '@/newtab/widgets/news/logic'
 import { localConfig } from '@/logic/config/state'
 import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
@@ -152,16 +155,10 @@ watch(isRender, (value) => {
                 'news__content--hover': !isDragMode,
               }"
             >
-              <template
-                v-if="
-                  newsLocalState[source.value] &&
-                  newsLocalState[source.value].list.length !== 0
-                "
-              >
+              <template v-if="newsLocalState[source.value].list.length !== 0">
                 <div
-                  v-for="(item, index) in newsLocalState[source.value] &&
-                  newsLocalState[source.value].list"
-                  :key="item.desc"
+                  v-for="(item, index) in newsLocalState[source.value].list"
+                  :key="index"
                   class="content__item"
                   :class="{
                     'content__item--hover': !isDragMode,
@@ -206,14 +203,39 @@ watch(isRender, (value) => {
                 v-else
                 class="content__empty"
               >
+                <p v-if="isSourceLoading(source.value)">
+                  {{ $t('news.loading') }}
+                </p>
+                <template v-else-if="isSourceAuthError(source.value)">
+                  <p class="content__empty-tip">
+                    {{ $t('news.needLogin').split('__source__')[0] }}
+                    <button
+                      class="content__empty-link"
+                      @click="createTab(NEWS_SOURCE_MAP[source.value], true)"
+                    >
+                      {{ $t(`news.${source.value}`) }}
+                    </button>
+                    {{ $t('news.needLogin').split('__source__')[1] }}
+                  </p>
+                  <NTButton
+                    type="primary"
+                    variant="secondary"
+                    size="small"
+                    round
+                    @click="onRetryNews(source.value)"
+                  >
+                    {{ $t('news.tapToRetry') }}
+                  </NTButton>
+                </template>
                 <NTButton
+                  v-else
                   type="primary"
                   variant="secondary"
                   size="small"
                   round
                   @click="onRetryNews(source.value)"
                 >
-                  {{ $t('news.loginOrRefresh') }}
+                  {{ $t('news.tapToRetry') }}
                 </NTButton>
               </div>
             </NTScrollArea>
@@ -319,9 +341,18 @@ watch(isRender, (value) => {
         }
         .content__empty {
           display: flex;
+          flex-direction: column;
           justify-content: center;
           align-items: center;
+          gap: 10px;
           height: var(--nt-n-height);
+        }
+        .content__empty-link {
+          all: unset;
+          display: inline;
+          color: var(--nt-primary-color);
+          cursor: pointer;
+          text-decoration: underline;
         }
       }
       .news__content--hover:hover {

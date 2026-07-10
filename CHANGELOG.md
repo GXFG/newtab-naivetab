@@ -8,6 +8,7 @@
 - +: 编辑模式：拖拽角标调整 Widget 尺寸，支持更灵活的自由布局
 - +: Widget 交互增强：点击置顶 Widget，悬停临时置顶
 - +: 布局相关：缩放适配模式切换（自动缩放 / 固定尺寸）
+- +: 资讯News 新增 GitHub Trending、Hacker News 两个新闻源，移除 cheerio 改用浏览器原生 API，修复多个数据解析异常
 - ^: 精简依赖：移除 unplugin-icons，构建配置优化
 
 

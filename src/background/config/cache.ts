@@ -141,8 +141,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   // source=1 的 keymap 存储在 local 区域
   if (areaName === 'local' && changes[SYSTEM_KEYMAP_STORAGE_KEY]) {
     const newKeymap = changes[SYSTEM_KEYMAP_STORAGE_KEY].newValue as
-      | Record<string, TBookmarkEntry>
-      | undefined
+      Record<string, TBookmarkEntry> | undefined
     if (newKeymap) {
       cachedSystemKeymap = newKeymap
       buildLayerKeymapComplete()
@@ -211,8 +210,7 @@ export const loadAndCacheSystemKeymap = async (): Promise<void> => {
   try {
     const data = await chrome.storage.local.get(SYSTEM_KEYMAP_STORAGE_KEY)
     const keymap = data[SYSTEM_KEYMAP_STORAGE_KEY] as
-      | Record<string, TBookmarkEntry>
-      | undefined
+      Record<string, TBookmarkEntry> | undefined
     if (keymap) {
       cachedSystemKeymap = keymap
       log('System keymap loaded from storage.local')

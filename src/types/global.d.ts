@@ -45,10 +45,7 @@ type settingPanes =
   | 'keyboardCommand'
 
 type KeydownTaskKey =
-  | 'draft-tool'
-  | 'keyboardBookmark'
-  | 'bookmarkFolder'
-  | 'globalShortcut'
+  'draft-tool' | 'keyboardBookmark' | 'bookmarkFolder' | 'globalShortcut'
 
 type DatabaseHandleType = 'add' | 'put' | 'get' | 'delete'
 type DatabaseStore = 'localBackgroundImages' | 'currBackgroundImages'
@@ -77,11 +74,7 @@ type Placement =
 
 type TDrawerPlacement = 'top' | 'bottom' | 'left' | 'right'
 type TPageFocusElement =
-  | 'default'
-  | 'root'
-  | 'search'
-  | 'memo'
-  | 'keyboardBookmark'
+  'default' | 'root' | 'search' | 'memo' | 'keyboardBookmark'
 
 interface SelectStringItem {
   label: string

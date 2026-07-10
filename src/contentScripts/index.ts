@@ -178,8 +178,7 @@ const initMain = () => {
         'naive-tab-keyboardBookmark',
       )
       const raw = keyboardData['naive-tab-keyboardBookmark'] as
-        | string
-        | undefined
+        string | undefined
       if (raw) {
         const parsed = await parseStoredData(raw)
         updateConfig({
@@ -271,8 +270,7 @@ const initMain = () => {
     if (areaName === 'sync') {
       // 书签快捷键配置变化
       const keyboardRaw = changes['naive-tab-keyboardBookmark']?.newValue as
-        | string
-        | undefined
+        string | undefined
       if (keyboardRaw) {
         parseStoredData(keyboardRaw)
           .then((parsed) => {
@@ -309,8 +307,7 @@ const initMain = () => {
 
       // 命令快捷键配置变化
       const commandRaw = changes['naive-tab-keyboardCommand']?.newValue as
-        | string
-        | undefined
+        string | undefined
       if (commandRaw) {
         parseStoredData(commandRaw)
           .then((parsed) => {
@@ -347,8 +344,7 @@ const initMain = () => {
     // 处理 local 区域的 systemKeymap 变化（source=1）
     if (areaName === 'local') {
       const systemKeymapRaw = changes[SYSTEM_KEYMAP_STORAGE_KEY]?.newValue as
-        | Record<string, TBookmarkEntry>
-        | undefined
+        Record<string, TBookmarkEntry> | undefined
       if (systemKeymapRaw) {
         systemKeymap = systemKeymapRaw
         debug('system keymap updated from storage.local', {

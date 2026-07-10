@@ -59,11 +59,7 @@ export interface CsToSwSwitchBookmarkLayer {
 }
 
 export type CsToSwMessage =
-  | CsToSwKeydownMessage
-  | CsToSwHello
-  | CsToSwSwitchBookmarkLayer
+  CsToSwKeydownMessage | CsToSwHello | CsToSwSwitchBookmarkLayer
 
 export type SwToCsMessage =
-  | SwToCsExecuteCommand
-  | SwToCsInitComplete
-  | SwToCsSwitchBookmarkLayer
+  SwToCsExecuteCommand | SwToCsInitComplete | SwToCsSwitchBookmarkLayer
