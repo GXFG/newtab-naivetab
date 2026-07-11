@@ -12,58 +12,12 @@ import { log } from '@/logic/utils/common'
 import { localConfig } from '@/logic/config/state'
 import { IMAGE_NETWORK_SOURCE } from '@/logic/image/constants'
 import { imageLocalState, isImageGalleryLoading } from './state'
+// 构建时由 scripts/fetch-bing-wallpaper.ts 自动生成，内置 24h TTL
+import bingWallpaperData from './bing-wallpaper.data.json'
 
-const localBingList = ref<TImage.BaseImageItem[]>([])
-
-export const getLocalBingList = async (): Promise<void> => {
-  if (localBingList.value.length > 0) {
-    return
-  }
-  try {
-    const response = await fetch('/assets/bing-wallpaper.md')
-    const text = await response.text()
-
-    const lines = text.split('\n')
-    const batchSize = 100
-    let index = 0
-
-    localBingList.value = []
-
-    return new Promise<void>((resolve) => {
-      const processBatch = () => {
-        const batch = lines.slice(index, index + batchSize)
-        const processedBatch = batch
-          .filter((line) => /^\d{4}-\d{2}-\d{2} \|/.test(line.trim()))
-          .map((line) => {
-            const nameMatch = line.match(/th\?id=OHR\.(.*?)_UHD\.jpg/)
-            const name = nameMatch ? nameMatch[1] : ''
-            const descMatch = line.match(/\[(.*?)\s*\(/)
-            const desc = descMatch ? descMatch[1] : ''
-            return {
-              name,
-              desc,
-            }
-          })
-          .filter((item) => item.name && item.desc)
-
-        localBingList.value.push(...processedBatch)
-        index += batchSize
-        if (index < lines.length) {
-          requestIdleCallback(processBatch)
-        } else {
-          resolve()
-        }
-      }
-
-      requestIdleCallback(processBatch)
-    })
-  } catch (e) {
-    console.error(e)
-    // catch 块中 resolve() 确保 async 函数返回 resolved Promise，
-    // 而非 rejected/never-resolve。调用方 updateBingImages 是 fire-and-forget，
-    // 但显式 resolve 能避免 "Promise 挂起" 的错觉和潜在的未处理 rejection。
-  }
-}
+const localBingList = ref<TImage.BaseImageItem[]>(
+  bingWallpaperData as TImage.BaseImageItem[],
+)
 
 export const getBingImageList = async () => {
   try {
@@ -114,7 +68,6 @@ export const getPexelsImageList = async () => {
 }
 
 export const updateBingImages = async () => {
-  getLocalBingList()
   const currTS = dayjs().valueOf()
   // 最小刷新间隔为3小时
   if (currTS - imageLocalState.value.bing.syncTime <= 3600000 * 3) {

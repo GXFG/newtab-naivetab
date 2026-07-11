@@ -1,24 +1,24 @@
 /**
  * @module news/logic
  * 新闻 Widget 数据层：从各平台获取热榜数据并缓存到 localStorage。
- * 10 个来源，无 cheerio 依赖（HTML 解析用浏览器原生 DOMParser）。
+ * 9 个来源，无 cheerio 依赖（HTML 解析用浏览器原生 DOMParser）。
  *
  * ## 数据获取策略（按 API 类型分为三类）
  *
  * ### 官方 JSON API（稳定，优先使用）
  * - B站：`api.bilibili.com/x/web-interface/ranking/v2`
- * - V2EX：`www.v2ex.com/?tab=hot`（DOMParser 解析，`/api/topics/hot.json` 仅 10 条已弃用）
  * - 头条：`www.toutiao.com/hot-event/hot-board/`
  * - 36氪：`openclaw.36krcdn.com/media/hotlist/{date}/24h_hot_list.json`（每小时更新，~15条）
- * - GitHub Trending：`github.com/trending`（DOMParser 解析 HTML，页面结构多年稳定）
  * - Hacker News：`hn.algolia.com/api/v1/search`（官方 Algolia API，单次请求）
  *
  * ### 内部 JSON API（页面自身使用的接口，非公开但相对稳定）
  * - 百度：`top.baidu.com/api/board?platform=wise&tab=realtime`
  * - 知乎：`zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50`（需用户已登录知乎，401 时提示登录）
  *
- * ### HTML 解析（该源无可用 JSON API，使用浏览器原生 DOMParser）
- * - 微博：`s.weibo.com/top/summary`（`/ajax/side/hotSearch` 需登录 Cookie 已 403）
+ * ### HTML 解析（无可用 JSON API，使用浏览器原生 DOMParser）
+ * - 微博：`s.weibo.com/top/summary`
+ * - V2EX：`www.v2ex.com/?tab=hot`（`/api/topics/hot.json` 仅 10 条已弃用）
+ * - GitHub Trending：`github.com/trending`（页面结构多年稳定）
  *
  * ## 缓存策略
  * 各源数据存入 localStorage（`data-news` key），通过 `syncTime` 时间戳 + `refreshIntervalTime` 控制刷新频率。
@@ -29,6 +29,10 @@ import { useStorageLocal } from '@/composables/useStorageLocal'
 import { NEWS_SOURCE_MAP } from '@/logic/constants/urls'
 import { log } from '@/logic/utils/common'
 import { localConfig } from '@/logic/config/state'
+
+/** DOMParser 请求统一 UA，避免被目标站反爬拦截（302/429） */
+const BROWSER_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
 
 export const state = reactive({
   currNewsTabValue: localConfig.news.sourceList[0] || '',
@@ -140,15 +144,17 @@ export const getZhihuNews = async () => {
       }[]
     } = await request.get(API_URL, {
       headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+        'User-Agent': BROWSER_UA,
       },
     })
     if (!res || !Array.isArray(res.data)) return
     authErrorSources.delete('zhihu')
     const newsList = res.data.map((item) => ({
-      url:
-        item.target.url || `https://www.zhihu.com/question/${item.target.id}`,
+      // target.id 是 number，超过 MAX_SAFE_INTEGER 会丢失精度。
+      // 从 url 路径中提取 id 字符串（如 /questions/2058898849314486143 → 2058898849314486143）
+      url: item.target.url
+        ? `https://www.zhihu.com/question/${item.target.url.split('/').pop()}`
+        : `https://www.zhihu.com/question/${item.target.id}`,
       desc: item.target.title,
       hot: item.detail_text.replace(/热度/g, '').replace(/\s*万/g, 'w').trim(), // "3326 万热度" / "3326万热度" → "3326w"
     }))
@@ -169,7 +175,12 @@ export const getWeiboNews = async () => {
   // 使用浏览器原生 DOMParser（无需 cheerio 依赖）。
   const PAGE_URL = 'https://s.weibo.com/top/summary?cate=realtimehot'
   try {
-    const html: string = await request.get(PAGE_URL)
+    const html: string = await request.get(PAGE_URL, {
+      headers: {
+        Referer: 'https://s.weibo.com/',
+        'User-Agent': BROWSER_UA,
+      },
+    })
     if (!html) return
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const rows = doc.querySelectorAll('#pl_top_realtimehot tbody tr')
@@ -193,8 +204,7 @@ export const getWeiboNews = async () => {
         }
       }
     })
-    // 跳过第一行（页面表头占位行）
-    newsLocalState.value.weibo.list = newsList.slice(1)
+    newsLocalState.value.weibo.list = newsList
     newsLocalState.value.weibo.syncTime = dayjs().valueOf()
     log('News-update weibo')
   } catch (e) {
@@ -259,7 +269,11 @@ export const getV2exNews = async () => {
   // /api/topics/hot.json 固定仅 10 条，回退到 DOMParser 解析公开页面获取更多条目
   const PAGE_URL = 'https://www.v2ex.com/?tab=hot'
   try {
-    const html: string = await request.get(PAGE_URL)
+    const html: string = await request.get(PAGE_URL, {
+      headers: {
+        'User-Agent': BROWSER_UA,
+      },
+    })
     if (!html) return
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const rows = doc.querySelectorAll('#Main .cell.item')
@@ -287,7 +301,11 @@ export const getGithubNews = async () => {
   // GitHub Trending 页面（无官方 API，HTML 结构多年稳定，使用 DOMParser 解析）
   const PAGE_URL = NEWS_SOURCE_MAP.github
   try {
-    const html: string = await request.get(PAGE_URL)
+    const html: string = await request.get(PAGE_URL, {
+      headers: {
+        'User-Agent': BROWSER_UA,
+      },
+    })
     if (!html) return
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const rows = doc.querySelectorAll('article.Box-row')

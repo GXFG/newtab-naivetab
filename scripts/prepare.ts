@@ -4,6 +4,9 @@ import fs from 'fs-extra'
 import chokidar from 'chokidar'
 import { isDev, log, port, r, BROWSER_DIR } from './utils'
 
+// 预取 Bing 壁纸历史数据（内置 TTL，24h 内不重复请求）
+execSync('tsx ./scripts/fetch-bing-wallpaper.ts', { stdio: 'inherit' })
+
 /**
  * Stub index.html to use Vite in development
  */
