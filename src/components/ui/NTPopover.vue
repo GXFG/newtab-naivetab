@@ -17,7 +17,7 @@
  *   内容
  * </NTPopover>
  */
-import { ref, computed, useAttrs } from 'vue'
+import { ref, computed, useAttrs, onUnmounted } from 'vue'
 import {
   PopoverRoot,
   PopoverTrigger,
@@ -48,6 +48,17 @@ const attrs = useAttrs()
 
 const internalOpen = ref(false)
 let closeTimer: ReturnType<typeof setTimeout> | null = null
+// hover 触发的 Popover 在页面滚动时应立即消失，避免跟随列表内容一起滚动
+let scrollCloseHandler: (() => void) | null = null
+
+const cleanupScrollListener = () => {
+  if (scrollCloseHandler) {
+    document.removeEventListener('scroll', scrollCloseHandler, {
+      capture: true,
+    })
+    scrollCloseHandler = null
+  }
+}
 
 const isOpen = computed(() =>
   props.trigger === 'manual' ? (props.show ?? false) : internalOpen.value,
@@ -70,6 +81,20 @@ const handleEnter = () => {
     clearTimeout(closeTimer)
     closeTimer = null
   }
+  // 注册滚动关闭监听——hover 弹出的 Popover 在页面滚动时应立即消失
+  cleanupScrollListener()
+  scrollCloseHandler = () => {
+    if (closeTimer) {
+      clearTimeout(closeTimer)
+      closeTimer = null
+    }
+    setOpen(false)
+    cleanupScrollListener()
+  }
+  document.addEventListener('scroll', scrollCloseHandler, {
+    capture: true,
+    passive: true,
+  })
   if (openDelayMs.value > 0) {
     closeTimer = setTimeout(() => setOpen(true), openDelayMs.value)
   } else {
@@ -81,6 +106,7 @@ const handleLeave = () => {
     clearTimeout(closeTimer)
     closeTimer = null
   }
+  cleanupScrollListener()
   closeTimer = setTimeout(() => setOpen(false), closeDelayMs.value)
 }
 const onUpdateOpen = (v: boolean) => {
@@ -89,8 +115,19 @@ const onUpdateOpen = (v: boolean) => {
     closeTimer = null
   }
   // Reka 请求关闭时（Escape / 点击外部），同步状态
-  if (!v) setOpen(false)
+  if (!v) {
+    cleanupScrollListener()
+    setOpen(false)
+  }
 }
+
+onUnmounted(() => {
+  if (closeTimer) {
+    clearTimeout(closeTimer)
+    closeTimer = null
+  }
+  cleanupScrollListener()
+})
 </script>
 
 <template>

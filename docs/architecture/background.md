@@ -249,7 +249,7 @@ BING_PHOTO 和 LOCAL 上传场景使用 `getOppositeAppearanceCode(code)` 同步
 
 ### Bing 本地壁纸列表
 
-Bing 每日一图的壁纸列表通过 `fetch('/assets/bing-wallpaper.md')` 读取本地打包的 Markdown 文件（打包时注入扩展），使用 `requestIdleCallback` 分批解析避免阻塞主线程。该文件仅加载一次，内容不变。
+Bing 历史壁纸列表在构建时由 `scripts/fetch-bing-wallpaper.ts` 从 GitHub 自动下载并预解析为 JSON（`src/logic/image/bing-wallpaper.data.json`），运行时通过 `import` 同步加载，零网络开销、零解析开销。脚本内置 24h TTL 缓存，频繁 dev/build 不重复请求。原始 Markdown 文件不再打包进扩展。
 
 ## 幻彩背景（SHIMMER 来源）
 
