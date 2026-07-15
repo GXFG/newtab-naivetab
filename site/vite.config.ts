@@ -4,8 +4,10 @@ import { resolve } from 'path'
 import { copyFileSync } from 'fs'
 import VueI18n from '@intlify/unplugin-vue-i18n/vite'
 
+const isCloudflare = process.env.CF_PAGES === '1'
+
 export default defineConfig({
-  base: '/newtab-naivetab/',
+  base: isCloudflare ? '/' : '/newtab-naivetab/',
   plugins: [
     vue(),
     VueI18n({
