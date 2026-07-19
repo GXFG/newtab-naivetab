@@ -48,18 +48,28 @@ const countdownStyle = computed(() => ({
 
 const isRender = getIsWidgetRender(WIDGET_CODE)
 
-// ─── 运行时持久化状态（与 localConfig 分离，不参与云同步）───
+// ─── 持久化状态（仅保留运行恢复所需的最小字段，避免高频写 localStorage）───
 const countdownState = useStorageLocal('l-countdown-state', {
-  initialRemaining: localConfig[WIDGET_CODE].defaultDuration,
-  remainingSeconds: localConfig[WIDGET_CODE].defaultDuration,
   startedAt: 0,
+  initialRemaining: localConfig[WIDGET_CODE].defaultDuration,
   isRunning: false,
 })
 
-// ─── 时间分量计算 ───
-const totalSeconds = computed(() =>
-  Math.max(0, Math.floor(countdownState.value.remainingSeconds)),
+// ─── 运行时派生值（不持久化，由 tick 实时计算）───
+const remaining = ref(
+  countdownState.value.isRunning
+    ? Math.max(
+        0,
+        countdownState.value.initialRemaining -
+          (Date.now() - countdownState.value.startedAt) / 1000,
+      )
+    : localConfig[WIDGET_CODE].defaultDuration,
 )
+
+let isFirstTick = true
+
+// ─── 时间分量计算 ───
+const totalSeconds = computed(() => Math.max(0, Math.floor(remaining.value)))
 
 const hh = computed(() =>
   String(Math.floor(totalSeconds.value / 3600)).padStart(2, '0'),
@@ -70,14 +80,11 @@ const mm = computed(() =>
 const ss = computed(() => String(totalSeconds.value % 60).padStart(2, '0'))
 
 const isFinished = computed(
-  () =>
-    countdownState.value.remainingSeconds <= 0 &&
-    !countdownState.value.isRunning,
+  () => remaining.value <= 0 && !countdownState.value.isRunning,
 )
 const isInitialState = computed(
   () =>
-    Math.floor(countdownState.value.remainingSeconds) ===
-      localConfig[WIDGET_CODE].defaultDuration &&
+    Math.floor(remaining.value) === localConfig[WIDGET_CODE].defaultDuration &&
     !countdownState.value.isRunning,
 )
 
@@ -95,7 +102,7 @@ const commitEdit = () => {
   const s = Math.min(59, Math.max(0, editS.value || 0))
   const newTotal = Math.max(1, h * 3600 + m * 60 + s)
   localConfig[WIDGET_CODE].defaultDuration = newTotal
-  countdownState.value.remainingSeconds = newTotal
+  remaining.value = newTotal
   countdownState.value.initialRemaining = newTotal
   isEditing.value = false
   globalState.isInputFocused = false
@@ -149,31 +156,34 @@ const sendFinishNotification = () => {
 const tick = () => {
   if (!countdownState.value.isRunning) return
   const elapsed = (Date.now() - countdownState.value.startedAt) / 1000
-  const remaining = countdownState.value.initialRemaining - elapsed
-  if (remaining <= 0) {
-    countdownState.value.remainingSeconds = 0
+  const rem = countdownState.value.initialRemaining - elapsed
+
+  if (rem <= 0) {
+    remaining.value = 0
     countdownState.value.isRunning = false
-    sendFinishNotification()
-    // 闪烁 2 秒后自动重置
-    setTimeout(() => {
-      if (
-        !countdownState.value.isRunning &&
-        countdownState.value.remainingSeconds <= 0
-      ) {
-        handleReset()
-      }
-    }, 2000)
+    if (isFirstTick) {
+      handleReset()
+    } else {
+      sendFinishNotification()
+      setTimeout(() => {
+        if (!countdownState.value.isRunning && remaining.value <= 0) {
+          handleReset()
+        }
+      }, 2000)
+    }
+    isFirstTick = false
     return
   }
-  countdownState.value.remainingSeconds = remaining
+  remaining.value = rem
+  isFirstTick = false
 }
 
 // ─── 控制操作 ───
 const handleStart = () => {
-  if (isDragMode.value || countdownState.value.remainingSeconds <= 0) return
+  if (isDragMode.value || remaining.value <= 0) return
   requestPermissionAsync('notifications')
   countdownState.value.startedAt = Date.now()
-  countdownState.value.initialRemaining = countdownState.value.remainingSeconds
+  countdownState.value.initialRemaining = remaining.value
   countdownState.value.isRunning = true
 }
 
@@ -186,8 +196,7 @@ const handlePause = () => {
 const handleReset = () => {
   if (isDragMode.value) return
   countdownState.value.isRunning = false
-  countdownState.value.remainingSeconds =
-    localConfig[WIDGET_CODE].defaultDuration
+  remaining.value = localConfig[WIDGET_CODE].defaultDuration
   countdownState.value.initialRemaining =
     localConfig[WIDGET_CODE].defaultDuration
   countdownState.value.startedAt = 0
@@ -198,7 +207,7 @@ watch(
   () => localConfig[WIDGET_CODE].defaultDuration,
   (newDuration) => {
     if (!countdownState.value.isRunning) {
-      countdownState.value.remainingSeconds = newDuration
+      remaining.value = newDuration
       countdownState.value.initialRemaining = newDuration
     }
   },
@@ -212,19 +221,12 @@ watch(
       removeTimerTask(WIDGET_CODE)
       return
     }
-    if (countdownState.value.isRunning) {
-      countdownState.value.startedAt = Date.now()
-      countdownState.value.initialRemaining =
-        countdownState.value.remainingSeconds
-    }
-    tick()
     addTimerTask(WIDGET_CODE, tick)
   },
   { immediate: true },
 )
 
 // ─── 进度环计算 ───
-// SVG viewBox 100×100，圆心(50,50)，半径动态基于 strokeWidth
 const svgRadius = computed(
   () => 50 - localConfig[WIDGET_CODE].strokeWidth / 2 - 1,
 )
@@ -233,7 +235,7 @@ const circumference = computed(() => 2 * Math.PI * svgRadius.value)
 const progressRatio = computed(() => {
   const total = countdownState.value.initialRemaining
   if (total <= 0) return 0
-  return Math.max(0, Math.min(1, countdownState.value.remainingSeconds / total))
+  return Math.max(0, Math.min(1, remaining.value / total))
 })
 
 const strokeDashoffset = computed(
@@ -405,7 +407,7 @@ const strokeDashoffset = computed(
           <button
             v-if="!isFinished && !isEditing"
             class="control__btn control__btn--main"
-            :disabled="isDragMode || countdownState.remainingSeconds <= 0"
+            :disabled="isDragMode || remaining <= 0"
             @click="countdownState.isRunning ? handlePause() : handleStart()"
           >
             <Icon

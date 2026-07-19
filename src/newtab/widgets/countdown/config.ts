@@ -20,7 +20,7 @@ export const WIDGET_CONFIG = {
   // 时钟字体
   clockFontFamily: 'LESLIEB',
   clockFontSize: 40,
-  clockFontColor: ['rgba(228, 228, 231, 1)', 'rgba(228, 228, 231, 1)'],
+  clockFontColor: ['rgba(44, 62, 80, 1)', 'rgba(44, 62, 80, 1)'],
   // 标签
   label: '',
   labelFontFamily: 'Arial',

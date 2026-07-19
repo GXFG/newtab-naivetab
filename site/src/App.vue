@@ -37,6 +37,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 <style>
 /* ---- html/body 背景色（覆盖 overscroll 区域，深色模式下避免白色闪现） ---- */
 body {
+  margin: 0;
+  padding: 0;
   background: #ffffff;
 }
 .dark body {
