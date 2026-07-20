@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
 import { createTab } from '@/logic/utils/common'
 import {
-  URL_NAIVETAB_DOC_HOME,
+  URL_NAIVETAB_HOME,
   URL_GITHUB_HOME,
   URL_FEEDBACK_EMAIL,
 } from '@/logic/constants/urls'
@@ -62,7 +62,7 @@ const handleOpenUserGuide = () => {
         <button
           class="action__card"
           :title="$t('about.officialSite')"
-          @click="createTab(URL_NAIVETAB_DOC_HOME)"
+          @click="createTab(URL_NAIVETAB_HOME)"
         >
           <span class="card__icon-wrap">
             <Icon

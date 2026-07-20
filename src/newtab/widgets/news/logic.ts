@@ -30,10 +30,6 @@ import { NEWS_SOURCE_MAP } from '@/logic/constants/urls'
 import { log } from '@/logic/utils/common'
 import { localConfig } from '@/logic/config/state'
 
-/** DOMParser 请求统一 UA，避免被目标站反爬拦截（302/429） */
-const BROWSER_UA =
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
-
 export const state = reactive({
   currNewsTabValue: localConfig.news.sourceList[0] || '',
 })
@@ -142,11 +138,7 @@ export const getZhihuNews = async () => {
         target: { id: number; title: string; url?: string }
         detail_text: string
       }[]
-    } = await request.get(API_URL, {
-      headers: {
-        'User-Agent': BROWSER_UA,
-      },
-    })
+    } = await request.get(API_URL)
     if (!res || !Array.isArray(res.data)) return
     authErrorSources.delete('zhihu')
     const newsList = res.data.map((item) => ({
@@ -175,12 +167,7 @@ export const getWeiboNews = async () => {
   // 使用浏览器原生 DOMParser（无需 cheerio 依赖）。
   const PAGE_URL = 'https://s.weibo.com/top/summary?cate=realtimehot'
   try {
-    const html: string = await request.get(PAGE_URL, {
-      headers: {
-        Referer: 'https://s.weibo.com/',
-        'User-Agent': BROWSER_UA,
-      },
-    })
+    const html: string = await request.get(PAGE_URL)
     if (!html) return
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const rows = doc.querySelectorAll('#pl_top_realtimehot tbody tr')
@@ -269,11 +256,7 @@ export const getV2exNews = async () => {
   // /api/topics/hot.json 固定仅 10 条，回退到 DOMParser 解析公开页面获取更多条目
   const PAGE_URL = 'https://www.v2ex.com/?tab=hot'
   try {
-    const html: string = await request.get(PAGE_URL, {
-      headers: {
-        'User-Agent': BROWSER_UA,
-      },
-    })
+    const html: string = await request.get(PAGE_URL)
     if (!html) return
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const rows = doc.querySelectorAll('#Main .cell.item')
@@ -301,11 +284,7 @@ export const getGithubNews = async () => {
   // GitHub Trending 页面（无官方 API，HTML 结构多年稳定，使用 DOMParser 解析）
   const PAGE_URL = NEWS_SOURCE_MAP.github
   try {
-    const html: string = await request.get(PAGE_URL, {
-      headers: {
-        'User-Agent': BROWSER_UA,
-      },
-    })
+    const html: string = await request.get(PAGE_URL)
     if (!html) return
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const rows = doc.querySelectorAll('article.Box-row')
