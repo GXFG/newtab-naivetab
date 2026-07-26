@@ -93,7 +93,13 @@
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=GXFG/newtab-naivetab&type=Date)](https://star-history.com/#GXFG/newtab-naivetab&Date)
+<a href="https://www.star-history.com/?repos=GXFG%2Fnewtab-naivetab&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=GXFG/newtab-naivetab&type=date&theme=dark&legend=top-left&sealed_token=qIMIWnX2CFtISmJAyE7Qy79z8x5NZTU3x4GGoienbRrp8exLKIhIcviChrPxdSan9JSGt1UtqQagCMj6E3McoiqPn2fUP11TOxc0qtvfVwhHyibmsX1I0A" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=GXFG/newtab-naivetab&type=date&legend=top-left&sealed_token=qIMIWnX2CFtISmJAyE7Qy79z8x5NZTU3x4GGoienbRrp8exLKIhIcviChrPxdSan9JSGt1UtqQagCMj6E3McoiqPn2fUP11TOxc0qtvfVwhHyibmsX1I0A" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=GXFG/newtab-naivetab&type=date&legend=top-left&sealed_token=qIMIWnX2CFtISmJAyE7Qy79z8x5NZTU3x4GGoienbRrp8exLKIhIcviChrPxdSan9JSGt1UtqQagCMj6E3McoiqPn2fUP11TOxc0qtvfVwhHyibmsX1I0A" />
+ </picture>
+</a>
 
 </div>
 
@@ -108,3 +114,6 @@
     <sub>Made with ❤️ by GXFG</sub>
   </p>
 </div>
+
+## 社区
+[LINUX DO](https://linux.do/)

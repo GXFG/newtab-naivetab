@@ -26,12 +26,12 @@
 
 Say goodbye to layers of clicks — manage your browser with a familiar keyboard layout.
 
-|                | **Bookmark Keyboard**                                      | **Command Keyboard**                                             |
-|----------------|------------------------------------------------------------|------------------------------------------------------------------|
-| **What**       | Display bookmarks on your new tab in a real keyboard layout | Execute browser commands on any page via modifier + key combos   |
-| **How**        | Open a new tab, press the corresponding key to open a site  | Set a modifier combo (e.g. `Ctrl+Shift`), press any key to trigger |
-| **Configurable** | Key mappings, keyboard layout, themes                    | Command bindings, modifier combos, domain black/whitelists       |
-| **Use Case**   | Quick access to your favorite sites from the new tab       | Tab management, page actions, scroll control — no mouse needed   |
+|                  | **Bookmark Keyboard**                                       | **Command Keyboard**                                               |
+| ---------------- | ----------------------------------------------------------- | ------------------------------------------------------------------ |
+| **What**         | Display bookmarks on your new tab in a real keyboard layout | Execute browser commands on any page via modifier + key combos     |
+| **How**          | Open a new tab, press the corresponding key to open a site  | Set a modifier combo (e.g. `Ctrl+Shift`), press any key to trigger |
+| **Configurable** | Key mappings, keyboard layout, themes                       | Command bindings, modifier combos, domain black/whitelists         |
+| **Use Case**     | Quick access to your favorite sites from the new tab        | Tab management, page actions, scroll control — no mouse needed     |
 
 ## 🌟 Features
 
@@ -39,22 +39,22 @@ Say goodbye to layers of clicks — manage your browser with a familiar keyboard
 
 **⏰ Time & Date**
 
-| Widget        | Description                        |
-|---------------|------------------------------------|
-| Clock         | Digital, analog, flip, neon styles |
-| Date          | Customizable format & style        |
-| Perpetual Calendar | Lunar calendar, holidays       |
+| Widget             | Description                        |
+| ------------------ | ---------------------------------- |
+| Clock              | Digital, analog, flip, neon styles |
+| Date               | Customizable format & style        |
+| Perpetual Calendar | Lunar calendar, holidays           |
 
 **🛠 Productivity Tools**
 
-| Widget            | Description                            |
-|-------------------|----------------------------------------|
-| Search Bar        | Customizable search engine             |
-| Folder Bookmarks  | Grid view for bookmark folders         |
-| Memo              | Notes & to-do lists                    |
-| Year Progress     | Percentage + dot grid visualization    |
-| Weather           | Temp, wind, humidity, daily indices    |
-| News              | Multi-platform trending aggregation    |
+| Widget           | Description                         |
+| ---------------- | ----------------------------------- |
+| Search Bar       | Customizable search engine          |
+| Folder Bookmarks | Grid view for bookmark folders      |
+| Memo             | Notes & to-do lists                 |
+| Year Progress    | Percentage + dot grid visualization |
+| Weather          | Temp, wind, humidity, daily indices |
+| News             | Multi-platform trending aggregation |
 
 ### Core Capabilities
 
@@ -93,7 +93,13 @@ Enjoying NaiveTab? Consider [buying me a coffee](sponsor.md) to support ongoing 
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=GXFG/newtab-naivetab&type=Date)](https://star-history.com/#GXFG/newtab-naivetab&Date)
+<a href="https://www.star-history.com/?repos=GXFG%2Fnewtab-naivetab&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=GXFG/newtab-naivetab&type=date&theme=dark&legend=top-left&sealed_token=qIMIWnX2CFtISmJAyE7Qy79z8x5NZTU3x4GGoienbRrp8exLKIhIcviChrPxdSan9JSGt1UtqQagCMj6E3McoiqPn2fUP11TOxc0qtvfVwhHyibmsX1I0A" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=GXFG/newtab-naivetab&type=date&legend=top-left&sealed_token=qIMIWnX2CFtISmJAyE7Qy79z8x5NZTU3x4GGoienbRrp8exLKIhIcviChrPxdSan9JSGt1UtqQagCMj6E3McoiqPn2fUP11TOxc0qtvfVwhHyibmsX1I0A" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=GXFG/newtab-naivetab&type=date&legend=top-left&sealed_token=qIMIWnX2CFtISmJAyE7Qy79z8x5NZTU3x4GGoienbRrp8exLKIhIcviChrPxdSan9JSGt1UtqQagCMj6E3McoiqPn2fUP11TOxc0qtvfVwhHyibmsX1I0A" />
+ </picture>
+</a>
 
 </div>
 
@@ -108,3 +114,7 @@ Enjoying NaiveTab? Consider [buying me a coffee](sponsor.md) to support ongoing 
     <sub>Made with ❤️ by GXFG</sub>
   </p>
 </div>
+
+## Community
+
+[LINUX DO](https://linux.do/)
