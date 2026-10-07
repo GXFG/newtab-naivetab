@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import NTSelect from '@/components/ui/NTSelect.vue'
 import { localConfig } from '@/logic/config/state'
 import { ICONS } from '@/logic/constants/icons'
+import {
+  HOLIDAY_REGIONS,
+  REGION_CODES,
+  resolveRegionCode,
+} from '@/logic/calendar/regions'
 import {
   SettingFormWrap,
   SettingFormItem,
@@ -19,6 +25,22 @@ const beginsList = computed(() => [
   { label: window.$t('calendar.weekday.monday'), value: 1 },
   { label: window.$t('calendar.weekday.sunday'), value: 7 },
 ])
+
+/** 节假日地区下拉项 */
+const regionList = computed(() =>
+  REGION_CODES.map((code) => ({
+    label: window.$t(HOLIDAY_REGIONS[code].labelKey),
+    value: code,
+  })),
+)
+
+/** 当前地区的假期口径说明 */
+const regionNote = computed(() =>
+  window.$t(
+    HOLIDAY_REGIONS[resolveRegionCode(localConfig.calendar.holidayRegion)]
+      .noteKey,
+  ),
+)
 </script>
 
 <template>
@@ -42,6 +64,32 @@ const beginsList = computed(() => [
           </NTRadio>
         </NTRadioGroup>
       </SettingFormItem>
+
+      <SettingFormItem
+        :label="$t('calendar.holidayRegion')"
+        :tip-content="regionNote"
+      >
+        <NTSelect
+          v-model:value="localConfig.calendar.holidayRegion"
+          :options="regionList"
+          size="small"
+        />
+      </SettingFormItem>
+
+      <SwitchField
+        v-model="localConfig.calendar.isHolidayMarkVisible"
+        :label="$t('calendar.holidayMarkVisible')"
+      />
+
+      <SwitchField
+        v-model="localConfig.calendar.isLunarTermVisible"
+        :label="$t('calendar.lunarTermVisible')"
+      />
+
+      <SwitchField
+        v-model="localConfig.calendar.isAlmanacVisible"
+        :label="$t('calendar.almanacVisible')"
+      />
 
       <SwitchField
         v-model="localConfig.calendar.festivalCountdown"

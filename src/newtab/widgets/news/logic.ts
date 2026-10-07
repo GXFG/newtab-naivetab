@@ -23,15 +23,27 @@
  * ## 缓存策略
  * 各源数据存入 localStorage（`data-news` key），通过 `syncTime` 时间戳 + `refreshIntervalTime` 控制刷新频率。
  * 刷新仅在组件挂载 / 配置变更时触发，无定时轮询 timer。
+ *
+ * ## 来源键校验
+ * `localConfig.news.sourceList` 持久化 + 云同步 + 支持导入，可能残留当前版本不支持的
+ * 键（旧版本实验来源、手工编辑、导入的旧配置）。所有使用点必须经 isNewsSource /
+ * validNewsSourceList 白名单过滤后再取值，否则 `newsLocalState.value[source]` 为
+ * undefined，会同时导致渲染报错（reading 'list'）与未捕获 Promise 拒绝（reading 'syncTime'）。
  */
 import request from '@/api/request'
 import { useStorageLocal } from '@/composables/useStorageLocal'
-import { NEWS_SOURCE_MAP } from '@/logic/constants/urls'
+import {
+  NEWS_SOURCE_MAP,
+  filterValidNewsSources,
+  isNewsSource,
+} from '@/logic/constants/urls'
 import { log } from '@/logic/utils/common'
 import { localConfig } from '@/logic/config/state'
 
 export const state = reactive({
-  currNewsTabValue: localConfig.news.sourceList[0] || '',
+  // 初值同样走白名单，避免首帧就指向未知来源（无匹配 tab → 组件空白）
+  currNewsTabValue:
+    filterValidNewsSources(localConfig.news.sourceList)[0] || '',
 })
 
 /** 需要登录的源集合，用于 UI 提示用户先去对应网站登录 */
@@ -72,6 +84,42 @@ export const newsLocalState = useStorageLocal('data-news', {
   github: { syncTime: 0, list: [] as NewsListItem[] },
   hackernews: { syncTime: 0, list: [] as NewsListItem[] },
 })
+
+/**
+ * 当前版本支持的来源列表（过滤配置中残留的未知来源键）
+ *
+ * 渲染 tab、拉取数据都必须用它，不能直接用 localConfig.news.sourceList。
+ */
+export const validNewsSourceList = computed(() =>
+  filterValidNewsSources(localConfig.news.sourceList),
+)
+
+/**
+ * 清理配置中残留的未知来源键（幂等）
+ *
+ * 仅在确有非法键时写回，避免无意义的持久化 / 云同步触发。写回会同步修正云端配置，
+ * 防止未知键在设备间反复传播。
+ */
+export const normalizeNewsSourceList = () => {
+  const list = localConfig.news.sourceList as unknown as string[]
+  const valid = filterValidNewsSources(list)
+  if (valid.length !== list.length) {
+    log(
+      'News remove unsupported sources',
+      list.filter((source) => !isNewsSource(source)),
+    )
+    localConfig.news.sourceList = valid
+  }
+  return valid
+}
+
+/** 当前选中的 tab 非法时回退到第一个有效来源，避免无匹配 tab 导致面板空白 */
+export const ensureCurrNewsTab = () => {
+  const list = validNewsSourceList.value
+  if (!list.includes(state.currNewsTabValue as NewsSources)) {
+    state.currNewsTabValue = list[0] || ''
+  }
+}
 
 export const getToutiaoNews = async () => {
   try {
@@ -364,15 +412,23 @@ export const onRetryNews = async (value: NewsSources) => {
 }
 
 export const updateNews = async () => {
+  // 先清理配置中的未知来源键并校正当前 tab，避免下文按下标取值抛错
+  normalizeNewsSourceList()
+  ensureCurrNewsTab()
   if (!localConfig.news.enabled) {
     return
   }
   const currTS = dayjs().valueOf()
   const intervalTime = localConfig.news.refreshIntervalTime * 60000
-  const promises = localConfig.news.sourceList
+  const promises = validNewsSourceList.value
     .filter((source) => {
-      const state = newsLocalState.value[source]
-      return currTS - state.syncTime >= intervalTime || state.list.length === 0
+      const cached = newsLocalState.value[source]
+      // cached 由 useStorageLocal 的浅合并兜底，理论上必然存在；此处防御
+      // NEWS_SOURCE_MAP 与 newsLocalState 默认键漂移导致的槽位缺失
+      if (!cached) return false
+      return (
+        currTS - cached.syncTime >= intervalTime || cached.list.length === 0
+      )
     })
     .map(async (source) => {
       markLoading(source)

@@ -88,6 +88,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 | `image/` | 背景图系统：状态、图库、渲染、来源常量 |
 | `keyboard/` | 键盘系统：布局转换、键帽主题（80+）、19 种布局定义 |
 | `bookmark/` | 浏览器书签 API 封装、书签树解析 |
+| `calendar/` | 日历数据适配层：唯一依赖日历库（tyme4ts）的模块 + 节日表 + 节假日地区数据 |
 | `shortcut/` | 全局快捷键：命令定义、匹配核心、Port 连接 |
 | `store/` | 运行时状态：全局状态、主题切换、DOM 副作用监听 |
 | `utils/` | 基础设施：数据库、GA 上报、权限、通用工具 |
@@ -108,6 +109,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 | [bookmark.md](docs/features/bookmark.md) | 书签系统 |
 | [keyboard.md](docs/features/keyboard.md) | 键盘布局、拖拽、主题 |
 | [widget-dev.md](docs/widgets/widget-dev.md) | Widget 生命周期、WidgetWrap、定时任务 |
+| [calendar-widget.md](docs/widgets/calendar-widget.md) | 日历适配层、tyme4ts 语义、节假日地区数据 |
 | [setting.md](docs/architecture/setting.md) | Setting 面板、注册、字段组件 |
 | [task.md](docs/architecture/task.md) | 定时任务系统 |
 | [background-modules.md](docs/architecture/background-modules.md) | SW 内部模块 |

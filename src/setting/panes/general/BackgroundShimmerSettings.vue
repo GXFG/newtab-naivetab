@@ -82,6 +82,20 @@ const randomizeColors = () => {
   })
   localConfig.general.shimmerBackgroundColors[code] = colors as any
 }
+
+/**
+ * 更新「当前外观」下第 index 个颜色。
+ *
+ * 这段赋值必须留在 script 里，不要写成模板内联 handler：写成
+ * `@update:value="(val) => { localConfig.general.…[ci] = val }"` 时，
+ * vue-tsc 3.3.x 会报 `Property 'value' does not exist on type {…config…}`；
+ * 抽成函数后即消失（实测，行为完全一致）。
+ */
+const updateShimmerColor = (index: number, value: string) => {
+  localConfig.general.shimmerBackgroundColors[
+    localState.value.currAppearanceCode
+  ][index] = value
+}
 </script>
 
 <template>
@@ -167,13 +181,7 @@ const randomizeColors = () => {
           ]"
           :key="ci"
           :value="color"
-          @update:value="
-            (val: string) => {
-              localConfig.general.shimmerBackgroundColors[
-                localState.currAppearanceCode
-              ][ci] = val
-            }
-          "
+          @update:value="(val: string) => updateShimmerColor(ci, val)"
         />
       </span>
       <NTButton

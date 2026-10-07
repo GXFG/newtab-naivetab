@@ -12,6 +12,7 @@
 dist
 dist-ssr
 node_modules
+.pnpm-store
 coverage
 extension
 extension-chrome

@@ -39,6 +39,21 @@
 - 嵌套对象新增字段不能依赖浅合并自动补全，必须在 `handleAppUpdate` 中手动赋值
 - 修改 `keymap` 时直接替换整个对象，不要试图只添加/删除单个 key
 
+## 持久化配置里的枚举数组必须白名单校验
+
+`localConfig` 中的"键名数组"（如 `news.sourceList` 的来源键）会持久化 + 云同步 + 支持导入，**可能残留当前版本不支持的键**（旧版本实验来源、手工编辑、其它设备/导入的旧配置）。直接按下标取对象会抛 `Cannot read properties of undefined`：渲染函数报错（WidgetErrorBoundary 捕获）+ async 调用变成未捕获 Promise 拒绝。
+
+**How to apply：**
+
+| 场景 | 正确做法 | 错误做法 |
+|------|----------|----------|
+| 遍历配置里的键名数组 | 先用常量注册表白名单过滤（`filterValidNewsSources`） | 直接 `list.filter((key) => data[key].xxx)` |
+| 模板里按 key 取数据 | `data[key]?.list \|\| []`（helper 收敛） | `data[key].list` |
+| 注册表新增键 | 同步 i18n 标签 + 数据槽位（`validate-registries` 校验 7 会拦截漏标签） | 只加 `NEWS_SOURCE_MAP` |
+| 清理脏键 | 幂等写回（长度变化才写，避免无谓的云同步触发） | 只在 UI 隐藏脏键（不可见又删不掉，永久崩溃） |
+
+**Why：** 白名单 UI（`find` + `filter(Boolean)`）会把未知键从界面隐藏，用户既看不到也删不掉它，脏键会一直留在配置里并在每次加载时崩溃。参考实现：`src/logic/constants/urls.ts`（`NEWS_SOURCE_KEYS` / `isNewsSource` / `filterValidNewsSources`）+ `src/newtab/widgets/news/logic.ts`（`validNewsSourceList` / `normalizeNewsSourceList`）。
+
 ## popup 修改配置后必须 flushSync
 
 popup 修改书签等配置后**必须调用 `flushConfigSync`** 强制同步，否则 popup 销毁后防抖回调不会执行，配置丢失。

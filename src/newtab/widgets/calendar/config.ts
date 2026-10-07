@@ -12,6 +12,14 @@ export const WIDGET_CONFIG = {
   enabled: true,
   weekBeginsOn: 1,
   festivalCountdown: true,
+  /** 节假日地区：ISO 3166-1 alpha-2，见 src/logic/calendar/regions */
+  holidayRegion: 'CN',
+  /** 是否显示休 / 班标记（关闭后不影响节日与节气展示） */
+  isHolidayMarkVisible: true,
+  /** 是否显示农历与节气（关闭后格子第二行、详情农历行、倒计时节气条目都不展示） */
+  isLunarTermVisible: true,
+  /** 是否显示黄历详情（宜、忌、吉神、凶煞） */
+  isAlmanacVisible: true,
   layout: {
     xOffsetKey: 'left',
     xOffsetValue: 0,

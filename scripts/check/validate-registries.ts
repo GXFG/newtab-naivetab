@@ -14,6 +14,8 @@
  *     - 源码 $t('key') → locale 中必须存在（ERROR，阻断 pre-commit）
  *     - locale 中 key 但源码未引用 → 警告（不阻断）
  *     - 模板字符串调用 $t(`...`) → 提醒无法静态校验
+ *  7. 新闻来源注册表：NEWS_SOURCE_MAP 的每个来源键都要有 news.<key> i18n 标签
+ *     （组件标签走动态 $t(`news.${key}`)，静态 i18n 检查覆盖不到）
  *
  * 用法：
  *   pnpm exec tsx scripts/check/validate-registries.ts          # 全量校验
@@ -364,6 +366,53 @@ const checkI18nUsage = () => {
 }
 
 /**
+ * 校验 7：新闻来源注册表与 i18n 标签一致
+ *
+ * NEWS_SOURCE_MAP 是来源键的唯一真源：数据层槽位、抓取函数、设置面板列表都从它派生，
+ * 组件标签走动态 `$t(`news.${key}`)`——静态 i18n 检查覆盖不到，漏加标签会让界面直接
+ * 显示原始键名（如 `reddit`）。
+ */
+const checkNewsSources = () => {
+  section('新闻来源注册表')
+
+  const urlsSource = readFileSync(
+    resolve(SRC, 'logic/constants/urls.ts'),
+    'utf-8',
+  )
+  const match = urlsSource.match(
+    /export const NEWS_SOURCE_MAP\s*=\s*\{([\s\S]*?)\n\}/,
+  )
+  if (!match) {
+    error('未找到 NEWS_SOURCE_MAP')
+    return
+  }
+
+  const sourceKeys = match[1]
+    .split('\n')
+    .map((line) => line.trim().match(/^(\w+):/)?.[1])
+    .filter(Boolean) as string[]
+
+  if (sourceKeys.length === 0) {
+    error('NEWS_SOURCE_MAP 未解析到任何来源键')
+    return
+  }
+
+  const zh = readJson<{ news?: Record<string, string> }>(
+    resolve(SRC, 'locales/zh-CN.json'),
+  )
+  const en = readJson<{ news?: Record<string, string> }>(
+    resolve(SRC, 'locales/en-US.json'),
+  )
+
+  const missing = sourceKeys.filter((key) => !zh.news?.[key] || !en.news?.[key])
+  if (missing.length > 0) {
+    error(`来源缺少 i18n 标签 news.<key>: ${missing.join(', ')}`)
+  } else {
+    ok(`所有来源均有 i18n 标签 (${sourceKeys.length} 个)`)
+  }
+}
+
+/**
  * 校验 6：i18n key 同步
  */
 const checkI18nSync = () => {
@@ -419,6 +468,7 @@ if (mode === 'i18n') {
   console.log('═══ NaiveTab 注册点完整性校验 ═══')
   checkUnregisteredWidgets()
   checkCommandConsistency()
+  checkNewsSources()
   checkI18nSync()
   checkI18nUsage()
 

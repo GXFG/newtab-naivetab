@@ -1,5 +1,10 @@
 /**
  * URL 常量 — 扩展商店、GitHub、文档、天气、新闻源等链接。
+ *
+ * NEWS_SOURCE_MAP 同时充当新闻来源键的唯一真源：数据层（newsLocalState 槽位、
+ * 抓取函数）、设置面板、i18n 标签都以此为准。消费持久化配置（
+ * localConfig.news.sourceList）时先用 isNewsSource / filterValidNewsSources 白名单
+ * 校验，避免历史残留的未知来源键导致按下标取值崩溃。
  */
 export const URL_FEEDBACK_EMAIL =
   'mailto:gxfgim@outlook.com?subject=NaiveTab Feedback'
@@ -32,3 +37,24 @@ export const NEWS_SOURCE_MAP = {
   github: 'https://github.com/trending',
   hackernews: 'https://news.ycombinator.com/news',
 }
+
+/** 受支持的新闻来源键（NEWS_SOURCE_MAP 的 key，顺序即设置面板默认展示顺序） */
+export const NEWS_SOURCE_KEYS = Object.keys(NEWS_SOURCE_MAP) as NewsSources[]
+
+/**
+ * 判断任意值是否为受支持的新闻来源键
+ *
+ * 用 hasOwnProperty 而非 `in`：后者会命中原型链（'constructor'、'toString' 等）。
+ */
+export const isNewsSource = (value: unknown): value is NewsSources =>
+  typeof value === 'string' &&
+  Object.prototype.hasOwnProperty.call(NEWS_SOURCE_MAP, value)
+
+/**
+ * 过滤出受支持的来源键，保持原顺序
+ *
+ * 用于 localConfig.news.sourceList —— 该数组持久化 + 云同步 + 支持导入，
+ * 可能残留旧版本或手工写入的未知键（如 'reddit'）。
+ */
+export const filterValidNewsSources = (list: unknown): NewsSources[] =>
+  Array.isArray(list) ? list.filter(isNewsSource) : []
