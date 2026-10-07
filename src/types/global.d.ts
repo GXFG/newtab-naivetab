@@ -34,6 +34,7 @@ type settingPanes =
   | 'bookmarkFolder'
   | 'clockDate'
   | 'calendar'
+  | 'calendarTw'
   | 'yearProgress'
   | 'countdown'
   | 'search'

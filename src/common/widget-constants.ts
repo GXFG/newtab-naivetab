@@ -34,6 +34,7 @@ export const WIDGET_CODE_LIST = [
   'news',
   'weather',
   'calendar',
+  'calendarTw',
   'yearProgress',
   'keyboardBookmark',
   'clockDigital',
@@ -58,6 +59,7 @@ export type WidgetConfigByCode = {
   keyboardBookmark: import('@/newtab/widgets/keyboardBookmark/config').TWidgetConfig
   bookmarkFolder: import('@/newtab/widgets/bookmarkFolder/config').TWidgetConfig
   calendar: import('@/newtab/widgets/calendar/config').TWidgetConfig
+  calendarTw: import('@/newtab/widgets/calendarTw/config').TWidgetConfig
   search: import('@/newtab/widgets/search/config').TWidgetConfig
   news: import('@/newtab/widgets/news/config').TWidgetConfig
   memo: import('@/newtab/widgets/memo/config').TWidgetConfig
@@ -105,6 +107,7 @@ export const WIDGET_GROUPS: Array<{
       'clockNeon',
       'date',
       'calendar',
+      'calendarTw',
       'yearProgress',
       'countdown',
     ],

@@ -12,6 +12,7 @@ import KeyboardBookmarkPane from './panes/keyboardBookmark/index.vue'
 import BookmarkFolderPane from './panes/bookmarkFolder/index.vue'
 import ClockDatePane from './panes/clockDate/index.vue'
 import CalendarPane from './panes/calendar/index.vue'
+import CalendarTwPane from './panes/calendarTw/index.vue'
 import YearProgressPane from './panes/yearProgress/index.vue'
 import CountdownPane from './panes/countdown/index.vue'
 import SearchPane from './panes/search/index.vue'
@@ -77,6 +78,7 @@ export const SETTING_GROUPS: SettingGroup[] = [
     items: [
       { code: 'clockDate', labelKey: 'setting.clockDate' },
       { code: 'calendar', labelKey: 'setting.calendar' },
+      { code: 'calendarTw', labelKey: 'setting.calendarTw' },
       { code: 'yearProgress', labelKey: 'setting.yearProgress' },
       { code: 'countdown', labelKey: 'setting.countdown' },
     ],
@@ -117,6 +119,7 @@ const PANE_MAP: Record<settingPanes, Component> = {
   bookmarkFolder: BookmarkFolderPane,
   clockDate: ClockDatePane,
   calendar: CalendarPane,
+  calendarTw: CalendarTwPane,
   yearProgress: YearProgressPane,
   countdown: CountdownPane,
   search: SearchPane,

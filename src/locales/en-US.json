@@ -163,6 +163,7 @@
     "clockNeon": "Neon Clock",
     "date": "Date",
     "calendar": "Calendar",
+    "calendarTw": "Taiwan Calendar",
     "yearProgress": "Year Progress",
     "search": "Search",
     "weather": "Weather",
@@ -553,6 +554,35 @@
       "friday": "Fri",
       "saturday": "Sat",
       "sunday": "Sun"
+    }
+  },
+  "calendarTw": {
+    "holiday": {
+      "newYear": "New Year's Day",
+      "lunarNewYearsEve": "Lunar New Year's Eve",
+      "springFestival": "Lunar New Year",
+      "springFestivalObserved": "Lunar New Year Observed",
+      "peaceMemorialDay": "Peace Memorial Day",
+      "peaceMemorialDayObserved": "Peace Memorial Day Observed",
+      "childrensDay": "Children's Day",
+      "childrensDayObserved": "Children's Day Observed",
+      "qingming": "Qingming Festival",
+      "qingmingObserved": "Qingming Festival Observed",
+      "labourDay": "Labour Day",
+      "dragonBoat": "Dragon Boat Festival",
+      "midAutumn": "Mid-Autumn Festival",
+      "teachersDay": "Teachers' Day",
+      "nationalDay": "National Day",
+      "nationalDayObserved": "National Day Observed",
+      "retrocessionDay": "Taiwan Retrocession Day",
+      "retrocessionDayObserved": "Taiwan Retrocession Day Observed",
+      "constitutionDay": "Constitution Day"
+    },
+    "festival": {
+      "lanternFestival": "Lantern Festival",
+      "qixi": "Qixi Festival",
+      "ghostFestival": "Ghost Festival",
+      "doubleNinth": "Double Ninth Festival"
     }
   },
   "yearProgress": {

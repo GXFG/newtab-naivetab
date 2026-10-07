@@ -1,0 +1,65 @@
+export const WIDGET_CODE = 'calendarTw'
+
+export const SCALABLE_FIELDS = {
+  width: { min: 16, max: 120 },
+  fontSize: { min: 6, max: 40 },
+  dayFontSize: { min: 8, max: 50 },
+  descFontSize: { min: 4, max: 30 },
+  borderRadius: { min: 0, max: 20 },
+}
+
+export const WIDGET_CONFIG = {
+  enabled: true,
+  weekBeginsOn: 1,
+  festivalCountdown: true,
+  layout: {
+    xOffsetKey: 'left',
+    xOffsetValue: 0,
+    xTranslateValue: 0,
+    yOffsetKey: 'bottom',
+    yOffsetValue: 0,
+    yTranslateValue: 0,
+  },
+  width: 45,
+  borderRadius: 4,
+  fontFamily: 'system',
+  fontSize: 13,
+  fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+  dayFontFamily: 'system',
+  dayFontSize: 16,
+  dayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+  descFontFamily: 'system',
+  descFontSize: 10,
+  descFontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
+  backgroundColor: ['rgba(255, 255, 255, 1)', 'rgba(52, 52, 57, 0.65)'],
+  backgroundBlur: 5,
+  isBorderEnabled: false,
+  borderWidth: 1,
+  borderColor: ['rgba(239, 239, 245, 1)', 'rgba(73, 73, 77, 1)'],
+  isShadowEnabled: true,
+  shadowColor: ['rgba(14, 30, 37, 0.12)', 'rgba(255, 255, 255, 0.06)'],
+  holidayFontColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
+  todayDayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
+  todayDescFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
+  todayLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+  todayLabelBackgroundColor: ['rgba(22, 144, 231, 1)', 'rgba(22, 144, 231, 1)'],
+  todayItemBackgroundColor: [
+    'rgba(159, 214, 255, 1)',
+    'rgba(106, 173, 224, 1)',
+  ],
+  restDayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
+  restDescFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
+  restLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+  restLabelBackgroundColor: ['rgba(32, 146, 0, 1)', 'rgba(32, 146, 0, 1)'],
+  restItemBackgroundColor: [
+    'rgba(213, 255, 203, 0.8)',
+    'rgba(169, 180, 156, 1)',
+  ],
+  workDayFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
+  workDescFontColor: ['rgba(44, 62, 80, 1)', 'rgba(53, 54, 58, 1)'],
+  workLabelFontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
+  workLabelBackgroundColor: ['rgba(250, 82, 82, 1)', 'rgba(250, 82, 82, 1)'],
+  workItemBackgroundColor: ['rgba(255, 221, 221, 1)', 'rgba(218, 181, 181, 1)'],
+}
+
+export type TWidgetConfig = typeof WIDGET_CONFIG

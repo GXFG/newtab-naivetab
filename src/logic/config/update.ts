@@ -134,6 +134,13 @@ export const handleAppUpdate = (localVersion?: string) => {
     fromVersion: version,
     toVersion: window.appVersion,
   })
+
+  // 新增 Widget 時，舊版設定不會自動帶入新的頂層 config。
+  // 在任何版本升級流程中補齊 calendarTw，避免舊使用者缺少設定而無法渲染。
+  if (!localConfig.calendarTw) {
+    localConfig.calendarTw = structuredClone(defaultConfig.calendarTw)
+  }
+
   // @@@@ 更新localConfig后需要手动处理新版本变更的本地数据结构
   if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
     const keymapLength = Object.keys(localConfig.keyboardBookmark.keymap).length
