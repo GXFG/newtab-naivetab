@@ -25,3 +25,36 @@
   <Icon :icon="ICONS.info" />
 </button>
 ```
+
+## 模板内联 handler 不要写配置赋值
+
+模板里的内联箭头函数**不要直接给 `localConfig` 赋值**，抽成 `<script setup>` 里的函数再调用。
+
+**Why：** vue-tsc 3.3.x 对这类写法会误报
+
+```
+error TS2339: Property 'value' does not exist on type '{ keyboardBookmark: … }'
+```
+
+报错位置指向 `localConfig.…`，但类型却是配置对象本身，排查时极其误导（实测：同一段赋值抽成 script 函数后报错立即消失，行为完全一致）。
+
+**How to apply：**
+
+```vue
+<!-- 错误：内联 handler 里赋值 -->
+<CustomColorPicker
+  v-for="(color, ci) in localConfig.general.shimmerBackgroundColors[localState.currAppearanceCode]"
+  :value="color"
+  @update:value="(val: string) => { localConfig.general.shimmerBackgroundColors[localState.currAppearanceCode][ci] = val }"
+/>
+
+<!-- 正确：抽成 script 函数 -->
+<script setup lang="ts">
+const updateShimmerColor = (index: number, value: string) => {
+  localConfig.general.shimmerBackgroundColors[localState.value.currAppearanceCode][index] = value
+}
+</script>
+<CustomColorPicker … @update:value="(val: string) => updateShimmerColor(ci, val)" />
+```
+
+顺带一提：`localState` 是 ref，在 script 里必须写 `.value`，在模板里则不要写——两种上下文的差异正是上面这个误报的来源。

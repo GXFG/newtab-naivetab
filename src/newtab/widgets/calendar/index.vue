@@ -3,7 +3,14 @@ import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import NTSelect from '@/components/ui/NTSelect.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
-import { Solar, Lunar, HolidayUtil } from 'lunar-typescript'
+import { getDayCell, getDayDetail, getFestivalList } from '@/logic/calendar'
+import type {
+  ICalendarOptions,
+  TCalendarCellOptions,
+  TConstellationKey,
+} from '@/logic/calendar'
+import { resolveRegionCode } from '@/logic/calendar/regions'
+import { getMonthGridPadding } from '@/logic/calendar/grid'
 import { gaProxy } from '@/logic/utils/gtag'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig } from '@/logic/config/state'
@@ -178,49 +185,66 @@ const state = reactive({
   currDetailDate: '',
 })
 
-const festivalList = (() => {
-  type FestivalItem = {
-    date: string
-    shortDate: string
-    desc: string
-    type: number
-    festivalCountdownDay: number
-  }
-  const list: FestivalItem[] = []
-  for (let i = 0; i <= 365; i++) {
-    const dateEle = todayDayjs.add(i, 'day')
-    const formatDate = dateEle.format('YYYY-MM-DD')
-    const shortDate = dateEle.format('MM.DD')
-    const targetDateEle = new Date(formatDate)
-    const solarEle = Solar.fromDate(targetDateEle)
-    const lunarEle = Lunar.fromDate(targetDateEle)
-    const holidayEle = HolidayUtil.getHoliday(
-      dateEle.get('year'),
-      dateEle.get('month') + 1,
-      dateEle.get('date'),
-    )
-    const desc =
-      lunarEle.getFestivals()[0] ||
-      solarEle.getFestivals()[0] ||
-      lunarEle.getJieQi() ||
-      ''
-    if (!desc) continue
-    let dayType = 0
-    if (holidayEle && holidayEle.isWork()) {
-      dayType = 2
-    } else if (holidayEle && holidayEle.getName()) {
-      dayType = 1
-    }
-    list.push({
-      date: formatDate,
-      shortDate,
-      desc,
-      type: dayType,
-      festivalCountdownDay: i,
-    })
-  }
-  return list
-})()
+/** 关闭「休 / 班标记」后，格子与倒计时列表都不再展示标记（节日与节气不受影响） */
+const toDisplayDayType = (dayType: CalendarDayType) =>
+  localConfig.calendar.isHolidayMarkVisible ? dayType : CalendarDayType.NORMAL
+
+/** 配置里的地区是字符串，收敛为已注册的地区代码（非法值回退默认地区） */
+const holidayRegion = computed(() =>
+  resolveRegionCode(localConfig.calendar.holidayRegion),
+)
+
+/** 格子与倒计时列表的选项（不含黄历，故切换黄历开关不会触发重算） */
+const cellOptions = computed<TCalendarCellOptions>(() => ({
+  region: holidayRegion.value,
+  showLunarTerm: localConfig.calendar.isLunarTermVisible,
+}))
+
+/** 详情弹窗的选项：格子选项 + 黄历开关 */
+const detailOptions = computed<ICalendarOptions>(() => ({
+  ...cellOptions.value,
+  showAlmanac: localConfig.calendar.isAlmanacVisible,
+}))
+
+/** 星期文案，索引与 tyme4ts 的 Week.NAMES 一致（0 = 周日） */
+const weekdayTextList = computed(() => [
+  window.$t('calendar.weekday.sunday'),
+  window.$t('calendar.weekday.monday'),
+  window.$t('calendar.weekday.tuesday'),
+  window.$t('calendar.weekday.wednesday'),
+  window.$t('calendar.weekday.thursday'),
+  window.$t('calendar.weekday.friday'),
+  window.$t('calendar.weekday.saturday'),
+])
+
+/** 星座文案，键与适配层的 CONSTELLATION_KEYS 一致 */
+const constellationTextMap = computed<Record<TConstellationKey, string>>(
+  () => ({
+    aries: window.$t('calendar.constellation.aries'),
+    taurus: window.$t('calendar.constellation.taurus'),
+    gemini: window.$t('calendar.constellation.gemini'),
+    cancer: window.$t('calendar.constellation.cancer'),
+    leo: window.$t('calendar.constellation.leo'),
+    virgo: window.$t('calendar.constellation.virgo'),
+    libra: window.$t('calendar.constellation.libra'),
+    scorpio: window.$t('calendar.constellation.scorpio'),
+    sagittarius: window.$t('calendar.constellation.sagittarius'),
+    capricorn: window.$t('calendar.constellation.capricorn'),
+    aquarius: window.$t('calendar.constellation.aquarius'),
+    pisces: window.$t('calendar.constellation.pisces'),
+  }),
+)
+
+/** 依赖 cellOptions，切换地区或农历开关后自动重算（约 34ms，仅变更时发生一次） */
+const festivalList = computed(() =>
+  getFestivalList(todayDayjs.toDate(), cellOptions.value).map((item) => ({
+    date: dayjs(item.date).format('YYYY-MM-DD'),
+    shortDate: dayjs(item.date).format('MM.DD'),
+    desc: item.desc,
+    type: toDisplayDayType(item.dayType),
+    festivalCountdownDay: item.offsetDays,
+  })),
+)
 
 const monthsList = computed(() => [
   { label: window.$t('calendar.month.january'), value: 1 },
@@ -268,49 +292,21 @@ const holidayTypeToDesc = computed(() => ({
 const genDateItem = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
   const shortDate = dateEle.format('MM.DD')
-  const targetDateEle = new Date(formatDate)
-  const solarEle = Solar.fromDate(targetDateEle)
-  const lunarEle = Lunar.fromDate(targetDateEle)
-  const holidayEle = HolidayUtil.getHoliday(
-    dateEle.get('year'),
-    dateEle.get('month') + 1,
-    dateEle.get('date'),
-  )
-
-  // desc展示优先级：阴历节日, 阳历节日, 节气, 阴历月份, 阴历日期
-  let desc =
-    lunarEle.getFestivals()[0] ||
-    solarEle.getFestivals()[0] ||
-    lunarEle.getJieQi() ||
-    ''
-  let isFestival = true
-  let festivalCountdownDay = 0
-  if (desc.length === 0) {
-    isFestival = false
-    desc =
-      lunarEle.getDay() === 1
-        ? `${lunarEle.getMonthInChinese()}月`
-        : lunarEle.getDayInChinese()
-  } else {
-    festivalCountdownDay = dateEle.diff(todayDayjs, 'day')
-  }
-
-  let dayType = CalendarDayType.NORMAL
-  if (holidayEle && holidayEle.isWork()) {
-    dayType = CalendarDayType.WORK
-  } else if (holidayEle && holidayEle.getName()) {
-    dayType = CalendarDayType.REST
-  }
+  // 传本地时间日期：适配层按本地时间取值，避免 new Date('YYYY-MM-DD') 的 UTC 解析偏差
+  const cell = getDayCell(dateEle.toDate(), cellOptions.value)
+  const festivalCountdownDay = cell.isFestival
+    ? dateEle.diff(todayDayjs, 'day')
+    : 0
 
   return {
     date: formatDate,
     shortDate,
     day: dateEle.get('date'),
-    desc,
-    type: dayType,
+    desc: cell.desc,
+    type: toDisplayDayType(cell.dayType),
     isToday: state.today === formatDate,
     isWeekend: [6, 0].includes(dateEle.get('day')),
-    isFestival,
+    isFestival: cell.isFestival,
     festivalCountdownDay,
     isNotCurrMonth: type !== 'main',
   }
@@ -322,20 +318,7 @@ const onRender = () => {
   currMonthFirstDateWeek =
     currMonthFirstDateWeek === 0 ? 7 : currMonthFirstDateWeek // 1234567
 
-  // padStart — 上月末尾填充日期
-  let padStartCount = currMonthFirstDateWeek - 1
-  if (localConfig.calendar.weekBeginsOn === 7) {
-    // begins on sunday
-    padStartCount = currMonthFirstDateWeek === 7 ? 0 : currMonthFirstDateWeek
-  }
-  const startDates: ReturnType<typeof genDateItem>[] = []
-  for (let index = 0; index < padStartCount; index += 1) {
-    const dateEle = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
-    startDates.push(genDateItem('start', dateEle))
-  }
-  startDates.reverse() // 让日期从远到近排列
-
-  // main — 当月日期
+  // 当月最后一天及其星期（与首日星期一起算出前后填充）
   const currMonthLastDate = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
     .subtract(1, 'day')
     .format('YYYY-MM-DD')
@@ -345,6 +328,25 @@ const onRender = () => {
   let currMonthLastDateWeek = dayjs(currMonthLastDate).day()
   currMonthLastDateWeek =
     currMonthLastDateWeek === 0 ? 7 : currMonthLastDateWeek
+
+  // 前后填充格数：固定补足到 6 行（42 格），否则 2 月（整 4 周）会在容器底部空出两行
+  const weekBeginsOn = localConfig.calendar.weekBeginsOn === 7 ? 7 : 1
+  const { padStart: padStartCount, padEnd: padEndCount } = getMonthGridPadding(
+    currMonthFirstDateWeek,
+    currMonthLastDateWeek,
+    currMonthLastDay,
+    weekBeginsOn,
+  )
+
+  // padStart — 上月末尾填充日期
+  const startDates: ReturnType<typeof genDateItem>[] = []
+  for (let index = 0; index < padStartCount; index += 1) {
+    const dateEle = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
+    startDates.push(genDateItem('start', dateEle))
+  }
+  startDates.reverse() // 让日期从远到近排列
+
+  // main — 当月日期
   const mainDates: ReturnType<typeof genDateItem>[] = []
   for (let index = 0; index < currMonthLastDay; index += 1) {
     const dateEle = dayjs(`${state.currYear}-${state.currMonth}-${index + 1}`)
@@ -352,15 +354,6 @@ const onRender = () => {
   }
 
   // padEnd — 下月开头填充日期
-  let padEndCount = 7 - currMonthLastDateWeek
-  if (localConfig.calendar.weekBeginsOn === 7) {
-    // begins on sunday
-    padEndCount = currMonthLastDateWeek === 7 ? 6 : 6 - currMonthLastDateWeek
-  }
-  if (startDates.length + mainDates.length + padEndCount === 35) {
-    // 确保整体为6行
-    padEndCount += 7
-  }
   const endDates: ReturnType<typeof genDateItem>[] = []
   for (let index = 0; index < padEndCount; index += 1) {
     const dateEle = dayjs(currMonthLastDate).add(index + 1, 'day')
@@ -375,7 +368,12 @@ onMounted(() => {
 })
 
 watch(
-  () => localConfig.calendar.weekBeginsOn,
+  [
+    () => localConfig.calendar.weekBeginsOn,
+    () => localConfig.calendar.holidayRegion,
+    () => localConfig.calendar.isHolidayMarkVisible,
+    () => localConfig.calendar.isLunarTermVisible,
+  ],
   () => {
     onRender()
   },
@@ -437,8 +435,7 @@ const onReset = () => {
 const detailInfo = reactive({
   date: '',
   lunar: '',
-  solarFestivals: '',
-  lunarFestivals: '',
+  festivals: [] as string[],
   xingzuo: '',
   yi: [] as string[],
   ji: [] as string[],
@@ -473,19 +470,16 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
   }
 
   // 打开新日期
-  const targetDateEle = new Date(date)
-  const lunarEle = Lunar.fromDate(targetDateEle)
-  const solarEle = Solar.fromDate(targetDateEle)
+  const detail = getDayDetail(dayjs(date).toDate(), detailOptions.value)
 
-  detailInfo.date = `${date} 周${lunarEle.getWeekInChinese()}`
-  detailInfo.lunar = `${lunarEle.getYearInGanZhi()}${lunarEle.getYearShengXiao()}年 农历${lunarEle.getMonthInChinese()}月${lunarEle.getDayInChinese()}`
-  detailInfo.solarFestivals = `${solarEle.getFestivals().join(' ')} ${solarEle.getOtherFestivals().join(' ')}`
-  detailInfo.lunarFestivals = `${lunarEle.getFestivals().join(' ')} ${lunarEle.getOtherFestivals().join(' ')}`
-  detailInfo.xingzuo = `${solarEle.getXingZuo()}座`
-  detailInfo.yi = lunarEle.getDayYi()
-  detailInfo.ji = lunarEle.getDayJi()
-  detailInfo.jishen = lunarEle.getDayJiShen()
-  detailInfo.xiongsha = lunarEle.getDayXiongSha()
+  detailInfo.date = `${date} ${weekdayTextList.value[detail.weekday]}`
+  detailInfo.lunar = detail.lunar
+  detailInfo.festivals = detail.festivals
+  detailInfo.xingzuo = constellationTextMap.value[detail.constellation]
+  detailInfo.yi = detail.yi
+  detailInfo.ji = detail.ji
+  detailInfo.jishen = detail.jishen
+  detailInfo.xiongsha = detail.xiongsha
 
   state.currDetailDate = date
   gaProxy('click', ['calendar', 'detail'])
@@ -644,24 +638,17 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
                         {{ detailInfo.xingzuo }}
                       </span>
                     </p>
-                    <p class="detail__lunar">
+                    <p
+                      v-if="detailInfo.lunar"
+                      class="detail__lunar"
+                    >
                       {{ detailInfo.lunar }}
                     </p>
                     <p
-                      v-if="
-                        detailInfo.lunarFestivals.trim() ||
-                        detailInfo.solarFestivals.trim()
-                      "
+                      v-if="detailInfo.festivals.length"
                       class="detail__festival"
                     >
-                      {{
-                        [
-                          detailInfo.lunarFestivals.trim(),
-                          detailInfo.solarFestivals.trim(),
-                        ]
-                          .filter(Boolean)
-                          .join(' · ')
-                      }}
+                      {{ detailInfo.festivals.join(' · ') }}
                     </p>
                   </div>
                   <div

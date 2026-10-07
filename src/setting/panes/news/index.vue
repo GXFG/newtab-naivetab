@@ -2,6 +2,7 @@
 import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
+import { NEWS_SOURCE_KEYS } from '@/logic/constants/urls'
 import { localConfig } from '@/logic/config/state'
 import {
   SettingFormWrap,
@@ -15,32 +16,44 @@ import {
   FontField,
   ToggleColorField,
 } from '@/setting/fields'
-import { state, onRetryNews } from '@/newtab/widgets/news/logic'
+import {
+  state,
+  onRetryNews,
+  normalizeNewsSourceList,
+  validNewsSourceList,
+} from '@/newtab/widgets/news/logic'
 
 type NewsSourceItem = {
   label: string
   value: NewsSources
 }
 
-const allNewsSources = computed<NewsSourceItem[]>(() => [
-  { label: window.$t('news.toutiao'), value: 'toutiao' },
-  { label: window.$t('news.baidu'), value: 'baidu' },
-  { label: window.$t('news.zhihu'), value: 'zhihu' },
-  { label: window.$t('news.weibo'), value: 'weibo' },
-  { label: window.$t('news.kr36'), value: 'kr36' },
-  { label: window.$t('news.bilibili'), value: 'bilibili' },
-  { label: window.$t('news.v2ex'), value: 'v2ex' },
-  { label: window.$t('news.github'), value: 'github' },
-  { label: window.$t('news.hackernews'), value: 'hackernews' },
-])
+/** 全部受支持来源：键以 NEWS_SOURCE_MAP 为唯一真源，标签走 i18n */
+const allNewsSources = computed<NewsSourceItem[]>(() =>
+  NEWS_SOURCE_KEYS.map((value) => ({
+    label: window.$t(`news.${value}`),
+    value,
+  })),
+)
 
 /** 同步当前 tab 为列表第一个源，列表空时回退到 baidu */
 function syncCurrTab() {
-  state.currNewsTabValue = localConfig.news.sourceList[0] || 'baidu'
+  state.currNewsTabValue = validNewsSourceList.value[0] || 'baidu'
+}
+
+/**
+ * 取可写的来源列表
+ *
+ * 先幂等清理配置中残留的未知来源键，保证下标的顺序与设置面板展示一致
+ * （否则未知键会插在中间，使上移/下移看起来"跳一格"）。
+ */
+function getEditableSourceList() {
+  normalizeNewsSourceList()
+  return localConfig.news.sourceList as unknown as NewsSources[]
 }
 
 const toggleSource = (value: NewsSources) => {
-  const list = localConfig.news.sourceList
+  const list = getEditableSourceList()
   const idx = list.indexOf(value)
   if (idx === -1) {
     list.push(value)
@@ -53,7 +66,7 @@ const toggleSource = (value: NewsSources) => {
 }
 
 const moveUp = (value: NewsSources) => {
-  const list = localConfig.news.sourceList
+  const list = getEditableSourceList()
   const idx = list.indexOf(value)
   if (idx <= 0) return
   list.splice(idx - 1, 0, list.splice(idx, 1)[0])
@@ -61,7 +74,7 @@ const moveUp = (value: NewsSources) => {
 }
 
 const moveDown = (value: NewsSources) => {
-  const list = localConfig.news.sourceList
+  const list = getEditableSourceList()
   const idx = list.indexOf(value)
   if (idx === -1 || idx >= list.length - 1) return
   list.splice(idx + 1, 0, list.splice(idx, 1)[0])
@@ -70,7 +83,7 @@ const moveDown = (value: NewsSources) => {
 
 /** 单一选择列表：已选源在前（sourceList顺序），未选源在后（默认顺序） */
 const allSourcesOrdered = computed(() => {
-  const sourceList = localConfig.news.sourceList as string[]
+  const sourceList = validNewsSourceList.value as string[]
   const selected = sourceList
     .map((v, i) => {
       const item = allNewsSources.value.find((s) => s.value === v)
@@ -130,7 +143,7 @@ const allSourcesOrdered = computed(() => {
                 variant="ghost"
                 size="tiny"
                 :disabled="
-                  item.selectedIndex === localConfig.news.sourceList.length - 1
+                  item.selectedIndex === validNewsSourceList.length - 1
                 "
                 @click="moveDown(item.value)"
               >

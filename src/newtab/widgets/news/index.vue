@@ -6,6 +6,7 @@ import { isDragMode } from '@/logic/moveable'
 import {
   state,
   newsLocalState,
+  validNewsSourceList,
   updateNews,
   onRetryNews,
   handleWatchNewsConfigChange,
@@ -64,11 +65,16 @@ const newsPopoverStyle = computed(() => ({
 const isRender = getIsWidgetRender(WIDGET_CODE)
 
 const selectNewsSourceList = computed(() =>
-  localConfig.news.sourceList.map((key: NewsSources) => ({
+  // 只渲染受支持的来源，配置里残留的未知键（如 'reddit'）不生成 tab
+  validNewsSourceList.value.map((key) => ({
     label: window.$t(`news.${key}`),
     value: key,
   })),
 )
+
+/** 取来源的缓存列表：未知来源或数据未就绪时返回空数组，避免取属性抛错 */
+const getSourceList = (source: NewsSources): NewsListItem[] =>
+  newsLocalState.value[source]?.list || []
 
 const handleChangeCurrTab = (value?: NewsSources | string | number) => {
   if (isDragMode.value || !value) {
@@ -155,9 +161,9 @@ watch(isRender, (value) => {
                 'news__content--hover': !isDragMode,
               }"
             >
-              <template v-if="newsLocalState[source.value].list.length !== 0">
+              <template v-if="getSourceList(source.value).length !== 0">
                 <div
-                  v-for="(item, index) in newsLocalState[source.value].list"
+                  v-for="(item, index) in getSourceList(source.value)"
                   :key="index"
                   class="content__item"
                   :class="{
