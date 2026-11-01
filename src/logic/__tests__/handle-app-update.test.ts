@@ -40,6 +40,11 @@ function resetMockState() {
       backgroundBlur: 0,
       dayFontFamily: 'Arial',
       descFontFamily: 'Arial',
+      subscriptionRegion: 'CN',
+      customSubscriptionUrl: '',
+      isHolidayMarkVisible: true,
+      isLunarTermVisible: true,
+      isAlmanacVisible: true,
     },
     memo: { enabled: true, backgroundBlur: 0 },
     news: { enabled: true, backgroundBlur: 0 },
@@ -72,7 +77,17 @@ vi.doMock('@/logic/config/defaults', () => ({
     search: { isNewTabOpen: false, backgroundBlur: 0 },
     clockDigital: { fontSize: 28, width: 22 },
     yearProgress: { enabled: true, backgroundBlur: 0 },
-    calendar: { festivalCountdown: true, backgroundBlur: 0, dayFontFamily: 'system', descFontFamily: 'system' },
+    calendar: {
+      festivalCountdown: true,
+      backgroundBlur: 0,
+      dayFontFamily: 'system',
+      descFontFamily: 'system',
+      subscriptionRegion: 'CN',
+      customSubscriptionUrl: '',
+      isHolidayMarkVisible: true,
+      isLunarTermVisible: true,
+      isAlmanacVisible: true,
+    },
     memo: { enabled: true, backgroundBlur: 0 },
     news: { enabled: true, backgroundBlur: 0 },
     bookmarkFolder: { enabled: false },
@@ -480,6 +495,23 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
 })
 
 // ── 边界场景 ──
+
+describe('handleAppUpdate: v2.7.0 calendar subscription', () => {
+  it('fills new subscription fields for a 2.6.x config', () => {
+    window.appVersion = '2.7.0'
+    mockLocalConfig.general.version = '2.6.6'
+    mockLocalConfig.calendar = {}
+
+    handleAppUpdate()
+
+    expect(mockLocalConfig.calendar.subscriptionRegion).toBe('CN')
+    expect(mockLocalConfig.calendar.customSubscriptionUrl).toBe('')
+    expect(mockLocalConfig.calendar.isHolidayMarkVisible).toBe(true)
+    expect(mockLocalConfig.calendar.isLunarTermVisible).toBe(true)
+    expect(mockLocalConfig.calendar.isAlmanacVisible).toBe(true)
+    expect(mockLocalConfig.general.version).toBe('2.7.0')
+  })
+})
 
 describe('handleAppUpdate: edge cases', () => {
   it('handles missing optional localStorage keys gracefully', () => {

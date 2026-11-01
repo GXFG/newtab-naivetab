@@ -341,6 +341,17 @@ function assertRequiredFieldsPresent(config: Record<string, any>) {
   for (const code of widgetCodes) {
     expect(config).toHaveProperty(code)
   }
+
+  // calendar 2.7.0 新增字段：节假日订阅（旧配置必须被迁移分支补齐）
+  for (const field of [
+    'subscriptionRegion',
+    'customSubscriptionUrl',
+    'isHolidayMarkVisible',
+    'isLunarTermVisible',
+    'isAlmanacVisible',
+  ]) {
+    expect(config.calendar).toHaveProperty(field)
+  }
 }
 
 // ── 核心断言：旧字段被清理 ──
@@ -355,6 +366,9 @@ function assertDeprecatedFieldsRemoved(config: Record<string, any>) {
   if (clockDigital) {
     expect(clockDigital).not.toHaveProperty('letterSpacing')
   }
+
+  // holidayRegion 是 2.7.0 开发期字段、从未发布，v2.7.0 迁移刻意不删除它；
+  // 它不会影响 subscriptionRegion，不要在这里断言“已清理”（fixture 里也没有该字段）。
 }
 
 // ── 测试主体 ──

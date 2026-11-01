@@ -4,7 +4,8 @@
  *   深色模式通过 data-theme 属性（dom.ts 中设置）控制。
  *   watch localConfig.general.appearance → 更新 localState.currAppearanceCode。
  * @dependencies common/i18n.ts（setLocale）、config/state.ts
- * @consumers newtab/App.vue
+ * @consumers newtab/App.vue、options/main.ts、popup/main.ts（副作用引入，保证启动即生效）、
+ *            date / yearProgress（currDayjsLang）
  * @see docs/architecture/config.md#主题与颜色系统
  */
 import { APPEARANCE_TO_CODE_MAP, DAYJS_LANG_MAP } from '@/logic/constants/app'
@@ -40,10 +41,19 @@ watch(
   },
 )
 
+/**
+ * 语言同步。
+ * 必须 immediate：localConfig 是**同步**从 localStorage 初始化的，
+ * 用户把语言改成英语后刷新页面，lang 在监听创建前就已经是 'en-US'，
+ * 不加 immediate 就永远不会把 i18n 从浏览器语言切换过来。
+ */
 watch(
   () => localConfig.general.lang,
   (lang) => {
     setLocale(lang)
+  },
+  {
+    immediate: true,
   },
 )
 

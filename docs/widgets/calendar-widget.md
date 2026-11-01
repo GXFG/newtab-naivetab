@@ -1,21 +1,22 @@
 # 日历 Widget 数据来源与适配层
 
-> 实现细节见 `src/logic/calendar/index.ts` 顶部注释；本文只记录"读单个文件看不到"的内容。
+> 实现细节见 `src/logic/calendar/index.ts` 与 `src/logic/calendar/subscriptions.ts` 顶部注释；本文只记录"读单个文件看不到"的内容。
 
 ## 1. 分层
 
 ```
-src/newtab/widgets/calendar/index.vue   展示层：布局、样式、交互
+src/newtab/widgets/calendar/index.vue   展示层：布局、样式、交互、加载/失败态
                 ↓
 src/logic/calendar/index.ts             适配层：全项目唯一依赖日历库的模块
-src/logic/calendar/festivals.ts         通用现代节日表：库未内置、由 Event 规则声明式补齐
-src/logic/calendar/regions/             节假日地区：注册表 + 逐年休班数据 + 校验
+src/logic/calendar/subscriptions.ts     节假日订阅：预设地区 + 自定义地址、拉取、校验、缓存
+src/logic/calendar/ics/                 ICS 解析：parse.ts（文本）+ rrule.ts（重复规则）
+src/logic/calendar/festivals.ts         通用现代节日表（9 条国际通用规则）
 src/logic/calendar/grid.ts              月历网格布局：纯计算，不依赖库与 dayjs
                 ↓
-tyme4ts                                 数据层
+tyme4ts                                 农历与黄历（农历月日、宜忌、神煞、干支）
 ```
 
-**Why：** 把"读库"的代码收口到一层，换库只改这一层；同时把日期语义（本地时间）与地区口径约定集中到一处。
+**Why：** 节日、节气、休班每年都会变，交给「节假日订阅」（iCalendar）自动更新；tyme4ts 只负责它擅长的历法计算。换库或换订阅源都只改一层。
 
 ## 2. 对外 API
 
@@ -25,19 +26,24 @@ tyme4ts                                 数据层
 | `getDayDetail(date, options)` | `{ weekday, lunar, festivals, constellation, yi, ji, jishen, xiongsha }` | 日期详情 Popover |
 | `getFestivalList(startDate, options, days = 365)` | `{ date, offsetDays, desc, dayType }[]` | 节日倒计时列表 |
 
-`options` 为 `ICalendarOptions`，三个字段彼此正交：
+`options` 为 `ICalendarOptions`：
 
 ```ts
 {
-  region: TRegionCode     // 数据：看哪个地区的节日与休班（NONE / CN / HK / TW）
-  showLunarTerm: boolean  // 展示：农历日期与节气
-  showAlmanac: boolean    // 展示：黄历详情（宜、忌、吉神、凶煞）
+  subscription: TSubscriptionDayMap | null  // 数据：订阅解析结果；null 表示尚未加载
+  includeLocalFestivals: boolean            // 数据：是否补充中文通用节日表
+  showLunarTerm: boolean                    // 展示：农历日期与节气
+  showAlmanac: boolean                      // 展示：黄历详情（宜、忌、吉神、凶煞）
 }
 ```
 
-由调用方从 `localConfig.calendar.*` 组装传入，**保持适配层为纯函数**；传入未注册的地区代码会回退到默认地区（云同步可能带来更高版本写入的值）。
+`includeLocalFestivals` 由订阅地区决定：只有**中国大陆**（`isMainlandSubscription`）为 true。`festivals.ts` 的条目只有中文名称且多为大陆常用节日，给其它日历补上会很怪；自定义地址同样不补充。
 
-文案优先级只有适配层这一份实现（格子、详情、倒计时共用）：**农历节日 → 阳历节日 → 通用现代节日 → 地区节日 → 当天节气 → 农历月/日**。
+格子与倒计时列表用 `TCalendarCellOptions`（不含 `showAlmanac`）——黄历只出现在详情弹窗，切换黄历开关不会触发格子与列表重算。
+
+由调用方从 `localConfig.calendar.*` + `subscriptionState` 组装传入，**保持适配层为纯函数**。
+
+文案优先级只有适配层这一份实现（格子、详情、倒计时共用）：**订阅节日 → 通用现代节日 → 订阅节气 → 农历月/日**。
 
 `weekday`（0=周日）与 `constellation`（如 `'gemini'`）返回的是**稳定标识**而非中文，由展示层映射到 i18n——避免把库的中文文案泄漏到界面。
 
@@ -53,10 +59,10 @@ tyme4ts                                 数据层
 
 设计要点：
 
-- **默认全开**，不与界面语言或其它设置联动——默认值不依赖运行环境，行为可预测、可测试，也不会在升级时改变老用户体验。英文商店描述本身已写明 "Lunar calendar, holidays"，默认值名副其实。
-- **正交**：`region` 管"看谁的数据"，两个开关管"看不看"。因此能表达"在美华人 = 要农历 + 不要大陆节假日"这类真实组合。
+- **默认全开**，不与界面语言或其它设置联动——默认值不依赖运行环境，行为可预测、可测试，也不会在升级时改变老用户体验。
+- **正交**：订阅管"看哪个日历"，另外三个开关分别管"看不看"。能表达"在美华人 = 要农历 + 订阅美国假日"这类真实组合。
 - **格子在文案为空时不会破版**：`.body__item` 是固定正方形 + 垂直居中，空 `<span>` 高度为 0，只有日期数字上移约 0.075vmin。
-- **缓存零耦合**：开关只在合成阶段过滤，不影响底层数据（地区节日表与休班表仍按 region + 年 缓存）。
+- **缓存零耦合**：开关只在合成阶段过滤，不影响缓存里的订阅数据。
 
 ## 2.2 网格恒定 6 行
 
@@ -71,9 +77,11 @@ tyme4ts                                 数据层
 
 ## 3. tyme4ts 的关键语义（易错）
 
+tyme4ts 现在**只提供农历与黄历**，它的节日表（`SolarFestival` / `LunarFestival`）已不再使用。
+
 | 语义 | 正确写法 | 说明 |
 |------|----------|------|
-| 节气 | `getTermDay().getDayIndex() === 0` | `getTerm()` 返回的是**当天所处的节气**，如 1 月 1 日返回「冬至」；只有 `dayIndex === 0` 才是交节日 |
+| 节气 | 优先用订阅里的节气条目；需要自己算时用 `getTermDay().getDayIndex() === 0` | `getTerm()` 返回的是**当天所处的节气**，如 1 月 1 日返回「冬至」；只有 `dayIndex === 0` 才是交节日 |
 | 农历年 | `lunarDay.getLunarMonth().getLunarYear().getSixtyCycle()` | 农历年以**正月初一**换年（GB/T 33661-2017）。`lunarDay.getYearSixtyCycle()` 是**立春**换年的八字口径，不是农历年 |
 | 农历月名 | `getLunarMonth().getName()` | 返回国标写法「正月 / 十一月 / 十二月」，**自带「月」字**，不要再拼 `${name}月` |
 | 农历日名 | `getLunarDay().getName()` | 「初一 / 廿三」；判断初一用 `getDay() === 1` |
@@ -83,41 +91,81 @@ tyme4ts                                 数据层
 
 ## 4. 通用现代节日表（festivals.ts）
 
-tyme4ts 内置的是国家级与传统节日（`SolarFestival` 10 个 + `LunarFestival` 13 个），不含情人节、母亲节这类现代节日。这些用库的 `Event` 规则补齐：
+订阅提供的是「某个地区认定的节日与休班」，但 Apple 的中国大陆日历**不含**情人节、母亲节、圣诞这类西方节日，所以这里用规则声明式补一张与地区无关的表：
 
 ```ts
 Event.builder().solarDay(2, 14, 0)        // 固定公历日
 Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示最后一个）
 ```
 
+**只收 9 条国际通用条目**（情人节、消费者权益日、愚人节、母亲节、父亲节、万圣节、感恩节、平安夜、圣诞节）。大陆特有的安全教育日 / 助残日 / 国防教育日已移除；**世界住房日、万圣节前夜也按产品决定删除，不要按旧的 11 条补回来**。
+
+**只在中国大陆订阅时生效**：条目名称只有中文且多为大陆常用节日，由 `includeLocalFestivals` 控制——订阅中国大陆时补充，订阅中国台湾 / 中国香港 / 美国等其它日历或自定义地址时不补充。
+
 **不使用库的 `EventManager`**：它是全局可变注册表（`static DATA`），且 `Event.all()` 每次调用都会重新解析整张表。`Event` 对象本身是自包含的（`getSolarDay(year)`），按年解析成日期表并缓存即可，全程无全局副作用。
 
-本表对**所有地区**生效；某地区不适用的条目由该地区数据文件的 `exclude` 排除。
+## 4.1 节假日订阅（subscriptions.ts）
 
-## 4.1 节假日地区（regions/）
+与 iOS/macOS 的节假日日历同一套数据：`https://calendars.icloud.com/holidays/<slug>.ics`。用户一次只能订阅**一个**日历（与 Apple 日历的使用心智一致），数据按 URL 缓存；将来放开多订阅时，除了 UI 还要调整 `writeSubscriptionCache` 的“只保留当前订阅”清理逻辑。
 
-休班标记与地区性节日按地区区分，地区代码遵循 **ISO 3166-1 alpha-2**（国际标准，唯一且撤销后不复用；与 `date-holidays`、Python `holidays` 等节假日数据库的约定一致）：
+| 项 | 取值 |
+|---|---|
+| 预设 | 46 个地区（CN / HK / TW / JP / KR / SG / MY / TH / VN / ID / PH / IN / US / CA / MX / BR / CL / CO / GB / IE / FR / DE / AT / CH / BE / NL / PT / ES / IT / GR / PL / CZ / HU / RO / UA / RU / TR / IL / AE / ZA / AU / NZ / SE / NO / DK / FI）|
+| 未提供 | 澳门（MO）、阿根廷（AR）——Apple 没有这两个日历 |
+| 自定义 | 任意 `http(s)` 的 `.ics` 地址；输入只改 draft，点击「验证」成功后才提交 URL 并替换订阅（失败/输入中都不碰当前订阅）；响应超过 5 MB 直接拒绝 |
+| 解析窗口 | ICS 里实际出现的年份范围 ∪ `[当前年-1, 当前年+2]`，并限制在 1900–2100；不再固定丢掉源里已有的年份。源本身未覆盖的年份仍只有农历/通用节日（这是数据源限制，不是解析遗漏）|
+| 地区名 | 用 `Intl.DisplayNames` 从 ISO 代码生成；中国大陆 / 中国台湾 / 中国香港用自定义 i18n 覆盖（`Intl` 会给出「中国」「台湾」「中国香港特别行政区」）|
+| 缓存 | `localStorage`，key 含 URL，TTL 24 小时；结构带版本号（旧 `isTerm` 缓存自动失效）；请求超时 10 秒 |
+| 失败降级 | 有过期缓存则继续展示并提示「更新失败，显示缓存数据」；无缓存才停在加载态（**刻意不用 tyme4ts 兜底**，避免两套数据源长期分叉）|
 
-↓ 顺序即设置面板下拉框顺序：
+### 刷新时机
 
-| 代码 | 地区 | 休班数据来源 | 假期口径 |
-|------|------|--------------|----------|
-| `NONE` | 不显示节假日 | 无 | 关闭态：只留国际通用节日 |
-| `CN` | 中国大陆 | tyme4ts 内置 `LegalHoliday` | 法定节假日（含调休）|
-| `HK` | 中国香港 | `regions/hk.json` | 公眾假期（17 天）|
-| `TW` | 中国台湾 | `regions/tw.json` | 政府行政機關辦公日曆表 |
+| 时机 | 行为 |
+|------|------|
+| 打开新标签页（widget `onMounted`）| 缓存未过期不请求；过期才拉 |
+| 切换预设地区 | 设置面板自动拉取（缓存缺失或过期时），widget 侧监听生效地址变化 |
+| 验证自定义地址 | 验证成功并提交后才切换；widget 随之加载新地址 |
+| 标签页重新可见（`visibilitychange`）| 同"过期才拉"，覆盖"标签页长期不关"的场景 |
+| 设置面板「刷新」按钮 | 忽略缓存强制拉取 |
+| 加载失败后的「重试」 | 强制拉取（widget 底部提示里的按钮，仅失败时出现）|
 
-`NONE` 不是地区，而是**关闭态**——每个轴都该有"关"，否则非中文地区用户无法去掉大陆口径节日（`isHolidayMarkVisible` 只能隐藏休/班角标，隐藏不了节日名）。它保留元旦、妇女节、劳动节（国际通用）与通用现代节日表，排除 7 个大陆特有内置节日、13 个农历传统节日、3 个"全国X日"。
+同一 URL 的并发加载在 `subscriptions.ts` 里用 in-flight map 合并——设置面板与 widget 同时触发只会发一次请求。`force` 与普通加载使用不同 key（避免强制刷新被缓存命中吞掉），两者并发时可能发两次请求，这是有意的。
 
-**地区影响三件事**，不只是"加节日"：
+不同 URL / `force` 的加载用 token 保护：旧请求晚返回不会覆盖新订阅；开始加载新 URL 时会清空旧 `error`。有旧数据（含过期的 TTL 缓存）时先展示旧数据，刷新期间/失败都不会清空日历；刷新时底部只显示 loading 提示（`subscriptionState.isRefreshing`），数据本身保持可见。
 
-1. **排除**：tyme4ts 内置的阳历节日是大陆口径（建党节、建军节、国庆节、儿童节 6-1、教师节 9-10…），台湾/香港用户需要排除其中不适用或日期不同的条目
-2. **新增**：该地区独有节日（雙十節、佛誕…），用与 `festivals.ts` 相同的 `Event` 规则表达
-3. **休班**：逐年由政府公告的休息日与补班日
+**设置面板的交互**：地区下拉与 `tip-content` 的灰色说明小字保持和其它设置项一致的形态；下拉与刷新按钮同一行，状态在下方灰色说明里。
 
-休班标记的优先级是 **地区数据文件 → tyme4ts 内置（仅 CN）→ 不显示标记**。这里刻意选择"宁可缺失，不可猜错"：某年数据没录入时用户看不到标记（最多觉得不够及时），而标错日期会让用户误事。
+- 外层 `.subscription` 是 `width: 100%` 的列容器——`NTSelect` 的触发器本身是 `width: 100%`，如果套一层无宽度的 `div`，会被控件区的 `justify-content: flex-end` 压成 `min-width: 90px`
+- 下拉与刷新按钮同一行：下拉通过 `:deep(.reka-select__trigger) { flex: 1 }` 占满剩余宽度，按钮 `flex-shrink: 0`
+- 刷新按钮与面板里其它按钮同款（`type="primary" variant="secondary" round` + 图标 + 文字）；刷新中重复点击在 handler 里忽略，不用 `disabled`（避免禁用态样式切换闪动）
+- 状态文案在下拉下方一行，四种状态互斥
+- 首次选中一个没缓存的地区会自动拉取，不需要用户手动点刷新
+- **自定义地址是 draft，不是 config**：输入只改 `draftCustomUrl`，不写 `localConfig`、不触发请求、不影响当前订阅；点击「验证」且成功后，才写入 `customSubscriptionUrl` 并用刚写入的缓存替换订阅（只发一次请求）。编辑 draft 会重置旧的验证提示
+- 验证期间切换地区或继续编辑会作废本次结果（token 保护），不会覆盖用户刚选的订阅
+- 未配置订阅（选「自定义」但地址为空）时 widget 不显示加载提示（状态为 `idle`）
 
-数据格式、口径说明、年度更新流程与校验规则见 [regions/README.md](../../src/logic/calendar/regions/README.md)。
+**不做定时轮询**：新标签页通常每次打开都会重新挂载，TTL + 可见性检查已覆盖实际使用场景；定时器只会增加无谓的唤醒与请求（Apple 的节假日日历一年也只变几次）。
+
+### ICS 解析要点（易错）
+
+| 坑 | 正确做法 |
+|---|---|
+| `DTEND` 是**排他**的 | `DTSTART 20231230 / DTEND 20240102` = 12/30、12/31、1/1 三天。按包含处理会每条多日假期多算一天 |
+| 多日假期用区间表示 | 展开成逐日，最多展开 `maxRangeDays`（默认 60）天；超出部分忽略（不整条丢弃）|
+| 固定节日用 `RRULE` | 支持 `FREQ=YEARLY` + `INTERVAL` + `COUNT` + `BYMONTH` + `BYDAY`（`4TH` / `-1MO`）+ `BYMONTHDAY`；非法数值/其他字段一律返回 null，当"无重复规则"处理（宁可少展开，不可猜错）|
+| `COUNT` 语义 | 按 RFC 计**实际产生的日期数**；2 月 29 日、不存在的第 5 个星期几不计数 |
+| `RRULE + DTEND` | 真实 Apple 源未出现该组合；目前只展开 DTSTART 的重复日（代码里有注释，不要误以为已完整支持）|
+| 休/班标记有两种来源 | `X-APPLE-SPECIAL-DAY: WORK-HOLIDAY / ALTERNATE-WORKDAY`（Apple 大陆日历）或 `SUMMARY` 的「（休）」「（班）」后缀；同日同时出现时「班」优先 |
+| 节气与节日可能同名 | 解析器分两步：先找出「无休班标记 + 名称在节气集合里」的事件作为节气日，再把事件拆进 `names` / `termNames`。这样 `清明（休）` 这类多日假期不会被当成节气；HK/TW 的繁体节气名（`驚蟄`/`穀雨`/`小滿`/`芒種`/`處暑`）也在 `SOLAR_TERM_NAMES` 里 |
+| 响应是 gzip | 浏览器 `fetch` 会自动解压，不要自己解；用命令行验证时才需要 `--compressed` |
+
+### 为什么运行时拉取，而不是打包进扩展
+
+- 打包等于再分发 Apple 的数据，条款上更暧昧；运行时由用户设备订阅公开日历，与任何日历 App 行为一致。
+- 扩展本身已有 `host_permissions: ['*://*/*']`，**不需要新增权限、不会弹授权**。
+- 单次传输约 9 KB（gzip），失败可从缓存继续。
+
+> Cloudflare 防护：有些第三方中文日历源（如 oneo.me）在 Cloudflare 的人机验证后面，命令行的完整浏览器请求头也会被 403；扩展内 `fetch` 无法执行 JS 挑战，除非用户已在浏览器里拿到 `cf_clearance`，因此不能作为内置预设。
 
 ## 5. 日期语义约定
 
@@ -125,30 +173,29 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
 
 ## 6. 性能
 
-适配层按天查询（每天都在问库"这天特殊吗"），列表路径需要遍历 366 天：
-
-| 路径 | tyme4ts | lunar-typescript（迁移前）|
-|------|---------|--------------------------|
-| 倒计时列表（366 天，切换地区或农历/节气开关时重算一次）| ~34 ms | ~10 ms |
-| 日期格子（42 格，每次切换月份）| ~5 ms | ~3 ms |
-
-瓶颈是 `LunarFestival.fromYmd`：它每天都要遍历 13 个节日名并逐个构造 `Event`。可选的优化方向是改用库的索引枚举（`LunarFestival.fromIndex` / `SolarTerm.fromIndex` / `SolarFestival.fromIndex`）按年预生成日期表——实测该枚举本身不到 1 ms，但需要处理农历年/节气年与公历年的错位，故暂未采用。**若后续需要，只需改 `src/logic/calendar/index.ts`。**
+| 路径 | 现状 |
+|------|------|
+| 倒计时列表（366 天）| 只查订阅 Map + 本地规则表 + 农历回退；本机实测约 7–12 ms（此前按天问库约 34 ms）|
+| 日期格子（42 格）| 同上，约 0.7 ms |
+| 订阅解析 | 一次解析约 1–5 ms（CN 246 个事件 → 7 年约 300 余天），结果进缓存，24 小时内不重复 |
 
 ## 7. 测试基线
 
 - `src/logic/__tests__/calendar.test.ts`
-  - **产品契约**：与库无关，换库也必须成立（文案优先级、干支年边界、休/班、`offsetDays` 语义、时区无关性、通用现代节日日期规则）
-  - **tyme4ts 语义**：记录相对旧库 lunar-typescript 的有意变化（国标月名、清明归入传统节日、新增上巳节/中元节/冬至节、凶煞返回中文）
-  - **节假日地区**：CN 走库、TW/HK 无数据时不标记、地区排除生效、历法信息不随地区变化、未注册代码回退
-  - **展示开关**：关闭农历与节气后格子留空/详情无农历行/倒计时不含节气；关闭黄历后四行为空；两开关互不影响
-  - **NONE**：不显示任何休班标记、排除大陆口径与农历传统节日、保留国际通用与通用现代节日、历法信息仍可用
-- `src/logic/__tests__/calendar-regions.test.ts`：注册表、规则 DSL 解析、校验器（坏数据必须被发现）
+  - **产品契约**：与库无关（文案优先级、干支年边界、休/班来自订阅、`offsetDays` 语义、时区无关性、订阅为 null 时的降级）
+  - **tyme4ts 语义**：国标月名、清明归入传统节日、星座枚举顺序、星期索引
+  - **展示开关**：关闭农历与节气后格子留空/详情无农历行/倒计时不含节气；关闭黄历后四行为空
+  - **通用节日表**：9 条规则的日期正确、已移除条目（含世界住房日、万圣节前夜）不再出现
+- `src/logic/__tests__/calendar-ics.test.ts`：ICS 文本解析与 RRULE 展开（区间排他、`BYDAY`、`BYMONTHDAY`、闰年、折叠行、异常输入、清明多日假期与繁体节气）
+- `src/logic/__tests__/calendar-subscriptions.test.ts`：46 个预设地址、地址校验、缓存 TTL/版本、错误映射、缓存优先与失败降级、源年份窗口、刷新保留旧数据、并发竞态
+- `src/logic/__tests__/calendar-grid.test.ts`：网格恒定 6 行
 
 ## 8. 依赖库现状
 
 | | lunar-typescript | tyme4ts |
 |---|---|---|
 | 官方定位 | 「后续不再增加新特性，仅修复 bug」，建议改用 Tyme | 官方继任者，长期支持 |
-| 采用情况 | 已于本次迁移移除 | 当前使用 1.5.3 |
+| 采用情况 | 已于本次迁移移除 | 当前使用 1.5.4（`^1.5.4`）|
+| 职责 | — | 只提供农历与黄历；节日/节气/休班来自订阅 |
 
-**风险**：tyme4ts 仍在演进（1.4.5 调整节日名称、1.4.6 废弃 `FestivalType`、1.5.0 移除），升级时务必跑 `calendar.test.ts` 与 `validate-holidays.ts`（后者会在节日改名导致 `exclude` 失效时报错）；另外它没有 lunar 那种 `HolidayUtil.fix()` 的公开假日数据补充 API（`LegalHoliday.DATA` 是 public static，必要时可覆盖但非文档化），大陆的次年法定假日数据依赖作者发版——这也是其他地区自带数据文件的原因。
+**风险**：tyme4ts 仍在演进（1.4.5 调整节日名称、1.4.6 废弃 `FestivalType`、1.5.0 移除）。它现在只影响农历与黄历，节日名称来自订阅源；升级时跑 `calendar.test.ts` 即可。

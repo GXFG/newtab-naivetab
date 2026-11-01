@@ -30,6 +30,9 @@ import {
   cleanupDomStyleWatchers,
 } from '@/logic/store/dom'
 import { getStyleField } from '@/logic/store/style'
+// 副作用引入：语言与外观同步必须在启动时执行，
+// 否则只在启用了 date / yearProgress 的用户那里才生效
+import '@/logic/store/theme'
 import { handleAppUpdate, getLocalVersion } from '@/logic/config/update'
 import { initBackgroundImage } from '@/logic/image/service'
 import { cleanupEvents, cleanupResizeObserver } from '@/logic/moveable'

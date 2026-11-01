@@ -1,13 +1,15 @@
 /**
- * 通用现代节日表
+ * 通用现代节日表（国际通用的 9 个）
  *
- * tyme4ts 内置的是国家级与传统节日（元旦、国庆、春节、中秋…），不含情人节、母亲节
- * 这类现代节日。此处用库的 Event 规则声明式补齐，全部由 EventBuilder 表达：
+ * 节假日订阅（./subscriptions）提供的是「某个地区认定的节日与休班」，
+ * 但 Apple 的中国大陆日历不含情人节、母亲节、圣诞这类西方节日，
+ * 所以这里用规则声明式补一张与地区无关的表，全部由 EventBuilder 表达：
  *   solarDay(月, 日, 偏移天数)          固定公历日
  *   solarWeek(月, 第几个, 星期几)       某月第 N 个星期几（-1 表示最后一个）
  *
- * 本表对所有节假日地区生效；某个地区不适用的条目由该地区数据文件的 exclude 排除
- * （见 ./regions/README.md）。
+ * 只收国际通用条目：大陆特有的纪念日（安全教育日、助残日、国防教育日）已移除，
+ * 避免美国等地区订阅的用户看到不属于自己的节日。世界住房日、万圣节前夜
+ * 也按产品决定移除，因此这里只有 9 条；不要再按旧的 11 条补回来。
  *
  * 不使用库的 EventManager：它是全局可变注册表，且每次查询都会重新解析整张表。
  * Event 对象本身是自包含的（getSolarDay(year)），按年解析一次即可。
@@ -26,34 +28,15 @@ export interface ILocalFestival {
 
 /** 库中星期索引：0=日 1=一 … 6=六 */
 const SUNDAY = 0
-const MONDAY = 1
 const THURSDAY = 4
-const SATURDAY = 6
 
 /** 节日表（顺序即同日多节日时的展示顺序） */
 export const LOCAL_FESTIVALS: ILocalFestival[] = [
   { name: '情人节', event: Event.builder().solarDay(2, 14, 0).build() },
   { name: '消费者权益日', event: Event.builder().solarDay(3, 15, 0).build() },
-  {
-    name: '全国中小学生安全教育日',
-    event: Event.builder().solarWeek(3, -1, MONDAY).build(),
-  },
   { name: '愚人节', event: Event.builder().solarDay(4, 1, 0).build() },
   { name: '母亲节', event: Event.builder().solarWeek(5, 2, SUNDAY).build() },
-  {
-    name: '全国助残日',
-    event: Event.builder().solarWeek(5, 3, SUNDAY).build(),
-  },
   { name: '父亲节', event: Event.builder().solarWeek(6, 3, SUNDAY).build() },
-  {
-    name: '全民国防教育日',
-    event: Event.builder().solarWeek(9, 3, SATURDAY).build(),
-  },
-  {
-    name: '世界住房日',
-    event: Event.builder().solarWeek(10, 1, MONDAY).build(),
-  },
-  { name: '万圣节前夜', event: Event.builder().solarDay(10, 31, 0).build() },
   { name: '万圣节', event: Event.builder().solarDay(11, 1, 0).build() },
   { name: '感恩节', event: Event.builder().solarWeek(11, 4, THURSDAY).build() },
   { name: '平安夜', event: Event.builder().solarDay(12, 24, 0).build() },

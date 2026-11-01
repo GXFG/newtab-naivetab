@@ -9,8 +9,8 @@ import Components from 'unplugin-vue-components/vite'
 import Markdown from 'unplugin-vue-markdown/vite'
 import postcssPresetEnv from 'postcss-preset-env'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { isDev, port, r, BROWSER_DIR } from './scripts/utils'
-import packageJson from './package.json'
+import { isDev, port, r, BROWSER_DIR } from './scripts/utils.ts'
+import packageJson from './package.json' with { type: 'json' }
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
@@ -37,7 +37,7 @@ export const sharedConfig: UserConfig = {
       include: [/\.vue$/, /\.md$/],
     }),
     VueI18nPlugin({
-      include: resolve(__dirname, './src/locales/**'),
+      include: resolve(import.meta.dirname, './src/locales/**'),
     }),
     Markdown({}),
     AutoImport({
@@ -105,7 +105,8 @@ export default defineConfig(({ command }) => ({
     emptyOutDir: false, // 保留未由 Vite 处理的静态资源
     sourcemap: isDev ? 'inline' : false,
     minify: process.env.NO_MINIFY ? false : 'esbuild',
-    chunkSizeWarningLimit: 1000,
+    // 扩展从本地磁盘加载，主 chunk 含 Vue + Reka UI 约 1.4 MB，阈值放宽到 2 MB
+    chunkSizeWarningLimit: 2000,
     // https://developer.chrome.com/docs/webstore/program_policies/#:~:text=Code%20Readability%20Requirements
     // terserOptions: {
     //   mangle: false,

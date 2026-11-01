@@ -80,6 +80,8 @@ const handleChangeCurrTab = (value?: NewsSources | string | number) => {
   if (isDragMode.value || !value) {
     return
   }
+  // 切换来源后旧条目的提示不再有意义
+  closeTooltip()
   state.currNewsTabValue = value as NewsSources
   gaProxy('click', ['news', 'changeTab'])
 }
@@ -108,6 +110,75 @@ const onMouseDownKey = (event: MouseEvent, url: string) => {
   createTab(url, false)
 }
 
+// 完整标题提示：整个 widget 共用一层 Popover，锚点跟随当前悬停的新闻条目。
+// 不能每个条目各用一个 Popover——行间移动时旧实例关闭、新实例打开，中间的空档
+// 会表现为提示抖动；共用一层则只切换锚点与文案，内容不卸载、不重播动画。
+/** 指针进入条目后延迟展示，避免扫视时闪出提示 */
+const TOOLTIP_OPEN_DELAY = 300
+/** 离开条目/提示后的关闭延迟，留出移到相邻条目的时间 */
+const TOOLTIP_CLOSE_DELAY = 200
+
+const tooltipAnchor = ref<HTMLElement>()
+const tooltipDesc = ref('')
+const isTooltipOpen = ref(false)
+let tooltipOpenTimer: ReturnType<typeof setTimeout> | null = null
+let tooltipCloseTimer: ReturnType<typeof setTimeout> | null = null
+
+const clearTooltipOpenTimer = () => {
+  if (tooltipOpenTimer) {
+    clearTimeout(tooltipOpenTimer)
+    tooltipOpenTimer = null
+  }
+}
+
+const clearTooltipCloseTimer = () => {
+  if (tooltipCloseTimer) {
+    clearTimeout(tooltipCloseTimer)
+    tooltipCloseTimer = null
+  }
+}
+
+const closeTooltip = () => {
+  clearTooltipOpenTimer()
+  clearTooltipCloseTimer()
+  isTooltipOpen.value = false
+}
+
+const scheduleCloseTooltip = () => {
+  clearTooltipOpenTimer()
+  clearTooltipCloseTimer()
+  tooltipCloseTimer = setTimeout(() => {
+    isTooltipOpen.value = false
+  }, TOOLTIP_CLOSE_DELAY)
+}
+
+const cancelCloseTooltip = () => {
+  clearTooltipCloseTimer()
+}
+
+const onNewsItemEnter = (event: MouseEvent, desc: string) => {
+  if (isDragMode.value) {
+    return
+  }
+  cancelCloseTooltip()
+  tooltipAnchor.value = event.currentTarget as HTMLElement
+  tooltipDesc.value = desc
+  // 已展示时只跟随锚点，不重新计时也不重建，保证行间移动连贯
+  if (isTooltipOpen.value) {
+    return
+  }
+  clearTooltipOpenTimer()
+  tooltipOpenTimer = setTimeout(() => {
+    isTooltipOpen.value = true
+  }, TOOLTIP_OPEN_DELAY)
+}
+
+watch(isDragMode, (value) => {
+  if (value) {
+    closeTooltip()
+  }
+})
+
 let newsConfigChangeHandle: ReturnType<
   typeof handleWatchNewsConfigChange
 > | null = null
@@ -121,6 +192,8 @@ onUnmounted(() => {
   if (newsConfigChangeHandle) {
     newsConfigChangeHandle()
   }
+  clearTooltipOpenTimer()
+  clearTooltipCloseTimer()
 })
 
 // 开启主开关后立即更新数据
@@ -142,7 +215,10 @@ watch(isRender, (value) => {
         'news__container--shadow': localConfig.news.isShadowEnabled,
       }"
     >
-      <div class="news__wrap">
+      <div
+        class="news__wrap"
+        @scroll.capture="closeTooltip"
+      >
         <NTTabs
           :value="state.currNewsTabValue"
           animated
@@ -160,6 +236,7 @@ watch(isRender, (value) => {
               :class="{
                 'news__content--hover': !isDragMode,
               }"
+              @mouseleave="scheduleCloseTooltip"
             >
               <template v-if="getSourceList(source.value).length !== 0">
                 <div
@@ -181,28 +258,19 @@ watch(isRender, (value) => {
                     {{ index + 1 }}
                   </p>
 
-                  <NTPopover
-                    :delay="300"
-                    trigger="hover"
-                    :disabled="isDragMode"
-                    :style="newsPopoverStyle"
+                  <div
+                    class="row__content"
+                    @mouseenter="onNewsItemEnter($event, item.desc)"
+                    @click="onOpenPage(item.url)"
+                    @mousedown="onMouseDownKey($event, item.url)"
                   >
-                    <template #trigger>
-                      <div
-                        class="row__content"
-                        @click="onOpenPage(item.url)"
-                        @mousedown="onMouseDownKey($event, item.url)"
-                      >
-                        <p class="content__desc">
-                          {{ item.desc }}
-                        </p>
-                        <p class="content__hot">
-                          {{ item.hot }}
-                        </p>
-                      </div>
-                    </template>
-                    <span>{{ item.desc }}</span>
-                  </NTPopover>
+                    <p class="content__desc">
+                      {{ item.desc }}
+                    </p>
+                    <p class="content__hot">
+                      {{ item.hot }}
+                    </p>
+                  </div>
                 </div>
               </template>
               <div
@@ -247,6 +315,26 @@ watch(isRender, (value) => {
             </NTScrollArea>
           </NTTabsPane>
         </NTTabs>
+
+        <!-- 整个 widget 共用一层完整标题提示，锚点跟随当前悬停的条目 -->
+        <NTPopover
+          trigger="manual"
+          :show="isTooltipOpen"
+          :reference="tooltipAnchor"
+          :style="newsPopoverStyle"
+          @update:show="isTooltipOpen = $event"
+        >
+          <template #trigger>
+            <div class="news__tooltip-anchor" />
+          </template>
+          <span
+            class="news__tooltip-text"
+            @mouseenter="cancelCloseTooltip"
+            @mouseleave="scheduleCloseTooltip"
+          >
+            {{ tooltipDesc }}
+          </span>
+        </NTPopover>
       </div>
     </div>
   </WidgetWrap>
@@ -282,6 +370,17 @@ watch(isRender, (value) => {
       .reka-tabs__indicator {
         background-color: var(--nt-n-tab-active-background-color, white);
       }
+      /* 提示的隐藏锚点：实际定位基准由 NTPopover 的 reference 提供 */
+      .news__tooltip-anchor {
+        position: absolute;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+      }
+      /* 提示内容铺满面板宽度，指针停在提示上时保持显示 */
+      .news__tooltip-text {
+        display: block;
+      }
       .news__content {
         height: var(--nt-n-height);
         color: var(--nt-n-font-color);
@@ -313,9 +412,6 @@ watch(isRender, (value) => {
           }
           .row__index__3 {
             color: #faa90e;
-          }
-          .reka-popover__trigger {
-            width: 100%;
           }
           .row__content {
             flex: 1;

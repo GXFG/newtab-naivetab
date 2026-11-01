@@ -321,6 +321,26 @@ export const handleAppUpdate = (localVersion?: string) => {
   if (compareLeftVersionLessThanRightVersions(version, '2.6.2')) {
     localConfig.general.isGaEnabled = localConfig.general.isGaEnabled ?? true
   }
+  if (compareLeftVersionLessThanRightVersions(version, '2.7.0')) {
+    /**
+     * 日历的节假日改为「订阅」驱动：新增 subscriptionRegion / customSubscriptionUrl 与三个展示开关。
+     * 这些字段对 2.6.x 用户尚不存在（浅合并也会补默认值），这里仍显式赋值——与仓库既有习惯一致，
+     * 目的是把「升级后的行为」与「默认值」解耦：以后调整默认值不会顺带改变老用户的体验。
+     *
+     * holidayRegion 是 2.7.0 开发期用过、从未发布的字段；
+     * 这里刻意不做映射/删除，残留值不会影响 subscriptionRegion（见 calendar-config-compat.test.ts）。
+     */
+    localConfig.calendar.subscriptionRegion =
+      defaultConfig.calendar.subscriptionRegion
+    localConfig.calendar.customSubscriptionUrl =
+      defaultConfig.calendar.customSubscriptionUrl
+    localConfig.calendar.isHolidayMarkVisible =
+      defaultConfig.calendar.isHolidayMarkVisible
+    localConfig.calendar.isLunarTermVisible =
+      defaultConfig.calendar.isLunarTermVisible
+    localConfig.calendar.isAlmanacVisible =
+      defaultConfig.calendar.isAlmanacVisible
+  }
 
   // 更新local版本号
   localConfig.general.version = window.appVersion

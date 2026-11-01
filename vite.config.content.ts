@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
-import { sharedConfig } from './vite.config'
-import { isDev, r, BROWSER_DIR } from './scripts/utils'
-import packageJson from './package.json'
+import { sharedConfig } from './vite.config.ts'
+import { isDev, r, BROWSER_DIR } from './scripts/utils.ts'
+import packageJson from './package.json' with { type: 'json' }
 
 // bundling the content script using Vite
 export default defineConfig({

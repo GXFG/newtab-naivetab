@@ -549,7 +549,7 @@ watch(isDragMode, () => {
       }
 
       /* NTScrollArea 在 dropdown 内的适配：flex:1 撑满 + min-height:0 允许收缩 */
-      .search__dropdown :deep(.reka-scroll-area) {
+      .reka-scroll-area {
         height: auto;
         flex: 1;
         min-height: 0;

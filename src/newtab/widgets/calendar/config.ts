@@ -1,3 +1,6 @@
+/** 预设地区类型（与适配层无关，仅用于配置取值） */
+import type { TSubscriptionRegion } from '@/logic/calendar/subscriptions'
+
 export const WIDGET_CODE = 'calendar'
 
 export const SCALABLE_FIELDS = {
@@ -12,8 +15,10 @@ export const WIDGET_CONFIG = {
   enabled: true,
   weekBeginsOn: 1,
   festivalCountdown: true,
-  /** 节假日地区：ISO 3166-1 alpha-2，见 src/logic/calendar/regions */
-  holidayRegion: 'CN',
+  /** 节假日订阅地区：ISO 3166-1 alpha-2，'custom' 表示使用下面的自定义地址 */
+  subscriptionRegion: 'CN' as TSubscriptionRegion | 'custom',
+  /** 自定义订阅地址（subscriptionRegion 为 'custom' 时生效） */
+  customSubscriptionUrl: '',
   /** 是否显示休 / 班标记（关闭后不影响节日与节气展示） */
   isHolidayMarkVisible: true,
   /** 是否显示农历与节气（关闭后格子第二行、详情农历行、倒计时节气条目都不展示） */

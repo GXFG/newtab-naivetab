@@ -574,7 +574,7 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
   flex-shrink: 0;
 }
 
-.setting-hint-card :deep(.form-item__control) {
+.setting-hint-card .form-item__control {
   justify-content: flex-start;
 }
 

@@ -78,7 +78,9 @@
     "setting": "Setting",
     "login": "Login",
     "behavior": "Config",
-    "swInitializing": "Extension is initializing, please try again shortly"
+    "swInitializing": "Extension is initializing, please try again shortly",
+    "retry": "Retry",
+    "loading": "Loading..."
   },
   "browserPermission": {
     "bookmark": "Requires browser permissions to access your bookmarks"
@@ -483,20 +485,35 @@
     "sectionWorkStyle": "Workday Style",
     "sectionGlobalColor": "Global Colors",
     "weekBeginsOn": "Week Begins",
-    "holidayRegion": "Holiday Region",
+    "holidaySubscription": "Holiday Subscription",
+    "subscriptionNote": "Data comes from iCloud Calendars (Apple) and updates automatically when online; any .ics feed URL also works.",
+    "customSubscriptionUrl": "Custom subscription URL",
+    "customSubscriptionHint": "Click Validate to apply. The current subscription is replaced only after validation succeeds; typing does not send requests.",
+    "subscriptionValidate": "Validate",
+    "subscriptionValid": "Validated. Subscription replaced.",
+    "subscriptionRefresh": "Refresh",
+    "subscriptionRefreshing": "Refreshing...",
+    "subscriptionLastUpdated": "Last updated:",
+    "subscriptionNeverUpdated": "Not updated yet",
+    "subscriptionStale": "Update failed, showing cached data",
+    "subscriptionFailed": "Failed to load subscription",
+    "subscriptionRegion": {
+      "custom": "Custom URL",
+      "cn": "Chinese Mainland",
+      "tw": "Taiwan, China",
+      "hk": "Hong Kong, China"
+    },
+    "subscriptionError": {
+      "invalid-url": "Invalid URL format",
+      "network": "Network request failed",
+      "http": "Server returned an error",
+      "not-calendar": "Not a valid calendar file (.ics)",
+      "too-large": "Calendar file is too large (over 5 MB)",
+      "empty": "The calendar has no events"
+    },
     "holidayMarkVisible": "Show Holiday Marks",
     "lunarTermVisible": "Show Lunar & Solar Terms",
     "almanacVisible": "Show Almanac Details",
-    "region": {
-      "cn": "Chinese Mainland",
-      "tw": "Taiwan, China",
-      "hk": "Hong Kong, China",
-      "none": "No Holidays",
-      "cnNote": "Statutory holidays and adjusted workdays of the Chinese Mainland; updated with the calendar library.",
-      "twNote": "Government office calendar of the Taiwan region; for reference only — labor and school schedules differ.",
-      "hkNote": "General holidays of Hong Kong; community-maintained and may lag behind official announcements.",
-      "noneNote": "Hides region-specific holidays; only internationally observed days remain."
-    },
     "constellation": {
       "aries": "Aries",
       "taurus": "Taurus",

@@ -116,3 +116,25 @@ if (config.isNewField === false) return
 - 修改 `defaultConfig` 后，检查 `config-snapshot.test.ts` 的必需字段断言
 - 新增迁移分支后，检查 `handle-app-update.test.ts` 是否需要补充用例
 - 全局搜索新字段名，确认测试 mock 是否需要补充该字段
+
+### 5. 监听配置值的 watch 必须 immediate
+
+`localConfig` 是**同步**从 `localStorage` 初始化的（`useStorageLocal` 在创建时就读取），
+所以模块级 `watch(() => localConfig.xxx, cb)` 在创建时值已经是持久化后的值，
+**永远不会触发**——只有用户再次修改才会生效。
+
+```
+// ❌ 错误：刷新页面后不生效（用户改了语言，重开还是旧语言）
+watch(() => localConfig.general.lang, (lang) => setLocale(lang))
+
+// ✅ 正确
+watch(() => localConfig.general.lang, (lang) => setLocale(lang), { immediate: true })
+```
+
+**真实案例：** 语言设置为英语后刷新仍是中文——`store/theme.ts` 的语言监听缺 `immediate`。
+回归测试见 `src/logic/__tests__/i18n-locale.test.ts`。
+
+**附带问题：** 这类副作用模块如果只被个别 widget 引入（如 `store/theme.ts` 曾被
+`date` / `yearProgress` 引用），未启用该 widget 的用户根本不会执行同步逻辑。
+需要同步的模块应在**每个执行上下文的入口**顶层副作用引入：`newtab/App.vue`、
+`options/main.ts`、`popup/main.ts`——只加 newtab 会让设置页/弹窗在刷新后语言仍是旧的。

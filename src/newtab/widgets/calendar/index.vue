@@ -3,14 +3,26 @@ import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import NTSelect from '@/components/ui/NTSelect.vue'
 import { Icon } from '@iconify/vue'
 import { ICONS } from '@/logic/constants/icons'
-import { getDayCell, getDayDetail, getFestivalList } from '@/logic/calendar'
+import {
+  SOLAR_TERM_NAMES,
+  getDayCell,
+  getDayDetail,
+  getFestivalList,
+} from '@/logic/calendar'
 import type {
   ICalendarOptions,
   TCalendarCellOptions,
   TConstellationKey,
 } from '@/logic/calendar'
-import { resolveRegionCode } from '@/logic/calendar/regions'
 import { getMonthGridPadding } from '@/logic/calendar/grid'
+import {
+  CUSTOM_SUBSCRIPTION,
+  getSubscriptionUrl,
+  isMainlandSubscription,
+  loadSubscription,
+  resolveSubscriptionRegion,
+  subscriptionState,
+} from '@/logic/calendar/subscriptions'
 import { gaProxy } from '@/logic/utils/gtag'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig } from '@/logic/config/state'
@@ -189,14 +201,61 @@ const state = reactive({
 const toDisplayDayType = (dayType: CalendarDayType) =>
   localConfig.calendar.isHolidayMarkVisible ? dayType : CalendarDayType.NORMAL
 
-/** 配置里的地区是字符串，收敛为已注册的地区代码（非法值回退默认地区） */
-const holidayRegion = computed(() =>
-  resolveRegionCode(localConfig.calendar.holidayRegion),
+/**
+ * 当前订阅地址：预设地区直接拼 Apple 地址，或用户自定义地址。
+ * 自定义地址只在设置面板验证成功后才写入 config，所以这里不会拿到半成品 URL。
+ */
+const subscriptionUrl = computed(() => {
+  if (localConfig.calendar.subscriptionRegion === CUSTOM_SUBSCRIPTION) {
+    return localConfig.calendar.customSubscriptionUrl.trim()
+  }
+  // 运行期配置可能来自云同步/旧开发版，非法地区回退默认值，避免 /undefined.ics
+  return getSubscriptionUrl(
+    resolveSubscriptionRegion(localConfig.calendar.subscriptionRegion),
+  )
+})
+
+/**
+ * 订阅数据是否已经可用。
+ * 不用 status === 'ready' 判断：后台刷新/缓存过期时状态会短暂变化，
+ * 但旧数据仍然有效，按数据本身判断可避免日历瞬间清空。
+ */
+const subscriptionDays = computed(() =>
+  subscriptionState.url === subscriptionUrl.value &&
+  Object.keys(subscriptionState.days).length > 0
+    ? subscriptionState.days
+    : null,
 )
+
+/** 拉取订阅：有缓存立即就绪，无缓存进入 loading */
+const refreshSubscription = (force = false) => {
+  void loadSubscription(subscriptionUrl.value, {
+    termNames: SOLAR_TERM_NAMES,
+    force,
+  })
+}
+
+/** 加载失败后重试 */
+const onRetrySubscription = () => {
+  refreshSubscription(true)
+}
+
+/**
+ * 标签页重新可见时检查一次订阅。
+ * 新标签页通常是每次打开重新挂载，onMounted 已覆盖；这里补的是「标签页长期不关」的场景。
+ * 走的是普通 loadSubscription，缓存未过期不会发请求，开销只是一次 localStorage 读取。
+ */
+const onDocumentVisibilityChange = () => {
+  if (document.visibilityState === 'visible') refreshSubscription()
+}
 
 /** 格子与倒计时列表的选项（不含黄历，故切换黄历开关不会触发重算） */
 const cellOptions = computed<TCalendarCellOptions>(() => ({
-  region: holidayRegion.value,
+  subscription: subscriptionDays.value,
+  // 通用节日表只有中文名且多为大陆常用节日，只在订阅中国大陆时补充
+  includeLocalFestivals: isMainlandSubscription(
+    localConfig.calendar.subscriptionRegion,
+  ),
   showLunarTerm: localConfig.calendar.isLunarTermVisible,
 }))
 
@@ -235,7 +294,7 @@ const constellationTextMap = computed<Record<TConstellationKey, string>>(
   }),
 )
 
-/** 依赖 cellOptions，切换地区或农历开关后自动重算（约 34ms，仅变更时发生一次） */
+/** 依赖 cellOptions，切换订阅或农历开关后自动重算（毫秒级，仅变更时发生一次） */
 const festivalList = computed(() =>
   getFestivalList(todayDayjs.toDate(), cellOptions.value).map((item) => ({
     date: dayjs(item.date).format('YYYY-MM-DD'),
@@ -365,12 +424,27 @@ const onRender = () => {
 
 onMounted(() => {
   onRender()
+  refreshSubscription()
+  document.addEventListener('visibilitychange', onDocumentVisibilityChange)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', onDocumentVisibilityChange)
+})
+
+/**
+ * 订阅地址变化时加载。
+ * 只有“切换预设地区”或“自定义地址验证成功”才会改变 config，
+ * 输入框的逐字编辑只改设置面板的 draft，不会再触发这里去请求半成品 URL。
+ */
+watch(subscriptionUrl, () => {
+  refreshSubscription()
 })
 
 watch(
   [
     () => localConfig.calendar.weekBeginsOn,
-    () => localConfig.calendar.holidayRegion,
+    subscriptionDays,
     () => localConfig.calendar.isHolidayMarkVisible,
     () => localConfig.calendar.isLunarTermVisible,
   ],
@@ -760,6 +834,43 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
           </div>
         </div>
       </NTScrollArea>
+
+      <!-- 订阅状态：加载中提示进度，失败可点击重试；未配置（idle）时不显示 -->
+      <div
+        v-if="
+          subscriptionState.url === subscriptionUrl &&
+          (subscriptionState.isRefreshing ||
+            subscriptionState.status === 'loading' ||
+            Boolean(subscriptionState.error))
+        "
+        class="calendar__subscribe-tip"
+        :class="{
+          'calendar__subscribe-tip--error': Boolean(subscriptionState.error),
+        }"
+      >
+        <template v-if="subscriptionState.error">
+          <span class="subscribe-tip__text">
+            {{
+              subscriptionState.status === 'ready'
+                ? $t('calendar.subscriptionStale')
+                : $t('calendar.subscriptionFailed')
+            }}
+          </span>
+          <button
+            type="button"
+            class="subscribe-tip__retry"
+            @click="onRetrySubscription()"
+          >
+            {{ $t('common.retry') }}
+          </button>
+        </template>
+        <span
+          v-else
+          class="subscribe-tip__text"
+        >
+          {{ $t('common.loading') }}
+        </span>
+      </div>
     </div>
   </WidgetWrap>
 </template>
@@ -863,6 +974,48 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
       overflow: hidden;
       height: var(--nt-cal-customBodyWrapHeight);
     }
+    /* 订阅状态提示（加载中 / 失败重试）：覆盖在日历底部，不占布局高度 */
+    .calendar__subscribe-tip {
+      position: absolute;
+      left: 50%;
+      bottom: 3%;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 92%;
+      padding: 1px 8px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      color: var(--nt-cal-customRestLabelFontColor);
+      background-color: var(--nt-cal-customRestLabelBackgroundColor);
+      font-family: var(--nt-cal-customDescFontFamily);
+      font-size: var(--nt-cal-customDescFontSize);
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .calendar__subscribe-tip--error {
+      background-color: var(--nt-cal-customWorkLabelBackgroundColor);
+      color: var(--nt-cal-customWorkLabelFontColor);
+    }
+
+    .subscribe-tip__text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .subscribe-tip__retry {
+      flex-shrink: 0;
+      padding: 0;
+      border: none;
+      color: inherit;
+      background: none;
+      font-family: inherit;
+      font-size: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
     .calendar__body {
       display: flex;
       flex-wrap: wrap;

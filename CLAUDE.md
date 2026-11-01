@@ -11,7 +11,7 @@ pnpm build:debug         # 不压缩的 chrome 构建
 pnpm typecheck           # vue-tsc --noEmit
 pnpm test                # vitest（测试文件在 src/logic/__tests__/）
 pnpm lint:fix            # ESLint --fix
-pnpm check-patterns      # CSS 模式检查（v-bind()、&--modifier、Reka z-index）
+pnpm check-patterns      # CSS 模式检查（v-bind()、&--modifier、:deep() 误用、Reka z-index）
 ```
 
 **pre-commit 自动执行**：`lint-staged → typecheck → test --run → validate-registries → check-patterns`。提交前务必全部通过。
@@ -88,7 +88,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 | `image/` | 背景图系统：状态、图库、渲染、来源常量 |
 | `keyboard/` | 键盘系统：布局转换、键帽主题（80+）、19 种布局定义 |
 | `bookmark/` | 浏览器书签 API 封装、书签树解析 |
-| `calendar/` | 日历数据适配层：唯一依赖日历库（tyme4ts）的模块 + 节日表 + 节假日地区数据 |
+| `calendar/` | 日历：适配层（唯一依赖 tyme4ts，只出农历与黄历）+ 节假日 ICS 订阅（预设 46 个地区 + 自定义）+ 通用节日表 + 网格布局 |
 | `shortcut/` | 全局快捷键：命令定义、匹配核心、Port 连接 |
 | `store/` | 运行时状态：全局状态、主题切换、DOM 副作用监听 |
 | `utils/` | 基础设施：数据库、GA 上报、权限、通用工具 |
@@ -109,7 +109,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 | [bookmark.md](docs/features/bookmark.md) | 书签系统 |
 | [keyboard.md](docs/features/keyboard.md) | 键盘布局、拖拽、主题 |
 | [widget-dev.md](docs/widgets/widget-dev.md) | Widget 生命周期、WidgetWrap、定时任务 |
-| [calendar-widget.md](docs/widgets/calendar-widget.md) | 日历适配层、tyme4ts 语义、节假日地区数据 |
+| [calendar-widget.md](docs/widgets/calendar-widget.md) | 日历适配层、tyme4ts 语义、节假日 ICS 订阅 |
 | [setting.md](docs/architecture/setting.md) | Setting 面板、注册、字段组件 |
 | [task.md](docs/architecture/task.md) | 定时任务系统 |
 | [background-modules.md](docs/architecture/background-modules.md) | SW 内部模块 |
@@ -122,7 +122,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 
 - **配置兼容性**：任何持久化配置修改必须走 `handleAppUpdate` 迁移，不能破坏老用户数据 → [pitfalls-config.md](.claude/rules/pitfalls-config.md)
 - **后台脚本**：`onChanged` 监听器必须返回 `Promise`；修改 keyboard 配置时同步改 `config/cache.ts` → [pitfalls-background.md](.claude/rules/pitfalls-background.md)
-- **样式 & 主题**：颜色用双元素数组 `[浅色, 深色]`；中性灰用 `--gray-alpha-xx` token；禁止 `v-bind()` 和 `&--modifier` → [pitfalls-css.md](.claude/rules/pitfalls-css.md)
+- **样式 & 主题**：颜色用双元素数组 `[浅色, 深色]`；中性灰用 `--gray-alpha-xx` token；禁止 `v-bind()`、`&--modifier` 和非 scoped 样式里的 `:deep()` → [pitfalls-css.md](.claude/rules/pitfalls-css.md)
 - **图标 & 文本**：图标必须用 `ICONS` 常量，文本必须 i18n（`zh-CN.json` + `en-US.json` 同步更新）→ [no-hardcode.md](.claude/rules/no-hardcode.md)
 - **Widget 规则**：用 `/add-widget` 技能或查 [REGISTRY-MAP.md](src/newtab/widgets/REGISTRY-MAP.md)；定时任务用 `addTimerTask`；根组件用 `WidgetWrap` 包裹
 - **Setting 面板**：在 `SETTING_GROUPS` 注册，用 `src/setting/fields` 原子组件，禁止自行封装
