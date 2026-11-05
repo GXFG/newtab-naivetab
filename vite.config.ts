@@ -84,7 +84,6 @@ export const sharedConfig: UserConfig = {
       'reka-ui',
       'vue-i18n',
     ],
-    exclude: ['vue-demi'],
   },
 }
 
@@ -105,8 +104,9 @@ export default defineConfig(({ command }) => ({
     emptyOutDir: false, // 保留未由 Vite 处理的静态资源
     sourcemap: isDev ? 'inline' : false,
     minify: process.env.NO_MINIFY ? false : 'esbuild',
-    // 扩展从本地磁盘加载，主 chunk 含 Vue + Reka UI 约 1.4 MB，阈值放宽到 2 MB
-    chunkSizeWarningLimit: 2000,
+    // 扩展从本地磁盘加载，不做分包（体积与请求数都不是关注点）。
+    // 注意：Vite 8 底层是 rolldown，函数式 output.manualChunks 已不生效，
+    chunkSizeWarningLimit: 3000,
     // https://developer.chrome.com/docs/webstore/program_policies/#:~:text=Code%20Readability%20Requirements
     // terserOptions: {
     //   mangle: false,
@@ -117,27 +117,6 @@ export default defineConfig(({ command }) => ({
         popup: r('src/popup/index.html'),
         options: r('src/options/index.html'),
       },
-      output: {
-        manualChunks(id) {
-          // 浏览器扩展从本地磁盘加载，无网络请求开销，chunk 不宜过多
-          if (id.includes('node_modules')) {
-            if (id.includes('lunar-typescript')) {
-              return 'vendor-lunar'
-            }
-            // 其余第三方依赖统一归入一个 vendor chunk
-            return 'vendor-libs'
-          }
-
-          // 业务代码统一归入 main chunk，避免碎片化
-          if (
-            ['src/components', 'src/logic', 'src/lib'].some((pkg) =>
-              id.includes(pkg),
-            )
-          ) {
-            return 'main'
-          }
-        },
-      },
     },
   },
   test: {
@@ -146,6 +125,30 @@ export default defineConfig(({ command }) => ({
     setupFiles: ['../test/setup.ts'],
     coverage: {
       reportsDirectory: '../coverage',
+      /**
+       * 覆盖率门槛：只防倒退，不逼补历史。
+       *
+       * 基线（2026-11 实测，被统计 86 个文件）：
+       *   全局      lines 74.8 / branches 63.8 / functions 76.4
+       *   src/logic lines 74.9 / branches 65.4 / functions 77.6
+       * 阈值取基线以下约 4 个百分点：能容忍正常波动，又能拦住「新增大块零测试代码」。
+       *
+       * 口径：只统计被测试触达的文件（未设 include），测试文件本身不计入。
+       * 若后续需要「未被任何测试 import 的新文件也计入分母」，需设置
+       * coverage.include，但那会把全部 .vue 计入（当前 0 覆盖），届时需重新定基线。
+       */
+      thresholds: {
+        lines: 70,
+        branches: 59,
+        functions: 71,
+        statements: 70,
+        'logic/**/*.ts': {
+          lines: 71,
+          branches: 61,
+          functions: 73,
+          statements: 71,
+        },
+      },
     },
   },
 }))

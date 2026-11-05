@@ -23,7 +23,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from 'reka-ui'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { computed, ref, watch, onBeforeUnmount } from 'vue'
 

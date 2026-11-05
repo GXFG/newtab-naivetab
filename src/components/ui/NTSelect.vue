@@ -22,7 +22,7 @@ import {
   SelectPortal,
   SelectContent,
 } from 'reka-ui'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { computed } from 'vue'
 import { ICONS } from '@/logic/constants/icons'
 import NTSelectItem from './NTSelectItem.vue'

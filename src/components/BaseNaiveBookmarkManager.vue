@@ -19,7 +19,7 @@ import {
 import { getFaviconFromUrl } from '@/logic/bookmark/api'
 import BrowserBookmarkPicker from '@/components/BrowserBookmarkPicker.vue'
 import KeyboardLayout from '@/components/KeyboardLayout.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 
 const primaryBorder = computed(() =>

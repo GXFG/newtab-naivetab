@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { computed, ref } from 'vue'
 import { localConfig } from '@/logic/config/state'
 import { getSettingKeyboardSize } from '@/logic/store/style'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useVirtualList } from '@vueuse/core'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import NTSwitch from '@/components/ui/NTSwitch.vue'
 import NTTabs from '@/components/ui/NTTabs.vue'
 import NTTabsPane from '@/components/ui/NTTabsPane.vue'

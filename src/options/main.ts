@@ -5,6 +5,7 @@ import i18n from '@/common/i18n'
 import '@/logic/store/theme'
 import { vLazy } from '@/directives/lazy'
 import App from './App.vue'
+import '@/common/iconify'
 import pkg from '../../package.json'
 
 window.appVersion = pkg.version

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NTScrollArea from '@/components/ui/NTScrollArea.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { createTab } from '@/logic/utils/common'
 import { getFaviconFromUrl } from '@/logic/bookmark/api'

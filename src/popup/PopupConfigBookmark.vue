@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed, ref } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { gaProxy } from '@/logic/utils/gtag'
 import { useKeyboardStyle } from '@/composables/useKeyboardStyle'

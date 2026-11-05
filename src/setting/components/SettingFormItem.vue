@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { Transition, computed } from 'vue'
 import { ICONS } from '@/logic/constants/icons'
 import Tips from '@/components/Tips.vue'

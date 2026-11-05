@@ -14,7 +14,7 @@
  * />
  */
 import { ref } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import {
   ComboboxRoot,
   ComboboxInput,

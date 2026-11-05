@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { gaProxy } from '@/logic/utils/gtag'
 import { addKeydownTask, removeKeydownTask } from '@/logic/task'
@@ -32,7 +32,7 @@ const widgetGroups = computed(() =>
         return {
           code: meta.code,
           label: window.$t(meta.widgetLabel || meta.code),
-          iconName: meta.iconName || 'material-symbols:widgets-outline',
+          iconName: meta.iconName || ICONS.widgetPlaceholder,
           iconSize: meta.iconSize || 30,
           disabled: localConfig[meta.code]?.enabled,
         }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import NTSelect from '@/components/ui/NTSelect.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import {
   SOLAR_TERM_NAMES,
@@ -239,6 +239,33 @@ const refreshSubscription = (force = false) => {
 const onRetrySubscription = () => {
   refreshSubscription(true)
 }
+
+/**
+ * 订阅只在**失败**时提示：一个可点击重试的图标。
+ *
+ * 刷新过程不做任何提示 —— 有缓存时数据本来就还在，没有缓存也只是短暂缺节日，
+ * 转圈的收益低于它对这张小卡片的打扰。
+ *
+ * stale = 有旧数据可用、只是本次更新失败（弱提示色）
+ * error = 没有可展示的数据（才用错误色）
+ */
+const subscribeStatus = computed<'idle' | 'stale' | 'error'>(() => {
+  // 切换地址的瞬间，store 里还是上一个地址的数据，不能拿来判断
+  if (subscriptionState.url !== subscriptionUrl.value) return 'idle'
+  if (!subscriptionState.error) return 'idle'
+  return subscriptionState.status === 'ready' ? 'stale' : 'error'
+})
+
+const subscribeTipText = computed(() => {
+  switch (subscribeStatus.value) {
+    case 'stale':
+      return window.$t('calendar.subscriptionStaleTip')
+    case 'error':
+      return window.$t('calendar.subscriptionFailedTip')
+    default:
+      return ''
+  }
+})
 
 /**
  * 标签页重新可见时检查一次订阅。
@@ -617,6 +644,25 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
           </button>
         </div>
         <div class="options__item options__reset">
+          <!-- 订阅失败提示：只在失败时出一个图标，图标本身即重试入口；刷新过程不提示 -->
+          <button
+            v-if="subscribeStatus !== 'idle'"
+            type="button"
+            class="item__btn item__retry"
+            :class="{
+              'item__btn--move': isDragMode,
+              'item__retry--danger': subscribeStatus === 'error',
+            }"
+            :disabled="isDragMode"
+            :title="subscribeTipText"
+            :aria-label="subscribeTipText"
+            @click="onRetrySubscription()"
+          >
+            <Icon
+              :icon="ICONS.warning"
+              class="retry__icon"
+            />
+          </button>
           <button
             v-show="isResetBtnVisible"
             type="button"
@@ -834,43 +880,6 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
           </div>
         </div>
       </NTScrollArea>
-
-      <!-- 订阅状态：加载中提示进度，失败可点击重试；未配置（idle）时不显示 -->
-      <div
-        v-if="
-          subscriptionState.url === subscriptionUrl &&
-          (subscriptionState.isRefreshing ||
-            subscriptionState.status === 'loading' ||
-            Boolean(subscriptionState.error))
-        "
-        class="calendar__subscribe-tip"
-        :class="{
-          'calendar__subscribe-tip--error': Boolean(subscriptionState.error),
-        }"
-      >
-        <template v-if="subscriptionState.error">
-          <span class="subscribe-tip__text">
-            {{
-              subscriptionState.status === 'ready'
-                ? $t('calendar.subscriptionStale')
-                : $t('calendar.subscriptionFailed')
-            }}
-          </span>
-          <button
-            type="button"
-            class="subscribe-tip__retry"
-            @click="onRetrySubscription()"
-          >
-            {{ $t('common.retry') }}
-          </button>
-        </template>
-        <span
-          v-else
-          class="subscribe-tip__text"
-        >
-          {{ $t('common.loading') }}
-        </span>
-      </div>
     </div>
   </WidgetWrap>
 </template>
@@ -930,6 +939,14 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
             color: var(--nt-cal-customFontColor_btn);
           }
         }
+        /* 订阅失败提示：图标即重试入口，靠语义色区分「有缓存兜底」与「彻底失败」 */
+        .item__retry .retry__icon {
+          font-size: calc(var(--nt-cal-customFontSize_btn) * 0.85);
+          color: var(--color-warning);
+        }
+        .item__retry--danger .retry__icon {
+          color: var(--color-error);
+        }
         .reka-select__trigger {
           color: var(--nt-cal-customFontColor);
           font-size: var(--nt-cal-customFontSize);
@@ -944,7 +961,9 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
       }
       .options__reset {
         flex: 0 0 auto;
-        width: 2.2vmin;
+        /* 用 min-width 而非固定宽度：重试图标出现时向右槽位左侧扩展，
+           「回到今日」贴着容器右边缘不动，不会跳动 */
+        min-width: 2.2vmin;
         margin-left: 0.5vmin;
       }
     }
@@ -973,47 +992,6 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
       position: relative;
       overflow: hidden;
       height: var(--nt-cal-customBodyWrapHeight);
-    }
-    /* 订阅状态提示（加载中 / 失败重试）：覆盖在日历底部，不占布局高度 */
-    .calendar__subscribe-tip {
-      position: absolute;
-      left: 50%;
-      bottom: 3%;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      max-width: 92%;
-      padding: 1px 8px;
-      border-radius: 999px;
-      transform: translateX(-50%);
-      color: var(--nt-cal-customRestLabelFontColor);
-      background-color: var(--nt-cal-customRestLabelBackgroundColor);
-      font-family: var(--nt-cal-customDescFontFamily);
-      font-size: var(--nt-cal-customDescFontSize);
-      line-height: 1.5;
-      white-space: nowrap;
-    }
-
-    .calendar__subscribe-tip--error {
-      background-color: var(--nt-cal-customWorkLabelBackgroundColor);
-      color: var(--nt-cal-customWorkLabelFontColor);
-    }
-
-    .subscribe-tip__text {
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .subscribe-tip__retry {
-      flex-shrink: 0;
-      padding: 0;
-      border: none;
-      color: inherit;
-      background: none;
-      font-family: inherit;
-      font-size: inherit;
-      text-decoration: underline;
-      cursor: pointer;
     }
 
     .calendar__body {

@@ -9,7 +9,7 @@
  * <NTSelectItem value="a">选项 A</NTSelectItem>
  */
 import { SelectItem, SelectItemText, SelectItemIndicator } from 'reka-ui'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 
 defineProps<{

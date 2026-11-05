@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import {
   SettingFormWrap,
   SettingFormSection,
@@ -97,7 +97,7 @@ const onRandomTheme = () => {
             round
             @click="onRandomTheme"
           >
-            <Icon icon="mdi:shuffle" />
+            <Icon :icon="ICONS.shuffle" />
             {{ $t('keyboardCommon.randomTheme') }}
           </NTButton>
 
@@ -108,7 +108,7 @@ const onRandomTheme = () => {
             round
             @click="state.isPresetThemeDrawerVisible = true"
           >
-            <Icon icon="mdi:palette-outline" />
+            <Icon :icon="ICONS.palette" />
             {{ $t('common.select') }}
           </NTButton>
         </div>

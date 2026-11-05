@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { h } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import NTDropdown from '@/components/ui/NTDropdown.vue'
 import NTButton from '@/components/ui/NTButton.vue'
 import { ICONS } from '@/logic/constants/icons'

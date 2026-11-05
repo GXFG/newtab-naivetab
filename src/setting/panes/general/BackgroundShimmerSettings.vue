@@ -6,7 +6,7 @@
  * @consumers BackgroundDrawer.vue
  */
 import { ref, computed } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import NTRadioGroup from '@/components/ui/NTRadioGroup.vue'
 import NTRadio from '@/components/ui/NTRadio.vue'
 import CustomColorPicker from '@/components/CustomColorPicker.vue'

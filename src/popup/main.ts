@@ -6,6 +6,7 @@ import i18n from '@/common/i18n'
 // 副作用引入：popup 也要按用户配置的语言/外观渲染
 import '@/logic/store/theme'
 import App from './App.vue'
+import '@/common/iconify'
 import pkg from '../../package.json'
 
 window.appVersion = pkg.version

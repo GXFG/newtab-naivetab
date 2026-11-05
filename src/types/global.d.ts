@@ -87,7 +87,7 @@ interface SelectStringItem {
  */
 interface SyncPayload {
   syncTime: number
-  syncId: string // md5
+  syncId: string // 内容指纹（SHA-256，64 位小写十六进制；历史值为 MD5 的 32 位）
   appVersion: string // 生成该数据的客户端版本
   data: any
 }

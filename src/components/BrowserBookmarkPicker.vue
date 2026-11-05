@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { reactive, type PropType } from 'vue'
 import { SECOND_MODAL_WIDTH } from '@/logic/constants/app'
 import { getBrowserBookmark, getFaviconFromUrl } from '@/logic/bookmark/api'

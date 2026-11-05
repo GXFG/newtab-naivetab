@@ -8,7 +8,7 @@ import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'
 import { isImageLoading } from '@/logic/image/state'
 import { getImageUrlFromName } from '@/logic/image/utils'
 import { IMAGE_NETWORK_SOURCE } from '@/logic/image/constants'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 
 const props = defineProps({

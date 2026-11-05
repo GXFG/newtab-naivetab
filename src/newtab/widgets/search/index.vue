@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NTScrollArea from '@/components/ui/NTScrollArea.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { useDebounceFn, onClickOutside } from '@vueuse/core'
 import { gaProxy } from '@/logic/utils/gtag'

@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import i18n from '@/common/i18n'
 import { vLazy } from '@/directives/lazy'
 import App from './App.vue'
+import '@/common/iconify'
 import 'dayjs/locale/zh-cn.js'
 import pkg from '../../package.json'
 

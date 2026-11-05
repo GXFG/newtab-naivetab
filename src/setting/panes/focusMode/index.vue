@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { computed, watch } from 'vue'
 import { localConfig, localState } from '@/logic/config/state'
 import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'

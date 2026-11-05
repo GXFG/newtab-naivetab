@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NTInputNumber from '@/components/ui/NTInputNumber.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import {
   SettingFormSection,
   SettingFormItem,
@@ -156,7 +156,7 @@ const deleteOverlay = (id: string) => {
   <template v-if="selectedOverlay">
     <SettingFormSection
       :title="$t('keyboardNameplate.textContent')"
-      icon="mdi:format-text"
+      :icon="ICONS.formatText"
     >
       <SettingFormItem :label="$t('keyboardNameplate.text')">
         <NTInput
@@ -198,7 +198,7 @@ const deleteOverlay = (id: string) => {
 
     <SettingFormSection
       :title="$t('common.appearance')"
-      icon="mdi:palette-outline"
+      :icon="ICONS.palette"
     >
       <SettingFormInlineRow>
         <NumberField
@@ -239,7 +239,7 @@ const deleteOverlay = (id: string) => {
 
     <SettingFormSection
       :title="$t('keyboardNameplate.shadow')"
-      icon="mdi:shadow"
+      :icon="ICONS.overlayShadow"
     >
       <ToggleColorField
         v-model:enable="selectedOverlay.shadowEnabled"
@@ -272,7 +272,7 @@ const deleteOverlay = (id: string) => {
 
     <SettingFormSection
       :title="$t('keyboardNameplate.textShadow')"
-      icon="mdi:format-text-shadow"
+      :icon="ICONS.overlayTextShadow"
     >
       <ToggleColorField
         v-model:enable="selectedOverlay.textShadowEnabled"

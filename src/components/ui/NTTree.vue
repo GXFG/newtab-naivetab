@@ -23,7 +23,7 @@
  * </NTTree>
  */
 import { TreeRoot, TreeItem } from 'reka-ui'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { computed } from 'vue'
 import { ICONS } from '@/logic/constants/icons'
 

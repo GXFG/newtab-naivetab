@@ -6,7 +6,7 @@
  * 接收 tabPaneList 和 groupLabelMap，nav 选中时 emit select 事件。
  * 内部管理滑动指示器的位置计算与动画。
  */
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import NTScrollArea from '@/components/ui/NTScrollArea.vue'
 import { globalState } from '@/logic/store/state'
 import type { SettingMeta } from '@/setting/registry'
