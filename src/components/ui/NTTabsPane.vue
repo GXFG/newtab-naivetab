@@ -51,6 +51,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <!-- 顺序锚点：非激活面板的 TabsContent 不进 DOM（Presence 会卸载），
+       重排后父级无法从内容面板判断顺序，靠这个隐藏节点提供真实顺序 -->
+  <span
+    hidden
+    :data-nt-pane="String(name)"
+  />
   <TabsContent
     v-if="hasContent"
     :value="name"

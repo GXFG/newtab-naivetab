@@ -124,6 +124,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 - **后台脚本**：`onChanged` 监听器必须返回 `Promise`；修改 keyboard 配置时同步改 `config/cache.ts` → [pitfalls-background.md](.claude/rules/pitfalls-background.md)
 - **样式 & 主题**：颜色用双元素数组 `[浅色, 深色]`；中性灰用 `--gray-alpha-xx` token；禁止 `v-bind()`、`&--modifier` 和非 scoped 样式里的 `:deep()` → [pitfalls-css.md](.claude/rules/pitfalls-css.md)
 - **图标 & 文本**：图标必须用 `ICONS` 常量，文本必须 i18n（`zh-CN.json` + `en-US.json` 同步更新）→ [no-hardcode.md](.claude/rules/no-hardcode.md)
+- **用户反馈**：toast 唯一入口是 `showToast`（`@/common/toast`，顶部胶囊 toast，`success`/`error`/`warning`/`info`），不要自建提示组件或页面内常驻结果文案
 - **Widget 规则**：用 `/add-widget` 技能或查 [REGISTRY-MAP.md](src/newtab/widgets/REGISTRY-MAP.md)；定时任务用 `addTimerTask`；根组件用 `WidgetWrap` 包裹
 - **Setting 面板**：在 `SETTING_GROUPS` 注册，用 `src/setting/fields` 原子组件，禁止自行封装
 - **权限管理**：非核心权限放 `optional_permissions`，首次使用时请求

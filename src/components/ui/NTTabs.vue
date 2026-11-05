@@ -15,7 +15,7 @@
  * </NTTabs>
  */
 import { TabsRoot, TabsList, TabsTrigger, TabsIndicator } from 'reka-ui'
-import { ref, provide, onBeforeUnmount, watch } from 'vue'
+import { ref, provide, onBeforeUnmount, onUpdated, watch } from 'vue'
 
 defineProps<{
   defaultValue?: string | number
@@ -41,6 +41,35 @@ provide('nt-tabs:addPane', (pane: PaneDescriptor) => {
 provide('nt-tabs:removePane', (name: string | number) => {
   panes.value = panes.value.filter((p) => p.name !== name)
 })
+
+/** 面板容器：用于读取面板的真实 DOM 顺序 */
+const panelsEl = ref<HTMLElement>()
+
+/**
+ * 按面板的真实 DOM 顺序校正触发器顺序
+ *
+ * 触发器来自 Pane 的注册顺序（setup 时 push），而面板顺序由调用方的 v-for 决定。
+ * 重排时 key 未变的实例被复用、setup 不重跑，注册顺序会停留在旧顺序 ——
+ * 表现为触发器不跟着变（如设置里调整新闻源顺序，Widget 的 tab 不实时跟随）。
+ * 面板顺序只存在于 DOM 中，因此每次更新后按锚点读出真实顺序再排一次。
+ */
+const syncPaneOrder = () => {
+  const root = panelsEl.value
+  if (!root) return
+  const paneMap = new Map(panes.value.map((pane) => [String(pane.name), pane]))
+  const order: PaneDescriptor[] = []
+  root.querySelectorAll<HTMLElement>('[data-nt-pane]').forEach((el) => {
+    const pane = paneMap.get(el.dataset.ntPane as string)
+    if (pane) order.push(pane)
+  })
+  // 锚点数量与注册数量不一致说明正处于增删过程中，增删由 addPane/removePane 负责
+  if (order.length !== panes.value.length) return
+  if (order.some((pane, index) => pane !== panes.value[index])) {
+    panes.value = order
+  }
+}
+
+onUpdated(syncPaneOrder)
 
 onBeforeUnmount(() => {
   panes.value = []
@@ -84,7 +113,10 @@ watch(modelValue, (newVal, oldVal) => {
         {{ pane.tab }}
       </TabsTrigger>
     </TabsList>
-    <div class="reka-tabs__panels">
+    <div
+      ref="panelsEl"
+      class="reka-tabs__panels"
+    >
       <slot />
     </div>
   </TabsRoot>

@@ -6,6 +6,7 @@ import NTSelect from '@/components/ui/NTSelect.vue'
 import { useI18n } from 'vue-i18n'
 import { localConfig } from '@/logic/config/state'
 import { ICONS } from '@/logic/constants/icons'
+import { showToast } from '@/common/toast'
 import { SOLAR_TERM_NAMES } from '@/logic/calendar'
 import {
   CUSTOM_SUBSCRIPTION,
@@ -82,19 +83,18 @@ const isCustomSubscription = computed(
  */
 const draftCustomUrl = ref(localConfig.calendar.customSubscriptionUrl)
 
-/** 自定义地址的校验状态 */
-const validateState = reactive({
-  status: 'idle' as 'idle' | 'validating' | 'valid' | 'invalid',
-  message: '',
-})
+/**
+ * 是否正在验证。结果通过 toast 展示，面板内不保留固定提示，
+ * 这里只用于禁用按钮与「验证中不打断草稿」的判断。
+ */
+const isValidating = ref(false)
 
 /** 每次草稿/地区变化都 +1；异步验证返回时序号不一致就丢弃结果 */
 let validationToken = 0
 
-const resetValidateState = () => {
+const resetValidation = () => {
   validationToken += 1
-  validateState.status = 'idle'
-  validateState.message = ''
+  isValidating.value = false
 }
 
 const subscriptionErrorText = (error: TSubscriptionError): string =>
@@ -205,13 +205,13 @@ watch(
     }
 
     draftCustomUrl.value = localConfig.calendar.customSubscriptionUrl
-    resetValidateState()
+    resetValidation()
   },
 )
 
-// 输入只改草稿；编辑后旧的成功/失败提示不再成立
+// 输入只改草稿；编辑后旧的验证结果不再成立，进行中的验证作废
 watch(draftCustomUrl, () => {
-  resetValidateState()
+  resetValidation()
 })
 
 // 云同步等外部来源更新了已保存地址：同步草稿（验证过程中不打断）
@@ -219,17 +219,16 @@ watch(
   () => localConfig.calendar.customSubscriptionUrl,
   (value) => {
     if (!isCustomSubscription.value) return
-    if (validateState.status === 'validating') return
+    if (isValidating.value) return
     draftCustomUrl.value = value
   },
 )
 
-/** 校验自定义地址：成功后才替换订阅 URL；失败时当前订阅保持不变 */
+/** 校验自定义地址：成功后才替换订阅 URL；失败时当前订阅保持不变。结果只用 toast 反馈 */
 const onValidateCustomUrl = async () => {
   const url = draftCustomUrl.value.trim()
   const token = ++validationToken
-  validateState.status = 'validating'
-  validateState.message = ''
+  isValidating.value = true
 
   try {
     // 先只校验，不碰 config/state；这样输入或验证失败都不会影响当前订阅
@@ -237,10 +236,7 @@ const onValidateCustomUrl = async () => {
     if (token !== validationToken) return
 
     // 校验期间切走了地区：不提交，避免覆盖用户刚选的订阅
-    if (!isCustomSubscription.value) {
-      resetValidateState()
-      return
-    }
+    if (!isCustomSubscription.value) return
 
     // 验证成功才真正替换 URL；随后 loadSubscription 命中刚写入的缓存，不重复请求
     writeSubscriptionCache(result)
@@ -249,17 +245,22 @@ const onValidateCustomUrl = async () => {
     if (token !== validationToken) return
 
     refreshLastUpdatedAt()
-    validateState.status = 'valid'
-    validateState.message = window.$t('calendar.subscriptionValid')
+    showToast.success(window.$t('calendar.subscriptionValid'))
   } catch (error) {
     if (token !== validationToken) return
-    validateState.status = 'invalid'
-    validateState.message = subscriptionErrorText(
-      (error as { subscriptionError?: TSubscriptionError })
-        .subscriptionError ?? {
-        code: 'network',
-      },
+    showToast.error(
+      subscriptionErrorText(
+        (error as { subscriptionError?: TSubscriptionError })
+          .subscriptionError ?? {
+          code: 'network',
+        },
+      ),
     )
+  } finally {
+    // 已被新的验证/编辑取代时不要收回按钮状态，交给那一轮负责
+    if (token === validationToken) {
+      isValidating.value = false
+    }
   }
 }
 </script>
@@ -329,23 +330,13 @@ const onValidateCustomUrl = async () => {
             size="tiny"
             variant="secondary"
             round
-            :disabled="validateState.status === 'validating'"
+            :disabled="isValidating"
             @click="onValidateCustomUrl()"
           >
+            <Icon :icon="ICONS.check" />
             {{ $t('calendar.subscriptionValidate') }}
           </NTButton>
         </div>
-        <p
-          v-if="validateState.message"
-          class="subscription__message"
-          :class="{
-            'subscription__message--valid': validateState.status === 'valid',
-            'subscription__message--invalid':
-              validateState.status === 'invalid',
-          }"
-        >
-          {{ validateState.message }}
-        </p>
       </SettingFormItem>
 
       <SwitchField
@@ -583,20 +574,5 @@ const onValidateCustomUrl = async () => {
 .subscription__custom :deep(.reka-input) {
   flex: 1;
   min-width: 0;
-}
-
-.subscription__message {
-  margin: 4px 0 0;
-  font-size: 12px;
-  line-height: 1.4;
-  text-align: left;
-}
-
-.subscription__message--valid {
-  color: var(--color-success);
-}
-
-.subscription__message--invalid {
-  color: var(--color-error);
 }
 </style>
