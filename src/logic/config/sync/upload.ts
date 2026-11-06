@@ -1,24 +1,25 @@
 /**
  * @module upload
- * @description 配置上传引擎 — 防抖写入、MD5 去重、Gzip 压缩、写入频率检测。
- * @dependencies config/defaults.ts（defaultUploadStatusItem）、config/compress.ts（压缩）、constants/app.ts（防抖延迟）
+ * @description 配置上传引擎 — 防抖写入、内容指纹去重、Gzip 压缩、写入频率检测。
+ * @dependencies config/defaults.ts（defaultUploadStatusItem）、config/compress.ts（压缩）、constants/app.ts（防抖延迟）、sync/fingerprint.ts（内容指纹）
  * @consumers config/sync/loader.ts（拉取时触发上传）、config/sync/state.ts（setupKeyboardSyncListener 监听）、config/sync/manage.ts（导入导出）
  * @pitfalls
- *   - checkWriteRate 必须在 MD5 去重、大小检查之后、chrome.storage.sync.set 之前调用，
+ *   - checkWriteRate 必须在内容指纹去重、大小检查之后、chrome.storage.sync.set 之前调用，
  *     否则被拦截的调用会虚增计数器、触发假警告
  *   - checkWriteRate 有滑动窗口限制（120 次/分钟），超过阈值会弹警告但不会拒绝写入
  *   - flushConfigSync 是 popup 关闭前必须调用的强制同步，否则防抖回调不会执行（popup 销毁后 watch 失效）
+ *   - 清空类操作（clearStorage / resetSetting）要先 cancelAllDebounce 再 waitForUploadsIdle：
+ *     排队中的防抖 + 已发出的 set 都会在清空后把旧数据写回
  *   - handleMissedUploadConfig 在页面启动时调用，补救那些 loading=true 但未完成的上传
  *   - genWatchUploadConfigFn 中先标记 dirty+localModifiedTime，再调用防抖函数，顺序不能反
  *   - pendingWrites 是预期写入注册表，chrome.storage.sync.set 调用前 add，回调后 delete。
  *     state.ts 的 onChanged 先检查 pendingWrites 再走 syncId 守卫，从架构上消除时序依赖
- *   - getUploadConfigData 对 keyboardBookmark 的 keymap 做过滤裁剪，计算 MD5 时必须
- *     使用此函数而非直接 JSON.stringify(localConfig)，否则 MD5 去重会失效
- *   - MD5 去重路径会同时清除 dirty（数据已确认同步），避免 handleMissedUploadConfig 每次启动无效重试
+ *   - getUploadConfigData 对 keyboardBookmark 的 keymap 做过滤裁剪，计算内容指纹时必须
+ *     使用此函数而非直接 JSON.stringify(localConfig)，否则去重会失效
+ *   - 去重路径会同时清除 dirty（数据已确认同步），避免 handleMissedUploadConfig 每次启动无效重试
  *   - size exceeded 路径会递增 retryCount（同 set 失败路径），3 次后自动停止重试
  * @see docs/architecture/storage.md#防抖写入机制
  */
-import md5 from 'crypto-js/md5'
 import { useDebounceFn } from '@vueuse/core'
 import {
   MERGE_CONFIG_DELAY,
@@ -40,6 +41,7 @@ import {
 import { showToast } from '@/common/toast'
 import { configSizeMap } from './state'
 import { addPendingWrite, removePendingWrite } from './pending-writes'
+import { computeSyncId } from './fingerprint'
 
 export const SYNC_QUOTA_BYTES_PER_ITEM = 8192
 const SYNC_SIZE_WARN = 7000
@@ -58,7 +60,7 @@ const writeHistory: WriteRecord[] = []
 
 // writeHistory 跨字段共享是有意设计：Chrome 的 MAX_WRITE_OPERATIONS_PER_MINUTE
 // 限制作用于 chrome.storage.sync 的所有写入操作总和，而非按字段独立计算。
-// checkWriteRate 仅在即将执行 chrome.storage.sync.set 时调用（MD5 去重、大小
+// checkWriteRate 仅在即将执行 chrome.storage.sync.set 时调用（指纹去重、大小
 // 检查之后），因此虚增已被消除。启动阶段 handleMissedUploadConfig 补救上传通常
 // 不超过 10 次，远低于 80% 警告阈值（96/120）。
 const checkWriteRate = (
@@ -101,55 +103,111 @@ export const getUploadConfigData = (field: ConfigField) => {
   return localConfig[field]
 }
 
-export const uploadConfigFn = async (field: ConfigField) => {
-  return new Promise((resolve) => {
-    if (!localState.value.isUploadConfigStatusMap[field]) {
-      localState.value.isUploadConfigStatusMap[field] = {
-        ...defaultUploadStatusItem,
-      }
-    }
-    const status = localState.value.isUploadConfigStatusMap[field]
-    status.loading = true
-    status.syncStatus = 'syncing'
-    log(`Upload config-${field} start`)
-    const uploadData = getUploadConfigData(field)
-    const currConfigMd5 = md5(JSON.stringify(uploadData)).toString()
-    const prevSyncId = status.syncId
+// ── 进行中上传跟踪 ──
+// 清空类操作（clearStorage / resetSetting）必须在清空 chrome.storage.sync 之前等待
+// 已发出的 set 回调落盘：浏览器进程里的 set 不会因为页面 reload 而取消，清空后
+// 迟到的回调会把旧数据写回去 —— 表现为「重置/清除后旧配置又回来了」。
+let inFlightUploadCount = 0
+let idleWaiters: Array<() => void> = []
 
-    // MD5 去重：内容未变则跳过，不记录到 writeHistory（Chrome 限制的是实际 set 调用次数）
-    // 注意：loading 已在第 109 行设为 true，此处延迟 100ms 重置是为了与成功/失败分支
-    // 保持一致的 UI 节奏。如果页面在此窗口内刷新，handleMissedUploadConfig 会补救
-    // loading=true 的字段，但再次进入 uploadConfigFn 时仍会被 MD5 去重拦截（resolve(true)），
-    // retryCount 不会增加（只在 chrome.storage.sync.set 回调报错时递增，第 208 行），
-    // 因此不会产生多余网络请求或消耗重试配额。
-    //
-    // dirty=true 但 MD5 相同：说明数据实际已同步，只是 syncId 与本地数据不一致
-    // （如 loadRemoteConfig 修复了错误的 syncId，或 handleAppUpdate → updateSetting
-    // 触发 watch 置 dirty 但数据未变）。同时清除 dirty 避免 handleMissedUploadConfig
-    // 每页加载都触发无效重试。
-    //
-    // 另一种触发场景：syncConfigFromOnChange（Popup onChanged）覆盖 Newtab 本地修改后，
-    // deep watcher 重新置 dirty=true，但数据 MD5 与 Popup syncId 一致。详见 state.ts
-    // syncConfigFromOnChange 注释。
-    if (prevSyncId === currConfigMd5) {
-      log(`Upload config-${field} skip (unchanged)`)
-      setTimeout(() => {
-        status.loading = false
-        status.dirty = false
-        status.syncStatus = 'idle'
-        resolve(true)
-      }, 100)
-      return
-    }
-    const currTime = Date.now()
-    const payloadStr = JSON.stringify({
-      syncTime: currTime,
-      syncId: currConfigMd5,
-      appVersion: window.appVersion,
-      data: uploadData,
-    })
-    const payloadBytes = new TextEncoder().encode(payloadStr).length
+const settleInFlightUpload = () => {
+  inFlightUploadCount--
+  if (inFlightUploadCount > 0) return
+  const waiters = idleWaiters
+  idleWaiters = []
+  for (const resolve of waiters) resolve()
+}
 
+/**
+ * 等待所有「已开始」的上传结束。
+ * 注意：只覆盖已经进入 uploadConfigFn 的上传，排队中的防抖需先调用 cancelAllDebounce。
+ * @param timeout 兜底超时（毫秒），避免异常状态让清空流程永久等待
+ */
+export const waitForUploadsIdle = (timeout = 3000): Promise<void> => {
+  if (inFlightUploadCount === 0) return Promise.resolve()
+  return new Promise<void>((resolve) => {
+    let settled = false
+    const done = () => {
+      if (settled) return
+      settled = true
+      resolve()
+    }
+    idleWaiters.push(done)
+    setTimeout(done, timeout)
+  })
+}
+
+export const uploadConfigFn = (field: ConfigField) => {
+  inFlightUploadCount++
+  return uploadConfigFnInner(field).finally(() => {
+    settleInFlightUpload()
+  })
+}
+
+const uploadConfigFnInner = async (field: ConfigField): Promise<boolean> => {
+  if (!localState.value.isUploadConfigStatusMap[field]) {
+    localState.value.isUploadConfigStatusMap[field] = {
+      ...defaultUploadStatusItem,
+    }
+  }
+  const status = localState.value.isUploadConfigStatusMap[field]
+  status.loading = true
+  status.syncStatus = 'syncing'
+  log(`Upload config-${field} start`)
+  const uploadData = getUploadConfigData(field)
+
+  // 指纹计算是异步的（WebCrypto 没有同步摘要 API），所以在 Promise 执行器之外先算好。
+  // 失败时按上传失败处理而不是让 Promise reject：uploadConfigFn 的调用方（防抖回调、
+  // handleMissedUploadConfig、flushConfigSync）都没有 catch，reject 会变成 unhandled rejection。
+  let currSyncId: string
+  try {
+    currSyncId = await computeSyncId(uploadData)
+  } catch (e) {
+    log(`Upload config-${field} fingerprint error`, e)
+    status.loading = false
+    status.syncStatus = 'failed'
+    // 与 set 失败 / 大小超限走同一套失败语义：递增 retryCount，3 次后
+    // handleMissedUploadConfig 不再自动重试。crypto.subtle 不可用是环境性
+    // 事实（非瞬时故障），不计数会让每次启动都白跑一次必然失败的哈希计算。
+    status.retryCount++
+    status.lastError = 'fingerprint'
+    return false
+  }
+  const prevSyncId = status.syncId
+
+  // 去重：内容未变则跳过，不记录到 writeHistory（Chrome 限制的是实际 set 调用次数）
+  // 注意：loading 已在上面设为 true，此处延迟 100ms 重置是为了与成功/失败分支
+  // 保持一致的 UI 节奏。如果页面在此窗口内刷新，handleMissedUploadConfig 会补救
+  // loading=true 的字段，但再次进入 uploadConfigFn 时仍会被指纹去重拦截（返回 true），
+  // retryCount 不会增加（只在 chrome.storage.sync.set 回调报错时递增），
+  // 因此不会产生多余网络请求或消耗重试配额。
+  //
+  // dirty=true 但指纹相同：说明数据实际已同步，只是 syncId 与本地数据不一致
+  // （如 loadRemoteConfig 修复了错误的 syncId，或 handleAppUpdate → updateSetting
+  // 触发 watch 置 dirty 但数据未变）。同时清除 dirty 避免 handleMissedUploadConfig
+  // 每页加载都触发无效重试。
+  //
+  // 另一种触发场景：syncConfigFromOnChange（Popup onChanged）覆盖 Newtab 本地修改后，
+  // deep watcher 重新置 dirty=true，但数据指纹与 Popup syncId 一致。详见 state.ts
+  // syncConfigFromOnChange 注释。
+  if (prevSyncId === currSyncId) {
+    log(`Upload config-${field} skip (unchanged)`)
+    await new Promise((r) => setTimeout(r, 100))
+    status.loading = false
+    status.dirty = false
+    status.syncStatus = 'idle'
+    return true
+  }
+  const currTime = Date.now()
+  const payloadStr = JSON.stringify({
+    syncTime: currTime,
+    syncId: currSyncId,
+    appVersion: window.appVersion,
+    data: uploadData,
+  })
+  const payloadBytes = new TextEncoder().encode(payloadStr).length
+
+  return new Promise<boolean>((resolve) => {
     const doUpload = async () => {
       let finalPayload = payloadStr
 
@@ -191,7 +249,7 @@ export const uploadConfigFn = async (field: ConfigField) => {
       }
 
       // 所有检查通过，即将执行 chrome.storage.sync.set，此时才记录到写入速率计数器。
-      // 避免 MD5 去重、大小超限等未实际写入的场景虚增计数器、触发假警告。
+      // 避免指纹去重、大小超限等未实际写入的场景虚增计数器、触发假警告。
       const { isNearLimit, count } = checkWriteRate(field)
       if (isNearLimit) {
         log(
@@ -208,13 +266,13 @@ export const uploadConfigFn = async (field: ConfigField) => {
 
       // 在 set 调用前注册预期写入，onChanged 命中 pendingWrites 则跳过。
       // 不依赖 syncId 的回调时序，从架构上消除竞态根因。
-      addPendingWrite(currConfigMd5)
-      status.syncId = currConfigMd5
-      status.syncTime = currTime
+      addPendingWrite(currSyncId)
+      status.syncId = currSyncId
+      // syncTime 只在写入成功后才记：失败时它会被 lastSyncTime 当成功时间展示
 
       const payload = { [`naive-tab-${field}`]: finalPayload }
       chrome.storage.sync.set(payload, () => {
-        removePendingWrite(currConfigMd5)
+        removePendingWrite(currSyncId)
         const error = chrome.runtime.lastError
         if (error) {
           log(`Upload config-${field} error`, error)
@@ -232,6 +290,7 @@ export const uploadConfigFn = async (field: ConfigField) => {
         } else {
           log(`Upload config-${field} done`)
           configSizeMap[field] = finalBytes
+          status.syncTime = currTime
           status.dirty = false
           status.retryCount = 0
           status.lastError = ''
@@ -257,8 +316,9 @@ const genUploadConfigDebounceFn = (field: ConfigField) => {
     () => {
       if (getDebounceGeneration() !== capturedGen) {
         log(`Upload config-${field} skipped (debounce cancelled)`)
-        // 重置 loading 状态，防止 clearStorage 中 watch(isUploadConfigLoading)
-        // 永远等待。只重置非上传中状态的字段（syncStatus==='syncing' 说明
+        // 重置 loading 状态，否则把字段置为 loading=true 之后没人再改回 false：
+        // 消费方（StorageVisualization 的同步时间转圈，走 isUploadConfigLoading）
+        // 会永远转下去。只重置非上传中状态的字段（syncStatus==='syncing' 说明
         // chrome.storage.sync.set 已在执行中，不能重置）。
         for (const f of Object.keys(
           localState.value.isUploadConfigStatusMap,
@@ -312,8 +372,8 @@ export const handleWatchLocalConfigChange = () => {
 
 export const flushConfigSync = async (field: ConfigField): Promise<boolean> => {
   // 注意：此函数不会取消 handleWatchLocalConfigChange 中已排队的防抖调用。
-  // 但 uploadConfigFn 内部的 MD5 去重（第 116 行）会在防抖回调执行时检查
-  // prevSyncId === currConfigMd5，数据未变则提前返回，不会产生重复上传。
+  // 但 uploadConfigFn 内部的指纹去重会在防抖回调执行时检查
+  // prevSyncId === currSyncId，数据未变则提前返回，不会产生重复上传。
   // 极端场景：如果 flushConfigSync 和防抖执行之间数据又变化了，防抖会执行一次
   // 新的上传。这是预期行为，因为数据确实更新了。
   if (!localState.value.isUploadConfigStatusMap[field]) {

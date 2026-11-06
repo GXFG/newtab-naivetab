@@ -384,75 +384,8 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
     // 深拷贝 fixture，避免测试间互相污染
     const fixtureCopy = JSON.parse(JSON.stringify(fixture))
 
-    // ── 第一步：normalize 旧版 key（bookmark → keyboardBookmark 等） ──
-    // 真实场景中，配置加载时会先经过 normalizeLegacyConfig，
-    // 否则 handleAppUpdate 会因找不到预期字段而崩溃。
-    // 这里手动内联 normalize 逻辑，避免跨模块 mock 冲突。
-    const normalizedConfig = { ...fixtureCopy }
-    // 顶层 key 重命名
-    const topLevelRename: Record<string, string> = {
-      bookmark: 'keyboardBookmark',
-      keyboard: 'keyboardBookmark',
-      commandShortcut: 'keyboardCommand',
-    }
-    for (const [oldKey, newKey] of Object.entries(topLevelRename)) {
-      if (oldKey in normalizedConfig && !(newKey in normalizedConfig)) {
-        normalizedConfig[newKey] = structuredClone(normalizedConfig[oldKey])
-        delete normalizedConfig[oldKey]
-      }
-    }
-    // 外观字段拆分（keyboardBookmark → keyboardCommon）
-    // 当 keyboardBookmark 包含外观字段且 keyboardCommon 不存在时，拆分到 keyboardCommon
-    if (normalizedConfig.keyboardBookmark && !normalizedConfig.keyboardCommon) {
-      const appearanceFields = [
-        'keyboardType', 'splitSpace', 'keyboardWklMode', 'keycapType',
-        'keycapPadding', 'keycapSize', 'keycapBorderRadius', 'isKeycapBorderEnabled',
-        'keycapBorderWidth', 'keycapBorderColor', 'isShellVisible',
-        'shellVerticalPadding', 'shellHorizontalPadding', 'shellBorderRadius',
-        'shellColor', 'isShellShadowEnabled', 'shellShadowColor', 'shellBackgroundBlur',
-        'isPlateVisible', 'platePadding', 'plateBorderRadius', 'plateColor',
-        'isCapKeyVisible', 'keycapKeyFontFamily', 'keycapKeyFontSize',
-        'isNameVisible', 'keycapBookmarkFontFamily', 'keycapBookmarkFontSize',
-        'isFaviconVisible', 'faviconSize', 'isTactileBumpsVisible',
-        'mainFontColor', 'mainBackgroundColor',
-        'emphasisOneFontColor', 'emphasisOneBackgroundColor',
-        'emphasisTwoFontColor', 'emphasisTwoBackgroundColor',
-        'emphasisKeyOverrides', 'fontSize', 'fontFamily',
-      ]
-      normalizedConfig.keyboardCommon = {}
-      for (const field of appearanceFields) {
-        if (normalizedConfig.keyboardBookmark[field] !== undefined) {
-          normalizedConfig.keyboardCommon[field] = normalizedConfig.keyboardBookmark[field]
-          delete normalizedConfig.keyboardBookmark[field]
-        }
-      }
-    }
-    // focusVisibleWidgetMap 内 key 重命名
-    const fvm = normalizedConfig.general?.focusVisibleWidgetMap
-    if (fvm && typeof fvm === 'object') {
-      if ('keyboard' in fvm && !('keyboardBookmark' in fvm)) {
-        fvm.keyboardBookmark = fvm.keyboard
-        delete fvm.keyboard
-      }
-      if ('commandShortcut' in fvm && !('keyboardCommand' in fvm)) {
-        fvm.keyboardCommand = fvm.commandShortcut
-        delete fvm.commandShortcut
-      }
-    }
-    // openPageFocusElement 值修正
-    if (normalizedConfig.general?.openPageFocusElement === 'keyboard') {
-      normalizedConfig.general.openPageFocusElement = 'keyboardBookmark'
-    }
-    // isFocusMode 从 general 提取
-    if (normalizedConfig.general && 'isFocusMode' in normalizedConfig.general) {
-      localState.value.isFocusMode = normalizedConfig.general.isFocusMode
-      delete normalizedConfig.general.isFocusMode
-    }
-    // 保存 normalize 结果，用于断言旧 key 清理
-    ;(globalThis as any).__normalizedConfig = normalizedConfig
 
     // 构建响应式的 mock state（与 state.ts 中 reactive/ref 一致）
-    localConfig = reactive(normalizedConfig)
     localState = ref({
       isUploadConfigStatusMap: {
         general: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
@@ -547,10 +480,6 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
       clockAnalog: true, clockFlip: true, clockNeon: true, date: true,
     }
 
-    vi.doMock('@/logic/config/state', () => ({
-      localConfig,
-      localState,
-    }))
     vi.doMock('@/logic/store/state', () => ({
       globalState: reactive({ isChangelogModalVisible: false }),
     }))
@@ -569,6 +498,13 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
     vi.doMock('@/logic/config/merge', () => ({
       mergeState: vi.fn((state: unknown, acceptState: unknown) => acceptState ?? state),
     }))
+
+    // 键名归一用真实实现：这里曾内联复制过一份，与 migrate.ts 各自演进
+    const { normalizeStructure } = await import('@/logic/config/migrate')
+    const normalizedConfig = normalizeStructure(fixtureCopy)
+    ;(globalThis as any).__normalizedConfig = normalizedConfig
+    localConfig = reactive(normalizedConfig)
+    vi.doMock('@/logic/config/state', () => ({ localConfig, localState }))
     vi.doMock('@/logic/utils/util', () => ({
       log: vi.fn(),
       compareLeftVersionLessThanRightVersions: (left: string, right: string) => {
@@ -612,5 +548,12 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
   it('版本号升级到目标版本', () => {
     handleAppUpdate()
     expect(localConfig.general.version).toBe(APP_VERSION)
+  })
+
+  // 迁移链重构的等价性基线：迁移结果必须与重构前逐字节一致。
+  // 任何字段层面的漂移（多赋值、漏 delete）都会在这里暴露。
+  it('迁移结果与基线快照一致', () => {
+    handleAppUpdate()
+    expect(JSON.parse(JSON.stringify(localConfig))).toMatchSnapshot()
   })
 })

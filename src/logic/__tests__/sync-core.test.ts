@@ -104,9 +104,9 @@ describe('flushConfigSync', () => {
     expect(localState.value.isUploadConfigStatusMap.general.loading).toBe(false)
   })
 
-  it('respects skip when content unchanged (same MD5)', async () => {
+  it('respects skip when content unchanged (same fingerprint)', async () => {
     const { localState } = await import('@/logic/config/state')
-    // First call will set syncId; second call should skip via MD5 match
+    // First call will set syncId; second call should skip via fingerprint match
     localState.value.isUploadConfigStatusMap = {}
     await flushConfigSync('general')
     const syncId = localState.value.isUploadConfigStatusMap.general.syncId
@@ -383,7 +383,7 @@ describe('loadRemoteConfig — merge marks dirty for recovery', () => {
     const status = localState.value.isUploadConfigStatusMap.general
     // 核心：合并后标记 dirty=true，交给下一步 handleMissedUploadConfig 上传
     expect(status.dirty).toBe(true)
-    // syncId 保持为云端原始值，不自行重算——避免与 uploadConfigFn MD5 检查冲突
+    // syncId 保持为云端原始值，不自行重算——避免与 uploadConfigFn 指纹检查冲突
     expect(status.syncId).toBe('cloudMd5xyz')
     // 状态已重置干净，等待上传
     expect(status.loading).toBe(false)
@@ -430,23 +430,23 @@ describe('handleMissedUploadConfig — dirty and retryCount guard', () => {
     const status = localState.value.isUploadConfigStatusMap.general
     expect(status.loading).toBe(false)
     // 上传后 dirty 取决于 uploadConfigFn 的结果：
-    // MD5 匹配 → dirty=false  |  上传成功 → dirty=false  |  上传失败 → dirty=true
+    // 指纹匹配 → dirty=false  |  上传成功 → dirty=false  |  上传失败 → dirty=true
     // 默认 mock chrome 数据为空，syncId='oldNeedUpload', currConfigMd5 由 defaultConfig 决定
     // 由于 prevSyncId 大概率 ≠ currConfigMd5，会上传成功 → dirty=false
     expect(status.dirty).toBe(false)
   })
 })
 
-// ── handleMissedUploadConfig: dirty=true + MD5 match clears dirty ──
+// ── handleMissedUploadConfig: dirty=true + fingerprint match clears dirty ──
 
-describe('handleMissedUploadConfig — MD5 match clears dirty', () => {
+describe('handleMissedUploadConfig — fingerprint match clears dirty', () => {
   let handleMissedUploadConfig: typeof import('@/logic/config/sync/upload')['handleMissedUploadConfig']
 
-  it('clears dirty when uploadConfigFn MD5 matches (data already synced)', async () => {
+  it('clears dirty when uploadConfigFn fingerprint matches (data already synced)', async () => {
     vi.resetModules()
     const { localState, localConfig } = await import('@/logic/config/state')
-    // 先让 uploadConfigFn 计算一次真实 MD5，然后用它作为 syncId
-    // 这样下次调用时 MD5 匹配 → dirty 应被清除
+    // 先让 uploadConfigFn 计算一次真实指纹，然后用它作为 syncId
+    // 这样下次调用时指纹匹配 → dirty 应被清除
     const mod = await import('@/logic/config/sync/upload')
     const { uploadConfigFn } = mod
 
@@ -463,7 +463,7 @@ describe('handleMissedUploadConfig — MD5 match clears dirty', () => {
     handleMissedUploadConfig = mod.handleMissedUploadConfig
     await handleMissedUploadConfig()
 
-    // MD5 匹配 → dirty 应被清除
+    // 指纹匹配 → dirty 应被清除
     const status = localState.value.isUploadConfigStatusMap.general
     expect(status.dirty).toBe(false)
     expect(status.syncId).toBe(syncedId)

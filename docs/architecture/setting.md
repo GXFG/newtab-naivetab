@@ -91,7 +91,7 @@ export const SETTING_GROUPS: SettingGroup[] = [
 
 1. 在 `SETTING_GROUPS` 对应分组中添加 `{ code, labelKey }`
 2. 创建 `src/setting/panes/{code}/index.vue`
-3. 在 `SETTING_ICON_META` 中注册图标
+3. 在 `SETTING_ICON_META` 中注册图标（新增了 `ICONS` 常量时还要跑 `pnpm gen:icons` 并提交 `icon-set.json`）
 4. 在 `locales/zh-CN.json` 和 `en-US.json` 中添加翻译
 
 ## 组件层级结构

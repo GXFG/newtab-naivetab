@@ -13,6 +13,7 @@
 import { computed, reactive } from 'vue'
 import { log } from '@/logic/utils/common'
 import { localConfig, localState } from '@/logic/config/state'
+import { defaultConfig } from '@/logic/config/defaults'
 import { mergeState } from '@/logic/config/merge'
 import { parseStoredData } from '@/logic/config/compress'
 import { isPendingWrite } from './pending-writes'
@@ -73,6 +74,18 @@ const SYNC_KEY_MAP: Record<SyncField, string> = {
 }
 
 /**
+ * 把远程 payload 合并进本地字段。
+ * 必须经过 mergeState：payload 可能来自旧版本的 popup/CS，直接赋值会让本地配置
+ * 丢掉新版字段（随后被 upload 当作「完整数据」推回云端，形成降级）。
+ */
+const applyRemoteField = <K extends SyncField>(field: K, data: unknown) => {
+  localConfig[field] = mergeState(
+    defaultConfig[field],
+    data,
+  ) as (typeof defaultConfig)[K]
+}
+
+/**
  * 监听 popup 修改配置 → 自动同步到 other context 的 localConfig
  *
  * chrome.storage.onChanged 在 popup 调用 flushConfigSync 写入后触发。
@@ -83,10 +96,10 @@ const SYNC_KEY_MAP: Record<SyncField, string> = {
  *
  * 若 Newtab 已有 dirty=true 的本地修改（2000ms 防抖尚未触发上传），此时 Popup 的
  * flushConfigSync 写入触发 onChanged，本函数会：
- *   1. 将 localConfig[field] 替换为 Popup 的数据（第 135 行）→ Newtab 本地修改丢失
- *   2. 设置 dirty=false（第 130 行）
- *   3. 第 135 行的赋值触发 deep watcher → genWatchUploadConfigFn 再次置 dirty=true
- *   4. 后续 uploadConfigFn 检测 MD5 与 Popup syncId 相同 → 跳过上传 + 清除 dirty
+ *   1. 用 Popup 的数据覆盖 localConfig[field]（applyRemoteField）→ Newtab 本地修改丢失
+ *   2. 设置 dirty=false
+ *   3. 覆盖赋值触发 deep watcher → genWatchUploadConfigFn 再次置 dirty=true
+ *   4. 后续 uploadConfigFn 检测内容指纹与 Popup syncId 相同 → 跳过上传 + 清除 dirty
  *      → syncStatus='idle' → handleMissedUploadConfig 不再无效重试
  *
  * 触发条件苛刻：需在 2000ms 窗口内同时在 Newtab 和 Popup 修改 keyboardBookmark 或
@@ -131,7 +144,9 @@ const syncConfigFromOnChange = (
       localState.value.isUploadConfigStatusMap[field].lastError = ''
       localState.value.isUploadConfigStatusMap[field].syncStatus = 'idle'
 
-      localConfig[field] = parsed.data
+      // 必须经过 mergeState：payload 可能来自旧版本的 popup/CS，直接赋值会让
+      // 本地配置丢掉新版字段（随后被 upload 当作「完整数据」推回云端，形成降级）
+      applyRemoteField(field, parsed.data)
       log(`Sync ${field} updated from storage.onChanged`)
     })
     .catch((e) => {

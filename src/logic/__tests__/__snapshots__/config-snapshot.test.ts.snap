@@ -1,0 +1,834 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`配置兼容性快照: 'v1.19.0 老用户：书签 keymap + 旧版顶层 key（book…' > 迁移结果与基线快照一致 1`] = `
+{
+  "bookmarkFolder": {
+    "enabled": false,
+  },
+  "calendar": {
+    "backgroundBlur": 5,
+    "customSubscriptionUrl": "",
+    "dayFontFamily": "system",
+    "descFontFamily": "system",
+    "festivalCountdown": true,
+    "isAlmanacVisible": true,
+    "isHolidayMarkVisible": true,
+    "isLunarTermVisible": true,
+    "subscriptionRegion": "CN",
+  },
+  "clockAnalog": {
+    "enabled": true,
+  },
+  "clockDigital": {
+    "fontSize": 32,
+    "width": 24,
+  },
+  "clockFlip": {
+    "enabled": false,
+  },
+  "clockNeon": {
+    "enabled": false,
+  },
+  "countdown": {
+    "enabled": false,
+  },
+  "date": {
+    "enabled": true,
+  },
+  "general": {
+    "appearance": "auto",
+    "backgroundColor": [
+      "rgba(232, 236, 241, 1)",
+      "rgba(26, 26, 46, 1)",
+    ],
+    "focusVisibleWidgetMap": {
+      "clockAnalog": true,
+      "clockDigital": true,
+      "clockFlip": true,
+      "clockNeon": true,
+      "date": true,
+      "keyboardBookmark": true,
+      "search": true,
+    },
+    "fontColor": [
+      "rgba(44, 62, 80, 1)",
+      "rgba(255, 255, 255, 1)",
+    ],
+    "fontFamily": "system",
+    "fontSize": 14,
+    "isAutoBackgroundColor": false,
+    "isAutoPrimaryColor": false,
+    "isGaEnabled": true,
+    "lang": "zh-CN",
+    "openPageFocusElement": "keyboardBookmark",
+    "pageTitle": "新标签页",
+    "primaryColor": [
+      "rgba(58, 115, 195, 1)",
+      "rgba(100, 160, 230, 1)",
+    ],
+    "scaleMode": "auto",
+    "shimmerAnimationSpeed": 1,
+    "shimmerBackgroundColors": [
+      [
+        "#D1ADFF",
+        "#98D69B",
+        "#FAE390",
+        "#FFACD8",
+        "#7DD5FF",
+        "#C8E6C9",
+      ],
+      [
+        "#6B4FAE",
+        "#4A7A4D",
+        "#B8A050",
+        "#B06080",
+        "#4080A0",
+        "#4A6F5A",
+      ],
+    ],
+    "shimmerBackgroundEffect": "aurora",
+    "showBreakingChangeNotice": true,
+    "timeLang": "zh-CN",
+    "version": "2.7.0",
+  },
+  "keyboardBookmark": {
+    "isEnabled": true,
+    "isGlobalShortcutEnabled": true,
+    "keymap": {
+      "Digit1": {
+        "title": "Gmail",
+        "url": "https://mail.google.com",
+      },
+      "KeyA": {
+        "title": "GitHub",
+        "url": "https://github.com",
+      },
+      "KeyB": {
+        "title": "Google",
+        "url": "https://google.com",
+      },
+    },
+    "layers": [
+      {
+        "sourceFolderPath": "NaiveTab/layer1",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+    ],
+    "noModifierMode": false,
+    "source": 2,
+  },
+  "keyboardCommand": {
+    "isEnabled": true,
+    "isGlobalShortcutEnabled": true,
+    "keymap": {
+      "KeyE": {
+        "command": "moveTabRight",
+      },
+      "KeyQ": {
+        "command": "moveTabLeft",
+      },
+      "KeyX": {
+        "command": "closeTab",
+      },
+    },
+    "noModifierMode": false,
+  },
+  "keyboardCommon": {
+    "emphasisKeyOverrides": {},
+    "emphasisOneBackgroundColor": [
+      "rgba(80,85,90,1.0)",
+      "rgba(30,41,59,1.0)",
+    ],
+    "emphasisOneFontColor": [
+      "rgba(235,238,240,1.0)",
+      "rgba(226,232,240,1.0)",
+    ],
+    "emphasisTwoBackgroundColor": [
+      "rgba(160,165,170,1.0)",
+      "rgba(148,163,184,1.0)",
+    ],
+    "emphasisTwoFontColor": [
+      "rgba(60,65,70,1.0)",
+      "rgba(30,41,59,1.0)",
+    ],
+    "faviconSize": 0.85,
+    "fontFamily": "system",
+    "fontSize": 14,
+    "isCapKeyVisible": true,
+    "isFaviconVisible": true,
+    "isKeycapBorderEnabled": false,
+    "isNameVisible": true,
+    "isPlateVisible": true,
+    "isShellShadowEnabled": true,
+    "isShellVisible": true,
+    "isTactileBumpsVisible": true,
+    "keyboardType": "key61",
+    "keyboardWklMode": false,
+    "keycapBookmarkFontFamily": "Arial",
+    "keycapBookmarkFontSize": 11,
+    "keycapBorderColor": [
+      "rgba(71, 85, 105, 1)",
+      "rgba(73, 73, 77, 1)",
+    ],
+    "keycapBorderRadius": 5,
+    "keycapBorderWidth": 1,
+    "keycapKeyFontFamily": "OpenCherry",
+    "keycapKeyFontSize": 12,
+    "keycapPadding": 1.5,
+    "keycapSize": 58,
+    "keycapType": "gmk",
+    "mainBackgroundColor": [
+      "rgba(235,238,240,1.0)",
+      "rgba(71,85,105,1.0)",
+    ],
+    "mainFontColor": [
+      "rgba(0, 0, 0, 1)",
+      "rgba(255, 255, 255, 1)",
+    ],
+    "nameplates": [],
+    "plateBorderRadius": 5,
+    "plateColor": [
+      "rgba(80, 80, 80, 0.7)",
+      "rgba(119, 119, 119, 0.5)",
+    ],
+    "platePadding": 3,
+    "shellBackgroundBlur": 5,
+    "shellBorderRadius": 10,
+    "shellColor": [
+      "rgba(225, 219, 209, 1.0)",
+      "rgba(51,65,85,1.0)",
+    ],
+    "shellHorizontalPadding": 15,
+    "shellShadowColor": [
+      "rgba(0, 0, 0, 0.4)",
+      "rgba(0, 0, 0, 0.4)",
+    ],
+    "shellVerticalPadding": 15,
+    "splitSpace": "space1",
+  },
+  "memo": {
+    "backgroundBlur": 10,
+    "enabled": true,
+    "fontFamily": "system",
+    "padding": 8,
+  },
+  "news": {
+    "backgroundBlur": 10,
+    "enabled": false,
+  },
+  "search": {
+    "backgroundBlur": 5,
+    "isNewTabOpen": false,
+  },
+  "weather": {
+    "enabled": false,
+  },
+  "yearProgress": {
+    "backgroundBlur": 5,
+    "backgroundColor": [
+      "rgba(255, 255, 255, 0.85)",
+      "rgba(52, 52, 57, 1)",
+    ],
+    "blockActiveColor": [
+      "rgba(58, 115, 195, 1)",
+      "rgba(58, 115, 195, 1)",
+    ],
+    "blockDefaultColor": [
+      "rgba(200, 200, 200, 1)",
+      "rgba(200, 200, 200, 1)",
+    ],
+    "blockMargin": 1.2,
+    "blockRadius": 1,
+    "blockSize": 4.5,
+    "borderColor": [
+      "rgba(239, 239, 245, 1)",
+      "rgba(73, 73, 77, 1)",
+    ],
+    "borderRadius": 5.5,
+    "borderWidth": 1,
+    "enabled": false,
+    "fontColor": [
+      "rgba(44, 62, 80, 1)",
+      "rgba(255, 255, 255, 1)",
+    ],
+    "fontFamily": "system",
+    "fontSize": 16,
+    "format": "YYYY.MM.DD",
+    "height": 110,
+    "isBorderEnabled": false,
+    "isDateEnabled": true,
+    "isPercentageEnabled": true,
+    "isRealtime": false,
+    "isShadowEnabled": true,
+    "layout": {
+      "xOffsetKey": "right",
+      "xOffsetValue": 0,
+      "xTranslateValue": 0,
+      "yOffsetKey": "top",
+      "yOffsetValue": 0,
+      "yTranslateValue": 0,
+    },
+    "padding": 10,
+    "percentageDecimal": 3,
+    "shadowColor": [
+      "rgba(14, 30, 37, 0.12)",
+      "rgba(14, 30, 37, 0.12)",
+    ],
+    "textActiveColor": [
+      "rgba(58, 115, 195, 1)",
+      "rgba(58, 115, 195, 1)",
+    ],
+    "textLineHeight": 1.5,
+    "width": 345,
+  },
+}
+`;
+
+exports[`配置兼容性快照: 'v2.1.0 用户：键盘已拆分但未迁移到新版快捷键架构' > 迁移结果与基线快照一致 1`] = `
+{
+  "bookmarkFolder": {
+    "enabled": false,
+  },
+  "calendar": {
+    "backgroundBlur": 0,
+    "customSubscriptionUrl": "",
+    "dayFontFamily": "Roboto",
+    "descFontFamily": "Roboto",
+    "festivalCountdown": true,
+    "isAlmanacVisible": true,
+    "isHolidayMarkVisible": true,
+    "isLunarTermVisible": true,
+    "subscriptionRegion": "CN",
+  },
+  "clockAnalog": {
+    "enabled": true,
+    "showSecondHand": false,
+  },
+  "clockDigital": {
+    "fontSize": 28,
+    "width": 22,
+  },
+  "clockFlip": {
+    "enabled": false,
+  },
+  "clockNeon": {
+    "enabled": false,
+  },
+  "countdown": {
+    "enabled": false,
+  },
+  "date": {
+    "enabled": true,
+  },
+  "general": {
+    "appearance": "dark",
+    "backgroundColor": [
+      "rgba(26, 26, 46, 1)",
+      "rgba(26, 26, 46, 1)",
+    ],
+    "backgroundImageList": [
+      {
+        "name": "19161535",
+        "networkSourceType": "pexels",
+      },
+      {
+        "name": "36873465",
+        "networkSourceType": "pexels",
+      },
+    ],
+    "backgroundImageSource": "network",
+    "focusVisibleWidgetMap": {
+      "clockAnalog": true,
+      "clockDigital": true,
+      "clockFlip": true,
+      "clockNeon": true,
+      "date": true,
+      "keyboardBookmark": true,
+      "search": true,
+    },
+    "fontColor": [
+      "rgba(255, 255, 255, 1)",
+      "rgba(255, 255, 255, 1)",
+    ],
+    "fontFamily": "Roboto",
+    "fontSize": 16,
+    "isAutoBackgroundColor": false,
+    "isAutoPrimaryColor": false,
+    "isBackgroundImageEnabled": true,
+    "isGaEnabled": true,
+    "lang": "en-US",
+    "openPageFocusElement": "search",
+    "pageTitle": "NaiveTab",
+    "primaryColor": [
+      "rgba(100, 160, 230, 1)",
+      "rgba(100, 160, 230, 1)",
+    ],
+    "scaleMode": "auto",
+    "shimmerAnimationSpeed": 1,
+    "shimmerBackgroundColors": [
+      [
+        "#D1ADFF",
+        "#98D69B",
+        "#FAE390",
+        "#FFACD8",
+        "#7DD5FF",
+        "#C8E6C9",
+      ],
+      [
+        "#6B4FAE",
+        "#4A7A4D",
+        "#B8A050",
+        "#B06080",
+        "#4080A0",
+        "#4A6F5A",
+      ],
+    ],
+    "shimmerBackgroundEffect": "aurora",
+    "showBreakingChangeNotice": true,
+    "timeLang": "en-US",
+    "version": "2.7.0",
+  },
+  "keyboardBookmark": {
+    "isEnabled": true,
+    "isGlobalShortcutEnabled": false,
+    "isListenBackgroundKeystrokes": false,
+    "keymap": {
+      "Digit1": {
+        "title": "Gmail",
+        "url": "https://mail.google.com",
+      },
+      "Digit2": {
+        "title": "Google Docs",
+        "url": "https://docs.google.com",
+      },
+      "KeyG": {
+        "title": "GitHub",
+        "url": "https://github.com",
+      },
+      "KeyT": {
+        "title": "Twitter",
+        "url": "https://twitter.com",
+      },
+      "KeyY": {
+        "title": "YouTube",
+        "url": "https://youtube.com",
+      },
+    },
+    "layers": [
+      {
+        "sourceFolderPath": "NaiveTab/layer1",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+    ],
+    "noModifierMode": false,
+    "source": 1,
+  },
+  "keyboardCommand": {
+    "enabled": true,
+    "isGlobalShortcutEnabled": true,
+    "keymap": {
+      "KeyA": {
+        "command": "prevTab",
+      },
+      "KeyD": {
+        "command": "nextTab",
+      },
+      "KeyE": {
+        "command": "moveTabRight",
+      },
+      "KeyQ": {
+        "command": "moveTabLeft",
+      },
+      "KeyT": {
+        "command": "newTabAfter",
+      },
+      "KeyV": {
+        "command": "toggleTabPinned",
+      },
+      "KeyX": {
+        "command": "closeTab",
+      },
+    },
+    "modifierKeys": [
+      "shift",
+      "ctrl",
+    ],
+    "noModifierMode": false,
+  },
+  "keyboardCommon": {
+    "fontFamily": "Roboto",
+    "fontSize": 15,
+    "isShellVisible": true,
+    "keyboardType": "key87",
+    "keycapPadding": 2,
+    "keycapSize": 60,
+    "keycapType": "dsa",
+    "mainBackgroundColor": [
+      "rgba(71,85,105,1.0)",
+      "rgba(71,85,105,1.0)",
+    ],
+    "mainFontColor": [
+      "rgba(226, 232, 240, 1.0)",
+      "rgba(226, 232, 240, 1.0)",
+    ],
+    "nameplates": [],
+    "plateColor": [
+      "rgba(119, 119, 119, 0.5)",
+      "rgba(119, 119, 119, 0.5)",
+    ],
+    "shellBackgroundBlur": 8,
+    "shellColor": [
+      "rgba(40, 40, 60, 1.0)",
+      "rgba(40, 40, 60, 1.0)",
+    ],
+    "splitSpace": "space2",
+  },
+  "memo": {
+    "backgroundBlur": 0,
+    "enabled": true,
+    "fontFamily": "Roboto",
+    "padding": 8,
+  },
+  "news": {
+    "backgroundBlur": 0,
+    "enabled": true,
+    "fontFamily": "Roboto",
+  },
+  "search": {
+    "backgroundBlur": 0,
+    "isNewTabOpen": true,
+  },
+  "weather": {
+    "enabled": true,
+    "unit": "metric",
+  },
+  "yearProgress": {
+    "backgroundBlur": 0,
+    "enabled": true,
+  },
+}
+`;
+
+exports[`配置兼容性快照: 'v2.3.0 用户：当前最新结构，检测未来迁移不破坏' > 迁移结果与基线快照一致 1`] = `
+{
+  "bookmarkFolder": {
+    "enabled": false,
+  },
+  "calendar": {
+    "backgroundBlur": 0,
+    "customSubscriptionUrl": "",
+    "dayFontFamily": "system",
+    "descFontFamily": "system",
+    "festivalCountdown": true,
+    "isAlmanacVisible": true,
+    "isHolidayMarkVisible": true,
+    "isLunarTermVisible": true,
+    "subscriptionRegion": "CN",
+  },
+  "clockAnalog": {
+    "enabled": true,
+    "showSecondHand": false,
+  },
+  "clockDigital": {
+    "fontSize": 28,
+    "width": 22,
+  },
+  "clockFlip": {
+    "enabled": false,
+  },
+  "clockNeon": {
+    "enabled": false,
+  },
+  "countdown": {
+    "enabled": false,
+  },
+  "date": {
+    "enabled": true,
+  },
+  "general": {
+    "appearance": "auto",
+    "backgroundColor": [
+      "rgba(232, 236, 241, 1)",
+      "rgba(26, 26, 46, 1)",
+    ],
+    "backgroundImageList": [
+      {
+        "name": "19161535",
+        "networkSourceType": "pexels",
+      },
+      {
+        "name": "DarwinsArch_ZH-CN9740478501",
+        "networkSourceType": "bing",
+      },
+    ],
+    "backgroundImageSource": "network",
+    "bgBlur": 0,
+    "bgOpacity": 1,
+    "favoriteImageList": [
+      {
+        "name": "DarwinsArch_ZH-CN9740478501",
+        "networkSourceType": "bing",
+      },
+      {
+        "name": "19161535",
+        "networkSourceType": "pexels",
+      },
+    ],
+    "focusVisibleWidgetMap": {
+      "calendar": false,
+      "clockAnalog": true,
+      "clockDigital": true,
+      "date": true,
+      "keyboardBookmark": true,
+      "search": true,
+    },
+    "fontColor": [
+      "rgba(44, 62, 80, 1)",
+      "rgba(255, 255, 255, 1)",
+    ],
+    "fontFamily": "system",
+    "fontSize": 14,
+    "isAutoBackgroundColor": false,
+    "isAutoPrimaryColor": false,
+    "isBackgroundImageEnabled": true,
+    "isGaEnabled": true,
+    "lang": "zh-CN",
+    "layout": {
+      "xOffsetKey": "right",
+      "xOffsetValue": 1,
+      "xTranslateValue": 0,
+      "yOffsetKey": "top",
+      "yOffsetValue": 50,
+      "yTranslateValue": -50,
+    },
+    "openPageFocusElement": "keyboardBookmark",
+    "pageTitle": "新标签页",
+    "primaryColor": [
+      "rgba(58, 115, 195, 1)",
+      "rgba(100, 160, 230, 1)",
+    ],
+    "scaleMode": "auto",
+    "shimmerAnimationSpeed": 1,
+    "shimmerBackgroundColors": [
+      [
+        "#D1ADFF",
+        "#98D69B",
+        "#FAE390",
+        "#FFACD8",
+        "#7DD5FF",
+        "#C8E6C9",
+      ],
+      [
+        "#6B4FAE",
+        "#4A7A4D",
+        "#B8A050",
+        "#B06080",
+        "#4080A0",
+        "#4A6F5A",
+      ],
+    ],
+    "shimmerBackgroundEffect": "aurora",
+    "showBreakingChangeNotice": true,
+    "swatcheColors": [
+      "rgba(255, 255, 255, 1)",
+      "rgba(15, 23, 42, 1)",
+      "rgba(44, 62, 80, 1)",
+      "rgba(58, 115, 195, 1)",
+    ],
+    "timeLang": "zh-CN",
+    "version": "2.7.0",
+  },
+  "keyboardBookmark": {
+    "isEnabled": true,
+    "keymap": {
+      "Digit1": {
+        "title": "Gmail",
+        "url": "https://mail.google.com",
+      },
+      "KeyA": {
+        "title": "GitHub",
+        "url": "https://github.com",
+      },
+      "KeyD": {
+        "title": "Docs",
+        "url": "https://docs.google.com",
+      },
+      "KeyS": {
+        "title": "StackOverflow",
+        "url": "https://stackoverflow.com",
+      },
+    },
+    "layers": [
+      {
+        "sourceFolderPath": "NaiveTab/layer1",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+      {
+        "sourceFolderPath": "",
+      },
+    ],
+    "noModifierMode": false,
+    "source": 1,
+  },
+  "keyboardCommand": {
+    "isEnabled": true,
+    "isGlobalShortcutEnabled": true,
+    "keymap": {
+      "KeyA": {
+        "command": "prevTab",
+      },
+      "KeyD": {
+        "command": "nextTab",
+      },
+      "KeyE": {
+        "command": "moveTabRight",
+      },
+      "KeyP": {
+        "command": "reopenClosedTab",
+      },
+      "KeyQ": {
+        "command": "moveTabLeft",
+      },
+      "KeyR": {
+        "command": "reloadPage",
+      },
+      "KeyT": {
+        "command": "newTabAfter",
+      },
+      "KeyV": {
+        "command": "toggleTabPinned",
+      },
+      "KeyX": {
+        "command": "closeTab",
+      },
+      "Slash": {
+        "command": "toggleFocusMode",
+      },
+    },
+    "modifiers": [
+      "shift",
+      "alt",
+    ],
+    "noModifierMode": false,
+    "shortcutInInputElement": true,
+    "urlBlacklist": [],
+  },
+  "keyboardCommon": {
+    "emphasisKeyOverrides": {},
+    "emphasisOneBackgroundColor": [
+      "rgba(80,85,90,1.0)",
+      "rgba(30,41,59,1.0)",
+    ],
+    "emphasisOneFontColor": [
+      "rgba(235,238,240,1.0)",
+      "rgba(226,232,240,1.0)",
+    ],
+    "emphasisTwoBackgroundColor": [
+      "rgba(160,165,170,1.0)",
+      "rgba(148,163,184,1.0)",
+    ],
+    "emphasisTwoFontColor": [
+      "rgba(60,65,70,1.0)",
+      "rgba(30,41,59,1.0)",
+    ],
+    "faviconSize": 0.85,
+    "fontFamily": "system",
+    "fontSize": 14,
+    "isCapKeyVisible": true,
+    "isFaviconVisible": true,
+    "isKeycapBorderEnabled": false,
+    "isNameVisible": true,
+    "isPlateVisible": true,
+    "isShellShadowEnabled": true,
+    "isShellVisible": true,
+    "isTactileBumpsVisible": true,
+    "keyboardType": "key61",
+    "keyboardWklMode": false,
+    "keycapBookmarkFontFamily": "Arial",
+    "keycapBookmarkFontSize": 11,
+    "keycapBorderColor": [
+      "rgba(71, 85, 105, 1)",
+      "rgba(73, 73, 77, 1)",
+    ],
+    "keycapBorderRadius": 5,
+    "keycapBorderWidth": 1,
+    "keycapKeyFontFamily": "OpenCherry",
+    "keycapKeyFontSize": 12,
+    "keycapPadding": 1.5,
+    "keycapSize": 58,
+    "keycapType": "gmk",
+    "mainBackgroundColor": [
+      "rgba(235,238,240,1.0)",
+      "rgba(71,85,105,1.0)",
+    ],
+    "mainFontColor": [
+      "rgba(60,65,70,1.0)",
+      "rgba(226,232,240,1.0)",
+    ],
+    "nameplates": [],
+    "plateBorderRadius": 5,
+    "plateColor": [
+      "rgba(80, 80, 80, 0.7)",
+      "rgba(119, 119, 119, 0.5)",
+    ],
+    "platePadding": 3,
+    "shellBackgroundBlur": 5,
+    "shellBorderRadius": 10,
+    "shellColor": [
+      "rgba(225, 219, 209, 1.0)",
+      "rgba(51,65,85,1.0)",
+    ],
+    "shellHorizontalPadding": 15,
+    "shellShadowColor": [
+      "rgba(0, 0, 0, 0.4)",
+      "rgba(0, 0, 0, 0.4)",
+    ],
+    "shellVerticalPadding": 15,
+    "splitSpace": "space1",
+  },
+  "memo": {
+    "backgroundBlur": 0,
+    "enabled": true,
+    "fontFamily": "system",
+    "padding": 8,
+  },
+  "news": {
+    "backgroundBlur": 0,
+    "enabled": true,
+    "fontFamily": "system",
+  },
+  "search": {
+    "backgroundBlur": 0,
+    "isNewTabOpen": false,
+  },
+  "weather": {
+    "enabled": true,
+    "unit": "metric",
+  },
+  "yearProgress": {
+    "backgroundBlur": 0,
+    "enabled": true,
+  },
+}
+`;

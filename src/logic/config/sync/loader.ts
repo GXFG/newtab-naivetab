@@ -8,7 +8,7 @@
  *   - loadRemoteKeyboardConfig 是轻量版拉取，只同步 keyboardBookmark 字段，不触发全量合并。
  *     必须使用 mergeState 合并默认配置，确保云端缺失新版本字段时能自动补全
  *   - loadRemoteConfig 合并后标记 dirty=true，由 handleMissedUploadConfig（下一步）
- *     统一处理上传。不在此处更新 syncId 或触发上传，避免与 MD5 去重逻辑冲突
+ *     统一处理上传。不在此处更新 syncId 或触发上传，避免与内容指纹去重逻辑冲突
  *   - loadRemoteConfig 的 new Promise + async 回调是因为 chrome.storage.sync.get
  *     是回调式 API，async 内部需要 await，外层手动 resolve 控制完成时机
  *   - setupPageConfigSync 是页面启动入口，按顺序：状态重置 → 拉取 → 补救未完成的上传 → 监听变化 → 跨标签页同步
@@ -141,7 +141,7 @@ export const loadRemoteConfig = () => {
                 targetSyncTime
               // syncId 暂设为 targetSyncId（云端值）。合并分支末尾统一标记
               // dirty=true，下一步 handleMissedUploadConfig 调用 uploadConfigFn 时
-              // 以此为 prevSyncId 与当前数据 MD5 比较，差异则触发上传愈合云端。
+              // 以此为 prevSyncId 与当前数据的内容指纹比较，差异则触发上传愈合云端。
               localState.value.isUploadConfigStatusMap[field].syncId =
                 targetSyncId
               localState.value.isUploadConfigStatusMap[field].retryCount = 0
@@ -190,8 +190,8 @@ export const loadRemoteConfig = () => {
 
         // 合并后重置状态并标记 dirty=true，交由 handleMissedUploadConfig（下一步）
         // 统一处理上传。不在此处更新 syncId：合并分支中已将 syncId 设为 targetSyncId
-        // （云端值），handleMissedUploadConfig 调用 uploadConfigFn 时会与当前数据 MD5
-        // 比较——若数据实际变了则上传，未变则 MD5 去重跳过并清除 dirty。
+        // （云端值），handleMissedUploadConfig 调用 uploadConfigFn 时会与当前数据指纹
+        // 比较——若数据实际变了则上传，未变则指纹去重跳过并清除 dirty。
         // 这样利用已有的恢复机制，无需额外引入 heal upload 逻辑。
         for (const field of Object.keys(pendingConfig) as ConfigField[]) {
           const status = localState.value.isUploadConfigStatusMap[field]

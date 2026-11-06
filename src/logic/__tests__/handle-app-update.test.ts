@@ -94,6 +94,8 @@ vi.doMock('@/logic/config/defaults', () => ({
     clockFlip: { enabled: false },
   },
   defaultFocusVisibleWidgetMap: { search: true, keyboardBookmark: true },
+  // migrate.ts 在模块作用域用 Object.keys(KEYBOARD_COMMON_CONFIG) 计算外观字段列表
+  KEYBOARD_COMMON_CONFIG: { fontSize: 14, fontFamily: 'system' },
 }))
 
 vi.doMock('@/logic/config/merge', () => ({
@@ -485,6 +487,9 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
   })
 
   it('shows changelog when migrating from old version (2.3.2 breaking change)', () => {
+    // 目标版本必须覆盖到 2.3.2 步骤：引擎会跳过「晚于目标版本」的步骤，
+    // 与真实发布版本（远高于 2.3.2）保持一致
+    window.appVersion = '2.7.0'
     mockLocalConfig.general.version = '2.2.5'
     mockLocalConfig.general.showBreakingChangeNotice = false
     handleAppUpdate()

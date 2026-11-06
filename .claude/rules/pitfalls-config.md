@@ -2,21 +2,26 @@
 
 ## 配置迁移黄金法则
 
-任何持久化配置结构修改都**不能破坏老用户数据**。改配置结构时必须：升 `package.json` version → `handleAppUpdate` 新增迁移分支。
+任何持久化配置结构修改都**不能破坏老用户数据**。改配置结构时必须：升 `package.json` version → 在 `MIGRATION_STEPS`（`src/logic/config/migrations.ts`）追加一个步骤。
 
-**Why：** 老用户 localStorage 中有旧结构的配置，新版本直接读取会崩溃或表现异常。`handleAppUpdate` 通过版本比较确保旧用户能执行迁移。
+**Why：** 老用户 localStorage 中有旧结构的配置，新版本直接读取会崩溃或表现异常。步骤表按版本门限执行，本机升级与导入备份共用同一条链。
 
 **How to apply：**
 
 | 场景 | 正确做法 | 错误做法 |
 |------|----------|----------|
-| 新增扁平字段 | 在 `handleAppUpdate` 中赋值 | 只改 `defaultConfig` |
+| 新增扁平字段 | 追加迁移步骤赋值 | 只改 `defaultConfig` |
 | 新增嵌套对象 | 整体赋值 `defaultConfig.xxx` | 只依赖浅合并 |
 | 重命名字段 | 新字段=旧字段值 → delete 旧字段 | 直接改字段名 |
 | 删除字段 | 先 `delete` 旧值 → 再删 `defaultConfig` | 直接从 `defaultConfig` 删 |
 | 修改类型 | 新增替代字段 + 迁移 | 直接改类型 |
 
-**关键注意：** `handleAppUpdate` 使用 `if` 而非 `if-else`，确保跨越多个版本的旧用户能依次执行所有迁移。详见 [config.md](../../docs/architecture/config.md#配置迁移系统)。
+**关键注意：**
+
+- 迁移**只允许**加到 `MIGRATION_STEPS`，不要在 `handleAppUpdate` 里写 `if` —— 导入路径不经过那里，写在那儿等于只对老用户生效
+- 步骤只读写 `ctx.config`；旧 localStorage 键、`localState`、更新公告走 `ctx.host`（导入模式无 host）
+- 步骤必须按 version 严格升序（`migration-chain.test.ts` 有断言），且版本号不得高于 `package.json`（否则永不执行）
+- 详见 [config.md](../../docs/architecture/config.md#配置迁移系统)。
 
 ## mergeState 合并陷阱
 

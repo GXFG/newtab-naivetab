@@ -190,10 +190,6 @@ vi.doMock('@vueuse/core', () => ({
   useDebounceFn: vi.fn((fn: (...args: unknown[]) => unknown) => fn),
 }))
 
-vi.doMock('crypto-js/md5', () => ({
-  default: vi.fn((str: string) => ({ toString: () => `md5-${str.length}` })),
-}))
-
 vi.doMock('vue', async (importOriginal) => {
   const actual = await importOriginal<typeof import('vue')>()
   return { ...actual, computed: actual.computed, reactive: actual.reactive }
@@ -268,7 +264,7 @@ describe('loadRemoteConfig sync branches', () => {
       }),
     )
     // 合并后标记 dirty=true，交由 handleMissedUploadConfig 统一上传愈合云端。
-    // syncId 保持为云端值，不自行重算，避免与 uploadConfigFn MD5 检查冲突。
+    // syncId 保持为云端值，不自行重算，避免与 uploadConfigFn 指纹检查冲突。
     expect(mockIsUploadConfigStatusMap.general.syncId).toBe(remoteSyncId)
     expect(mockIsUploadConfigStatusMap.general.dirty).toBe(true)
     expect(mockIsUploadConfigStatusMap.general.loading).toBe(false)
@@ -437,7 +433,7 @@ describe('multi-device sync scenarios', () => {
     uploadField(deviceName: string, field: string) {
       const device = this.devices.get(deviceName)!
       const config = device.localConfig[field]
-      const syncId = `md5-${deviceName}-${field}-${this._cloudVersion}`
+      const syncId = `sid-${deviceName}-${field}-${this._cloudVersion}`
       const syncTime = ++this._cloudVersion * 100000
       this.cloudData[`naive-tab-${field}`] = JSON.stringify({
         syncTime,

@@ -15,8 +15,12 @@
  * 「新增图标集不需要改依赖」和「所有集合只有一个版本号」。产物必须能由
  * `pnpm gen:icons` 现场复现 —— CI 会重跑并与提交的产物比对（`pnpm check:icons`）。
  *
- * 用法：pnpm gen:icons
- * 退出码：出现「常量值格式非法 / 缺数据包（含安装不完整）/ 未知图标集前缀 / 图标名不存在」时为 1，且不写产物。
+ * 用法：
+ *   pnpm gen:icons            # 生成并写入 src/logic/constants/icon-set.json
+ *   pnpm check:icons          # 同 --check：只在内存里生成，与磁盘产物比对，不写文件
+ *   tsx scripts/gen-icon-set.ts --check
+ * 退出码：出现「常量值格式非法 / 缺数据包（含安装不完整）/ 未知图标集前缀 / 图标名不存在」时为 1，
+ * 且不写产物；`--check` 模式下产物与常量表不一致也为 1。
  *
  * 为什么自建而不是用库：`@iconify/*` 只提供「给定集合的数据与解析」，没有任何库能
  * 「从项目的常量表挑出图标、按项目规则报错、写出可提交的产物」—— 这段是项目约定，
@@ -33,6 +37,7 @@ import { ICONS, COMMAND_ICONS } from '../src/logic/constants/icons'
 import {
   buildIconMap,
   type IconifyCollectionData,
+  type IconifyIconData,
 } from '../src/logic/constants/icon-set-build'
 import { ICON_NAME_RE } from '../src/logic/constants/icon-scan'
 
@@ -41,6 +46,8 @@ const DATA_DIR = r('node_modules/@iconify/json/json')
 /** 全量包的集合清单：用来区分「前缀拼错了」和「数据包没装」 */
 const COLLECTIONS_FILE = r('node_modules/@iconify/json/collections.json')
 const OUT_FILE = r('src/logic/constants/icon-set.json')
+/** `--check`：只比对不落盘（CI / pre-commit 用） */
+const CHECK = process.argv.includes('--check')
 
 /** 常量表里的全部图标名 → 引用它的常量（报错时指明该改哪一行） */
 function collectIconOwners(): Map<string, string[]> {
@@ -164,7 +171,14 @@ function main() {
     return
   }
 
-  writeFileSync(OUT_FILE, `${JSON.stringify(icons, null, 2)}\n`)
+  const content = `${JSON.stringify(icons, null, 2)}\n`
+
+  if (CHECK) {
+    process.exitCode = verifyIconSet(content) ? 0 : 1
+    return
+  }
+
+  writeFileSync(OUT_FILE, content)
 
   const rel = relative(r(), OUT_FILE)
   console.log(
@@ -172,6 +186,70 @@ function main() {
     `${Object.keys(icons).length} 个图标 / ${collections.size} 个图标集`,
   )
   console.log(`  → ${rel}`)
+}
+
+/**
+ * `--check` 模式：只在内存里生成，与磁盘上的产物比对，不写文件。
+ *
+ * 为什么是「与文件比」而不是 `git diff --exit-code`：
+ *  - 不依赖 git 状态。`git diff` 比较的是 index 与工作区，产物未被跟踪时整条校验是空跑；
+ *    比对文件内容则与 git 无关，`git add` 与否都能拦。
+ *  - 不覆盖证据。旧写法先重生成再比对，等于把「产物被人手改过」这个现场先抹掉；
+ *    这里不落盘，改坏的文件会如实报 diff。
+ *  - 报错能说清差在哪：给出新增／移除／图形数据变化的图标名，而不是让 56KB JSON 刷屏。
+ */
+function verifyIconSet(content: string): boolean {
+  const rel = relative(r(), OUT_FILE)
+  const expected = JSON.parse(content) as Record<string, IconifyIconData>
+
+  if (!existsSync(OUT_FILE)) {
+    console.error(red(`\n✖ ${rel} 不存在`))
+    console.error(yellow('  运行 pnpm gen:icons 生成后一并提交。'))
+    return false
+  }
+
+  const actual = readFileSync(OUT_FILE, 'utf8')
+  if (actual === content) {
+    console.log(
+      green('✔ 图标集与常量表一致'),
+      `${Object.keys(expected).length} 个图标`,
+    )
+    return true
+  }
+
+  let current: Record<string, IconifyIconData>
+  try {
+    current = JSON.parse(actual) as Record<string, IconifyIconData>
+  } catch (error) {
+    console.error(red(`\n✖ ${rel} 不是合法 JSON`))
+    console.error(`  ${(error as Error).message}`)
+    console.error(yellow('  运行 pnpm gen:icons 重写产物。'))
+    return false
+  }
+
+  const added = Object.keys(expected).filter((name) => !(name in current))
+  const removed = Object.keys(current).filter((name) => !(name in expected))
+  const changed = Object.keys(expected).filter(
+    (name) =>
+      name in current &&
+      JSON.stringify(expected[name]) !== JSON.stringify(current[name]),
+  )
+
+  console.error(red(`\n✖ ${rel} 落后于常量表`))
+  console.error(
+    `  应有 ${Object.keys(expected).length} 个图标，磁盘上有 ${Object.keys(current).length} 个`,
+  )
+  const show = (label: string, names: string[]) => {
+    if (!names.length) return
+    const preview = names.slice(0, 8).join(', ')
+    const rest = names.length > 8 ? ` 等 ${names.length} 个` : ''
+    console.error(`    ${label}：${preview}${rest}`)
+  }
+  show('新增', added)
+  show('移除', removed)
+  show('图形数据变化', changed)
+  console.error(yellow('  修复：pnpm gen:icons → git add ' + rel))
+  return false
 }
 
 main()
