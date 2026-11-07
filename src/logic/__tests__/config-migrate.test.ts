@@ -96,7 +96,10 @@ describe('外观字段拆分', () => {
     // 外观字段应迁移到 keyboardCommon
     expect(result.keyboardCommon.keyboardType).toBe('key87')
     expect(result.keyboardCommon.keycapType).toBe('dsa')
-    expect(result.keyboardCommon.mainFontColor).toEqual(['rgba(0,0,0,1)', 'rgba(255,255,255,1)'])
+    expect(result.keyboardCommon.mainFontColor).toEqual([
+      'rgba(0,0,0,1)',
+      'rgba(255,255,255,1)',
+    ])
     // 外观字段应从 keyboardBookmark 中删除
     expect(result.keyboardBookmark.keyboardType).toBeUndefined()
     expect(result.keyboardBookmark.keycapType).toBeUndefined()
@@ -228,7 +231,10 @@ describe('多版本叠加旧配置', () => {
 
     // 外观字段拆分
     expect(result.keyboardCommon.keyboardType).toBe('key87')
-    expect(result.keyboardCommon.mainFontColor).toEqual(['rgba(0,0,0,1)', 'rgba(255,255,255,1)'])
+    expect(result.keyboardCommon.mainFontColor).toEqual([
+      'rgba(0,0,0,1)',
+      'rgba(255,255,255,1)',
+    ])
     expect(result.keyboardBookmark.keyboardType).toBeUndefined()
 
     // focusVisibleWidgetMap key 重命名

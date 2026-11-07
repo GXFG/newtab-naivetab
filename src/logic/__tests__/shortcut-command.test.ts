@@ -23,7 +23,7 @@ vi.mock('@/env', () => ({
 }))
 
 describe('getCommandExecEnv', () => {
-  let getCommandExecEnv: typeof import('@/logic/shortcut/shortcut-command')['getCommandExecEnv']
+  let getCommandExecEnv: (typeof import('@/logic/shortcut/shortcut-command'))['getCommandExecEnv']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -76,9 +76,8 @@ describe('KEYBOARD_COMMAND_CONFIG', () => {
 
 describe('CS_COMMANDS 派生正确性', () => {
   it('从 COMMAND_CATEGORIES 中所有 execEnv: "cs" 的命令派生', async () => {
-    const { CS_COMMANDS, COMMAND_CATEGORIES } = await import(
-      '@/logic/shortcut/shortcut-command'
-    )
+    const { CS_COMMANDS, COMMAND_CATEGORIES } =
+      await import('@/logic/shortcut/shortcut-command')
 
     const expectedCs = COMMAND_CATEGORIES.flatMap((cat) =>
       cat.commands.filter((c) => c.execEnv === 'cs').map((c) => c.command),
@@ -104,9 +103,8 @@ describe('CS_COMMANDS 派生正确性', () => {
   })
 
   it('三命令列表互不重叠', async () => {
-    const { CS_COMMANDS, NEWTAB_COMMANDS, SW_COMMANDS } = await import(
-      '@/logic/shortcut/shortcut-command'
-    )
+    const { CS_COMMANDS, NEWTAB_COMMANDS, SW_COMMANDS } =
+      await import('@/logic/shortcut/shortcut-command')
     const csSet = new Set(CS_COMMANDS)
     const newtabSet = new Set(NEWTAB_COMMANDS)
     const swSet = new Set(SW_COMMANDS)
@@ -146,9 +144,8 @@ describe('SW_COMMANDS 派生正确性', () => {
 
 describe('getCommandExecEnv 完整性', () => {
   it('遍历 COMMAND_CATEGORIES 所有命令，返回值与声明 execEnv 一致', async () => {
-    const { getCommandExecEnv, COMMAND_CATEGORIES } = await import(
-      '@/logic/shortcut/shortcut-command'
-    )
+    const { getCommandExecEnv, COMMAND_CATEGORIES } =
+      await import('@/logic/shortcut/shortcut-command')
 
     for (const category of COMMAND_CATEGORIES) {
       for (const cmd of category.commands) {
@@ -162,9 +159,8 @@ describe('getCommandExecEnv 完整性', () => {
 
 describe('REPEATABLE_SCROLL_COMMANDS', () => {
   it('是 Set 类型且包含 4 个滚动命令', async () => {
-    const { REPEATABLE_SCROLL_COMMANDS } = await import(
-      '@/logic/shortcut/shortcut-command'
-    )
+    const { REPEATABLE_SCROLL_COMMANDS } =
+      await import('@/logic/shortcut/shortcut-command')
 
     expect(REPEATABLE_SCROLL_COMMANDS).toBeInstanceOf(Set)
     expect(REPEATABLE_SCROLL_COMMANDS.has('scrollUp')).toBe(true)
@@ -175,9 +171,8 @@ describe('REPEATABLE_SCROLL_COMMANDS', () => {
   })
 
   it('不包含单次触发滚动命令', async () => {
-    const { REPEATABLE_SCROLL_COMMANDS } = await import(
-      '@/logic/shortcut/shortcut-command'
-    )
+    const { REPEATABLE_SCROLL_COMMANDS } =
+      await import('@/logic/shortcut/shortcut-command')
     expect(REPEATABLE_SCROLL_COMMANDS.has('scrollToTop')).toBe(false)
     expect(REPEATABLE_SCROLL_COMMANDS.has('scrollPageUp')).toBe(false)
   })

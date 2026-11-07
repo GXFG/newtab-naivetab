@@ -18,14 +18,16 @@ import {
  * 只测"清了"而不管"不该清的不清"，等于漏掉后半条约束。
  */
 
-const { state, buildLayerKeymapComplete, parseBookmarkFolder } = vi.hoisted(() => ({
-  state: {
-    layers: [] as { sourceFolderPath: string }[],
-    configMissing: false,
-  },
-  buildLayerKeymapComplete: vi.fn(),
-  parseBookmarkFolder: vi.fn(),
-}))
+const { state, buildLayerKeymapComplete, parseBookmarkFolder } = vi.hoisted(
+  () => ({
+    state: {
+      layers: [] as { sourceFolderPath: string }[],
+      configMissing: false,
+    },
+    buildLayerKeymapComplete: vi.fn(),
+    parseBookmarkFolder: vi.fn(),
+  }),
+)
 
 vi.mock('@/background/config/cache', () => ({
   getCachedKeyboardBookmarkConfig: () =>

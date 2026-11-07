@@ -28,7 +28,12 @@ const DEFAULT_SYNC_IDS: Record<string, string> = {}
 
 // ── 工具函数 ──
 
-function buildPayload(field: string, data: Record<string, any>, appVersion: string, syncId: string) {
+function buildPayload(
+  field: string,
+  data: Record<string, any>,
+  appVersion: string,
+  syncId: string,
+) {
   return JSON.stringify({ syncTime: Date.now(), syncId, appVersion, data })
 }
 
@@ -53,14 +58,24 @@ function resetMockState() {
   }
 }
 
-function populateCloudData(modifications: Record<string, { data: Record<string, any>; appVersion?: string; syncId?: string }>) {
+function populateCloudData(
+  modifications: Record<
+    string,
+    { data: Record<string, any>; appVersion?: string; syncId?: string }
+  >,
+) {
   const cloudData: Record<string, string> = {}
   for (const [field, value] of Object.entries(CONFIG_FIELDS)) {
     const mod = modifications[field]
     const data = mod?.data ?? value
     const appVersion = mod?.appVersion ?? '2.3.0'
     const syncId = mod?.syncId ?? DEFAULT_SYNC_IDS[field]
-    cloudData[`naive-tab-${field}`] = buildPayload(field, data, appVersion, syncId)
+    cloudData[`naive-tab-${field}`] = buildPayload(
+      field,
+      data,
+      appVersion,
+      syncId,
+    )
   }
   return cloudData
 }
@@ -117,7 +132,9 @@ vi.doMock('@/logic/utils/util', () => ({
 
 vi.doMock('@/logic/config/state', () => ({
   localConfig: mockLocalConfig,
-  localState: { value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap } },
+  localState: {
+    value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap },
+  },
 }))
 vi.doMock('@/logic/store/state', () => ({
   globalState: {},
@@ -126,21 +143,42 @@ vi.doMock('@/logic/store/state', () => ({
 
 vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: CONFIG_FIELDS,
-  defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false, retryCount: 0, lastError: '', syncStatus: 'idle' },
+  defaultUploadStatusItem: {
+    loading: false,
+    syncTime: 0,
+    syncId: '',
+    localModifiedTime: 0,
+    dirty: false,
+    retryCount: 0,
+    lastError: '',
+    syncStatus: 'idle',
+  },
 }))
 
 // Recursive merge helper (cannot reference vi.doMock factory's own name)
 const mockMergeState = (state: unknown, acceptState: unknown): unknown => {
   if (acceptState === undefined || acceptState === null) return state
-  if (Object.prototype.toString.call(state) !== Object.prototype.toString.call(acceptState)) return state
-  if (typeof acceptState === 'string' || typeof acceptState === 'number' || typeof acceptState === 'boolean') {
+  if (
+    Object.prototype.toString.call(state) !==
+    Object.prototype.toString.call(acceptState)
+  )
+    return state
+  if (
+    typeof acceptState === 'string' ||
+    typeof acceptState === 'number' ||
+    typeof acceptState === 'boolean'
+  ) {
     return acceptState
   }
-  if (Object.prototype.toString.call(acceptState) !== '[object Object]') return acceptState
+  if (Object.prototype.toString.call(acceptState) !== '[object Object]')
+    return acceptState
   const acceptObj = acceptState as Record<string, unknown>
   const stateObj = state as Record<string, unknown>
   const hasKeymapPattern = Object.keys(acceptObj).some(
-    (key) => key.startsWith('Key') || key.startsWith('Digit') || key.startsWith('Numpad'),
+    (key) =>
+      key.startsWith('Key') ||
+      key.startsWith('Digit') ||
+      key.startsWith('Numpad'),
   )
   if (hasKeymapPattern) return acceptState
   const filterState: Record<string, unknown> = {}
@@ -173,7 +211,9 @@ vi.doMock('@/logic/config/compress', () => ({
   compressString: vi.fn().mockResolvedValue('compressed'),
   decompressString: vi.fn().mockResolvedValue('{}'),
   shouldCompress: vi.fn().mockReturnValue(false),
-  parseStoredData: vi.fn().mockImplementation(async (raw: string) => JSON.parse(raw)),
+  parseStoredData: vi
+    .fn()
+    .mockImplementation(async (raw: string) => JSON.parse(raw)),
 }))
 
 vi.doMock('@/logic/constants/app', () => ({
@@ -274,7 +314,11 @@ describe('loadRemoteConfig sync branches', () => {
   it('Branch 4: local newer (dirty=true, localModifiedTime > syncTime) → upload local', async () => {
     const remoteSyncId = 'remote-sync-general'
     const cloudData = populateCloudData({
-      general: { data: { version: '2.2.5', lang: 'zh-CN' }, appVersion: '2.2.5', syncId: remoteSyncId },
+      general: {
+        data: { version: '2.2.5', lang: 'zh-CN' },
+        appVersion: '2.2.5',
+        syncId: remoteSyncId,
+      },
     })
     setupChromeSync(cloudData)
 
@@ -322,7 +366,11 @@ describe('loadRemoteConfig sync branches', () => {
     const remoteSyncId = 'remote-sync-search'
     const cloudData = populateCloudData({
       // 云端 v2.2.5 缺少 isVoiceEnabled 字段
-      search: { data: { isNewTabOpen: true }, appVersion: '2.2.5', syncId: remoteSyncId },
+      search: {
+        data: { isNewTabOpen: true },
+        appVersion: '2.2.5',
+        syncId: remoteSyncId,
+      },
     })
     setupChromeSync(cloudData)
 
@@ -331,7 +379,9 @@ describe('loadRemoteConfig sync branches', () => {
 
     await loadRemoteConfig()
 
-    const pendingConfig = (mockUpdateSetting.mock.calls[0] as [Record<string, any>])[0]
+    const pendingConfig = (
+      mockUpdateSetting.mock.calls[0] as [Record<string, any>]
+    )[0]
     // 本地较新 → 以本地为模板 → 保留本地新增字段 isVoiceEnabled
     expect(pendingConfig.search).toHaveProperty('isVoiceEnabled', true)
     expect(pendingConfig.search.isNewTabOpen).toBe(true)
@@ -354,7 +404,9 @@ describe('loadRemoteConfig sync branches', () => {
 
     await loadRemoteConfig()
 
-    const pendingConfig = (mockUpdateSetting.mock.calls[0] as [Record<string, any>])[0]
+    const pendingConfig = (
+      mockUpdateSetting.mock.calls[0] as [Record<string, any>]
+    )[0]
     // 云端较新 → 以云端为模板 → 保留云端新增字段
     expect(pendingConfig.search).toHaveProperty('newFeature', true)
     expect(pendingConfig.search.isNewTabOpen).toBe(false)
@@ -450,7 +502,10 @@ describe('multi-device sync scenarios', () => {
      * 设备拉取：模拟 loadRemoteConfig 对单个字段的处理
      * 返回 pendingConfig 和上传记录
      */
-    pullField(deviceName: string, field: string): {
+    pullField(
+      deviceName: string,
+      field: string,
+    ): {
       mergedData: Record<string, any> | null
       uploaded: boolean
     } {
@@ -482,7 +537,10 @@ describe('multi-device sync scenarios', () => {
       // dirty = false → 版本感知合并
       if (!localDirty) {
         const merged = doMergeWithVersionAwareness(
-          localConfig, targetConfig, localVersion, targetAppVersion,
+          localConfig,
+          targetConfig,
+          localVersion,
+          targetAppVersion,
         )
         device.statusMap[field].syncTime = targetSyncTime
         device.statusMap[field].syncId = targetSyncId
@@ -498,7 +556,10 @@ describe('multi-device sync scenarios', () => {
 
       // dirty = true, 云端更新 → 合并
       const merged = doMergeWithVersionAwareness(
-        localConfig, targetConfig, localVersion, targetAppVersion,
+        localConfig,
+        targetConfig,
+        localVersion,
+        targetAppVersion,
       )
       device.statusMap[field].dirty = false
       device.statusMap[field].syncTime = targetSyncTime
@@ -540,21 +601,24 @@ describe('multi-device sync scenarios', () => {
     name: string
     version: string
     localConfig: Record<string, any>
-    statusMap: Record<string, {
-      loading: boolean
-      syncTime: number
-      syncId: string
-      localModifiedTime: number
-      dirty: boolean
-      retryCount?: number
-      lastError?: string
-      syncStatus?: string
-    }>
+    statusMap: Record<
+      string,
+      {
+        loading: boolean
+        syncTime: number
+        syncId: string
+        localModifiedTime: number
+        dirty: boolean
+        retryCount?: number
+        lastError?: string
+        syncStatus?: string
+      }
+    >
   }
 
   // ── 场景 1：A 修改 → B 拉取 → B 拿到 A 的值 ──
 
-  it('scenario 1: A modifies and uploads → B pulls and gets A\'s changes', () => {
+  it("scenario 1: A modifies and uploads → B pulls and gets A's changes", () => {
     const sim = new SyncSimulator()
     const baseSyncId = 'base-sync'
 
@@ -582,7 +646,9 @@ describe('multi-device sync scenarios', () => {
     expect(result.mergedData).toHaveProperty('lang', 'en-US')
     expect(b.localConfig.general.lang).toBe('en-US')
     // B 的 syncId 应更新为 A 的
-    expect(b.statusMap.general.syncId).toBe(sim.devices.get('A')!.statusMap.general.syncId)
+    expect(b.statusMap.general.syncId).toBe(
+      sim.devices.get('A')!.statusMap.general.syncId,
+    )
   })
 
   // ── 场景 2：A 改 X，B 改 Y → 互不干扰 ──
@@ -591,8 +657,16 @@ describe('multi-device sync scenarios', () => {
     const sim = new SyncSimulator()
     const baseSyncId = 'base-sync'
 
-    sim.addDevice('A', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
-    sim.addDevice('B', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
+    sim.addDevice('A', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
+    sim.addDevice('B', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
 
     // A 修改 general.lang
     sim.modifyField('A', 'general', { lang: 'en-US' })
@@ -621,8 +695,16 @@ describe('multi-device sync scenarios', () => {
     const sim = new SyncSimulator()
     const baseSyncId = 'base-sync'
 
-    sim.addDevice('A', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
-    sim.addDevice('B', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
+    sim.addDevice('A', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
+    sim.addDevice('B', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
 
     // A 先改 general.lang 并上传
     sim.modifyField('A', 'general', { lang: 'en-US' })
@@ -645,8 +727,16 @@ describe('multi-device sync scenarios', () => {
     const sim = new SyncSimulator()
     const baseSyncId = 'base-sync'
 
-    sim.addDevice('A', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
-    sim.addDevice('B', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
+    sim.addDevice('A', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
+    sim.addDevice('B', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
 
     // 第一轮：A 改 general.lang = 'en-US' 并上传
     sim.modifyField('A', 'general', { lang: 'en-US' })
@@ -672,8 +762,16 @@ describe('multi-device sync scenarios', () => {
     const sim = new SyncSimulator()
     const baseSyncId = 'base-sync'
 
-    sim.addDevice('A', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
-    sim.addDevice('B', '2.2.5', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
+    sim.addDevice('A', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
+    sim.addDevice('B', '2.2.5', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
 
     // A 升级后修改 search 和 general
     sim.modifyField('A', 'search', { isNewTabOpen: true })
@@ -709,7 +807,7 @@ describe('multi-device sync scenarios', () => {
     // 新设备：本地有默认配置，云端全部为空
 
     sim.addDevice('NewDevice', '2.3.0', {
-      general: '',      // 空 syncId 表示从未同步过
+      general: '', // 空 syncId 表示从未同步过
       keyboardBookmark: '',
       search: '',
     })
@@ -735,12 +833,20 @@ describe('multi-device sync scenarios', () => {
   // ── 场景 7：B 先改字段上传 → A 不改动拉取 → B 再升级改版本 ──
   // 验证 syncId 跨版本流转
 
-  it('scenario 7: B uploads v2.2.5 data → A pulls at v2.3.0 → A gets B\'s data with version-aware merge', () => {
+  it("scenario 7: B uploads v2.2.5 data → A pulls at v2.3.0 → A gets B's data with version-aware merge", () => {
     const sim = new SyncSimulator()
     const baseSyncId = 'base-sync'
 
-    sim.addDevice('A', '2.3.0', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
-    sim.addDevice('B', '2.2.5', { general: baseSyncId, keyboardBookmark: baseSyncId, search: baseSyncId })
+    sim.addDevice('A', '2.3.0', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
+    sim.addDevice('B', '2.2.5', {
+      general: baseSyncId,
+      keyboardBookmark: baseSyncId,
+      search: baseSyncId,
+    })
 
     // B 在 v2.2.5 修改 general.lang 并上传（旧版 appVersion）
     sim.modifyField('B', 'general', { lang: 'ko-KR' })

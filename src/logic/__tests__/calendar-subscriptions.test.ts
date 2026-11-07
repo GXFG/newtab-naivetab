@@ -63,18 +63,28 @@ describe('预设订阅', () => {
   it('地区列表与 Apple 日历对齐且 URL 唯一', () => {
     expect(SUBSCRIPTION_REGIONS.length).toBe(46)
 
-    const urls = SUBSCRIPTION_REGIONS.map((region) => getSubscriptionUrl(region))
+    const urls = SUBSCRIPTION_REGIONS.map((region) =>
+      getSubscriptionUrl(region),
+    )
     expect(new Set(urls).size).toBe(urls.length)
 
     for (const url of urls) {
-      expect(url).toMatch(/^https:\/\/calendars\.icloud\.com\/holidays\/[a-z0-9_-]+\.ics$/)
+      expect(url).toMatch(
+        /^https:\/\/calendars\.icloud\.com\/holidays\/[a-z0-9_-]+\.ics$/,
+      )
     }
   })
 
   it('中国大陆、美国、台湾的地址符合实测结果', () => {
-    expect(getSubscriptionUrl('CN')).toBe('https://calendars.icloud.com/holidays/cn_zh.ics')
-    expect(getSubscriptionUrl('US')).toBe('https://calendars.icloud.com/holidays/us_en-us.ics')
-    expect(getSubscriptionUrl('TW')).toBe('https://calendars.icloud.com/holidays/tw_zh.ics')
+    expect(getSubscriptionUrl('CN')).toBe(
+      'https://calendars.icloud.com/holidays/cn_zh.ics',
+    )
+    expect(getSubscriptionUrl('US')).toBe(
+      'https://calendars.icloud.com/holidays/us_en-us.ics',
+    )
+    expect(getSubscriptionUrl('TW')).toBe(
+      'https://calendars.icloud.com/holidays/tw_zh.ics',
+    )
   })
 
   it('非法地区不生成 /undefined.ics', () => {
@@ -122,9 +132,14 @@ describe('缓存', () => {
 
   it('超过 TTL 视为过期', () => {
     writeSubscriptionCache(cache)
-    expect(readSubscriptionCache(URL_CN, cache.fetchedAt + SUBSCRIPTION_CACHE_TTL)).toEqual(cache)
     expect(
-      readSubscriptionCache(URL_CN, cache.fetchedAt + SUBSCRIPTION_CACHE_TTL + 1),
+      readSubscriptionCache(URL_CN, cache.fetchedAt + SUBSCRIPTION_CACHE_TTL),
+    ).toEqual(cache)
+    expect(
+      readSubscriptionCache(
+        URL_CN,
+        cache.fetchedAt + SUBSCRIPTION_CACHE_TTL + 1,
+      ),
     ).toBeNull()
   })
 
@@ -161,7 +176,6 @@ describe('缓存', () => {
     expect(readSubscriptionCache(URL_CN)).toBeNull()
   })
 
-
   it('写入新订阅时清掉其它订阅的缓存（只保留当前一个）', () => {
     const other = 'https://example.com/other.ics'
     writeSubscriptionCache({ ...cache, url: URL_CN })
@@ -194,7 +208,9 @@ describe('fetchSubscription：错误映射', () => {
   })
 
   it('是日历但没有任何事件', async () => {
-    mockFetch(async () => okResponse('BEGIN:VCALENDAR\nVERSION:2.0\nEND:VCALENDAR'))
+    mockFetch(async () =>
+      okResponse('BEGIN:VCALENDAR\nVERSION:2.0\nEND:VCALENDAR'),
+    )
     await expect(fetchSubscription(URL_CN)).rejects.toMatchObject({
       subscriptionError: { code: 'not-calendar' },
     })
@@ -226,7 +242,10 @@ describe('fetchSubscription：正常解析', () => {
   it('解析出休/班并写入缓存', async () => {
     mockFetch(async () => okResponse(SAMPLE_ICS))
 
-    const result = await fetchSubscription(URL_CN, { fromYear: 2026, toYear: 2026 })
+    const result = await fetchSubscription(URL_CN, {
+      fromYear: 2026,
+      toYear: 2026,
+    })
 
     expect(result.days['2026-01-01']).toMatchObject({ mark: 'REST' })
     expect(result.days['2026-01-02']).toMatchObject({ mark: 'REST' })
@@ -303,7 +322,11 @@ describe('loadSubscription：缓存优先', () => {
     })
     const spy = mockFetch(async () => okResponse(SAMPLE_ICS))
 
-    await loadSubscription(URL_CN, { force: true, fromYear: 2026, toYear: 2026 })
+    await loadSubscription(URL_CN, {
+      force: true,
+      fromYear: 2026,
+      toYear: 2026,
+    })
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(subscriptionState.days['2026-01-01']).toBeDefined()

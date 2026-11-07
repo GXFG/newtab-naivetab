@@ -25,7 +25,9 @@ const APP_VERSION = pkg.version
 
 // ── Widget 默认配置（从 defaults.ts 同步） ──
 // 通过 import.meta.glob 扫描各 widget 的 config.ts，与 defaults.ts 聚合方式一致
-const widgetModules = import.meta.glob('@/newtab/widgets/**/config.ts', { eager: true }) as Record<string, any>
+const widgetModules = import.meta.glob('@/newtab/widgets/**/config.ts', {
+  eager: true,
+}) as Record<string, any>
 const widgetDefaultConfig: Record<string, any> = {}
 const widgetCodes: string[] = []
 for (const key in widgetModules) {
@@ -38,18 +40,31 @@ for (const key in widgetModules) {
 
 // ── 快照 fixtures ──
 // 新增快照：在数组中追加一个对象，同时在 test/fixtures/ 放置对应 JSON 文件
-const fixtures: Array<{ name: string; version: string; data: Record<string, any> }> = [
+const fixtures: Array<{
+  name: string
+  version: string
+  data: Record<string, any>
+}> = [
   {
     name: 'v1.19.0 老用户：书签 keymap + 旧版顶层 key（bookmark/commandShortcut）',
     version: '1.19.0',
     data: {
       general: {
-        version: '1.19.0', lang: 'zh-CN', appearance: 'auto', pageTitle: '新标签页',
-        fontFamily: 'Arial', fontSize: 14,
+        version: '1.19.0',
+        lang: 'zh-CN',
+        appearance: 'auto',
+        pageTitle: '新标签页',
+        fontFamily: 'Arial',
+        fontSize: 14,
         fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
         primaryColor: ['rgba(58, 115, 195, 1)', 'rgba(100, 160, 230, 1)'],
         openPageFocusElement: 'bookmarkKeyboard',
-        focusVisibleWidgetMap: { search: true, keyboard: true, clockDigital: true, date: true },
+        focusVisibleWidgetMap: {
+          search: true,
+          keyboard: true,
+          clockDigital: true,
+          date: true,
+        },
       },
       bookmark: {
         keymap: {
@@ -57,7 +72,8 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
           KeyB: { url: 'https://google.com', title: 'Google' },
           Digit1: { url: 'https://mail.google.com', title: 'Gmail' },
         },
-        keyboardType: 'key61', keycapType: 'gmk',
+        keyboardType: 'key61',
+        keycapType: 'gmk',
         mainFontColor: ['rgba(0, 0, 0, 1)', 'rgba(255, 255, 255, 1)'],
         isShellVisible: true,
         shellColor: ['rgba(225, 219, 209, 1.0)', 'rgba(51,65,85,1.0)'],
@@ -72,7 +88,12 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
       },
       search: { isNewTabOpen: true, backgroundBlur: 5 },
       clockDigital: { fontSize: 32, letterSpacing: 2 },
-      calendar: { festivalCountdown: false, dayFontFamily: 'Arial', descFontFamily: 'Arial', backgroundBlur: 0 },
+      calendar: {
+        festivalCountdown: false,
+        dayFontFamily: 'Arial',
+        descFontFamily: 'Arial',
+        backgroundBlur: 0,
+      },
       memo: { enabled: true, fontFamily: 'Arial', backgroundBlur: 0 },
       yearProgress: { enabled: false },
       clockFlip: { enabled: true },
@@ -92,15 +113,26 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
     version: '2.1.0',
     data: {
       general: {
-        version: '2.1.0', lang: 'en-US', timeLang: 'en-US', appearance: 'dark',
-        pageTitle: 'NaiveTab', fontFamily: 'Roboto', fontSize: 16,
+        version: '2.1.0',
+        lang: 'en-US',
+        timeLang: 'en-US',
+        appearance: 'dark',
+        pageTitle: 'NaiveTab',
+        fontFamily: 'Roboto',
+        fontSize: 16,
         fontColor: ['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 1)'],
         primaryColor: ['rgba(100, 160, 230, 1)', 'rgba(100, 160, 230, 1)'],
         backgroundColor: ['rgba(26, 26, 46, 1)', 'rgba(26, 26, 46, 1)'],
         openPageFocusElement: 'search',
-        focusVisibleWidgetMap: { search: true, keyboardBookmark: true, clockDigital: true, calendar: true },
+        focusVisibleWidgetMap: {
+          search: true,
+          keyboardBookmark: true,
+          clockDigital: true,
+          calendar: true,
+        },
         showBreakingChangeNotice: false,
-        isBackgroundImageEnabled: true, backgroundImageSource: 'network',
+        isBackgroundImageEnabled: true,
+        backgroundImageSource: 'network',
         backgroundImageList: [
           { networkSourceType: 'pexels', name: '19161535' },
           { networkSourceType: 'pexels', name: '36873465' },
@@ -118,8 +150,13 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
         isListenBackgroundKeystrokes: false,
       },
       keyboardCommon: {
-        keyboardType: 'key87', keycapType: 'dsa', splitSpace: 'space2',
-        fontSize: 15, fontFamily: 'Roboto', keycapSize: 60, keycapPadding: 2,
+        keyboardType: 'key87',
+        keycapType: 'dsa',
+        splitSpace: 'space2',
+        fontSize: 15,
+        fontFamily: 'Roboto',
+        keycapSize: 60,
+        keycapPadding: 2,
         isShellVisible: true,
         shellColor: ['rgba(40, 40, 60, 1.0)', 'rgba(40, 40, 60, 1.0)'],
         shellBackgroundBlur: 8,
@@ -129,12 +166,16 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
       },
       keyboardCommand: {
         keymap: {
-          KeyQ: { command: 'moveTabLeft' }, KeyE: { command: 'moveTabRight' },
-          KeyA: { command: 'prevTab' }, KeyD: { command: 'nextTab' },
-          KeyX: { command: 'closeTab' }, KeyV: { command: 'toggleTabPinned' },
+          KeyQ: { command: 'moveTabLeft' },
+          KeyE: { command: 'moveTabRight' },
+          KeyA: { command: 'prevTab' },
+          KeyD: { command: 'nextTab' },
+          KeyX: { command: 'closeTab' },
+          KeyV: { command: 'toggleTabPinned' },
           KeyT: { command: 'newTabAfter' },
         },
-        enabled: true, modifierKeys: ['shift', 'ctrl'],
+        enabled: true,
+        modifierKeys: ['shift', 'ctrl'],
       },
       search: { isNewTabOpen: true, backgroundBlur: 0 },
       clockDigital: { fontSize: 28, width: 22 },
@@ -144,8 +185,10 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
       date: { enabled: true },
       yearProgress: { enabled: true, backgroundBlur: 0 },
       calendar: {
-        festivalCountdown: true, backgroundBlur: 0,
-        dayFontFamily: 'Roboto', descFontFamily: 'Roboto',
+        festivalCountdown: true,
+        backgroundBlur: 0,
+        dayFontFamily: 'Roboto',
+        descFontFamily: 'Roboto',
       },
       memo: { enabled: true, backgroundBlur: 0, fontFamily: 'Roboto' },
       news: { enabled: true, backgroundBlur: 0, fontFamily: 'Roboto' },
@@ -159,19 +202,30 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
     version: '2.3.0',
     data: {
       general: {
-        version: '2.3.0', lang: 'zh-CN', timeLang: 'zh-CN', appearance: 'auto',
-        pageTitle: '新标签页', fontFamily: 'system', fontSize: 14,
+        version: '2.3.0',
+        lang: 'zh-CN',
+        timeLang: 'zh-CN',
+        appearance: 'auto',
+        pageTitle: '新标签页',
+        fontFamily: 'system',
+        fontSize: 14,
         fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
         primaryColor: ['rgba(58, 115, 195, 1)', 'rgba(100, 160, 230, 1)'],
         backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'],
-        bgOpacity: 1, bgBlur: 0,
+        bgOpacity: 1,
+        bgBlur: 0,
         openPageFocusElement: 'keyboardBookmark',
         focusVisibleWidgetMap: {
-          search: true, keyboardBookmark: true, clockDigital: true,
-          clockAnalog: true, date: true, calendar: false,
+          search: true,
+          keyboardBookmark: true,
+          clockDigital: true,
+          clockAnalog: true,
+          date: true,
+          calendar: false,
         },
         showBreakingChangeNotice: true,
-        isBackgroundImageEnabled: true, backgroundImageSource: 'network',
+        isBackgroundImageEnabled: true,
+        backgroundImageSource: 'network',
         backgroundImageList: [
           { networkSourceType: 'pexels', name: '19161535' },
           { networkSourceType: 'bing', name: 'DarwinsArch_ZH-CN9740478501' },
@@ -181,12 +235,18 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
           { networkSourceType: 'pexels', name: '19161535' },
         ],
         layout: {
-          xOffsetKey: 'right', xOffsetValue: 1, xTranslateValue: 0,
-          yOffsetKey: 'top', yOffsetValue: 50, yTranslateValue: -50,
+          xOffsetKey: 'right',
+          xOffsetValue: 1,
+          xTranslateValue: 0,
+          yOffsetKey: 'top',
+          yOffsetValue: 50,
+          yTranslateValue: -50,
         },
         swatcheColors: [
-          'rgba(255, 255, 255, 1)', 'rgba(15, 23, 42, 1)',
-          'rgba(44, 62, 80, 1)', 'rgba(58, 115, 195, 1)',
+          'rgba(255, 255, 255, 1)',
+          'rgba(15, 23, 42, 1)',
+          'rgba(44, 62, 80, 1)',
+          'rgba(58, 115, 195, 1)',
         ],
       },
       keyboardBookmark: {
@@ -196,41 +256,77 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
           KeyS: { url: 'https://stackoverflow.com', title: 'StackOverflow' },
           Digit1: { url: 'https://mail.google.com', title: 'Gmail' },
         },
-        source: 1, noModifierMode: false,
+        source: 1,
+        noModifierMode: false,
       },
       keyboardCommon: {
-        keyboardType: 'key61', splitSpace: 'space1', keyboardWklMode: false,
-        keycapType: 'gmk', keycapPadding: 1.5, keycapSize: 58, keycapBorderRadius: 5,
-        isKeycapBorderEnabled: false, keycapBorderWidth: 1,
+        keyboardType: 'key61',
+        splitSpace: 'space1',
+        keyboardWklMode: false,
+        keycapType: 'gmk',
+        keycapPadding: 1.5,
+        keycapSize: 58,
+        keycapBorderRadius: 5,
+        isKeycapBorderEnabled: false,
+        keycapBorderWidth: 1,
         keycapBorderColor: ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)'],
-        isShellVisible: true, shellVerticalPadding: 15, shellHorizontalPadding: 15,
-        shellBorderRadius: 10, shellBackgroundBlur: 5, isPlateVisible: true,
-        platePadding: 3, plateBorderRadius: 5,
+        isShellVisible: true,
+        shellVerticalPadding: 15,
+        shellHorizontalPadding: 15,
+        shellBorderRadius: 10,
+        shellBackgroundBlur: 5,
+        isPlateVisible: true,
+        platePadding: 3,
+        plateBorderRadius: 5,
         plateColor: ['rgba(80, 80, 80, 0.7)', 'rgba(119, 119, 119, 0.5)'],
-        isCapKeyVisible: true, keycapKeyFontFamily: 'OpenCherry', keycapKeyFontSize: 12,
-        isNameVisible: true, keycapBookmarkFontFamily: 'Arial', keycapBookmarkFontSize: 11,
-        isFaviconVisible: true, faviconSize: 0.85, isTactileBumpsVisible: true,
+        isCapKeyVisible: true,
+        keycapKeyFontFamily: 'OpenCherry',
+        keycapKeyFontSize: 12,
+        isNameVisible: true,
+        keycapBookmarkFontFamily: 'Arial',
+        keycapBookmarkFontSize: 11,
+        isFaviconVisible: true,
+        faviconSize: 0.85,
+        isTactileBumpsVisible: true,
         mainFontColor: ['rgba(60,65,70,1.0)', 'rgba(226,232,240,1.0)'],
         mainBackgroundColor: ['rgba(235,238,240,1.0)', 'rgba(71,85,105,1.0)'],
-        emphasisOneFontColor: ['rgba(235,238,240,1.0)', 'rgba(226,232,240,1.0)'],
-        emphasisOneBackgroundColor: ['rgba(80,85,90,1.0)', 'rgba(30,41,59,1.0)'],
+        emphasisOneFontColor: [
+          'rgba(235,238,240,1.0)',
+          'rgba(226,232,240,1.0)',
+        ],
+        emphasisOneBackgroundColor: [
+          'rgba(80,85,90,1.0)',
+          'rgba(30,41,59,1.0)',
+        ],
         emphasisTwoFontColor: ['rgba(60,65,70,1.0)', 'rgba(30,41,59,1.0)'],
-        emphasisTwoBackgroundColor: ['rgba(160,165,170,1.0)', 'rgba(148,163,184,1.0)'],
+        emphasisTwoBackgroundColor: [
+          'rgba(160,165,170,1.0)',
+          'rgba(148,163,184,1.0)',
+        ],
         emphasisKeyOverrides: {},
         shellColor: ['rgba(225, 219, 209, 1.0)', 'rgba(51,65,85,1.0)'],
         isShellShadowEnabled: true,
         shellShadowColor: ['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.4)'],
-        fontSize: 14, fontFamily: 'system',
+        fontSize: 14,
+        fontFamily: 'system',
       },
       keyboardCommand: {
-        isEnabled: true, noModifierMode: false, shortcutInInputElement: true,
-        urlBlacklist: [], modifiers: ['shift', 'alt'],
+        isEnabled: true,
+        noModifierMode: false,
+        shortcutInInputElement: true,
+        urlBlacklist: [],
+        modifiers: ['shift', 'alt'],
         keymap: {
-          KeyQ: { command: 'moveTabLeft' }, KeyE: { command: 'moveTabRight' },
-          KeyA: { command: 'prevTab' }, KeyD: { command: 'nextTab' },
-          KeyX: { command: 'closeTab' }, KeyV: { command: 'toggleTabPinned' },
-          KeyT: { command: 'newTabAfter' }, KeyP: { command: 'reopenClosedTab' },
-          KeyR: { command: 'reloadPage' }, Slash: { command: 'toggleFocusMode' },
+          KeyQ: { command: 'moveTabLeft' },
+          KeyE: { command: 'moveTabRight' },
+          KeyA: { command: 'prevTab' },
+          KeyD: { command: 'nextTab' },
+          KeyX: { command: 'closeTab' },
+          KeyV: { command: 'toggleTabPinned' },
+          KeyT: { command: 'newTabAfter' },
+          KeyP: { command: 'reopenClosedTab' },
+          KeyR: { command: 'reloadPage' },
+          Slash: { command: 'toggleFocusMode' },
         },
       },
       search: { isNewTabOpen: false, backgroundBlur: 0 },
@@ -241,8 +337,10 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
       date: { enabled: true },
       yearProgress: { enabled: true, backgroundBlur: 0 },
       calendar: {
-        festivalCountdown: true, backgroundBlur: 0,
-        dayFontFamily: 'system', descFontFamily: 'system',
+        festivalCountdown: true,
+        backgroundBlur: 0,
+        dayFontFamily: 'system',
+        descFontFamily: 'system',
       },
       memo: { enabled: true, backgroundBlur: 0, fontFamily: 'system' },
       news: { enabled: true, backgroundBlur: 0, fontFamily: 'system' },
@@ -254,9 +352,13 @@ const fixtures: Array<{ name: string; version: string; data: Record<string, any>
 ]
 
 // ── 核心断言：用户数据不丢失 ──
-function assertUserDataPreserved(config: Record<string, any>, fixture: Record<string, any>) {
+function assertUserDataPreserved(
+  config: Record<string, any>,
+  fixture: Record<string, any>,
+) {
   // 书签 keymap 中的每个条目都应该保留
-  const fixtureKeymap = fixture.keyboardBookmark?.keymap ?? fixture.bookmark?.keymap
+  const fixtureKeymap =
+    fixture.keyboardBookmark?.keymap ?? fixture.bookmark?.keymap
   if (fixtureKeymap) {
     const migratedKeymap = config.keyboardBookmark?.keymap
     expect(migratedKeymap).toBeDefined()
@@ -266,7 +368,8 @@ function assertUserDataPreserved(config: Record<string, any>, fixture: Record<st
   }
 
   // 命令 keymap 应保留
-  const fixtureCommandKeymap = fixture.keyboardCommand?.keymap ?? fixture.commandShortcut?.keymap
+  const fixtureCommandKeymap =
+    fixture.keyboardCommand?.keymap ?? fixture.commandShortcut?.keymap
   if (fixtureCommandKeymap) {
     const migratedCommandKeymap = config.keyboardCommand?.keymap
     expect(migratedCommandKeymap).toBeDefined()
@@ -285,7 +388,9 @@ function assertUserDataPreserved(config: Record<string, any>, fixture: Record<st
 
   // 背景图列表应保留
   if (fixture.general?.backgroundImageList) {
-    expect(config.general?.backgroundImageList).toEqual(fixture.general.backgroundImageList)
+    expect(config.general?.backgroundImageList).toEqual(
+      fixture.general.backgroundImageList,
+    )
   }
 
   // search 自定义设置应保留
@@ -302,22 +407,41 @@ function assertUserDataPreserved(config: Record<string, any>, fixture: Record<st
 
   // keyboardBookmark.source 应保留
   if (fixture.keyboardBookmark?.source !== undefined) {
-    expect(config.keyboardBookmark?.source).toBe(fixture.keyboardBookmark.source)
+    expect(config.keyboardBookmark?.source).toBe(
+      fixture.keyboardBookmark.source,
+    )
   }
 
   // 键盘外观设置应保留（已拆分到 keyboardCommon 的应保留在 keyboardCommon）
   if (fixture.keyboardCommon?.keyboardType) {
-    expect(config.keyboardCommon?.keyboardType).toBe(fixture.keyboardCommon.keyboardType)
+    expect(config.keyboardCommon?.keyboardType).toBe(
+      fixture.keyboardCommon.keyboardType,
+    )
   }
   if (fixture.keyboardCommon?.keycapType) {
-    expect(config.keyboardCommon?.keycapType).toBe(fixture.keyboardCommon.keycapType)
+    expect(config.keyboardCommon?.keycapType).toBe(
+      fixture.keyboardCommon.keycapType,
+    )
   }
 }
 
 // ── 核心断言：迁移后包含当前所有必需字段 ──
 function assertRequiredFieldsPresent(config: Record<string, any>) {
   // general 必需字段
-  const generalRequiredFields = ['version', 'lang', 'appearance', 'fontFamily', 'isAutoPrimaryColor', 'isAutoBackgroundColor', 'primaryColor', 'backgroundColor', 'shimmerBackgroundEffect', 'shimmerBackgroundColors', 'shimmerAnimationSpeed', 'isGaEnabled']
+  const generalRequiredFields = [
+    'version',
+    'lang',
+    'appearance',
+    'fontFamily',
+    'isAutoPrimaryColor',
+    'isAutoBackgroundColor',
+    'primaryColor',
+    'backgroundColor',
+    'shimmerBackgroundEffect',
+    'shimmerBackgroundColors',
+    'shimmerAnimationSpeed',
+    'isGaEnabled',
+  ]
   for (const field of generalRequiredFields) {
     expect(config.general).toHaveProperty(field)
   }
@@ -384,27 +508,128 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
     // 深拷贝 fixture，避免测试间互相污染
     const fixtureCopy = JSON.parse(JSON.stringify(fixture))
 
-
     // 构建响应式的 mock state（与 state.ts 中 reactive/ref 一致）
     localState = ref({
       isUploadConfigStatusMap: {
-        general: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        keyboardBookmark: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        keyboardCommon: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        keyboardCommand: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        search: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        clockDigital: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        calendar: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        memo: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        news: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        yearProgress: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        bookmarkFolder: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        clockFlip: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        clockAnalog: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        clockNeon: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        date: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        weather: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
-        countdown: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false },
+        general: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        keyboardBookmark: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        keyboardCommon: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        keyboardCommand: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        search: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        clockDigital: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        calendar: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        memo: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        news: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        yearProgress: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        bookmarkFolder: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        clockFlip: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        clockAnalog: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        clockNeon: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        date: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        weather: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
+        countdown: {
+          dirty: false,
+          syncTime: 0,
+          syncId: '',
+          localModifiedTime: 0,
+          loading: false,
+        },
       },
       isFocusMode: false,
     })
@@ -412,63 +637,113 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
     // 构建完整的 defaultConfig mock
     const defaultConfigMock = {
       general: {
-        version: APP_VERSION, lang: 'zh-CN', timeLang: 'zh-CN',
-        appearance: 'auto', pageTitle: '新标签页', fontFamily: 'system', fontSize: 14,
+        version: APP_VERSION,
+        lang: 'zh-CN',
+        timeLang: 'zh-CN',
+        appearance: 'auto',
+        pageTitle: '新标签页',
+        fontFamily: 'system',
+        fontSize: 14,
         fontColor: ['rgba(44, 62, 80, 1)', 'rgba(255, 255, 255, 1)'],
         primaryColor: ['rgba(58, 115, 195, 1)', 'rgba(100, 160, 230, 1)'],
         isAutoPrimaryColor: false,
         isAutoBackgroundColor: false,
         backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'],
-        bgOpacity: 1, bgBlur: 0,
+        bgOpacity: 1,
+        bgBlur: 0,
         openPageFocusElement: 'keyboardBookmark',
         focusVisibleWidgetMap: { search: true, keyboardBookmark: true },
         showBreakingChangeNotice: false,
-        isBackgroundImageEnabled: true, backgroundImageSource: 'network',
-        backgroundImageList: [], favoriteImageList: [],
+        isBackgroundImageEnabled: true,
+        backgroundImageSource: 'network',
+        backgroundImageList: [],
+        favoriteImageList: [],
         layout: {
-          xOffsetKey: 'right', xOffsetValue: 1, xTranslateValue: 0,
-          yOffsetKey: 'top', yOffsetValue: 50, yTranslateValue: -50,
+          xOffsetKey: 'right',
+          xOffsetValue: 1,
+          xTranslateValue: 0,
+          yOffsetKey: 'top',
+          yOffsetValue: 50,
+          yTranslateValue: -50,
         },
         swatcheColors: ['rgba(255, 255, 255, 1)'],
-        isParallaxEnabled: true, parallaxIntensity: 5,
-        isBackgroundImageCustomUrlEnabled: false, backgroundImageCustomUrls: [],
-        isLoadPageAnimationEnabled: true, loadPageAnimationType: 'fade-in',
+        isParallaxEnabled: true,
+        parallaxIntensity: 5,
+        isBackgroundImageCustomUrlEnabled: false,
+        backgroundImageCustomUrls: [],
+        isLoadPageAnimationEnabled: true,
+        loadPageAnimationType: 'fade-in',
         drawerPlacement: 'right',
         isBackgroundImageHighQuality: true,
         backgroundImageHighQuality: true,
         isFirstOpen: true,
       },
       keyboardCommon: {
-        keyboardType: 'key61', splitSpace: 'space1', keyboardWklMode: false,
-        keycapType: 'gmk', keycapPadding: 1.5, keycapSize: 58, keycapBorderRadius: 5,
-        isKeycapBorderEnabled: false, keycapBorderWidth: 1,
+        keyboardType: 'key61',
+        splitSpace: 'space1',
+        keyboardWklMode: false,
+        keycapType: 'gmk',
+        keycapPadding: 1.5,
+        keycapSize: 58,
+        keycapBorderRadius: 5,
+        isKeycapBorderEnabled: false,
+        keycapBorderWidth: 1,
         keycapBorderColor: ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)'],
-        isShellVisible: true, shellVerticalPadding: 15, shellHorizontalPadding: 15,
-        shellBorderRadius: 10, shellBackgroundBlur: 5, isPlateVisible: true,
-        platePadding: 3, plateBorderRadius: 5,
+        isShellVisible: true,
+        shellVerticalPadding: 15,
+        shellHorizontalPadding: 15,
+        shellBorderRadius: 10,
+        shellBackgroundBlur: 5,
+        isPlateVisible: true,
+        platePadding: 3,
+        plateBorderRadius: 5,
         plateColor: ['rgba(80, 80, 80, 0.7)', 'rgba(119, 119, 119, 0.5)'],
-        isCapKeyVisible: true, keycapKeyFontFamily: 'OpenCherry', keycapKeyFontSize: 12,
-        isNameVisible: true, keycapBookmarkFontFamily: 'Arial', keycapBookmarkFontSize: 11,
-        isFaviconVisible: true, faviconSize: 0.85, isTactileBumpsVisible: true,
+        isCapKeyVisible: true,
+        keycapKeyFontFamily: 'OpenCherry',
+        keycapKeyFontSize: 12,
+        isNameVisible: true,
+        keycapBookmarkFontFamily: 'Arial',
+        keycapBookmarkFontSize: 11,
+        isFaviconVisible: true,
+        faviconSize: 0.85,
+        isTactileBumpsVisible: true,
         mainFontColor: ['rgba(60,65,70,1.0)', 'rgba(226,232,240,1.0)'],
         mainBackgroundColor: ['rgba(235,238,240,1.0)', 'rgba(71,85,105,1.0)'],
-        emphasisOneFontColor: ['rgba(235,238,240,1.0)', 'rgba(226,232,240,1.0)'],
-        emphasisOneBackgroundColor: ['rgba(80,85,90,1.0)', 'rgba(30,41,59,1.0)'],
+        emphasisOneFontColor: [
+          'rgba(235,238,240,1.0)',
+          'rgba(226,232,240,1.0)',
+        ],
+        emphasisOneBackgroundColor: [
+          'rgba(80,85,90,1.0)',
+          'rgba(30,41,59,1.0)',
+        ],
         emphasisTwoFontColor: ['rgba(60,65,70,1.0)', 'rgba(30,41,59,1.0)'],
-        emphasisTwoBackgroundColor: ['rgba(160,165,170,1.0)', 'rgba(148,163,184,1.0)'],
-        emphasisKeyOverrides: {}, fontSize: 14, fontFamily: 'system',
+        emphasisTwoBackgroundColor: [
+          'rgba(160,165,170,1.0)',
+          'rgba(148,163,184,1.0)',
+        ],
+        emphasisKeyOverrides: {},
+        fontSize: 14,
+        fontFamily: 'system',
         shellColor: ['rgba(225, 219, 209, 1.0)', 'rgba(51,65,85,1.0)'],
         isShellShadowEnabled: true,
         shellShadowColor: ['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.4)'],
         keycapBorderColor: ['rgba(71, 85, 105, 1)', 'rgba(73, 73, 77, 1)'],
-        keycapBorderWidth: 1, keycapKeyFontFamily: 'OpenCherry', keycapKeyFontSize: 12,
+        keycapBorderWidth: 1,
+        keycapKeyFontFamily: 'OpenCherry',
+        keycapKeyFontSize: 12,
       },
       keyboardCommand: {
-        isEnabled: true, noModifierMode: false, shortcutInInputElement: true,
-        urlBlacklist: [], modifiers: ['shift', 'alt'] as Array<'ctrl' | 'shift' | 'alt' | 'meta'>,
+        isEnabled: true,
+        noModifierMode: false,
+        shortcutInInputElement: true,
+        urlBlacklist: [],
+        modifiers: ['shift', 'alt'] as Array<'ctrl' | 'shift' | 'alt' | 'meta'>,
         keymap: {
-          KeyQ: { command: 'moveTabLeft' }, KeyE: { command: 'moveTabRight' },
-          KeyA: { command: 'prevTab' }, KeyD: { command: 'nextTab' },
+          KeyQ: { command: 'moveTabLeft' },
+          KeyE: { command: 'moveTabRight' },
+          KeyA: { command: 'prevTab' },
+          KeyD: { command: 'nextTab' },
           KeyX: { command: 'closeTab' },
         },
       },
@@ -476,8 +751,13 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
     }
 
     const defaultFocusVisibleWidgetMap = {
-      search: true, keyboardBookmark: true, clockDigital: true,
-      clockAnalog: true, clockFlip: true, clockNeon: true, date: true,
+      search: true,
+      keyboardBookmark: true,
+      clockDigital: true,
+      clockAnalog: true,
+      clockFlip: true,
+      clockNeon: true,
+      date: true,
     }
 
     vi.doMock('@/logic/store/state', () => ({
@@ -496,7 +776,9 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
       KEYBOARD_COMMON_CONFIG: defaultConfigMock.keyboardCommon,
     }))
     vi.doMock('@/logic/config/merge', () => ({
-      mergeState: vi.fn((state: unknown, acceptState: unknown) => acceptState ?? state),
+      mergeState: vi.fn(
+        (state: unknown, acceptState: unknown) => acceptState ?? state,
+      ),
     }))
 
     // 键名归一用真实实现：这里曾内联复制过一份，与 migrate.ts 各自演进
@@ -507,7 +789,10 @@ describe.each(fixtures)('配置兼容性快照: $name', ({ data: fixture }) => {
     vi.doMock('@/logic/config/state', () => ({ localConfig, localState }))
     vi.doMock('@/logic/utils/util', () => ({
       log: vi.fn(),
-      compareLeftVersionLessThanRightVersions: (left: string, right: string) => {
+      compareLeftVersionLessThanRightVersions: (
+        left: string,
+        right: string,
+      ) => {
         const l = left.split('.').map(Number)
         const r = right.split('.').map(Number)
         for (let i = 0; i < Math.max(l.length, r.length); i++) {

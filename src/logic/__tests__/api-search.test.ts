@@ -14,7 +14,7 @@ function createMockRequest() {
 }
 
 describe('getSearchSuggestion', () => {
-  let getSearchSuggestion: typeof import('@/api/search')['getSearchSuggestion']
+  let getSearchSuggestion: (typeof import('@/api/search'))['getSearchSuggestion']
   let mockRequest: ReturnType<typeof createMockRequest>
 
   beforeEach(async () => {
@@ -221,11 +221,7 @@ describe('getSearchSuggestion', () => {
       g: [{ q: 'fallback' }],
     })
 
-    const result = await getSearchSuggestion(
-      'UnknownEngine',
-      undefined,
-      'test',
-    )
+    const result = await getSearchSuggestion('UnknownEngine', undefined, 'test')
 
     expect(mockRequest).toHaveBeenCalledWith({
       url: 'https://www.baidu.com/sugrec',

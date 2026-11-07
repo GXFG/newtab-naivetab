@@ -44,32 +44,38 @@ const getTriggerTexts = (wrapper: ReturnType<typeof mount>) =>
 
 describe('NTTabs 触发器顺序', () => {
   it('初次渲染按传入顺序', async () => {
-    const wrapper = mount(createWrapper([
-      { name: 'a', tab: 'A' },
-      { name: 'b', tab: 'B' },
-      { name: 'c', tab: 'C' },
-    ]))
+    const wrapper = mount(
+      createWrapper([
+        { name: 'a', tab: 'A' },
+        { name: 'b', tab: 'B' },
+        { name: 'c', tab: 'C' },
+      ]),
+    )
     // 注册发生在挂载过程中，触发器在紧随其后的重渲染里才出现
     await nextTick()
     expect(getTriggerTexts(wrapper)).toEqual(['A', 'B', 'C'])
   })
 
   it('重排面板后触发器顺序跟随', async () => {
-    const wrapper = mount(createWrapper([
-      { name: 'a', tab: 'A' },
-      { name: 'b', tab: 'B' },
-      { name: 'c', tab: 'C' },
-    ]))
+    const wrapper = mount(
+      createWrapper([
+        { name: 'a', tab: 'A' },
+        { name: 'b', tab: 'B' },
+        { name: 'c', tab: 'C' },
+      ]),
+    )
     ;(wrapper.vm as unknown as { list: PaneItem[] }).list.reverse()
     await nextTick()
     expect(getTriggerTexts(wrapper)).toEqual(['C', 'B', 'A'])
   })
 
   it('新增/移除面板后触发器同步', async () => {
-    const vm = mount(createWrapper([
-      { name: 'a', tab: 'A' },
-      { name: 'b', tab: 'B' },
-    ]))
+    const vm = mount(
+      createWrapper([
+        { name: 'a', tab: 'A' },
+        { name: 'b', tab: 'B' },
+      ]),
+    )
     const state = vm.vm as unknown as { list: PaneItem[] }
     state.list = [
       { name: 'c', tab: 'C' },

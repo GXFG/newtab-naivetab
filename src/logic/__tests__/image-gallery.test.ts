@@ -16,14 +16,16 @@ const IMAGE_NETWORK_SOURCE = {
 } as const
 
 /** 统一 mock 辅助函数 */
-async function loadGallery(overrides: {
-  bingSyncTime?: number
-  pexelsSyncTime?: number
-  pexelsList?: any[]
-  pexelsCurrentPage?: number
-  bingList?: any[]
-  favoriteImageList?: any[]
-} = {}) {
+async function loadGallery(
+  overrides: {
+    bingSyncTime?: number
+    pexelsSyncTime?: number
+    pexelsList?: any[]
+    pexelsCurrentPage?: number
+    bingList?: any[]
+    favoriteImageList?: any[]
+  } = {},
+) {
   vi.resetModules()
 
   const mockBingList = overrides.bingList || []

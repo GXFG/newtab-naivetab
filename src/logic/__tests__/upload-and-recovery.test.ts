@@ -58,41 +58,45 @@ function setupChromeSync(options?: {
   const chrome = globalThis.chrome as any
   mockUploadSetCalls.length = 0
 
-  chrome.storage.sync.set.mockImplementation((obj: any, callback?: Function) => {
-    if (options?.lastError) {
-      chrome.runtime.lastError = options.lastError
-    } else {
-      chrome.runtime.lastError = null
-    }
+  chrome.storage.sync.set.mockImplementation(
+    (obj: any, callback?: Function) => {
+      if (options?.lastError) {
+        chrome.runtime.lastError = options.lastError
+      } else {
+        chrome.runtime.lastError = null
+      }
 
-    for (const [key, value] of Object.entries(obj)) {
-      if (!key.startsWith('naive-tab-')) continue
+      for (const [key, value] of Object.entries(obj)) {
+        if (!key.startsWith('naive-tab-')) continue
 
-      // 可选：阻止超大 payload 写入（模拟 uploadConfigFn 内部的大小拦截）
-      if (options?.blockLargePayload) {
-        const bytes = new TextEncoder().encode(value as string).length
-        if (bytes > 8000) {
-          // 超限：不调用 callback，uploadConfigFn 内部会在 doUpload 之前拦截
-          // 这里我们模拟的是已经被拦截后的行为
-          continue
+        // 可选：阻止超大 payload 写入（模拟 uploadConfigFn 内部的大小拦截）
+        if (options?.blockLargePayload) {
+          const bytes = new TextEncoder().encode(value as string).length
+          if (bytes > 8000) {
+            // 超限：不调用 callback，uploadConfigFn 内部会在 doUpload 之前拦截
+            // 这里我们模拟的是已经被拦截后的行为
+            continue
+          }
+        }
+
+        const field = key.replace('naive-tab-', '')
+        try {
+          const parsed = JSON.parse(value as string)
+          mockUploadSetCalls.push({ field, data: parsed })
+        } catch {
+          mockUploadSetCalls.push({ field, data: value })
         }
       }
 
-      const field = key.replace('naive-tab-', '')
-      try {
-        const parsed = JSON.parse(value as string)
-        mockUploadSetCalls.push({ field, data: parsed })
-      } catch {
-        mockUploadSetCalls.push({ field, data: value })
-      }
-    }
+      callback?.()
+    },
+  )
 
-    callback?.()
-  })
-
-  chrome.storage.sync.getBytesInUse.mockImplementation((key: string, callback: Function) => {
-    callback(1024)
-  })
+  chrome.storage.sync.getBytesInUse.mockImplementation(
+    (key: string, callback: Function) => {
+      callback(1024)
+    },
+  )
 }
 
 // ── Mock 定义 ──
@@ -109,7 +113,9 @@ vi.doMock('@/logic/utils/common', () => ({
 
 vi.doMock('@/logic/config/state', () => ({
   localConfig: mockLocalConfig,
-  localState: { value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap } },
+  localState: {
+    value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap },
+  },
 }))
 vi.doMock('@/logic/store/state', () => ({
   globalState: {},
@@ -118,7 +124,13 @@ vi.doMock('@/logic/store/state', () => ({
 
 vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: DEFAULT_CONFIG,
-  defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false },
+  defaultUploadStatusItem: {
+    loading: false,
+    syncTime: 0,
+    syncId: '',
+    localModifiedTime: 0,
+    dirty: false,
+  },
 }))
 
 vi.doMock('@/logic/config/merge', () => ({
@@ -138,7 +150,9 @@ vi.doMock('@/logic/config/compress', () => ({
   compressString: vi.fn().mockResolvedValue('compressed-base64-data'),
   decompressString: vi.fn().mockResolvedValue('{}'),
   shouldCompress: vi.fn().mockReturnValue(false),
-  parseStoredData: vi.fn().mockImplementation(async (raw: string) => JSON.parse(raw)),
+  parseStoredData: vi
+    .fn()
+    .mockImplementation(async (raw: string) => JSON.parse(raw)),
 }))
 
 vi.doMock('@/logic/constants/app', () => ({
@@ -187,7 +201,11 @@ describe('flushConfigSync', () => {
 
     resetMockState()
     window.appVersion = '2.3.0'
-    window.$message = { warning: mockMessageWarn, error: mockMessageError, success: mockMessageSuccess } as any
+    window.$message = {
+      warning: mockMessageWarn,
+      error: mockMessageError,
+      success: mockMessageSuccess,
+    } as any
     window.$notification = { info: vi.fn() } as any
     window.$t = (key: string) => key
     ;(globalThis.chrome as any).runtime.lastError = null
@@ -303,7 +321,10 @@ describe('flushConfigSync', () => {
       keymap: {
         KeyA: { url: 'https://example.com', name: 'Example' },
         KeyB: { url: '', name: 'Empty' },
-        KeyC: { url: 'https://test.com/' + 'a'.repeat(200), name: 'LongName' + 'b'.repeat(20) },
+        KeyC: {
+          url: 'https://test.com/' + 'a'.repeat(200),
+          name: 'LongName' + 'b'.repeat(20),
+        },
       },
       source: 1,
     }
@@ -336,7 +357,11 @@ describe('handleMissedUploadConfig', () => {
 
     resetMockState()
     window.appVersion = '2.3.0'
-    window.$message = { warning: mockMessageWarn, error: mockMessageError, success: mockMessageSuccess } as any
+    window.$message = {
+      warning: mockMessageWarn,
+      error: mockMessageError,
+      success: mockMessageSuccess,
+    } as any
     window.$notification = { info: vi.fn() } as any
     window.$t = (key: string) => key
     ;(globalThis.chrome as any).runtime.lastError = null
@@ -411,7 +436,9 @@ describe('setupKeyboardSyncListener', () => {
 
   beforeEach(setup)
 
-  function triggerStorageChange(changes: Record<string, { newValue?: string }>) {
+  function triggerStorageChange(
+    changes: Record<string, { newValue?: string }>,
+  ) {
     if (_onChangedHandler) {
       _onChangedHandler(changes)
     }
@@ -435,7 +462,9 @@ describe('setupKeyboardSyncListener', () => {
     await new Promise((r) => setTimeout(r, 10))
 
     expect(mockLocalConfig.keyboardBookmark.source).toBe(2)
-    expect(mockIsUploadConfigStatusMap.keyboardBookmark.syncId).toBe('new-remote-sync-id')
+    expect(mockIsUploadConfigStatusMap.keyboardBookmark.syncId).toBe(
+      'new-remote-sync-id',
+    )
     expect(mockIsUploadConfigStatusMap.keyboardBookmark.dirty).toBe(false)
   })
 
@@ -456,7 +485,9 @@ describe('setupKeyboardSyncListener', () => {
 
     await new Promise((r) => setTimeout(r, 10))
 
-    expect(mockLog).toHaveBeenCalledWith('Sync keyboardBookmark skipped (same syncId)')
+    expect(mockLog).toHaveBeenCalledWith(
+      'Sync keyboardBookmark skipped (same syncId)',
+    )
   })
 
   it('skips when newValue is empty', () => {
@@ -528,7 +559,10 @@ describe('setupLocalStorageSyncListener', () => {
   it('skips when content is identical', () => {
     setupLocalStorageSyncListener()
 
-    triggerStorageEvent('c-general', JSON.stringify({ version: '2.3.0', lang: 'zh-CN' }))
+    triggerStorageEvent(
+      'c-general',
+      JSON.stringify({ version: '2.3.0', lang: 'zh-CN' }),
+    )
 
     // 内容相同，不调用 mergeState
     expect(mockLocalConfig.general.lang).toBe('zh-CN')

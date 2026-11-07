@@ -18,7 +18,7 @@ vi.mock('@/logic/utils/util', () => ({ log: vi.fn() }))
 // ── clearDatabase: success ──
 
 describe('clearDatabase success', () => {
-  let clearDatabase: typeof import('@/logic/utils/database')['clearDatabase']
+  let clearDatabase: (typeof import('@/logic/utils/database'))['clearDatabase']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -53,7 +53,7 @@ describe('clearDatabase success', () => {
 // ── clearDatabase: error ──
 
 describe('clearDatabase error handling', () => {
-  let clearDatabase: typeof import('@/logic/utils/database')['clearDatabase']
+  let clearDatabase: (typeof import('@/logic/utils/database'))['clearDatabase']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -76,7 +76,10 @@ describe('clearDatabase error handling', () => {
     const mod = await import('@/logic/utils/database')
     clearDatabase = mod.clearDatabase
 
-    setTimeout(() => fakeDeleteRequest.onerror?.({ target: fakeDeleteRequest }), 0)
+    setTimeout(
+      () => fakeDeleteRequest.onerror?.({ target: fakeDeleteRequest }),
+      0,
+    )
   })
 
   it('returns false on delete error', async () => {
@@ -88,7 +91,7 @@ describe('clearDatabase error handling', () => {
 // ── clearDatabase: blocked ──
 
 describe('clearDatabase blocked handling', () => {
-  let clearDatabase: typeof import('@/logic/utils/database')['clearDatabase']
+  let clearDatabase: (typeof import('@/logic/utils/database'))['clearDatabase']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -111,7 +114,10 @@ describe('clearDatabase blocked handling', () => {
     const mod = await import('@/logic/utils/database')
     clearDatabase = mod.clearDatabase
 
-    setTimeout(() => fakeDeleteRequest.onblocked?.({ target: fakeDeleteRequest }), 0)
+    setTimeout(
+      () => fakeDeleteRequest.onblocked?.({ target: fakeDeleteRequest }),
+      0,
+    )
   })
 
   it('returns false when delete is blocked', async () => {

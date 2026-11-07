@@ -139,9 +139,7 @@ describe('getDayCell 文案优先级：订阅节日 → 本地节日 → 节气 
     })
     // 情人节没有订阅条目，也不补中文表 → 回退农历
     expect(getDayCell(localDate(2026, 2, 14), english).desc).toBe('廿七')
-    expect(
-      getDayCell(localDate(2026, 6, 21), english).isFestival,
-    ).toBe(false)
+    expect(getDayCell(localDate(2026, 6, 21), english).isFestival).toBe(false)
   })
 })
 
@@ -180,7 +178,10 @@ describe('getDayCell 休 / 班 标记来自订阅', () => {
   })
 
   it('订阅未就绪（null）时只输出农历，不打标记', () => {
-    const cell = getDayCell(localDate(2026, 2, 17), opts({ subscription: null }))
+    const cell = getDayCell(
+      localDate(2026, 2, 17),
+      opts({ subscription: null }),
+    )
     expect(cell.dayType).toBe(CalendarDayType.NORMAL)
     expect(cell.desc).toBe('正月')
   })
@@ -216,7 +217,12 @@ describe('getDayDetail', () => {
     expect(detail.ji.length).toBeGreaterThan(0)
     expect(detail.jishen.length + detail.xiongsha.length).toBeGreaterThan(0)
 
-    const all = [...detail.yi, ...detail.ji, ...detail.jishen, ...detail.xiongsha]
+    const all = [
+      ...detail.yi,
+      ...detail.ji,
+      ...detail.jishen,
+      ...detail.xiongsha,
+    ]
     expect(new Set(all).size).toBe(all.length)
   })
 
@@ -259,9 +265,7 @@ describe('getFestivalList', () => {
     const near = getFestivalList(localDate(2026, 1, 1), cellOpts(), 5)
     const far = getFestivalList(localDate(2026, 1, 1), cellOpts(), 60)
     expect(near.length).toBeLessThan(far.length)
-    expect(far).toEqual(
-      [...far].sort((a, b) => a.offsetDays - b.offsetDays),
-    )
+    expect(far).toEqual([...far].sort((a, b) => a.offsetDays - b.offsetDays))
   })
 
   it('关闭「农历与节气」后不再包含只有节气的日期', () => {
@@ -283,7 +287,10 @@ describe('getFestivalList', () => {
 
 describe('展示开关', () => {
   it('关闭「农历与节气」后，无节日与节气的格子留空且不再算节日', () => {
-    const termOnly = getDayCell(localDate(2026, 1, 5), opts({ showLunarTerm: false }))
+    const termOnly = getDayCell(
+      localDate(2026, 1, 5),
+      opts({ showLunarTerm: false }),
+    )
     expect(termOnly).toEqual({
       desc: '',
       isFestival: false,
@@ -298,7 +305,10 @@ describe('展示开关', () => {
   })
 
   it('关闭「农历与节气」不影响订阅节日', () => {
-    const cell = getDayCell(localDate(2026, 2, 17), opts({ showLunarTerm: false }))
+    const cell = getDayCell(
+      localDate(2026, 2, 17),
+      opts({ showLunarTerm: false }),
+    )
     expect(cell.desc).toBe('春节')
     expect(cell.isFestival).toBe(true)
   })
@@ -324,9 +334,13 @@ describe('展示开关', () => {
   })
 
   it('关闭「农历与节气」后，详情不再返回农历行', () => {
-    expect(getDayDetail(localDate(2026, 6, 21), opts({ showLunarTerm: false })).lunar).toBe('')
     expect(
-      getDayDetail(localDate(2026, 6, 21), opts({ showLunarTerm: false })).festivals,
+      getDayDetail(localDate(2026, 6, 21), opts({ showLunarTerm: false }))
+        .lunar,
+    ).toBe('')
+    expect(
+      getDayDetail(localDate(2026, 6, 21), opts({ showLunarTerm: false }))
+        .festivals,
     ).toEqual(['父亲节'])
   })
 

@@ -41,10 +41,7 @@ describe('日历配置向前兼容', () => {
 
   it('开发期残留的 holidayRegion 不会干扰新字段', async () => {
     // 2.7.0 开发阶段曾用过 holidayRegion，从未发布；残留值不应影响订阅地区
-    localStorage.setItem(
-      'c-calendar',
-      JSON.stringify({ holidayRegion: 'TW' }),
-    )
+    localStorage.setItem('c-calendar', JSON.stringify({ holidayRegion: 'TW' }))
 
     const { localConfig } = await import('@/logic/config/state')
 

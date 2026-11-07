@@ -45,7 +45,10 @@ describe('getMonthGridPadding', () => {
     // 2026-03-01 是周日、2026-03-31 是周二 → 周一起始为 6 + 31 + 5 = 42
     expect(getMonthGridPadding(7, 2, 31, 1)).toEqual({ padStart: 6, padEnd: 5 })
     // 构造整 5 周：周一起始、1 号周一、31 天 → 0 + 31 + 4 = 35 → 补 7
-    expect(getMonthGridPadding(1, 3, 31, 1)).toEqual({ padStart: 0, padEnd: 11 })
+    expect(getMonthGridPadding(1, 3, 31, 1)).toEqual({
+      padStart: 0,
+      padEnd: 11,
+    })
   })
 
   it('整 6 周时不额外补', () => {
@@ -57,7 +60,7 @@ describe('getMonthGridPadding', () => {
     // 2027-02：1 号周一 → 无上月填充
     expect(paddingOf(2027, 2, 1).padStart).toBe(0)
     // 2027-03：1 号周一 → 无上月填充；31 天，最后一天周三 → 本周补 4 天后再补足到 6 行
- 
+
     expect(paddingOf(2027, 3, 1)).toEqual({ padStart: 0, padEnd: 11 })
   })
 

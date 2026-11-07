@@ -90,9 +90,9 @@ describe('looksLikeCalendar', () => {
   })
 
   it('只有 VCALENDAR 没有事件时不算日历', () => {
-    expect(looksLikeCalendar('BEGIN:VCALENDAR\nVERSION:2.0\nEND:VCALENDAR')).toBe(
-      false,
-    )
+    expect(
+      looksLikeCalendar('BEGIN:VCALENDAR\nVERSION:2.0\nEND:VCALENDAR'),
+    ).toBe(false)
   })
 
   it('带 UTF-8 BOM 也能识别', () => {

@@ -53,7 +53,10 @@ function collectSourceFiles(dir: string, acc: string[] = []): string[] {
     if (entry.isDirectory()) {
       if (entry.name === '__tests__' || entry.name === 'node_modules') continue
       collectSourceFiles(full, acc)
-    } else if (/\.(ts|vue)$/.test(entry.name) && !entry.name.endsWith('.d.ts')) {
+    } else if (
+      /\.(ts|vue)$/.test(entry.name) &&
+      !entry.name.endsWith('.d.ts')
+    ) {
       acc.push(full)
     }
   }
@@ -67,7 +70,9 @@ const SOURCES = collectSourceFiles(SRC_DIR).map((file) => ({
 
 describe('图标常量表', () => {
   it('图标名均为 prefix:name 形式', () => {
-    const invalid = [...CONSTANT_ICONS].filter((name) => !ICON_NAME_RE.test(name))
+    const invalid = [...CONSTANT_ICONS].filter(
+      (name) => !ICON_NAME_RE.test(name),
+    )
     expect(invalid).toEqual([])
   })
 
@@ -97,7 +102,9 @@ describe('图标集产物', () => {
   })
 
   it('产物里没有常量表以外的图标', () => {
-    const stale = Object.keys(iconSet).filter((name) => !CONSTANT_ICONS.has(name))
+    const stale = Object.keys(iconSet).filter(
+      (name) => !CONSTANT_ICONS.has(name),
+    )
     expect(stale, '产物里有已删除的图标：跑 pnpm gen:icons 清掉').toEqual([])
   })
 
@@ -120,12 +127,15 @@ describe('图标名不得硬编码', () => {
     for (const { file, source } of SOURCES) {
       if (file === ICONS_FILE) continue
       for (const { icon, index } of findIconLiterals(source, KNOWN_PREFIXES)) {
-        hits.push(`${relative(SRC_DIR, file)}:${lineOf(source, index)} → ${icon}`)
+        hits.push(
+          `${relative(SRC_DIR, file)}:${lineOf(source, index)} → ${icon}`,
+        )
       }
     }
-    expect(hits, '图标名只能写在 icons.ts 的 ICONS 里，模板用 :icon="ICONS.xxx"').toEqual(
-      [],
-    )
+    expect(
+      hits,
+      '图标名只能写在 icons.ts 的 ICONS 里，模板用 :icon="ICONS.xxx"',
+    ).toEqual([])
   })
 
   it('扫描规则确实在起作用（防止守卫静默通过）', () => {

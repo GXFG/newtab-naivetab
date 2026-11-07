@@ -22,7 +22,11 @@ describe('buildIconMap', () => {
     const collections = new Map([
       [
         'set',
-        makeCollection({ width: 24, height: 24, icons: { close: { body: 'A' } } }),
+        makeCollection({
+          width: 24,
+          height: 24,
+          icons: { close: { body: 'A' } },
+        }),
       ],
     ])
 

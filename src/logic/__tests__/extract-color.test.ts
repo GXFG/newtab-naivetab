@@ -193,7 +193,9 @@ describe('extract-color', () => {
       img.src = dataUrl
       // 等待图片解码完成，确保浏览器已处理 0x0 尺寸（data URL 通常同步但非保证）
       if (!img.complete) {
-        await new Promise<void>((resolve) => { img.onload = () => resolve() })
+        await new Promise<void>((resolve) => {
+          img.onload = () => resolve()
+        })
       }
 
       // 0x0 图片 drawImage 到 canvas 无实际像素
@@ -202,21 +204,21 @@ describe('extract-color', () => {
     })
   })
 
-/**
- * 解析 rgba 颜色字符串的 RGB 分量
- */
-function parseRgba(color: string): [number, number, number] | null {
-  const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
-  if (!match) return null
-  return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])]
-}
+  /**
+   * 解析 rgba 颜色字符串的 RGB 分量
+   */
+  function parseRgba(color: string): [number, number, number] | null {
+    const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+    if (!match) return null
+    return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])]
+  }
 
-/**
- * 计算 RGB 颜色的近似 HSL 亮度（简化版，用于测试断言）
- */
-function approxLightness(r: number, g: number, b: number): number {
-  return (Math.max(r, g, b) + Math.min(r, g, b)) / 2 / 255
-}
+  /**
+   * 计算 RGB 颜色的近似 HSL 亮度（简化版，用于测试断言）
+   */
+  function approxLightness(r: number, g: number, b: number): number {
+    return (Math.max(r, g, b) + Math.min(r, g, b)) / 2 / 255
+  }
 
   describe('extractAndApplyPrimaryColor', () => {
     it('浅色模式：在 Vibrant 画像区间内取色，亮度应在 0.30–0.60', async () => {
@@ -231,18 +233,15 @@ function approxLightness(r: number, g: number, b: number): number {
         if (img.complete) resolve()
       })
 
-      const primaryColorRef = [
-        'rgba(0, 0, 0, 1)',
-        'rgba(255, 255, 255, 1)',
-      ]
+      const primaryColorRef = ['rgba(0, 0, 0, 1)', 'rgba(255, 255, 255, 1)']
       extractAndApplyPrimaryColor(img, 0, primaryColorRef)
 
       const rgb = parseRgba(primaryColorRef[0])
       expect(rgb).not.toBeNull()
       if (rgb) {
         const lightness = approxLightness(rgb[0], rgb[1], rgb[2])
-        expect(lightness).toBeGreaterThanOrEqual(0.30)
-        expect(lightness).toBeLessThanOrEqual(0.60)
+        expect(lightness).toBeGreaterThanOrEqual(0.3)
+        expect(lightness).toBeLessThanOrEqual(0.6)
       }
     })
 
@@ -258,10 +257,7 @@ function approxLightness(r: number, g: number, b: number): number {
         if (img.complete) resolve()
       })
 
-      const primaryColorRef = [
-        'rgba(0, 0, 0, 1)',
-        'rgba(0, 0, 0, 1)',
-      ]
+      const primaryColorRef = ['rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 1)']
       extractAndApplyPrimaryColor(img, 1, primaryColorRef)
 
       const rgb = parseRgba(primaryColorRef[1])
@@ -269,7 +265,7 @@ function approxLightness(r: number, g: number, b: number): number {
       if (rgb) {
         const lightness = approxLightness(rgb[0], rgb[1], rgb[2])
         expect(lightness).toBeGreaterThanOrEqual(0.45)
-        expect(lightness).toBeLessThanOrEqual(0.70)
+        expect(lightness).toBeLessThanOrEqual(0.7)
       }
     })
 
@@ -285,10 +281,7 @@ function approxLightness(r: number, g: number, b: number): number {
         if (img.complete) resolve()
       })
 
-      const primaryColorRef = [
-        'rgba(0, 0, 0, 1)',
-        'rgba(255, 255, 255, 1)',
-      ]
+      const primaryColorRef = ['rgba(0, 0, 0, 1)', 'rgba(255, 255, 255, 1)']
       extractAndApplyPrimaryColor(img, 0, primaryColorRef)
 
       // 无颜色在画像区间内，保持原值
@@ -307,10 +300,7 @@ function approxLightness(r: number, g: number, b: number): number {
         if (img.complete) resolve()
       })
 
-      const primaryColorRef = [
-        'rgba(0, 0, 0, 1)',
-        'rgba(255, 255, 255, 1)',
-      ]
+      const primaryColorRef = ['rgba(0, 0, 0, 1)', 'rgba(255, 255, 255, 1)']
       extractAndApplyPrimaryColor(img, 0, primaryColorRef)
 
       expect(primaryColorRef[0]).toMatch(/^rgba\(\d+,\s*\d+,\s*\d+,\s*1\)$/)
@@ -329,10 +319,7 @@ function approxLightness(r: number, g: number, b: number): number {
         if (img.complete) resolve()
       })
 
-      const primaryColorRef = [
-        'rgba(0, 0, 0, 1)',
-        'rgba(255, 255, 255, 1)',
-      ]
+      const primaryColorRef = ['rgba(0, 0, 0, 1)', 'rgba(255, 255, 255, 1)']
       extractAndApplyPrimaryColor(img, 0, primaryColorRef)
 
       expect(primaryColorRef[0]).toBe('rgba(0, 0, 0, 1)')
@@ -362,8 +349,7 @@ function approxLightness(r: number, g: number, b: number): number {
         expect(l).toBeGreaterThanOrEqual(0.88)
         expect(l).toBeLessThanOrEqual(0.94)
         // 不应是纯灰（R=G=B），应带色调
-        const isGray =
-          rgb[0] === rgb[1] && rgb[1] === rgb[2]
+        const isGray = rgb[0] === rgb[1] && rgb[1] === rgb[2]
         expect(isGray).toBe(false)
       }
     })
@@ -523,7 +509,7 @@ describe('extractPrimaryColorFromPalette (幻彩色板主题色)', () => {
     if (rgb) {
       const l = approxLightnessTop(rgb[0], rgb[1], rgb[2])
       // 在深色 Vibrant 画像区间内：L 0.45–0.70 或已被钳制
-      expect(l).toBeGreaterThanOrEqual(0.40)
+      expect(l).toBeGreaterThanOrEqual(0.4)
       expect(l).toBeLessThanOrEqual(0.75)
     }
   })
@@ -584,13 +570,22 @@ describe('extractPrimaryColorFromPalette (幻彩色板主题色)', () => {
   })
 
   it('无效 hex 被过滤，剩余有效色正常工作', () => {
-    const mixedPalette = ['#4A90D9', 'invalid', '#6BB5FF', '', '#3A7BC8', '#notacolor']
+    const mixedPalette = [
+      '#4A90D9',
+      'invalid',
+      '#6BB5FF',
+      '',
+      '#3A7BC8',
+      '#notacolor',
+    ]
     const result = extractPrimaryColorFromPalette(mixedPalette, 0)
     expect(result).toMatch(/^rgba\(\d+,\s*\d+,\s*\d+,\s*1\)$/)
   })
 
   it('全是无效 hex 返回空字符串', () => {
-    expect(extractPrimaryColorFromPalette(['invalid', 'bad', 'xyz'], 0)).toBe('')
+    expect(extractPrimaryColorFromPalette(['invalid', 'bad', 'xyz'], 0)).toBe(
+      '',
+    )
   })
 })
 

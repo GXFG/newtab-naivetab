@@ -22,13 +22,15 @@ const IMAGE_NETWORK_SOURCE = {
 } as const
 
 /** 统一 mock 辅助函数 */
-async function loadService(overrides: {
-  backgroundImageSource?: number
-  bingList?: any[]
-  backgroundImageList?: any[]
-  backgroundImageHighQuality?: boolean
-  currAppearanceCode?: number
-} = {}) {
+async function loadService(
+  overrides: {
+    backgroundImageSource?: number
+    bingList?: any[]
+    backgroundImageList?: any[]
+    backgroundImageHighQuality?: boolean
+    currAppearanceCode?: number
+  } = {},
+) {
   vi.resetModules()
 
   const mockBingList = overrides.bingList || []
@@ -39,7 +41,9 @@ async function loadService(overrides: {
     return {
       ...actual,
       urlToFile: vi.fn().mockResolvedValue(new File([''], 'test.jpg')),
-      compressedImageUrlToBase64: vi.fn().mockResolvedValue('data:image/jpeg;base64,test'),
+      compressedImageUrlToBase64: vi
+        .fn()
+        .mockResolvedValue('data:image/jpeg;base64,test'),
       downloadImageByUrl: vi.fn().mockResolvedValue(undefined),
     }
   })
@@ -47,15 +51,23 @@ async function loadService(overrides: {
   vi.doMock('@/logic/config/state', () => ({
     localConfig: {
       general: {
-        backgroundImageSource: overrides.backgroundImageSource ?? BACKGROUND_IMAGE_SOURCE.NETWORK,
+        backgroundImageSource:
+          overrides.backgroundImageSource ?? BACKGROUND_IMAGE_SOURCE.NETWORK,
         backgroundImageList: mockBackgroundImageList,
-        backgroundImageHighQuality: overrides.backgroundImageHighQuality ?? false,
+        backgroundImageHighQuality:
+          overrides.backgroundImageHighQuality ?? false,
       },
     },
-    localState: { value: { currAppearanceCode: overrides.currAppearanceCode ?? 0 } },
+    localState: {
+      value: { currAppearanceCode: overrides.currAppearanceCode ?? 0 },
+    },
   }))
   vi.doMock('@/logic/image/state', () => ({
-    imageState: reactive({ fullImageUrl: '', previewImageUrl: '', currBackgroundImageFileName: '' }),
+    imageState: reactive({
+      fullImageUrl: '',
+      previewImageUrl: '',
+      currBackgroundImageFileName: '',
+    }),
     imageLocalState: {
       value: {
         bing: { list: mockBingList },
@@ -104,19 +116,25 @@ describe('getCurrBackgroundImageStoreName', () => {
   })
 
   it('LOCAL 来源返回 localBackgroundImages', async () => {
-    const mod = await loadService({ backgroundImageSource: BACKGROUND_IMAGE_SOURCE.LOCAL })
+    const mod = await loadService({
+      backgroundImageSource: BACKGROUND_IMAGE_SOURCE.LOCAL,
+    })
     getCurrBackgroundImageStoreName = mod.getCurrBackgroundImageStoreName
     expect(getCurrBackgroundImageStoreName()).toBe('localBackgroundImages')
   })
 
   it('NETWORK 来源返回 currBackgroundImages', async () => {
-    const mod = await loadService({ backgroundImageSource: BACKGROUND_IMAGE_SOURCE.NETWORK })
+    const mod = await loadService({
+      backgroundImageSource: BACKGROUND_IMAGE_SOURCE.NETWORK,
+    })
     getCurrBackgroundImageStoreName = mod.getCurrBackgroundImageStoreName
     expect(getCurrBackgroundImageStoreName()).toBe('currBackgroundImages')
   })
 
   it('BING_PHOTO 来源返回 currBackgroundImages', async () => {
-    const mod = await loadService({ backgroundImageSource: BACKGROUND_IMAGE_SOURCE.BING_PHOTO })
+    const mod = await loadService({
+      backgroundImageSource: BACKGROUND_IMAGE_SOURCE.BING_PHOTO,
+    })
     getCurrBackgroundImageStoreName = mod.getCurrBackgroundImageStoreName
     expect(getCurrBackgroundImageStoreName()).toBe('currBackgroundImages')
   })
@@ -155,8 +173,14 @@ describe('getCurrNetworkBackgroundImageUrl', () => {
     const mod = await loadService({
       backgroundImageSource: BACKGROUND_IMAGE_SOURCE.NETWORK,
       backgroundImageList: [
-        { networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS, name: 'PexelsName_001' },
-        { networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS, name: 'PexelsName_002' },
+        {
+          networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS,
+          name: 'PexelsName_001',
+        },
+        {
+          networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS,
+          name: 'PexelsName_002',
+        },
       ],
     })
     getCurrNetworkBackgroundImageUrl = mod.getCurrNetworkBackgroundImageUrl
@@ -188,8 +212,14 @@ describe('getCurrNetworkBackgroundImageUrl', () => {
     const mod = await loadService({
       backgroundImageSource: BACKGROUND_IMAGE_SOURCE.NETWORK,
       backgroundImageList: [
-        { networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS, name: 'Name0_ZH-CN001' },
-        { networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS, name: 'Name1_ZH-CN002' },
+        {
+          networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS,
+          name: 'Name0_ZH-CN001',
+        },
+        {
+          networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS,
+          name: 'Name1_ZH-CN002',
+        },
       ],
     })
     getCurrNetworkBackgroundImageUrl = mod.getCurrNetworkBackgroundImageUrl

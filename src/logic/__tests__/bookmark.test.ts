@@ -8,8 +8,8 @@
  */
 
 describe('getBrowserBookmark', () => {
-  let getBrowserBookmark: typeof import('@/logic/bookmark/api')['getBrowserBookmark']
-  let findBookmarksBarFromTree: typeof import('@/logic/bookmark/api')['findBookmarksBarFromTree']
+  let getBrowserBookmark: (typeof import('@/logic/bookmark/api'))['getBrowserBookmark']
+  let findBookmarksBarFromTree: (typeof import('@/logic/bookmark/api'))['findBookmarksBarFromTree']
 
   describe('Chrome 环境', () => {
     beforeEach(async () => {
@@ -35,7 +35,13 @@ describe('getBrowserBookmark', () => {
                   {
                     id: '11',
                     title: 'Work',
-                    children: [{ id: '110', title: 'Jira', url: 'https://jira.example.com' }],
+                    children: [
+                      {
+                        id: '110',
+                        title: 'Jira',
+                        url: 'https://jira.example.com',
+                      },
+                    ],
                   },
                 ],
               },
@@ -63,18 +69,21 @@ describe('getBrowserBookmark', () => {
     })
 
     it('findBookmarksBarFromTree returns node with id="1" for Chrome', () => {
-      const tree = [{ id: '0', children: [
-        { id: '1', title: 'Bookmarks Bar' },
-        { id: '2', title: 'Other Bookmarks' },
-      ]}]
+      const tree = [
+        {
+          id: '0',
+          children: [
+            { id: '1', title: 'Bookmarks Bar' },
+            { id: '2', title: 'Other Bookmarks' },
+          ],
+        },
+      ]
       const bar = findBookmarksBarFromTree(tree)
       expect(bar?.id).toBe('1')
     })
 
     it('findBookmarksBarFromTree falls back to children[0] for Chrome', () => {
-      const tree = [{ id: '0', children: [
-        { id: '99', title: 'Some Folder' },
-      ]}]
+      const tree = [{ id: '0', children: [{ id: '99', title: 'Some Folder' }] }]
       const bar = findBookmarksBarFromTree(tree)
       expect(bar?.title).toBe('Some Folder')
     })
@@ -91,9 +100,13 @@ describe('getBrowserBookmark', () => {
 
       ;(chrome.bookmarks as any) = {
         getSubTree: vi.fn(async () => [{ id: '1', title: 'Bookmarks Bar' }]),
-        getTree: vi.fn(async () => [{ id: '0', title: '', children: [
-          { id: '1', title: 'Bookmarks Bar', children: [] },
-        ]}]),
+        getTree: vi.fn(async () => [
+          {
+            id: '0',
+            title: '',
+            children: [{ id: '1', title: 'Bookmarks Bar', children: [] }],
+          },
+        ]),
       }
 
       const { getBrowserBookmark: fn } = await import('@/logic/bookmark/api')
@@ -148,21 +161,31 @@ describe('getBrowserBookmark', () => {
     })
 
     it('findBookmarksBarFromTree returns node with id="toolbar_____" for Firefox', () => {
-      const tree = [{ id: 'root', children: [
-        { id: 'menu', title: 'Bookmarks Menu' },
-        { id: 'toolbar_____', title: 'Bookmarks Toolbar' },
-        { id: 'unfiled', title: 'Other Bookmarks' },
-      ]}]
+      const tree = [
+        {
+          id: 'root',
+          children: [
+            { id: 'menu', title: 'Bookmarks Menu' },
+            { id: 'toolbar_____', title: 'Bookmarks Toolbar' },
+            { id: 'unfiled', title: 'Other Bookmarks' },
+          ],
+        },
+      ]
       const bar = findBookmarksBarFromTree(tree)
       expect(bar?.id).toBe('toolbar_____')
     })
 
     it('findBookmarksBarFromTree falls back to children[1] for Firefox', () => {
-      const tree = [{ id: 'root', children: [
-        { id: 'menu', title: 'Bookmarks Menu' },
-        { id: 'custom', title: 'Bookmarks Toolbar' },
-        { id: 'unfiled', title: 'Other Bookmarks' },
-      ]}]
+      const tree = [
+        {
+          id: 'root',
+          children: [
+            { id: 'menu', title: 'Bookmarks Menu' },
+            { id: 'custom', title: 'Bookmarks Toolbar' },
+            { id: 'unfiled', title: 'Other Bookmarks' },
+          ],
+        },
+      ]
       const bar = findBookmarksBarFromTree(tree)
       expect(bar?.id).toBe('custom')
     })
@@ -178,7 +201,9 @@ describe('getBrowserBookmark', () => {
       }))
 
       ;(chrome.bookmarks as any) = {
-        getSubTree: vi.fn(async () => [{ id: 'toolbar_____', title: 'Bookmarks Toolbar' }]),
+        getSubTree: vi.fn(async () => [
+          { id: 'toolbar_____', title: 'Bookmarks Toolbar' },
+        ]),
       }
 
       const { getBrowserBookmark: fn } = await import('@/logic/bookmark/api')
@@ -210,7 +235,7 @@ describe('getBrowserBookmark', () => {
 })
 
 describe('getFaviconFromUrl', () => {
-  let getFaviconFromUrl: typeof import('@/logic/bookmark/api')['getFaviconFromUrl']
+  let getFaviconFromUrl: (typeof import('@/logic/bookmark/api'))['getFaviconFromUrl']
 
   describe('Chrome 环境', () => {
     beforeEach(async () => {
@@ -274,7 +299,9 @@ describe('getFaviconFromUrl', () => {
 
     it('returns Google favicon API URL', () => {
       const result = getFaviconFromUrl('https://example.com/path')
-      expect(result).toBe('https://www.google.com/s2/favicons?domain=https://example.com&sz=128')
+      expect(result).toBe(
+        'https://www.google.com/s2/favicons?domain=https://example.com&sz=128',
+      )
     })
 
     it('uses custom size parameter', () => {

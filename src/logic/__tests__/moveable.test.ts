@@ -25,12 +25,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 /** 统一的 mock 辅助函数，减少重复代码 */
-async function loadMoveable(overrides: { localConfig?: Record<string, any> } = {}) {
+async function loadMoveable(
+  overrides: { localConfig?: Record<string, any> } = {},
+) {
   vi.resetModules()
 
   vi.doMock('@/logic/utils/gtag', () => ({ gaProxy: vi.fn() }))
   vi.doMock('@/logic/store/state', () => ({
-    globalState: { isGuideMode: false, isSettingDrawerVisible: false, isSearchFocused: false, isInputFocused: false },
+    globalState: {
+      isGuideMode: false,
+      isSettingDrawerVisible: false,
+      isSearchFocused: false,
+      isInputFocused: false,
+    },
   }))
   vi.doMock('@/logic/config/state', () => ({
     localConfig: overrides.localConfig ?? {},
@@ -48,7 +55,7 @@ async function loadMoveable(overrides: { localConfig?: Record<string, any> } = {
 // ── 纯函数测试：getTargetDataFromEvent ──
 
 describe('getTargetDataFromEvent', () => {
-  let getTargetDataFromEvent: typeof import('@/logic/moveable')['getTargetDataFromEvent']
+  let getTargetDataFromEvent: (typeof import('@/logic/moveable'))['getTargetDataFromEvent']
 
   beforeEach(async () => {
     const mod = await loadMoveable()
@@ -132,11 +139,13 @@ describe('getTargetDataFromEvent', () => {
 // ── cleanupEvents 测试（间接验证 onResetMoveState） ──
 
 describe('cleanupEvents', () => {
-  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
-  let moveState: typeof import('@/logic/moveable')['moveState']
+  let cleanupEvents: (typeof import('@/logic/moveable'))['cleanupEvents']
+  let moveState: (typeof import('@/logic/moveable'))['moveState']
 
   beforeEach(async () => {
-    const mod = await loadMoveable({ localConfig: { testWidget: { enabled: true } } })
+    const mod = await loadMoveable({
+      localConfig: { testWidget: { enabled: true } },
+    })
     cleanupEvents = mod.cleanupEvents
     moveState = mod.moveState
   })
@@ -164,9 +173,9 @@ describe('cleanupEvents', () => {
 // ── handleToggleIsDraftDrawerVisible 测试 ──
 
 describe('handleToggleIsDraftDrawerVisible', () => {
-  let handleToggleIsDraftDrawerVisible: typeof import('@/logic/moveable')['handleToggleIsDraftDrawerVisible']
-  let isDraftDrawerVisible: typeof import('@/logic/moveable')['isDraftDrawerVisible']
-  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+  let handleToggleIsDraftDrawerVisible: (typeof import('@/logic/moveable'))['handleToggleIsDraftDrawerVisible']
+  let isDraftDrawerVisible: (typeof import('@/logic/moveable'))['isDraftDrawerVisible']
+  let cleanupEvents: (typeof import('@/logic/moveable'))['cleanupEvents']
 
   beforeEach(async () => {
     const mod = await loadMoveable()
@@ -196,9 +205,9 @@ describe('handleToggleIsDraftDrawerVisible', () => {
 // ── animateDeleteWidget 测试 ──
 
 describe('animateDeleteWidget', () => {
-  let animateDeleteWidget: typeof import('@/logic/moveable')['animateDeleteWidget']
+  let animateDeleteWidget: (typeof import('@/logic/moveable'))['animateDeleteWidget']
   let localConfig: any
-  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+  let cleanupEvents: (typeof import('@/logic/moveable'))['cleanupEvents']
 
   beforeEach(async () => {
     vi.useFakeTimers()
@@ -268,8 +277,8 @@ describe('animateDeleteWidget', () => {
 // ── moveState 初始值测试 ──
 
 describe('moveState initial values', () => {
-  let moveState: typeof import('@/logic/moveable')['moveState']
-  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+  let moveState: (typeof import('@/logic/moveable'))['moveState']
+  let cleanupEvents: (typeof import('@/logic/moveable'))['cleanupEvents']
 
   beforeEach(async () => {
     const mod = await loadMoveable()
@@ -313,14 +322,19 @@ describe('moveState initial values', () => {
 // ── cleanupResizeObserver 测试 ──
 
 describe('cleanupResizeObserver', () => {
-  let cleanupResizeObserver: typeof import('@/logic/moveable')['cleanupResizeObserver']
+  let cleanupResizeObserver: (typeof import('@/logic/moveable'))['cleanupResizeObserver']
 
   beforeEach(async () => {
     vi.resetModules()
 
     vi.doMock('@/logic/utils/gtag', () => ({ gaProxy: vi.fn() }))
     vi.doMock('@/logic/store/state', () => ({
-      globalState: { isGuideMode: false, isSettingDrawerVisible: false, isSearchFocused: false, isInputFocused: false },
+      globalState: {
+        isGuideMode: false,
+        isSettingDrawerVisible: false,
+        isSearchFocused: false,
+        isInputFocused: false,
+      },
     }))
     vi.doMock('@/logic/config/state', () => ({
       localConfig: {},
@@ -343,9 +357,9 @@ describe('cleanupResizeObserver', () => {
 // ── toggle 导出测试 ──
 
 describe('toggle exports', () => {
-  let isDragMode: typeof import('@/logic/moveable')['isDragMode']
-  let toggleIsDragMode: typeof import('@/logic/moveable')['toggleIsDragMode']
-  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+  let isDragMode: (typeof import('@/logic/moveable'))['isDragMode']
+  let toggleIsDragMode: (typeof import('@/logic/moveable'))['toggleIsDragMode']
+  let cleanupEvents: (typeof import('@/logic/moveable'))['cleanupEvents']
 
   beforeEach(async () => {
     const mod = await loadMoveable()
@@ -373,9 +387,9 @@ describe('toggle exports', () => {
 // ── toggleDragMode 测试 ──
 
 describe('toggleDragMode', () => {
-  let isDragMode: typeof import('@/logic/moveable')['isDragMode']
-  let toggleDragMode: typeof import('@/logic/moveable')['toggleDragMode']
-  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+  let isDragMode: (typeof import('@/logic/moveable'))['isDragMode']
+  let toggleDragMode: (typeof import('@/logic/moveable'))['toggleDragMode']
+  let cleanupEvents: (typeof import('@/logic/moveable'))['cleanupEvents']
 
   beforeEach(async () => {
     vi.useFakeTimers()
@@ -396,14 +410,18 @@ describe('toggleDragMode', () => {
     expect(isDragMode.value).toBe(true)
     // gaProxy 由 loadMoveable mock，验证调用参数
     const { gaProxy } = await import('@/logic/utils/gtag')
-    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], { enabled: true })
+    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], {
+      enabled: true,
+    })
   })
 
   it('传 true 时设为 true 并上报 { enabled: true }', async () => {
     toggleDragMode(true)
     expect(isDragMode.value).toBe(true)
     const { gaProxy } = await import('@/logic/utils/gtag')
-    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], { enabled: true })
+    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], {
+      enabled: true,
+    })
   })
 
   it('传 false 时设为 false 并上报 { enabled: false }', async () => {
@@ -412,7 +430,9 @@ describe('toggleDragMode', () => {
     gaProxy.mockClear()
     toggleDragMode(false)
     expect(isDragMode.value).toBe(false)
-    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], { enabled: false })
+    expect(gaProxy).toHaveBeenCalledWith('click', ['dragMode_toggle'], {
+      enabled: false,
+    })
   })
 })
 
@@ -423,10 +443,10 @@ describe('toggleDragMode', () => {
 // 进入拖拽模式时草稿抽屉自动打开，退出时自动关闭（reset）。
 
 describe('watch isDragMode 副作用', () => {
-  let isDragMode: typeof import('@/logic/moveable')['isDragMode']
-  let isDraftDrawerVisible: typeof import('@/logic/moveable')['isDraftDrawerVisible']
-  let toggleIsDragMode: typeof import('@/logic/moveable')['toggleIsDragMode']
-  let cleanupEvents: typeof import('@/logic/moveable')['cleanupEvents']
+  let isDragMode: (typeof import('@/logic/moveable'))['isDragMode']
+  let isDraftDrawerVisible: (typeof import('@/logic/moveable'))['isDraftDrawerVisible']
+  let toggleIsDragMode: (typeof import('@/logic/moveable'))['toggleIsDragMode']
+  let cleanupEvents: (typeof import('@/logic/moveable'))['cleanupEvents']
 
   beforeEach(async () => {
     const mod = await loadMoveable()
