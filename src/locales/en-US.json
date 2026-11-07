@@ -506,6 +506,8 @@
       "tw": "Taiwan, China",
       "hk": "Hong Kong, China"
     },
+    "subscriptionSearchPlaceholder": "Search country or region",
+    "subscriptionSearchEmpty": "No matching region",
     "subscriptionError": {
       "invalid-url": "Invalid URL format",
       "network": "Network request failed",

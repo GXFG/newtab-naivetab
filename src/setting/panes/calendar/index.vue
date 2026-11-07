@@ -2,7 +2,7 @@
 import { Icon } from '@iconify/vue/offline'
 import NTButton from '@/components/ui/NTButton.vue'
 import NTInput from '@/components/ui/NTInput.vue'
-import NTSelect from '@/components/ui/NTSelect.vue'
+import NTAutoComplete from '@/components/ui/NTAutoComplete.vue'
 import { useI18n } from 'vue-i18n'
 import { localConfig } from '@/logic/config/state'
 import { ICONS } from '@/logic/constants/icons'
@@ -10,10 +10,12 @@ import { showToast } from '@/common/toast'
 import { SOLAR_TERM_NAMES } from '@/logic/calendar'
 import {
   CUSTOM_SUBSCRIPTION,
-  SUBSCRIPTION_REGIONS,
+  createRegionLabelComparator,
   fetchSubscription,
   getSubscriptionUrl,
+  isSubscriptionRegion,
   loadSubscription,
+  orderSubscriptionRegions,
   readSubscriptionFetchedAt,
   resolveSubscriptionRegion,
   subscriptionState,
@@ -59,17 +61,63 @@ const regionLabel = (region: TSubscriptionRegion): string => {
   return regionDisplayNames.value.of(region) ?? region
 }
 
-/** 节假日订阅下拉项：自定义地址置顶，其后是预设地区 */
-const subscriptionList = computed(() => [
+/**
+ * 地区下拉：可搜索（输入过滤）+ 按当前语言字母序。
+ *
+ * 为什么按语言排序：界面切到哪种语言，用户就只会用那种语言的名字去找。
+ * 中文界面里「德国」若按 Germany 待在 G 段，用户根本定位不到；按拼音排在 D 段才对。
+ */
+const regionComparator = computed(() =>
+  createRegionLabelComparator(locale.value),
+)
+
+const toRegionOption = (region: TSubscriptionRegion) => ({
+  label: regionLabel(region),
+  value: region,
+})
+
+/**
+ * 下拉候选：「自定义地址」→ 中国大陆 / 中国香港 / 中国台湾 →
+ * 其余地区按当前语言字母序（置顶规则见 orderSubscriptionRegions）。
+ */
+const regionOptions = computed<{ label: string; value: string }[]>(() => [
   {
     label: window.$t('calendar.subscriptionRegion.custom'),
     value: CUSTOM_SUBSCRIPTION,
   },
-  ...SUBSCRIPTION_REGIONS.map((region) => ({
-    label: regionLabel(region),
-    value: region,
-  })),
+  ...orderSubscriptionRegions(regionLabel, regionComparator.value).map(
+    toRegionOption,
+  ),
 ])
+
+/** 输入框里的文字：选中项变化（用户选择 / 云同步写回）时同步成对应名称 */
+const regionKeyword = ref('')
+
+const syncRegionKeyword = () => {
+  const region = localConfig.calendar.subscriptionRegion
+  regionKeyword.value =
+    region === CUSTOM_SUBSCRIPTION
+      ? window.$t('calendar.subscriptionRegion.custom')
+      : regionLabel(resolveSubscriptionRegion(region))
+}
+
+syncRegionKeyword()
+
+/** 选中候选：写回配置，由下方 watch 触发订阅加载 */
+const onSelectRegion = (value: string) => {
+  if (value === CUSTOM_SUBSCRIPTION) {
+    localConfig.calendar.subscriptionRegion = CUSTOM_SUBSCRIPTION
+    return
+  }
+  if (isSubscriptionRegion(value)) {
+    localConfig.calendar.subscriptionRegion = value
+  }
+}
+
+// 选中项或界面语言变化时同步输入框文字（$t 与 Intl.DisplayNames 都不是响应式）
+watch([() => localConfig.calendar.subscriptionRegion, locale], () =>
+  syncRegionKeyword(),
+)
 
 const isCustomSubscription = computed(
   () => localConfig.calendar.subscriptionRegion === CUSTOM_SUBSCRIPTION,
@@ -293,11 +341,19 @@ const onValidateCustomUrl = async () => {
       >
         <div class="subscription">
           <div class="subscription__row">
-            <NTSelect
-              v-model:value="localConfig.calendar.subscriptionRegion"
-              :options="subscriptionList"
+            <NTAutoComplete
+              v-model:value="regionKeyword"
+              :options="regionOptions"
+              :ignore-filter="false"
+              :open-on-click="true"
               size="small"
-            />
+              :placeholder="$t('calendar.subscriptionSearchPlaceholder')"
+              @select="onSelectRegion"
+            >
+              <template #empty>
+                {{ $t('calendar.subscriptionSearchEmpty') }}
+              </template>
+            </NTAutoComplete>
             <NTButton
               class="subscription__refresh"
               type="primary"
@@ -554,8 +610,8 @@ const onValidateCustomUrl = async () => {
   width: 100%;
 }
 
-/* 触发器的根元素就是 .reka-select__trigger，占满按钮之外的剩余宽度 */
-.subscription__row :deep(.reka-select__trigger) {
+/* 可搜索下拉的根元素是 .reka-autocomplete，占满按钮之外的剩余宽度 */
+.subscription__row :deep(.reka-autocomplete) {
   flex: 1;
   min-width: 0;
 }

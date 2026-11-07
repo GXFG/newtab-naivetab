@@ -405,7 +405,7 @@ Reka UI 的 Indicator 组件（如 `CheckboxIndicator`、`SwitchThumb`）内部�
 | NTSelect / NTSelectItem | `components/ui/NTSelect.vue` + `NTSelectItem.vue` | `SelectRoot` + `SelectContent` 等 | Indicator 固定占位防抖动 |
 | NTDropdown | `components/ui/NTDropdown.vue` | `DropdownMenuRoot` + `DropdownMenuContent` | `options` / 插槽模式 |
 | NTTooltip | `components/ui/NTTooltip.vue` | `TooltipProvider` + `TooltipRoot` + `TooltipContent` | 400ms 默认延迟 |
-| NTAutoComplete | `components/ui/NTAutoComplete.vue` | `ComboboxRoot` + `ComboboxInput` | `ignore-filter` / `loading` 服务端搜索 |
+| NTAutoComplete | `components/ui/NTAutoComplete.vue` | `ComboboxRoot` + `ComboboxInput` | `ignore-filter`（服务端搜索 / 本地过滤）/ `open-on-click` / `loading` |
 | NTInput | `components/ui/NTInput.vue` | 原生 `<input>` / `<textarea>` | `clearable` / `showCount` / `autosize` |
 | NTInputNumber | `components/ui/NTInputNumber.vue` | `NumberFieldRoot` + `NumberFieldInput` + `NumberFieldDecrement` + `NumberFieldIncrement` | `safeValue` / `clamp` |
 | NTTree | `components/ui/NTTree.vue` | `TreeRoot` + `TreeItem` + `TreeItemContents` | `blockLine` / `blockNode` / `showLine` / `expandOnClick` |

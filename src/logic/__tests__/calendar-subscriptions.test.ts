@@ -3,11 +3,13 @@ import {
   CUSTOM_SUBSCRIPTION,
   SUBSCRIPTION_CACHE_TTL,
   SUBSCRIPTION_REGIONS,
+  createRegionLabelComparator,
   fetchSubscription,
   getSubscriptionUrl,
   isMainlandSubscription,
   isValidSubscriptionUrl,
   loadSubscription,
+  orderSubscriptionRegions,
   readSubscriptionCache,
   readSubscriptionFetchedAt,
   resolveSubscriptionRegion,
@@ -73,6 +75,32 @@ describe('预设订阅', () => {
         /^https:\/\/calendars\.icloud\.com\/holidays\/[a-z0-9_-]+\.ics$/,
       )
     }
+  })
+
+  it('地区名按当前语言字母序', () => {
+    const zh = createRegionLabelComparator('zh-CN')
+    // 中文下是拼音序：a-g 在 a-i 之前，d 在 r 之前
+    expect(zh('阿根廷', '爱尔兰')).toBeLessThan(0)
+    expect(zh('德国', '日本')).toBeLessThan(0)
+
+    const en = createRegionLabelComparator('en-US')
+    expect(en('Argentina', 'Austria')).toBeLessThan(0)
+    expect(en('Germany', 'Japan')).toBeLessThan(0)
+  })
+
+  it('下拉顺序：中港台置顶，其余按比较器排', () => {
+    // 用地区代码当标签，方便断言顺序；比较器用最直白的字面序
+    const compare = (a: string, b: string) => a.localeCompare(b)
+    const order = orderSubscriptionRegions((region) => region, compare)
+
+    expect(order.slice(0, 3)).toEqual(['CN', 'HK', 'TW'])
+    // 置顶项不再出现在后面，且一个都不少
+    expect(order).toHaveLength(SUBSCRIPTION_REGIONS.length)
+    expect(new Set(order).size).toBe(order.length)
+
+    const rest = order.slice(3)
+    expect(rest).not.toContain('CN')
+    expect([...rest].sort(compare)).toEqual(rest)
   })
 
   it('中国大陆、美国、台湾的地址符合实测结果', () => {

@@ -147,12 +147,14 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
 
 槽位用 `min-width: 2.2vmin` 而不是固定 `width`：图标出现时向右扩展，`space-between` 的最后一组右边缘固定，「回到今日」不会跳动，只有中间的月份选择会平移半个图标宽（仅「翻到其他月份 + 订阅恰好失败」时可见）。
 
-**设置面板的交互**：地区下拉与 `tip-content` 的灰色说明小字保持和其它设置项一致的形态；下拉与刷新按钮同一行，状态在下方灰色说明里。
+**设置面板的交互**：地区选择器与 `tip-content` 的灰色说明小字保持和其它设置项一致的形态；选择器与刷新按钮同一行，状态在下方灰色说明里。
 
-- 外层 `.subscription` 是 `width: 100%` 的列容器——`NTSelect` 的触发器本身是 `width: 100%`，如果套一层无宽度的 `div`，会被控件区的 `justify-content: flex-end` 压成 `min-width: 90px`
-- 下拉与刷新按钮同一行：下拉通过 `:deep(.reka-select__trigger) { flex: 1 }` 占满剩余宽度，按钮 `flex-shrink: 0`
+- 外层 `.subscription` 是 `width: 100%` 的列容器——选择器的根元素本身是 `width: 100%`，如果套一层无宽度的 `div`，会被控件区的 `justify-content: flex-end` 压成 `min-width: 90px`
+- 选择器与刷新按钮同一行：选择器通过 `:deep(.reka-autocomplete) { flex: 1 }` 占满剩余宽度，按钮 `flex-shrink: 0`
 - 刷新按钮与面板里其它按钮同款（`type="primary" variant="secondary" round` + 图标 + 文字）；刷新中重复点击在 handler 里忽略，不用 `disabled`（避免禁用态样式切换闪动）
-- 状态文案在下拉下方一行，四种状态互斥
+- 状态文案在下方一行，四种状态互斥
+- **地区选择器是可搜索的**：`NTAutoComplete`（Reka Combobox）+ `ignore-filter=false` 走本地过滤 + `open-on-click` 让点击输入框就能看到全部候选。候选顺序 =「自定义地址」（动作项）→ **中国大陆 / 中国香港 / 中国台湾（固定置顶）** → 其余地区按当前语言字母序（`orderSubscriptionRegions` + `createRegionLabelComparator`，中文下即拼音序）。置顶规则在 `PINNED_SUBSCRIPTION_REGIONS`：默认地区是 CN，这三项也是中文用户最高频的选择，不该让人滚字母表去找。其余地区切语言自动重排——界面用哪种语言，用户就只会用那种语言的名字去找；中文界面里「德国」若按 Germany 待在 G 段，用户根本定位不到，按拼音它就在 D 段
+- 输入框文字（`regionKeyword`）随 `subscriptionRegion` 同步（用户选择、云同步写回都走同一个 watch）；选中项通过 `@select` 写回配置，再由已有的 region watch 触发订阅加载
 - 首次选中一个没缓存的地区会自动拉取，不需要用户手动点刷新
 - **自定义地址是 draft，不是 config**：输入只改 `draftCustomUrl`，不写 `localConfig`、不触发请求、不影响当前订阅；点击「验证」且成功后，才写入 `customSubscriptionUrl` 并用刚写入的缓存替换订阅（只发一次请求）。编辑 draft 会重置旧的验证提示
 - 验证期间切换地区或继续编辑会作废本次结果（token 保护），不会覆盖用户刚选的订阅

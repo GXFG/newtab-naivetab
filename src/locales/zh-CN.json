@@ -506,6 +506,8 @@
       "tw": "中国台湾",
       "hk": "中国香港"
     },
+    "subscriptionSearchPlaceholder": "搜索国家或地区",
+    "subscriptionSearchEmpty": "无匹配的地区",
     "subscriptionError": {
       "invalid-url": "地址格式不正确",
       "network": "网络请求失败",

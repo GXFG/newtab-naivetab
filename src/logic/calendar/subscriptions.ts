@@ -22,7 +22,9 @@ import type { IIcsDayEntry } from './ics/parse'
 const APPLE_CALENDAR_BASE = 'https://calendars.icloud.com/holidays'
 
 /**
- * 预设地区（ISO 3166-1 alpha-2），顺序即下拉顺序。
+ * 预设地区（ISO 3166-1 alpha-2）。数组顺序只为人眼核对，不参与任何逻辑——
+ * 下拉里的顺序由 createRegionLabelComparator 按当前语言实时排。
+ *
  * 全部实测可达（2026-11 验证），澳门、阿根廷 Apple 未提供。
  *
  * 产品决定：不提供「不订阅 / 不显示节假日」的选项。
@@ -83,6 +85,47 @@ export const SUBSCRIPTION_REGIONS = [
 ] as const
 
 export type TSubscriptionRegion = (typeof SUBSCRIPTION_REGIONS)[number]
+
+/**
+ * 地区名比较器：按当前语言的字母序（中文下即拼音序）。
+ *
+ * 为什么不写死顺序：界面语言切换后，用户只会用自己语言的名字去找。
+ * 中文界面里「德国」若待在 G 段（按 Germany 排），用户根本定位不到；
+ * 按拼音排它就在 D 段。
+ */
+export const createRegionLabelComparator = (
+  locale: string,
+): ((a: string, b: string) => number) => {
+  const collator = new Intl.Collator(locale, { sensitivity: 'base' })
+  return (a, b) => collator.compare(a, b)
+}
+
+/**
+ * 下拉里固定置顶的地区：中国大陆、中国香港、中国台湾。
+ * 产品默认地区是 CN，且这三项是中文用户最高频的选择，不该让人滚字母表去找。
+ */
+export const PINNED_SUBSCRIPTION_REGIONS: readonly TSubscriptionRegion[] = [
+  'CN',
+  'HK',
+  'TW',
+]
+
+/**
+ * 下拉候选顺序：置顶三项（按 PINNED_SUBSCRIPTION_REGIONS 的顺序）在前，
+ * 其余按传入的比较器排。
+ *
+ * labelOf / compare 由调用方注入——logic 层不依赖 i18n 与 Intl.DisplayNames，
+ * 排序规则本身也因此可测。
+ */
+export const orderSubscriptionRegions = (
+  labelOf: (region: TSubscriptionRegion) => string,
+  compare: (a: string, b: string) => number,
+): TSubscriptionRegion[] => {
+  const pinned = new Set<TSubscriptionRegion>(PINNED_SUBSCRIPTION_REGIONS)
+  const rest = SUBSCRIPTION_REGIONS.filter((region) => !pinned.has(region))
+  rest.sort((a, b) => compare(labelOf(a), labelOf(b)))
+  return [...PINNED_SUBSCRIPTION_REGIONS, ...rest]
+}
 
 /** 地区 → Apple 日历 slug */
 const APPLE_SLUGS: Record<TSubscriptionRegion, string> = {
