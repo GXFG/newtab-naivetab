@@ -88,6 +88,11 @@ export async function getManifest() {
   } else {
     // favicon permission 仅 Chrome 支持
     manifest.permissions!.push('favicon')
+    // 浏览器兼容基线：Chrome 130+，与 Firefox 侧 gecko.strict_min_version: '130.0'
+    // 对齐成单一数字（2024-10 版本，发布两年，存量可忽略）。CSS 嵌套（112）、
+    // color-mix()（111）均覆盖；后续引入 @starting-style / light-dark() /
+    // 滚动驱动动画 / anchor positioning 等新特性无需再动基线。
+    manifest.minimum_chrome_version = '130'
   }
   return manifest
 }

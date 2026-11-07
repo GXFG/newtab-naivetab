@@ -7,8 +7,8 @@
 
 | 项 | 状态 | 落地位置 | 验证方式 |
 |----|------|----------|----------|
-| P0-1 架构边界检查 | ✅ 已落地 | `scripts/check/check-boundaries.ts`，接入 pre-commit 与 CI | 故意在 `logic/` 引入 `.vue` 会被拦下（退出码 1） |
-| P0-2 CI 校验 | ✅ 已落地 | `.github/workflows/pr-check.yml` | `--no-verify` 提交后 CI 仍然拦得住 |
+| P0-1 架构边界检查 | ✅ 已落地 | `scripts/check/check-boundaries.ts`，接入 pre-commit | 故意在 `logic/` 引入 `.vue` 会被拦下（退出码 1） |
+| P0-2 CI 校验 | ⛔ 已撤销（2026-11） | 曾为 `.github/workflows/pr-check.yml`，已删除；检查收敛到本地 pre-commit | 单人项目无外部 PR，CI 的唯一独有价值（format 覆盖面）已并入 pre-commit |
 | P0-3 覆盖率门槛 | ✅ 已落地 | `vite.config.ts` → `test.coverage.thresholds` | 阈值临时提到 99% 时以退出码 1 阻断 |
 | P1-1 新模块测试骨架 | ✅ 改为内嵌进技能（不写独立生成器） | `skills/add-widget` Step 8、`skills/config-migration` Step 3 | 新增 Widget 必带 `__tests__/config.test.ts` |
 | P1-3 影响面分析工具 | ✅ 已落地 | `scripts/check/impact.ts`（`pnpm impact <文件|目录>`），与边界检查共用 `lib/import-graph.ts` | 对 `memo/config.ts` 能识别出「0 个相关测试」 |
@@ -33,7 +33,7 @@
 
 ## 2. 现状盘点（2026-11 快照）
 
-> 本节是当时的能力快照，不是现状。P0 落地后拦截能力已变化，判断当下请直接查 `scripts/check/`、`.github/workflows/` 与 `vite.config.ts`。
+> 本节是当时的能力快照，不是现状。判断当下请直接查 `scripts/check/`、`package.json` 的 `simple-git-hooks` 与 `vite.config.ts`。
 
 | 能力 | 位置 | 覆盖 | 局限 |
 |------|------|------|------|
@@ -43,8 +43,7 @@
 | 模式校验 | `scripts/check/check-patterns.ts` | CSS 模式（`v-bind`、`&--modifier`、`:deep`、z-index） | 只扫样式，不扫 TS import |
 | 类型检查 | `pnpm typecheck` | 全量 | 无法发现跨上下文 API 误用（类型上都合法） |
 | 回归测试 | `src/logic/__tests__/` | 配置迁移链、同步、日历、键盘、书签 | `components/` 与 `setting/` 基本无覆盖 |
-| 提交闸门 | `simple-git-hooks` pre-commit | lint → typecheck → test → registries → patterns | 可被 `--no-verify` 绕过 |
-| CI | `.github/workflows/pr-check.yml` | 与 pre-commit 对齐，另加覆盖率与 Chrome 构建 | — |
+| 提交闸门 | `simple-git-hooks` pre-commit | lint-staged → typecheck → test → format:check → icons → registries → patterns → boundaries | 可被 `--no-verify` 绕过（单人项目自担风险） |
 
 ## 3. 风险模型
 
@@ -65,7 +64,7 @@ R1 和 R4 是 AI 引入的新风险——人写代码时对"我在哪个上下�
 
 ```
 L1 规则层  告诉 AI 怎么做        →  提示词，软约束，会被稀释
-L2 检查层  机器判定是否违规      →  脚本 + CI，硬约束，不可绕过
+L2 检查层  机器判定是否违规      →  脚本 + pre-commit，硬约束（本地）
 L3 流程层  限制改动的形状        →  缩小单次改动的破坏面
 ```
 
@@ -97,30 +96,24 @@ L3 流程层  限制改动的形状        →  缩小单次改动的破坏面
 - 用 TS AST 提取 import 说明符，先把 `@/` 别名还原成绝对路径前缀，再做前缀匹配。不要用正则直接 match 源码文本——注释和字符串会误报。
 - **必须区分运行时依赖与类型依赖（实测踩坑）**：`import type { X } from './x'` 和类型位置的 `import('./x').X` 编译后都会被擦除，不构成真实耦合。`ts.preProcessFile` 无法区分这两类，会把类型位置的 `import()` 当成动态导入——实测在 `common/widget-constants.ts`（用 `import('@/newtab/...').TWidgetConfig` 做类型映射）和 `logic/config/migrations.ts`（`import type`）上产生了两个假环。必须走完整 AST；`.vue` 先用 `@vue/compiler-sfc` 拆出 `script` / `scriptSetup` 再分别解析，行号按块起始行换算。
 - 输出必须可执行：`文件:行号 → 违规说明 → 正确做法`。报错信息里带上 `docs/conventions/ai-collaboration.md#p0-1` 锚点，让 AI 被拦下时能自己查。
-- 接入点：追加到 `package.json` 的 pre-commit 链尾，同时进 CI。
+- 接入点：追加到 `package.json` 的 pre-commit 链尾。
 - 顺带产出：脚本可输出一份模块依赖摘要，用于 review 时快速判断影响面。
 
 **为什么不写成 ESLint 规则**：目录级跨文件约束用 `no-restricted-imports` 的 overrides 也能做，但通配路径的报错信息很糟，且项目已有 `scripts/check/` 的惯例，保持一致。
 
 **验收标准**：故意在 `src/logic/utils/` 里写 `import X from '@/components/NtButton.vue'`，pre-commit 必须失败，且报错能指出正确做法。
 
-#### P0-2 CI 校验 `.github/workflows/pr-check.yml`
+#### P0-2 CI 校验（已撤销，2026-11）
 
-**防"绕过本地钩子"。** 触发条件：`pull_request` + `push` 到主分支。步骤与本地 pre-commit 对齐，并补两项本地不跑的：
+**原始目标：防"绕过本地钩子"。** 曾落地为 `.github/workflows/pr-check.yml`（PR + push main 触发，步骤与 pre-commit 对齐，另加覆盖率门槛与 `build:chrome`）。
 
-```yaml
-- pnpm lint
-- pnpm typecheck
-- pnpm test -- --run
-- pnpm exec tsx scripts/check/validate-registries.ts
-- pnpm check-patterns
-- pnpm exec tsx scripts/check/check-boundaries.ts   # P0-1 落地后加
-- pnpm build:chrome                                  # 抓构建期问题（manifest 生成、i18n 编译）
-```
+**撤销理由**：单人项目、无外部 PR 流，`pull_request` 触发几乎不发生；日常提交都在 `develop`，而工作流只监听 `main`，等于只在发版时才检查（事后报警而非事前拦截）；与 pre-commit 重合 9 步中的 6 步；仓库又未设分支保护，红叉没有实际阻断力。
 
-**实现要点**：`pnpm install --frozen-lockfile`（防止 AI 顺手改 lockfile 掩盖依赖问题）；`BROWSER=chrome` 只构建一个目标即可，Firefox 差异主要在 manifest，CI 阶段不必要。
-
-**验收标准**：开一个故意失败的 PR，CI 必须红；`git commit --no-verify` 之后 CI 仍然拦得住。
+**撤销后的补偿**：
+- format 覆盖面（CI 独有项中成本最低的）已并入 pre-commit 的 `format:check`。
+- 覆盖率门槛保留在 `vite.config.ts` 的 `test.coverage.thresholds`，发版前手动 `pnpm test:coverage` 校验。
+- 构建期校验（manifest 生成、i18n 编译）由 `pnpm release` 内的 `build:chrome` / `build:firefox` 天然覆盖。
+- `.github/workflows/` 下仅保留 `docs-deploy.yml`（部署 site 站）。
 
 #### P0-3 覆盖率门槛
 
@@ -131,9 +124,9 @@ L3 流程层  限制改动的形状        →  缩小单次改动的破坏面
 1. 先跑一次 `pnpm test:coverage` 取基线。**统计口径很关键**：当前未设 `coverage.include`，只统计被测试触达的文件（实测 86 个），测试文件本身不计入分母。代价是「从未被任何测试 import 的新文件」不进分母；但实际新增模块必然被注册点 import，仍会以 0 覆盖进入分母，门槛依然有效。
 2. 阈值设为「基线 − 4~5 个百分点」，给正常波动留余量。
 3. **只对 `src/logic/**` 设阈值**（纯逻辑、测试成本低、回归价值最高）。`components/` 和 `setting/` 暂不设——对 UI 强推覆盖率只会产出为了达标而写的废测试。
-4. 阈值写进 `vite.config.ts` 的 `test.coverage.thresholds`，CI 用 `pnpm test:coverage`。
+4. 阈值写进 `vite.config.ts` 的 `test.coverage.thresholds`，用 `pnpm test:coverage` 校验（发版前手动跑）。
 
-**验收标准**：新增一个 200 行、零测试的 `src/logic/xxx/` 模块，CI 覆盖率步骤必须失败。
+**验收标准**：新增一个 200 行、零测试的 `src/logic/xxx/` 模块，`pnpm test:coverage` 必须失败。
 
 ### P1 — 让新模块天生合规
 
@@ -225,7 +218,7 @@ src/newtab/widgets/<name>/
 
 | 阶段 | 内容 | 状态 |
 |------|------|------|
-| 一 | P0-1 边界检查 + P0-2 CI | ✅ 已完成 |
+| 一 | P0-1 边界检查 + P0-2 CI | ✅ 已完成（P0-2 于 2026-11 撤销，检查收敛到 pre-commit） |
 | 二 | P0-3 覆盖率阈值（已随阶段一落地） + P1-2 PR 模板 | 阈值已完成，PR 模板待做 |
 | 三 | P1-1 生成器 + §6 规则条文 | 待做 |
 
@@ -261,7 +254,7 @@ src/newtab/widgets/<name>/
 
 **结论：重构后同步文档，范围要包含 `.claude/rules/` 与 `.claude/skills/`，不只是 `docs/`。**
 
-一次性扫描即可发现这类问题：提取规则/技能中出现的 `src/**`、`scripts/**` 路径与 Markdown 相对链接，逐个校验存在性（本次共发现 4 处，其中 1 处是既有失效链接）。建议后续固化为检查脚本，纳入 CI——成本约 0.1 秒，收益是"文档里写的路径一定打得开"。
+一次性扫描即可发现这类问题：提取规则/技能中出现的 `src/**`、`scripts/**` 路径与 Markdown 相对链接，逐个校验存在性（本次共发现 4 处，其中 1 处是既有失效链接）。建议后续固化为检查脚本，接入 pre-commit——成本约 0.1 秒，收益是"文档里写的路径一定打得开"。
 
 ---
 

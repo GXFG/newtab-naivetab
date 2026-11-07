@@ -49,6 +49,8 @@
     "release": "run-s build pack",
     "lint": "eslint './src/**/*.{vue,ts}' './scripts/**/*.ts'",
     "lint:fix": "pnpm lint --fix",
+    "format": "prettier --write \"src/**/*.{ts,vue}\" \"scripts/**/*.ts\" \"*.{js,ts}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,vue}\" \"scripts/**/*.ts\" \"*.{js,ts}\"",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest test",
     "test:coverage": "vitest test --coverage",
@@ -94,7 +96,6 @@
     "kolorist": "^1.8.0",
     "lint-staged": "^16.4.0",
     "npm-run-all2": "^9.0.4",
-    "postcss-preset-env": "^11.6.2",
     "prettier": "^3.9.10",
     "rimraf": "^6.1.4",
     "rollup-plugin-visualizer": "^7.1.1",
@@ -113,11 +114,12 @@
     "vue-tsc": "3.3.12"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged && pnpm typecheck && pnpm test --run && pnpm check:icons && pnpm exec tsx scripts/check/validate-registries.ts && pnpm check-patterns && pnpm check-boundaries"
+    "pre-commit": "pnpm lint-staged && pnpm typecheck && pnpm test --run && pnpm format:check && pnpm check:icons && pnpm exec tsx scripts/check/validate-registries.ts && pnpm check-patterns && pnpm check-boundaries"
   },
   "lint-staged": {
     "*.{ts,js,vue}": [
-      "eslint --fix"
+      "eslint --fix",
+      "prettier --write"
     ]
   }
 }

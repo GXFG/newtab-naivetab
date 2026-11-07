@@ -11,7 +11,7 @@ export default {
   jsxSingleQuote: false,
   arrowParens: 'always',
   bracketSpacing: true,
-  jsxBracketSameLine: false,
+  bracketSameLine: false,
   singleAttributePerLine: true,
   endOfLine: 'auto',
 }

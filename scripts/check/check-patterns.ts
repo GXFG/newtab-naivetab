@@ -5,7 +5,7 @@
  *
  * 检查项：
  *  1. v-bind() 在 <style> 中使用（禁止，应用 :style + computed + var()）
- *  2. &--modifier BEM 拼接（禁止，postcss-preset-env 不支持）
+ *  2. &--modifier BEM 拼接（禁止，原生 CSS 嵌套同样不支持 & 后缀拼接）
  *  3. Reka Content/Overlay 组件缺少 z-index（portal 内容面板可能被遮挡）
  *  4. :deep() 出现在非 scoped 的 <style> 或纯 CSS 中（禁止，lightningcss 无法解析）
  *

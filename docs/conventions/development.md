@@ -79,7 +79,7 @@ CSS 踩坑（`&--modifier` 禁止、`v-bind()` 禁止、`rgba()` + `var()` 等�
 
 ```bash
 pnpm test              # 交互模式（监听变化）
-pnpm test -- --run     # 执行一次后退出（CI/PR）
+pnpm test -- --run     # 执行一次后退出
 ```
 
 ### 配置
@@ -115,7 +115,7 @@ pnpm test -- --run     # 执行一次后退出（CI/PR）
 
 ### 自动运行
 
-pre-commit hook 自动执行：`pnpm lint-staged && pnpm test -- --run`。可通过 `SKIP_SIMPLE_GIT_HOOKS=1` 跳过。
+pre-commit hook 自动执行：`lint-staged → typecheck → test --run → format:check → check:icons → validate-registries → check-patterns → check-boundaries`。可通过 `SKIP_SIMPLE_GIT_HOOKS=1` 跳过（不建议）。
 
 ### 新增测试指南
 

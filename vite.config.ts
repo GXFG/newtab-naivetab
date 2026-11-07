@@ -7,7 +7,6 @@ import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import Markdown from 'unplugin-vue-markdown/vite'
-import postcssPresetEnv from 'postcss-preset-env'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { isDev, port, r, BROWSER_DIR } from './scripts/utils.ts'
 import packageJson from './package.json' with { type: 'json' }
@@ -25,13 +24,9 @@ export const sharedConfig: UserConfig = {
     __APP_NAME__: JSON.stringify(packageJson.name),
     __APP_VERSION__: JSON.stringify(packageJson.version),
   },
-  css: {
-    postcss: {
-      plugins: [
-        postcssPresetEnv({ stage: 3, features: { 'nesting-rules': true } }),
-      ],
-    },
-  },
+  // CSS 不再经过 postcss-preset-env：浏览器基线（Chrome 112+ / Firefox gecko 130+）
+  // 已原生支持 CSS 嵌套，构建期降级反而按无人配置的默认 browserslist 盲目改写产物。
+  // 若未来引入需要降级的特性，先在 manifest 里收紧基线，再选带明确 browserslist 的工具。
   plugins: [
     Vue({
       include: [/\.vue$/, /\.md$/],

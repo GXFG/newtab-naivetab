@@ -10,20 +10,20 @@ pnpm build               # 生产构建（chrome + firefox）
 pnpm build:debug         # 不压缩的 chrome 构建
 pnpm typecheck           # vue-tsc --noEmit
 pnpm test                # vitest（用例放在被测模块旁的 __tests__/）
-pnpm lint                # ESLint 校验（不改文件，CI 用）
+pnpm lint                # ESLint 校验（不改文件）
 pnpm lint:fix            # ESLint --fix
 pnpm check-patterns      # CSS 模式检查（v-bind()、&--modifier、:deep() 误用、Reka z-index）
 pnpm check-boundaries    # 架构边界检查（4 个执行上下文的 import 方向 + 循环依赖）
 pnpm impact <文件|目录>   # 改动影响面：依赖者、涉及上下文、相关测试、已知风险
 pnpm gen:icons           # 重新生成离线图标集（新增/更换图标后必须执行，见 docs/architecture/icons.md）
-pnpm check:icons         # 校验产物与常量表一致（只在内存生成比对，不落盘；CI / pre-commit 用）
+pnpm check:icons         # 校验产物与常量表一致（只在内存生成比对，不落盘；pre-commit 用）
 ```
 
 **改共享层前先跑 `pnpm impact`**：输出「谁依赖它、波及哪些执行上下文、哪些测试会覆盖、有哪些已知坑」。动手前看一眼，比事后被检查拦下便宜得多。
 
-**pre-commit 自动执行**：`lint-staged → typecheck → test --run → check:icons → validate-registries → check-patterns → check-boundaries`。提交前务必全部通过。
+**pre-commit 自动执行**：`lint-staged → typecheck → test --run → format:check → check:icons → validate-registries → check-patterns → check-boundaries`。提交前务必全部通过，禁止 `--no-verify` 绕过。
 
-**CI**（`.github/workflows/pr-check.yml`）在 PR 与推送到主分支时重跑上述全部检查，并额外校验覆盖率门槛（`vite.config.ts` 的 `test.coverage.thresholds`）与 Chrome 构建。本地钩子可被 `--no-verify` 绕过，CI 不可绕过。
+**本地不进 pre-commit、发版前手动跑的检查**：覆盖率门槛（`pnpm test:coverage`，阈值在 `vite.config.ts` 的 `test.coverage.thresholds`）与完整构建（`pnpm release` 内含 `build:chrome` / `build:firefox`，抓 manifest 生成、i18n 编译等构建期问题）。本项目不设代码检查类 CI，唯一保留的工作流是 `docs-deploy.yml`（部署 site 站）。
 
 ## 核心规则
 
@@ -132,7 +132,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 - **后台脚本**：`onChanged` 监听器必须返回 `Promise`；修改 keyboard 配置时同步改 `config/cache.ts` → [pitfalls-background.md](.claude/rules/pitfalls-background.md)
 - **样式 & 主题**：颜色用双元素数组 `[浅色, 深色]`；中性灰用 `--gray-alpha-xx` token；禁止 `v-bind()`、`&--modifier` 和非 scoped 样式里的 `:deep()` → [pitfalls-css.md](.claude/rules/pitfalls-css.md)
 - **图标 & 文本**：图标必须用 `ICONS` 常量，文本必须 i18n（`zh-CN.json` + `en-US.json` 同步更新）→ [no-hardcode.md](.claude/rules/no-hardcode.md)
-- **图标离线**：图标统一从 `@iconify/vue/offline` 引入，数据由 `pnpm gen:icons` 从 `ICONS` / `COMMAND_ICONS` 生成（`src/logic/constants/icon-set.json`，需提交）。**新增图标后不重跑生成脚本 = 渲染空白**，`icon-set.test.ts` 会拦；产物是否与常量表一致由 `pnpm check:icons` 在 CI 校验 → [icons.md](docs/architecture/icons.md)
+- **图标离线**：图标统一从 `@iconify/vue/offline` 引入，数据由 `pnpm gen:icons` 从 `ICONS` / `COMMAND_ICONS` 生成（`src/logic/constants/icon-set.json`，需提交）。**新增图标后不重跑生成脚本 = 渲染空白**，`icon-set.test.ts` 会拦；产物是否与常量表一致由 `pnpm check:icons` 在 pre-commit 校验 → [icons.md](docs/architecture/icons.md)
 - **用户反馈**：toast 唯一入口是 `showToast`（`@/common/toast`，顶部胶囊 toast，`success`/`error`/`warning`/`info`），不要自建提示组件或页面内常驻结果文案
 - **Widget 规则**：用 `/add-widget` 技能或查 [REGISTRY-MAP.md](src/newtab/widgets/REGISTRY-MAP.md)；定时任务用 `addTimerTask`；根组件用 `WidgetWrap` 包裹
 - **Setting 面板**：在 `SETTING_GROUPS` 注册，用 `src/setting/fields` 原子组件，禁止自行封装
