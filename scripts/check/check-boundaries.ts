@@ -9,7 +9,7 @@
  *  1. logic/ 反向依赖 UI 层（logic 必须上下文无关，否则 SW 引入即崩）
  *  2. background/ 引入 DOM 相关代码（SW 无 DOM）
  *  3. contentScripts/ 引入页面层代码（注入宿主页面，体积与 DOM 环境受限）
- *  4. contentScripts/ 直接使用 localStorage（应走 browser.storage）
+ *  4. contentScripts/ 直接使用 localStorage（应走 chrome.storage）
  *  5. components/ 依赖页面层（通用组件不得绑定具体页面）
  *  6. 循环依赖
  *  7. logic/ / background/ / contentScripts/ 引入虚拟组件模块（`~icons/*` 之类）
@@ -272,7 +272,7 @@ function checkFile(filePath: string): Violation[] {
           rule: 'no-localstorage-in-cs',
           specifier: 'localStorage',
           message: 'contentScripts/ 运行在宿主页面环境，不得使用 localStorage',
-          fix: '改用 browser.storage（@/logic/utils/database 或 webextension-polyfill）',
+          fix: '改用 chrome.storage（@/logic/utils/database）',
         })
       }
     }

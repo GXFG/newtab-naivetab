@@ -71,7 +71,6 @@ pnpm check:icons         # 校验产物与常量表一致（只在内存生成�
 ### 自动注入（禁止手动 import）
 
 - `vue` 全家桶（`ref`、`computed`、`watch` 等）— 全局自动导入
-- `webextension-polyfill` → `browser` 变量 — 全局可用
 - `dayjs` → `dayjs` 函数 — 全局可用
 - `src/components/` 下所有组件 — 自动注册，直接用 `<NtXxx />`
 - 路径别名 `@/` → `src/`
@@ -107,26 +106,24 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 
 开发时**先查对应文档**，确认既有设计后再动手。
 
+- **全量索引 + 写作约定 + 什么内容该放哪种载体**：[docs/README.md](docs/README.md)
+- **某个设计为什么是这样、否决过什么方案**：[docs/decisions/](docs/decisions/)
+
+下表只列高频入口：
+
 | 文档 | 主题 |
 |------|------|
 | [config.md](docs/architecture/config.md) | 三层配置架构、配置迁移、主题系统 |
 | [storage.md](docs/architecture/storage.md) | 存储与同步、Gzip 压缩 |
-| [development.md](docs/conventions/development.md) | 编码风格（CSS/Vue/TS）+ 测试架构 |
-| [ai-collaboration.md](docs/conventions/ai-collaboration.md) | AI 协作治理：防线模型、架构边界规则、改动约束 |
-| [messaging.md](docs/architecture/messaging.md) | 背景脚本消息传递 |
-| [background.md](docs/architecture/background.md) | 背景图系统 |
-| [global-shortcut.md](docs/features/global-shortcut.md) | 全局命令快捷键 |
-| [bookmark.md](docs/features/bookmark.md) | 书签系统 |
+| [messaging.md](docs/architecture/messaging.md) | 三上下文通信、三层兜底 |
+| [background-modules.md](docs/architecture/background-modules.md) | SW 内部模块、启动顺序、层切换冷却 |
+| [setting.md](docs/architecture/setting.md) | 设置面板结构、注册、drawerStack |
 | [keyboard.md](docs/features/keyboard.md) | 键盘布局、拖拽、主题 |
+| [bookmark.md](docs/features/bookmark.md) | 书签系统、层绑定 |
+| [global-shortcut.md](docs/features/global-shortcut.md) | 命令体系与执行路由 |
 | [widget-dev.md](docs/widgets/widget-dev.md) | Widget 生命周期、WidgetWrap、定时任务 |
-| [calendar-widget.md](docs/widgets/calendar-widget.md) | 日历适配层、tyme4ts 语义、节假日 ICS 订阅 |
-| [setting.md](docs/architecture/setting.md) | Setting 面板、注册、字段组件 |
-| [task.md](docs/architecture/task.md) | 定时任务系统 |
-| [background-modules.md](docs/architecture/background-modules.md) | SW 内部模块 |
-| [moveable.md](docs/architecture/moveable.md) | Widget 拖拽定位 |
-| [api.md](docs/architecture/api.md) | 外部 API 封装 |
-| [icons.md](docs/architecture/icons.md) | 图标系统：离线图标集、新增图标流程 |
 | [reka-ui.md](docs/architecture/reka-ui.md) | Reka UI 封装规范 + 设计标杆 |
+| [ai-collaboration.md](docs/conventions/ai-collaboration.md) | 三层约束模型、架构边界规则 |
 | [pitfalls.md](.claude/rules/pitfalls.md) | 踩坑索引（CSS/Vue/配置/快捷键/后台） |
 
 ## 核心开发要点

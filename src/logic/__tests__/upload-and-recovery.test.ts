@@ -169,8 +169,6 @@ vi.doMock('vue', async (importOriginal) => {
   return { ...actual, computed: actual.computed, reactive: actual.reactive }
 })
 
-vi.doMock('webextension-polyfill', () => ({}))
-
 vi.mock('@/auto-imports', () => ({}))
 
 // ════════════════════════════════════════════════════════════

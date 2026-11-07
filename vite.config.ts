@@ -41,11 +41,7 @@ export const sharedConfig: UserConfig = {
     }),
     Markdown({}),
     AutoImport({
-      imports: [
-        'vue',
-        { 'webextension-polyfill': [['*', 'browser']] },
-        { dayjs: [['default', 'dayjs']] },
-      ],
+      imports: ['vue', { dayjs: [['default', 'dayjs']] }],
       dts: r('src/auto-imports.d.ts'),
     }),
     // https://github.com/antfu/unplugin-vue-components
@@ -77,13 +73,7 @@ export const sharedConfig: UserConfig = {
     ...(process.env.ANALYZE ? [visualizer()] : []),
   ],
   optimizeDeps: {
-    include: [
-      'vue',
-      '@vueuse/core',
-      'webextension-polyfill',
-      'reka-ui',
-      'vue-i18n',
-    ],
+    include: ['vue', '@vueuse/core', 'reka-ui', 'vue-i18n'],
   },
 }
 

@@ -1,12 +1,11 @@
 import fs from 'fs-extra'
-import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
 import { isDev, port, r } from '../scripts/utils'
 
 export async function getManifest() {
   const pkg = (await fs.readJSON(r('package.json'))) as typeof PkgType
 
-  const manifest: Manifest.WebExtensionManifest = {
+  const manifest: chrome.runtime.ManifestV3 = {
     manifest_version: 3,
     name: '__MSG_appName__',
     version: pkg.version,
@@ -74,10 +73,12 @@ export async function getManifest() {
   }
 
   if (process.env.BROWSER === 'firefox') {
+    // Firefox MV3 仍用 background.scripts（Chrome 侧是 service_worker），
+    // @types/chrome 只描述了 Chrome 形态，这里需要显式断言。
     manifest.background = {
       scripts: ['/dist/background/index.mjs'],
       type: 'module',
-    }
+    } as unknown as chrome.runtime.ManifestV3['background']
     manifest.browser_specific_settings = {
       gecko: {
         id: 'gxfgim@outlook.com',
