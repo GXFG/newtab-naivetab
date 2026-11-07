@@ -43,6 +43,10 @@ export const parseBookmarkTitle = (
  * 在书签树中按路径查找文件夹（如 "NaiveTab/layer1" 或 "layer1"）
  *
  * 通过 findBookmarksBarFromTree 定位书签工具栏，不依赖 children 索引顺序。
+ *
+ * 按完整路径逐段匹配，而不是 DFS 找第一个同名节点：用户书签树里同名文件夹很常见，
+ * DFS 命中哪一个取决于遍历顺序，会让同一份配置在不同用户那里指向不同目录，
+ * 表现为"层切换后书签突然变成别的文件夹"。
  */
 export const findFolderByPath = (
   tree: chrome.bookmarks.BookmarkTreeNode[],

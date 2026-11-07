@@ -1,5 +1,12 @@
 /**
  * 搜索引擎常量 — 搜索引擎列表定义与模板。
+ *
+ * `value` 与 `suggestUrl` 都必须包含 `{query}` 占位符，请求前由
+ * `getSearchSuggestion` 用 `encodeURIComponent(keyword)` 替换。
+ *
+ * `label` 同时是建议接口的分发键：`getSearchSuggestion` 按 label 精确匹配
+ * 选择解析分支。改名或新增引擎而未提供 `suggestUrl` 时，会静默走百度回退
+ * 分支（不报错），表现为"建议词莫名其妙变成百度给的"。
  */
 export interface TSearchEngine {
   label: string

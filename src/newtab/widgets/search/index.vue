@@ -121,6 +121,9 @@ const onSearch = () => {
   state.currSuggestIndex = -1
   gaProxy('click', ['search', 'onSearch'])
   if (localConfig.search.isNewTabOpen) {
+    // 新标签页打开后本页不会跳走，立刻清空输入避免用户切回时看到残留搜索词；
+    // isSearching 保持 600ms 让输入框处于禁用态，覆盖标签页切换的视觉过渡，
+    // 否则过渡期间用户可能在已提交的输入框里继续打字。
     state.isSearching = true
     createTab(searchUrl)
     setTimeout(() => {

@@ -93,6 +93,11 @@ const getOrCreateLayerFolder = async (
 /**
  * 导出 keymap 到浏览器书签树，所有书签自动添加 `[X]` 前缀
  * 书签创建在 NaiveTab/layer1 子文件夹中，同时创建 layer2-4 空文件夹占位
+ *
+ * 恒写 layer1 是有意为之，不是遗漏：本函数只服务 source=2（自定义 keymap），
+ * 该模式只有一套 keymap，没有层的概念。想用多层必须切到 source=1 再自行配置
+ * 其余层的文件夹——两种数据源的职责边界。
+ *
  * @param keymap - 要导出的 keymap
  */
 export const exportKeymapToBrowser = async (

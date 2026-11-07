@@ -45,7 +45,7 @@
 
 ## ESC 逐层关闭 Drawer
 
-Setting 面板打开时按 ESC 需逐层关闭子 Drawer 再关主面板。完整实现（`drawerStack` 栈结构、`useDrawerStack` composable、关闭路径、已注册子 Drawer 列表）详见 [setting.md](../docs/architecture/setting.md#drawer-stack-架构)。
+Setting 面板打开时按 ESC 需逐层关闭子 Drawer 再关主面板。完整实现（`drawerStack` 栈结构、`useDrawerStack` composable、关闭路径、已注册子 Drawer 列表）详见 [setting.md](../../docs/architecture/setting.md#drawer-stack)。
 
 ---
 

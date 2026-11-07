@@ -38,14 +38,14 @@
 - 在 Service Worker 中执行
 - 可以直接调用 `chrome.tabs`、`chrome.windows` 等浏览器 API
 - 占现有命令的大多数（标签页切换、窗口操作等）
-- 实现位置：[src/background/commands/registry.ts](src/background/commands/registry.ts)
+- 实现位置：`src/background/commands/registry.ts`
 
 ### CS 命令（`execEnv: 'cs'`）
 
 - 在 Content Script 中执行
 - 可以操作页面 DOM（滚动、复制 URL、刷新页面等）
 - 通过 Port 接收 SW 转发的命令
-- 实现位置：[src/contentScripts/index.ts](src/contentScripts/index.ts) 的 `commandExecutors`
+- 实现位置：`src/contentScripts/index.ts` 的 `commandExecutors`
 
 **消息流转：**
 ```
@@ -61,13 +61,13 @@
 - 操作 `localConfig` / `globalState`
 - **不经过 SW**，直接由 `shortcut-executor.ts` 中的 `newtabControlExecutors` 执行
 - 如果命令来自普通网页的 CS，静默忽略（没有 localConfig）
-- 实现位置：[src/logic/shortcut/shortcut-executor.ts](src/logic/shortcut/shortcut-executor.ts)
+- 实现位置：`src/logic/shortcut/shortcut-executor.ts`
 
 ## 命令注册流程详解
 
 ### 1. COMMAND_CATEGORIES（单一数据源）
 
-位置：[src/logic/shortcut/shortcut-command.ts](src/logic/shortcut/shortcut-command.ts)
+位置：`src/logic/shortcut/shortcut-command.ts`
 
 这是整个系统的唯一真相来源。所有命令类型（`TCommandName`、`TSwCommandName`、`TCsCommandName`、`TNewtabCommandName`）和运行时列表（`SW_COMMANDS`、`CS_COMMANDS`、`NEWTAB_COMMANDS`）都从这里自动派生。
 
@@ -93,7 +93,7 @@ TSwCommandName = TCommandName 排除 TCsCommandName 和 TNewtabCommandName
 
 ### 3. SW 命令分发
 
-位置：[src/background/commands/registry.ts](src/background/commands/registry.ts)
+位置：`src/background/commands/registry.ts`
 
 ```ts
 const COMMAND_HANDLERS: Record<TSwCommandName, CommandHandler> = {
@@ -111,7 +111,7 @@ TS Record 约束确保遗漏 handler 时编译报错，不会运行时空指针�
 
 ### 4. Content Script 命令执行
 
-位置：[src/contentScripts/index.ts](src/contentScripts/index.ts)
+位置：`src/contentScripts/index.ts`
 
 ```ts
 const commandExecutors: Record<string, () => void> = {
@@ -131,7 +131,7 @@ port.onMessage.addListener((msg) => {
 
 ### 5. NaiveTab 本地命令执行
 
-位置：[src/logic/shortcut/shortcut-executor.ts](src/logic/shortcut/shortcut-executor.ts)
+位置：`src/logic/shortcut/shortcut-executor.ts`
 
 ```ts
 const newtabControlExecutors: Record<string, () => void> = {
