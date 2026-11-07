@@ -175,11 +175,7 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
 
 ### 为什么运行时拉取，而不是打包进扩展
 
-- 打包等于再分发 Apple 的数据，条款上更暧昧；运行时由用户设备订阅公开日历，与任何日历 App 行为一致。
-- 扩展本身已有 `host_permissions: ['*://*/*']`，**不需要新增权限、不会弹授权**。
-- 单次传输约 9 KB（gzip），失败可从缓存继续。
-
-> Cloudflare 防护：有些第三方中文日历源（如 oneo.me）在 Cloudflare 的人机验证后面，命令行的完整浏览器请求头也会被 403；扩展内 `fetch` 无法执行 JS 挑战，除非用户已在浏览器里拿到 `cf_clearance`，因此不能作为内置预设。
+决策与理由见 [ADR 0009](../decisions/0009-calendar-runtime-subscription.md)。此处只留一条操作提醒：**新增预设源前必须先验证它对普通 `fetch` 的响应**，有 JS 挑战或强 UA 校验的站点不要加。
 
 ## 5. 日期语义约定
 

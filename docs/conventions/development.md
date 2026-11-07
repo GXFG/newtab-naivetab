@@ -107,7 +107,7 @@ pnpm test -- --run     # 执行一次后退出（CI/PR）
 | `src/logic/__tests__/config-snapshot.test.ts` | 从不同历史版本的用户配置快照出发，运行完整迁移流程 |
 | `test/fixtures/snapshot-v*.json` | 用户配置快照 JSON，可从线上用户 localStorage 导出或手动构造 |
 
-详见 [config.md](architecture/config.md#配置兼容性快照测试)。
+详见 [config.md](../architecture/config.md#配置兼容性快照测试)。
 
 ### 测试环境 Polyfill
 

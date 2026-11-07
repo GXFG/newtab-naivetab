@@ -2,9 +2,11 @@
 
 ## 概述
 
-键盘系统负责在 NaiveTab 新标签页中渲染可定制的虚拟键盘，支持 19 种布局、3 种键帽视觉风格、81 个预设配色方案。键盘与书签 Widget（`keyboardBookmark`）和全局命令快捷键共享视觉渲染逻辑。
+键盘系统负责在 NaiveTab 新标签页中渲染可定制的虚拟键盘，提供多套布局定义、键帽视觉风格与主题预设。键盘与书签 Widget（`keyboardBookmark`）和全局命令快捷键共享视觉渲染逻辑。
 
-**业务范围：** 本文档描述通用键盘引擎（布局、渲染、主题、拖拽）。Widget 专属内容（书签绑定、keymap、事件处理）详见 [keyboard-bookmark-widget.md](../widgets/keyboard-bookmark-widget.md)。
+数量的唯一来源是代码：布局见 `layouts/index.ts` 的导出，主题见 `themes/index.ts` 的 `KEYCAP_PREINSTALL_GROUPS`，默认值见 `KEYBOARD_COMMON_CONFIG`。本文不重复这些清单。
+
+**业务范围：** 本文档描述通用键盘引擎（布局、渲染、主题、拖拽）。Widget 专属内容（书签绑定、keymap、层切换）见 [bookmark.md](bookmark.md)。
 
 ---
 
@@ -26,17 +28,17 @@
 - `src/logic/keyboard/keyboard-layout.ts` — 布局定义与运行时转换（WKL/Mac 替换/空格分割）
 - `src/logic/keyboard/keyboard-constants.ts` — 按键默认配置（label/size/textAlign）、强调键集合、`ALL_KEYBOARD_CODES`
 - `src/logic/config/defaults.ts` — `KEYBOARD_COMMON_CONFIG` 默认配置
-- `src/logic/keyboard/themes/` — 80+ 预设配色方案（4 大系列，6 个文件）
+- `src/logic/keyboard/themes/` — 键帽主题预设，按系列分组导出，见 `themes/index.ts`
 - `src/logic/keyboard/keyboard-options.ts` — UI 选择器选项（键盘类型、空格拆分、键帽类型、禁用按键列表）
 - `src/logic/bookmark/api.ts` — 浏览器书签读取 API 封装（`getBrowserBookmark`、`getFaviconFromUrl`）
 - `src/logic/bookmark/parser.ts` — 书签解析器（解析 chrome.bookmarks 构建 keymap、`findFolderByPath`）
 - `src/logic/bookmark/mutations.ts` — 书签变更操作（`swapBookmarksInSourceFolder`、`removeBookmarkFromSourceFolder`）
 - `src/logic/keyboard/bookmark-export.ts` — 书签导出模块（`exportKeymapToBrowser`、`addBookmarkToSourceFolder`）
-- `src/logic/keyboard/layouts/` — 19 种键盘布局定义（key33~key104、hhkb），统一导出自 `layouts/index.ts`
+- `src/logic/keyboard/layouts/` — 键盘布局定义，统一导出自 `layouts/index.ts`
 
-### 可用布局（19 种）
+### 可用布局
 
-`key33`, `key45`, `key47`, `key53`, `key61`, `key64`, `key66`, `key67`（默认）, `key68`, `key80`, `key81a`, `key81b`, `key84`, `key87`, `key96a`, `key96b`, `key98`, `key104`, `hhkb`
+唯一来源是 `layouts/index.ts` 的导出；默认布局是 `KEYBOARD_COMMON_CONFIG.keyboardType`（`src/logic/config/defaults.ts`）。
 
 ### 布局数据结构
 
@@ -218,14 +220,7 @@ function useKeyboardStyle(unit: 'vmin' | 'px', baseSizeOverride?: number)
 
 ## 键帽主题预设
 
-`src/logic/keyboard/themes/` — 81 个预设主题，分 4 组 6 文件：
-
-| 分组 | 数量 | 示例 |
-|------|------|------|
-| `KEYCAP_CLASSIC_MAP` | 32 | Light, White on Black, Dolch, Godspeed |
-| `KEYCAP_ATMOSPHERE_MAP` | 21 | Nord, Sakura, Mocha, Aurora |
-| `KEYCAP_STUDIO_MAP` | 21 | Dracula, Gruvbox, Tokyo Night, Catppuccin |
-| `KEYCAP_PREMIUM_MAP` | 7 | Cashmere, Titanium, Obsidian |
+`src/logic/keyboard/themes/` 按系列分组导出，分组与各自的主题清单见 `themes/index.ts` 的 `KEYCAP_PREINSTALL_GROUPS`。新增主题时往对应的 `KEYCAP_*_MAP` 追加即可，无需改动其他文件。
 
 每个主题定义 7 个颜色字段：`shellColor`, `mainFontColor`, `mainBackgroundColor`, `emphasisOneFontColor`, `emphasisOneBackgroundColor`, `emphasisTwoFontColor`, `emphasisTwoBackgroundColor`。
 
@@ -235,39 +230,7 @@ function useKeyboardStyle(unit: 'vmin' | 'px', baseSizeOverride?: number)
 
 ## keyboardCommon 配置字段
 
-```
-keyboardCommon 配置（约 30 个字段）：
-├── 布局类
-│   ├── keyboardType          // 布局类型
-│   ├── splitSpace             // 空格分割 ('space1' | 'space2' | 'space3')
-│   ├── keyboardWklMode        // WKL 无 Win 键模式
-│   └── keycapType             // 键帽视觉风格 ('gmk' | 'dsa' | 'flat')
-├── 键帽类
-│   ├── keycapPadding / keycapSize / keycapBorderRadius
-│   ├── isKeycapBorderEnabled / keycapBorderWidth / keycapBorderColor
-│   └── keycapBackgroundBlur
-├── 外壳类
-│   ├── isShellVisible
-│   ├── shellVerticalPadding / shellHorizontalPadding / shellBorderRadius
-│   ├── shellColor
-│   └── isShellShadowEnabled / shellShadowColor
-├── 内板类
-│   ├── isPlateVisible / platePadding / plateBorderRadius
-│   ├── plateColor / plateBackgroundBlur
-├── 内容类
-│   ├── isCapKeyVisible / keycapKeyFontFamily / keycapKeyFontSize
-│   ├── isNameVisible / keycapBookmarkFontFamily / keycapBookmarkFontSize
-│   ├── isFaviconVisible / faviconSize
-│   └── isTactileBumpsVisible
-├── 颜色类（双模式数组 [浅色, 深色]）
-│   ├── mainFontColor / mainBackgroundColor
-│   ├── emphasisOneFontColor / emphasisOneBackgroundColor
-│   └── emphasisTwoFontColor / emphasisTwoBackgroundColor
-└── 覆盖类
-    └── emphasisKeyOverrides: Record<string, 0 | 1 | 2>  // 用户自定义强调分组
-```
-
-**PRESERVE_FIELDS** = `['keyboardType', 'keycapType', 'emphasisKeyOverrides']`
+字段与默认值的唯一来源是 `KEYBOARD_COMMON_CONFIG`（`src/logic/config/defaults.ts`）。迁移与合并时受 `PRESERVE_FIELDS` 保护，机制见 [config.md](../architecture/config.md)。
 
 ---
 

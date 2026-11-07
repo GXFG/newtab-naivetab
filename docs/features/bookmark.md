@@ -271,6 +271,10 @@ newtab 页面额外维护一份 `localStorage` 缓存：模块加载时同步读
 - `chrome.storage.onChanged`：其他标签页/popup 修改时实时更新 `localConfig.keyboardBookmark`
 - `localStorage` `storage` 事件：同设备 options/newtab 之间同步
 
+书签相关的 `onChanged` 监听器有三处：`keyboard/bookmark-state.ts`（newtab）、`background/config/cache.ts`（SW）、`widgets/keyboardBookmark/logic.ts`（Widget）。
+
+**这不是重复注册，不要合并。** newtab / SW / CS 是三个独立进程，无法共享内存，各自必须监听 storage 变更刷新本地缓存；每个监听器只处理自己关心的 key，过滤条件不同是设计意图。
+
 ### Service Worker 缓存（`src/background/config/cache.ts`）
 
 Service Worker 无法使用 Vue 响应式，维护纯对象缓存：

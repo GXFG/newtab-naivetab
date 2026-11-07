@@ -63,4 +63,4 @@ window.$t('key.xxx').replace('__count__', String(count))
 
 - 写代码时先想 i18n key，再写实现
 - 不要因为"只是 dialog 文案"就跳过 i18n
-- 完整规则见 [no-hardcode.md](../.claude/rules/no-hardcode.md)
+- 完整规则见 [no-hardcode.md](../../rules/no-hardcode.md)

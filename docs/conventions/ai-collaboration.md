@@ -19,7 +19,7 @@
 
 ## 1. 为什么现有规范还不够
 
-项目已有 `.claude/rules/` 7 份行为规则、`docs/` 19 篇架构文档、pre-commit 五连校验。这套东西对"人"足够，对 AI 有三个结构性缺陷：
+项目已有 `.claude/rules/` 一整套行为规则、`docs/` 一批架构文档、pre-commit 多道校验。这套东西对"人"足够，对 AI 有三个结构性缺陷：
 
 | 缺陷 | 具体表现 |
 |------|----------|
@@ -31,18 +31,20 @@
 
 **结论：能机器验证的，就不要只写成规则。** 规则层只保留无法自动判断的部分（方案设计、是否真是 bug、架构取舍）。
 
-## 2. 现状盘点
+## 2. 现状盘点（2026-11 快照）
+
+> 本节是当时的能力快照，不是现状。P0 落地后拦截能力已变化，判断当下请直接查 `scripts/check/`、`.github/workflows/` 与 `vite.config.ts`。
 
 | 能力 | 位置 | 覆盖 | 局限 |
 |------|------|------|------|
-| 行为规则 | `.claude/rules/`（7 份） | 编码习惯、禁硬编码、文档同步、踩坑 | 纯提示词，无强制力 |
-| 架构文档 | `docs/`（19 篇） | 配置、存储、消息、Widget、Setting | 同上 |
+| 行为规则 | `.claude/rules/` | 编码习惯、禁硬编码、文档同步、踩坑 | 纯提示词，无强制力 |
+| 架构文档 | `docs/` | 配置、存储、消息、Widget、Setting | 同上 |
 | 结构校验 | `scripts/check/validate-registries.ts` | Widget 注册、命令一致性、i18n 同步、新闻源 | 只覆盖"注册点"，不覆盖"依赖方向" |
 | 模式校验 | `scripts/check/check-patterns.ts` | CSS 模式（`v-bind`、`&--modifier`、`:deep`、z-index） | 只扫样式，不扫 TS import |
 | 类型检查 | `pnpm typecheck` | 全量 | 无法发现跨上下文 API 误用（类型上都合法） |
-| 回归测试 | `src/logic/__tests__/`（40 个） | 配置迁移链、同步、日历、键盘、书签 | `components/` 1 个、`setting/` 0 个 |
+| 回归测试 | `src/logic/__tests__/` | 配置迁移链、同步、日历、键盘、书签 | `components/` 与 `setting/` 基本无覆盖 |
 | 提交闸门 | `simple-git-hooks` pre-commit | lint → typecheck → test → registries → patterns | 可被 `--no-verify` 绕过 |
-| CI | `.github/workflows/docs-deploy.yml` | 只部署文档站 | **无任何代码校验** |
+| CI | `.github/workflows/pr-check.yml` | 与 pre-commit 对齐，另加覆盖率与 Chrome 构建 | — |
 
 ## 3. 风险模型
 
@@ -86,7 +88,7 @@ L3 流程层  限制改动的形状        →  缩小单次改动的破坏面
 | `src/logic/**` | `@/newtab`、`@/components`、`@/setting`、`@/popup`、`@/options` | logic 必须上下文无关。一旦反向依赖 UI，SW 引入即崩 |
 | `src/background/**` | 任何 `.vue`、`@/components`、`@/setting`、`@/newtab`、`@/popup`、`@/options` | SW 无 DOM |
 | `src/contentScripts/**` | `@/newtab`、`@/popup`、`@/options`、`@/setting`、`@/components` | 注入宿主页面，体积和 DOM 环境均受限 |
-| `src/contentScripts/**` | 直接使用 `localStorage` | 宿主页面环境，应走 `browser.storage` |
+| `src/contentScripts/**` | 直接使用 `localStorage` | 宿主页面环境，应走 `chrome.storage` |
 | `src/components/**` | `@/newtab`、`@/popup`、`@/options` | 通用组件不得依赖页面 |
 | 全局 | 循环依赖 | 构建期难排查，运行期顺序不确定 |
 
