@@ -257,7 +257,7 @@ newtab 页面额外维护一份 `localStorage` 缓存：模块加载时同步读
 
 `uploadConfigFn` 关键步骤：
 1. 清理 `keyboardBookmark` 数据：移除空 URL、截断过长 URL/名称
-2. 计算 MD5 — 若 `syncId` 未变则跳过上传（去重）
+2. 计算 SHA-256 内容指纹 — 若 `syncId` 未变则跳过上传（去重）
 3. Payload > 4000 字节时 gzip 压缩
 4. 检查 8KB 单 key 限制（7KB 时预警）
 5. 写入 `chrome.storage.sync`，key 为 `naive-tab-keyboardBookmark`
@@ -270,6 +270,10 @@ newtab 页面额外维护一份 `localStorage` 缓存：模块加载时同步读
 ### 跨设备/跨标签页同步
 - `chrome.storage.onChanged`：其他标签页/popup 修改时实时更新 `localConfig.keyboardBookmark`
 - `localStorage` `storage` 事件：同设备 options/newtab 之间同步
+
+书签相关的 `onChanged` 监听器有三处：`keyboard/bookmark-state.ts`（newtab）、`background/config/cache.ts`（SW）、`widgets/keyboardBookmark/logic.ts`（Widget）。
+
+**这不是重复注册，不要合并。** newtab / SW / CS 是三个独立进程，无法共享内存，各自必须监听 storage 变更刷新本地缓存；每个监听器只处理自己关心的 key，过滤条件不同是设计意图。
 
 ### Service Worker 缓存（`src/background/config/cache.ts`）
 
@@ -316,7 +320,7 @@ handleBookmarkShortcutKeydown(key: string, _tabId: number): void
 
 ## 缓存与优化策略
 
-1. **Gzip 压缩 / MD5 去重 / 防抖写入**：详见 [storage.md](../architecture/storage.md)
+1. **Gzip 压缩 / 内容指纹去重 / 防抖写入**：详见 [storage.md](../architecture/storage.md)
 2. **SW 内存缓存**：`config/cache.ts` 启动时缓存配置，keydown 读取 ~0ms
 3. **延迟创建 keymap**：`ensureKeymapEntry` 仅在用户实际修改时创建条目
 4. **页面焦点/可见性刷新**：`addPageFocusTask` 和 `addVisibilityTask` 在用户返回时刷新书签

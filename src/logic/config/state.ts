@@ -10,7 +10,10 @@
  */
 import type { WidgetConfigByCode } from '@/common/widget-constants'
 import { WIDGET_CODE_LIST } from '@/common/widget-constants'
-import { useStorageLocal } from '@/composables/useStorageLocal'
+import {
+  recoveredStorageKeys,
+  useStorageLocal,
+} from '@/composables/useStorageLocal'
 import { defaultConfig, defaultLocalState } from './defaults'
 
 type LocalConfigRefs = {
@@ -54,6 +57,28 @@ const createLocalConfig = (): LocalConfigRefs => {
 export const localConfig: typeof defaultConfig = reactive(createLocalConfig())
 
 export const localState = useStorageLocal('l-state', defaultLocalState)
+
+/**
+ * 内容被写坏、已回落默认值的配置字段：清空其同步状态，让同步层以云端为准回拉。
+ *
+ * 不清的话 `syncId` 仍等于云端值 → `loadRemoteConfig` 判定「无更新」直接跳过 →
+ * 用户的真实配置留在云端没人取回，本地这份默认值还会在下次修改该 section 时被整段
+ * 上传，把云端覆盖掉。清空后 `syncId` 与云端不等 → 走合并分支（本地 dirty=false）
+ * → 版本相同直接用云端数据 → 再由 handleMissedUploadConfig 愈合上传。
+ *
+ * 只处理 `c-<field>`：这是配置字段专用前缀（组件/页面级状态用 `data-*` / `l-*`）。
+ * 万一将来出现别的 `c-` 键，statusMap 里没有对应项也会被自动跳过。
+ * `l-state` 本身损坏时 statusMap 已整体回落默认值（syncId 全为空），
+ * 天然走「不一致 → 拉取」路径，不需要额外处理。
+ */
+for (const storageKey of recoveredStorageKeys) {
+  if (!storageKey.startsWith('c-')) continue
+  const status =
+    localState.value.isUploadConfigStatusMap[storageKey.slice(2) as ConfigField]
+  if (!status) continue
+  status.syncId = ''
+  status.dirty = false
+}
 
 /**
  * 强制将 localConfig 中的配置写入 localStorage。

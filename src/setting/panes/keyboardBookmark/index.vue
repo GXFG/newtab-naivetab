@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { requestPermission } from '@/logic/utils/permission'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import {
   getSystemBookmarkForKeyboard,
@@ -574,7 +574,7 @@ const doExport = async (keymap: Record<string, TBookmarkEntry>) => {
   flex-shrink: 0;
 }
 
-.setting-hint-card :deep(.form-item__control) {
+.setting-hint-card .form-item__control {
   justify-content: flex-start;
 }
 

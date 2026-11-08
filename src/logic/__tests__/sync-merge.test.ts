@@ -64,12 +64,7 @@ describe('mergeConfigWithVersionAwareness', () => {
     it('calls mergeState with localData as template when local is newer', () => {
       mockCompareVersion.mockReturnValue(true) // remote < local → local is newer
 
-      mergeConfigWithVersionAwareness(
-        localData,
-        remoteData,
-        '2.3.0',
-        '2.2.5',
-      )
+      mergeConfigWithVersionAwareness(localData, remoteData, '2.3.0', '2.2.5')
 
       expect(mockCompareVersion).toHaveBeenCalledWith('2.2.5', '2.3.0')
       expect(mockMergeState).toHaveBeenCalledWith(localData, remoteData)
@@ -80,12 +75,7 @@ describe('mergeConfigWithVersionAwareness', () => {
     it('calls mergeState with remoteData as template when remote is newer', () => {
       mockCompareVersion.mockReturnValue(false) // remote >= local → remote is newer
 
-      mergeConfigWithVersionAwareness(
-        localData,
-        remoteData,
-        '2.2.5',
-        '2.3.0',
-      )
+      mergeConfigWithVersionAwareness(localData, remoteData, '2.2.5', '2.3.0')
 
       expect(mockCompareVersion).toHaveBeenCalledWith('2.3.0', '2.2.5')
       expect(mockMergeState).toHaveBeenCalledWith(remoteData, localData)
@@ -96,12 +86,7 @@ describe('mergeConfigWithVersionAwareness', () => {
     it('local newer when remote has no version', () => {
       mockCompareVersion.mockReturnValue(true)
 
-      mergeConfigWithVersionAwareness(
-        localData,
-        remoteData,
-        '2.3.0',
-        '0.0.0',
-      )
+      mergeConfigWithVersionAwareness(localData, remoteData, '2.3.0', '0.0.0')
 
       expect(mockMergeState).toHaveBeenCalledWith(localData, remoteData)
     })
@@ -109,12 +94,7 @@ describe('mergeConfigWithVersionAwareness', () => {
     it('remote newer when local has no version', () => {
       mockCompareVersion.mockReturnValue(false)
 
-      mergeConfigWithVersionAwareness(
-        localData,
-        remoteData,
-        '0.0.0',
-        '2.3.0',
-      )
+      mergeConfigWithVersionAwareness(localData, remoteData, '0.0.0', '2.3.0')
 
       expect(mockMergeState).toHaveBeenCalledWith(remoteData, localData)
     })
@@ -148,7 +128,12 @@ describe('mergeConfigWithVersionAwareness', () => {
       const remote = { enabled: false, fontSize: 16 }
 
       mockCompareVersion.mockReturnValue(true)
-      const result = mergeConfigWithVersionAwareness(local, remote, '2.3.0', '2.2.5')
+      const result = mergeConfigWithVersionAwareness(
+        local,
+        remote,
+        '2.3.0',
+        '2.2.5',
+      )
 
       expect(result).toHaveProperty('enabled', false)
       expect(result).toHaveProperty('newFeature', true)
@@ -169,7 +154,12 @@ describe('mergeConfigWithVersionAwareness', () => {
       const remote = { enabled: false, newFeature: true, fontSize: 16 }
 
       mockCompareVersion.mockReturnValue(false)
-      const result = mergeConfigWithVersionAwareness(local, remote, '2.2.5', '2.3.0')
+      const result = mergeConfigWithVersionAwareness(
+        local,
+        remote,
+        '2.2.5',
+        '2.3.0',
+      )
 
       expect(result).toHaveProperty('enabled', true)
       expect(result).toHaveProperty('newFeature', true)

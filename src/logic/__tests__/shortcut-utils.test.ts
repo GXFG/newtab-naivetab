@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest'
-import { isUrlInBlacklist, normalizeDomain, buildModifierKeys, formatModifierKeys, toModifierMask, isInInputElement } from '@/logic/shortcut/utils'
+import {
+  isUrlInBlacklist,
+  normalizeDomain,
+  buildModifierKeys,
+  formatModifierKeys,
+  toModifierMask,
+  isInInputElement,
+} from '@/logic/shortcut/utils'
 import { matchShortcut } from '@/logic/shortcut/matcher'
 
 describe('normalizeDomain', () => {
@@ -12,7 +19,9 @@ describe('normalizeDomain', () => {
   })
 
   it('removes path, query and hash', () => {
-    expect(normalizeDomain('https://docs.google.com/document/123?foo=bar#anchor')).toBe('docs.google.com')
+    expect(
+      normalizeDomain('https://docs.google.com/document/123?foo=bar#anchor'),
+    ).toBe('docs.google.com')
   })
 
   it('removes port number', () => {
@@ -77,7 +86,9 @@ describe('isUrlInBlacklist', () => {
   })
 
   it('normalizes pattern input (protocol, path, case)', () => {
-    expect(isUrlInBlacklist('google.com', ['https://GOOGLE.COM/some/path'])).toBe(true)
+    expect(
+      isUrlInBlacklist('google.com', ['https://GOOGLE.COM/some/path']),
+    ).toBe(true)
   })
 
   it('normalizes hostname input (www, case)', () => {
@@ -85,7 +96,9 @@ describe('isUrlInBlacklist', () => {
   })
 
   it('matches multiple patterns (first match wins)', () => {
-    expect(isUrlInBlacklist('bing.com', ['google.com', 'bing.com', 'yahoo.com'])).toBe(true)
+    expect(
+      isUrlInBlacklist('bing.com', ['google.com', 'bing.com', 'yahoo.com']),
+    ).toBe(true)
   })
 
   it('handles empty hostname (about:blank)', () => {
@@ -98,7 +111,9 @@ describe('isUrlInBlacklist', () => {
   })
 })
 
-function createKeyboardEvent(partial: Partial<KeyboardEventInit>): KeyboardEvent {
+function createKeyboardEvent(
+  partial: Partial<KeyboardEventInit>,
+): KeyboardEvent {
   return new KeyboardEvent('keydown', {
     code: 'KeyK',
     ctrlKey: false,
@@ -114,13 +129,27 @@ describe('matchShortcut — blacklist integration', () => {
   it('blocks shortcut when hostname matches blacklist', () => {
     const e = createKeyboardEvent({})
     // 模拟 location.hostname = 'docs.google.com'
-    const result = matchShortcut(e, true, ['alt'], false, ['google.com'], 'docs.google.com')
+    const result = matchShortcut(
+      e,
+      true,
+      ['alt'],
+      false,
+      ['google.com'],
+      'docs.google.com',
+    )
     expect(result).toBeNull()
   })
 
   it('allows shortcut when hostname does not match blacklist', () => {
     const e = createKeyboardEvent({ code: 'KeyK', altKey: true })
-    const result = matchShortcut(e, true, ['alt'], false, ['blocked.com'], 'allowed.com')
+    const result = matchShortcut(
+      e,
+      true,
+      ['alt'],
+      false,
+      ['blocked.com'],
+      'allowed.com',
+    )
     expect(result).toBe('KeyK')
   })
 
@@ -166,17 +195,21 @@ describe('toModifierMask', () => {
   })
 
   it('is order-independent (bitwise property)', () => {
-    expect(toModifierMask(['alt', 'shift'])).toBe(toModifierMask(['shift', 'alt']))
+    expect(toModifierMask(['alt', 'shift'])).toBe(
+      toModifierMask(['shift', 'alt']),
+    )
   })
 })
 
 describe('buildModifierKeys', () => {
-  function createKeyboardEventWithModifiers(partial: Partial<KeyboardEventInit> & {
-    ctrlKey?: boolean
-    shiftKey?: boolean
-    altKey?: boolean
-    metaKey?: boolean
-  }): KeyboardEvent {
+  function createKeyboardEventWithModifiers(
+    partial: Partial<KeyboardEventInit> & {
+      ctrlKey?: boolean
+      shiftKey?: boolean
+      altKey?: boolean
+      metaKey?: boolean
+    },
+  ): KeyboardEvent {
     return new KeyboardEvent('keydown', {
       ctrlKey: false,
       shiftKey: false,
@@ -197,7 +230,11 @@ describe('buildModifierKeys', () => {
   })
 
   it('extracts multiple modifiers in canonical order', () => {
-    const e = createKeyboardEventWithModifiers({ metaKey: true, ctrlKey: true, shiftKey: true })
+    const e = createKeyboardEventWithModifiers({
+      metaKey: true,
+      ctrlKey: true,
+      shiftKey: true,
+    })
     expect(buildModifierKeys(e)).toEqual(['ctrl', 'shift', 'meta'])
   })
 
@@ -228,7 +265,10 @@ describe('isInInputElement', () => {
    * 模拟 activeElement（现在的首要检测源）。
    */
   function withActiveElement(el: Element | null): void {
-    Object.defineProperty(document, 'activeElement', { value: el, configurable: true })
+    Object.defineProperty(document, 'activeElement', {
+      value: el,
+      configurable: true,
+    })
   }
 
   const originalActiveElement = document.activeElement
@@ -243,31 +283,41 @@ describe('isInInputElement', () => {
   it('returns true for INPUT element via activeElement', () => {
     const input = document.createElement('input')
     withActiveElement(input)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for TEXTAREA via activeElement', () => {
     const textarea = document.createElement('textarea')
     withActiveElement(textarea)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for SELECT via activeElement', () => {
     const select = document.createElement('select')
     withActiveElement(select)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for EMBED via activeElement', () => {
     const embed = document.createElement('embed')
     withActiveElement(embed)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for OBJECT via activeElement', () => {
     const obj = document.createElement('object')
     withActiveElement(obj)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for contenteditable="true" via activeElement', () => {
@@ -275,38 +325,50 @@ describe('isInInputElement', () => {
     div.setAttribute('contenteditable', 'true')
     Object.defineProperty(div, 'isContentEditable', { value: true })
     withActiveElement(div)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for role=textbox via activeElement', () => {
     const div = document.createElement('div')
     div.setAttribute('role', 'textbox')
     withActiveElement(div)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for role=combobox via activeElement', () => {
     const div = document.createElement('div')
     div.setAttribute('role', 'combobox')
     withActiveElement(div)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns true for IFRAME via activeElement', () => {
     const iframe = document.createElement('iframe')
     withActiveElement(iframe)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(true)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(true)
   })
 
   it('returns false for regular div when neither activeElement nor composedPath match', () => {
     const div = document.createElement('div')
     withActiveElement(div)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(false)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(false)
   })
 
   it('returns false for body as activeElement', () => {
     withActiveElement(document.body)
-    expect(isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' }))).toBe(false)
+    expect(
+      isInInputElement(new KeyboardEvent('keydown', { code: 'KeyA' })),
+    ).toBe(false)
   })
 
   // -- composedPath 兜底路径（activeElement 非输入时） --
@@ -358,7 +420,20 @@ describe('isInInputElement', () => {
   // -- input type 白名单 --
 
   it('returns true for text/password/email/search/number/tel/url input types', () => {
-    for (const type of ['text', 'password', 'email', 'search', 'number', 'tel', 'url', 'date', 'time', 'datetime-local', 'month', 'week']) {
+    for (const type of [
+      'text',
+      'password',
+      'email',
+      'search',
+      'number',
+      'tel',
+      'url',
+      'date',
+      'time',
+      'datetime-local',
+      'month',
+      'week',
+    ]) {
       const input = document.createElement('input')
       input.type = type
       withActiveElement(input)
@@ -367,7 +442,17 @@ describe('isInInputElement', () => {
   })
 
   it('returns false for button/checkbox/radio/file/hidden/image/submit/reset/color input types', () => {
-    for (const type of ['button', 'checkbox', 'radio', 'file', 'hidden', 'image', 'submit', 'reset', 'color']) {
+    for (const type of [
+      'button',
+      'checkbox',
+      'radio',
+      'file',
+      'hidden',
+      'image',
+      'submit',
+      'reset',
+      'color',
+    ]) {
       const input = document.createElement('input')
       input.type = type
       withActiveElement(input)
@@ -386,10 +471,16 @@ describe('isInInputElement', () => {
     const nonInput = document.createElement('div')
     withActiveElement(nonInput)
     // jsdom 中 designMode 默认是 'off'，需要模拟
-    Object.defineProperty(document, 'designMode', { value: 'on', configurable: true })
+    Object.defineProperty(document, 'designMode', {
+      value: 'on',
+      configurable: true,
+    })
     expect(isInInputElement(new KeyboardEvent('keydown'))).toBe(true)
     // 恢复
-    Object.defineProperty(document, 'designMode', { value: 'off', configurable: true })
+    Object.defineProperty(document, 'designMode', {
+      value: 'off',
+      configurable: true,
+    })
   })
 
   afterAll(() => {
@@ -399,14 +490,17 @@ describe('isInInputElement', () => {
 })
 
 describe('matchShortcut — non-blacklist paths', () => {
-
   it('returns null when disabled', () => {
     const e = new KeyboardEvent('keydown', { code: 'KeyK', ctrlKey: true })
     expect(matchShortcut(e, false, ['ctrl'], false)).toBeNull()
   })
 
   it('returns null when event.repeat is true', () => {
-    const e = new KeyboardEvent('keydown', { code: 'KeyK', ctrlKey: true, repeat: true })
+    const e = new KeyboardEvent('keydown', {
+      code: 'KeyK',
+      ctrlKey: true,
+      repeat: true,
+    })
     expect(matchShortcut(e, true, ['ctrl'], false)).toBeNull()
   })
 
@@ -425,7 +519,11 @@ describe('matchShortcut — non-blacklist paths', () => {
   })
 
   it('matches when modifiers match via bitmask', () => {
-    const e = new KeyboardEvent('keydown', { code: 'KeyA', ctrlKey: true, shiftKey: true })
+    const e = new KeyboardEvent('keydown', {
+      code: 'KeyA',
+      ctrlKey: true,
+      shiftKey: true,
+    })
     expect(matchShortcut(e, true, ['ctrl', 'shift'], false)).toBe('KeyA')
   })
 
@@ -468,16 +566,22 @@ describe('matchShortcut — non-blacklist paths', () => {
 describe('matchShortcut — noModifierMode', () => {
   it('matches single key without modifiers', () => {
     const e = new KeyboardEvent('keydown', { code: 'KeyK' })
-    expect(matchShortcut(e, true, [], false, undefined, undefined, true)).toBe('KeyK')
+    expect(matchShortcut(e, true, [], false, undefined, undefined, true)).toBe(
+      'KeyK',
+    )
   })
 
   it('rejects when modifiers are pressed in noModifierMode', () => {
     const e = new KeyboardEvent('keydown', { code: 'KeyK', ctrlKey: true })
-    expect(matchShortcut(e, true, [], false, undefined, undefined, true)).toBeNull()
+    expect(
+      matchShortcut(e, true, [], false, undefined, undefined, true),
+    ).toBeNull()
   })
 
   it('rejects non-allowed keys in noModifierMode', () => {
     const e = new KeyboardEvent('keydown', { code: 'Escape' })
-    expect(matchShortcut(e, true, [], false, undefined, undefined, true)).toBeNull()
+    expect(
+      matchShortcut(e, true, [], false, undefined, undefined, true),
+    ).toBeNull()
   })
 })

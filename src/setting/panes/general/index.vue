@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NTSelect from '@/components/ui/NTSelect.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { useI18n } from 'vue-i18n'
 import i18n from '@/common/i18n'
 import {

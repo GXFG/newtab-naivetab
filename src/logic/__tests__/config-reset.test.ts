@@ -76,8 +76,11 @@ vi.mock('@/logic/config/defaults', () => {
   return obj
 })
 
-
-import { resetWidgetConfig, hasWidgetConfig, hasPreserveFields } from '@/logic/config/reset'
+import {
+  resetWidgetConfig,
+  hasWidgetConfig,
+  hasPreserveFields,
+} from '@/logic/config/reset'
 
 function getMockConfig() {
   return (globalThis as any).__mockConfigResetStore.localConfig
@@ -137,7 +140,10 @@ describe('resetWidgetConfig — full mode', () => {
 
     // Other fields reset to default
     expect(mock.clockDigital.fontSize).toBe(24)
-    expect(mock.clockDigital.fontColor).toEqual(['rgba(0,0,0,1)', 'rgba(255,255,255,1)'])
+    expect(mock.clockDigital.fontColor).toEqual([
+      'rgba(0,0,0,1)',
+      'rgba(255,255,255,1)',
+    ])
   })
 
   it('does nothing for unknown widget codes', () => {
@@ -179,7 +185,9 @@ describe('resetWidgetConfig — quick mode', () => {
     expect(mock.keyboardBookmark.layout).toEqual({ x: 3, y: 7 })
     // preserve fields (source, keymap, isEnabled, noModifierMode etc.) preserved
     expect(mock.keyboardBookmark.source).toBe(1)
-    expect(mock.keyboardBookmark.keymap).toEqual({ KeyB: { url: 'https://custom.com', name: 'Custom' } })
+    expect(mock.keyboardBookmark.keymap).toEqual({
+      KeyB: { url: 'https://custom.com', name: 'Custom' },
+    })
     expect(mock.keyboardBookmark.isEnabled).toBe(true)
   })
 

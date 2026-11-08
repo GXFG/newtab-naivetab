@@ -395,7 +395,7 @@ Reka UI 的 Indicator 组件（如 `CheckboxIndicator`、`SwitchThumb`）内部�
 | NTSlider | `components/ui/NTSlider.vue` | `SliderRoot` + `SliderTrack` + `SliderRange` + `SliderThumb` | `number[]` → `number` 桥接 |
 | NTTag | `components/ui/NTTag.vue` | 无（纯 CSS） | `closable` / `type` 变体 |
 | NTNotice | `components/ui/NTNotice.vue` | 无（纯 CSS） | `type`（warning/info/success/error）/ `bordered` |
-| NTPopover | `components/ui/NTPopover.vue` | `PopoverRoot` + `PopoverTrigger` + `PopoverPortal` + `PopoverContent` | `:show` / `trigger` (hover/click/manual) |
+| NTPopover | `components/ui/NTPopover.vue` | `PopoverRoot` + `PopoverTrigger` + `PopoverPortal` + `PopoverContent` | `:show` / `trigger` (hover/click/manual) / `reference`（自定义定位锚点，列表共用一层时跟随悬停项） |
 | NTPopconfirm | `components/ui/NTPopconfirm.vue` | 基于 NTPopover | `@positive-click` / `@negative-click` |
 | NTButton | `components/ui/NTButton.vue` | 无（纯 CSS） | `type` / `size` / `variant` / `loading` |
 | NTCard | `components/ui/NTCard.vue` | 无（纯 CSS） | `title` |
@@ -405,7 +405,7 @@ Reka UI 的 Indicator 组件（如 `CheckboxIndicator`、`SwitchThumb`）内部�
 | NTSelect / NTSelectItem | `components/ui/NTSelect.vue` + `NTSelectItem.vue` | `SelectRoot` + `SelectContent` 等 | Indicator 固定占位防抖动 |
 | NTDropdown | `components/ui/NTDropdown.vue` | `DropdownMenuRoot` + `DropdownMenuContent` | `options` / 插槽模式 |
 | NTTooltip | `components/ui/NTTooltip.vue` | `TooltipProvider` + `TooltipRoot` + `TooltipContent` | 400ms 默认延迟 |
-| NTAutoComplete | `components/ui/NTAutoComplete.vue` | `ComboboxRoot` + `ComboboxInput` | `ignore-filter` / `loading` 服务端搜索 |
+| NTAutoComplete | `components/ui/NTAutoComplete.vue` | `ComboboxRoot` + `ComboboxInput` | `ignore-filter`（服务端搜索 / 本地过滤）/ `open-on-click` / `loading` |
 | NTInput | `components/ui/NTInput.vue` | 原生 `<input>` / `<textarea>` | `clearable` / `showCount` / `autosize` |
 | NTInputNumber | `components/ui/NTInputNumber.vue` | `NumberFieldRoot` + `NumberFieldInput` + `NumberFieldDecrement` + `NumberFieldIncrement` | `safeValue` / `clamp` |
 | NTTree | `components/ui/NTTree.vue` | `TreeRoot` + `TreeItem` + `TreeItemContents` | `blockLine` / `blockNode` / `showLine` / `expandOnClick` |

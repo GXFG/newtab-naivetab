@@ -10,7 +10,7 @@
  * <NTInput v-model:value="text" type="textarea" :rows="3" clearable />
  * <NTInput v-model:value="text" show-count :maxlength="100" />
  */
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ref, watch, nextTick, computed } from 'vue'
 import { ICONS } from '@/logic/constants/icons'
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ref, computed, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { parseColor, colorToString, isValidColor } from 'reka-ui'

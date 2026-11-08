@@ -20,6 +20,10 @@ export const getBaiduSugrec = (
  * 统一搜索建议获取接口，适配不同搜索引擎的 API 返回格式。
  * 扩展环境不受 CORS 限制，可直接 fetch 各引擎的 suggestion 接口。
  * 查询词超过 20 字符时跳过请求（超长词无有意义的建议）。
+ *
+ * 分支选择靠 `engineLabel` 精确匹配：未命中的 label 会落到函数末尾的百度分支，
+ * 与"无 suggestUrl 时回退百度"是同一条路径。因此改搜索引擎名称不会报错，
+ * 只会让该引擎的建议词静默变成百度返回的结果。
  */
 export const getSearchSuggestion = async (
   engineLabel: string,

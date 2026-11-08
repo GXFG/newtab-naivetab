@@ -25,8 +25,12 @@ vi.mock('@/logic/image/utils', async () => {
   const actual = await vi.importActual('@/logic/image/utils')
   return {
     ...actual,
-    urlToFile: vi.fn().mockResolvedValue(new File([''], 'test.jpg', { type: 'image/jpeg' })),
-    compressedImageUrlToBase64: vi.fn().mockResolvedValue('data:image/jpeg;base64,test'),
+    urlToFile: vi
+      .fn()
+      .mockResolvedValue(new File([''], 'test.jpg', { type: 'image/jpeg' })),
+    compressedImageUrlToBase64: vi
+      .fn()
+      .mockResolvedValue('data:image/jpeg;base64,test'),
     downloadImageByUrl: vi.fn().mockResolvedValue(undefined),
   }
 })
@@ -73,7 +77,7 @@ vi.mock('@/logic/image/constants', () => ({
 }))
 
 describe('getImageUrlFromName', () => {
-  let getImageUrlFromName: typeof import('@/logic/image/utils')['getImageUrlFromName']
+  let getImageUrlFromName: (typeof import('@/logic/image/utils'))['getImageUrlFromName']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -113,7 +117,7 @@ describe('getImageUrlFromName', () => {
 })
 
 describe('downloadCurrentWallpaper', () => {
-  let downloadCurrentWallpaper: typeof import('@/logic/image/service')['downloadCurrentWallpaper']
+  let downloadCurrentWallpaper: (typeof import('@/logic/image/service'))['downloadCurrentWallpaper']
   let localConfig: any
 
   beforeEach(async () => {
@@ -131,7 +135,9 @@ describe('downloadCurrentWallpaper', () => {
   it('does nothing when background image is disabled', async () => {
     localConfig.general.isBackgroundImageEnabled = false
     await downloadCurrentWallpaper()
-    expect(vi.mocked(await import('@/logic/image/utils')).downloadImageByUrl).not.toHaveBeenCalled()
+    expect(
+      vi.mocked(await import('@/logic/image/utils')).downloadImageByUrl,
+    ).not.toHaveBeenCalled()
   })
 
   it('downloads from URL for network source', async () => {
@@ -145,7 +151,9 @@ describe('downloadCurrentWallpaper', () => {
     await downloadCurrentWallpaper()
 
     const utilMod = await import('@/logic/image/utils')
-    expect(vi.mocked(utilMod.downloadImageByUrl).mock.calls[0][0]).toContain('cn.bing.com')
+    expect(vi.mocked(utilMod.downloadImageByUrl).mock.calls[0][0]).toContain(
+      'cn.bing.com',
+    )
   })
 
   it('downloads from URL for BING_PHOTO source', async () => {

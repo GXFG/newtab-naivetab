@@ -13,7 +13,7 @@
  * <NTNotice type="success" content="操作成功" />
  * <NTNotice type="error" :bordered="false" content="无边框错误提示" />
  */
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { computed } from 'vue'
 

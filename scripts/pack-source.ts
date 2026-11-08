@@ -24,16 +24,16 @@ const EXCLUDE_DIRS = new Set([
   'extension-chrome',
   'extension-firefox',
   'dist',
-  '.git',
-  '.claude',
-  '.github',
-  '.vscode',
-  '.idea',
-  '.qoder',
   'test',
   'coverage',
   '__tests__',
 ])
+
+/**
+ * 以 `.` 开头的目录一律排除（.git/.claude/.github/.vscode/.pnpm-store/.workbuddy 等）。
+ * 这些目录都是本地工具缓存或仓库元数据，既不属于源码，体积也可能很大
+ * （例如误建在项目根的 .pnpm-store 可达数百 MB）。
+ */
 
 /** 任意层级排除的文件名（精确匹配） */
 const EXCLUDE_FILES = new Set(['.DS_Store', '.eslintcache', 'stats.html'])
@@ -49,6 +49,7 @@ function isExcluded(
   relativePath: string,
   isDir: boolean,
 ): boolean {
+  if (isDir && name.startsWith('.')) return true
   if (isDir && EXCLUDE_DIRS.has(name)) return true
   if (EXCLUDE_FILES.has(name)) return true
   if (EXCLUDE_EXT.has(path.extname(name))) return true
@@ -58,9 +59,14 @@ function isExcluded(
 
 // ── 递归遍历 ────────────────────────────────────────────────────────────────
 
-function addDir(archive: ZipArchive, rootDir: string, currentDir: string) {
+function addDir(
+  archive: ZipArchive,
+  rootDir: string,
+  currentDir: string,
+): number {
   const scanDir = currentDir ? path.join(rootDir, currentDir) : rootDir
   const entries = fs.readdirSync(scanDir)
+  let count = 0
 
   for (const name of entries) {
     const relativePath = currentDir ? path.join(currentDir, name) : name
@@ -70,15 +76,21 @@ function addDir(archive: ZipArchive, rootDir: string, currentDir: string) {
     if (isExcluded(name, relativePath, stat.isDirectory())) continue
 
     if (stat.isDirectory()) {
-      addDir(archive, rootDir, relativePath)
+      count += addDir(archive, rootDir, relativePath)
     } else {
       // zip 内部统一使用 POSIX 分隔符
       archive.file(fullPath, { name: relativePath.replaceAll(path.sep, '/') })
+      count += 1
     }
   }
+
+  return count
 }
 
 // ── 主逻辑 ──────────────────────────────────────────────────────────────────
+
+/** 源码包体积上限（MB）。超出基本意味着把缓存/依赖目录误打进去了。 */
+const MAX_SIZE_MB = 20
 
 async function packSource() {
   console.log('📦 Creating source zip for Firefox store submission...')
@@ -88,11 +100,22 @@ async function packSource() {
 
   const output = fs.createWriteStream(OUTPUT)
   const archive = new ZipArchive({ zlib: { level: 9 } })
+  let fileCount = 0
 
   return new Promise<void>((resolve, reject) => {
     output.on('close', () => {
-      const sizeMB = (archive.pointer() / 1024 / 1024).toFixed(2)
-      console.log(`✅ Source zip created: ${OUTPUT} (${sizeMB} MB)`)
+      const sizeMB = archive.pointer() / 1024 / 1024
+      console.log(
+        `✅ Source zip created: ${OUTPUT} (${sizeMB.toFixed(2)} MB, ${fileCount} files)`,
+      )
+      if (sizeMB > MAX_SIZE_MB) {
+        reject(
+          new Error(
+            `源码包体积异常（${sizeMB.toFixed(2)} MB > ${MAX_SIZE_MB} MB），请检查排除规则`,
+          ),
+        )
+        return
+      }
       resolve()
     })
 
@@ -100,7 +123,7 @@ async function packSource() {
 
     archive.pipe(output)
 
-    addDir(archive, ROOT, '')
+    fileCount = addDir(archive, ROOT, '')
 
     archive.finalize()
   })

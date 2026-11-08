@@ -1,43 +1,47 @@
 /**
  * @module update
- * @description 配置更新与版本迁移。updateSetting 合并配置，handleAppUpdate 处理跨版本数据结构迁移。
- * @dependencies config/merge.ts（mergeState）、config/version.ts（版本比较）、config/defaults.ts（默认值）、
+ * @description 配置更新与版本迁移入口。updateSetting 合并配置，
+ *   handleAppUpdate 负责「判断是否需要升级 → 跑迁移步骤表 → 收尾」。
+ *   具体的结构迁移知识在 config/migrations.ts，这里只做编排。
+ * @dependencies config/migrations.ts（步骤表）、config/migrate.ts（迁移引擎）、
+ *   config/merge.ts（mergeState）、config/version.ts（版本比较）、config/defaults.ts（默认值）、
  *   store/state.ts（globalState）— handleAppUpdate 作为顶层编排器需要控制 changelog 弹窗等 UI 状态，
  *   globalState 在此充当跨层共享状态总线，非纯配置工具依赖 UI 层
  * @pitfalls
- *   - handleAppUpdate 使用 if 而非 if-else，确保跨越多个版本的旧用户能依次执行所有迁移
+ *   - 新增迁移只能加到 MIGRATION_STEPS，不要在这里写 if 分支：
+ *     导入路径不经过本文件，写在这里等于只对老用户生效
  *   - 末尾的 updateSetting() 是异步执行（不 await），整理配置结构但不阻塞首屏渲染
  *   - 新增迁移分支时必须同步升 package.json version
+ *   - host 提供的旧 localStorage 键读取只对本机升级有意义，导入模式下 host 不注入
  * @see docs/architecture/config.md#配置迁移系统
- * @see .claude/rules/pitfalls.md#配置迁移黄金法则
+ * @see .claude/rules/pitfalls-config.md#配置迁移黄金法则
  */
 import { showToast } from '@/common/toast'
-import {
-  defaultConfig,
-  defaultLocalState,
-  defaultFocusVisibleWidgetMap,
-} from '@/logic/config/defaults'
+import { defaultConfig, defaultLocalState } from '@/logic/config/defaults'
 import { log } from '@/logic/utils/common'
 import { gaProxy } from '@/logic/utils/gtag'
-import {
-  type WidgetCodes,
-  MAX_LAYERS,
-  BookmarkSource,
-} from '@/common/widget-constants'
-import { DEFAULT_LAYER_SOURCE_FOLDER } from '@/logic/keyboard/keyboard-constants'
 import { globalState } from '@/logic/store/state'
 import { mergeState } from './merge'
 import { localConfig, localState } from './state'
 import { compareLeftVersionLessThanRightVersions } from './version'
+import { runMigrations, type ConfigDraft, type MigrationHost } from './migrate'
 
 /**
  * 获取本地版本号
  */
 export const getLocalVersion = () => {
   let version = localConfig.general.version
+  // 直接读 localStorage 而不是 localConfig：要的是「上次落盘的版本号」，
+  // 避免运行期 localConfig.general.version 已被写成本次升级后的值。
   const settingGeneral = localStorage.getItem('c-general')
   if (settingGeneral) {
-    version = JSON.parse(settingGeneral).version
+    try {
+      version = JSON.parse(settingGeneral).version
+    } catch {
+      // 正常走不到这里：useStorageLocal 建 localConfig 时已把损坏内容修复成默认值。
+      // 只有那次修复写回也失败（配额写满）才会残留损坏内容，此时退回 localConfig
+      // 里的版本号即可 —— 版本号读不出来不该升级成启动期异常。
+    }
   }
   return version || '0'
 }
@@ -58,6 +62,21 @@ const updateSuccess = () => {
  * 避免全量重置导致丢失已有字段的同步状态（dirty, syncTime, syncId 等）
  */
 export const handleStateResetAndUpdate = () => {
+  // 清理已下线字段（不在 defaultConfig 中）的残留状态：
+  // 上传链路按 statusMap 的 key 遍历字段，残留项会让 getUploadConfigData() 返回
+  // undefined，产出缺少 data 的垃圾 payload 写进 chrome.storage.sync。
+  //
+  // 注意：这里只清本地状态，不回删 chrome.storage.sync 里的同名键。已下线字段在云端
+  // 的残留键会一直占配额，但主动 remove 有「组件临时下线后又回归」的误删风险，
+  // 这里选择保守处理 —— 残留键不会再被读写，也不会再产生垃圾 payload。
+  const statusMap = localState.value.isUploadConfigStatusMap
+  for (const field of Object.keys(statusMap)) {
+    if (!Object.prototype.hasOwnProperty.call(defaultConfig, field)) {
+      delete statusMap[field as ConfigField]
+      log(`isUploadConfigStatusMap remove stale field: ${field}`)
+    }
+  }
+
   // 遍历默认状态，增量添加缺失的字段
   for (const [field, defaultStatus] of Object.entries(
     defaultLocalState.isUploadConfigStatusMap,
@@ -102,7 +121,6 @@ export const updateSetting = (
               (defaultConfig[configField] as any)[subField],
               (acceptState[configField] as any)[subField],
             )
-            // console.log(`${configField}-${subField}`, localConfig[configField][subField], '=', defaultConfig[configField][subField], '<-', acceptState[configField][subField])
           }
         }
       }
@@ -115,6 +133,35 @@ export const updateSetting = (
     }
   })
 }
+
+/**
+ * 本机升级可用的宿主能力：旧 localStorage 键、localState、更新公告。
+ * 导入路径不注入 host，因此这些逻辑对导入天然失效。
+ */
+const createUpgradeHost = (): MigrationHost => ({
+  markBreakingChange: () => {
+    localConfig.general.showBreakingChangeNotice = true
+  },
+  setFocusMode: (value: boolean) => {
+    localState.value.isFocusMode = value
+  },
+  takeLegacyStorage: <T>(key: string): T | undefined => {
+    const raw = localStorage.getItem(key)
+    if (!raw) return undefined
+    // 旧键是历史遗留数据，读坏（手工编辑、写入中断）不能让升级流程整体失败：
+    // 此时版本号还没写，异常会在每次启动重复抛出，迁移永远无法完成。
+    // 读不出来就当作「没有旧数据」，顺手删掉这条无法使用的残留。
+    try {
+      const parsed = JSON.parse(raw) as T
+      localStorage.removeItem(key)
+      return parsed
+    } catch (e) {
+      log(`Migration: invalid legacy storage "${key}", skip`, e)
+      localStorage.removeItem(key)
+      return undefined
+    }
+  },
+})
 
 /**
  * 处理应用版本升级迁移
@@ -134,193 +181,17 @@ export const handleAppUpdate = (localVersion?: string) => {
     fromVersion: version,
     toVersion: window.appVersion,
   })
-  // @@@@ 更新localConfig后需要手动处理新版本变更的本地数据结构
-  if (compareLeftVersionLessThanRightVersions(version, '1.20.0')) {
-    const keymapLength = Object.keys(localConfig.keyboardBookmark.keymap).length
-    localConfig.keyboardBookmark.source =
-      keymapLength === 0 ? BookmarkSource.BROWSER : BookmarkSource.INTERNAL
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.21.0')) {
-    localConfig.search.isNewTabOpen = false
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.23.1')) {
-    localConfig.clockDigital.width = localConfig.clockDigital.fontSize / 2 + 8
-    const clockDigitalConfig =
-      localConfig.clockDigital as typeof localConfig.clockDigital & {
-        letterSpacing?: number
-      }
-    delete clockDigitalConfig.letterSpacing
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.24.0')) {
-    localConfig.general.timeLang = localConfig.general.lang
-    localConfig.yearProgress = defaultConfig.yearProgress
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.24.3')) {
-    localConfig.general.backgroundColor = structuredClone(
-      defaultConfig.general.backgroundColor,
-    )
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.25.9')) {
-    localConfig.calendar.festivalCountdown = true
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '1.27.0')) {
-    localState.value.isFocusMode = false
-    localConfig.general.focusVisibleWidgetMap = defaultFocusVisibleWidgetMap
-    if (
-      (localConfig.general.openPageFocusElement as any) === 'bookmarkKeyboard'
-    ) {
-      localConfig.general.openPageFocusElement = 'keyboardBookmark'
-    }
-    localConfig.calendar.backgroundBlur = defaultConfig.calendar.backgroundBlur
-    localConfig.memo.backgroundBlur = defaultConfig.memo.backgroundBlur
-    localConfig.news.backgroundBlur = defaultConfig.news.backgroundBlur
-    localConfig.search.backgroundBlur = defaultConfig.search.backgroundBlur
-    localConfig.yearProgress.backgroundBlur =
-      defaultConfig.yearProgress.backgroundBlur
-    localConfig.bookmarkFolder.enabled = false
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.0.0')) {
-    localConfig.clockFlip.enabled = false
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.2.0')) {
-    localConfig.keyboardBookmark.isGlobalShortcutEnabled =
-      (localConfig.keyboardBookmark as any).isListenBackgroundKeystrokes ?? true
-    // 全局快捷键架构变更（浏览器原生 → 扩展内部控制），老用户需重新配置修饰键
-    // 修饰键从字符串改为数组的迁移在 handleStateResetAndUpdate 中处理
-    localConfig.general.showBreakingChangeNotice = true
-    // 通用 widget 字体改为系统字体栈
-    const configList = [
-      'general',
-      'memo',
-      'yearProgress',
-      'calendar',
-      'bookmarkFolder',
-      'search',
-      'news',
-    ] as WidgetCodes[]
-    for (const code of configList) {
-      const config = localConfig[code] as any
-      if (config.fontFamily === 'Arial') {
-        config.fontFamily = 'system'
-      }
-    }
-    // calendar 有额外字段
-    if (localConfig.calendar.dayFontFamily === 'Arial') {
-      localConfig.calendar.dayFontFamily = 'system'
-    }
-    if (localConfig.calendar.descFontFamily === 'Arial') {
-      localConfig.calendar.descFontFamily = 'system'
-    }
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.2.2')) {
-    localConfig.general.focusVisibleWidgetMap = defaultFocusVisibleWidgetMap
-    // openPageFocusElement 修正
-    if ((localConfig.general.openPageFocusElement as any) === 'keyboard') {
-      localConfig.general.openPageFocusElement = 'keyboardBookmark'
-    }
-    // keyboard → keyboardBookmark
-    const localKeyboardData = localStorage.getItem('c-keyboard')
-    if (localKeyboardData) {
-      const localKeyboardConfig = JSON.parse(localKeyboardData)
-      const keyboardBookmarkFields = Object.keys(defaultConfig.keyboardBookmark)
-      for (const field of keyboardBookmarkFields) {
-        ;(localConfig.keyboardBookmark as any)[field] =
-          localKeyboardConfig[field]
-      }
 
-      const keyboardCommonFields = Object.keys(defaultConfig.keyboardCommon)
-      for (const field of keyboardCommonFields) {
-        ;(localConfig.keyboardCommon as any)[field] = localKeyboardConfig[field]
-      }
-      localStorage.removeItem('c-keyboard')
-    }
-    // commandShortcut → keyboardCommand
-    const localCommandShortcutData = localStorage.getItem('c-commandShortcut')
-    if (localCommandShortcutData) {
-      const localCommandShortcutConfig = JSON.parse(localCommandShortcutData)
-      const keyboardCommandFields = Object.keys(defaultConfig.keyboardCommand)
-      for (const field of keyboardCommandFields) {
-        ;(localConfig.keyboardCommand as any)[field] =
-          localCommandShortcutConfig[field]
-      }
-      localStorage.removeItem('c-commandShortcut')
-    }
-
-    /**
-     * isFocusMode 从 localConfig.general（云同步）迁移到 localState（仅本地）
-     * 保留用户当前的专注模式状态，不重置为 false
-     */
-    const oldFocusMode = (localConfig.general as any).isFocusMode
-    if (oldFocusMode !== undefined) {
-      localState.value.isFocusMode = oldFocusMode
-      delete (localConfig.general as any).isFocusMode
-    }
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.3.1')) {
-    // 无修饰键模式：默认关闭
-    if (typeof localConfig.keyboardCommand.noModifierMode !== 'boolean') {
-      localConfig.keyboardCommand.noModifierMode = false
-    }
-    if (typeof localConfig.keyboardBookmark.noModifierMode !== 'boolean') {
-      localConfig.keyboardBookmark.noModifierMode = false
-    }
-    // 移除键盘键帽 / 定位板的 backdrop-filter blur 配置（性能优化，改为纯 CSS 实现）
-    delete (localConfig.keyboardCommon as any).keycapBackgroundBlur
-    delete (localConfig.keyboardCommon as any).plateBackgroundBlur
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.3.2')) {
-    localConfig.general.showBreakingChangeNotice = true
-    // 新增书签层功能，初始化默认 4 层配置（第 0 层默认为 DEFAULT_LAYER_SOURCE_FOLDER，与导出路径一致）
-    localConfig.keyboardBookmark.layers = Array.from(
-      { length: MAX_LAYERS },
-      (_, i) => ({
-        sourceFolderPath: i === 0 ? DEFAULT_LAYER_SOURCE_FOLDER : '',
-      }),
-    )
-    // 移除顺序模式，统一为 [X] 前缀精确绑定，引导用户使用「文件夹书签」Widget
-    delete (localConfig.keyboardBookmark as any).defaultExpandFolder
-    // 背景图配置重构：backgroundImageNames 从字符串数组改为对象数组，backgroundNetworkSourceType 废弃
-    const oldNames = (localConfig.general as any).backgroundImageNames
-    if (Array.isArray(oldNames) && typeof oldNames[0] === 'string') {
-      const networkSourceType = (localConfig.general as any)
-        .backgroundNetworkSourceType
-      localConfig.general.backgroundImageList = oldNames.map(
-        (name: string) => ({
-          networkSourceType: networkSourceType,
-          name,
-        }),
-      )
-    }
-    delete (localConfig.general as any).backgroundImageNames
-    delete (localConfig.general as any).backgroundNetworkSourceType
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.5.0')) {
-    localConfig.keyboardCommon.nameplates = []
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.5.2')) {
-    localConfig.keyboardBookmark.isEnabled =
-      (localConfig.keyboardBookmark as any).isEnabled ?? true
-    localConfig.keyboardCommand.isGlobalShortcutEnabled =
-      (localConfig.keyboardCommand as any).isGlobalShortcutEnabled ?? true
-    localConfig.memo.padding = defaultConfig.memo.padding
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.6.0')) {
-    localConfig.general.scaleMode = 'auto'
-    localConfig.general.isAutoPrimaryColor = false
-    localConfig.general.isAutoBackgroundColor = false
-    localConfig.general.shimmerBackgroundEffect =
-      (localConfig.general as any).shimmerBackgroundEffect ?? 'aurora'
-    localConfig.general.shimmerBackgroundColors = (localConfig.general as any)
-      .shimmerBackgroundColors ?? [
-      ['#D1ADFF', '#98D69B', '#FAE390', '#FFACD8', '#7DD5FF', '#C8E6C9'],
-      ['#6B4FAE', '#4A7A4D', '#B8A050', '#B06080', '#4080A0', '#4A6F5A'],
-    ]
-    localConfig.general.shimmerAnimationSpeed =
-      (localConfig.general as any).shimmerAnimationSpeed ?? 1
-  }
-  if (compareLeftVersionLessThanRightVersions(version, '2.6.2')) {
-    localConfig.general.isGaEnabled = localConfig.general.isGaEnabled ?? true
-  }
+  runMigrations(
+    {
+      mode: 'upgrade',
+      config: localConfig as unknown as ConfigDraft,
+      defaults: defaultConfig,
+      host: createUpgradeHost(),
+    },
+    version,
+    window.appVersion,
+  )
 
   // 更新local版本号
   localConfig.general.version = window.appVersion

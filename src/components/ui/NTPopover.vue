@@ -16,6 +16,11 @@
  *   <template #trigger><div @mouseenter="visible=true">...</div></template>
  *   内容
  * </NTPopover>
+ * <!-- 列表共用一层：用 reference 把锚点切到当前悬停项，内容不卸载、只跟随移动 -->
+ * <NTPopover trigger="manual" :show="visible" :reference="hoveredEl">
+ *   <template #trigger><div class="hidden-anchor" /></template>
+ *   内容
+ * </NTPopover>
  */
 import { ref, computed, useAttrs, onUnmounted } from 'vue'
 import {
@@ -37,6 +42,8 @@ const props = defineProps<{
   /** @deprecated 用 openDelay/closeDelay 替代 */
   delay?: number
   disabled?: boolean
+  /** 自定义定位锚点：传入后替代 trigger 作为定位基准，用于多个条目共用一层时跟随悬停项 */
+  reference?: HTMLElement
 }>()
 
 const emit = defineEmits<{
@@ -150,6 +157,7 @@ onUnmounted(() => {
       <PopoverContent
         :side="placement ?? 'top'"
         :side-offset="8"
+        :reference="reference"
         class="reka-popover"
         v-bind="attrs"
         @mouseenter="trigger === 'hover' && handleEnter()"

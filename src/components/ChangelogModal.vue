@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import NTModal from '@/components/ui/NTModal.vue'
 import NTNotice from '@/components/ui/NTNotice.vue'
 import { ICONS } from '@/logic/constants/icons'

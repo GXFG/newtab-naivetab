@@ -62,7 +62,7 @@ CSS 踩坑（`&--modifier` 禁止、`v-bind()` 禁止、`rgba()` + `var()` 等�
 
 ### 错误处理
 
-- 用户可见提示用 `showToast`（统一 toast 模块）/ `window.$notification`
+- 用户可见提示统一用 `showToast`（`@/common/toast`，顶部胶囊 toast，Shadow DOM 隔离样式，提供 `success`/`error`/`warning`/`info` 四个方法，默认 3.5s 自动消失），不要自建提示组件或浮层
 - 内部异常用 `log` 记录
 - catch 块返回失败标志，不抛原始异常
 - **禁止空 catch 块**：ESLint `no-empty` 强制，静默降级时必须在 catch 块内加注释说明原因
@@ -79,7 +79,7 @@ CSS 踩坑（`&--modifier` 禁止、`v-bind()` 禁止、`rgba()` + `var()` 等�
 
 ```bash
 pnpm test              # 交互模式（监听变化）
-pnpm test -- --run     # 执行一次后退出（CI/PR）
+pnpm test -- --run     # 执行一次后退出
 ```
 
 ### 配置
@@ -107,7 +107,7 @@ pnpm test -- --run     # 执行一次后退出（CI/PR）
 | `src/logic/__tests__/config-snapshot.test.ts` | 从不同历史版本的用户配置快照出发，运行完整迁移流程 |
 | `test/fixtures/snapshot-v*.json` | 用户配置快照 JSON，可从线上用户 localStorage 导出或手动构造 |
 
-详见 [config.md](architecture/config.md#配置兼容性快照测试)。
+详见 [config.md](../architecture/config.md#配置兼容性快照测试)。
 
 ### 测试环境 Polyfill
 
@@ -115,7 +115,7 @@ pnpm test -- --run     # 执行一次后退出（CI/PR）
 
 ### 自动运行
 
-pre-commit hook 自动执行：`pnpm lint-staged && pnpm test -- --run`。可通过 `SKIP_SIMPLE_GIT_HOOKS=1` 跳过。
+pre-commit hook 自动执行：`lint-staged → typecheck → test --run → format:check → check:icons → validate-registries → check-patterns → check-boundaries`。可通过 `SKIP_SIMPLE_GIT_HOOKS=1` 跳过（不建议）。
 
 ### 新增测试指南
 

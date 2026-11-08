@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NTScrollArea from '@/components/ui/NTScrollArea.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { useDebounceFn, onClickOutside } from '@vueuse/core'
 import { gaProxy } from '@/logic/utils/gtag'
@@ -121,6 +121,9 @@ const onSearch = () => {
   state.currSuggestIndex = -1
   gaProxy('click', ['search', 'onSearch'])
   if (localConfig.search.isNewTabOpen) {
+    // 新标签页打开后本页不会跳走，立刻清空输入避免用户切回时看到残留搜索词；
+    // isSearching 保持 600ms 让输入框处于禁用态，覆盖标签页切换的视觉过渡，
+    // 否则过渡期间用户可能在已提交的输入框里继续打字。
     state.isSearching = true
     createTab(searchUrl)
     setTimeout(() => {
@@ -549,7 +552,7 @@ watch(isDragMode, () => {
       }
 
       /* NTScrollArea 在 dropdown 内的适配：flex:1 撑满 + min-height:0 允许收缩 */
-      .search__dropdown :deep(.reka-scroll-area) {
+      .reka-scroll-area {
         height: auto;
         flex: 1;
         min-height: 0;

@@ -15,7 +15,7 @@
  * <NTAccordion v-model="openSection" :items="sections" />
  */
 import type { Component } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import {
   AccordionRoot,
   AccordionItem,

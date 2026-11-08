@@ -45,7 +45,10 @@ function setupMocks(overrides?: {
         name: '61%',
         keys: [...defaultKeyLayout],
         spaceVariants: {
-          space2: [{ code: 'SpaceSplit1', w: 3 }, { code: 'SpaceSplit2', w: 3 }],
+          space2: [
+            { code: 'SpaceSplit1', w: 3 },
+            { code: 'SpaceSplit2', w: 3 },
+          ],
         },
       },
       key87: {
@@ -61,7 +64,7 @@ function setupMocks(overrides?: {
 }
 
 describe('currKeyboardConfig', () => {
-  let currKeyboardConfig: typeof import('@/logic/keyboard/keyboard-layout')['currKeyboardConfig']
+  let currKeyboardConfig: (typeof import('@/logic/keyboard/keyboard-layout'))['currKeyboardConfig']
 
   beforeEach(() => {
     vi.resetModules()
@@ -86,7 +89,10 @@ describe('currKeyboardConfig', () => {
     setupMocks()
     const mod = await import('@/logic/keyboard/keyboard-layout')
     currKeyboardConfig = mod.currKeyboardConfig
-    expect(currKeyboardConfig.value.emphasisOneCodes).toEqual(['Escape', 'Enter'])
+    expect(currKeyboardConfig.value.emphasisOneCodes).toEqual([
+      'Escape',
+      'Enter',
+    ])
     expect(currKeyboardConfig.value.emphasisTwoCodes).toEqual(['Space'])
   })
 
@@ -132,7 +138,8 @@ describe('currKeyboardConfig', () => {
     const config = currKeyboardConfig.value
     const lastRowY = Math.max(...config.keys.map((k) => k.y))
     const spaceKeys = config.keys.filter(
-      (k) => k.y === lastRowY && ['SpaceSplit1', 'SpaceSplit2'].includes(k.code),
+      (k) =>
+        k.y === lastRowY && ['SpaceSplit1', 'SpaceSplit2'].includes(k.code),
     )
     expect(spaceKeys).toHaveLength(2)
     const originalSpace = config.keys.find(
@@ -155,7 +162,7 @@ describe('currKeyboardConfig', () => {
 })
 
 describe('keyboardCurrentModelAllKeyList', () => {
-  let keyboardCurrentModelAllKeyList: typeof import('@/logic/keyboard/keyboard-layout')['keyboardCurrentModelAllKeyList']
+  let keyboardCurrentModelAllKeyList: (typeof import('@/logic/keyboard/keyboard-layout'))['keyboardCurrentModelAllKeyList']
 
   beforeEach(async () => {
     vi.resetModules()

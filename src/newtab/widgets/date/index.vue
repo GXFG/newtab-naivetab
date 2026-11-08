@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { addTimerTask, removeTimerTask } from '@/logic/task'
+import { addDailyTask, removeDailyTask } from '@/logic/task'
 import { localConfig } from '@/logic/config/state'
 import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import { currDayjsLang } from '@/logic/store/theme'
@@ -26,23 +26,40 @@ const state = reactive({
   date: '',
 })
 
-const updateDate = () => {
-  state.date = dayjs()
+/**
+ * 显示的是日期（默认格式 `YYYY-MM-DD dddd`，不含时间），只需要按天刷新，
+ * 因此用 addDailyTask 而不是每秒跑一次：后者会对同一个结果重复格式化 86400 次。
+ */
+const updateDate = (now: Date = new Date()) => {
+  state.date = dayjs(now)
     .locale(currDayjsLang.value)
     .format(localConfig.date.format)
 }
 
+/**
+ * 禁用只销毁 WidgetWrap 内部的 slot DOM（组件不卸载），所以清理必须挂 `isRender`；
+ * `onUnmounted` 只兜「组件真被销毁」那一种（错误边界）。
+ * 首次渲染由 addDailyTask 的「注册即执行」负责，不必再单独调 updateDate。
+ */
 watch(
   isRender,
   (value) => {
     if (!value) {
-      removeTimerTask(WIDGET_CODE)
+      removeDailyTask(WIDGET_CODE)
       return
     }
-    addTimerTask(WIDGET_CODE, updateDate)
+    addDailyTask(WIDGET_CODE, updateDate)
   },
   { immediate: true },
 )
+
+onUnmounted(() => removeDailyTask(WIDGET_CODE))
+
+/**
+ * 语言或格式变化不会跨天，但文案要立刻跟上。
+ * 以前靠「每秒重算」顺带覆盖，改成日切后必须显式监听，否则切语言要等到第二天。
+ */
+watch([currDayjsLang, () => localConfig.date.format], () => updateDate())
 </script>
 
 <template>

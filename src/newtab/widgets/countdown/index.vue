@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { addTimerTask, removeTimerTask } from '@/logic/task'
 import { localConfig } from '@/logic/config/state'
 import { globalState } from '@/logic/store/state'

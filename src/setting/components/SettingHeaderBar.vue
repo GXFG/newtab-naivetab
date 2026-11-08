@@ -7,7 +7,7 @@
  * 功能：标题 + 预览按钮（hover 透视）+ 打开新标签页按钮 + 关闭按钮（仅 drawer 模式）。
  * 该组件固定在滚动区域之外，不随下方内容滚动。
  */
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { globalState } from '@/logic/store/state'
 

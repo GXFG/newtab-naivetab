@@ -1,139 +1,83 @@
 # Background 内部模块
 
-本文档描述 Service Worker（`src/background/`）内部各模块的职责、启动流程和协作关系。消息传递架构详见 [messaging.md](messaging.md)。
+Service Worker（`src/background/`）的模块划分与启动顺序。消息如何投递见 [messaging.md](messaging.md)，为什么这么设计见 [decisions/](../decisions/)。
 
-## 文件索引
-
-| 文件 | 职责 |
-|------|------|
-| `main.ts` | SW 入口：启动编排、Port 管理注册、CS 重新注入 |
-| `messaging/port-manager.ts` | Port 连接管理、消息队列、sendMessage 兜底 |
-| `messaging/toast.ts` | 层切换 toast 通知 |
-| `config/cache.ts` | 配置缓存：SW 侧内存缓存 + onChanged 自动刷新 |
-| `config/init-guard.ts` | 启动守卫：等待三配置（keyboardBookmark + keyboardCommand + systemKeymap）加载完成后放行 |
-| `commands/registry.ts` | SW 命令注册表：命令定义 + Record 映射分发 |
-| `commands/handlers.ts` | 可复用的组合命令实现 |
-| `commands/layer-keymap-builder.ts` | 书签层 keymap 构建 |
-
-## 目录结构
+## 目录
 
 ```
 src/background/
-├── main.ts                           ← 入口：启动编排 + listener 注册（胶水层）
+├── main.ts                       胶水层：启动编排 + listener 注册
 ├── messaging/
-│   ├── port-manager.ts               ← Port 连接生命周期 + 消息分发
-│   └── toast.ts                      ← 层切换 toast 通知
+│   ├── port-manager.ts           Port 连接生命周期 + 消息分发
+│   └── toast.ts                  层切换 toast（经 Port 下发）
 ├── commands/
-│   ├── registry.ts                   ← 命令定义 + Record 分发
-│   ├── handlers.ts                   ← tab/窗口/标签组操作
-│   └── layer-keymap-builder.ts       ← 书签层 keymap 构建
+│   ├── registry.ts               命令定义 + Record 映射分发
+│   ├── handlers.ts               可复用的组合命令
+│   └── layer-keymap-builder.ts   书签层 keymap 构建
 └── config/
-    ├── cache.ts                      ← 配置加载 + 内存缓存 + onChanged
-    └── init-guard.ts                 ← 启动守卫
+    ├── cache.ts                  配置内存缓存 + onChanged 刷新
+    └── init-guard.ts             启动守卫
 ```
 
-### 模块依赖关系
-
-```
-main.ts → messaging/ → commands/ (双向，业务必然)
-main.ts → config/ (单向)
-config/ → 无内部依赖，只导入 logic/
-```
-
-详见 `src/background/main.ts` 源码注释。
+依赖方向：`main → messaging → commands`（业务上双向，属必然），`main → config`，`config/` 只依赖 `logic/`，不反向依赖任何 UI 目录。这条由 `pnpm check-boundaries` 强制。
 
 ## 启动流程
 
 ```
-SW 加载（同步 < 1ms）
-  ├── waitInitialized()        ← 并发加载双配置 + system keymap，10s 超时兜底
-  ├── reinjectContentScripts()  ← 并发注入 CS 到已有页面
-  ├── initLayerToast(portMap)   ← 注入 Port 映射到 toast
-  └── setupPortManager()        ← 注册 onConnect/onMessage listener
+SW 加载（同步 < 1ms，listener 注册完成）
+  ├── waitInitialized()         并发加载双配置 + system keymap，10s 超时兜底
+  ├── reinjectContentScripts()  并发注入 CS 到已有页面
+  ├── initLayerToast(portMap)
+  └── setupPortManager()        注册 onConnect / onMessage
 ```
 
-`waitInitialized()` 和 `reinjectContentScripts()` 并发执行：SW listener 在同步模块加载阶段就注册完成，远快于任何 CS 连接请求。即使 CS 在 wait 完成前建立 Port，也会走 `pendingMessages` 路径。
+`waitInitialized()` 与 `reinjectContentScripts()` 并发，不串行。原因：listener 在同步加载阶段就绪，远早于任何 CS 连接；即便注入的 CS 先连上来，也会走 `pendingMessages` 被正确处理。串行只是延后 ~50ms，没有收益。
 
 ## config/init-guard 启动守卫
 
-防止冷启动期间读到空 keymap。CS 通过 Port 连接后收到 `INIT_COMPLETE` 消息才激活快捷键。10s 超时后自动标记已初始化，降级到默认配置。
+防止冷启动期间读到空 keymap。CS 连上后要收到 `INIT_COMPLETE` 才激活快捷键。10s 超时后强制标记已初始化，降级到默认配置——宁可让用户用默认键位，也不要让快捷键永久无响应。
 
 ## config/cache 配置缓存
 
-SW 无法使用 Vue 响应式状态，采用启动时加载 + `onChanged` 自动更新模式。按键事件直读缓存（~0ms 响应）。
+SW 用不了 Vue 响应式，改为「启动时加载 + `onChanged` 自动刷新」：按键路径直读内存，响应约 0ms。
 
-### 层切换冷却控制
+### 层切换冷却
 
-采用 `isBuildingLayerKeymap` 标志位防护：从命令触发到 `onChanged` 完成期间始终为 true，不依赖具体耗时，无间隙。
+用 `isBuildingLayerKeymap` 标志位，而不是时间窗口：从命令触发到 `onChanged` 完成期间始终为 `true`，与具体耗时无关，没有缝隙可钻。
 
-**异常安全**：`isBuildingLayerKeymap` 有两类清除路径——成功路径在 `onChanged` 中清除，非成功路径在 `buildAndSaveLayerKeymap` 中清除。两者互不冲突，覆盖所有退出路径。详见 `src/background/config/cache.ts` 源码注释。
+标志位有两条清除路径：成功路径在 `onChanged` 里清，失败路径在 `buildAndSaveLayerKeymap` 里清。两条互不冲突，覆盖所有退出路径——**这是必须守住的，漏一条会让书签快捷键永久失灵**（见 [ADR 0004](../decisions/0004-sw-builds-layer-keymap.md)）。
 
-### 导出 API
+## commands/registry 命令注册表
 
-```ts
-// 配置加载
-loadAndCacheKeyboardBookmarkConfig(): Promise<void>
-loadAndCacheKeyboardCommandConfig(): Promise<void>
-loadAndCacheSystemKeymap(): Promise<void>
-// 读取缓存
-getCachedKeyboardBookmarkConfig() / getCachedKeyboardCommandConfig() / getCachedSystemKeymap()
-getCachedKeyboardBookmarkLayers()  // 层配置，避免循环依赖
-// 层切换冷却
-markLayerKeymapBuilding() / buildLayerKeymapComplete() / isInLayerSwitchCooldown()
-```
+每个命令是一个独立命名函数，用 `Record<TSwCommandName, CommandHandler>` 做 O(1) 分发。分组（Tab / 窗口 / 会话 / 标签组 / 最近标签页 / 书签层）以 `registry.ts` 的分段注释为准，本文不记数量。
 
-## commands/registry SW 命令注册表
+不用 `switch` 的原因：TS 类型约束能自动发现遗漏（少一个 key 就编译报错）；新增命令只需加函数 + 加注册项；函数名即命令名，grep 定位快。
 
-每个命令定义为独立命名函数，通过 `Record<TSwCommandName, CommandHandler>` 做 O(1) 分发。按功能分组：Tab 操作(27)、窗口操作(8)、会话与去重(3)、标签组(4)、书签层切换(4)。
+错误统一走 `logLastError`；async handler 的 Promise 由 `execSwCommand` 统一 catch，避免未处理拒绝泄漏到全局。
 
-**为什么不用 switch：** TS 类型约束自动检查遗漏；新增命令只需添加函数 + 注册项；函数名即命令名，grep 定位更快。
+`switchToPinnedTab1-9`、`switchToPinnedTabLast` 各自是独立 handler，而不是带参数的单个函数——命令系统按字符串名称匹配，没有传参通道。
 
-**错误处理：** 统一 `logLastError` 处理 Chrome API 错误。async handler 的 Promise 由 `execSwCommand` 统一 catch。
+## commands/layer-keymap-builder
 
-**Pinned Tab 快捷键：** `switchToPinnedTab1-9` + `switchToPinnedTabLast` 是 10 个独立 handler（而非带参数的单个函数），因为命令系统基于字符串名称匹配。
-
-## commands/layer-keymap-builder 书签层 keymap 构建
-
-### 为什么由 SW 构建
-
-书签层切换命令 `execEnv = 'sw'`，可在任意页面执行。SW 直接构建的优势：`chrome.bookmarks` API 可用、不依赖 newtab 页面是否存在。UI 端（newtab/popup）通过 `runtime.sendMessage` 通知 SW 执行，SW 原子写入 keymap + activeLayer，避免 UI 端两步写入的中间状态。
-
-### 构建流程
+构建流程：
 
 ```
-命令/UI触发 → markLayerKeymapBuilding() → 标志位置 true
-    → parseBookmarkFolder() 读取书签树 → 构建 keymap
-    → chrome.storage.local.set({ keymap, activeLayer })  原子写入
-    → onChanged 触发 → cachedSystemKeymap 更新
-    → buildLayerKeymapComplete() 清除标志位
-    → toast 通知
+命令 / UI 触发 → markLayerKeymapBuilding()（标志位置 true）
+  → parseBookmarkFolder() 读书签树 → 构建 keymap
+  → chrome.storage.local.set({ keymap, activeLayer }) 原子写入
+  → onChanged → cachedSystemKeymap 更新
+  → buildLayerKeymapComplete()
+  → toast
 ```
 
-### 异常处理
-
-| 场景 | 行为 |
-|------|------|
-| 层未配置 | 清除标志位，返回空对象，不写入 storage |
-| 书签权限未授予 | 清除标志位，返回空对象 |
-| storage 配额超限 | 清除标志位 |
-
-**保证**：所有退出路径必须调用 `buildLayerKeymapComplete()`，否则 `isBuildingLayerKeymap` 永久为 `true`，书签快捷键被永久拦截。详见 `src/background/commands/layer-keymap-builder.ts` 源码注释。
+异常分支（层未配置 / 书签权限未授予 / 配额超限）一律清除标志位后返回，不写 storage。为什么必须原子写入、为什么放在 SW，见 [ADR 0004](../decisions/0004-sw-builds-layer-keymap.md)。
 
 ## main.ts 职责
 
-`main.ts` 是胶水层，专注启动编排 + listener 注册：
+只做四件事：启动编排（`waitInitialized` + `reinjectContentScripts` 并发）、`setupPortManager(execSwCommand)` 注册 listener、`initLayerToast(portMap)`、`chrome.tabs.onActivated` 追踪最近标签页。业务逻辑不进 main.ts。
 
-1. **启动编排**：`waitInitialized()` + `reinjectContentScripts()` 并发执行
-2. **Port 管理注册**：`setupPortManager(execSwCommand)` 注册 listener
-3. **Toast 初始化**：`initLayerToast(portMap)`
-4. **标签页追踪**：`chrome.tabs.onActivated` 监听器用于最近标签页切换
+`reinjectContentScripts` 的三个取舍：`tabs.query({})` 查全部（按 URL 过滤会漏掉 `file://` 与 `about:blank`）；串行 for 循环（大量 tab 时 `Promise.all` 会让浏览器卡顿）；注入失败静默忽略（受限页面失败是预期，记日志只是噪声）。
 
-### Port 连接生命周期
+## 相关决策
 
-冷启动时 CS 连接先注册暂存 listener，`waitInitialized()` resolve 后批量处理积压消息并切换正常 listener。正常路径下立即 `postMessage INIT_COMPLETE`。
-
-### reinjectContentScripts 注入策略
-
-- `chrome.tabs.query({})` 查询所有 tab（含 `file://` 和 `about:blank`）
-- 串行 for 循环注入（大量 tab 时避免 `Promise.all` 卡顿）
-- 注入失败静默忽略（受限页面是预期的）
+[0004 书签层 keymap 由 SW 构建](../decisions/0004-sw-builds-layer-keymap.md) · [0001 Port 长连接](../decisions/0001-port-over-sendmessage.md)

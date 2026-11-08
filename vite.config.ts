@@ -7,10 +7,9 @@ import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import Markdown from 'unplugin-vue-markdown/vite'
-import postcssPresetEnv from 'postcss-preset-env'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { isDev, port, r, BROWSER_DIR } from './scripts/utils'
-import packageJson from './package.json'
+import { isDev, port, r, BROWSER_DIR } from './scripts/utils.ts'
+import packageJson from './package.json' with { type: 'json' }
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
@@ -25,27 +24,19 @@ export const sharedConfig: UserConfig = {
     __APP_NAME__: JSON.stringify(packageJson.name),
     __APP_VERSION__: JSON.stringify(packageJson.version),
   },
-  css: {
-    postcss: {
-      plugins: [
-        postcssPresetEnv({ stage: 3, features: { 'nesting-rules': true } }),
-      ],
-    },
-  },
+  // CSS 不再经过 postcss-preset-env：浏览器基线（Chrome 112+ / Firefox gecko 130+）
+  // 已原生支持 CSS 嵌套，构建期降级反而按无人配置的默认 browserslist 盲目改写产物。
+  // 若未来引入需要降级的特性，先在 manifest 里收紧基线，再选带明确 browserslist 的工具。
   plugins: [
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
     VueI18nPlugin({
-      include: resolve(__dirname, './src/locales/**'),
+      include: resolve(import.meta.dirname, './src/locales/**'),
     }),
     Markdown({}),
     AutoImport({
-      imports: [
-        'vue',
-        { 'webextension-polyfill': [['*', 'browser']] },
-        { dayjs: [['default', 'dayjs']] },
-      ],
+      imports: ['vue', { dayjs: [['default', 'dayjs']] }],
       dts: r('src/auto-imports.d.ts'),
     }),
     // https://github.com/antfu/unplugin-vue-components
@@ -77,14 +68,7 @@ export const sharedConfig: UserConfig = {
     ...(process.env.ANALYZE ? [visualizer()] : []),
   ],
   optimizeDeps: {
-    include: [
-      'vue',
-      '@vueuse/core',
-      'webextension-polyfill',
-      'reka-ui',
-      'vue-i18n',
-    ],
-    exclude: ['vue-demi'],
+    include: ['vue', '@vueuse/core', 'reka-ui', 'vue-i18n'],
   },
 }
 
@@ -105,7 +89,9 @@ export default defineConfig(({ command }) => ({
     emptyOutDir: false, // 保留未由 Vite 处理的静态资源
     sourcemap: isDev ? 'inline' : false,
     minify: process.env.NO_MINIFY ? false : 'esbuild',
-    chunkSizeWarningLimit: 1000,
+    // 扩展从本地磁盘加载，不做分包（体积与请求数都不是关注点）。
+    // 注意：Vite 8 底层是 rolldown，函数式 output.manualChunks 已不生效，
+    chunkSizeWarningLimit: 3000,
     // https://developer.chrome.com/docs/webstore/program_policies/#:~:text=Code%20Readability%20Requirements
     // terserOptions: {
     //   mangle: false,
@@ -116,27 +102,6 @@ export default defineConfig(({ command }) => ({
         popup: r('src/popup/index.html'),
         options: r('src/options/index.html'),
       },
-      output: {
-        manualChunks(id) {
-          // 浏览器扩展从本地磁盘加载，无网络请求开销，chunk 不宜过多
-          if (id.includes('node_modules')) {
-            if (id.includes('lunar-typescript')) {
-              return 'vendor-lunar'
-            }
-            // 其余第三方依赖统一归入一个 vendor chunk
-            return 'vendor-libs'
-          }
-
-          // 业务代码统一归入 main chunk，避免碎片化
-          if (
-            ['src/components', 'src/logic', 'src/lib'].some((pkg) =>
-              id.includes(pkg),
-            )
-          ) {
-            return 'main'
-          }
-        },
-      },
     },
   },
   test: {
@@ -145,6 +110,30 @@ export default defineConfig(({ command }) => ({
     setupFiles: ['../test/setup.ts'],
     coverage: {
       reportsDirectory: '../coverage',
+      /**
+       * 覆盖率门槛：只防倒退，不逼补历史。
+       *
+       * 基线（2026-11 实测，被统计 86 个文件）：
+       *   全局      lines 74.8 / branches 63.8 / functions 76.4
+       *   src/logic lines 74.9 / branches 65.4 / functions 77.6
+       * 阈值取基线以下约 4 个百分点：能容忍正常波动，又能拦住「新增大块零测试代码」。
+       *
+       * 口径：只统计被测试触达的文件（未设 include），测试文件本身不计入。
+       * 若后续需要「未被任何测试 import 的新文件也计入分母」，需设置
+       * coverage.include，但那会把全部 .vue 计入（当前 0 覆盖），届时需重新定基线。
+       */
+      thresholds: {
+        lines: 70,
+        branches: 59,
+        functions: 71,
+        statements: 70,
+        'logic/**/*.ts': {
+          lines: 71,
+          branches: 61,
+          functions: 73,
+          statements: 71,
+        },
+      },
     },
   },
 }))

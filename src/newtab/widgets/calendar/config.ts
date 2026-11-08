@@ -1,4 +1,45 @@
+/** 预设地区类型（与适配层无关，仅用于配置取值） */
+import type { TSubscriptionRegion } from '@/logic/calendar/subscriptions'
+
 export const WIDGET_CODE = 'calendar'
+
+/**
+ * 可浏览的年份范围。
+ *
+ * 与 `logic/calendar/subscriptions.ts` 的 MIN_PARSE_YEAR / MAX_PARSE_YEAR 保持一致：
+ * 订阅的解析窗口本来就钳在 1900–2100，日历翻出这个范围只会看到农历与黄历，
+ * 节日与休班必然为空。把两处边界对齐，「翻得到的年份」与「有节日数据的年份」
+ * 就不会给人两套口径。
+ *
+ * 下限取 1900 而不是 2000：万年历的高频用途之一是查农历生日，
+ * 2000 起会挡住 1990 年代及更早出生的人查自己。tyme4ts 在 1900 年附近计算正常
+ * （已实测 1850 / 1900 / 2200 均可正确返回农历）。
+ */
+export const CALENDAR_MIN_YEAR = 1900
+export const CALENDAR_MAX_YEAR = 2100
+
+/** 年月的单调序号：跨年比较、钳制都换算成它，避免各写一遍 12 进制进位 */
+export const toYearMonth = (year: number, month: number): number =>
+  year * 12 + month
+
+/**
+ * 把年月钳制进 [1900-01, 2100-12]。
+ *
+ * 只做钳制、不做取舍：调用方拿到的一定是范围内且合法的年月，
+ * 因此箭头翻月、下拉选年、回到今日三条路径可以共用同一份边界。
+ */
+export const clampYearMonth = (
+  year: number,
+  month: number,
+): { year: number; month: number } => {
+  const min = toYearMonth(CALENDAR_MIN_YEAR, 1)
+  const max = toYearMonth(CALENDAR_MAX_YEAR, 12)
+  const clamped = Math.min(max, Math.max(min, toYearMonth(year, month)))
+  return {
+    year: Math.floor((clamped - 1) / 12),
+    month: ((clamped - 1) % 12) + 1,
+  }
+}
 
 export const SCALABLE_FIELDS = {
   width: { min: 16, max: 120 },
@@ -12,8 +53,10 @@ export const WIDGET_CONFIG = {
   enabled: true,
   weekBeginsOn: 1,
   festivalCountdown: true,
-  /** 节假日地区：ISO 3166-1 alpha-2，见 src/logic/calendar/regions */
-  holidayRegion: 'CN',
+  /** 节假日订阅地区：ISO 3166-1 alpha-2，'custom' 表示使用下面的自定义地址 */
+  subscriptionRegion: 'CN' as TSubscriptionRegion | 'custom',
+  /** 自定义订阅地址（subscriptionRegion 为 'custom' 时生效） */
+  customSubscriptionUrl: '',
   /** 是否显示休 / 班标记（关闭后不影响节日与节气展示） */
   isHolidayMarkVisible: true,
   /** 是否显示农历与节气（关闭后格子第二行、详情农历行、倒计时节气条目都不展示） */

@@ -18,7 +18,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 // ── mergeConfigWithVersionAwareness ──
 
 describe('mergeConfigWithVersionAwareness', () => {
-  let fn: typeof import('@/logic/config/sync/loader')['mergeConfigWithVersionAwareness']
+  let fn: (typeof import('@/logic/config/sync/loader'))['mergeConfigWithVersionAwareness']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -86,7 +86,7 @@ describe('mergeConfigWithVersionAwareness', () => {
 // ── flushConfigSync ──
 
 describe('flushConfigSync', () => {
-  let flushConfigSync: typeof import('@/logic/config/sync/upload')['flushConfigSync']
+  let flushConfigSync: (typeof import('@/logic/config/sync/upload'))['flushConfigSync']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -104,9 +104,9 @@ describe('flushConfigSync', () => {
     expect(localState.value.isUploadConfigStatusMap.general.loading).toBe(false)
   })
 
-  it('respects skip when content unchanged (same MD5)', async () => {
+  it('respects skip when content unchanged (same fingerprint)', async () => {
     const { localState } = await import('@/logic/config/state')
-    // First call will set syncId; second call should skip via MD5 match
+    // First call will set syncId; second call should skip via fingerprint match
     localState.value.isUploadConfigStatusMap = {}
     await flushConfigSync('general')
     const syncId = localState.value.isUploadConfigStatusMap.general.syncId
@@ -120,13 +120,19 @@ describe('flushConfigSync', () => {
 // ── handleMissedUploadConfig ──
 
 describe('handleMissedUploadConfig', () => {
-  let handleMissedUploadConfig: typeof import('@/logic/config/sync/upload')['handleMissedUploadConfig']
+  let handleMissedUploadConfig: (typeof import('@/logic/config/sync/upload'))['handleMissedUploadConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: true, dirty: true, localModifiedTime: Date.now(), syncTime: 0, syncId: '' },
+      general: {
+        loading: true,
+        dirty: true,
+        localModifiedTime: Date.now(),
+        syncTime: 0,
+        syncId: '',
+      },
     }
     const mod = await import('@/logic/config/sync/upload')
     handleMissedUploadConfig = mod.handleMissedUploadConfig
@@ -149,7 +155,7 @@ describe('handleMissedUploadConfig', () => {
 // ── loadRemoteConfig: no remote data → initialize all fields ──
 
 describe('loadRemoteConfig — no remote data, initialize fields', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -168,7 +174,7 @@ describe('loadRemoteConfig — no remote data, initialize fields', () => {
 // ── loadRemoteConfig: chrome.storage.sync error ──
 
 describe('loadRemoteConfig — chrome API error', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -176,7 +182,7 @@ describe('loadRemoteConfig — chrome API error', () => {
     localState.value.isUploadConfigStatusMap = {}
 
     // Override the global chrome mock to simulate error
-    const origGet = (chrome.storage.sync.get as any)
+    const origGet = chrome.storage.sync.get as any
     vi.spyOn(chrome.storage.sync, 'get').mockImplementation((_keys, cb) => {
       ;(chrome.runtime.lastError as any) = { message: 'quota exceeded' }
       cb({})
@@ -199,13 +205,19 @@ describe('loadRemoteConfig — chrome API error', () => {
 // ── loadRemoteConfig: remote data with same syncId → skip ──
 
 describe('loadRemoteConfig — remote data with same syncId', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: false, localModifiedTime: 0, syncTime: 100, syncId: 'abc123' },
+      general: {
+        loading: false,
+        dirty: false,
+        localModifiedTime: 0,
+        syncTime: 100,
+        syncId: 'abc123',
+      },
     }
     const payload = JSON.stringify({
       syncTime: 200,
@@ -228,20 +240,28 @@ describe('loadRemoteConfig — remote data with same syncId', () => {
     // The general field with matching syncId should not trigger a new upload
     // (other fields may still be initialized)
     const { localState } = await import('@/logic/config/state')
-    expect(localState.value.isUploadConfigStatusMap.general.syncId).toBe('abc123')
+    expect(localState.value.isUploadConfigStatusMap.general.syncId).toBe(
+      'abc123',
+    )
   })
 })
 
 // ── loadRemoteConfig: remote newer, local clean → merge ──
 
 describe('loadRemoteConfig — remote newer, local clean', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: false, localModifiedTime: 0, syncTime: 100, syncId: 'old' },
+      general: {
+        loading: false,
+        dirty: false,
+        localModifiedTime: 0,
+        syncTime: 100,
+        syncId: 'old',
+      },
     }
     const payload = JSON.stringify({
       syncTime: 200,
@@ -267,13 +287,19 @@ describe('loadRemoteConfig — remote newer, local clean', () => {
 // ── loadRemoteConfig: parse error with legacy fallback ──
 
 describe('loadRemoteConfig — parse error with legacy fallback', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: false, localModifiedTime: 0, syncTime: 0, syncId: '' },
+      general: {
+        loading: false,
+        dirty: false,
+        localModifiedTime: 0,
+        syncTime: 0,
+        syncId: '',
+      },
     }
     // Invalid compressed data → parse fails → legacy JSON parse also fails → skip
     vi.spyOn(chrome.storage.sync, 'get').mockImplementation((_keys, cb) => {
@@ -292,13 +318,19 @@ describe('loadRemoteConfig — parse error with legacy fallback', () => {
 // ── loadRemoteConfig: local dirty and newer → upload ──
 
 describe('loadRemoteConfig — local dirty and newer → upload local', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: true, localModifiedTime: Date.now() + 10000, syncTime: 100, syncId: 'oldLocal' },
+      general: {
+        loading: false,
+        dirty: true,
+        localModifiedTime: Date.now() + 10000,
+        syncTime: 100,
+        syncId: 'oldLocal',
+      },
     }
     const payload = JSON.stringify({
       syncTime: 100,
@@ -322,13 +354,19 @@ describe('loadRemoteConfig — local dirty and newer → upload local', () => {
 // ── loadRemoteConfig: local dirty but remote newer → merge ──
 
 describe('loadRemoteConfig — local dirty but remote newer → merge', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: true, localModifiedTime: 100, syncTime: 100, syncId: 'old' },
+      general: {
+        loading: false,
+        dirty: true,
+        localModifiedTime: 100,
+        syncTime: 100,
+        syncId: 'old',
+      },
     }
     const payload = JSON.stringify({
       syncTime: 99999,
@@ -353,13 +391,19 @@ describe('loadRemoteConfig — local dirty but remote newer → merge', () => {
 // 验证合并后不自行上传，而是标记 dirty=true 交给下一步统一处理
 
 describe('loadRemoteConfig — merge marks dirty for recovery', () => {
-  let loadRemoteConfig: typeof import('@/logic/config/sync/loader')['loadRemoteConfig']
+  let loadRemoteConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: false, localModifiedTime: 0, syncTime: 100, syncId: 'oldLocal' },
+      general: {
+        loading: false,
+        dirty: false,
+        localModifiedTime: 0,
+        syncTime: 100,
+        syncId: 'oldLocal',
+      },
     }
     // 云端 syncId 不同，但数据结构只是多了个 extra 字段
     const payload = JSON.stringify({
@@ -383,7 +427,7 @@ describe('loadRemoteConfig — merge marks dirty for recovery', () => {
     const status = localState.value.isUploadConfigStatusMap.general
     // 核心：合并后标记 dirty=true，交给下一步 handleMissedUploadConfig 上传
     expect(status.dirty).toBe(true)
-    // syncId 保持为云端原始值，不自行重算——避免与 uploadConfigFn MD5 检查冲突
+    // syncId 保持为云端原始值，不自行重算——避免与 uploadConfigFn 指纹检查冲突
     expect(status.syncId).toBe('cloudMd5xyz')
     // 状态已重置干净，等待上传
     expect(status.loading).toBe(false)
@@ -395,13 +439,22 @@ describe('loadRemoteConfig — merge marks dirty for recovery', () => {
 // ── handleMissedUploadConfig: dirty + retryCount guard ──
 
 describe('handleMissedUploadConfig — dirty and retryCount guard', () => {
-  let handleMissedUploadConfig: typeof import('@/logic/config/sync/upload')['handleMissedUploadConfig']
+  let handleMissedUploadConfig: (typeof import('@/logic/config/sync/upload'))['handleMissedUploadConfig']
 
   it('skips fields with dirty=true but retryCount >= 3', async () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: true, localModifiedTime: Date.now(), syncTime: 100, syncId: 'willNotRetry', retryCount: 3, lastError: 'persistent error', syncStatus: 'failed' },
+      general: {
+        loading: false,
+        dirty: true,
+        localModifiedTime: Date.now(),
+        syncTime: 100,
+        syncId: 'willNotRetry',
+        retryCount: 3,
+        lastError: 'persistent error',
+        syncStatus: 'failed',
+      },
     }
     const mod = await import('@/logic/config/sync/upload')
     handleMissedUploadConfig = mod.handleMissedUploadConfig
@@ -419,7 +472,16 @@ describe('handleMissedUploadConfig — dirty and retryCount guard', () => {
     vi.resetModules()
     const { localState } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      general: { loading: false, dirty: true, localModifiedTime: Date.now(), syncTime: 100, syncId: 'oldNeedUpload', retryCount: 1, lastError: '', syncStatus: 'failed' },
+      general: {
+        loading: false,
+        dirty: true,
+        localModifiedTime: Date.now(),
+        syncTime: 100,
+        syncId: 'oldNeedUpload',
+        retryCount: 1,
+        lastError: '',
+        syncStatus: 'failed',
+      },
     }
     const mod = await import('@/logic/config/sync/upload')
     handleMissedUploadConfig = mod.handleMissedUploadConfig
@@ -430,23 +492,23 @@ describe('handleMissedUploadConfig — dirty and retryCount guard', () => {
     const status = localState.value.isUploadConfigStatusMap.general
     expect(status.loading).toBe(false)
     // 上传后 dirty 取决于 uploadConfigFn 的结果：
-    // MD5 匹配 → dirty=false  |  上传成功 → dirty=false  |  上传失败 → dirty=true
+    // 指纹匹配 → dirty=false  |  上传成功 → dirty=false  |  上传失败 → dirty=true
     // 默认 mock chrome 数据为空，syncId='oldNeedUpload', currConfigMd5 由 defaultConfig 决定
     // 由于 prevSyncId 大概率 ≠ currConfigMd5，会上传成功 → dirty=false
     expect(status.dirty).toBe(false)
   })
 })
 
-// ── handleMissedUploadConfig: dirty=true + MD5 match clears dirty ──
+// ── handleMissedUploadConfig: dirty=true + fingerprint match clears dirty ──
 
-describe('handleMissedUploadConfig — MD5 match clears dirty', () => {
-  let handleMissedUploadConfig: typeof import('@/logic/config/sync/upload')['handleMissedUploadConfig']
+describe('handleMissedUploadConfig — fingerprint match clears dirty', () => {
+  let handleMissedUploadConfig: (typeof import('@/logic/config/sync/upload'))['handleMissedUploadConfig']
 
-  it('clears dirty when uploadConfigFn MD5 matches (data already synced)', async () => {
+  it('clears dirty when uploadConfigFn fingerprint matches (data already synced)', async () => {
     vi.resetModules()
     const { localState, localConfig } = await import('@/logic/config/state')
-    // 先让 uploadConfigFn 计算一次真实 MD5，然后用它作为 syncId
-    // 这样下次调用时 MD5 匹配 → dirty 应被清除
+    // 先让 uploadConfigFn 计算一次真实指纹，然后用它作为 syncId
+    // 这样下次调用时指纹匹配 → dirty 应被清除
     const mod = await import('@/logic/config/sync/upload')
     const { uploadConfigFn } = mod
 
@@ -463,7 +525,7 @@ describe('handleMissedUploadConfig — MD5 match clears dirty', () => {
     handleMissedUploadConfig = mod.handleMissedUploadConfig
     await handleMissedUploadConfig()
 
-    // MD5 匹配 → dirty 应被清除
+    // 指纹匹配 → dirty 应被清除
     const status = localState.value.isUploadConfigStatusMap.general
     expect(status.dirty).toBe(false)
     expect(status.syncId).toBe(syncedId)
@@ -474,13 +536,19 @@ describe('handleMissedUploadConfig — MD5 match clears dirty', () => {
 // ── loadRemoteKeyboardConfig ──
 
 describe('loadRemoteKeyboardConfig', () => {
-  let loadRemoteKeyboardConfig: typeof import('@/logic/config/sync/loader')['loadRemoteKeyboardConfig']
+  let loadRemoteKeyboardConfig: (typeof import('@/logic/config/sync/loader'))['loadRemoteKeyboardConfig']
 
   beforeEach(async () => {
     vi.resetModules()
     const { localState, localConfig } = await import('@/logic/config/state')
     localState.value.isUploadConfigStatusMap = {
-      keyboardBookmark: { loading: false, dirty: false, localModifiedTime: 0, syncTime: 0, syncId: 'oldSync' },
+      keyboardBookmark: {
+        loading: false,
+        dirty: false,
+        localModifiedTime: 0,
+        syncTime: 0,
+        syncId: 'oldSync',
+      },
     }
     localConfig.keyboardBookmark = { keymap: {} }
   })
@@ -490,7 +558,9 @@ describe('loadRemoteKeyboardConfig', () => {
   })
 
   it('returns false when remote data is empty', async () => {
-    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({ 'naive-tab-keyboardBookmark': '' })
+    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({
+      'naive-tab-keyboardBookmark': '',
+    })
     const mod = await import('@/logic/config/sync/loader')
     loadRemoteKeyboardConfig = mod.loadRemoteKeyboardConfig
     const result = await loadRemoteKeyboardConfig()
@@ -504,7 +574,9 @@ describe('loadRemoteKeyboardConfig', () => {
       appVersion: window.appVersion,
       data: { keymap: {} },
     })
-    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({ 'naive-tab-keyboardBookmark': payload })
+    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({
+      'naive-tab-keyboardBookmark': payload,
+    })
     const mod = await import('@/logic/config/sync/loader')
     loadRemoteKeyboardConfig = mod.loadRemoteKeyboardConfig
     const result = await loadRemoteKeyboardConfig()
@@ -512,26 +584,32 @@ describe('loadRemoteKeyboardConfig', () => {
   })
 
   it('returns true and updates state when syncId differs', async () => {
-    const newKeymap = { 'KeyA': { url: 'https://example.com' } }
+    const newKeymap = { KeyA: { url: 'https://example.com' } }
     const payload = JSON.stringify({
       syncTime: 999,
       syncId: 'newSync123',
       appVersion: window.appVersion,
       data: { keymap: newKeymap },
     })
-    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({ 'naive-tab-keyboardBookmark': payload })
+    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({
+      'naive-tab-keyboardBookmark': payload,
+    })
     const mod = await import('@/logic/config/sync/loader')
     loadRemoteKeyboardConfig = mod.loadRemoteKeyboardConfig
     const result = await loadRemoteKeyboardConfig()
     expect(result).toBe(true)
 
     const { localState, localConfig } = await import('@/logic/config/state')
-    expect(localState.value.isUploadConfigStatusMap.keyboardBookmark.syncId).toBe('newSync123')
+    expect(
+      localState.value.isUploadConfigStatusMap.keyboardBookmark.syncId,
+    ).toBe('newSync123')
     expect(localConfig.keyboardBookmark.keymap).toEqual(newKeymap)
   })
 
   it('returns false on parse error', async () => {
-    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({ 'naive-tab-keyboardBookmark': 'garbage-data' })
+    vi.spyOn(chrome.storage.sync, 'get').mockResolvedValue({
+      'naive-tab-keyboardBookmark': 'garbage-data',
+    })
     const mod = await import('@/logic/config/sync/loader')
     loadRemoteKeyboardConfig = mod.loadRemoteKeyboardConfig
     const result = await loadRemoteKeyboardConfig()

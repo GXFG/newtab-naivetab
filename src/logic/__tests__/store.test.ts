@@ -18,8 +18,11 @@ describe('store (isolated exports)', () => {
     vi.resetModules()
 
     // Mock all dependencies BEFORE importing store
+    // 注意：mock 必须保持与真实模块一致的导出面 —— config/state.ts 在模块初始化时
+    // 会遍历 recoveredStorageKeys 清理受损字段的同步状态
     vi.doMock('@/composables/useStorageLocal', () => ({
       useStorageLocal: vi.fn((key: string, defaultVal: any) => ref(defaultVal)),
+      recoveredStorageKeys: new Set<string>(),
     }))
 
     vi.doMock('@/env', () => ({

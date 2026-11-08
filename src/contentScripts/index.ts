@@ -34,7 +34,6 @@ import { matchShortcut } from '@/logic/shortcut/matcher'
 import { toModifierMask, type TShortcutModifier } from '@/logic/shortcut/utils'
 import { parseStoredData } from '@/logic/config/compress'
 import { SYSTEM_KEYMAP_STORAGE_KEY } from '@/logic/keyboard/keyboard-constants'
-import { padUrlHttps } from '@/logic/utils/common'
 import { registerGlobalErrorHandler } from '@/logic/utils/errorHandler'
 import {
   REPEATABLE_SCROLL_COMMANDS,
@@ -569,8 +568,14 @@ const initMain = () => {
   }
 
   /**
-   * 通过 Port（优先）或 sendMessage + 本地 keymap（兜底）发送书签快捷键到 SW。
-   * 本地 keymap 兜底确保即使 SW 休眠也能零延迟打开书签 URL。
+   * 通过 Port（优先）或 sendMessage（降级）把书签快捷键送到 SW 执行。
+   *
+   * 这里**没有**本地打开兜底：`chrome.tabs` 在内容脚本中不存在（Chrome 不向内容脚本
+   * 暴露 Tabs API），所以 CS 无法自己开标签页。曾经写过 `chrome.tabs.create`，
+   * 结果是每次都抛 TypeError 并被外层 catch 吞掉，连带 `preventDefault` 失效，
+   * 表现为"书签打开了、页面也响应了这个键"。不要重新加回来——
+   * 若确实需要零延迟打开，得改用 `window.open`，且必须先删掉下面的 sendMessage，
+   * 否则一次按键会开两个标签页。详见 docs/decisions/0006。
    */
   const tryDispatchBookmark = (e: KeyboardEvent): boolean => {
     if (swReady && port) {
@@ -587,15 +592,11 @@ const initMain = () => {
         key: e.code,
         source: 'bookmark',
       })
+      return true
     } catch {
-      // sendMessage 也可能失败（SW 被卸载等极端场景）
+      // 消息发不出去（扩展上下文失效等）：不拦截按键，交回页面，避免按键被无声吞掉
+      return false
     }
-    const activeKeymap = source === 1 ? systemKeymap : keymap
-    const entry = activeKeymap[e.code]
-    if (entry?.url) {
-      chrome.tabs.create({ url: padUrlHttps(entry.url) })
-    }
-    return true
   }
 
   /**

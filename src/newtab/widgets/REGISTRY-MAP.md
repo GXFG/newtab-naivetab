@@ -9,7 +9,7 @@
 | 1 | [widget-constants.ts](src/common/widget-constants.ts) | `WIDGET_CODE_LIST` 数组 | 无标记，直接追加 | Widget code 字符串 |
 | 2 | [widget-constants.ts](src/common/widget-constants.ts) | `WIDGET_GROUPS` 分组 | 无标记，直接追加 | 决定组件库抽屉中的分类展示 |
 | 3 | [widget-constants.ts](src/common/widget-constants.ts) | `WIDGET_SETTING_PANE_MAP`（可选） | 无标记 | 若与其他 Widget 共用 setting pane 则添加 |
-| 4 | [icons.ts](src/logic/constants/icons.ts) | `ICONS` 对象 | 无标记，直接追加 | Widget 图标常量 |
+| 4 | [icons.ts](src/logic/constants/icons.ts) | `ICONS` 对象 | 无标记，直接追加 | Widget 图标常量；追加后跑 `pnpm gen:icons` 并提交产物 |
 | 5 | [icons.ts](src/logic/constants/icons.ts) | `WIDGET_ICON_META` | 无标记，直接追加 | 引用 `ICONS.xxx`，不可硬编码字符串 |
 | 6 | [locales/zh-CN.json](src/locales/zh-CN.json) / [en-US.json](src/locales/en-US.json) | `setting` 对象 | 无标记 | Widget 名称多语言 |
 

@@ -2,7 +2,6 @@ allowBuilds:
   esbuild: true
   simple-git-hooks: true
   spawn-sync: true
-  vue-demi: true
 minimumReleaseAgeExclude:
   - '@typescript-eslint/eslint-plugin@8.59.4'
   - '@typescript-eslint/parser@8.59.4'

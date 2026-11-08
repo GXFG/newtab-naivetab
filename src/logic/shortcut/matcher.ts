@@ -24,6 +24,13 @@ export function matchShortcut(
 
   if (!shortcutInInputElement && isInInputElement(e)) return null
 
+  // hostname 为空即跳过黑名单：扩展自身页面（chrome-extension://，hostname 为 ''）
+  // 和 about:blank 都没有可比对的域名。黑名单的语义是"在这些域名下禁用"，
+  // 不是"除白名单外全禁用"——用户在自己的新标签页上按快捷键，理应始终有效。
+  //
+  // 不要为了"让黑名单更严格"改成按 location.href 匹配：只要某条规则足够宽
+  // （例如带上 chrome-extension），就会连带命中扩展页，新标签页快捷键集体失效，
+  // 而且极难排查。这不是 bug，是有意留的短路。
   if (
     hostname &&
     urlBlacklist &&

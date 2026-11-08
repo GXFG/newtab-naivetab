@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, computed, ref } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { localConfig } from '@/logic/config/state'
 import { customPrimaryColor, colorMixWithAlpha } from '@/logic/store/style'

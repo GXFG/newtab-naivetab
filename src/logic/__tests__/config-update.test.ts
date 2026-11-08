@@ -81,6 +81,9 @@ describe('config/update', () => {
         bookmarkFolder: { enabled: false },
         clockFlip: { enabled: false },
       },
+      // 迁移引擎在模块作用域读取这两个导出
+      KEYBOARD_COMMON_CONFIG: { fontSize: 14 },
+      defaultFocusVisibleWidgetMap: { search: true, keyboardBookmark: true },
       defaultLocalState: {
         widgetInteractionOrder: [],
         isUploadConfigStatusMap: {
@@ -180,6 +183,28 @@ describe('config/update', () => {
       expect(afterKeys).toContain('keyboardBookmark')
       expect(afterKeys).toContain('search')
     })
+
+    it('removes stale fields that no longer exist in defaultConfig', async () => {
+      const { localState } = await import('@/logic/config/state')
+
+      // 模拟已下线 Widget 的残留同步状态
+      localState.value.isUploadConfigStatusMap.removedWidget = {
+        dirty: true,
+        syncTime: 1,
+        syncId: 'stale',
+        localModifiedTime: 1,
+        loading: false,
+      }
+
+      handleStateResetAndUpdate()
+
+      // 残留项会被上传链路遍历（getUploadConfigData 返回 undefined → 垃圾 payload）
+      expect(localState.value.isUploadConfigStatusMap).not.toHaveProperty(
+        'removedWidget',
+      )
+      // 已知字段不受影响
+      expect(localState.value.isUploadConfigStatusMap).toHaveProperty('general')
+    })
   })
 
   describe('updateSetting', () => {
@@ -221,6 +246,8 @@ describe('config/update', () => {
 
   describe('handleAppUpdate', () => {
     it('v2.6.0 migration: sets shimmer/scaleMode fields for old config', async () => {
+      // 目标版本要覆盖到被断言的迁移步骤：引擎会跳过晚于目标版本的步骤
+      window.appVersion = '2.6.2'
       handleAppUpdate()
 
       const { localConfig } = await import('@/logic/config/state')
@@ -231,10 +258,11 @@ describe('config/update', () => {
       expect(localConfig.general.shimmerBackgroundColors).toHaveLength(2)
       expect(localConfig.general.shimmerAnimationSpeed).toBe(1)
       // 升级后版本号更新为当前应用版本
-      expect(localConfig.general.version).toBe('2.2.5')
+      expect(localConfig.general.version).toBe('2.6.2')
     })
 
     it('v2.6.0 migration: preserves existing shimmer values', async () => {
+      window.appVersion = '2.6.2'
       const { localConfig } = await import('@/logic/config/state')
       // 预设已有 shimmer 值，迁移不应覆盖
       localConfig.general = Object.assign(localConfig.general, {
@@ -251,6 +279,7 @@ describe('config/update', () => {
     })
 
     it('v2.6.1 migration: defaults isGaEnabled to true for old config', async () => {
+      window.appVersion = '2.6.2'
       const { localConfig } = await import('@/logic/config/state')
       // 模拟老用户配置不含 isGaEnabled
       expect((localConfig.general as any).isGaEnabled).toBeUndefined()
@@ -261,6 +290,7 @@ describe('config/update', () => {
     })
 
     it('v2.6.1 migration: preserves existing isGaEnabled=false', async () => {
+      window.appVersion = '2.6.2'
       const { localConfig } = await import('@/logic/config/state')
       ;(localConfig.general as any).isGaEnabled = false
 

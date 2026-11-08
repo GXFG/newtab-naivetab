@@ -209,10 +209,15 @@ describe('downloadImageByUrl', () => {
   })
 
   it('uses jpg as fallback extension for unknown MIME type', async () => {
-    const mockBlob = new Blob(['image data'], { type: 'application/octet-stream' })
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      blob: () => Promise.resolve(mockBlob),
-    }))
+    const mockBlob = new Blob(['image data'], {
+      type: 'application/octet-stream',
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        blob: () => Promise.resolve(mockBlob),
+      }),
+    )
     vi.stubGlobal('URL', {
       createObjectURL: vi.fn().mockReturnValue('blob:mock-url'),
       revokeObjectURL: vi.fn(),
@@ -230,9 +235,12 @@ describe('downloadImageByUrl', () => {
 
   it('preserves filename if it already has extension', async () => {
     const mockBlob = new Blob(['image data'], { type: 'image/png' })
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      blob: () => Promise.resolve(mockBlob),
-    }))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        blob: () => Promise.resolve(mockBlob),
+      }),
+    )
     vi.stubGlobal('URL', {
       createObjectURL: vi.fn().mockReturnValue('blob:mock-url'),
       revokeObjectURL: vi.fn(),
@@ -352,13 +360,19 @@ describe('urlToImage', () => {
       #onload: Function | null = null
       #srcVal = ''
 
-      set onload(fn: Function | null) { this.#onload = fn }
-      get onload() { return this.#onload }
+      set onload(fn: Function | null) {
+        this.#onload = fn
+      }
+      get onload() {
+        return this.#onload
+      }
       set src(v: string) {
         this.#srcVal = v
         queueMicrotask(() => this.#onload?.())
       }
-      get src() { return this.#srcVal }
+      get src() {
+        return this.#srcVal
+      }
     }
 
     globalThis.Image = FakeImage as unknown as typeof Image
@@ -378,13 +392,19 @@ describe('urlToImage', () => {
       #onerror: Function | null = null
       #srcVal = ''
 
-      set onerror(fn: Function | null) { this.#onerror = fn }
-      get onerror() { return this.#onerror }
+      set onerror(fn: Function | null) {
+        this.#onerror = fn
+      }
+      get onerror() {
+        return this.#onerror
+      }
       set src(v: string) {
         this.#srcVal = v
         queueMicrotask(() => this.#onerror?.())
       }
-      get src() { return this.#srcVal }
+      get src() {
+        return this.#srcVal
+      }
     }
 
     globalThis.Image = FakeImage as unknown as typeof Image
@@ -447,9 +467,7 @@ describe('compressedImageToBlob', () => {
       naturalHeight: 100,
     } as HTMLImageElement
 
-    await expect(compressedImageToBlob(mockImg)).rejects.toThrow(
-      'Blob failed',
-    )
+    await expect(compressedImageToBlob(mockImg)).rejects.toThrow('Blob failed')
   })
 })
 
@@ -488,7 +506,9 @@ describe('compressedImageUrlToBase64', () => {
       onload: Function | null = null
       onerror: Function | null = null
       #srcVal = ''
-      get src() { return this.#srcVal }
+      get src() {
+        return this.#srcVal
+      }
       set src(_v: string) {
         this.#srcVal = _v
         // Auto-trigger onload when src is set (simulating immediate load)
@@ -498,20 +518,22 @@ describe('compressedImageUrlToBase64', () => {
     globalThis.Image = FakeImage as any
 
     const origCreateElement = document.createElement.bind(document)
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      if (tagName === 'canvas') {
-        const mockCtx = { drawImage: vi.fn() }
-        return {
-          width: 0,
-          height: 0,
-          getContext: vi.fn().mockReturnValue(mockCtx),
-          toBlob: vi.fn((cb: Function) => {
-            cb(new Blob(['compressed'], { type: 'image/jpeg' }))
-          }),
-        } as any as HTMLCanvasElement
-      }
-      return origCreateElement(tagName)
-    })
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        if (tagName === 'canvas') {
+          const mockCtx = { drawImage: vi.fn() }
+          return {
+            width: 0,
+            height: 0,
+            getContext: vi.fn().mockReturnValue(mockCtx),
+            toBlob: vi.fn((cb: Function) => {
+              cb(new Blob(['compressed'], { type: 'image/jpeg' }))
+            }),
+          } as any as HTMLCanvasElement
+        }
+        return origCreateElement(tagName)
+      },
+    )
 
     const OrigFileReader = globalThis.FileReader
     class FakeFileReader extends EventTarget {
@@ -524,7 +546,9 @@ describe('compressedImageUrlToBase64', () => {
     }
     globalThis.FileReader = FakeFileReader as any
 
-    const result = await compressedImageUrlToBase64('https://example.com/img.jpg')
+    const result = await compressedImageUrlToBase64(
+      'https://example.com/img.jpg',
+    )
 
     expect(typeof result).toBe('string')
     expect(result).toBe('data:image/jpeg;base64,dGVzdA==')

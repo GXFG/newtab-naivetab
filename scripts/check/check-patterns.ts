@@ -5,8 +5,9 @@
  *
  * 检查项：
  *  1. v-bind() 在 <style> 中使用（禁止，应用 :style + computed + var()）
- *  2. &--modifier BEM 拼接（禁止，postcss-preset-env 不支持）
+ *  2. &--modifier BEM 拼接（禁止，原生 CSS 嵌套同样不支持 & 后缀拼接）
  *  3. Reka Content/Overlay 组件缺少 z-index（portal 内容面板可能被遮挡）
+ *  4. :deep() 出现在非 scoped 的 <style> 或纯 CSS 中（禁止，lightningcss 无法解析）
  *
  * 用法：
  *   pnpm exec tsx scripts/check/check-patterns.ts                    # 检查 src/ 下所有文件
@@ -29,19 +30,23 @@ interface Violation {
 }
 
 /**
- * 从 Vue 文件中提取 <style> 块的行号范围
+ * 从 Vue 文件中提取 <style> 块的行号范围与是否 scoped
  */
 function getStyleBlocks(
   content: string,
-): Array<{ start: number; end: number }> {
-  const blocks: Array<{ start: number; end: number }> = []
-  const regex = /<style[^>]*>([\s\S]*?)<\/style>/g
+): Array<{ start: number; end: number; scoped: boolean }> {
+  const blocks: Array<{ start: number; end: number; scoped: boolean }> = []
+  const regex = /<style([^>]*)>([\s\S]*?)<\/style>/g
   let match: RegExpExecArray | null
   while ((match = regex.exec(content)) !== null) {
     const before = content.slice(0, match.index)
     const startLine = before.split('\n').length
-    const blockLines = match[1].split('\n').length
-    blocks.push({ start: startLine, end: startLine + blockLines })
+    const blockLines = match[2].split('\n').length
+    blocks.push({
+      start: startLine,
+      end: startLine + blockLines,
+      scoped: /\bscoped\b/.test(match[1]),
+    })
   }
   return blocks
 }
@@ -93,6 +98,22 @@ function checkFile(filePath: string): Violation[] {
           line: lineNum,
           message:
             '禁止使用 &--modifier BEM 拼接（postcss-preset-env 不支持），请写完整类名',
+        })
+      }
+    }
+
+    // 检查 4: :deep() 只能用于 scoped 的 <style> 块
+    // 非 scoped 或纯 CSS 文件中 Vue 不会编译 :deep()，lightningcss 压缩时直接报错
+    if (line.includes(':deep(')) {
+      const owner = styleBlocks.find(
+        (b) => lineNum >= b.start && lineNum <= b.end,
+      )
+      if (!owner?.scoped) {
+        violations.push({
+          file: filePath,
+          line: lineNum,
+          message:
+            ':deep() 仅在 <style scoped> 中有效（非 scoped / 纯 CSS 中 lightningcss 无法解析），请直接写后代选择器',
         })
       }
     }

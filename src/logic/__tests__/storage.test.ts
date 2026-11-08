@@ -73,6 +73,8 @@ vi.mock('@/logic/config/defaults', () => ({
     localModifiedTime: 0,
     dirty: false,
   },
+  // 迁移步骤表在模块作用域读取这两个导出
+  defaultFocusVisibleWidgetMap: { search: true, keyboardBookmark: true },
   KEYBOARD_COMMON_CONFIG: {
     keyboardType: 'key67',
     splitSpace: 'space1',
@@ -179,6 +181,14 @@ vi.mock('@/logic/utils/database', () => ({
   clearDatabase: vi.fn().mockResolvedValue(undefined),
 }))
 
+// 上传引擎单独测试（upload-and-recovery.test.ts），这里只验证导入后的同步状态与调用关系
+const uploadMock = vi.hoisted(() => ({
+  flushConfigSync: vi.fn().mockResolvedValue(true),
+  cancelAllDebounce: vi.fn(),
+  waitForUploadsIdle: vi.fn().mockResolvedValue(undefined),
+}))
+vi.mock('@/logic/config/sync/upload', () => uploadMock)
+
 vi.mock('@/logic/keyboard/keyboard-constants', () => ({
   KEYBOARD_URL_MAX_LENGTH: 200,
   KEYBOARD_NAME_MAX_LENGTH: 10,
@@ -193,11 +203,12 @@ vi.mock('@vueuse/core', () => ({
   useDebounceFn: vi.fn((fn: (...args: unknown[]) => unknown) => fn),
 }))
 
-vi.mock('crypto-js/md5', () => ({
-  default: vi.fn((str: string) => ({ toString: () => `md5-${str.length}` })),
-}))
-
-import { importSetting, exportSetting } from '@/logic/config/sync/manage'
+import {
+  importSetting,
+  exportSetting,
+  refreshSetting,
+  resetSetting,
+} from '@/logic/config/sync/manage'
 
 // Access mock state from globalThis (set by the mock factory)
 const getMock = () => (globalThis as any).__mockStore
@@ -303,12 +314,15 @@ describe('importSetting migrations', () => {
     ).toBe(true)
   })
 
-  it('migrates isFocusMode from general to localState', async () => {
+  it('discards isFocusMode from imported config', async () => {
+    // 配置文件只描述 config，不描述本机运行时状态：导入不再改写 localState
     const oldFormat = {
       general: { version: '2.2.0', isFocusMode: true },
     }
     await importSetting(JSON.stringify(oldFormat))
-    expect(getMock().localState.value.isFocusMode).toBe(true)
+    // 本机现值保持 false（既有字段不会被导入的数据覆盖）
+    expect(getMock().localState.value.isFocusMode).toBe(false)
+    expect(getMock().localConfig.general.isFocusMode).toBe(false)
   })
 
   it('updates version to current appVersion', async () => {
@@ -327,7 +341,9 @@ describe('importSetting migrations', () => {
     await importSetting(JSON.stringify(oldFormat))
     // keyboardBookmark 已存在，keyboard 不会被迁移
     expect(getMock().localConfig.keyboardBookmark.keymap).toHaveProperty('KeyA')
-    expect(getMock().localConfig.keyboardBookmark.keymap).not.toHaveProperty('KeyB')
+    expect(getMock().localConfig.keyboardBookmark.keymap).not.toHaveProperty(
+      'KeyB',
+    )
   })
 
   it('preserves existing new keys in focusVisibleWidgetMap during migration', async () => {
@@ -376,6 +392,84 @@ describe('importSetting migrations', () => {
   })
 })
 
+describe('importSetting cloud sync', () => {
+  beforeEach(() => {
+    resetMockState()
+    vi.clearAllMocks()
+    window.appVersion = '2.2.5'
+  })
+
+  it('keeps cloud syncId and marks dirty so the import is pushed to cloud', async () => {
+    // 回归用例：导入后把 syncId 写成「本地内容指纹」+ dirty=false，会让下次启动的
+    // loadRemoteConfig 误判「本地干净 + 版本相同 → 用云端」，导入结果被旧云端数据回滚。
+    const m = getMock()
+    m.localState.value.isUploadConfigStatusMap = {
+      general: {
+        loading: false,
+        syncTime: 1000,
+        syncId: 'cloud-old-md5',
+        localModifiedTime: 0,
+        dirty: false,
+        retryCount: 3,
+        lastError: 'previous',
+        syncStatus: 'failed',
+      },
+    }
+
+    await importSetting(
+      JSON.stringify({ general: { version: '2.0.0', lang: 'en-US' } }),
+    )
+
+    const status = m.localState.value.isUploadConfigStatusMap.general
+    expect(m.localConfig.general.lang).toBe('en-US')
+    // syncId 必须保持云端值，否则 uploadConfigFn 的指纹去重会直接跳过一次必要的上传
+    expect(status.syncId).toBe('cloud-old-md5')
+    expect(status.dirty).toBe(true)
+    expect(status.localModifiedTime).toBeGreaterThan(0)
+    // 手动操作重置重试配额
+    expect(status.retryCount).toBe(0)
+    expect(status.lastError).toBe('')
+  })
+
+  it('flushes every config field to cloud after import', async () => {
+    await importSetting(JSON.stringify({ general: { version: '2.0.0' } }))
+
+    const flushedFields = uploadMock.flushConfigSync.mock.calls.map(
+      (call: unknown[]) => call[0],
+    )
+    expect(flushedFields).toContain('general')
+    expect(flushedFields).toContain('keyboardBookmark')
+    expect(flushedFields.length).toBe(Object.keys(getMock().localConfig).length)
+  })
+})
+
+describe('importSetting 结构校验', () => {
+  beforeEach(() => {
+    resetMockState()
+    vi.clearAllMocks()
+    window.appVersion = '2.2.5'
+  })
+
+  it('拒绝数组形式的 JSON 并给出失败提示', async () => {
+    const m = getMock()
+    const before = JSON.stringify(m.localConfig)
+
+    await importSetting(JSON.stringify([{ general: { version: '2.0.0' } }]))
+
+    expect(showToast.error).toHaveBeenCalled()
+    // 配置不能被改动，也不能触发任何上传
+    expect(JSON.stringify(m.localConfig)).toBe(before)
+    expect(uploadMock.flushConfigSync).not.toHaveBeenCalled()
+    expect(m.globalState.isImportSettingLoading).toBe(false)
+  })
+
+  it('缺少 general.version 时给出失败提示而不是静默返回', async () => {
+    await importSetting(JSON.stringify({ search: { isNewTabOpen: true } }))
+
+    expect(showToast.error).toHaveBeenCalled()
+  })
+})
+
 describe('importSetting error handling', () => {
   beforeEach(() => {
     resetMockState()
@@ -413,5 +507,51 @@ describe('exportSetting', () => {
   it('shows success message', async () => {
     await exportSetting()
     expect(showToast.success).toHaveBeenCalled()
+  })
+})
+
+describe('清空类操作的上传竞态防护', () => {
+  beforeEach(() => {
+    resetMockState()
+    vi.clearAllMocks()
+    window.appVersion = '2.2.5'
+  })
+
+  it('resetSetting 先取消防抖并等待进行中的上传，再清空 chrome.storage.sync', async () => {
+    const order: string[] = []
+    uploadMock.cancelAllDebounce.mockImplementation(() => {
+      order.push('cancel')
+    })
+    uploadMock.waitForUploadsIdle.mockImplementation(async () => {
+      order.push('wait-idle')
+    })
+    ;(chrome.storage.sync.clear as any).mockImplementation(() => {
+      order.push('sync.clear')
+    })
+
+    await resetSetting()
+
+    // 顺序反了就会出现「重置后又变回旧配置」：迟到的 set 回调把数据写回去
+    expect(order).toEqual(['cancel', 'wait-idle', 'sync.clear'])
+  })
+
+  it('refreshSetting 先等上传落盘，再清空 localStorage', async () => {
+    const order: string[] = []
+    uploadMock.cancelAllDebounce.mockImplementation(() => {
+      order.push('cancel')
+    })
+    uploadMock.waitForUploadsIdle.mockImplementation(async () => {
+      order.push('wait-idle')
+    })
+    const clearSpy = vi
+      .spyOn(Storage.prototype, 'clear')
+      .mockImplementation(() => {
+        order.push('localStorage.clear')
+      })
+
+    await refreshSetting()
+
+    expect(order).toEqual(['cancel', 'wait-idle', 'localStorage.clear'])
+    clearSpy.mockRestore()
   })
 })

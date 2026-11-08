@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * upload-and-recovery.test.ts — 测试 config/sync/ 中的上传链路、故障恢复、监听器
  *
  * 覆盖场景：
- * 1. flushConfigSync: 强制同步（间接测试 uploadConfigFn 的 MD5 去重、压缩、超限、失败处理）
+ * 1. flushConfigSync: 强制同步（间接测试 uploadConfigFn 的指纹去重、压缩、超限、失败处理）
  * 2. handleMissedUploadConfig: 故障恢复
  * 3. setupKeyboardSyncListener: chrome.storage.onChanged 同步
  * 4. setupLocalStorageSyncListener: localStorage 跨标签页同步
@@ -13,7 +13,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * 与 sync-flow.test.ts 保持一致的架构。
  *
  * 注意：uploadConfigFn 是内部函数，不直接导出。通过 flushConfigSync
- * 间接测试其核心行为（MD5 去重、压缩、大小超限、失败处理、keymap 清理）。
+ * 间接测试其核心行为（指纹去重、压缩、大小超限、失败处理、keymap 清理）。
  */
 
 const mockLog = vi.fn()
@@ -58,41 +58,45 @@ function setupChromeSync(options?: {
   const chrome = globalThis.chrome as any
   mockUploadSetCalls.length = 0
 
-  chrome.storage.sync.set.mockImplementation((obj: any, callback?: Function) => {
-    if (options?.lastError) {
-      chrome.runtime.lastError = options.lastError
-    } else {
-      chrome.runtime.lastError = null
-    }
+  chrome.storage.sync.set.mockImplementation(
+    (obj: any, callback?: Function) => {
+      if (options?.lastError) {
+        chrome.runtime.lastError = options.lastError
+      } else {
+        chrome.runtime.lastError = null
+      }
 
-    for (const [key, value] of Object.entries(obj)) {
-      if (!key.startsWith('naive-tab-')) continue
+      for (const [key, value] of Object.entries(obj)) {
+        if (!key.startsWith('naive-tab-')) continue
 
-      // 可选：阻止超大 payload 写入（模拟 uploadConfigFn 内部的大小拦截）
-      if (options?.blockLargePayload) {
-        const bytes = new TextEncoder().encode(value as string).length
-        if (bytes > 8000) {
-          // 超限：不调用 callback，uploadConfigFn 内部会在 doUpload 之前拦截
-          // 这里我们模拟的是已经被拦截后的行为
-          continue
+        // 可选：阻止超大 payload 写入（模拟 uploadConfigFn 内部的大小拦截）
+        if (options?.blockLargePayload) {
+          const bytes = new TextEncoder().encode(value as string).length
+          if (bytes > 8000) {
+            // 超限：不调用 callback，uploadConfigFn 内部会在 doUpload 之前拦截
+            // 这里我们模拟的是已经被拦截后的行为
+            continue
+          }
+        }
+
+        const field = key.replace('naive-tab-', '')
+        try {
+          const parsed = JSON.parse(value as string)
+          mockUploadSetCalls.push({ field, data: parsed })
+        } catch {
+          mockUploadSetCalls.push({ field, data: value })
         }
       }
 
-      const field = key.replace('naive-tab-', '')
-      try {
-        const parsed = JSON.parse(value as string)
-        mockUploadSetCalls.push({ field, data: parsed })
-      } catch {
-        mockUploadSetCalls.push({ field, data: value })
-      }
-    }
+      callback?.()
+    },
+  )
 
-    callback?.()
-  })
-
-  chrome.storage.sync.getBytesInUse.mockImplementation((key: string, callback: Function) => {
-    callback(1024)
-  })
+  chrome.storage.sync.getBytesInUse.mockImplementation(
+    (key: string, callback: Function) => {
+      callback(1024)
+    },
+  )
 }
 
 // ── Mock 定义 ──
@@ -109,7 +113,9 @@ vi.doMock('@/logic/utils/common', () => ({
 
 vi.doMock('@/logic/config/state', () => ({
   localConfig: mockLocalConfig,
-  localState: { value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap } },
+  localState: {
+    value: { isUploadConfigStatusMap: mockIsUploadConfigStatusMap },
+  },
 }))
 vi.doMock('@/logic/store/state', () => ({
   globalState: {},
@@ -118,7 +124,13 @@ vi.doMock('@/logic/store/state', () => ({
 
 vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: DEFAULT_CONFIG,
-  defaultUploadStatusItem: { loading: false, syncTime: 0, syncId: '', localModifiedTime: 0, dirty: false },
+  defaultUploadStatusItem: {
+    loading: false,
+    syncTime: 0,
+    syncId: '',
+    localModifiedTime: 0,
+    dirty: false,
+  },
 }))
 
 vi.doMock('@/logic/config/merge', () => ({
@@ -138,7 +150,9 @@ vi.doMock('@/logic/config/compress', () => ({
   compressString: vi.fn().mockResolvedValue('compressed-base64-data'),
   decompressString: vi.fn().mockResolvedValue('{}'),
   shouldCompress: vi.fn().mockReturnValue(false),
-  parseStoredData: vi.fn().mockImplementation(async (raw: string) => JSON.parse(raw)),
+  parseStoredData: vi
+    .fn()
+    .mockImplementation(async (raw: string) => JSON.parse(raw)),
 }))
 
 vi.doMock('@/logic/constants/app', () => ({
@@ -164,16 +178,10 @@ vi.doMock('@vueuse/core', () => ({
   useDebounceFn: vi.fn((fn: (...args: unknown[]) => unknown) => fn),
 }))
 
-vi.doMock('crypto-js/md5', () => ({
-  default: vi.fn((str: string) => ({ toString: () => `md5-${str.length}` })),
-}))
-
 vi.doMock('vue', async (importOriginal) => {
   const actual = await importOriginal<typeof import('vue')>()
   return { ...actual, computed: actual.computed, reactive: actual.reactive }
 })
-
-vi.doMock('webextension-polyfill', () => ({}))
 
 vi.mock('@/auto-imports', () => ({}))
 
@@ -193,7 +201,11 @@ describe('flushConfigSync', () => {
 
     resetMockState()
     window.appVersion = '2.3.0'
-    window.$message = { warning: mockMessageWarn, error: mockMessageError, success: mockMessageSuccess } as any
+    window.$message = {
+      warning: mockMessageWarn,
+      error: mockMessageError,
+      success: mockMessageSuccess,
+    } as any
     window.$notification = { info: vi.fn() } as any
     window.$t = (key: string) => key
     ;(globalThis.chrome as any).runtime.lastError = null
@@ -222,19 +234,48 @@ describe('flushConfigSync', () => {
     expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
   })
 
-  it('skips upload and clears dirty when MD5 matches (content unchanged)', async () => {
-    // syncId 与当前内容的 MD5 相同 → MD5 去重跳过上传，同时清除 dirty
-    mockIsUploadConfigStatusMap.general.syncId = `md5-${JSON.stringify(mockLocalConfig.general).length}`
+  it('skips upload and clears dirty when fingerprint matches (content unchanged)', async () => {
+    // 首次同步上传一次，并让 statusMap 记下当前内容的摘要
+    mockIsUploadConfigStatusMap.general.syncId = 'old-sync-id'
+    await flushConfigSync('general')
+    expect(mockIsUploadConfigStatusMap.general.syncId).not.toBe('old-sync-id')
+
+    // 内容未变但被标记 dirty → 指纹去重跳过上传，同时清除 dirty
+    mockUploadSetCalls.length = 0
     mockIsUploadConfigStatusMap.general.dirty = true
 
     const result = await flushConfigSync('general')
 
     expect(result).toBe(true)
-    // MD5 去重：不实际调用 chrome.storage.sync.set
+    // 指纹去重：不实际调用 chrome.storage.sync.set
     expect(mockUploadSetCalls).toHaveLength(0)
     // dirty 应被清除，避免 handleMissedUploadConfig 每页加载都无效重试
     expect(mockIsUploadConfigStatusMap.general.dirty).toBe(false)
     expect(mockIsUploadConfigStatusMap.general.syncStatus).toBe('idle')
+  })
+
+  it('returns false and counts a retry when fingerprint computation fails', async () => {
+    // crypto.subtle 不可用（非 secure context）时不能抛出去：uploadConfigFn 的
+    // 调用方（防抖回调 / handleMissedUploadConfig / flushConfigSync）都没有 catch，
+    // reject 会变成 unhandled rejection。必须自行兜住并返回 false。
+    const spy = vi
+      .spyOn(crypto.subtle, 'digest')
+      .mockRejectedValueOnce(new Error('subtle unavailable'))
+    mockIsUploadConfigStatusMap.general.syncId = 'old-sync-id'
+    mockIsUploadConfigStatusMap.general.retryCount = 0
+
+    const result = await flushConfigSync('general')
+
+    expect(result).toBe(false)
+    // 没算出指纹就绝不写云端
+    expect(mockUploadSetCalls).toHaveLength(0)
+    expect(mockIsUploadConfigStatusMap.general.syncStatus).toBe('failed')
+    expect(mockIsUploadConfigStatusMap.general.lastError).toBe('fingerprint')
+    // 与其他失败路径一致：计数一次，3 次后 handleMissedUploadConfig 不再自动重试
+    expect(mockIsUploadConfigStatusMap.general.retryCount).toBe(1)
+    // 失败保留 dirty，等待下次机会
+    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(true)
+    spy.mockRestore()
   })
 
   it('initializes statusMap when field has no entry', async () => {
@@ -270,6 +311,9 @@ describe('flushConfigSync', () => {
     expect(mockMessageError).toHaveBeenCalled()
     expect(mockIsUploadConfigStatusMap.general.loading).toBe(false)
     // 失败时 dirty 保留（不设为 false）
+    expect(mockIsUploadConfigStatusMap.general.dirty).toBe(true)
+    // 失败时不能更新 syncTime：lastSyncTime 会把它当作「最近一次成功同步」
+    expect(mockIsUploadConfigStatusMap.general.syncTime).toBe(0)
   })
 
   it('cleans keyboardBookmark keymap: removes empty urls and truncates long values', async () => {
@@ -277,7 +321,10 @@ describe('flushConfigSync', () => {
       keymap: {
         KeyA: { url: 'https://example.com', name: 'Example' },
         KeyB: { url: '', name: 'Empty' },
-        KeyC: { url: 'https://test.com/' + 'a'.repeat(200), name: 'LongName' + 'b'.repeat(20) },
+        KeyC: {
+          url: 'https://test.com/' + 'a'.repeat(200),
+          name: 'LongName' + 'b'.repeat(20),
+        },
       },
       source: 1,
     }
@@ -310,7 +357,11 @@ describe('handleMissedUploadConfig', () => {
 
     resetMockState()
     window.appVersion = '2.3.0'
-    window.$message = { warning: mockMessageWarn, error: mockMessageError, success: mockMessageSuccess } as any
+    window.$message = {
+      warning: mockMessageWarn,
+      error: mockMessageError,
+      success: mockMessageSuccess,
+    } as any
     window.$notification = { info: vi.fn() } as any
     window.$t = (key: string) => key
     ;(globalThis.chrome as any).runtime.lastError = null
@@ -385,7 +436,9 @@ describe('setupKeyboardSyncListener', () => {
 
   beforeEach(setup)
 
-  function triggerStorageChange(changes: Record<string, { newValue?: string }>) {
+  function triggerStorageChange(
+    changes: Record<string, { newValue?: string }>,
+  ) {
     if (_onChangedHandler) {
       _onChangedHandler(changes)
     }
@@ -409,7 +462,9 @@ describe('setupKeyboardSyncListener', () => {
     await new Promise((r) => setTimeout(r, 10))
 
     expect(mockLocalConfig.keyboardBookmark.source).toBe(2)
-    expect(mockIsUploadConfigStatusMap.keyboardBookmark.syncId).toBe('new-remote-sync-id')
+    expect(mockIsUploadConfigStatusMap.keyboardBookmark.syncId).toBe(
+      'new-remote-sync-id',
+    )
     expect(mockIsUploadConfigStatusMap.keyboardBookmark.dirty).toBe(false)
   })
 
@@ -430,7 +485,9 @@ describe('setupKeyboardSyncListener', () => {
 
     await new Promise((r) => setTimeout(r, 10))
 
-    expect(mockLog).toHaveBeenCalledWith('Sync keyboardBookmark skipped (same syncId)')
+    expect(mockLog).toHaveBeenCalledWith(
+      'Sync keyboardBookmark skipped (same syncId)',
+    )
   })
 
   it('skips when newValue is empty', () => {
@@ -502,7 +559,10 @@ describe('setupLocalStorageSyncListener', () => {
   it('skips when content is identical', () => {
     setupLocalStorageSyncListener()
 
-    triggerStorageEvent('c-general', JSON.stringify({ version: '2.3.0', lang: 'zh-CN' }))
+    triggerStorageEvent(
+      'c-general',
+      JSON.stringify({ version: '2.3.0', lang: 'zh-CN' }),
+    )
 
     // 内容相同，不调用 mergeState
     expect(mockLocalConfig.general.lang).toBe('zh-CN')
@@ -514,5 +574,45 @@ describe('setupLocalStorageSyncListener', () => {
     triggerStorageEvent('some-other-key', JSON.stringify({ foo: 'bar' }))
 
     expect(mockLocalConfig.general.lang).toBe('zh-CN')
+  })
+})
+
+// ════════════════════════════════════════════════════════════
+// 5. waitForUploadsIdle — 清空类操作前的落盘等待
+// ════════════════════════════════════════════════════════════
+
+describe('waitForUploadsIdle', () => {
+  let mod: typeof import('@/logic/config/sync/upload')
+
+  beforeEach(async () => {
+    vi.resetModules()
+    resetMockState()
+    window.appVersion = '2.3.0'
+    window.$t = (key: string) => key
+    ;(globalThis.chrome as any).runtime.lastError = null
+    setupChromeSync()
+    mod = await import('@/logic/config/sync/upload')
+  })
+
+  it('没有进行中的上传时立即返回', async () => {
+    await expect(mod.waitForUploadsIdle()).resolves.toBeUndefined()
+  })
+
+  it('等待进行中的上传结束后才返回', async () => {
+    mockIsUploadConfigStatusMap.general.syncId = 'old-sync-id'
+
+    let idleReached = false
+    const uploadPromise = mod.flushConfigSync('general')
+    const idlePromise = mod.waitForUploadsIdle().then(() => {
+      idleReached = true
+    })
+
+    await Promise.resolve()
+    // 上传仍在进行中：必须先等到 set 回调，清空操作才能继续
+    expect(idleReached).toBe(false)
+
+    await uploadPromise
+    await idlePromise
+    expect(idleReached).toBe(true)
   })
 })

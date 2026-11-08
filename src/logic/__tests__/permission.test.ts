@@ -10,7 +10,7 @@ import type { Mock } from 'vitest'
 beforeEach(() => {
   // Ensure notifications mock exists (vi.restoreAllMocks may reset it)
   if (!chrome.notifications) {
-    (chrome as any).notifications = {
+    ;(chrome as any).notifications = {
       create: vi.fn(),
       clear: vi.fn(),
     }
@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 describe('requestPermissionAsync', () => {
-  let requestPermissionAsync: typeof import('@/logic/utils/permission')['requestPermissionAsync']
+  let requestPermissionAsync: (typeof import('@/logic/utils/permission'))['requestPermissionAsync']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -50,7 +50,7 @@ describe('requestPermissionAsync', () => {
 })
 
 describe('requestPermission', () => {
-  let requestPermission: typeof import('@/logic/utils/permission')['requestPermission']
+  let requestPermission: (typeof import('@/logic/utils/permission'))['requestPermission']
 
   beforeEach(async () => {
     vi.resetModules()
@@ -74,12 +74,14 @@ describe('requestPermission', () => {
     ;(chrome.permissions.request as Mock).mockImplementation(() => {
       throw new Error('Permission API unavailable')
     })
-    await expect(requestPermission('bookmarks')).rejects.toThrow('Permission API unavailable')
+    await expect(requestPermission('bookmarks')).rejects.toThrow(
+      'Permission API unavailable',
+    )
   })
 })
 
 describe('sendNotification', () => {
-  let sendNotification: typeof import('@/logic/utils/permission')['sendNotification']
+  let sendNotification: (typeof import('@/logic/utils/permission'))['sendNotification']
 
   beforeEach(async () => {
     vi.resetModules()

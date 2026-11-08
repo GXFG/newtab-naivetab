@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 /**
- * config-migrate.test.ts — 测试 normalizeLegacyConfig 纯函数
+ * config-migrate.test.ts — 测试 normalizeStructure 纯函数
  *
- * 覆盖 normalizeLegacyConfig 的全部转换规则：
+ * 覆盖 normalizeStructure 的全部转换规则：
  * 1. 顶层 key 重命名（bookmark→keyboardBookmark、keyboard→keyboardBookmark 等）
  * 2. 外观字段拆分（keyboardBookmark→keyboardCommon）
  * 3. focusVisibleWidgetMap key 重命名
@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * 5. isFocusMode 从 general 提取
  */
 
-let normalizeLegacyConfig: typeof import('@/logic/config/migrate').normalizeLegacyConfig
+let normalizeStructure: typeof import('@/logic/config/migrate').normalizeStructure
 
 // 需要 mock 因为 migrate.ts 导入 KEYBOARD_COMMON_CONFIG
 beforeEach(async () => {
@@ -28,7 +28,7 @@ beforeEach(async () => {
   }))
 
   const mod = await import('@/logic/config/migrate')
-  normalizeLegacyConfig = mod.normalizeLegacyConfig
+  normalizeStructure = mod.normalizeStructure
 })
 
 // ── 1. 顶层 key 重命名 ──
@@ -39,10 +39,10 @@ describe('顶层 key 重命名', () => {
       general: { version: '1.19.0' },
       bookmark: { keymap: { KeyA: { url: 'https://test.com' } } },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.keyboardBookmark).toBeDefined()
-    expect(result.config.bookmark).toBeUndefined()
-    expect(result.config.keyboardBookmark.keymap.KeyA.url).toBe('https://test.com')
+    const result = normalizeStructure(raw)
+    expect(result.keyboardBookmark).toBeDefined()
+    expect(result.bookmark).toBeUndefined()
+    expect(result.keyboardBookmark.keymap.KeyA.url).toBe('https://test.com')
   })
 
   it('将旧 keyboard key 重命名为 keyboardBookmark（v2.2.2 旧 key）', () => {
@@ -51,9 +51,9 @@ describe('顶层 key 重命名', () => {
       keyboard: { keymap: {}, source: 1 },
       commandShortcut: { isEnabled: true },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.keyboardBookmark).toBeDefined()
-    expect(result.config.keyboard).toBeUndefined()
+    const result = normalizeStructure(raw)
+    expect(result.keyboardBookmark).toBeDefined()
+    expect(result.keyboard).toBeUndefined()
   })
 
   it('将旧 commandShortcut key 重命名为 keyboardCommand', () => {
@@ -61,9 +61,9 @@ describe('顶层 key 重命名', () => {
       general: { version: '2.2.2' },
       commandShortcut: { keymap: { KeyA: { command: 'prevTab' } } },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.keyboardCommand).toBeDefined()
-    expect(result.config.commandShortcut).toBeUndefined()
+    const result = normalizeStructure(raw)
+    expect(result.keyboardCommand).toBeDefined()
+    expect(result.commandShortcut).toBeUndefined()
   })
 
   it('新 key 已存在时不覆盖旧 key', () => {
@@ -72,10 +72,10 @@ describe('顶层 key 重命名', () => {
       keyboardBookmark: { keymap: { KeyB: { url: 'https://new.com' } } },
       bookmark: { keymap: { KeyA: { url: 'https://old.com' } } },
     }
-    const result = normalizeLegacyConfig(raw)
+    const result = normalizeStructure(raw)
     // keyboardBookmark 已存在，bookmark 应保留不删除
-    expect(result.config.keyboardBookmark.keymap.KeyB.url).toBe('https://new.com')
-    expect(result.config.bookmark).toBeDefined()
+    expect(result.keyboardBookmark.keymap.KeyB.url).toBe('https://new.com')
+    expect(result.bookmark).toBeDefined()
   })
 })
 
@@ -92,15 +92,18 @@ describe('外观字段拆分', () => {
         mainFontColor: ['rgba(0,0,0,1)', 'rgba(255,255,255,1)'],
       },
     }
-    const result = normalizeLegacyConfig(raw)
+    const result = normalizeStructure(raw)
     // 外观字段应迁移到 keyboardCommon
-    expect(result.config.keyboardCommon.keyboardType).toBe('key87')
-    expect(result.config.keyboardCommon.keycapType).toBe('dsa')
-    expect(result.config.keyboardCommon.mainFontColor).toEqual(['rgba(0,0,0,1)', 'rgba(255,255,255,1)'])
+    expect(result.keyboardCommon.keyboardType).toBe('key87')
+    expect(result.keyboardCommon.keycapType).toBe('dsa')
+    expect(result.keyboardCommon.mainFontColor).toEqual([
+      'rgba(0,0,0,1)',
+      'rgba(255,255,255,1)',
+    ])
     // 外观字段应从 keyboardBookmark 中删除
-    expect(result.config.keyboardBookmark.keyboardType).toBeUndefined()
-    expect(result.config.keyboardBookmark.keycapType).toBeUndefined()
-    expect(result.config.keyboardBookmark.keymap).toBeDefined()
+    expect(result.keyboardBookmark.keyboardType).toBeUndefined()
+    expect(result.keyboardBookmark.keycapType).toBeUndefined()
+    expect(result.keyboardBookmark.keymap).toBeDefined()
   })
 
   it('未拆分的键盘书签配置不创建 keyboardCommon', () => {
@@ -109,9 +112,9 @@ describe('外观字段拆分', () => {
       keyboardBookmark: { keymap: {}, source: 1 },
       keyboardCommon: { keyboardType: 'key61' },
     }
-    const result = normalizeLegacyConfig(raw)
+    const result = normalizeStructure(raw)
     // keyboardCommon 已存在，不应触发拆分
-    expect(result.config.keyboardBookmark.keyboardType).toBeUndefined()
+    expect(result.keyboardBookmark.keyboardType).toBeUndefined()
   })
 
   it('默认配置中保留外观字段的值', () => {
@@ -121,9 +124,9 @@ describe('外观字段拆分', () => {
         isShellVisible: false,
       },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.keyboardCommon.isShellVisible).toBe(false)
-    expect(result.config.keyboardBookmark.isShellVisible).toBeUndefined()
+    const result = normalizeStructure(raw)
+    expect(result.keyboardCommon.isShellVisible).toBe(false)
+    expect(result.keyboardBookmark.isShellVisible).toBeUndefined()
   })
 })
 
@@ -137,10 +140,10 @@ describe('focusVisibleWidgetMap key 重命名', () => {
         focusVisibleWidgetMap: { keyboard: true, search: true },
       },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.general.focusVisibleWidgetMap.keyboardBookmark).toBe(true)
-    expect(result.config.general.focusVisibleWidgetMap.keyboard).toBeUndefined()
-    expect(result.config.general.focusVisibleWidgetMap.search).toBe(true)
+    const result = normalizeStructure(raw)
+    expect(result.general.focusVisibleWidgetMap.keyboardBookmark).toBe(true)
+    expect(result.general.focusVisibleWidgetMap.keyboard).toBeUndefined()
+    expect(result.general.focusVisibleWidgetMap.search).toBe(true)
   })
 
   it('将 commandShortcut 重命名为 keyboardCommand', () => {
@@ -150,9 +153,9 @@ describe('focusVisibleWidgetMap key 重命名', () => {
         focusVisibleWidgetMap: { commandShortcut: true },
       },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.general.focusVisibleWidgetMap.keyboardCommand).toBe(true)
-    expect(result.config.general.focusVisibleWidgetMap.commandShortcut).toBeUndefined()
+    const result = normalizeStructure(raw)
+    expect(result.general.focusVisibleWidgetMap.keyboardCommand).toBe(true)
+    expect(result.general.focusVisibleWidgetMap.commandShortcut).toBeUndefined()
   })
 
   it('新 key 已存在时不重命名', () => {
@@ -162,9 +165,9 @@ describe('focusVisibleWidgetMap key 重命名', () => {
         focusVisibleWidgetMap: { keyboardBookmark: true, keyboard: false },
       },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.general.focusVisibleWidgetMap.keyboardBookmark).toBe(true)
-    expect(result.config.general.focusVisibleWidgetMap.keyboard).toBe(false)
+    const result = normalizeStructure(raw)
+    expect(result.general.focusVisibleWidgetMap.keyboardBookmark).toBe(true)
+    expect(result.general.focusVisibleWidgetMap.keyboard).toBe(false)
   })
 })
 
@@ -178,8 +181,8 @@ describe('openPageFocusElement 值修正', () => {
         openPageFocusElement: 'keyboard',
       },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.general.openPageFocusElement).toBe('keyboardBookmark')
+    const result = normalizeStructure(raw)
+    expect(result.general.openPageFocusElement).toBe('keyboardBookmark')
   })
 
   it('非 keyboard 值保持不变', () => {
@@ -189,43 +192,8 @@ describe('openPageFocusElement 值修正', () => {
         openPageFocusElement: 'search',
       },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.general.openPageFocusElement).toBe('search')
-  })
-})
-
-// ── 5. isFocusMode 从 general 提取 ──
-
-describe('isFocusMode 从 general 提取', () => {
-  it('从 general 中提取 isFocusMode', () => {
-    const raw = {
-      general: {
-        version: '2.2.1',
-        isFocusMode: true,
-      },
-    }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.extractedIsFocusMode).toBe(true)
-    expect(result.config.general.isFocusMode).toBeUndefined()
-  })
-
-  it('isFocusMode 为 false 时也正确提取', () => {
-    const raw = {
-      general: {
-        version: '2.2.1',
-        isFocusMode: false,
-      },
-    }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.extractedIsFocusMode).toBe(false)
-  })
-
-  it('不存在 isFocusMode 时 extractedIsFocusMode 为 undefined', () => {
-    const raw = {
-      general: { version: '2.3.0' },
-    }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.extractedIsFocusMode).toBeUndefined()
+    const result = normalizeStructure(raw)
+    expect(result.general.openPageFocusElement).toBe('search')
   })
 })
 
@@ -253,31 +221,33 @@ describe('多版本叠加旧配置', () => {
         keymap: { KeyQ: { command: 'prevTab' } },
       },
     }
-    const result = normalizeLegacyConfig(raw)
+    const result = normalizeStructure(raw)
 
     // 顶层 key 重命名
-    expect(result.config.keyboardBookmark).toBeDefined()
-    expect(result.config.keyboardCommand).toBeDefined()
-    expect(result.config.bookmark).toBeUndefined()
-    expect(result.config.commandShortcut).toBeUndefined()
+    expect(result.keyboardBookmark).toBeDefined()
+    expect(result.keyboardCommand).toBeDefined()
+    expect(result.bookmark).toBeUndefined()
+    expect(result.commandShortcut).toBeUndefined()
 
     // 外观字段拆分
-    expect(result.config.keyboardCommon.keyboardType).toBe('key87')
-    expect(result.config.keyboardCommon.mainFontColor).toEqual(['rgba(0,0,0,1)', 'rgba(255,255,255,1)'])
-    expect(result.config.keyboardBookmark.keyboardType).toBeUndefined()
+    expect(result.keyboardCommon.keyboardType).toBe('key87')
+    expect(result.keyboardCommon.mainFontColor).toEqual([
+      'rgba(0,0,0,1)',
+      'rgba(255,255,255,1)',
+    ])
+    expect(result.keyboardBookmark.keyboardType).toBeUndefined()
 
     // focusVisibleWidgetMap key 重命名
-    expect(result.config.general.focusVisibleWidgetMap.keyboardBookmark).toBe(true)
-    expect(result.config.general.focusVisibleWidgetMap.keyboardCommand).toBe(false)
-    expect(result.config.general.focusVisibleWidgetMap.keyboard).toBeUndefined()
-    expect(result.config.general.focusVisibleWidgetMap.commandShortcut).toBeUndefined()
+    expect(result.general.focusVisibleWidgetMap.keyboardBookmark).toBe(true)
+    expect(result.general.focusVisibleWidgetMap.keyboardCommand).toBe(false)
+    expect(result.general.focusVisibleWidgetMap.keyboard).toBeUndefined()
+    expect(result.general.focusVisibleWidgetMap.commandShortcut).toBeUndefined()
 
     // openPageFocusElement 值修正
-    expect(result.config.general.openPageFocusElement).toBe('keyboardBookmark')
+    expect(result.general.openPageFocusElement).toBe('keyboardBookmark')
 
-    // isFocusMode 提取
-    expect(result.extractedIsFocusMode).toBe(true)
-    expect(result.config.general.isFocusMode).toBeUndefined()
+    // isFocusMode 的提取属于版本迁移（2.2.2），不归键名归一负责
+    expect(result.general.isFocusMode).toBe(true)
   })
 })
 
@@ -285,9 +255,8 @@ describe('多版本叠加旧配置', () => {
 
 describe('边界场景', () => {
   it('空配置不报错', () => {
-    const result = normalizeLegacyConfig({})
-    expect(result.config).toEqual({})
-    expect(result.extractedIsFocusMode).toBeUndefined()
+    const result = normalizeStructure({})
+    expect(result).toEqual({})
   })
 
   it('不修改传入的原始对象（深拷贝保护）', () => {
@@ -296,7 +265,7 @@ describe('边界场景', () => {
       bookmark: { keymap: {} },
     }
     const cloned = JSON.parse(JSON.stringify(raw))
-    normalizeLegacyConfig(raw)
+    normalizeStructure(raw)
     // 原始对象不应被修改（structuredClone 保护了顶层 key，但 general 会被修改）
     // bookmark 应该仍然存在
     expect(raw.bookmark).toBeDefined()
@@ -306,8 +275,8 @@ describe('边界场景', () => {
     const raw = {
       keyboardBookmark: { keymap: {} },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.keyboardBookmark.keymap).toEqual({})
+    const result = normalizeStructure(raw)
+    expect(result.keyboardBookmark.keymap).toEqual({})
   })
 
   it('focusVisibleWidgetMap 为非对象时不报错', () => {
@@ -317,7 +286,7 @@ describe('边界场景', () => {
         focusVisibleWidgetMap: null,
       },
     }
-    const result = normalizeLegacyConfig(raw)
-    expect(result.config.general.focusVisibleWidgetMap).toBeNull()
+    const result = normalizeStructure(raw)
+    expect(result.general.focusVisibleWidgetMap).toBeNull()
   })
 })

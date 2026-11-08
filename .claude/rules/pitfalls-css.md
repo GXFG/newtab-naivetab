@@ -1,6 +1,6 @@
 # CSS & 样式踩坑
 
-> pre-commit 已集成 `pnpm check-patterns` 自动检查 `v-bind()`、`&--modifier` 和 **Reka 组件 z-index 遗漏**。
+> pre-commit 已集成 `pnpm check-patterns` 自动检查 `v-bind()`、`&--modifier`、**:deep() 误用**和 **Reka 组件 z-index 遗漏**。
 
 ## `&--modifier` 禁止
 
@@ -15,6 +15,22 @@
 **Why：** Vue 的 `v-bind()` 在 `<style>` 中动态绑定会导致样式计算性能问题，且与项目 CSS 变量方案冲突。
 
 **How to apply：** 动态样式使用 `:style` + `computed` + `var()` 注入。
+
+## `:deep()` 只能写在 `<style scoped>` 里
+
+`:deep()` 是 Vue SFC 的编译期语法，**只在 `scoped` 样式块中才会被 Vue 编译**。写在普通 `<style>` 或 `src/styles/` 的 `.css` 文件里时，Vue 原样保留 → 输出非法选择器 → 浏览器丢弃整条规则，同时 Vite 8 默认用 lightningcss 压缩 CSS 会直接报错：
+
+```
+[lightningcss minify] 'deep' is not recognized as a valid pseudo-class.
+```
+
+**Why：** 非 scoped 样式本来就是全局作用域，不需要穿透，`:deep()` 在这里既没有语义也没有编译支持；而且规则失效是"静默"的——样式不生效但不影响其他代码，很容易被忽略。
+
+**How to apply：**
+- 全局 `<style>` / 纯 `.css` 文件：直接写后代选择器，`.parent :deep(.child)` → `.parent .child`
+- 嵌套写法（postcss-preset-env nesting）直接写子选择器即可：`.parent { .child { … } }`
+- 确实需要限定作用域时，才把 `<style>` 改成 `<style scoped>` 再使用 `:deep()`
+- pre-commit 已集成自动检查：`check-patterns.ts` 会报错阻断提交
 
 ## Flexbox `min-width: 0`
 

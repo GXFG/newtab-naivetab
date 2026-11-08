@@ -45,6 +45,6 @@ myWidget: 'myPane',
 
 ## 注意事项
 
-- 禁止硬编码图标和文本（见 [no-hardcode.md](../.claude/rules/no-hardcode.md)）
+- 禁止硬编码图标和文本（见 [no-hardcode.md](../../rules/no-hardcode.md)）
 - 面板内颜色使用双元素数组 `[浅色, 深色]`
-- 完整规范见 [setting.md](../../docs/architecture/setting.md)
+- 完整规范见 [setting.md](../../../docs/architecture/setting.md)

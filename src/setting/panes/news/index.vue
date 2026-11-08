@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NTInputNumber from '@/components/ui/NTInputNumber.vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import { NEWS_SOURCE_KEYS } from '@/logic/constants/urls'
 import { localConfig } from '@/logic/config/state'

@@ -2,7 +2,7 @@
 import NTInputNumber from '@/components/ui/NTInputNumber.vue'
 import NTAutoComplete from '@/components/ui/NTAutoComplete.vue'
 import { useDebounceFn } from '@vueuse/core'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import { getCityLookup } from '@/api'
 import { URL_QWEATHER_START } from '@/logic/constants/urls'
 import { localConfig } from '@/logic/config/state'

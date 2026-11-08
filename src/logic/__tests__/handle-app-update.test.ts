@@ -40,6 +40,11 @@ function resetMockState() {
       backgroundBlur: 0,
       dayFontFamily: 'Arial',
       descFontFamily: 'Arial',
+      subscriptionRegion: 'CN',
+      customSubscriptionUrl: '',
+      isHolidayMarkVisible: true,
+      isLunarTermVisible: true,
+      isAlmanacVisible: true,
     },
     memo: { enabled: true, backgroundBlur: 0 },
     news: { enabled: true, backgroundBlur: 0 },
@@ -48,7 +53,15 @@ function resetMockState() {
   })
 
   mockLocalState.value = {
-    isUploadConfigStatusMap: { general: { dirty: false, syncTime: 0, syncId: '', localModifiedTime: 0, loading: false } },
+    isUploadConfigStatusMap: {
+      general: {
+        dirty: false,
+        syncTime: 0,
+        syncId: '',
+        localModifiedTime: 0,
+        loading: false,
+      },
+    },
     isFocusMode: false,
   }
 
@@ -65,24 +78,45 @@ vi.doMock('@/logic/store/state', () => ({
 
 vi.doMock('@/logic/config/defaults', () => ({
   defaultConfig: {
-    general: { version: '2.3.0', lang: 'zh-CN', timeLang: 'zh-CN', openPageFocusElement: 'default', focusVisibleWidgetMap: { search: true }, backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'] },
+    general: {
+      version: '2.3.0',
+      lang: 'zh-CN',
+      timeLang: 'zh-CN',
+      openPageFocusElement: 'default',
+      focusVisibleWidgetMap: { search: true },
+      backgroundColor: ['rgba(232, 236, 241, 1)', 'rgba(26, 26, 46, 1)'],
+    },
     keyboardBookmark: { keymap: {}, source: 1 },
     keyboardCommon: { fontSize: 14, fontFamily: 'system' },
     keyboardCommand: { enabled: true, modifierKeys: [] },
     search: { isNewTabOpen: false, backgroundBlur: 0 },
     clockDigital: { fontSize: 28, width: 22 },
     yearProgress: { enabled: true, backgroundBlur: 0 },
-    calendar: { festivalCountdown: true, backgroundBlur: 0, dayFontFamily: 'system', descFontFamily: 'system' },
+    calendar: {
+      festivalCountdown: true,
+      backgroundBlur: 0,
+      dayFontFamily: 'system',
+      descFontFamily: 'system',
+      subscriptionRegion: 'CN',
+      customSubscriptionUrl: '',
+      isHolidayMarkVisible: true,
+      isLunarTermVisible: true,
+      isAlmanacVisible: true,
+    },
     memo: { enabled: true, backgroundBlur: 0 },
     news: { enabled: true, backgroundBlur: 0 },
     bookmarkFolder: { enabled: false },
     clockFlip: { enabled: false },
   },
   defaultFocusVisibleWidgetMap: { search: true, keyboardBookmark: true },
+  // migrate.ts 在模块作用域用 Object.keys(KEYBOARD_COMMON_CONFIG) 计算外观字段列表
+  KEYBOARD_COMMON_CONFIG: { fontSize: 14, fontFamily: 'system' },
 }))
 
 vi.doMock('@/logic/config/merge', () => ({
-  mergeState: vi.fn((state: unknown, acceptState: unknown) => acceptState ?? state),
+  mergeState: vi.fn(
+    (state: unknown, acceptState: unknown) => acceptState ?? state,
+  ),
 }))
 
 vi.doMock('@/logic/utils/util', () => ({
@@ -98,15 +132,20 @@ vi.doMock('@/logic/utils/util', () => ({
   },
 }))
 
-
 // localStorage mock
 const localStorageMock: Record<string, string> = {}
 Object.defineProperty(globalThis, 'localStorage', {
   value: {
     getItem: vi.fn((key: string) => localStorageMock[key] ?? null),
-    setItem: vi.fn((key: string, value: string) => { localStorageMock[key] = value }),
-    removeItem: vi.fn((key: string) => { delete localStorageMock[key] }),
-    clear: vi.fn(() => { Object.keys(localStorageMock).forEach(k => delete localStorageMock[k]) }),
+    setItem: vi.fn((key: string, value: string) => {
+      localStorageMock[key] = value
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete localStorageMock[key]
+    }),
+    clear: vi.fn(() => {
+      Object.keys(localStorageMock).forEach((k) => delete localStorageMock[k])
+    }),
   },
   configurable: true,
 })
@@ -117,7 +156,7 @@ let getLocalVersion: () => string
 beforeEach(async () => {
   vi.resetModules()
   localStorageMock['__cleared__'] = ''
-  Object.keys(localStorageMock).forEach(k => delete localStorageMock[k])
+  Object.keys(localStorageMock).forEach((k) => delete localStorageMock[k])
   resetMockState()
 
   window.appVersion = '2.3.0'
@@ -157,9 +196,10 @@ describe('handleAppUpdate: no upgrade', () => {
   })
 })
 
-
 describe('handleAppUpdate: v1.20.0 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '1.19.0' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '1.19.0'
+  })
 
   it('sets keyboardBookmark.source to 1 when keymap is empty', () => {
     mockLocalConfig.keyboardBookmark.keymap = {}
@@ -168,7 +208,9 @@ describe('handleAppUpdate: v1.20.0 migration', () => {
   })
 
   it('sets keyboardBookmark.source to 2 when keymap has entries', () => {
-    mockLocalConfig.keyboardBookmark.keymap = { KeyA: { url: 'https://example.com' } }
+    mockLocalConfig.keyboardBookmark.keymap = {
+      KeyA: { url: 'https://example.com' },
+    }
     handleAppUpdate()
     expect(mockLocalConfig.keyboardBookmark.source).toBe(2)
   })
@@ -177,7 +219,9 @@ describe('handleAppUpdate: v1.20.0 migration', () => {
 // ── v1.23.1: clockDigital width 计算 + 删除 letterSpacing ──
 
 describe('handleAppUpdate: v1.23.1 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '1.23.0' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '1.23.0'
+  })
 
   it('calculates width from fontSize / 2 + 8', () => {
     mockLocalConfig.clockDigital.fontSize = 28
@@ -195,7 +239,9 @@ describe('handleAppUpdate: v1.23.1 migration', () => {
 // ── v1.24.0: timeLang 迁移 + yearProgress 初始化 ──
 
 describe('handleAppUpdate: v1.24.0 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '1.23.9' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '1.23.9'
+  })
 
   it('copies lang to timeLang', () => {
     mockLocalConfig.general.lang = 'en-US'
@@ -212,7 +258,9 @@ describe('handleAppUpdate: v1.24.0 migration', () => {
 // ── v1.24.3: backgroundColor 初始化 ──
 
 describe('handleAppUpdate: v1.24.3 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '1.24.2' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '1.24.2'
+  })
 
   it('sets backgroundColor from defaultConfig', () => {
     // 确保原来没有
@@ -227,7 +275,9 @@ describe('handleAppUpdate: v1.24.3 migration', () => {
 // ── v1.25.9: calendar.festivalCountdown ──
 
 describe('handleAppUpdate: v1.25.9 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '1.25.8' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '1.25.8'
+  })
 
   it('enables festivalCountdown', () => {
     mockLocalConfig.calendar.festivalCountdown = false
@@ -239,7 +289,9 @@ describe('handleAppUpdate: v1.25.9 migration', () => {
 // ── v1.27.0: 重大变更（专注模式、背景模糊、书签文件夹） ──
 
 describe('handleAppUpdate: v1.27.0 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '1.26.0' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '1.26.0'
+  })
 
   it('initializes isFocusMode to false', () => {
     handleAppUpdate()
@@ -249,15 +301,18 @@ describe('handleAppUpdate: v1.27.0 migration', () => {
   it('sets focusVisibleWidgetMap from default', () => {
     mockLocalConfig.general.focusVisibleWidgetMap = { old: true }
     handleAppUpdate()
-    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual(
-      { search: true, keyboardBookmark: true },
-    )
+    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual({
+      search: true,
+      keyboardBookmark: true,
+    })
   })
 
   it('corrects openPageFocusElement from bookmarkKeyboard to keyboardBookmark', () => {
     mockLocalConfig.general.openPageFocusElement = 'bookmarkKeyboard'
     handleAppUpdate()
-    expect(mockLocalConfig.general.openPageFocusElement).toBe('keyboardBookmark')
+    expect(mockLocalConfig.general.openPageFocusElement).toBe(
+      'keyboardBookmark',
+    )
   })
 
   it('does not change openPageFocusElement when already correct', () => {
@@ -285,7 +340,9 @@ describe('handleAppUpdate: v1.27.0 migration', () => {
 // ── v2.0.0: clockFlip 初始化 ──
 
 describe('handleAppUpdate: v2.0.0 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '1.99.0' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '1.99.0'
+  })
 
   it('initializes clockFlip.enabled to false', () => {
     mockLocalConfig.clockFlip.enabled = true
@@ -297,10 +354,13 @@ describe('handleAppUpdate: v2.0.0 migration', () => {
 // ── v2.2.0: 全局快捷键 + 字体迁移 ──
 
 describe('handleAppUpdate: v2.2.0 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '2.1.0' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '2.1.0'
+  })
 
   it('migrates isGlobalShortcutEnabled from old key', () => {
-    ;(mockLocalConfig.keyboardBookmark as any).isListenBackgroundKeystrokes = false
+    ;(mockLocalConfig.keyboardBookmark as any).isListenBackgroundKeystrokes =
+      false
     handleAppUpdate()
     expect(mockLocalConfig.keyboardBookmark.isGlobalShortcutEnabled).toBe(false)
   })
@@ -351,20 +411,25 @@ describe('handleAppUpdate: v2.2.0 migration', () => {
 // ── v2.2.2: focusVisibleWidgetMap 更新 + localStorage 迁移 ──
 
 describe('handleAppUpdate: v2.2.2 migration', () => {
-  beforeEach(() => { mockLocalConfig.general.version = '2.2.1' })
+  beforeEach(() => {
+    mockLocalConfig.general.version = '2.2.1'
+  })
 
   it('resets focusVisibleWidgetMap to default', () => {
     mockLocalConfig.general.focusVisibleWidgetMap = { oldKey: true }
     handleAppUpdate()
-    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual(
-      { search: true, keyboardBookmark: true },
-    )
+    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual({
+      search: true,
+      keyboardBookmark: true,
+    })
   })
 
   it('corrects openPageFocusElement from keyboard to keyboardBookmark', () => {
     mockLocalConfig.general.openPageFocusElement = 'keyboard'
     handleAppUpdate()
-    expect(mockLocalConfig.general.openPageFocusElement).toBe('keyboardBookmark')
+    expect(mockLocalConfig.general.openPageFocusElement).toBe(
+      'keyboardBookmark',
+    )
   })
 
   it('migrates keyboard data from localStorage to keyboardBookmark', () => {
@@ -426,8 +491,11 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
     mockLocalConfig.clockDigital.fontSize = 30
     ;(mockLocalConfig.clockDigital as any).letterSpacing = 1
     mockLocalConfig.calendar.festivalCountdown = false
-    mockLocalConfig.keyboardBookmark.keymap = { KeyX: { url: 'https://old.com' } }
-    ;(mockLocalConfig.keyboardBookmark as any).isListenBackgroundKeystrokes = false
+    mockLocalConfig.keyboardBookmark.keymap = {
+      KeyX: { url: 'https://old.com' },
+    }
+    ;(mockLocalConfig.keyboardBookmark as any).isListenBackgroundKeystrokes =
+      false
     mockLocalConfig.general.fontFamily = 'Arial'
     mockLocalConfig.calendar.dayFontFamily = 'Arial'
     mockLocalConfig.calendar.descFontFamily = 'Arial'
@@ -446,7 +514,9 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
     // v1.25.9
     expect(mockLocalConfig.calendar.festivalCountdown).toBe(true)
     // v1.27.0
-    expect(mockLocalConfig.general.openPageFocusElement).toBe('keyboardBookmark')
+    expect(mockLocalConfig.general.openPageFocusElement).toBe(
+      'keyboardBookmark',
+    )
     expect(mockLocalConfig.bookmarkFolder.enabled).toBe(false)
     // v2.0.0
     expect(mockLocalConfig.clockFlip.enabled).toBe(false)
@@ -455,9 +525,10 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
     expect(mockLocalConfig.general.fontFamily).toBe('system')
     expect(mockLocalConfig.calendar.dayFontFamily).toBe('system')
     // v2.2.2
-    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual(
-      { search: true, keyboardBookmark: true },
-    )
+    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual({
+      search: true,
+      keyboardBookmark: true,
+    })
     expect(mockLocalState.value.isFocusMode).toBe(true)
     expect((mockLocalConfig.general as any).isFocusMode).toBeUndefined()
   })
@@ -470,6 +541,9 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
   })
 
   it('shows changelog when migrating from old version (2.3.2 breaking change)', () => {
+    // 目标版本必须覆盖到 2.3.2 步骤：引擎会跳过「晚于目标版本」的步骤，
+    // 与真实发布版本（远高于 2.3.2）保持一致
+    window.appVersion = '2.7.0'
     mockLocalConfig.general.version = '2.2.5'
     mockLocalConfig.general.showBreakingChangeNotice = false
     handleAppUpdate()
@@ -481,15 +555,33 @@ describe('handleAppUpdate: cumulative migration from old version', () => {
 
 // ── 边界场景 ──
 
+describe('handleAppUpdate: v2.7.0 calendar subscription', () => {
+  it('fills new subscription fields for a 2.6.x config', () => {
+    window.appVersion = '2.7.0'
+    mockLocalConfig.general.version = '2.6.6'
+    mockLocalConfig.calendar = {}
+
+    handleAppUpdate()
+
+    expect(mockLocalConfig.calendar.subscriptionRegion).toBe('CN')
+    expect(mockLocalConfig.calendar.customSubscriptionUrl).toBe('')
+    expect(mockLocalConfig.calendar.isHolidayMarkVisible).toBe(true)
+    expect(mockLocalConfig.calendar.isLunarTermVisible).toBe(true)
+    expect(mockLocalConfig.calendar.isAlmanacVisible).toBe(true)
+    expect(mockLocalConfig.general.version).toBe('2.7.0')
+  })
+})
+
 describe('handleAppUpdate: edge cases', () => {
   it('handles missing optional localStorage keys gracefully', () => {
     mockLocalConfig.general.version = '2.2.1'
     // localStorage 没有 c-keyboard 和 c-commandShortcut
     handleAppUpdate()
     // 不应报错，正常完成
-    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual(
-      { search: true, keyboardBookmark: true },
-    )
+    expect(mockLocalConfig.general.focusVisibleWidgetMap).toEqual({
+      search: true,
+      keyboardBookmark: true,
+    })
   })
 
   it('updates version even when no migration branches are triggered', () => {

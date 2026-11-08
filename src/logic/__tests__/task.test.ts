@@ -269,6 +269,33 @@ describe('timer task system', () => {
     removeTimerTask('tick')
   })
 
+  it('单个任务抛错不影响同批次其它任务与后续帧', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    let armed = false
+    const bad = vi.fn(() => {
+      if (armed) throw new Error('boom')
+    })
+    const good = vi.fn()
+
+    // 注册时的首次执行不在隔离范围内（错误要抛给调用方），所以先不武装
+    addTimerTask('bad', bad)
+    addTimerTask('good', good)
+    good.mockClear()
+    armed = true
+
+    advanceOneSecond()
+    expect(good).toHaveBeenCalledTimes(1)
+
+    // 关键断言：rAF 链没有断，下一秒还能继续调度
+    advanceOneSecond()
+    expect(good).toHaveBeenCalledTimes(2)
+    expect(errorSpy).toHaveBeenCalled()
+
+    removeTimerTask('bad')
+    removeTimerTask('good')
+    errorSpy.mockRestore()
+  })
+
   it('calls tasks at ~1 second intervals after start', () => {
     const fn = vi.fn()
     addTimerTask('tick', fn) // 1 call (immediate)
@@ -455,5 +482,207 @@ describe('page focus task system', () => {
 
     onPageFocus()
     expect(fn).not.toHaveBeenCalled()
+  })
+})
+
+describe('daily task system', () => {
+  let addDailyTask: (typeof import('@/logic/task'))['addDailyTask']
+  let removeDailyTask: (typeof import('@/logic/task'))['removeDailyTask']
+  let startTimer: (typeof import('@/logic/task'))['startTimer']
+  let stopTimer: (typeof import('@/logic/task'))['stopTimer']
+
+  /** 与 timer 测试一致：fake timer 下 rAF 被模拟成 setTimeout(≈16ms) */
+  const advanceOneSecond = () => vi.advanceTimersByTime(1000)
+
+  beforeEach(async () => {
+    vi.resetModules()
+    vi.doMock('@/logic/store/state', () => ({
+      globalState: {
+        isGuideMode: false,
+        isSettingDrawerVisible: false,
+        isSearchFocused: false,
+        isInputFocused: false,
+        drawerStack: [],
+      },
+      switchSettingDrawerVisible: vi.fn(),
+      closeSettingDrawer: vi.fn(),
+      closeTopDrawer: vi.fn(),
+    }))
+
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 10, 7, 23, 59, 30))
+
+    const task = await import('@/logic/task')
+    addDailyTask = task.addDailyTask
+    removeDailyTask = task.removeDailyTask
+    startTimer = task.startTimer
+    stopTimer = task.stopTimer
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  it('注册即执行一次', () => {
+    const fn = vi.fn()
+    addDailyTask('cal', fn)
+    expect(fn).toHaveBeenCalledTimes(1)
+    removeDailyTask('cal')
+  })
+
+  it('同一天内反复 tick 不会重复触发', () => {
+    const fn = vi.fn()
+    addDailyTask('cal', fn)
+
+    for (let i = 0; i < 10; i += 1) advanceOneSecond()
+
+    expect(fn).toHaveBeenCalledTimes(1)
+    removeDailyTask('cal')
+  })
+
+  it('跨过午夜触发一次，之后同一天不再触发', () => {
+    const fn = vi.fn()
+    addDailyTask('cal', fn)
+
+    vi.setSystemTime(new Date(2026, 10, 8, 0, 0, 1))
+    advanceOneSecond()
+    expect(fn).toHaveBeenCalledTimes(2)
+
+    advanceOneSecond()
+    expect(fn).toHaveBeenCalledTimes(2)
+
+    removeDailyTask('cal')
+  })
+
+  it('多个消费者共享同一次比较，各自都被触发', () => {
+    const a = vi.fn()
+    const b = vi.fn()
+    addDailyTask('calendar', a)
+    addDailyTask('date', b)
+
+    vi.setSystemTime(new Date(2026, 10, 8, 0, 0, 1))
+    advanceOneSecond()
+
+    expect(a).toHaveBeenCalledTimes(2)
+    expect(b).toHaveBeenCalledTimes(2)
+
+    removeDailyTask('calendar')
+    removeDailyTask('date')
+  })
+
+  it('回调拿到的是同一个触发时刻', () => {
+    const received: Date[] = []
+    const a = (now: Date) => received.push(now)
+    const b = (now: Date) => received.push(now)
+    addDailyTask('a', a)
+    addDailyTask('b', b)
+
+    vi.setSystemTime(new Date(2026, 10, 8, 0, 0, 1))
+    advanceOneSecond()
+
+    // 首次注册各一次 + 跨天各一次
+    expect(received).toHaveLength(4)
+    expect(received[2].getTime()).toBe(received[3].getTime())
+
+    removeDailyTask('a')
+    removeDailyTask('b')
+  })
+
+  it('一个消费者抛错不影响其它消费者', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const bad = vi.fn(() => {
+      throw new Error('boom')
+    })
+    const good = vi.fn()
+    addDailyTask('bad', bad)
+    addDailyTask('good', good)
+
+    vi.setSystemTime(new Date(2026, 10, 8, 0, 0, 1))
+    expect(() => advanceOneSecond()).not.toThrow()
+
+    expect(good).toHaveBeenCalledTimes(2)
+    expect(errorSpy).toHaveBeenCalled()
+
+    removeDailyTask('bad')
+    removeDailyTask('good')
+  })
+
+  it('移除后不再触发', () => {
+    const fn = vi.fn()
+    addDailyTask('cal', fn)
+    removeDailyTask('cal')
+
+    vi.setSystemTime(new Date(2026, 10, 8, 0, 0, 1))
+    advanceOneSecond()
+
+    expect(fn).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * 守住 addDailyTask 里「先立基线再注册 timer」的顺序：
+   * 少了那一步，addTimerTask 立即执行的那次 checkDayChange 会拿**旧的** lastDayKey
+   * 去比，把新消费者当成跨天补跑一次，叠加注册时的显式调用就是连跑两次。
+   */
+  it('清空后跨天再注册只初始化一次，不会连跑两次', () => {
+    const first = vi.fn()
+    addDailyTask('cal', first)
+    removeDailyTask('cal')
+
+    // 期间跨过午夜：基线还停在昨天
+    vi.setSystemTime(new Date(2026, 10, 8, 8, 0, 0))
+
+    const second = vi.fn()
+    addDailyTask('date', second)
+
+    expect(second).toHaveBeenCalledTimes(1)
+    removeDailyTask('date')
+  })
+
+  it('最后一个消费者移除后共享 timer 一起停掉', () => {
+    const fn = vi.fn()
+    addDailyTask('cal', fn)
+    expect(vi.getTimerCount()).toBeGreaterThan(0)
+
+    removeDailyTask('cal')
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  /**
+   * 注销一个没注册过的 key 必须是纯空操作：否则 removeTimerTask 会顺带把
+   * 不属于 daily 的 rAF 循环停掉。这里复现的是「App 已 startTimer、timer map 还是空的」
+   * 那个窗口——此时 daily 根本没注册过东西，没有资格摘掉别人的循环。
+   */
+  it('移除未注册的 key 不会误停 App 启动的 rAF 循环', () => {
+    startTimer()
+    expect(vi.getTimerCount()).toBeGreaterThan(0)
+
+    removeDailyTask('unknown')
+
+    expect(vi.getTimerCount()).toBeGreaterThan(0)
+    stopTimer()
+  })
+
+  it('跨年边界（12-31 → 01-01）也判定为跨天', () => {
+    vi.setSystemTime(new Date(2026, 11, 31, 23, 59, 30))
+    const fn = vi.fn()
+    addDailyTask('cal', fn)
+
+    vi.setSystemTime(new Date(2027, 0, 1, 0, 0, 1))
+    advanceOneSecond()
+
+    expect(fn).toHaveBeenCalledTimes(2)
+    removeDailyTask('cal')
+  })
+
+  it('睡眠跳过多个整天只补触发一次', () => {
+    const fn = vi.fn()
+    addDailyTask('cal', fn)
+
+    vi.setSystemTime(new Date(2026, 10, 10, 8, 0, 0))
+    advanceOneSecond()
+
+    expect(fn).toHaveBeenCalledTimes(2)
+    removeDailyTask('cal')
   })
 })

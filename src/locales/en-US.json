@@ -78,7 +78,9 @@
     "setting": "Setting",
     "login": "Login",
     "behavior": "Config",
-    "swInitializing": "Extension is initializing, please try again shortly"
+    "swInitializing": "Extension is initializing, please try again shortly",
+    "retry": "Retry",
+    "loading": "Loading..."
   },
   "browserPermission": {
     "bookmark": "Requires browser permissions to access your bookmarks"
@@ -221,6 +223,8 @@
     "importExportSettingsLabel": "Import/Export",
     "importSettingsValue": "Import",
     "importExportSettingsTips": "Import a local config file to restore settings, or export current config regularly to prevent data loss",
+    "importInvalidFile": "Not a valid NaiveTab config file (missing general.version)",
+    "importNewerVersion": "This file was exported by a newer NaiveTab version. Update the extension before importing",
     "exportSettingValue": "Export",
     "clearStorageLabel": "Clear cache",
     "clearStorageValue": "Clear",
@@ -483,20 +487,38 @@
     "sectionWorkStyle": "Workday Style",
     "sectionGlobalColor": "Global Colors",
     "weekBeginsOn": "Week Begins",
-    "holidayRegion": "Holiday Region",
+    "holidaySubscription": "Holiday Subscription",
+    "subscriptionNote": "Data comes from iCloud Calendars (Apple) and updates automatically when online; any .ics feed URL also works.",
+    "customSubscriptionUrl": "Custom subscription URL",
+    "customSubscriptionHint": "Click Validate to apply. The current subscription is replaced only after validation succeeds; typing does not send requests.",
+    "subscriptionValidate": "Validate",
+    "subscriptionValid": "Validated. Subscription replaced.",
+    "subscriptionRefresh": "Refresh",
+    "subscriptionRefreshing": "Refreshing...",
+    "subscriptionLastUpdated": "Last updated:",
+    "subscriptionNeverUpdated": "Not updated yet",
+    "subscriptionStaleTip": "Update failed, showing cached data. Click to retry",
+    "subscriptionFailed": "Failed to load subscription",
+    "subscriptionFailedTip": "Failed to load subscription. Click to retry",
+    "subscriptionRegion": {
+      "custom": "Custom URL",
+      "cn": "Chinese Mainland",
+      "tw": "Taiwan, China",
+      "hk": "Hong Kong, China"
+    },
+    "subscriptionSearchPlaceholder": "Search country or region",
+    "subscriptionSearchEmpty": "No matching region",
+    "subscriptionError": {
+      "invalid-url": "Invalid URL format",
+      "network": "Network request failed",
+      "http": "Server returned an error",
+      "not-calendar": "Not a valid calendar file (.ics)",
+      "too-large": "Calendar file is too large (over 5 MB)",
+      "empty": "The calendar has no events"
+    },
     "holidayMarkVisible": "Show Holiday Marks",
     "lunarTermVisible": "Show Lunar & Solar Terms",
     "almanacVisible": "Show Almanac Details",
-    "region": {
-      "cn": "Chinese Mainland",
-      "tw": "Taiwan, China",
-      "hk": "Hong Kong, China",
-      "none": "No Holidays",
-      "cnNote": "Statutory holidays and adjusted workdays of the Chinese Mainland; updated with the calendar library.",
-      "twNote": "Government office calendar of the Taiwan region; for reference only — labor and school schedules differ.",
-      "hkNote": "General holidays of Hong Kong; community-maintained and may lag behind official announcements.",
-      "noneNote": "Hides region-specific holidays; only internationally observed days remain."
-    },
     "constellation": {
       "aries": "Aries",
       "taurus": "Taurus",
@@ -512,7 +534,7 @@
       "pisces": "Pisces"
     },
     "festivalCountdown": "Festival Countdown",
-    "festivalCountdownDaySuffix": "Days",
+    "festivalCountdownDaySuffix": "{n} day | {n} days",
     "today": "T",
     "work": "W",
     "rest": "R",

@@ -14,7 +14,7 @@
  * />
  */
 import { ref } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue/offline'
 import {
   ComboboxRoot,
   ComboboxInput,
@@ -35,6 +35,13 @@ const props = withDefaults(
   defineProps<{
     /** 下拉选项 */
     options?: Option[]
+    /**
+     * 忽略内置过滤，由父级给出已过滤的选项（服务端搜索用）。
+     * 传 false 时由 Reka 按选项文本做本地过滤，适合静态候选（如国家列表）。
+     */
+    ignoreFilter?: boolean
+    /** 点击输入框即展开候选（默认关；国家/地区这类静态候选需要一个「点开看全部」的入口） */
+    openOnClick?: boolean
     /** 加载中 */
     loading?: boolean
     /** 禁用 */
@@ -46,6 +53,8 @@ const props = withDefaults(
   }>(),
   {
     options: () => [],
+    ignoreFilter: true,
+    openOnClick: false,
     loading: false,
     disabled: false,
     size: 'medium',
@@ -84,7 +93,8 @@ const handleSelect = (value: string) => {
 <template>
   <ComboboxRoot
     v-model="selected"
-    :ignore-filter="true"
+    :ignore-filter="ignoreFilter"
+    :open-on-click="openOnClick"
     :disabled="disabled"
     class="reka-autocomplete"
     :class="{ 'reka-autocomplete--small': size === 'small' }"
@@ -111,8 +121,9 @@ const handleSelect = (value: string) => {
       align="start"
     >
       <ComboboxViewport class="reka-autocomplete__viewport">
+        <!-- 空态交给 Reka 判断：本地过滤无命中与列表为空都会走到这里 -->
         <ComboboxEmpty
-          v-if="!loading && !options.length"
+          v-if="!loading"
           class="reka-autocomplete__empty"
         >
           <slot name="empty">无匹配结果</slot>

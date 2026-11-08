@@ -78,7 +78,9 @@
     "setting": "设置",
     "login": "登录",
     "behavior": "配置项",
-    "swInitializing": "扩展正在初始化，请稍后再试"
+    "swInitializing": "扩展正在初始化，请稍后再试",
+    "retry": "重试",
+    "loading": "加载中..."
   },
   "browserPermission": {
     "bookmark": "需要浏览器权限访问您的书签"
@@ -221,6 +223,8 @@
     "importExportSettingsLabel": "导入/导出",
     "importSettingsValue": "导入",
     "importExportSettingsTips": "导入本地配置文件恢复设置，或导出当前配置定期备份，防止数据丢失",
+    "importInvalidFile": "文件不是有效的 NaiveTab 配置（缺少 general.version）",
+    "importNewerVersion": "该文件由更新版本的 NaiveTab 导出，请先更新扩展后再导入",
     "exportSettingValue": "导出",
     "clearStorageLabel": "清除缓存",
     "clearStorageValue": "清除",
@@ -483,20 +487,38 @@
     "sectionWorkStyle": "工作日样式",
     "sectionGlobalColor": "全局配色",
     "weekBeginsOn": "一周开始于",
-    "holidayRegion": "节假日地区",
+    "holidaySubscription": "节假日订阅",
+    "subscriptionNote": "数据来自 iCloud 日历（Apple），联网后自动更新；也可填入任意 .ics 订阅地址。",
+    "customSubscriptionUrl": "自定义订阅地址",
+    "customSubscriptionHint": "输入后点击「验证」，验证成功才会替换当前订阅；输入过程中不会请求地址。",
+    "subscriptionValidate": "验证",
+    "subscriptionValid": "验证成功，已替换当前订阅",
+    "subscriptionRefresh": "刷新",
+    "subscriptionRefreshing": "刷新中...",
+    "subscriptionLastUpdated": "上次更新：",
+    "subscriptionNeverUpdated": "尚未更新",
+    "subscriptionStaleTip": "更新失败，显示缓存数据，点击重试",
+    "subscriptionFailed": "订阅加载失败",
+    "subscriptionFailedTip": "订阅加载失败，点击重试",
+    "subscriptionRegion": {
+      "custom": "自定义地址",
+      "cn": "中国大陆",
+      "tw": "中国台湾",
+      "hk": "中国香港"
+    },
+    "subscriptionSearchPlaceholder": "搜索国家或地区",
+    "subscriptionSearchEmpty": "无匹配的地区",
+    "subscriptionError": {
+      "invalid-url": "地址格式不正确",
+      "network": "网络请求失败",
+      "http": "服务器返回错误",
+      "not-calendar": "不是有效的日历文件（.ics）",
+      "too-large": "日历文件过大（超过 5 MB）",
+      "empty": "日历里没有任何事件"
+    },
     "holidayMarkVisible": "显示休班标记",
     "lunarTermVisible": "显示农历与节气",
     "almanacVisible": "显示黄历详情",
-    "region": {
-      "cn": "中国大陆",
-      "tw": "中国台湾",
-      "hk": "中国香港",
-      "none": "不显示节假日",
-      "cnNote": "中国大陆法定节假日安排（含调休），数据随日历库更新。",
-      "twNote": "台湾地区行政机关办公日历，仅供参考，劳工与学校另有规定。",
-      "hkNote": "香港公众假期，数据由社区维护，可能滞后，请以官方公告为准。",
-      "noneNote": "不展示任何地区的节假日，仅保留元旦、劳动节等国际通用节日。"
-    },
     "constellation": {
       "aries": "白羊座",
       "taurus": "金牛座",
@@ -512,7 +534,7 @@
       "pisces": "双鱼座"
     },
     "festivalCountdown": "节日倒数",
-    "festivalCountdownDaySuffix": "天后",
+    "festivalCountdownDaySuffix": "{n}天后",
     "today": "今",
     "work": "班",
     "rest": "休",

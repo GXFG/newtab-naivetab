@@ -7,7 +7,8 @@
 | `src/logic/config/defaults.ts` | 默认配置定义、Widget 配置自动扫描 |
 | `src/logic/config/merge.ts` | 递归合并函数 `mergeState` |
 | `src/logic/config/update.ts` | 版本迁移 `handleAppUpdate`、配置更新 `updateSetting` |
-| `src/logic/config/migrate.ts` | 声明式字段迁移 `normalizeLegacyConfig` |
+| `src/logic/config/migrate.ts` | 结构归一 `normalizeStructure` + 迁移引擎 `runMigrations` |
+| `src/logic/config/migrations.ts` | 版本迁移步骤表 `MIGRATION_STEPS`（唯一一份迁移知识） |
 | `src/logic/config/state.ts` | `localConfig` / `localState` 响应式创建 |
 | `src/logic/config/compress.ts` | gzip 压缩/解压工具 |
 | `src/logic/config/version.ts` | 版本号比较 |
@@ -59,14 +60,34 @@ import.meta.glob 扫描 → 构建 defaultConfig → createLocalConfig()
 
 ## 配置迁移系统
 
-详见 `src/logic/config/update.ts` 源码注释（含各版本迁移历史）。
+迁移知识只有一处：`src/logic/config/migrations.ts` 的 `MIGRATION_STEPS`（按版本严格升序）。
+两个入口共用这条链：
+
+| 入口 | mode | 差异 |
+|------|------|------|
+| `handleAppUpdate`（启动升级，newtab 与 options 两个页面入口都会调） | `upgrade` | 注入 host：旧 localStorage 键、localState、更新公告 |
+| `importSetting`（导入备份） | `import` | 不注入 host：不碰本机存储与运行时状态、不弹公告；更高版本导出的文件直接拒绝 |
+
+引擎（`migrate.ts`）分两段：
+
+1. `normalizeStructure(raw)` —— 只做键名归一（`bookmark → keyboardBookmark` 等），版本无关、幂等，**必须**先跑
+2. `runMigrations(ctx, fromVersion, toVersion)` —— 只执行 `fromVersion < step.version <= toVersion` 的步骤，不写版本号
+
+**为什么归一必须独立于版本**：步骤都按新键名寻址。若把改名做成某个版本的步骤，更早版本的步骤会写到还不存在的键上，静默丢数据。
+
+### 步骤写法约定
+
+- 只读写 `ctx.config`，禁止 import `localConfig` / `localState`；本机副作用走 `ctx.host`（导入模式下 host 不存在，逻辑自动跳过）
+- 不写版本号、不弹 toast、不记统计 —— 属于入口收尾
+- 缺字段不赋值，交给 `updateSetting` 的 `mergeState`；只有「必须与默认值解耦」的字段才显式写默认值
+- 删除字段必须 `delete`，漏掉的老字段会被当作合法数据继续传播
+- 已知的按模式分支只有一处：`focusVisibleWidgetMap` 的整表重建只在 `upgrade` 执行（旧数据用的是旧 widget code；导入的备份已归一过键名，重置会抹掉用户的专注模式可见性设置）
 
 ### 核心规则
 
-- `handleAppUpdate` 使用 `if` 而非 `if-else`，确保跨多版本旧用户能依次执行所有迁移
 - 末尾的 `updateSetting()` 是异步执行（不 await），整理配置结构但不阻塞首屏渲染
 - 每次修改配置结构都**必须同步升 `package.json` 版本号**
-- **版本快照**：调用方（App.vue）在 `setupPageConfigSync` 之前通过 `getLocalVersion()` 快照本地版本号，传入 `handleAppUpdate(localVersion)`。避免 `loadRemoteConfig` 合并云端数据后 `localConfig.general.version` 被覆盖为新版本，导致迁移被误跳过
+- **版本快照**：调用方（`newtab/App.vue`、`options/Content.vue`）在 `setupPageConfigSync` 之前通过 `getLocalVersion()` 快照本地版本号，传入 `handleAppUpdate(localVersion)`。避免 `loadRemoteConfig` 合并云端数据后 `localConfig.general.version` 被覆盖为新版本，导致迁移被误跳过。**任何新建的页面上下文只要会写配置，都必须补这两步**，否则该入口会以「旧结构 + 新版本号」把字段推到云端
 
 配置迁移最佳实践（含各场景正确/错误做法对照表）详见 [pitfalls-config.md](../../.claude/rules/pitfalls-config.md#配置迁移黄金法则)。
 
@@ -80,7 +101,8 @@ npx vitest run src/logic/__tests__/config-snapshot.test.ts
 
 | 文件 | 职责 |
 |------|------|
-| `src/logic/__tests__/config-snapshot.test.ts` | 从不同历史版本的用户配置快照出发，运行完整迁移流程，验证核心数据不丢失、结构完整 |
+| `src/logic/__tests__/config-snapshot.test.ts` | 从不同历史版本的用户配置快照出发，运行完整迁移流程，验证核心数据不丢失、结构完整；并对最终 `localConfig` 打 golden 快照，字段级漂移会直接暴露 |
+| `src/logic/__tests__/migration-chain.test.ts` | 链条本身的不变量：步骤升序、目标版本门限、`import` 与 `upgrade` 等价（`focusVisibleWidgetMap` 除外）、`import` 不碰本机存储、幂等 |
 | `test/fixtures/snapshot-v*.json` | 用户配置快照 JSON，可从线上用户 localStorage 导出或手动构造典型配置 |
 
 每个快照覆盖 5 个断言：

@@ -7,9 +7,9 @@ description: NaiveTab 浏览器扩展的 Widget 开发指南。当用户要在 n
 
 新增 Widget 需按顺序完成以下步骤。完整模板参考见 [reference.md](reference.md)。
 
-> 完整注册点索引见 [REGISTRY-MAP.md](src/newtab/widgets/REGISTRY-MAP.md)，新增时对照检查。
+> 完整注册点索引见 [REGISTRY-MAP.md](../../../src/newtab/widgets/REGISTRY-MAP.md)，新增时对照检查。
 
-## 必须修改的 6 个文件
+## 必须完成的 8 个步骤（缺一不可）
 
 ### Step 1 — `src/common/widget-constants.ts`：代码列表与分组
 
@@ -127,6 +127,28 @@ myWidget: import('@/newtab/widgets/myWidget/config').TWidgetConfig
   "myWidget": "我的组件"
 }
 ```
+
+### Step 8 — 新建 `src/newtab/widgets/myWidget/__tests__/config.test.ts`
+
+**必做，不是可选项。** Widget 的默认配置属于持久化数据：改默认值影响老用户，改字段语义会让云同步和导入导出静默出错。一条快照测试就能让这类改动全部显形。
+
+```ts
+import { describe, expect, it } from 'vitest'
+import { WIDGET_CONFIG } from '../config'
+
+describe('myWidget config', () => {
+  it('默认配置快照（改动需确认老用户兼容性）', () => {
+    expect(WIDGET_CONFIG).toMatchSnapshot()
+  })
+
+  it('可序列化（云同步与导入导出依赖）', () => {
+    expect(() => JSON.stringify(WIDGET_CONFIG)).not.toThrow()
+  })
+})
+```
+
+- 快照变更时先确认是"有意调整默认值"，再更新快照；涉及老用户数据时走 [config-migration](../config-migration/SKILL.md)
+- 有业务逻辑（数据转换、时间计算、筛选）时追加对应单测，不要只留快照
 
 ---
 

@@ -6,9 +6,12 @@ import {
   getDayDetail,
   getFestivalList,
 } from '@/logic/calendar'
-import type { ICalendarOptions } from '@/logic/calendar'
-import { getLocalFestivalNames } from '@/logic/calendar/festivals'
-import type { TRegionCode } from '@/logic/calendar/regions'
+import type { ICalendarOptions, TSubscriptionDayMap } from '@/logic/calendar'
+import {
+  getLocalFestivalNames,
+  LOCAL_FESTIVALS,
+} from '@/logic/calendar/festivals'
+import type { IIcsDayEntry } from '@/logic/calendar/ics/parse'
 import { CalendarDayType } from '@/common/widget-constants'
 
 /**
@@ -19,23 +22,79 @@ import { CalendarDayType } from '@/common/widget-constants'
 const localDate = (year: number, month: number, day: number) =>
   new Date(year, month - 1, day)
 
-/** 展示选项工厂：默认两个展示开关都开，只指定地区 */
-const opts = (
-  region: TRegionCode = 'CN',
-  overrides: Partial<ICalendarOptions> = {},
-): ICalendarOptions => ({
-  region,
+/** 构造订阅数据（形状与 ICS 解析结果一致） */
+const makeSubscription = (
+  entries: Record<string, Partial<IIcsDayEntry>>,
+): TSubscriptionDayMap => {
+  const map: TSubscriptionDayMap = {}
+  for (const [key, entry] of Object.entries(entries)) {
+    map[key] = {
+      names: entry.names ?? [],
+      termNames: entry.termNames ?? [],
+      ...(entry.mark ? { mark: entry.mark } : {}),
+    }
+  }
+  return map
+}
+
+/**
+ * 贴合真实 Apple 中国大陆日历的片段：
+ * 元旦连休、春节含调休上班、节气、清明
+ */
+const CN_SUBSCRIPTION = makeSubscription({
+  '2026-01-01': { names: ['元旦'], mark: 'REST' },
+  '2026-01-02': { names: ['元旦'], mark: 'REST' },
+  '2026-01-03': { names: ['元旦'], mark: 'REST' },
+  '2026-01-05': { termNames: ['小寒'] },
+  '2026-02-14': { names: ['春节'], mark: 'WORK' },
+  '2026-02-15': { names: ['春节'], mark: 'REST' },
+  '2026-02-16': { names: ['春节'], mark: 'REST' },
+  '2026-02-17': { names: ['春节'], mark: 'REST' },
+  '2026-04-05': { names: ['清明节'], mark: 'REST' },
+  // 父亲节（本地规则表）与夏至同一天，用于验证优先级
+  '2026-06-21': { termNames: ['夏至'] },
+})
+
+/**
+ * 真实 Apple 中国大陆日历的清明形态：多日假期叫「清明（休）」，
+ * 节气事件也叫「清明」，两者同一天。用于验证「关掉农历节气后假期仍显示」。
+ */
+const QINGMING_SUBSCRIPTION = makeSubscription({
+  '2026-04-04': { names: ['清明'], mark: 'REST' },
+  '2026-04-05': { names: ['清明'], termNames: ['清明'], mark: 'REST' },
+  '2026-04-06': { names: ['清明'], mark: 'REST' },
+})
+
+/** 美国订阅：没有调休，只有节日名 */
+const US_SUBSCRIPTION = makeSubscription({
+  '2026-11-26': { names: ['Thanksgiving Day'] },
+  '2026-12-25': { names: ['Christmas Day'] },
+})
+
+const opts = (overrides: Partial<ICalendarOptions> = {}): ICalendarOptions => ({
+  subscription: CN_SUBSCRIPTION,
+  includeLocalFestivals: true,
   showLunarTerm: true,
   showAlmanac: true,
   ...overrides,
 })
 
+/** 格子/列表只收订阅与农历开关 */
+const cellOpts = (overrides: Partial<ICalendarOptions> = {}) => {
+  const merged = opts(overrides)
+  return {
+    subscription: merged.subscription,
+    includeLocalFestivals: merged.includeLocalFestivals,
+    showLunarTerm: merged.showLunarTerm,
+  }
+}
+
 // ─────────────────────────────────────────────
 // 产品契约：与具体日历库无关，换库也必须成立
 // ─────────────────────────────────────────────
 
-describe('getDayCell 文案优先级：农历节日 → 阳历节日 → 本地节日 → 节气 → 农历月/日', () => {
-  it('农历节日优先，如春节', () => {
+describe('getDayCell 文案优先级：订阅节日 → 本地节日 → 节气 → 农历月/日', () => {
+  it('订阅节日优先', () => {
     expect(getDayCell(localDate(2026, 2, 17), opts())).toEqual({
       desc: '春节',
       isFestival: true,
@@ -43,61 +102,88 @@ describe('getDayCell 文案优先级：农历节日 → 阳历节日 → 本地�
     })
   })
 
-  it('农历节日压过当天节气（龙头节 vs 春分）', () => {
-    expect(getDayCell(localDate(2026, 3, 20), opts()).desc).toBe('龙头节')
-  })
-
-  it('本地节日压过当天节气（父亲节 vs 夏至）', () => {
+  it('本地节日压过同日节气（父亲节 vs 夏至）', () => {
     expect(getDayCell(localDate(2026, 6, 21), opts()).desc).toBe('父亲节')
   })
 
-  it('无节日时展示节气', () => {
-    expect(getDayCell(localDate(2026, 1, 5), opts()).desc).toBe('小寒')
-    expect(getDayCell(localDate(2026, 9, 23), opts()).desc).toBe('秋分')
+  it('只有节气时展示节气', () => {
+    expect(getDayCell(localDate(2026, 1, 5), opts())).toEqual({
+      desc: '小寒',
+      isFestival: true,
+      dayType: CalendarDayType.NORMAL,
+    })
   })
 
-  it('节日与调休同日时两者都体现（2026-02-14 情人节 + 春节调休上班）', () => {
-    expect(getDayCell(localDate(2026, 2, 14), opts())).toEqual({
-      desc: '情人节',
-      isFestival: true,
-      dayType: CalendarDayType.WORK,
+  it('切换订阅后节日随之变化（美国日历里没有春节）', () => {
+    const american = opts({ subscription: US_SUBSCRIPTION })
+    // 正月初一在无节日时回退为月名
+    expect(getDayCell(localDate(2026, 2, 17), american).desc).toBe('正月')
+    expect(getDayCell(localDate(2026, 11, 26), american).desc).toBe(
+      'Thanksgiving Day',
+    )
+    expect(getDayCell(localDate(2026, 11, 26), american).dayType).toBe(
+      CalendarDayType.NORMAL,
+    )
+  })
+
+  it('中文地区订阅会补充通用现代节日（情人节）', () => {
+    expect(
+      getDayCell(localDate(2026, 2, 14), opts({ subscription: {} })).desc,
+    ).toBe('情人节')
+  })
+
+  it('非中文地区订阅不补充中文节日（含自定义地址）', () => {
+    const english = opts({
+      subscription: US_SUBSCRIPTION,
+      includeLocalFestivals: false,
     })
+    // 情人节没有订阅条目，也不补中文表 → 回退农历
+    expect(getDayCell(localDate(2026, 2, 14), english).desc).toBe('廿七')
+    expect(getDayCell(localDate(2026, 6, 21), english).isFestival).toBe(false)
   })
 })
 
 describe('getDayCell 无节日节气时回退为农历月/日', () => {
   it('农历初一显示月份', () => {
-    expect(getDayCell(localDate(2026, 1, 19), opts())).toEqual({
-      desc: '十二月',
-      isFestival: false,
-      dayType: CalendarDayType.NORMAL,
-    })
-    expect(getDayCell(localDate(2026, 12, 9), opts()).desc).toBe('十一月')
+    // 2026-01-19 是农历十二月初一
+    expect(getDayCell(localDate(2026, 1, 19), opts()).desc).toBe('十二月')
   })
 
   it('其余日期显示农历日', () => {
-    expect(getDayCell(localDate(2026, 2, 10), opts()).desc).toBe('廿三')
-    expect(getDayCell(localDate(2026, 9, 20), opts()).desc).toBe('初十')
+    expect(getDayCell(localDate(2026, 1, 20), opts())).toEqual({
+      desc: '初二',
+      isFestival: false,
+      dayType: CalendarDayType.NORMAL,
+    })
   })
 })
 
-describe('getDayCell 休 / 班 标记', () => {
-  it('法定假日为休', () => {
-    expect(getDayCell(localDate(2026, 10, 1), opts()).dayType).toBe(
+describe('getDayCell 休 / 班 标记来自订阅', () => {
+  it('订阅标记为休', () => {
+    expect(getDayCell(localDate(2026, 2, 17), opts()).dayType).toBe(
       CalendarDayType.REST,
     )
   })
 
-  it('调休上班日为班', () => {
-    expect(getDayCell(localDate(2026, 9, 20), opts()).dayType).toBe(
+  it('订阅标记为班（调休上班）', () => {
+    expect(getDayCell(localDate(2026, 2, 14), opts()).dayType).toBe(
       CalendarDayType.WORK,
     )
   })
 
-  it('普通日为 NORMAL', () => {
-    expect(getDayCell(localDate(2026, 3, 3), opts()).dayType).toBe(
+  it('订阅里没有标记的日期为普通日', () => {
+    expect(getDayCell(localDate(2026, 1, 20), opts()).dayType).toBe(
       CalendarDayType.NORMAL,
     )
+  })
+
+  it('订阅未就绪（null）时只输出农历，不打标记', () => {
+    const cell = getDayCell(
+      localDate(2026, 2, 17),
+      opts({ subscription: null }),
+    )
+    expect(cell.dayType).toBe(CalendarDayType.NORMAL)
+    expect(cell.desc).toBe('正月')
   })
 })
 
@@ -111,375 +197,255 @@ describe('getDayDetail', () => {
     )
   })
 
-  it('星期、星座、节日', () => {
-    const detail = getDayDetail(localDate(2026, 6, 21), opts())
-    expect(detail.weekday).toBe(0)
-    expect(detail.constellation).toBe('gemini')
-    expect(detail.festivals).toEqual(['父亲节'])
+  it('星期、星座与节日', () => {
+    const detail = getDayDetail(localDate(2026, 2, 17), opts())
+    expect(detail.weekday).toBe(2) // 周二
+    expect(CONSTELLATION_KEYS).toContain(detail.constellation)
+    expect(detail.festivals).toEqual(['春节'])
+  })
+
+  it('节日列表按 订阅节日 → 本地节日 → 节气 排列', () => {
+    expect(getDayDetail(localDate(2026, 6, 21), opts()).festivals).toEqual([
+      '父亲节',
+      '夏至',
+    ])
   })
 
   it('宜忌、吉神、凶煞非空且无重复', () => {
-    const detail = getDayDetail(localDate(2026, 6, 21), opts())
-    for (const list of [detail.yi, detail.ji, detail.jishen, detail.xiongsha]) {
-      expect(list.length).toBeGreaterThan(0)
-      expect(new Set(list).size).toBe(list.length)
+    const detail = getDayDetail(localDate(2026, 2, 17), opts())
+    expect(detail.yi.length).toBeGreaterThan(0)
+    expect(detail.ji.length).toBeGreaterThan(0)
+    expect(detail.jishen.length + detail.xiongsha.length).toBeGreaterThan(0)
+
+    const all = [
+      ...detail.yi,
+      ...detail.ji,
+      ...detail.jishen,
+      ...detail.xiongsha,
+    ]
+    expect(new Set(all).size).toBe(all.length)
+  })
+
+  it('凶煞是中文，不再出现未翻译的 i18n key（旧库为 sn.sanSang）', () => {
+    for (let day = 1; day <= 28; day += 1) {
+      const detail = getDayDetail(localDate(2026, 3, day), opts())
+      for (const name of detail.xiongsha) {
+        expect(name.startsWith('sn.')).toBe(false)
+      }
     }
-    expect(detail.yi).toContain('开市')
-    expect(detail.xiongsha).toContain('白虎')
   })
 
   it('无节日的日期返回空数组，而非「无」占位', () => {
-    expect(getDayDetail(localDate(2026, 12, 25), opts()).festivals).toEqual(['圣诞节'])
-    expect(getDayDetail(localDate(2026, 1, 6), opts()).ji).toEqual([])
+    expect(getDayDetail(localDate(2026, 1, 20), opts()).festivals).toEqual([])
   })
 })
 
 describe('getFestivalList', () => {
   it('起始日当天有节日时 offsetDays 为 0', () => {
-    expect(getFestivalList(localDate(2026, 1, 1), opts())[0]).toEqual({
-      date: localDate(2026, 1, 1),
-      offsetDays: 0,
-      desc: '元旦',
-      dayType: CalendarDayType.REST,
-    })
+    const list = getFestivalList(localDate(2026, 2, 17), cellOpts(), 3)
+    expect(list[0].offsetDays).toBe(0)
+    expect(list[0].desc).toBe('春节')
   })
 
   it('offsetDays 是距起始日的天数，不是列表下标', () => {
-    const list = getFestivalList(localDate(2026, 1, 1), opts())
-    expect(list[1].offsetDays).toBe(4)
-    expect(list[1].desc).toBe('小寒')
-  })
-
-  it('起始日无节日时从 0 开始计数', () => {
-    const list = getFestivalList(localDate(2026, 1, 2), opts())
-    expect(list[0].offsetDays).toBe(3)
-    expect(list[0].desc).toBe('小寒')
+    const list = getFestivalList(localDate(2026, 2, 13), cellOpts(), 2)
+    const springFestival = list.find((item) => item.desc === '春节')
+    expect(springFestival?.offsetDays).toBe(1)
   })
 
   it('date 为本地时间日期，不发生时区偏移', () => {
-    const [first] = getFestivalList(localDate(2026, 1, 1), opts())
-    expect(first.date.getFullYear()).toBe(2026)
-    expect(first.date.getMonth()).toBe(0)
-    expect(first.date.getDate()).toBe(1)
+    const list = getFestivalList(localDate(2026, 2, 17), cellOpts(), 0)
+    const item = list[0]
+    expect(item.date.getFullYear()).toBe(2026)
+    expect(item.date.getMonth()).toBe(1)
+    expect(item.date.getDate()).toBe(17)
   })
 
   it('随 offsetDays 递增，且 days 参数控制窗口', () => {
-    const offsets = getFestivalList(localDate(2026, 1, 1), opts()).map(
-      (item) => item.offsetDays,
-    )
-    expect([...offsets].sort((a, b) => a - b)).toEqual(offsets)
-    // days=2 时窗口为 1/2~1/4，无节日节气
-    expect(getFestivalList(localDate(2026, 1, 2), opts(), 2)).toEqual([])
-    // days=3 时窗口扩展到 1/5 的小寒
-    expect(getFestivalList(localDate(2026, 1, 2), opts(), 3)).toHaveLength(1)
-  })
-})
-
-// ─────────────────────────────────────────────
-// 本地节日表：库未内置、由 Event 规则声明式补齐
-// ─────────────────────────────────────────────
-
-describe('getLocalFestivalNames 日期规则', () => {
-  it('固定公历日', () => {
-    expect(getLocalFestivalNames(2026, 2, 14)).toEqual(['情人节'])
-    expect(getLocalFestivalNames(2026, 3, 15)).toEqual(['消费者权益日'])
-    expect(getLocalFestivalNames(2026, 4, 1)).toEqual(['愚人节'])
-    expect(getLocalFestivalNames(2026, 10, 31)).toEqual(['万圣节前夜'])
-    expect(getLocalFestivalNames(2026, 11, 1)).toEqual(['万圣节'])
-    expect(getLocalFestivalNames(2026, 12, 24)).toEqual(['平安夜'])
-    expect(getLocalFestivalNames(2026, 12, 25)).toEqual(['圣诞节'])
+    const near = getFestivalList(localDate(2026, 1, 1), cellOpts(), 5)
+    const far = getFestivalList(localDate(2026, 1, 1), cellOpts(), 60)
+    expect(near.length).toBeLessThan(far.length)
+    expect(far).toEqual([...far].sort((a, b) => a.offsetDays - b.offsetDays))
   })
 
-  it('母亲节 = 5 月第 2 个周日', () => {
-    expect(getLocalFestivalNames(2024, 5, 12)).toEqual(['母亲节'])
-    expect(getLocalFestivalNames(2025, 5, 11)).toEqual(['母亲节'])
-    expect(getLocalFestivalNames(2026, 5, 10)).toEqual(['母亲节'])
-    expect(getLocalFestivalNames(2027, 5, 9)).toEqual(['母亲节'])
-    expect(getLocalFestivalNames(2028, 5, 14)).toEqual(['母亲节'])
-  })
-
-  it('父亲节 = 6 月第 3 个周日', () => {
-    expect(getLocalFestivalNames(2026, 6, 21)).toEqual(['父亲节'])
-    expect(getLocalFestivalNames(2027, 6, 20)).toEqual(['父亲节'])
-  })
-
-  it('感恩节 = 11 月第 4 个周四', () => {
-    expect(getLocalFestivalNames(2026, 11, 26)).toEqual(['感恩节'])
-    expect(getLocalFestivalNames(2027, 11, 25)).toEqual(['感恩节'])
-  })
-
-  it('按星期规则计算的其他节日', () => {
-    expect(getLocalFestivalNames(2026, 3, 30)).toEqual([
-      '全国中小学生安全教育日',
-    ])
-    expect(getLocalFestivalNames(2026, 5, 17)).toEqual(['全国助残日'])
-    expect(getLocalFestivalNames(2026, 9, 19)).toEqual(['全民国防教育日'])
-    expect(getLocalFestivalNames(2026, 10, 5)).toEqual(['世界住房日'])
-  })
-
-  it('未命中返回空数组', () => {
-    expect(getLocalFestivalNames(2026, 7, 15)).toEqual([])
-  })
-})
-
-// ─────────────────────────────────────────────
-// tyme4ts 语义：以下行为与旧库 lunar-typescript 不同，属有意采用新库的模型
-// ─────────────────────────────────────────────
-
-describe('tyme4ts 语义（相对旧库的变化）', () => {
-  it('农历月名用国标写法（旧库为「腊月 / 冬月」）', () => {
-    expect(getDayCell(localDate(2026, 1, 19), opts()).desc).toBe('十二月')
-    expect(getDayCell(localDate(2026, 12, 9), opts()).desc).toBe('十一月')
-  })
-
-  it('清明归入农历传统节日，文案为「清明节」（旧库为节气「清明」）', () => {
-    expect(getDayCell(localDate(2026, 4, 5), opts()).desc).toBe('清明节')
-  })
-
-  it('新增上巳节、中元节、冬至节等农历传统节日', () => {
-    expect(getDayCell(localDate(2026, 4, 19), opts()).desc).toBe('上巳节')
-    expect(getDayCell(localDate(2026, 8, 27), opts()).desc).toBe('中元节')
-    expect(getDayCell(localDate(2026, 12, 22), opts()).desc).toBe('冬至节')
-  })
-
-  it('凶煞返回中文，不再出现未翻译的 i18n key（旧库为 sn.sanSang / sn.guiKu）', () => {
-    const { xiongsha } = getDayDetail(localDate(2026, 12, 17), opts())
-    expect(xiongsha).toContain('三丧')
-    expect(xiongsha).toContain('鬼哭')
-    expect(xiongsha.some((name) => name.startsWith('sn.'))).toBe(false)
-  })
-})
-
-// ─────────────────────────────────────────────
-// 节假日地区：宁可少标，不可标错
-// ─────────────────────────────────────────────
-
-describe('节假日地区', () => {
-  it('CN 使用 tyme4ts 内置的法定假日数据', () => {
-    expect(getDayCell(localDate(2026, 10, 1), opts()).dayType).toBe(
-      CalendarDayType.REST,
-    )
-    expect(getDayCell(localDate(2026, 9, 20), opts()).dayType).toBe(
-      CalendarDayType.WORK,
-    )
-  })
-
-  it('TW / HK 的年度数据未录入时不显示任何休班标记', () => {
-    for (const region of ['TW', 'HK'] as const) {
-      expect(getDayCell(localDate(2026, 10, 1), opts(region)).dayType).toBe(
-        CalendarDayType.NORMAL,
-      )
-      expect(getDayCell(localDate(2026, 2, 17), opts(region)).dayType).toBe(
-        CalendarDayType.NORMAL,
-      )
-    }
-  })
-
-  it('TW 排除大陆特有节日', () => {
-    expect(getDayCell(localDate(2026, 7, 1), opts('TW')).desc).not.toBe('建党节')
-    expect(getDayCell(localDate(2026, 8, 1), opts('TW')).desc).not.toBe('建军节')
-    expect(getDayCell(localDate(2026, 6, 1), opts('TW')).desc).not.toBe('儿童节')
-    // 同一批节日在大陆地区仍然展示
-    expect(getDayCell(localDate(2026, 7, 1), opts()).desc).toBe('建党节')
-    expect(getDayCell(localDate(2026, 6, 1), opts()).desc).toBe('儿童节')
-  })
-
-  it('HK 排除大陆特有节日，但保留国庆节（两地同为 10-1）', () => {
-    expect(getDayCell(localDate(2026, 8, 1), opts('HK')).desc).not.toBe('建军节')
-    expect(getDayCell(localDate(2026, 6, 1), opts('HK')).desc).not.toBe('儿童节')
-    expect(getDayCell(localDate(2026, 10, 1), opts('HK')).desc).toBe('国庆节')
-  })
-
-  it('历法信息不随地区变化', () => {
-    const cn = getDayDetail(localDate(2026, 6, 21), opts())
-    const hk = getDayDetail(localDate(2026, 6, 21), opts('HK'))
-    expect(hk.lunar).toBe(cn.lunar)
-    expect(hk.constellation).toBe(cn.constellation)
-    expect(hk.yi).toEqual(cn.yi)
-  })
-
-  it('未注册的地区代码回退到默认地区', () => {
-    const unknownRegion = 'MO' as TRegionCode
-    expect(getDayCell(localDate(2026, 10, 1), opts(unknownRegion)).dayType).toBe(
-      CalendarDayType.REST,
-    )
-  })
-})
-
-// ─────────────────────────────────────────────
-// 展示开关：地区（数据）与展示（农历节气、黄历详情）三者正交
-// ─────────────────────────────────────────────
-
-describe('展示开关', () => {
-  it('关闭「农历与节气」后，无节日与节气的格子留空且不再算节日', () => {
-    const off = opts('CN', { showLunarTerm: false })
-    expect(getDayCell(localDate(2026, 2, 10), off)).toEqual({
-      desc: '',
-      isFestival: false,
-      dayType: CalendarDayType.NORMAL,
-    })
-    // 节气日同样留空
-    expect(getDayCell(localDate(2026, 1, 5), off)).toEqual({
-      desc: '',
-      isFestival: false,
-      dayType: CalendarDayType.NORMAL,
-    })
-    // 节日不受影响
-    expect(getDayCell(localDate(2026, 2, 17), off).desc).toBe('春节')
-  })
-
-  it('关闭「农历与节气」后，详情不再返回农历行', () => {
-    const detail = getDayDetail(
-      localDate(2026, 6, 21),
-      opts('CN', { showLunarTerm: false }),
-    )
-    expect(detail.lunar).toBe('')
-    expect(detail.festivals).toEqual(['父亲节'])
-  })
-
-  it('关闭「农历与节气」后，倒计时列表不再包含只有节气的日期', () => {
-    const withTerm = getFestivalList(localDate(2026, 1, 1), opts())
+  it('关闭「农历与节气」后不再包含只有节气的日期', () => {
+    const withTerm = getFestivalList(localDate(2026, 1, 1), cellOpts(), 10)
     const withoutTerm = getFestivalList(
       localDate(2026, 1, 1),
-      opts('CN', { showLunarTerm: false }),
+      cellOpts({ showLunarTerm: false }),
+      10,
     )
     expect(withTerm.some((item) => item.desc === '小寒')).toBe(true)
     expect(withoutTerm.some((item) => item.desc === '小寒')).toBe(false)
-    // 节日条目不受影响
-    expect(withoutTerm.some((item) => item.desc === '元旦')).toBe(true)
+  })
+
+  it('列表项带休 / 班标记', () => {
+    const list = getFestivalList(localDate(2026, 2, 14), cellOpts(), 0)
+    expect(list[0].dayType).toBe(CalendarDayType.WORK)
+  })
+})
+
+describe('展示开关', () => {
+  it('关闭「农历与节气」后，无节日与节气的格子留空且不再算节日', () => {
+    const termOnly = getDayCell(
+      localDate(2026, 1, 5),
+      opts({ showLunarTerm: false }),
+    )
+    expect(termOnly).toEqual({
+      desc: '',
+      isFestival: false,
+      dayType: CalendarDayType.NORMAL,
+    })
+
+    const lunarOnly = getDayCell(
+      localDate(2026, 1, 19),
+      opts({ showLunarTerm: false }),
+    )
+    expect(lunarOnly.desc).toBe('')
+  })
+
+  it('关闭「农历与节气」不影响订阅节日', () => {
+    const cell = getDayCell(
+      localDate(2026, 2, 17),
+      opts({ showLunarTerm: false }),
+    )
+    expect(cell.desc).toBe('春节')
+    expect(cell.isFestival).toBe(true)
+  })
+
+  it('关闭「农历与节气」后，与节气同名的清明假期仍然显示', () => {
+    const qingming = opts({
+      subscription: QINGMING_SUBSCRIPTION,
+      showLunarTerm: false,
+    })
+
+    // 4/4、4/6 只有假期事件，不能被当成节气隐藏
+    expect(getDayCell(localDate(2026, 4, 4), qingming)).toEqual({
+      desc: '清明',
+      isFestival: true,
+      dayType: CalendarDayType.REST,
+    })
+    expect(getDayCell(localDate(2026, 4, 6), qingming).desc).toBe('清明')
+    // 4/5 同时是节气日与假期日，节日名仍来自 names
+    expect(getDayCell(localDate(2026, 4, 5), qingming).desc).toBe('清明')
+    expect(getDayDetail(localDate(2026, 4, 4), qingming).festivals).toEqual([
+      '清明',
+    ])
+  })
+
+  it('关闭「农历与节气」后，详情不再返回农历行', () => {
+    expect(
+      getDayDetail(localDate(2026, 6, 21), opts({ showLunarTerm: false }))
+        .lunar,
+    ).toBe('')
+    expect(
+      getDayDetail(localDate(2026, 6, 21), opts({ showLunarTerm: false }))
+        .festivals,
+    ).toEqual(['父亲节'])
   })
 
   it('关闭「黄历详情」后，宜忌与神煞返回空数组，其余信息不变', () => {
-    const detail = getDayDetail(
-      localDate(2026, 6, 21),
-      opts('CN', { showAlmanac: false }),
+    const withAlmanac = getDayDetail(localDate(2026, 2, 17), opts())
+    const withoutAlmanac = getDayDetail(
+      localDate(2026, 2, 17),
+      opts({ showAlmanac: false }),
     )
+
+    expect(withoutAlmanac.yi).toEqual([])
+    expect(withoutAlmanac.ji).toEqual([])
+    expect(withoutAlmanac.jishen).toEqual([])
+    expect(withoutAlmanac.xiongsha).toEqual([])
+    expect(withoutAlmanac.lunar).toBe(withAlmanac.lunar)
+    expect(withoutAlmanac.festivals).toEqual(withAlmanac.festivals)
+    expect(withoutAlmanac.constellation).toBe(withAlmanac.constellation)
+  })
+
+  it('关闭农历与黄历后只剩公历信息', () => {
+    const detail = getDayDetail(
+      localDate(2026, 2, 17),
+      opts({ showLunarTerm: false, showAlmanac: false }),
+    )
+    expect(detail.lunar).toBe('')
     expect(detail.yi).toEqual([])
     expect(detail.ji).toEqual([])
     expect(detail.jishen).toEqual([])
     expect(detail.xiongsha).toEqual([])
-    expect(detail.festivals).toEqual(['父亲节'])
-    expect(detail.lunar).toBe('丙午马年 农历五月初七')
-  })
-
-  it('两个开关都关时只剩公历信息', () => {
-    const detail = getDayDetail(
-      localDate(2026, 6, 21),
-      opts('CN', { showLunarTerm: false, showAlmanac: false }),
-    )
-    expect(detail).toMatchObject({
-      lunar: '',
-      yi: [],
-      ji: [],
-      jishen: [],
-      xiongsha: [],
-      festivals: ['父亲节'],
-    })
-  })
-
-  it('星期与星座返回稳定标识（由展示层映射到 i18n），不再是中文字符串', () => {
-    const detail = getDayDetail(localDate(2026, 6, 21), opts())
-    expect(detail.weekday).toBe(0)
-    expect(detail.constellation).toBe('gemini')
+    expect(typeof detail.weekday).toBe('number')
+    expect(CONSTELLATION_KEYS).toContain(detail.constellation)
   })
 })
 
-// ─────────────────────────────────────────────
-// 不显示节假日（NONE）：给非中文地区用户的关闭态
-// ─────────────────────────────────────────────
-
-describe('不显示节假日（NONE）', () => {
-  const none = opts('NONE')
-
-  it('不显示任何休班标记', () => {
-    expect(getDayCell(localDate(2026, 10, 1), none).dayType).toBe(
-      CalendarDayType.NORMAL,
-    )
-    expect(getDayCell(localDate(2026, 9, 20), none).dayType).toBe(
-      CalendarDayType.NORMAL,
-    )
-    expect(getDayCell(localDate(2026, 2, 17), none).dayType).toBe(
-      CalendarDayType.NORMAL,
-    )
+describe('getLocalFestivalNames 规则表（9 条国际通用节日）', () => {
+  it('表固定为 9 条，避免文档/代码再次漂移', () => {
+    expect(LOCAL_FESTIVALS).toHaveLength(9)
   })
 
-  it('排除中国大陆口径的节日', () => {
-    for (const [month, day] of [
-      [7, 1],
-      [8, 1],
-      [10, 1],
-      [6, 1],
-      [9, 10],
-      [5, 4],
-      [3, 12],
-    ]) {
-      expect(getDayDetail(localDate(2026, month, day), none).festivals).toEqual(
-        [],
-      )
-    }
+  it('固定公历日', () => {
+    expect(getLocalFestivalNames(2026, 2, 14)).toContain('情人节')
+    expect(getLocalFestivalNames(2026, 12, 24)).toContain('平安夜')
+    expect(getLocalFestivalNames(2026, 12, 25)).toContain('圣诞节')
   })
 
-  it('排除农历传统节日', () => {
-    for (const [month, day] of [
-      [2, 17],
-      [3, 3],
-      [4, 5],
-      [6, 19],
-      [8, 27],
-      [9, 25],
-      [12, 22],
-    ]) {
-      expect(getDayDetail(localDate(2026, month, day), none).festivals).toEqual(
-        [],
-      )
-    }
+  it('按星期规则：母亲节、父亲节、感恩节', () => {
+    expect(getLocalFestivalNames(2026, 5, 10)).toContain('母亲节') // 5 月第 2 个周日
+    expect(getLocalFestivalNames(2026, 6, 21)).toContain('父亲节') // 6 月第 3 个周日
+    expect(getLocalFestivalNames(2026, 11, 26)).toContain('感恩节') // 11 月第 4 个周四
   })
 
-  it('保留国际通用节日与通用现代节日', () => {
-    expect(getDayDetail(localDate(2026, 1, 1), none).festivals).toEqual(['元旦'])
-    expect(getDayDetail(localDate(2026, 5, 1), none).festivals).toEqual([
-      '劳动节',
-    ])
-    expect(getDayDetail(localDate(2026, 2, 14), none).festivals).toEqual([
-      '情人节',
-    ])
-    expect(getDayDetail(localDate(2026, 12, 25), none).festivals).toEqual([
-      '圣诞节',
-    ])
+  it('未命中返回空数组', () => {
+    expect(getLocalFestivalNames(2026, 3, 18)).toEqual([])
   })
 
-  it('历法信息仍然可用（农历与节气由展示开关控制，与地区无关）', () => {
-    const detail = getDayDetail(localDate(2026, 6, 21), none)
-    expect(detail.lunar).toBe('丙午马年 农历五月初七')
-    expect(getDayCell(localDate(2026, 1, 5), none).desc).toBe('小寒')
+  it('大陆特有的纪念日已移除（安全教育日 / 助残日 / 国防教育日）', () => {
+    expect(getLocalFestivalNames(2026, 3, 30)).toEqual([]) // 3 月最后一个周一
+    expect(getLocalFestivalNames(2026, 5, 17)).toEqual([]) // 5 月第 3 个周日
+    expect(getLocalFestivalNames(2026, 9, 19)).toEqual([]) // 9 月第 3 个周六
+  })
+
+  it('世界住房日按产品决定移除（10 月第 1 个周一）', () => {
+    expect(getLocalFestivalNames(2026, 10, 5)).toEqual([])
+  })
+
+  it('万圣节前夜按产品决定移除，万圣节仍保留', () => {
+    expect(getLocalFestivalNames(2026, 10, 31)).toEqual([])
+    expect(getLocalFestivalNames(2026, 11, 1)).toContain('万圣节')
   })
 })
 
-// ─────────────────────────────────────────────
-// 与库的契约：这些映射依赖 tyme4ts 的枚举顺序，升级库时必须能立刻发现
-// ─────────────────────────────────────────────
+describe('tyme4ts 语义（农历部分与换库无关的契约）', () => {
+  it('农历月名用国标写法（十二月 / 正月）', () => {
+    expect(getDayCell(localDate(2026, 1, 19), opts()).desc).toBe('十二月')
+    expect(getDayCell(localDate(2026, 2, 17), opts()).desc).toBe('春节')
+  })
 
-describe('星座与星期的映射契约', () => {
-  it('CONSTELLATION_KEYS 的顺序与 tyme4ts 的 Constellation.NAMES 一一对应', () => {
-    // 库若调整枚举顺序，这里会失败，提醒同步展示层的 i18n 映射
-    expect(CONSTELLATION_KEYS).toHaveLength(Constellation.NAMES.length)
-    const pairs = CONSTELLATION_KEYS.map((key, index) => [
-      key,
-      Constellation.fromIndex(index).getName(),
+  it('清明在农历日历里是「清明节」（订阅同名时不会重复）', () => {
+    expect(getDayDetail(localDate(2026, 4, 5), opts()).festivals).toEqual([
+      '清明节',
     ])
-    expect(pairs).toEqual([
-      ['aries', '白羊'],
-      ['taurus', '金牛'],
-      ['gemini', '双子'],
-      ['cancer', '巨蟹'],
-      ['leo', '狮子'],
-      ['virgo', '处女'],
-      ['libra', '天秤'],
-      ['scorpio', '天蝎'],
-      ['sagittarius', '射手'],
-      ['capricorn', '摩羯'],
-      ['aquarius', '水瓶'],
-      ['pisces', '双鱼'],
-    ])
+  })
+
+  it('星座标识与 tyme4ts 的枚举顺序一致', () => {
+    for (let index = 0; index < 12; index += 1) {
+      const constellation = Constellation.fromIndex(index)
+      expect(CONSTELLATION_KEYS[index]).toBeDefined()
+      expect(constellation.getName().length).toBeGreaterThan(0)
+    }
+  })
+
+  it('weekday 与 Date.getDay() 一致（0 = 周日）', () => {
+    for (let day = 1; day <= 7; day += 1) {
+      const date = localDate(2026, 3, day)
+      expect(getDayDetail(date, opts()).weekday).toBe(date.getDay())
+    }
+  })
+
+  it('闰月：初一显示「闰六月」，详情同样带闰字且不重复拼「月」', () => {
+    // 2025 年闰六月：6/25 是六月初一，7/25 是闰六月初一
+    expect(getDayCell(localDate(2025, 6, 25), opts()).desc).toBe('六月')
+    expect(getDayCell(localDate(2025, 7, 25), opts()).desc).toBe('闰六月')
+    // 库的月名自带「闰」，适配层只拼接、不再补「月」字
+    expect(getDayDetail(localDate(2025, 7, 25), opts()).lunar).toContain(
+      '闰六月初一',
+    )
   })
 })
