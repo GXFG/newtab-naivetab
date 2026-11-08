@@ -438,4 +438,14 @@ describe('tyme4ts 语义（农历部分与换库无关的契约）', () => {
       expect(getDayDetail(date, opts()).weekday).toBe(date.getDay())
     }
   })
+
+  it('闰月：初一显示「闰六月」，详情同样带闰字且不重复拼「月」', () => {
+    // 2025 年闰六月：6/25 是六月初一，7/25 是闰六月初一
+    expect(getDayCell(localDate(2025, 6, 25), opts()).desc).toBe('六月')
+    expect(getDayCell(localDate(2025, 7, 25), opts()).desc).toBe('闰六月')
+    // 库的月名自带「闰」，适配层只拼接、不再补「月」字
+    expect(getDayDetail(localDate(2025, 7, 25), opts()).lunar).toContain(
+      '闰六月初一',
+    )
+  })
 })

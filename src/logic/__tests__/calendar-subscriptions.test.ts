@@ -54,7 +54,7 @@ beforeEach(() => {
   subscriptionState.status = 'idle'
   subscriptionState.days = {}
   subscriptionState.error = null
-  subscriptionState.isRefreshing = false
+  subscriptionState.isErrorVisible = false
 })
 
 afterEach(() => {
@@ -380,12 +380,10 @@ describe('loadSubscription：缓存优先', () => {
 
     const task = loadSubscription(URL_CN, { force: true })
     expect(subscriptionState.status).toBe('ready')
-    expect(subscriptionState.isRefreshing).toBe(true)
     expect(subscriptionState.days['2026-01-01']).toBeDefined()
 
     resolveFetch?.(okResponse(SAMPLE_ICS))
     await task
-    expect(subscriptionState.isRefreshing).toBe(false)
     expect(subscriptionState.days['2026-01-01']).toBeDefined()
   })
 
@@ -481,6 +479,61 @@ describe('loadSubscription：缓存优先', () => {
     await loadSubscription('')
     expect(subscriptionState.status).toBe('idle')
     expect(subscriptionState.url).toBe('')
+  })
+})
+
+describe('失败提示按自然日去重', () => {
+  const failFetch = () =>
+    mockFetch(async () => {
+      throw new Error('offline')
+    })
+
+  it('同一天内只提示第一次，后续自动失败静默', async () => {
+    failFetch()
+
+    await loadSubscription(URL_CN)
+    expect(subscriptionState.error).toMatchObject({ code: 'network' })
+    expect(subscriptionState.isErrorVisible).toBe(true)
+
+    // 换一个标签页再进来（新的加载、同一天）：不再提示，但错误原因仍然保留给设置面板
+    await loadSubscription(URL_CN)
+    expect(subscriptionState.error).toMatchObject({ code: 'network' })
+    expect(subscriptionState.isErrorVisible).toBe(false)
+  })
+
+  it('跨天后重新提示', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 10, 7, 9, 0, 0))
+    failFetch()
+
+    await loadSubscription(URL_CN)
+    expect(subscriptionState.isErrorVisible).toBe(true)
+
+    vi.setSystemTime(new Date(2026, 10, 8, 9, 0, 0))
+    await loadSubscription(URL_CN)
+    expect(subscriptionState.isErrorVisible).toBe(true)
+  })
+
+  it('用户主动重试（force）失败时照常提示', async () => {
+    failFetch()
+
+    await loadSubscription(URL_CN)
+    expect(subscriptionState.isErrorVisible).toBe(true)
+
+    await loadSubscription(URL_CN, { force: true })
+    expect(subscriptionState.isErrorVisible).toBe(true)
+  })
+
+  it('拉取成功后清除错误与提示标记', async () => {
+    failFetch()
+    await loadSubscription(URL_CN)
+    expect(subscriptionState.isErrorVisible).toBe(true)
+
+    mockFetch(async () => okResponse(SAMPLE_ICS))
+    await loadSubscription(URL_CN, { force: true })
+
+    expect(subscriptionState.error).toBeNull()
+    expect(subscriptionState.isErrorVisible).toBe(false)
   })
 })
 

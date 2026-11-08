@@ -9,5 +9,6 @@ export {
   type TaskPriority,
 } from './keydown'
 export { addTimerTask, removeTimerTask, startTimer, stopTimer } from './timer'
+export { addDailyTask, removeDailyTask } from './daily'
 export { addVisibilityTask, removeVisibilityTask } from './events'
 export { addPageFocusTask, removePageFocusTask, onPageFocus } from './events'

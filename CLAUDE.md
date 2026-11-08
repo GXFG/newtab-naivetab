@@ -28,11 +28,12 @@ pnpm check:icons         # 校验产物与常量表一致（只在内存生成�
 ## 核心规则
 
 - **输出必须中文**。不清楚先问再动手。改代码前先给方案。
+- **问题分析前置**：动手前先判定「这真的是问题吗」。是 → 修复；不是（设计如此、框架特性、有意为之）→ 在代码里写清原因注释，避免下次又被当成 bug；不确定的点先问。修掉非 bug 类"问题"后必须回填 `docs/` 的设计说明 → [workflow.md](.claude/rules/workflow.md#日常规则)
 - 代码改动后**主动更新**受影响的文档、注释、单测（见 [documentation-sync.md](.claude/rules/documentation-sync.md)）。
 - 编码行为准则见 [coding-principles.md](.claude/rules/coding-principles.md)：思考优先、**库优先（不自造轮子，含脚本）**、简单至上、手术式改动、目标驱动。
 - **新增 Reka 组件必须先对照标杆**（shadcn/ui + Radix Themes），步骤见 [reka-ui.md](docs/architecture/reka-ui.md#新增-reka-组件检查清单)。
 
-## 行为规则（`.claude/rules/`，通过 `opencode.json` 自动注入）
+## 行为规则（`.claude/rules/`，改动前按需查阅）
 
 | 文件 | 内容 |
 |------|------|
@@ -40,7 +41,7 @@ pnpm check:icons         # 校验产物与常量表一致（只在内存生成�
 | [communication.md](.claude/rules/communication.md) | 中文输出、不猜测、先给方案 |
 | [documentation-sync.md](.claude/rules/documentation-sync.md) | 代码改动后主动同步文档 |
 | [no-hardcode.md](.claude/rules/no-hardcode.md) | 禁止硬编码图标（ICONS）和文本（i18n） |
-| [workflow.md](.claude/rules/workflow.md) | **改动半径**、基线先行、新增行为先有失败用例、检查失败不绕过；不启动 dev server、不改版本号 |
+| [workflow.md](.claude/rules/workflow.md) | **改动半径**、**问题分析前置**、基线先行、新增行为先有失败用例、检查失败不绕过；不启动 dev server、不改版本号 |
 | [pitfalls.md](.claude/rules/pitfalls.md) | 踩坑索引 → [CSS](.claude/rules/pitfalls-css.md) / [Vue](.claude/rules/pitfalls-vue.md) / [配置](.claude/rules/pitfalls-config.md) / [快捷键](.claude/rules/pitfalls-keyboard.md) / [后台](.claude/rules/pitfalls-background.md) |
 
 ## 架构要点
@@ -134,7 +135,7 @@ globalState      // 运行时全局状态（不持久化，不云同步）
 - **图标 & 文本**：图标必须用 `ICONS` 常量，文本必须 i18n（`zh-CN.json` + `en-US.json` 同步更新）→ [no-hardcode.md](.claude/rules/no-hardcode.md)
 - **图标离线**：图标统一从 `@iconify/vue/offline` 引入，数据由 `pnpm gen:icons` 从 `ICONS` / `COMMAND_ICONS` 生成（`src/logic/constants/icon-set.json`，需提交）。**新增图标后不重跑生成脚本 = 渲染空白**，`icon-set.test.ts` 会拦；产物是否与常量表一致由 `pnpm check:icons` 在 pre-commit 校验 → [icons.md](docs/architecture/icons.md)
 - **用户反馈**：toast 唯一入口是 `showToast`（`@/common/toast`，顶部胶囊 toast，`success`/`error`/`warning`/`info`），不要自建提示组件或页面内常驻结果文案
-- **Widget 规则**：用 `/add-widget` 技能或查 [REGISTRY-MAP.md](src/newtab/widgets/REGISTRY-MAP.md)；定时任务用 `addTimerTask`；根组件用 `WidgetWrap` 包裹
+- **Widget 规则**：用 `/add-widget` 技能或查 [REGISTRY-MAP.md](src/newtab/widgets/REGISTRY-MAP.md)；定时任务用 `addTimerTask`，只需按天刷新（日期文本、「今天」标记）用 `addDailyTask`；根组件用 `WidgetWrap` 包裹
 - **Setting 面板**：在 `SETTING_GROUPS` 注册，用 `src/setting/fields` 原子组件，禁止自行封装
 - **权限管理**：非核心权限放 `optional_permissions`，首次使用时请求
 - **发布**：version 由用户手动改；同步更新 `CHANGELOG.md`（**面向用户**，合并同类项、不写内部实现细节）→ [documentation-sync.md](.claude/rules/documentation-sync.md#changelog-写作规则)

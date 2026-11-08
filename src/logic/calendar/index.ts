@@ -252,6 +252,11 @@ export const getDayDetail = (
       showLunarTerm,
       includeLocalFestivals,
     ),
+    /**
+     * getIndex() 恒在 0–11（Constellation 枚举固定 12 项），`?? 'aries'` 正常不可达：
+     * 它只为「库某天返回越界索引」兜底，避免详情拿到 undefined 崩掉，
+     * 不是「有星座没映射」——12 个键与 CONSTELLATION_KEYS 一一对应。
+     */
     constellation:
       CONSTELLATION_KEYS[solarDay.getConstellation().getIndex()] ?? 'aries',
     yi: showAlmanac

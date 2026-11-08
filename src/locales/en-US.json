@@ -534,7 +534,7 @@
       "pisces": "Pisces"
     },
     "festivalCountdown": "Festival Countdown",
-    "festivalCountdownDaySuffix": "Days",
+    "festivalCountdownDaySuffix": "{n} day | {n} days",
     "today": "T",
     "work": "W",
     "rest": "R",

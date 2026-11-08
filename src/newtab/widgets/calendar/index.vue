@@ -15,6 +15,7 @@ import type {
   TConstellationKey,
 } from '@/logic/calendar'
 import { getMonthGridPadding } from '@/logic/calendar/grid'
+import { addDailyTask, removeDailyTask } from '@/logic/task'
 import {
   CUSTOM_SUBSCRIPTION,
   getSubscriptionUrl,
@@ -27,9 +28,15 @@ import { gaProxy } from '@/logic/utils/gtag'
 import { isDragMode } from '@/logic/moveable'
 import { localConfig } from '@/logic/config/state'
 import { CalendarDayType } from '@/common/widget-constants'
-import { getStyleField } from '@/logic/store/style'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
-import { WIDGET_CODE } from './config'
+import {
+  CALENDAR_MAX_YEAR,
+  CALENDAR_MIN_YEAR,
+  WIDGET_CODE,
+  clampYearMonth,
+  toYearMonth,
+} from './config'
 
 const customContainerWidth = getStyleField(WIDGET_CODE, 'width', 'vmin', 7.3)
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
@@ -95,19 +102,19 @@ const customWorkItemBackgroundColor = getStyleField(
   WIDGET_CODE,
   'workItemBackgroundColor',
 )
-const customDestivalCountdownItemHeight = getStyleField(
+const customFestivalCountdownItemHeight = getStyleField(
   WIDGET_CODE,
   'width',
   'vmin',
   1.4,
 )
-const customDestivalCountdownFontSize = getStyleField(
+const customFestivalCountdownFontSize = getStyleField(
   WIDGET_CODE,
   'fontSize',
   'vmin',
   0.95,
 )
-const customDestivalCountdownRestFontSize = getStyleField(
+const customFestivalRestLabelFontSize = getStyleField(
   WIDGET_CODE,
   'fontSize',
   'vmin',
@@ -121,8 +128,6 @@ const calendarStyle = computed(() => ({
   '--nt-cal-customBorderRadius': customBorderRadius.value,
   '--nt-cal-customBackgroundColor': customBackgroundColor.value,
   '--nt-cal-customBackgroundBlur': customBackgroundBlur.value,
-  '--nt-cal-customFontSize_btn': customFontSize.value,
-  '--nt-cal-customFontColor_btn': customFontColor.value,
   '--nt-cal-customHolidayFontColor': customHolidayFontColor.value,
   '--nt-cal-customBodyWrapHeight': customBodyWrapHeight.value,
   '--nt-cal-customItemWidth': customItemWidth.value,
@@ -154,11 +159,13 @@ const calendarStyle = computed(() => ({
   '--nt-cal-customBorderWidth': customBorderWidth.value,
   '--nt-cal-customBorderColor': customBorderColor.value,
   '--nt-cal-customShadowColor': customShadowColor.value,
-  '--nt-cal-customDestivalCountdownItemHeight':
-    customDestivalCountdownItemHeight.value,
-  '--nt-cal-customDestivalCountdownFontSize':
-    customDestivalCountdownFontSize.value,
-  '--nt-cal-customRestLabelFontSize': customDestivalCountdownRestFontSize.value,
+  '--nt-cal-customFestivalCountdownItemHeight':
+    customFestivalCountdownItemHeight.value,
+  '--nt-cal-customFestivalCountdownFontSize':
+    customFestivalCountdownFontSize.value,
+  // 倒计时列表里「休」小字的字号：与格子上的 RestLabel 系列（颜色）不是一回事，故带 Festival 前缀
+  '--nt-cal-customFestivalRestLabelFontSize':
+    customFestivalRestLabelFontSize.value,
 }))
 
 /** Popover 渲染在 Portal 中，需显式传入日历自定义字体变量 */
@@ -169,35 +176,46 @@ const detailPopoverStyle = computed(() => ({
   '--nt-cal-customFontSize': customFontSize.value,
 }))
 
-const todayDayjs = dayjs()
+/**
+ * 「今天」用 ref 而不是常量：跨天时要能就地更新。
+ * 见下方 syncToday 与 addDailyTask 的说明。
+ */
+const todayDayjs = ref(dayjs())
 
 const slideDirection = ref<'left' | 'right'>('left')
 
 const state = reactive({
-  today: todayDayjs.format('YYYY-MM-DD'),
-  currYear: todayDayjs.get('year'),
-  currMonth: todayDayjs.get('month') + 1,
-  currDay: todayDayjs.get('date'),
-  yearList: Array.from(Array(101), (v, i) => ({
-    label: `${2000 + i}`,
-    value: 2000 + i,
-  })),
+  today: todayDayjs.value.format('YYYY-MM-DD'),
+  currYear: todayDayjs.value.get('year'),
+  currMonth: todayDayjs.value.get('month') + 1,
+  yearList: Array.from(
+    { length: CALENDAR_MAX_YEAR - CALENDAR_MIN_YEAR + 1 },
+    (_, index) => ({
+      label: `${CALENDAR_MIN_YEAR + index}`,
+      value: CALENDAR_MIN_YEAR + index,
+    }),
+  ),
   dateList: [] as {
     date: string // YYYY-MM-DD
-    shortDate: string // MM.DD
     day: number // D
     desc: string // 节日
     type: number // 0不展示，1休，2班
     isToday: boolean
     isWeekend: boolean
     isFestival: boolean
-    festivalCountdownDay: number
     isNotCurrMonth: boolean
   }[],
   currDetailDate: '',
 })
 
-/** 关闭「休 / 班标记」后，格子与倒计时列表都不再展示标记（节日与节气不受影响） */
+/**
+ * 关闭「休 / 班标记」后，格子与倒计时列表都不再展示标记（节日与节气不受影响）。
+ *
+ * 这个开关刻意留在展示层、不并入 TCalendarCellOptions：适配层返回的 dayType
+ * 是订阅里的事实（这天到底休不休），「要不要显示」是渲染决策。农历/黄历开关进
+ * 适配层则是因为它们要过滤**文案与数组**（不传下去就没有可用的数据），
+ * 两者性质不同，不要为了「看起来统一」把这个开关也搬过去。
+ */
 const toDisplayDayType = (dayType: CalendarDayType) =>
   localConfig.calendar.isHolidayMarkVisible ? dayType : CalendarDayType.NORMAL
 
@@ -246,6 +264,10 @@ const onRetrySubscription = () => {
  * 刷新过程不做任何提示 —— 有缓存时数据本来就还在，没有缓存也只是短暂缺节日，
  * 转圈的收益低于它对这张小卡片的打扰。
  *
+ * 自动刷新的失败还按**自然日去重**（见 subscriptions.shouldPromptError）：
+ * 一天只提示第一次，之后静默 —— 数据一年只变几次，网络不好时每天弹一个警告图标不值得。
+ * 用户主动点这个图标重试（force）失败则照常提示，那是他要求的反馈。
+ *
  * stale = 有旧数据可用、只是本次更新失败（弱提示色）
  * error = 没有可展示的数据（才用错误色）
  */
@@ -253,6 +275,8 @@ const subscribeStatus = computed<'idle' | 'stale' | 'error'>(() => {
   // 切换地址的瞬间，store 里还是上一个地址的数据，不能拿来判断
   if (subscriptionState.url !== subscriptionUrl.value) return 'idle'
   if (!subscriptionState.error) return 'idle'
+  // 同一天内的重复失败不再打扰（自动刷新一天只提示一次）
+  if (!subscriptionState.isErrorVisible) return 'idle'
   return subscriptionState.status === 'ready' ? 'stale' : 'error'
 })
 
@@ -266,15 +290,6 @@ const subscribeTipText = computed(() => {
       return ''
   }
 })
-
-/**
- * 标签页重新可见时检查一次订阅。
- * 新标签页通常是每次打开重新挂载，onMounted 已覆盖；这里补的是「标签页长期不关」的场景。
- * 走的是普通 loadSubscription，缓存未过期不会发请求，开销只是一次 localStorage 读取。
- */
-const onDocumentVisibilityChange = () => {
-  if (document.visibilityState === 'visible') refreshSubscription()
-}
 
 /** 格子与倒计时列表的选项（不含黄历，故切换黄历开关不会触发重算） */
 const cellOptions = computed<TCalendarCellOptions>(() => ({
@@ -321,9 +336,9 @@ const constellationTextMap = computed<Record<TConstellationKey, string>>(
   }),
 )
 
-/** 依赖 cellOptions，切换订阅或农历开关后自动重算（毫秒级，仅变更时发生一次） */
+/** 依赖 cellOptions 与「今天」：切换订阅/农历开关、跨天后自动重算（毫秒级，仅变更时发生一次） */
 const festivalList = computed(() =>
-  getFestivalList(todayDayjs.toDate(), cellOptions.value).map((item) => ({
+  getFestivalList(todayDayjs.value.toDate(), cellOptions.value).map((item) => ({
     date: dayjs(item.date).format('YYYY-MM-DD'),
     shortDate: dayjs(item.date).format('MM.DD'),
     desc: item.desc,
@@ -377,41 +392,35 @@ const holidayTypeToDesc = computed(() => ({
  */
 const genDateItem = (type: 'start' | 'main' | 'end', dateEle: typeof dayjs) => {
   const formatDate = dateEle.format('YYYY-MM-DD')
-  const shortDate = dateEle.format('MM.DD')
   // 传本地时间日期：适配层按本地时间取值，避免 new Date('YYYY-MM-DD') 的 UTC 解析偏差
   const cell = getDayCell(dateEle.toDate(), cellOptions.value)
-  const festivalCountdownDay = cell.isFestival
-    ? dateEle.diff(todayDayjs, 'day')
-    : 0
 
   return {
     date: formatDate,
-    shortDate,
     day: dateEle.get('date'),
     desc: cell.desc,
     type: toDisplayDayType(cell.dayType),
     isToday: state.today === formatDate,
     isWeekend: [6, 0].includes(dateEle.get('day')),
     isFestival: cell.isFestival,
-    festivalCountdownDay,
     isNotCurrMonth: type !== 'main',
   }
 }
 
 const onRender = () => {
   const currMonthFirstDate = `${state.currYear}-${state.currMonth}-01`
-  let currMonthFirstDateWeek = dayjs(currMonthFirstDate).day()
+  const currMonthFirstDateEle = dayjs(currMonthFirstDate)
+  let currMonthFirstDateWeek = currMonthFirstDateEle.day()
   currMonthFirstDateWeek =
     currMonthFirstDateWeek === 0 ? 7 : currMonthFirstDateWeek // 1234567
 
-  // 当月最后一天及其星期（与首日星期一起算出前后填充）
-  const currMonthLastDate = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
-    .subtract(1, 'day')
-    .format('YYYY-MM-DD')
-  const currMonthLastDay = dayjs(`${state.currYear}-${state.currMonth + 1}-01`)
-    .subtract(1, 'day')
-    .get('date')
-  let currMonthLastDateWeek = dayjs(currMonthLastDate).day()
+  // 当月最后一天及其星期（与首日星期一起算出前后填充）。
+  // currMonth + 1 在 12 月会拼出「13 月」，靠 dayjs 按 Date 语义滚到次年 1 月——不要换成严格解析。
+  const currMonthLastDateEle = dayjs(
+    `${state.currYear}-${state.currMonth + 1}-01`,
+  ).subtract(1, 'day')
+  const currMonthLastDay = currMonthLastDateEle.get('date')
+  let currMonthLastDateWeek = currMonthLastDateEle.day()
   currMonthLastDateWeek =
     currMonthLastDateWeek === 0 ? 7 : currMonthLastDateWeek
 
@@ -427,7 +436,7 @@ const onRender = () => {
   // padStart — 上月末尾填充日期
   const startDates: ReturnType<typeof genDateItem>[] = []
   for (let index = 0; index < padStartCount; index += 1) {
-    const dateEle = dayjs(currMonthFirstDate).subtract(index + 1, 'day')
+    const dateEle = currMonthFirstDateEle.subtract(index + 1, 'day')
     startDates.push(genDateItem('start', dateEle))
   }
   startDates.reverse() // 让日期从远到近排列
@@ -442,21 +451,66 @@ const onRender = () => {
   // padEnd — 下月开头填充日期
   const endDates: ReturnType<typeof genDateItem>[] = []
   for (let index = 0; index < padEndCount; index += 1) {
-    const dateEle = dayjs(currMonthLastDate).add(index + 1, 'day')
+    const dateEle = currMonthLastDateEle.add(index + 1, 'day')
     endDates.push(genDateItem('end', dateEle))
   }
 
   state.dateList = [...startDates, ...mainDates, ...endDates]
 }
 
-onMounted(() => {
+/**
+ * 跨天校正：「今天」不能只在 setup 时取一次。
+ *
+ * 新标签页会长期驻留（合盖过夜后直接打开、或一直挂在标签栏），此时 setup 时算出的
+ * todayDayjs 仍是昨天 —— 昨天的格子继续挂「今」、「回到今日」回到昨天、
+ * 节日倒计时整体差 1 天。
+ *
+ * 用 `addDailyTask`（逻辑见 `logic/task/daily.ts`）而不是自己挂 visibilitychange：
+ * 合盖恢复、或标签页一直可见只是窗口失焦时 document 不会触发 visibilitychange，
+ * 只有共享的 rAF 循环能在恢复后补上这一次。日期比较由 daily 统一做，这里不再自己比。
+ *
+ * 注册只挂 `isRender`：禁用只销毁 WidgetWrap 内部的 slot DOM（组件不卸载），
+ * `onUnmounted` 在禁用时不会触发，只兜「组件真被销毁」那一种（错误边界）。
+ */
+const syncToday = (now: Date) => {
+  const next = dayjs(now)
+
+  // 用户正翻在别的月份时不要把他拽回来；只有本来停在「今天所在月」才跟随
+  const wasFollowingToday =
+    state.currYear === todayDayjs.value.get('year') &&
+    state.currMonth === todayDayjs.value.get('month') + 1
+
+  todayDayjs.value = next
+  state.today = next.format('YYYY-MM-DD')
+
+  if (wasFollowingToday) {
+    state.currYear = next.get('year')
+    state.currMonth = next.get('month') + 1
+  }
   onRender()
+}
+
+const isRender = getIsWidgetRender(WIDGET_CODE)
+
+watch(
+  isRender,
+  (value) => {
+    if (!value) {
+      removeDailyTask(WIDGET_CODE)
+      return
+    }
+    // daily 注册即执行一次，首次渲染由它触发，不必再单独 onRender
+    addDailyTask(WIDGET_CODE, syncToday)
+  },
+  { immediate: true },
+)
+
+onMounted(() => {
   refreshSubscription()
-  document.addEventListener('visibilitychange', onDocumentVisibilityChange)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('visibilitychange', onDocumentVisibilityChange)
+  removeDailyTask(WIDGET_CODE)
 })
 
 /**
@@ -480,68 +534,109 @@ watch(
   },
 )
 
+/**
+ * 是否已到可浏览范围的端点。箭头按钮与两个下拉共用同一份边界，
+ * 避免出现「箭头能翻出 2000，但下拉里没有 1999」这种半截状态。
+ */
+const isPrevDisabled = computed(
+  () =>
+    toYearMonth(state.currYear, state.currMonth) <=
+    toYearMonth(CALENDAR_MIN_YEAR, 1),
+)
+
+const isNextDisabled = computed(
+  () =>
+    toYearMonth(state.currYear, state.currMonth) >=
+    toYearMonth(CALENDAR_MAX_YEAR, 12),
+)
+
 const onPrevMonth = () => {
+  if (isPrevDisabled.value) return
   slideDirection.value = 'right'
-  if (state.currMonth === 1) {
-    state.currYear -= 1
-    state.currMonth = 12
-  } else {
-    state.currMonth -= 1
-  }
+  // 月份传 0 或 13 由 clampYearMonth 完成 12 进制进位（2026-01 的上一月 → 2025-12）
+  const prev = clampYearMonth(state.currYear, state.currMonth - 1)
+  state.currYear = prev.year
+  state.currMonth = prev.month
   onRender()
   gaProxy('click', ['calendar', 'prevMonth'])
 }
 
 const onNextMonth = () => {
+  if (isNextDisabled.value) return
   slideDirection.value = 'left'
-  if (state.currMonth === 12) {
-    state.currYear += 1
-    state.currMonth = 1
-  } else {
-    state.currMonth += 1
-  }
+  const next = clampYearMonth(state.currYear, state.currMonth + 1)
+  state.currYear = next.year
+  state.currMonth = next.month
   onRender()
   gaProxy('click', ['calendar', 'nextMonth'])
 }
 
+/**
+ * 年月下拉的切换。
+ *
+ * 这里刻意**不用** `v-model:value`，只写 `:value` + 单个 `@update:value`。
+ * 两者同时写时，编译产物是 `onUpdate:value: [vModel 赋值, 本函数]` 的数组，
+ * 赋值排在本函数之前 —— 进入本函数时 state 已经是新值，oldYearMonth 会等于
+ * newYearMonth，方向判断恒为 'left'（已用 test-utils 实测确认）。
+ * 由本函数自己写回，才能拿到真正的旧值。
+ */
 const onDateChange = (type: 'year' | 'month', newVal: number) => {
-  const oldYearMonth = state.currYear * 12 + state.currMonth
-  const newYearMonth =
+  const oldYearMonth = toYearMonth(state.currYear, state.currMonth)
+  const target =
     type === 'year'
-      ? newVal * 12 + state.currMonth
-      : state.currYear * 12 + newVal
-  slideDirection.value = newYearMonth >= oldYearMonth ? 'left' : 'right'
+      ? { year: newVal, month: state.currMonth }
+      : { year: state.currYear, month: newVal }
+  const next = clampYearMonth(target.year, target.month)
+  state.currYear = next.year
+  state.currMonth = next.month
+
+  slideDirection.value =
+    toYearMonth(next.year, next.month) >= oldYearMonth ? 'left' : 'right'
   gaProxy('click', ['calendar', 'dateChange', type])
   onRender()
 }
 
 const isResetBtnVisible = computed(
   () =>
-    state.currYear !== todayDayjs.get('year') ||
-    state.currMonth !== todayDayjs.get('month') + 1,
+    state.currYear !== todayDayjs.value.get('year') ||
+    state.currMonth !== todayDayjs.value.get('month') + 1,
 )
 
 const onReset = () => {
-  const currYearMonth = state.currYear * 12 + state.currMonth
-  const todayYearMonth =
-    todayDayjs.get('year') * 12 + todayDayjs.get('month') + 1
+  const currYearMonth = toYearMonth(state.currYear, state.currMonth)
+  const todayYearMonth = toYearMonth(
+    todayDayjs.value.get('year'),
+    todayDayjs.value.get('month') + 1,
+  )
   slideDirection.value = currYearMonth > todayYearMonth ? 'right' : 'left'
-  state.currYear = todayDayjs.get('year')
-  state.currMonth = todayDayjs.get('month') + 1
-  state.currDay = todayDayjs.get('date')
+  state.currYear = todayDayjs.value.get('year')
+  state.currMonth = todayDayjs.value.get('month') + 1
   onRender()
   gaProxy('click', ['calendar', 'resetToady'])
 }
 
-const detailInfo = reactive({
-  date: '',
-  lunar: '',
-  festivals: [] as string[],
-  xingzuo: '',
-  yi: [] as string[],
-  ji: [] as string[],
-  jishen: [] as string[],
-  xiongsha: [] as string[],
+/**
+ * 详情弹窗内容：由「当前打开的日期」派生，不命令式搬运字段。
+ * 好处是切日期/切黄历开关时不会出现「部分字段还是上一天」的中间态。
+ */
+const detailInfo = computed(() => {
+  if (!state.currDetailDate) return null
+
+  const detail = getDayDetail(
+    dayjs(state.currDetailDate).toDate(),
+    detailOptions.value,
+  )
+
+  return {
+    date: `${state.currDetailDate} ${weekdayTextList.value[detail.weekday]}`,
+    lunar: detail.lunar,
+    festivals: detail.festivals,
+    xingzuo: constellationTextMap.value[detail.constellation],
+    yi: detail.yi,
+    ji: detail.ji,
+    jishen: detail.jishen,
+    xiongsha: detail.xiongsha,
+  }
 })
 
 /**
@@ -549,6 +644,11 @@ const detailInfo = reactive({
  *   1. @click 在 <li> 上 → 切换/打开日期
  *   2. @clickoutside 在 NTPopover 上 → 仅当该 Popover 所属日期仍是当前打开日期时才关闭，
  *      避免 A 的 clickoutside 误关刚打开的 B（每个日期格子有独立 NTPopover 实例）
+ *
+ * 翻月时**不**手动清空 state.currDetailDate：箭头按钮与年月下拉都在 Popover 外部，
+ * pointerdown 会先触发 interact-outside 走到下面的 clickoutside 分支清空。
+ * 只有纯键盘翻月（Tab + Enter，不产生 pointerdown）会让残留在翻回原月份时重开弹窗，
+ * 属已知的极低概率路径，不值得为此在翻月路径上加一个副作用。
  */
 const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
   if (isDragMode.value) {
@@ -564,24 +664,13 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
     return
   }
 
-  // @pointerdown：toggle 关闭或打开新日期
+  // 模板挂在 <li> 的 @click 上：toggle 关闭或打开新日期
   if (state.currDetailDate === date) {
     state.currDetailDate = ''
     return
   }
 
-  // 打开新日期
-  const detail = getDayDetail(dayjs(date).toDate(), detailOptions.value)
-
-  detailInfo.date = `${date} ${weekdayTextList.value[detail.weekday]}`
-  detailInfo.lunar = detail.lunar
-  detailInfo.festivals = detail.festivals
-  detailInfo.xingzuo = constellationTextMap.value[detail.constellation]
-  detailInfo.yi = detail.yi
-  detailInfo.ji = detail.ji
-  detailInfo.jishen = detail.jishen
-  detailInfo.xiongsha = detail.xiongsha
-
+  // 打开新日期（内容由 detailInfo 派生）
   state.currDetailDate = date
   gaProxy('click', ['calendar', 'detail'])
 }
@@ -601,20 +690,23 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
       <div class="calendar__options">
         <div class="options__item">
           <NTSelect
-            v-model:value="state.currYear"
+            :value="state.currYear"
             class="item__select_year"
             size="small"
             :options="state.yearList"
             :disabled="isDragMode"
-            @update:value="(v) => onDateChange('year', v)"
+            @update:value="(v: number) => onDateChange('year', v)"
           />
         </div>
         <div class="options__item">
           <button
             type="button"
             class="item__btn"
-            :class="{ 'item__btn--move': isDragMode }"
-            :disabled="isDragMode"
+            :class="{
+              'item__btn--move': isDragMode,
+              'item__btn--edge': isPrevDisabled,
+            }"
+            :disabled="isDragMode || isPrevDisabled"
             @click="onPrevMonth()"
           >
             <Icon
@@ -623,7 +715,7 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
             />
           </button>
           <NTSelect
-            v-model:value="state.currMonth"
+            :value="state.currMonth"
             class="item__select_month"
             size="small"
             :options="monthsList"
@@ -633,8 +725,11 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
           <button
             type="button"
             class="item__btn"
-            :disabled="isDragMode"
-            :class="{ 'item__btn--move': isDragMode }"
+            :disabled="isDragMode || isNextDisabled"
+            :class="{
+              'item__btn--move': isDragMode,
+              'item__btn--edge': isNextDisabled,
+            }"
             @click="onNextMonth()"
           >
             <Icon
@@ -750,7 +845,10 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
                 </template>
 
                 <!-- detail -->
-                <div class="calendar__detail">
+                <div
+                  v-if="detailInfo"
+                  class="calendar__detail"
+                >
                   <div class="detail__header">
                     <p class="detail__date">
                       {{ detailInfo.date }}
@@ -857,7 +955,7 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
           <div
             v-for="item in festivalList"
             :key="item.date"
-            :title="`${item.shortDate} ${item.desc} ${item.festivalCountdownDay}${$t('calendar.festivalCountdownDaySuffix')}`"
+            :title="`${item.shortDate} ${item.desc} ${$t('calendar.festivalCountdownDaySuffix', { n: item.festivalCountdownDay }, item.festivalCountdownDay)}`"
             class="festival__item"
           >
             <div class="item__left">
@@ -934,14 +1032,22 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
               background-color: transparent;
             }
           }
+          /* 已到可浏览范围的端点：箭头置灰，避免「点了没反应」被当成卡死 */
+          &.item__btn--edge {
+            opacity: 0.3;
+            cursor: default;
+            &:hover {
+              background-color: transparent;
+            }
+          }
           .btn__icon {
-            font-size: var(--nt-cal-customFontSize_btn);
-            color: var(--nt-cal-customFontColor_btn);
+            font-size: var(--nt-cal-customFontSize);
+            color: var(--nt-cal-customFontColor);
           }
         }
         /* 订阅失败提示：图标即重试入口，靠语义色区分「有缓存兜底」与「彻底失败」 */
         .item__retry .retry__icon {
-          font-size: calc(var(--nt-cal-customFontSize_btn) * 0.85);
+          font-size: calc(var(--nt-cal-customFontSize) * 0.85);
           color: var(--color-warning);
         }
         .item__retry--danger .retry__icon {
@@ -1211,8 +1317,8 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
 
 /* NTScrollArea 外层：接管高度约束和分隔线。height 必须有确定值，否则 Reka viewport 的 height:100% 无法解析 */
 .calendar__festival__scroll {
-  height: var(--nt-cal-customDestivalCountdownItemHeight);
-  max-height: var(--nt-cal-customDestivalCountdownItemHeight);
+  height: var(--nt-cal-customFestivalCountdownItemHeight);
+  max-height: var(--nt-cal-customFestivalCountdownItemHeight);
   border-top: 1px solid var(--nt-gray-light);
 }
 
@@ -1228,7 +1334,7 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
     justify-content: space-between;
     align-items: center;
     width: 50%;
-    font-size: var(--nt-cal-customDestivalCountdownFontSize);
+    font-size: var(--nt-cal-customFestivalCountdownFontSize);
     box-sizing: border-box;
     .item__left {
       display: flex;
@@ -1249,7 +1355,7 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
         flex: 0 0 auto;
         color: var(--nt-cal-customRestLabelFontColor);
         background-color: var(--nt-cal-customRestLabelBackgroundColor);
-        font-size: var(--nt-cal-customRestLabelFontSize);
+        font-size: var(--nt-cal-customFestivalRestLabelFontSize);
         border-radius: 3px;
         box-sizing: border-box;
         line-height: 1.5;

@@ -54,15 +54,28 @@ WidgetWrap mount
   └── watch(isDragMode) → 辅助线 class
 ```
 
-> 注意：`watch(isRender) → addTimerTask(widgetCode, task)` 是**消费方 Widget** 的责任，不是 WidgetWrap 的职责。详见下方"定时任务系统"。
+> 注意：`watch(isRender) → addTimerTask(widgetCode, task)`（注销同理）是**消费方 Widget** 的责任，不是 WidgetWrap 的职责。详见下方"定时任务系统"。
 
-### 卸载
+### 禁用 / 卸载
+
+`v-if="isEnabled"` 在 WidgetWrap **内部**，只包住 `<slot />`：
 
 ```
-WidgetWrap unmount
+div.widget__wrap            ← 常驻
+└── div v-if="isEnabled"     ← 禁用时被销毁的是这一层和它的 slot DOM
+      └── <slot />           ← Widget 的模板内容
+```
+
+```
+enabled = false（禁用，不是卸载）
+  └── slot DOM 被销毁，Widget 组件实例仍在 → onUnmounted 不触发
+
+WidgetWrap unmount（组件真的被销毁，如 WidgetErrorBoundary 捕获异常）
   ├── 从 moveState 注销拖拽回调
-  └── enabled=false → removeTimerTask
+  └── 消费方 Widget 的 onUnmounted 兜底注销任务
 ```
+
+所以「禁用」这条路径只能由 `watch(isRender)` 感知，`onUnmounted` 感知的是另一种（罕见）情况。
 
 ## 3. WidgetWrap 核心能力
 
@@ -106,23 +119,49 @@ localConfig[code].layout = {
 ## 4. 定时任务系统
 
 ```ts
-addTimerTask(key, task)   // 立即执行一次 + 注册到 Map
-removeTimerTask(key)      // 从 Map 删除，最后一个任务时自动停止 rAF 循环
-startTimer()              // 手动启动 rAF 循环（通常不需要手动调用）
+addTimerTask(key, task)    // 立即执行一次 + 注册到 Map
+removeTimerTask(key)       // 从 Map 删除，最后一个任务时自动停止 rAF 循环
+addDailyTask(key, task)    // 按天刷新（跨本地午夜一次），与 timer 共用同一个 rAF 循环
+removeDailyTask(key)
+startTimer()               // 手动启动 rAF 循环（通常不需要手动调用）
 ```
 
-Widget 中使用：
+Widget 中使用 — **注册/注销都挂在 `watch(isRender)` 上，`onUnmounted` 只作兜底**：
 ```ts
-watch(isRender, (value) => {
-  if (!value) { removeTimerTask(WIDGET_CODE); return }
-  addTimerTask(WIDGET_CODE, updateData)
-}, { immediate: true })
+const isRender = getIsWidgetRender(WIDGET_CODE)
+
+watch(
+  isRender,
+  (value) => {
+    if (!value) {
+      removeDailyTask(WIDGET_CODE)
+      return
+    }
+    addDailyTask(WIDGET_CODE, updateData) // 立即执行一次，首次渲染靠它
+  },
+  { immediate: true },
+)
+
+// 兜底：错误边界让组件真的卸载时，watcher 已随作用域 stop
+onUnmounted(() => removeDailyTask(WIDGET_CODE))
 ```
 
-- 组件卸载**无需手动移除任务**，`isEnabled` watch 会在 `enabled=false` 时自动调用
-- `addTimerTask` 会**立即执行一次**，确保数据不会等到 1000ms 后才刷新
+- **为什么不是 `onMounted`/`onUnmounted`**：`Content.vue` 用 `v-for` 无条件挂载所有 Widget，
+  `WidgetWrap` 的 `v-if="isEnabled"` 只销毁它内部那层 div 和 slot DOM，Widget 组件实例始终活着。
+  禁用时 `onUnmounted` **不触发**，`onMounted` 也只在页面加载时跑一次 —— 这两个钩子都不对应
+  「启用/禁用」。实测（真实 `WidgetWrap` + 真实 store）：启用 → `watch(true)` + `onMounted`；
+  禁用 → 只有 `watch(false)` 执行，DOM 消失但 `onUnmounted` 没跑；再启用 → `watch(true)`
+- **`onUnmounted` 仍要写**：`WidgetErrorBoundary` 捕获异常后 slot 被卸载、组件真的销毁，
+  watcher 随作用域自动 stop，这时只有 `onUnmounted` 收得到。只写 watch 会漏掉这条路径
+- **漏写注销的代价**：任务留在 Map 里，`dailyTasks` 不清空 → 共享的 rAF 循环永不停止；
+  `yearProgress` 实时模式这类秒级任务还会对着一个看不见的 Widget 每秒重算
+- **按天刷新用 `addDailyTask`**：日期文本、「今」标记、一年中的第几天这类只在跨天时变化的数据，
+  共享同一次日期比较；不要自己在 `addTimerTask` 里比日期，更不要 `setInterval`
+- 两者都是**立即执行一次**，首次渲染不必再单独调一遍
 - 底层基于 `requestAnimationFrame` + 节流，后台标签页自动暂停。详见 [task.md](../architecture/task.md)
 - `task/` 还提供 `addKeydownTask`、`addVisibilityTask`、`addPageFocusTask`
+- 这套契约有回归用例兜着：`src/newtab/widgets/__tests__/task-lifecycle.test.ts` 会挂载真实
+  `date` / `yearProgress` 组件跑启停序列，改动注册时机前先让它红一次再动手
 
 ## 5. Widget 与 Setting 面板的交互
 
@@ -162,8 +201,7 @@ Setting 面板在 src/setting/panes/myWidget/index.vue
 ```vue
 <script setup lang="ts">
 import { addTimerTask, removeTimerTask } from '@/logic/task'
-import { getIsWidgetRender } from '@/logic/store/style'
-import { getStyleField } from '@/logic/store/style'
+import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
 
@@ -173,10 +211,20 @@ const cssVars = computed(() => ({
 }))
 
 const isRender = getIsWidgetRender(WIDGET_CODE)
-watch(isRender, (value) => {
-  if (!value) { removeTimerTask(WIDGET_CODE); return }
-  addTimerTask(WIDGET_CODE, updateData)
-}, { immediate: true })
+
+watch(
+  isRender,
+  (value) => {
+    if (!value) {
+      removeTimerTask(WIDGET_CODE)
+      return
+    }
+    addTimerTask(WIDGET_CODE, updateData)
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => removeTimerTask(WIDGET_CODE))
 </script>
 
 <template>
@@ -219,9 +267,12 @@ Widget 样式块的外层 selector 必须为 `#widgetCode`（由 WidgetWrap 内�
 
 禁止硬编码图标字符串（如 `'mdi:play'`），必须通过 `ICONS` 常量引用。
 
-### 定时任务不需要手动清理
+### 定时任务的注销要挂 `isRender`，不是 `onUnmounted`
 
-`watch(isRender)` 管理即可，`enabled=false` 会自动触发 `removeTimerTask`。
+`WidgetWrap` 的 `v-if="isEnabled"` 在内部、只销毁 slot DOM，Widget 组件实例不会因为禁用而卸载，
+`onUnmounted` 在禁用时**不会触发**。所以注销写在 `onUnmounted` 里等于「禁用后任务永远留着」——
+`dailyTasks` 不清空，共享 rAF 循环就不会停。注册/注销挂 `watch(isRender)`，
+再把 `onUnmounted` 留着兜住真实的卸载（错误边界）路径。
 
 ## 8. 附录
 

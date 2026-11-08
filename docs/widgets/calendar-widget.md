@@ -75,6 +75,20 @@ tyme4ts                                 农历与黄历（农历月日、宜忌�
 
 > 历史坑：早期实现只特判了「35 格 → 补 7」这一种情况，漏了 28 格，导致 2021-02 / 2027-02 底部空两行。
 
+## 2.3 年份范围与跨天校正
+
+**可浏览范围固定 1900–2100**（`newtab/widgets/calendar/config.ts` 的 `CALENDAR_MIN_YEAR` / `CALENDAR_MAX_YEAR`）。箭头翻月、年月下拉、回到今日三条路径共用 `clampYearMonth()`，到端点时箭头置灰（`.item__btn--edge`）；`toYearMonth()` 把年月换算成单调序号，月份传 0 / 13 自动完成 12 进制进位，三处不用各写一遍进位分支。
+
+边界与 `subscriptions.ts` 的 `MIN_PARSE_YEAR` / `MAX_PARSE_YEAR` 相同，由 `calendar-range.test.ts` 锁住——「翻得到的年份」与「可能有节日数据的年份」必须是同一套口径，否则会翻到没有节日、只剩农历的年份，被误认为订阅坏了。
+
+> 下限取 1900 而不是 2000：万年历的高频用途之一是查农历生日，2000 起会挡住 1990 年代及更早出生的人。tyme4ts 在 1900 附近计算正常（实测 1850 / 1900 / 2200 均可返回正确农历），真正的约束是订阅源只覆盖近几年。
+
+**跨天校正**：`todayDayjs` 是 ref 而非 setup 时常量。组件注册 `addDailyTask(WIDGET_CODE, syncToday)`（见 [task.md](../architecture/task.md) 第 5 节），跨天时更新「今天」、重算格子与倒计时。日期比较由 daily 任务统一做，多个 Widget 共享同一次比较，组件自己不再逐秒比日期。
+
+- **为什么不用 `visibilitychange`**：合盖恢复、或标签页一直可见只是窗口失焦时不会触发它，只有共享的 rAF 循环能在恢复后补上这一次。这与下文「刻意不监听 visibilitychange」**不冲突**——那一条针对的是「要不要发网络请求」，这里是「日期基准对不对」
+- 用户翻在别的月份时不跟随；只有原本停在「今天所在月」才跟到新的当月
+- 禁用时由 `watch(isRender)` 摘掉、组件真被销毁时 `onUnmounted` 兜底，不残留任务
+
 ## 3. tyme4ts 的关键语义（易错）
 
 tyme4ts 现在**只提供农历与黄历**，它的节日表（`SolarFestival` / `LunarFestival`）已不再使用。
@@ -125,9 +139,12 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
 | 打开新标签页（widget `onMounted`）| 缓存未过期不请求；过期才拉 |
 | 切换预设地区 | 设置面板自动拉取（缓存缺失或过期时），widget 侧监听生效地址变化 |
 | 验证自定义地址 | 验证成功并提交后才切换；widget 随之加载新地址 |
-| 标签页重新可见（`visibilitychange`）| 同"过期才拉"，覆盖"标签页长期不关"的场景 |
 | 设置面板「刷新」按钮 | 忽略缓存强制拉取 |
 | 加载失败后的「重试」 | 强制拉取（点击 widget 顶栏的状态图标，仅失败时出现）|
+
+**刻意不监听 `visibilitychange`**：新标签页每次打开都会重新挂载，`onMounted` 已经覆盖了主路径；TTL 24 小时而节假日数据一年只变几次，「标签页长期不关」晚一天刷新没有可感知的损失。反过来，缓存跨过 TTL 且网络不通时，切回前台会真的发请求并把 `error` 写进状态，让用户只是 alt-tab 回来就看到顶栏警告图标——这是纯粹的副作用。**不要按"覆盖长期不关的场景"再加回来。**
+
+> 这条只约束**订阅请求**。日期基准的跨天校正另走 `addDailyTask`（见 2.3）：它不发网络请求，且合盖恢复时只有共享的 rAF 循环能发现日期已变。看到这段时不要顺手把 2.3 的定时任务删掉。
 
 同一 URL 的并发加载在 `subscriptions.ts` 里用 in-flight map 合并——设置面板与 widget 同时触发只会发一次请求。`force` 与普通加载使用不同 key（避免强制刷新被缓存命中吞掉），两者并发时可能发两次请求，这是有意的。
 
@@ -137,11 +154,19 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
 
 **刻意不做刷新提示**：有缓存时数据本来就还在，没有缓存也只是短暂缺节日；转圈图标对这张小卡片的打扰大于信息量，订阅是否成功用「失败图标」这一个反例即可覆盖。
 
+**自动刷新的失败按自然日去重**（`shouldPromptError`）：同一自然日只有**第一次**自动失败会出图标，之后静默，次日恢复提示。理由是数据一年只变几次，网络不稳时每开一个标签页弹一次警告图标不值得。三点约束：
+
+- 标记存在 `localStorage`（`naivetab:calendar:error-prompt-day`）而不是模块变量——新标签页是新的执行上下文，模块变量存不住；键名**刻意不带** `naivetab:calendar:subscription:` 前缀，否则会被 `writeSubscriptionCache` 的「只保留当前订阅」清理逻辑误删
+- 只抑制**提示**，不抑制**请求**：后续挂载仍然照常拉取，成功即自愈
+- 用户主动点图标重试（`force`）失败**照常提示**，并占用当天的名额——他自己要求的动作必须有反馈，否则点了没反应
+
+`subscriptionState.error` 与 `isErrorVisible` 是两件事：前者是「最近一次失败原因」（设置面板的「更新失败」文案读它，不受去重影响），后者是「这次失败要不要惊动用户」。
+
 | 状态 | 图标 | 颜色 | 交互 |
 |------|------|------|------|
-| `idle`（含刷新中、缓存命中）| 不渲染 | — | — |
-| `stale`（`error` + `status === 'ready'`，旧数据仍可读）| `ICONS.warning` | `--color-warning` | 点击 = 强制刷新 |
-| `error`（`error` + 没有可展示的数据）| `ICONS.warning` | `--color-error` | 点击 = 强制刷新 |
+| `idle`（含刷新中、缓存命中、当天的重复失败）| 不渲染 | — | — |
+| `stale`（`error` + `isErrorVisible` + `status === 'ready'`，旧数据仍可读）| `ICONS.warning` | `--color-warning` | 点击 = 强制刷新 |
+| `error`（`error` + `isErrorVisible` + 没有可展示的数据）| `ICONS.warning` | `--color-error` | 点击 = 强制刷新 |
 
 文案退到 `title` / `aria-label`（`calendar.subscriptionStaleTip` / `calendar.subscriptionFailedTip`），hover 才出现；**不要**再往倒数日区叠文字胶囊——那里既有数据又只有一两行，任何常驻文案都会盖住内容，而且胶囊复用的「休」标签绿/红会带出错误的语义。
 
@@ -160,7 +185,7 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
 - 验证期间切换地区或继续编辑会作废本次结果（token 保护），不会覆盖用户刚选的订阅
 - 未配置订阅（选「自定义」但地址为空）时 widget 不显示状态图标（`idle`）
 
-**不做定时轮询**：新标签页通常每次打开都会重新挂载，TTL + 可见性检查已覆盖实际使用场景；定时器只会增加无谓的唤醒与请求（Apple 的节假日日历一年也只变几次）。
+**不做定时轮询**：新标签页每次打开都会重新挂载，`onMounted` + TTL 已覆盖实际使用场景；定时器只会增加无谓的唤醒与请求（Apple 的节假日日历一年也只变几次）。
 
 ### ICS 解析要点（易错）
 
@@ -199,8 +224,10 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
   - **展示开关**：关闭农历与节气后格子留空/详情无农历行/倒计时不含节气；关闭黄历后四行为空
   - **通用节日表**：9 条规则的日期正确、已移除条目（含世界住房日、万圣节前夜）不再出现
 - `src/logic/__tests__/calendar-ics.test.ts`：ICS 文本解析与 RRULE 展开（区间排他、`BYDAY`、`BYMONTHDAY`、闰年、折叠行、异常输入、清明多日假期与繁体节气）
-- `src/logic/__tests__/calendar-subscriptions.test.ts`：46 个预设地址、地址校验、缓存 TTL/版本、错误映射、缓存优先与失败降级、源年份窗口、刷新保留旧数据、并发竞态
+- `src/logic/__tests__/calendar-subscriptions.test.ts`：46 个预设地址、地址校验、缓存 TTL/版本、错误映射、缓存优先与失败降级、源年份窗口、刷新保留旧数据、并发竞态、失败提示按自然日去重（同日静默 / 跨日恢复 / `force` 总是提示）
 - `src/logic/__tests__/calendar-grid.test.ts`：网格恒定 6 行
+- `src/logic/__tests__/calendar-range.test.ts`：年月序号、`clampYearMonth` 端点钳制、可浏览范围与订阅解析窗口一致
+- `src/logic/__tests__/calendar-config-compat.test.ts`：2.6.x 旧配置的向前兼容（浅合并前提、已废弃的 `holidayRegion` 不干扰新字段）
 
 ## 8. 依赖库现状
 

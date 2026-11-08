@@ -534,7 +534,7 @@
       "pisces": "双鱼座"
     },
     "festivalCountdown": "节日倒数",
-    "festivalCountdownDaySuffix": "天后",
+    "festivalCountdownDaySuffix": "{n}天后",
     "today": "今",
     "work": "班",
     "rest": "休",

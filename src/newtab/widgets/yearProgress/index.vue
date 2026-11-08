@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { isDragMode } from '@/logic/moveable'
-import { addTimerTask, removeTimerTask } from '@/logic/task'
+import {
+  addDailyTask,
+  addTimerTask,
+  removeDailyTask,
+  removeTimerTask,
+} from '@/logic/task'
 import { localConfig } from '@/logic/config/state'
 import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import { currDayjsLang } from '@/logic/store/theme'
@@ -65,6 +70,12 @@ const state = reactive({
 })
 
 /**
+ * 当前表格数据对应的年份。跨年时要重建 365/366 天的方块图与总数，
+ * 靠它判断「是不是跨年了」，而不是每次拿当前年份去比。
+ */
+let currentYear = dayjs().year()
+
+/**
  * 获取当前年份的起止时间戳。
  * 使用 getter 而非模块级常量，避免页面跨年时数据过时。
  */
@@ -80,6 +91,7 @@ const getYearRange = () => {
  */
 const initTableData = () => {
   const { start, end } = getYearRange()
+  currentYear = start.year()
   state.totalDay = end.diff(start, 'day') + 1
   state.passDay = dayjs().diff(start, 'day') + 1
   state.tableList = Array.from(Array(state.totalDay), (_, index) => {
@@ -115,17 +127,64 @@ const onRender = () => {
   updateDate()
 }
 
+/**
+ * 跨天刷新。
+ *
+ * `passDay`（「第几天」）只在跨天时变化，而 onRender 只算百分比与日期文本，
+ * 所以两种模式都需要这个入口：非实时模式下它甚至是唯一的刷新来源
+ * （此前只在 onMounted 算一次，标签页过夜后「第几天」会停在昨天）。
+ */
+const onDayChange = (now: Date) => {
+  const next = dayjs(now)
+  if (next.year() !== currentYear) {
+    // 跨年：方块图与总天数都要重建成新的一年
+    initTableData()
+  } else {
+    state.passDay = next.diff(getYearRange().start, 'day') + 1
+  }
+  onRender()
+}
+
+/**
+ * 实时模式专属的秒级任务：只负责百分比与日期文本，`passDay` 不归它管。
+ * 与日切是互补关系，所以两者共存，切模式时只动 timer 这一半。
+ * 未启用时一律不注册 —— 否则一个看不见的 Widget 会让共享的 rAF 循环长挂不熄。
+ */
+const syncRealtimeTask = () => {
+  removeTimerTask(WIDGET_CODE)
+  if (isRender.value && localConfig.yearProgress.isRealtime) {
+    addTimerTask(WIDGET_CODE, onRender)
+  }
+}
+
+watch(() => localConfig.yearProgress.isRealtime, syncRealtimeTask)
+
+/**
+ * 禁用只销毁 WidgetWrap 内部的 slot DOM（组件不卸载），所以清理必须挂 `isRender`；
+ * `onUnmounted` 只兜「组件真被销毁」那一种（错误边界）。
+ * 日切与实时模式并存：前者管 `passDay`（含跨年重建表格），后者管百分比与日期文本。
+ */
 watch(
-  [isRender, () => localConfig.yearProgress.isRealtime],
-  () => {
-    if (isRender && localConfig.yearProgress.isRealtime) {
-      addTimerTask(WIDGET_CODE, onRender)
-    } else {
+  isRender,
+  (value) => {
+    if (!value) {
+      removeDailyTask(WIDGET_CODE)
       removeTimerTask(WIDGET_CODE)
+      return
     }
+    // 首次的百分比与日期文本由「注册即执行」的 onDayChange → onRender 负责
+    addDailyTask(WIDGET_CODE, onDayChange)
+    syncRealtimeTask()
   },
   { immediate: true },
 )
+
+onMounted(initTableData)
+
+onUnmounted(() => {
+  removeDailyTask(WIDGET_CODE)
+  removeTimerTask(WIDGET_CODE)
+})
 
 watch(
   () => localConfig.yearProgress.percentageDecimal,
@@ -136,11 +195,6 @@ watch(
 
 watch([() => localConfig.yearProgress.format, currDayjsLang], () => {
   updateDate()
-})
-
-onMounted(() => {
-  initTableData()
-  onRender()
 })
 </script>
 

@@ -201,7 +201,13 @@ export const isMainlandSubscription = (region: string): boolean =>
   region !== CUSTOM_SUBSCRIPTION &&
   resolveSubscriptionRegion(region) === 'CN'
 
-/** 取预设地区的订阅地址；非法地区返回空串，让上层走 idle */
+/**
+ * 取预设地区的订阅地址。
+ *
+ * 参数类型已保证是合法地区，正常路径不会返回空串；末尾的空串分支只为
+ * 「运行时拿到被写坏的配置」兜底（测试用 `'XX' as never` 覆盖），
+ * 调用方**不需要**再判空。真正可能为空的是自定义地址，那条路径不经过这里。
+ */
 export const getSubscriptionUrl = (region: TSubscriptionRegion): string => {
   const slug = APPLE_SLUGS[region] as string | undefined
   return slug ? `${APPLE_CALENDAR_BASE}/${slug}.ics` : ''
@@ -235,13 +241,60 @@ export const SUBSCRIPTION_CACHE_TTL = 24 * 60 * 60 * 1000
 const CACHE_KEY_PREFIX = 'naivetab:calendar:subscription:'
 const cacheKey = (url: string): string => `${CACHE_KEY_PREFIX}${url}`
 const FETCH_TIMEOUT = 10_000
+
+/**
+ * 「同一天内不重复提示」的标记：最近一次向用户提示过订阅失败的本地自然日。
+ *
+ * 用 localStorage 而不是模块变量 —— 新标签页是新的执行上下文，模块变量存不住，
+ * 而这里要抑制的恰恰是「每开一个标签页就提示一次」。
+ *
+ * 键名刻意**不带** CACHE_KEY_PREFIX：writeSubscriptionCache 会删掉所有同前缀的其他键。
+ */
+const ERROR_PROMPT_KEY = 'naivetab:calendar:error-prompt-day'
+
+/** 本地自然日键（YYYY-MM-DD），用于判断「是不是同一天」 */
+const toLocalDayKey = (date = new Date()): string =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+    date.getDate(),
+  ).padStart(2, '0')}`
+
+/**
+ * 本次失败是否需要提示给用户。
+ *
+ * 自动刷新失败：同一自然日只提示第一次——节假日数据一年只变几次，
+ * 网络不稳时每天弹一次警告图标的打扰远大于收益。
+ * 用户主动重试（force）失败：总是提示，那是他自己要求的动作。
+ *
+ * 只影响「提示」，不影响重试：后续挂载仍会正常发起请求，成功即自愈。
+ */
+const shouldPromptError = (force: boolean): boolean => {
+  const today = toLocalDayKey()
+  let alreadyPrompted: boolean
+  try {
+    alreadyPrompted = localStorage.getItem(ERROR_PROMPT_KEY) === today
+    // force 也要占掉当天的名额，否则用户点一次重试后，当天后续自动失败又会提示
+    if (!alreadyPrompted) localStorage.setItem(ERROR_PROMPT_KEY, today)
+  } catch {
+    // 隐私模式/容量不足：退化成每次都提示
+    return true
+  }
+  return force || !alreadyPrompted
+}
+
 /**
  * 自定义地址可能指向超大文件。节假日源通常只有几十 KB，
  * 这里设一个宽松上限，避免异常/恶意响应把新标签页的解析线程拖死。
  */
 const MAX_ICS_BYTES = 5 * 1024 * 1024
 
-/** 缓存条目的最小结构校验：损坏/旧格式不应让适配层拿到半截数据 */
+/**
+ * 缓存条目的最小结构校验：损坏/旧格式不应让适配层拿到半截数据。
+ *
+ * 全量遍历（订阅展开后条目可达千级）。单次加载会读两次缓存（新鲜命中 + 过期兜底），
+ * 设置面板还会为「上次更新」再读一次，等于每次开面板校验三遍。
+ * 单条只是几次类型判断，实测可忽略；若要再省，应先合并这三次读取，
+ * 而不是削弱校验——坏缓存会直接让格子读到 undefined。
+ */
 const isValidDayEntry = (entry: unknown): entry is IIcsDayEntry => {
   if (!entry || typeof entry !== 'object') return false
   const candidate = entry as Partial<IIcsDayEntry>
@@ -373,9 +426,15 @@ export interface ILoadSubscriptionOptions {
   toYear?: number
 }
 
-/** 解析年份的合理边界，防止异常源把年份拉到离谱的范围 */
-const MIN_PARSE_YEAR = 1900
-const MAX_PARSE_YEAR = 2100
+/**
+ * 解析年份的合理边界，防止异常源把年份拉到离谱的范围。
+ *
+ * 必须与 widget 侧的可浏览范围（`newtab/widgets/calendar/config.ts` 的
+ * CALENDAR_MIN_YEAR / CALENDAR_MAX_YEAR）保持一致，由 calendar-range.test.ts 锁住：
+ * 「翻得到的年份」不该超出「可能有节日数据的年份」。
+ */
+export const MIN_PARSE_YEAR = 1900
+export const MAX_PARSE_YEAR = 2100
 
 const clampYear = (year: number): number =>
   Math.min(MAX_PARSE_YEAR, Math.max(MIN_PARSE_YEAR, year))
@@ -459,12 +518,15 @@ export const subscriptionState = reactive({
   status: 'idle' as 'idle' | 'loading' | 'ready',
   /** 日期键 → 当天条目 */
   days: {} as Record<string, IIcsDayEntry>,
-  /** 最近一次失败原因（即使有旧缓存也会保留，供 UI 提示） */
+  /** 最近一次失败原因（即使有旧缓存也会保留，供设置面板展示） */
   error: null as TSubscriptionError | null,
+  /**
+   * 本次失败是否要提示给用户（widget 顶栏的警告图标）。
+   * 自动刷新失败在同一自然日只提示第一次，详见 shouldPromptError。
+   */
+  isErrorVisible: false,
   /** 数据时间戳 */
   fetchedAt: 0,
-  /** 是否正在后台刷新（有数据时也会为 true，但不影响 days 展示） */
-  isRefreshing: false,
 })
 
 /**
@@ -479,8 +541,8 @@ const resetState = (url: string): void => {
   subscriptionState.status = 'idle'
   subscriptionState.days = {}
   subscriptionState.error = null
+  subscriptionState.isErrorVisible = false
   subscriptionState.fetchedAt = 0
-  subscriptionState.isRefreshing = false
 }
 
 /**
@@ -518,6 +580,7 @@ const runLoadSubscription = async (
     subscriptionState.fetchedAt = 0
   }
   subscriptionState.error = null
+  subscriptionState.isErrorVisible = false
 
   const cached = options.force ? null : readSubscriptionCache(url)
   if (cached) {
@@ -525,7 +588,6 @@ const runLoadSubscription = async (
     subscriptionState.status = 'ready'
     subscriptionState.days = cached.days
     subscriptionState.fetchedAt = cached.fetchedAt
-    subscriptionState.isRefreshing = false
     return
   }
 
@@ -544,7 +606,6 @@ const runLoadSubscription = async (
     subscriptionState.status = 'ready'
   }
 
-  subscriptionState.isRefreshing = true
   try {
     const fresh = await fetchSubscription(url, options)
     if (token !== loadToken) return
@@ -553,6 +614,7 @@ const runLoadSubscription = async (
     subscriptionState.fetchedAt = fresh.fetchedAt
     subscriptionState.status = 'ready'
     subscriptionState.error = null
+    subscriptionState.isErrorVisible = false
   } catch (error) {
     if (token !== loadToken) return
     subscriptionState.error = (
@@ -560,11 +622,15 @@ const runLoadSubscription = async (
     ).subscriptionError ?? {
       code: 'network',
     }
-    // 过期缓存仍可展示，避免日历突然空掉
-    const fallback = readSubscriptionCache(url, 0)
-    if (fallback) {
-      subscriptionState.days = fallback.days
-      subscriptionState.fetchedAt = fallback.fetchedAt
+    subscriptionState.isErrorVisible = shouldPromptError(Boolean(options.force))
+    /**
+     * 过期缓存仍可展示，避免日历突然空掉。
+     * 用的是上面已经读到的 stale：请求失败不会写缓存，token 守卫又排除了并发加载，
+     * 所以这里再读一次 localStorage 拿到的必然是同一份数据。
+     */
+    if (stale) {
+      subscriptionState.days = stale.days
+      subscriptionState.fetchedAt = stale.fetchedAt
       subscriptionState.status = 'ready'
     } else if (Object.keys(subscriptionState.days).length > 0) {
       subscriptionState.status = 'ready'
@@ -572,8 +638,6 @@ const runLoadSubscription = async (
       subscriptionState.days = {}
       subscriptionState.status = 'loading'
     }
-  } finally {
-    if (token === loadToken) subscriptionState.isRefreshing = false
   }
 }
 
