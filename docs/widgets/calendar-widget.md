@@ -89,6 +89,35 @@ tyme4ts                                 农历与黄历（农历月日、宜忌�
 - 用户翻在别的月份时不跟随；只有原本停在「今天所在月」才跟到新的当月
 - 禁用时由 `watch(isRender)` 摘掉、组件真被销毁时 `onUnmounted` 兜底，不残留任务
 
+## 2.4 顶栏的年月选择（MonthPicker）
+
+**形态是「标题按钮 + 弹层网格」，不是两个下拉。** 12 个月是固定、已知、无需搜索的集合，下拉最有价值的三件事（选项不定长、省空间、可搜索）一样都用不上；代价却是顶栏最中央的位置被带边框的表单控件占着。改完之后：
+
+- 标题能放大到 `1.15em` 加粗，月份在视觉上成为这一行的主角，而不是「跟年份平级的两个字段」
+- 12 个格子位置固定，靠空间记忆点击（跳 11 月就往右下角点），不用在列表里扫字
+- 年份从「201 项下拉」变成「12 年一页的网格」。原来从 2026 滚到 1990 要手动划很久，Reka Select 的 typeahead 又只按首字符匹配（年份全以 1/2 开头，等于没有）
+
+**交互模型：立即提交，没有草稿态。** 翻年、点年、点月都直接 `emit('select')`，背后的日历当场跟着变，弹层相当于「遥控器」而不是「选好再确认」的表单。点月份后关闭；点年份后留在弹层里继续选月（年份已提交，月份还要挑）。这样避免了「年份改了但没点月份算不算生效」的二义性。
+
+**边界与键位**：年份网格按 `minYear` 对齐、一页 12 年（与月份同列数），页首页尾按钮置灰；翻年与选择都走 `clampYearMonth()`，与箭头、回到今日共用同一份 1900–2100 边界。键盘用 roving focus：方向键按 4 列移动、Home/End 到首尾，**没有**用 `role="grid"`——那套 ARIA 要求 row/gridcell 的完整结构，半套比不用更糟，这里用 `role="group"` + 格子的 `aria-current`。
+
+**弹层样式要靠变量透传**：Popover 渲染在 Portal 里，拿不到 widget 容器上的 CSS 变量，`pickerPopoverStyle` 显式传字体三件套 + `--nt-cal-customTodayItemBackgroundColor`。最后那个是刻意的：弹层里「当前月」用格子上「今天」的同一支背景色，两张界面才是一套配色。
+
+**标题宽度必须与当前月份无关**：`.title__text` 里堆了 12 条 `visibility: hidden` 的占位串（`8888年1月` … `8888年12月`），全部落在同一个网格单元格上，单元格宽度 = 最宽那条；可见的 `.title__value` 居中放进这个固定宽度里。Chrome 实测：12 个月标题块中线与卡片中线偏差恒为 0，右箭头 x 恒为 174.9；改之前宽度在 97.9–106.9 之间跳，右箭头跟着平移 9px —— 翻月是连点操作，箭头不能在鼠标底下跑。
+
+- 顶栏用三栏 grid（`minmax(0,1fr) auto minmax(0,1fr)`）而不是 flex + `space-between`：中间那组「‹ 年月 ▾ ›」永远落在卡片正中，与两侧内容宽度无关；「回到今日」放第 3 栏 `justify-self: end`
+- 用隐藏串而不是给 `min-width` 写死 `em`：字体、字号、语言都可配，写死的数值一定会在某个组合下不够（文字溢出）或留白过多
+- 藏的是**整串**而不是只藏月份：`2026年` 前半段也不能动
+- 文字居中，代价是位数变化时整串左右微移约 4px（1 月 ↔ 12 月）；标题框与左右箭头不受影响。要彻底消除这点微移只能把月份补零成 `01月`，权衡后不做
+- 占位串的年份用 `8888` 而不是真实年份：数字字形里 8 基本最宽，换年（1xxx / 2xxx）时框宽也不会动；再叠一层 `font-variant-numeric: tabular-nums`，`2026 → 2027` 的推进量也一致
+- 标题按钮同时带 `:aria-label="titleText"`：可见文本外面还包着 12 条隐藏串，不能让它们进入无障碍名称
+
+> **标题的 `@click` 必须加 `.stop`。** 按钮在 `NTPopover` 的 `PopoverTrigger` 内部，Reka 给触发器绑了 `onClick: onOpenToggle`。真实点击时浏览器会在两个监听器之间做一次 microtask checkpoint，Vue 刚好把 `open = true` 刷进去，事件冒泡到触发器时 Reka 读到 open 已是 true，又翻回 false —— 现象是「弹层闪一下就没了」。从 JS 里 `dispatchEvent` 不会有这次 checkpoint，所以单测只点一次是绿的，只有真人点才复现。详见 [pitfalls-vue.md](../../.claude/rules/pitfalls-vue.md#ntpopover-的-trigger-里再放按钮点击会被-reka-反手关掉)。
+
+**月份标签用短形态**：中文「1月…12月」、英文「Jan…Dec」，语言包 `calendar.month.*` 里直接存短名。中文的「一月」本来就是 month one，写成「1月」零语义损失；英文全名是这一行里最宽的文本（`September` 约 66px），缩写砍掉一半。
+
+> 踩过的坑：`<NTSelect class="…">` 上的 class 曾经**不会落到任何元素**（根节点是 Reka 的 `SelectRoot`，`inheritAttrs: false`）——早先的 `.item__select_year { width: 84px }` / `.item__select_month { width: 105px }` 写了却从未生效，真正生效的一直是 `.reka-select__trigger` 的 `min-width: 90px`。现已修复（NTSelect 显式把 `$attrs` 绑到触发按钮），完整记录见 [pitfalls-vue.md](../../.claude/rules/pitfalls-vue.md#reka-root-不渲染元素时组件的-class-会被静默丢弃)。
+
 ## 3. tyme4ts 的关键语义（易错）
 
 tyme4ts 现在**只提供农历与黄历**，它的节日表（`SolarFestival` / `LunarFestival`）已不再使用。
@@ -228,6 +257,7 @@ Event.builder().solarWeek(5, 2, SUNDAY)   // 某月第 2 个周日（-1 表示�
 - `src/logic/__tests__/calendar-grid.test.ts`：网格恒定 6 行
 - `src/logic/__tests__/calendar-range.test.ts`：年月序号、`clampYearMonth` 端点钳制、可浏览范围与订阅解析窗口一致
 - `src/logic/__tests__/calendar-config-compat.test.ts`：2.6.x 旧配置的向前兼容（浅合并前提、已废弃的 `holidayRegion` 不干扰新字段）
+- `src/newtab/widgets/calendar/__tests__/month-picker.test.ts`：年月选择器的状态机（标题文案、展开 12 格并标出当前月、选月提交后关闭、选年后回到月面板、方向键移动焦点、1900/2100 端点置灰、年份尾页裁到 maxYear、disabled 时不展开）
 
 ## 8. 依赖库现状
 

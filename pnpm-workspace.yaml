@@ -1,7 +1,17 @@
+# 让 package.json 的 engines.node（>=26）真正生效：
+# 版本不符时 pnpm install 直接失败，而不是静默用错版本构建
+engineStrict: true
+
 allowBuilds:
   esbuild: true
   simple-git-hooks: true
   spawn-sync: true
+
+# pnpm ≥11 默认 minimumReleaseAge = 1440：发布不满 24h 的版本不参与解析（非 strict 模式下
+# 若范围内没有满足窗口的版本，仍会兜底选最新并用警告提示）。这里列的是升级当时急着要用、
+# 需要当场放行的版本，属于**历史快照** —— 后续依赖往前走了，条目里的版本与 lockfile 对不上
+# （例如写着 prettier@3.10.0、实际装的是 3.10.1）是正常的，既不影响 pnpm install，
+# 也不代表配置失效，不必逐条对齐或清理。
 minimumReleaseAgeExclude:
   - '@typescript-eslint/eslint-plugin@8.59.4'
   - '@typescript-eslint/parser@8.59.4'
@@ -16,3 +26,6 @@ minimumReleaseAgeExclude:
   - '@vue/language-core@3.3.0'
   - typescript-eslint@8.59.4
   - vue-tsc@3.3.0
+  - driver.js@1.12.1
+  - prettier@3.10.0
+  - vite@8.3.8

@@ -10,7 +10,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
  * 关联模块 sync/manage.ts 覆盖率未提升原因：
  * importSetting/exportSetting/resetSetting 强依赖 DOM 操作
  * （localStorage.clear()、location.reload()、downloadJsonByTagA），
- * 这些操作在 jsdom 中行为不可控（如 reload 会中断测试上下文）。
+ * 这些操作在 happy-dom 中行为不可控（如 reload 会中断测试上下文）。
  * clearStorage 内部使用 watch() 监听响应式变量并调用 location.reload()，
  * 无法在不 mock Vue 响应式系统的情况下安全测试。
  */

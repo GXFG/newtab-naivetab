@@ -6,15 +6,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * 覆盖率未显著提升原因：
  * 核心方法 renderRawBackgroundImage 深度耦合浏览器 API：
  * new Image() → img.decode() → URL.createObjectURL/revokeObjectURL →
- * requestAnimationFrame 时序控制。这些 API 在 jsdom 中不可用或行为不完整，
- * mock 成本极高且不稳定。
+ * requestAnimationFrame 时序控制。这些 API 在 happy-dom 里只是空壳
+ * （Image 不真正加载图片、decode 不做真实解码），mock 成本极高且不稳定。
  *
  * initBackgroundImage / storeLocalBackgroundImage 等函数同样依赖 IndexedDB
  * 和 DOM 元素选择器，无法在纯测试环境中覆盖。
  *
  * 策略：mock 所有依赖，仅测试 getImageUrlFromName（URL 构造）和
  * downloadCurrentWallpaper 的分支路径、模块导出结构。
- * 如需进一步提升 coverage，需引入 jsdom 的 Image/decode mock 方案。
+ * 如需进一步提升 coverage，需引入对 Image/decode 的完整 mock 方案。
  */
 
 vi.mock('@/logic/utils/util', () => ({

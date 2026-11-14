@@ -543,11 +543,11 @@ describe('清空类操作的上传竞态防护', () => {
     uploadMock.waitForUploadsIdle.mockImplementation(async () => {
       order.push('wait-idle')
     })
-    const clearSpy = vi
-      .spyOn(Storage.prototype, 'clear')
-      .mockImplementation(() => {
-        order.push('localStorage.clear')
-      })
+    // 监视实例而非 Storage.prototype：happy-dom 的 localStorage 是 Proxy，
+    // 其方法由 getter 返回绑定函数，与 Storage.prototype.clear 不是同一引用
+    const clearSpy = vi.spyOn(localStorage, 'clear').mockImplementation(() => {
+      order.push('localStorage.clear')
+    })
 
     await refreshSetting()
 

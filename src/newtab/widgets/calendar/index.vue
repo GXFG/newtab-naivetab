@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import NTScrollArea from '@/components/ui/NTScrollArea.vue'
-import NTSelect from '@/components/ui/NTSelect.vue'
 import { Icon } from '@iconify/vue/offline'
 import { ICONS } from '@/logic/constants/icons'
 import {
@@ -30,6 +29,7 @@ import { localConfig } from '@/logic/config/state'
 import { CalendarDayType } from '@/common/widget-constants'
 import { getIsWidgetRender, getStyleField } from '@/logic/store/style'
 import WidgetWrap from '../WidgetWrap.vue'
+import MonthPicker from './MonthPicker.vue'
 import {
   CALENDAR_MAX_YEAR,
   CALENDAR_MIN_YEAR,
@@ -177,6 +177,23 @@ const detailPopoverStyle = computed(() => ({
 }))
 
 /**
+ * 年月选择器的弹层同样在 Portal 里，除了字体三件套还要传「今天」的背景色：
+ * 弹层里的当前月用与格子上「今天」同一支颜色，两张界面才是一套配色，
+ * 否则用户在弹层里看到的强调色和日历上的完全无关。
+ *
+ * 与 detailPopoverStyle 刻意各自独立，不抽公共对象：那个对象带 `maxWidth: 350px`
+ * （详情弹窗要限宽），而选择器的宽度由 `.picker` 的 184px 决定，混在一起会把两处
+ * 互不相干的宽度策略绑死。重复的只是三行字体变量，比多一层抽象好读。
+ */
+const pickerPopoverStyle = computed(() => ({
+  '--nt-cal-customFontFamily': customFontFamily.value,
+  '--nt-cal-customFontColor': customFontColor.value,
+  '--nt-cal-customFontSize': customFontSize.value,
+  '--nt-cal-customTodayItemBackgroundColor':
+    customTodayItemBackgroundColor.value,
+}))
+
+/**
  * 「今天」用 ref 而不是常量：跨天时要能就地更新。
  * 见下方 syncToday 与 addDailyTask 的说明。
  */
@@ -188,13 +205,6 @@ const state = reactive({
   today: todayDayjs.value.format('YYYY-MM-DD'),
   currYear: todayDayjs.value.get('year'),
   currMonth: todayDayjs.value.get('month') + 1,
-  yearList: Array.from(
-    { length: CALENDAR_MAX_YEAR - CALENDAR_MIN_YEAR + 1 },
-    (_, index) => ({
-      label: `${CALENDAR_MIN_YEAR + index}`,
-      value: CALENDAR_MIN_YEAR + index,
-    }),
-  ),
   dateList: [] as {
     date: string // YYYY-MM-DD
     day: number // D
@@ -347,19 +357,26 @@ const festivalList = computed(() =>
   })),
 )
 
-const monthsList = computed(() => [
-  { label: window.$t('calendar.month.january'), value: 1 },
-  { label: window.$t('calendar.month.february'), value: 2 },
-  { label: window.$t('calendar.month.march'), value: 3 },
-  { label: window.$t('calendar.month.april'), value: 4 },
-  { label: window.$t('calendar.month.may'), value: 5 },
-  { label: window.$t('calendar.month.june'), value: 6 },
-  { label: window.$t('calendar.month.july'), value: 7 },
-  { label: window.$t('calendar.month.august'), value: 8 },
-  { label: window.$t('calendar.month.september'), value: 9 },
-  { label: window.$t('calendar.month.october'), value: 10 },
-  { label: window.$t('calendar.month.november'), value: 11 },
-  { label: window.$t('calendar.month.december'), value: 12 },
+/**
+ * 月份标签用短形态（中文「1月」/ 英文「Jan」），不用语言包里的全名。
+ *
+ * 中文的「一月」本来就是 month one，写成「1月」零语义损失、字更少；英文全名
+ * （September 约 66px）在 4 列网格里放不下、在标题里也过长，缩写直接砍掉一半。
+ * 顺带与 widget 其它地方的写法一致：详情弹窗是 YYYY-MM-DD、倒计日区是 MM.DD。
+ */
+const monthLabels = computed(() => [
+  window.$t('calendar.month.january'),
+  window.$t('calendar.month.february'),
+  window.$t('calendar.month.march'),
+  window.$t('calendar.month.april'),
+  window.$t('calendar.month.may'),
+  window.$t('calendar.month.june'),
+  window.$t('calendar.month.july'),
+  window.$t('calendar.month.august'),
+  window.$t('calendar.month.september'),
+  window.$t('calendar.month.october'),
+  window.$t('calendar.month.november'),
+  window.$t('calendar.month.december'),
 ])
 
 const sundayOption = { label: window.$t('calendar.weekday.sunday'), value: 7 }
@@ -572,27 +589,21 @@ const onNextMonth = () => {
 }
 
 /**
- * 年月下拉的切换。
+ * 年月选择器的提交入口（MonthPicker 的 @select）。
  *
- * 这里刻意**不用** `v-model:value`，只写 `:value` + 单个 `@update:value`。
- * 两者同时写时，编译产物是 `onUpdate:value: [vModel 赋值, 本函数]` 的数组，
- * 赋值排在本函数之前 —— 进入本函数时 state 已经是新值，oldYearMonth 会等于
- * newYearMonth，方向判断恒为 'left'（已用 test-utils 实测确认）。
- * 由本函数自己写回，才能拿到真正的旧值。
+ * 年月一次性写入、只渲染一次：翻年和点月都走这里，不必先写年再写月。
+ * 方向按「年 × 12 + 月」的单调序号比较 —— 跨年时只看月份会判反
+ * （2026-12 → 2027-01 月份在减小，但时间在往前走）。
  */
-const onDateChange = (type: 'year' | 'month', newVal: number) => {
+const onPickerSelect = (year: number, month: number) => {
   const oldYearMonth = toYearMonth(state.currYear, state.currMonth)
-  const target =
-    type === 'year'
-      ? { year: newVal, month: state.currMonth }
-      : { year: state.currYear, month: newVal }
-  const next = clampYearMonth(target.year, target.month)
+  const next = clampYearMonth(year, month)
   state.currYear = next.year
   state.currMonth = next.month
 
   slideDirection.value =
     toYearMonth(next.year, next.month) >= oldYearMonth ? 'left' : 'right'
-  gaProxy('click', ['calendar', 'dateChange', type])
+  gaProxy('click', ['calendar', 'dateChange', 'picker'])
   onRender()
 }
 
@@ -689,16 +700,6 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
     >
       <div class="calendar__options">
         <div class="options__item">
-          <NTSelect
-            :value="state.currYear"
-            class="item__select_year"
-            size="small"
-            :options="state.yearList"
-            :disabled="isDragMode"
-            @update:value="(v: number) => onDateChange('year', v)"
-          />
-        </div>
-        <div class="options__item">
           <button
             type="button"
             class="item__btn"
@@ -714,13 +715,15 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
               class="btn__icon"
             />
           </button>
-          <NTSelect
-            :value="state.currMonth"
-            class="item__select_month"
-            size="small"
-            :options="monthsList"
+          <MonthPicker
+            :year="state.currYear"
+            :month="state.currMonth"
+            :labels="monthLabels"
+            :min-year="CALENDAR_MIN_YEAR"
+            :max-year="CALENDAR_MAX_YEAR"
             :disabled="isDragMode"
-            @update:value="(v: number) => onDateChange('month', v)"
+            :popover-style="pickerPopoverStyle"
+            @select="onPickerSelect"
           />
           <button
             type="button"
@@ -1002,10 +1005,14 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
     transform: translateZ(0);
     .calendar__options {
       padding: 1.8% 2%;
-      display: flex;
-      justify-content: space-between;
+      /* 三栏 grid 而不是 flex + space-between：左右各 1fr、中间 auto，
+         中间的「‹ 年月 ▾ ›」永远落在卡片正中，且与两侧内容宽度无关。
+         原来只有两个 flex 子项时标题被推到最左，右半边空着。*/
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
       .options__item {
+        grid-column: 2;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1053,20 +1060,18 @@ const onToggleDetailPopover = (date?: string, source?: 'clickoutside') => {
         .item__retry--danger .retry__icon {
           color: var(--color-error);
         }
-        .reka-select__trigger {
-          color: var(--nt-cal-customFontColor);
-          font-size: var(--nt-cal-customFontSize);
-        }
-        .item__select_year {
-          width: 84px;
-        }
-        .item__select_month {
-          flex: 0 0 auto;
-          width: 105px;
-        }
       }
+      /* 年月已改成标题 + 弹层网格（见 MonthPicker.vue），这里不再有 Select。
+         早先写在这里的 .item__select_year { width: 84px } / .item__select_month { width: 105px }
+         从来没有生效过：当时 NTSelect 的根节点是 Reka 的 SelectRoot（Fragment +
+         inheritAttrs: false），调用方传的 class 落不到任何元素，真正决定宽度的是
+         .reka-select__trigger 自己的 min-width。
+         该问题已在 NTSelect.vue 修好（显式 inheritAttrs: false + 把 $attrs 绑到
+         SelectTrigger），现在 <NTSelect class="…"> 的 class 会正常落到触发按钮上，
+         所以这些宽度也不用再补回来 —— 年月已经不是 Select 了。*/
       .options__reset {
-        flex: 0 0 auto;
+        grid-column: 3;
+        justify-self: end;
         /* 用 min-width 而非固定宽度：重试图标出现时向右槽位左侧扩展，
            「回到今日」贴着容器右边缘不动，不会跳动 */
         min-width: 2.2vmin;

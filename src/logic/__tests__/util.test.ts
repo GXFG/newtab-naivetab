@@ -475,7 +475,7 @@ describe('blobToBase64', () => {
   it('reads blob as data URL using FileReader', async () => {
     const blob = new Blob(['hello'], { type: 'text/plain' })
 
-    // FileReader in jsdom doesn't work, so mock it
+    // 统一 mock FileReader，避免不同 DOM 模拟实现的 readAsDataURL 差异
     const OrigFileReader = globalThis.FileReader
     class FakeFileReader extends EventTarget {
       result = 'data:text/plain;base64,aGVsbG8='

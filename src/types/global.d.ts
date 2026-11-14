@@ -13,7 +13,14 @@ interface Window {
    * Content Script 初始化标志（涵盖书签快捷键 + 命令快捷键两类功能的完整初始化）
    */
   __naivetabGlobalShortcutInit: boolean
-  $t: (key: string) => string
+  /**
+   * vue-i18n 的 t。第二个参数用于插值：具名（`{ year }`）或位置数组，
+   * 与 `calendar.yearMonthTitle` 这类含占位符的文案配合使用。
+   */
+  $t: (
+    key: string,
+    params?: Record<string, string | number> | (string | number)[] | number,
+  ) => string
 }
 
 type WidgetCodes = import('@/common/widget-constants').WidgetCodes

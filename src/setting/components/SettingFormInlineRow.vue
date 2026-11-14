@@ -72,13 +72,21 @@ defineProps<{
     display: flex;
     flex-wrap: wrap;
 
-    > * {
-      flex: 1;
+    /*
+     * 同行等分必须用 :slotted 写：
+     * .inline-row 的子元素是父组件传入的 slot 内容，只带「父组件的」data-v 标记，
+     * 不带本组件的 data-v。普通 scoped 选择器（> *）会编译成 > *[data-v-xxx]，
+     * 永远匹配不到 slot 内容，表现为各字段按内容宽度排列、无法各占 50% 铺满。
+     * :slotted() 编译成 [data-v-xxx-s]，只命中 slot 内容，
+     * 不会像通配符那样误伤本组件模板内的 Tips 图标。
+     */
+    > :slotted(*) {
+      flex: 1 1 0;
       min-width: 0;
     }
 
     /* 相邻子元素之间用垂直分割线 */
-    > *:not(:last-child) {
+    > :slotted(*:not(:last-child)) {
       border-right: 1px solid var(--nt-gray-light);
     }
 

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`配置兼容性快照: 'v1.19.0 老用户：书签 keymap + 旧版顶层 key（book…' > 迁移结果与基线快照一致 1`] = `
+exports[`配置兼容性快照: v1.19.0 老用户：书签 keymap + 旧版顶层 key（bookma… > 迁移结果与基线快照一致 1`] = `
 {
   "bookmarkFolder": {
     "enabled": false,
@@ -89,7 +89,7 @@ exports[`配置兼容性快照: 'v1.19.0 老用户：书签 keymap + 旧版顶�
     "shimmerBackgroundEffect": "aurora",
     "showBreakingChangeNotice": true,
     "timeLang": "zh-CN",
-    "version": "2.7.0",
+    "version": "2.7.1",
   },
   "keyboardBookmark": {
     "isEnabled": true,
@@ -292,7 +292,7 @@ exports[`配置兼容性快照: 'v1.19.0 老用户：书签 keymap + 旧版顶�
 }
 `;
 
-exports[`配置兼容性快照: 'v2.1.0 用户：键盘已拆分但未迁移到新版快捷键架构' > 迁移结果与基线快照一致 1`] = `
+exports[`配置兼容性快照: v2.1.0 用户：键盘已拆分但未迁移到新版快捷键架构 > 迁移结果与基线快照一致 1`] = `
 {
   "bookmarkFolder": {
     "enabled": false,
@@ -394,7 +394,7 @@ exports[`配置兼容性快照: 'v2.1.0 用户：键盘已拆分但未迁移到�
     "shimmerBackgroundEffect": "aurora",
     "showBreakingChangeNotice": true,
     "timeLang": "en-US",
-    "version": "2.7.0",
+    "version": "2.7.1",
   },
   "keyboardBookmark": {
     "isEnabled": true,
@@ -525,7 +525,7 @@ exports[`配置兼容性快照: 'v2.1.0 用户：键盘已拆分但未迁移到�
 }
 `;
 
-exports[`配置兼容性快照: 'v2.3.0 用户：当前最新结构，检测未来迁移不破坏' > 迁移结果与基线快照一致 1`] = `
+exports[`配置兼容性快照: v2.3.0 用户：当前最新结构，检测未来迁移不破坏 > 迁移结果与基线快照一致 1`] = `
 {
   "bookmarkFolder": {
     "enabled": false,
@@ -652,7 +652,7 @@ exports[`配置兼容性快照: 'v2.3.0 用户：当前最新结构，检测未�
       "rgba(58, 115, 195, 1)",
     ],
     "timeLang": "zh-CN",
-    "version": "2.7.0",
+    "version": "2.7.1",
   },
   "keyboardBookmark": {
     "isEnabled": true,

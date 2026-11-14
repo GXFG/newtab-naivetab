@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from 'vitest'
 
-// extractPrimaryColor 依赖浏览器 Canvas API，仅在 jsdom + canvas 支持时测试
+// extractPrimaryColor 依赖浏览器 Canvas API，仅在 DOM 模拟环境提供 canvas 时测试
 const hasCanvasSupport = (() => {
   try {
     const c = document.createElement('canvas')

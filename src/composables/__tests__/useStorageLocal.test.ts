@@ -62,7 +62,9 @@ describe('useStorageLocal', () => {
   it('连续变更只在最后一次之后写一次', async () => {
     const store = useStorageLocal('c-test', { a: 1 })
     // 初始化写入发生在建 spy 之前，这里只统计后续变更
-    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem')
+    // 监视实例而非 Storage.prototype：happy-dom 的 localStorage 是 Proxy，
+    // 其方法由 getter 返回绑定函数，与 Storage.prototype.setItem 不是同一引用
+    const setItemSpy = vi.spyOn(localStorage, 'setItem')
 
     store.value.a = 2
     vi.advanceTimersByTime(200)

@@ -20,7 +20,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          # 与本地 .node-version 保持一致；写死大版本会在本地升小版本后漂移
+          node-version-file: .node-version
           cache: pnpm
       - name: Setup Pages
         uses: actions/configure-pages@v6

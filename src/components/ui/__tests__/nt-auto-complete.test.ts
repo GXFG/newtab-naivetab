@@ -23,7 +23,8 @@ const options = [
 ]
 
 beforeAll(() => {
-  // jsdom 没有 ResizeObserver，Reka 的下拉定位会直接抛
+  // 兜底：happy-dom 已内置 ResizeObserver，此分支通常不触发；
+  // 保留以防环境缺少该 API 时 Reka 的下拉定位直接抛错
   if (typeof globalThis.ResizeObserver === 'undefined') {
     globalThis.ResizeObserver = class {
       observe() {}

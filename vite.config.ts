@@ -106,7 +106,11 @@ export default defineConfig(({ command }) => ({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: 'happy-dom',
+    // Vitest 5 起该默认值改为 true（每个测试前清空 mock 调用历史）。
+    // setup.ts 的 vi.restoreAllMocks() 已做更强清理，这里显式写出以钉住语义：
+    // 后续版本若再改默认值，测试行为不会静默漂移。
+    clearMocks: true,
     setupFiles: ['../test/setup.ts'],
     coverage: {
       reportsDirectory: '../coverage',

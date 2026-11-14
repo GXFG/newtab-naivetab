@@ -372,17 +372,18 @@ Reka UI 的 Indicator 组件（如 `CheckboxIndicator`、`SwitchThumb`）内部�
 2. **在 `src/styles/reka/` 创建 `{name}.css`** — 从 `reka-template.css` 复制 + 填空，按状态模板覆盖所有必需状态
 3. **绑定 `reka-focus-visible` class** — Root 元素添加共享焦点环 class
 4. **`all: unset` 根元素和可交互子元素**
-5. **禁止在组件 `<style>` 中写样式** — 全部放入 `src/styles/reka/{name}.css`
-6. **不需要手动注册** — `src/components.d.ts` 由 Vite 自动生成
-7. **验证浅色/深色模式（逐属性排查）** — 逐条过 [深色模式防遗漏清单](#深色模式防遗漏)：
+5. **Root 不渲染元素时，手动接 attrs** — Reka 的 `SelectRoot` / `PopoverRoot` / `RadioGroupRoot` 等根组件是 Fragment 且内部 `inheritAttrs: false`，默认透传会把调用方传的 `class` / `style` 静默丢弃。封装时写 `defineOptions({ inheritAttrs: false })`，再把 `$attrs` 绑到真正承载元素的那层（`SelectTrigger` / `PopoverTrigger`）——参考 `NTSelect.vue`，以及踩坑记录 [pitfalls-vue.md](../../.claude/rules/pitfalls-vue.md#reka-root-不渲染元素时组件的-class-会被静默丢弃)
+6. **禁止在组件 `<style>` 中写样式** — 全部放入 `src/styles/reka/{name}.css`
+7. **不需要手动注册** — `src/components.d.ts` 由 Vite 自动生成
+8. **验证浅色/深色模式（逐属性排查）** — 逐条过 [深色模式防遗漏清单](#深色模式防遗漏)：
    - 容器内阴影 → 是否有 `rgba(255,255,255,...)` 深色覆盖？
    - 指示器投影 → 是否有 `rgba(255,255,255,...)` 深色覆盖？
    - 指示器背景色 → 深色下是否降纯（`#fff` → `#f0f0f0`）？
    - `color-mix` 中的 `rgba(0,0,0,...)` 基底 → 深色下是否切换为 `rgba(255,255,255,...)`？
    - 硬编码 `white` / `black` → 深色下是否需要微调？（原则5）
-8. **对照设计原则自查** — 逐条过 [设计原则](#设计原则) 6 条，确认无遗漏（立体层次、局部反馈、环境光着色、通透质感、双模式自适应、弹簧律动）
-9. **添加 forced-colors 支持** — 组件区块末尾添加 `@media (forced-colors: active)` 规则，使用系统色彩关键字（`Highlight`/`ButtonFace`/`ButtonText`）保证高对比度模式下可用
-10. **设置 z-index** — 如果组件包含 Portal Content（下拉面板、弹窗、对话框等），必须在 `__content` / `__overlay` 规则块中设置 `z-index`，值参考 [z-index 层级体系](#z-index-层级体系)
+9. **对照设计原则自查** — 逐条过 [设计原则](#设计原则) 6 条，确认无遗漏（立体层次、局部反馈、环境光着色、通透质感、双模式自适应、弹簧律动）
+10. **添加 forced-colors 支持** — 组件区块末尾添加 `@media (forced-colors: active)` 规则，使用系统色彩关键字（`Highlight`/`ButtonFace`/`ButtonText`）保证高对比度模式下可用
+11. **设置 z-index** — 如果组件包含 Portal Content（下拉面板、弹窗、对话框等），必须在 `__content` / `__overlay` 规则块中设置 `z-index`，值参考 [z-index 层级体系](#z-index-层级体系)
 
 ## 现有组件参考
 
