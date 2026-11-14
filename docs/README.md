@@ -38,6 +38,7 @@
 | [moveable.md](architecture/moveable.md) | Widget 拖拽与吸附算法 |
 | [icons.md](architecture/icons.md) | 图标为何构建期离线渲染，新增图标流程 |
 | [reka-ui.md](architecture/reka-ui.md) | Reka 组件封装规范与设计语言（新增组件前必读） |
+| [styles.md](architecture/styles.md) | 样式分层与作用域：三条轨道、widget 为何用 #id、px 与 vmin 双轨 |
 
 ### 功能（解释：单一领域的设计）
 

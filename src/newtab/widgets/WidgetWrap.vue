@@ -855,6 +855,28 @@ watch(
   display: block;
 }
 
+/* ============================================================
+ * 拖拽编辑态视觉：为什么这里全是 !important
+ *
+ * 这些状态类（.widget-bg-hover / .widget-active / .widget-dragging / .widget-delete）
+ * 由 modifyMoveableWrapClass 挂到 widget 自己的容器上（如 .calendar__container），
+ * 而 widget 样式是「全局 style 块 + #id 作用域根」：
+ *
+ *   #calendar .calendar__container { background-color: var(--nt-cal-customBackgroundColor) }  → (1,1,0)
+ *   .widget-active                 { background-color: … }                                    → (0,1,0)
+ *
+ * 两者命中同一个元素，ID 选择器永远赢。把 #id 换成 [data-widget=x] 也解决不了
+ * （(0,2,0) 仍然大于 (0,1,0)），只有 !important 能保证「编辑态视觉压过用户自定义配色」。
+ *
+ * 所以：下面 .widget-auxiliary-line / -bg-hover / -active / -dragging / -delete
+ * 这五组里的 !important 是承重的，不是历史遗留，别在"清理冗余"时顺手删。
+ * 要清掉它们必须先把 widget 作用域根降到 (0,1,0) 以内（如 :where(#calendar)），
+ * 属于一次性重构。
+ *
+ * 例外：上面 resize handle 与 cursor 那两条 !important 与本次冲突无关
+ * （选择器本身就够赢或没有竞争者），属于可收未收，改动需肉眼验收拖拽手感。
+ * ============================================================ */
+
 /* 拖动编辑模式 — 辅助线轮廓 */
 .widget-auxiliary-line {
   outline: 2px dashed var(--nt-auxiliary-line-widget) !important;

@@ -66,7 +66,23 @@
   font-display: fallback;
 }
 
+/* body 的字体栈 —— **只对 newtab 生效**（`styles/index.css` 的使用方）。
+ *
+ * 别把这里当成"改 body 字体的一处开关"，options / popup 各有一份**刻意的**覆盖：
+ *   options/App.vue  body { Helvetica Neue, … PingFang SC … }   ← 设置面板需中文优先
+ *   popup/App.vue    body { Helvetica Neue, … PingFang SC … }   ← 弹窗更小，同理
+ * 两者都通过组件 <style> 注入，在产物里排在索引 CSS 之后，所以是它们赢。
+ * 要改 options 的 body 字体，改 options/App.vue；改这里只影响 newtab。
+ *
+ * 为什么不写在 global.css：body 字体必须晚于 global.css 生效，之前两处都写、
+ * 靠加载顺序决定胜负，global.css 那条成了死规则，已删除。
+ *
+ * 为什么不含上面那些装饰字体：@font-face 只负责"让字体可用"，不负责"默认用它"。
+ * 装饰字体（KBD / LED7 / OpenCherry …）一律由用户配置显式选用，经
+ * `--nt-*-font-family` 变量落到具体 widget 上；把它们写进 body 兜底链没有意义，
+ * 而且会抢在系统 CJK 兜底之前介入缺字渲染。原写法还带一个把 'sans-serif'
+ * 加了引号的 bug —— 加引号即被视为名为“sans-serif”的字体族，通用兜底完全失效。
+ */
 body {
-  font-family: 'Arial', 'Helvetica', 'sans-serif', 'Arial Rounded MT Bold', 'OpenCherry', 'KBD', 'LED7', 'Advanced Led Board-7', 'KBSkittled', 'LESLIEB', 'The Led Display St', 'LCDMono2', 'LCD',
-    'Pixel Lcd Machine';
+  font-family: Arial, Helvetica, sans-serif;
 }

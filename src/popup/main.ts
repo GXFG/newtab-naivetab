@@ -1,3 +1,7 @@
+// 刻意只引这三层，不引 styles/index.css：
+// global.css 里的 body 是 100vw/100vh/overflow:hidden 的全屏规则，会把弹窗撑满；
+// animations / font / driver / qweather-icons 弹窗都用不到，引进来只是增加体积。
+// 代价是 body 的文字色要在 popup/App.vue 里自己补（见该文件注释）。
 import '../styles/reset.css'
 import '../styles/tokens.css'
 import '../styles/reka/index.css'

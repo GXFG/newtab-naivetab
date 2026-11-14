@@ -2,7 +2,7 @@
   "name": "newtab-naivetab",
   "displayName": "NaiveTab - Visual Keyboard New Tab",
   "type": "module",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "private": true,
   "packageManager": "pnpm@12.16.1",
   "engines": {

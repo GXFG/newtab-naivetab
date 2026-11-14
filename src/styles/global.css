@@ -2,15 +2,31 @@
    Global Base & Utility Styles
    ============================================================ */
 
-/* Base body styles */
+/* Base body styles
+ *
+ * --nt-text-color-main / --nt-bg-main 不在 tokens.css 里定义：
+ * 由 logic/store/dom.ts 按 localConfig.general 的配置写到 document.body 的行内变量。
+ * 因此这里不需要 !important —— body 上没有任何其他声明与之竞争，
+ * 而 Reka Portal 内容（下拉/弹窗）挂在 body 下，正好继承这两个值。
+ *
+ * font-family 不在此设：body 的字体栈属 font.css（@font-face 所在文件，加载顺序更靠后）。
+ * 注意 font.css 那条只对 newtab 生效 —— options 虽然也引本文件，但 options/App.vue
+ * 另有一份中文优先的 body 字体覆盖，产物里排在索引 CSS 之后，最终是它赢。
+ * popup 刻意不引本文件（100vw/100vh 会把弹窗撑满），它在 popup/App.vue 里自带字体栈。
+ *
+ * 关于首屏背景：newtab/index.html 里那条 body{background-color:#e8ecf1} 会**输给**本规则
+ * （同特异性、link 后加载），而变量未定义时整条声明无效、计算结果退回 transparent，
+ * 所以它并不保证"JS 执行前有底色"。实测（Chrome 130）看不到白闪，是因为首帧落在模块
+ * 脚本执行之后、变量早已写好。别为此给这里加 !important —— 它被吃掉的原因不是权重，
+ * 是 var 未求值，加权重同样无效；真要兜底就得写 var(--nt-bg-main, <兜底色>)。
+ */
 body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  font-family: arial, sans-serif;
   font-size: var(--nt-font-base, 14px);
-  color: var(--nt-text-color-main) !important;
-  background-color: var(--nt-bg-main) !important;
+  color: var(--nt-text-color-main);
+  background-color: var(--nt-bg-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -30,8 +46,9 @@ svg[aria-hidden="true"] {
   outline: none;
 }
 
-/* Drag mode disabled input */
-.reka-input--disabled .reka-input__native {
-  cursor: move;
-}
+/* 注：这里原本有一条 `.reka-input--disabled .reka-input__native { cursor: move }`
+   （拖拽模式下输入框显示移动光标）。它与 reka/input.css 中的同名选择器完全一致，
+   而 reka/ 在 index.css 中后加载 → 实际生效的始终是 input.css 的 `not-allowed`，
+   那条规则从未起作用过，已删除。若确实需要拖拽态显示 move，应在 input.css 中以
+   更高特异性实现，而不是依赖加载顺序。 */
 

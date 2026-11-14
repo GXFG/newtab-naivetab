@@ -89,7 +89,7 @@ exports[`配置兼容性快照: v1.19.0 老用户：书签 keymap + 旧版顶层
     "shimmerBackgroundEffect": "aurora",
     "showBreakingChangeNotice": true,
     "timeLang": "zh-CN",
-    "version": "2.7.1",
+    "version": "2.7.2",
   },
   "keyboardBookmark": {
     "isEnabled": true,
@@ -394,7 +394,7 @@ exports[`配置兼容性快照: v2.1.0 用户：键盘已拆分但未迁移到�
     "shimmerBackgroundEffect": "aurora",
     "showBreakingChangeNotice": true,
     "timeLang": "en-US",
-    "version": "2.7.1",
+    "version": "2.7.2",
   },
   "keyboardBookmark": {
     "isEnabled": true,
@@ -652,7 +652,7 @@ exports[`配置兼容性快照: v2.3.0 用户：当前最新结构，检测未�
       "rgba(58, 115, 195, 1)",
     ],
     "timeLang": "zh-CN",
-    "version": "2.7.1",
+    "version": "2.7.2",
   },
   "keyboardBookmark": {
     "isEnabled": true,

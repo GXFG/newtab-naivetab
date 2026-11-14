@@ -7,14 +7,44 @@
      Zone 1 — Primitives     → 不随主题变化（间距/圆角/字体/透明度/过渡/阴影 + Reka 通用）
      Zone 2 — Colors Light   → 浅色模式颜色值
      Zone 3 — Colors Dark    → 深色模式覆盖
+   （Zone 1 之前还有一段 Zone 0：`color-scheme` 这类必须写在 :root 的原生属性，
+     它随主题变，不属于上面任何一区。）
 
    命名规范：
      --{category}-{variant}  通用 Token（--space-4, --radius-pill, --transition-bg）
      --nt-gray-{weight}        中性灰透明通道
      --color-{name}          语义色
      --reka-{name}           Reka UI 专用 Token
-     --nt-{module}-{name}    NaiveTab 业务模块色（JS 动态注入的 --nt-primary-color 不在此文件）
+     --nt-{module}-{name}    NaiveTab 业务模块色
+
+   本文件只放"静态"Token。以下变量**不在这里定义**，由 JS 在运行时注入，
+   在 CSS 里 grep 不到它们是正常的：
+     --nt-bg-main            页面背景色      ← store/dom.ts 写 document.body（general.backgroundColor）
+     --nt-text-color-main    页面文字色      ← store/dom.ts 写 document.body（general.fontColor）
+     --nt-primary-color      主题色          ← store/dom.ts 写 document.body（general.primaryColor / customPrimaryColor）
+     --nt-font-{2xs..2xl}    8 级字号阶梯   ← store/dom.ts 写 document.documentElement（FONT_SCALE_RATIOS）
+     --nt-app-font-family    页面字体栈      ← newtab/App.vue 写 #container（general.fontFamily）
+     --nt-app-font-size      页面基准字号    ← newtab/App.vue 写 #container
+     --nt-{widget}-{name}    各 widget 主题  ← 各自 index.vue 的 :style 注入；命名约定见 docs/architecture/styles.md#变量前缀
    ============================================================ */
+
+/* ============================================================
+   0. Root 属性（不是 Token）
+   color-scheme 是唯一必须写在 :root 上的原生属性，而且它**随主题变化**
+   （Zone 3 里覆盖成 dark），所以不能塞进 Zone 1「不随主题变化」，
+   否则下次按"这个值在深色模式下会变吗"分类时会找不到它。
+   ============================================================ */
+:root {
+  /* 声明后浏览器才知道该用哪套 UA 配色。它只影响**原生部分**：
+       - UA 画布底色（body 没有背景色时露出来的那层，popup 深色下圆角处发白就是它）
+       - 默认滚动条、文本选区高亮
+       - 原生控件的默认配色（input 的光标、number 输入框的上下箭头、自动填充底色）
+     它**不**负责我们自己 CSS 里的文字与背景色 —— 那些走 token。
+
+     显式跟随 data-theme，而不是写 `light dark` 交给浏览器按系统偏好猜：
+     用户可能手动指定了主题，与系统不一致。 */
+  color-scheme: light;
+}
 
 /* ============================================================
    1. Primitives — 不随主题变化
@@ -40,7 +70,12 @@
 
   /* --- Font Size ---
      实际值由 JS 根据 general.fontSize 动态注入 --nt-font-* 变量。
-     此处的 fallback 值仅在 JS 未加载时生效，与 fontSize=14 默认值一致。 */
+     此处的 fallback 值仅在 JS 未加载时生效，与 fontSize=14 默认值一致。
+
+     为什么只暴露 5 级（没有 2xs / xl / 2xl）：JS 侧生成的是完整 8 级阶梯
+     （FONT_SCALE_RATIOS），但界面实际只用到这 5 级。缺的 3 级不是遗漏 ——
+     要用时直接写 var(--nt-font-xl) 即可，变量是存在的；等真有第二处用途再补
+     --text-xl，避免出现一排零引用的 token。 */
   --text-xs: var(--nt-font-xs, 11px);
   --text-sm: var(--nt-font-sm, 12px);
   --text-base: var(--nt-font-base, 14px);
@@ -184,6 +219,8 @@
    ============================================================ */
 :root[data-theme='dark'],
 .dark {
+  color-scheme: dark;
+
   /* --- Neutral Gray → White Alpha --- */
   --nt-gray-ghost: rgba(255, 255, 255, 0.05);
   --nt-gray-minimal: rgba(255, 255, 255, 0.08);

@@ -12,7 +12,7 @@ pnpm typecheck           # vue-tsc --noEmit
 pnpm test                # vitest（用例放在被测模块旁的 __tests__/）
 pnpm lint                # ESLint 校验（不改文件）
 pnpm lint:fix            # ESLint --fix
-pnpm check-patterns      # CSS 模式检查（v-bind()、&--modifier、:deep() 误用、Reka z-index）
+pnpm check-patterns      # CSS 模式检查（v-bind()、&--modifier、:deep() 误用、Reka z-index、widget 变量前缀）
 pnpm check-boundaries    # 架构边界检查（4 个执行上下文的 import 方向 + 循环依赖）
 pnpm impact <文件|目录>   # 改动影响面：依赖者、涉及上下文、相关测试、已知风险
 pnpm gen:icons           # 重新生成离线图标集（新增/更换图标后必须执行，见 docs/architecture/icons.md）
