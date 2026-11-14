@@ -1,12 +1,19 @@
 # CSS & 样式踩坑
 
-> pre-commit 已集成 `pnpm check-patterns` 自动检查 `v-bind()`、`&--modifier`、**:deep() 误用**和 **Reka 组件 z-index 遗漏**。
+> pre-commit 已集成 `pnpm check-patterns` 自动检查 `v-bind()`、`&--modifier`、**:deep() 误用**、**Reka 组件 z-index 遗漏**和 **widget 变量前缀撞车**。
 
 ## `&--modifier` 禁止
 
-`postcss-preset-env` 不支持 `&--xxx` BEM 拼接，modifier 必须写完整类名。`&` 只允许用于伪类/伪元素或嵌套完整类名。
+原生 CSS 嵌套不支持 `&--xxx` 这种拼接，modifier 必须写完整类名。`&` 只允许用于伪类/伪元素或嵌套完整类名。
 
-**Why：** 编译产物中 modifier 类名不会被正确展开，导致样式完全不生效。
+**基线别写错：** CSS 不再经过 `postcss-preset-env`（见 `vite.config.ts` 的 `sharedConfig` 注释），嵌套原样交给浏览器。两条线要分清：
+
+- 以 `&` / `.class` / `#id` 开头的嵌套：Chrome 112 起就有。
+- **裸 type 选择器**嵌套（`.foo { span { … } }`，本仓库 `clockFlip` / `clockAnalog` / `bookmarkFolder` 在用）：依赖放宽后的语法，Chrome **120+**、Safari 17.2+、Firefox 117+。写 112 会让人以为 `span {}` 在 112 也安全，实际整条规则被丢弃。
+
+本项目 manifest 最低 Chrome 130 / Firefox 130，远高于上面两条，所以都能用；但基线数字要按"放宽语法"这条写，否则将来放开最低版本时会踩空。
+
+**Why：** `&` 在规范里只代表父选择器本身，不能当字符串前缀拼接。写 `&--active` 会被解析成一个非法选择器，整条规则被丢弃，样式完全不生效——而且不报错。
 
 **How to apply：** 始终写完整类名，如 `.widget__container--active` 而非 `&--active`。详见 [development.md](../../docs/conventions/development.md#编码风格)。
 
@@ -28,7 +35,7 @@
 
 **How to apply：**
 - 全局 `<style>` / 纯 `.css` 文件：直接写后代选择器，`.parent :deep(.child)` → `.parent .child`
-- 嵌套写法（postcss-preset-env nesting）直接写子选择器即可：`.parent { .child { … } }`
+- 嵌套写法（原生 CSS 嵌套）直接写子选择器即可：`.parent { .child { … } }`
 - 确实需要限定作用域时，才把 `<style>` 改成 `<style scoped>` 再使用 `:deep()`
 - pre-commit 已集成自动检查：`check-patterns.ts` 会报错阻断提交
 

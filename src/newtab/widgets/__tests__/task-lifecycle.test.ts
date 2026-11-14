@@ -20,7 +20,8 @@ import { nextTick } from 'vue'
  * - `@/logic/task` 的 4 个注册函数替换成写本地 registry 的 spy。断言「任务在不在」
  *   而不是调用次数：`syncRealtimeTask` 会先 remove 再 add，只看次数容易写脆。
  * - 其余导出用 importOriginal 保留，避免打断 WidgetWrap → moveable → task 的传递依赖。
- * - jsdom 没有 matchMedia，store/theme.ts 在模块初始化时就会调用，必须先 polyfill。
+ * - happy-dom 已内置 matchMedia，下方 polyfill 是兜底、通常不触发；保留是因为
+ *   store/theme.ts 在模块初始化时就会调用它，换环境或裁剪版 DOM 实现缺该 API 会直接崩。
  */
 
 type TTaskRegistry = {

@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  *
  * 覆盖率未提升原因：
  * IndexedDB CRUD 是浏览器原生异步 API（window.indexedDB.open / deleteDatabase），
- * 在 jsdom 测试环境中没有 fake-indexeddb 依赖时无法可靠模拟完整请求生命周期。
+ * 在 happy-dom 测试环境中没有 fake-indexeddb 依赖时无法可靠模拟完整请求生命周期。
  * 手动 mock 的 fake IDB 请求对象存在 queueMicrotask 时序、objectStoreNames.contains
  * 等差异，导致测试超时而非通过。
  *

@@ -8,6 +8,7 @@
  *  2. &--modifier BEM 拼接（禁止，原生 CSS 嵌套同样不支持 & 后缀拼接）
  *  3. Reka Content/Overlay 组件缺少 z-index（portal 内容面板可能被遮挡）
  *  4. :deep() 出现在非 scoped 的 <style> 或纯 CSS 中（禁止，lightningcss 无法解析）
+ *  5. widget 的 --nt-{prefix}-* 变量前缀跨 widget 撞车（同一前缀应只属于一个 widget）
  *
  * 用法：
  *   pnpm exec tsx scripts/check/check-patterns.ts                    # 检查 src/ 下所有文件
@@ -97,7 +98,7 @@ function checkFile(filePath: string): Violation[] {
           file: filePath,
           line: lineNum,
           message:
-            '禁止使用 &--modifier BEM 拼接（postcss-preset-env 不支持），请写完整类名',
+            '禁止使用 &--modifier BEM 拼接（原生 CSS 嵌套不支持 & 后缀拼接），请写完整类名',
         })
       }
     }
@@ -238,6 +239,96 @@ function checkRekaZIndex(): Violation[] {
   return violations
 }
 
+/**
+ * 检查 5：widget 的 CSS 变量前缀是否跨 widget 撞车
+ *
+ * 每个 widget 通过 :style 注入形如 `'--nt-{prefix}-{name}': value` 的变量，
+ * widget 的 style 块里再用 var(--nt-{prefix}-{name}) 读取。前缀是 widget 的
+ * 命名空间，两个 widget 共用一个前缀时，一旦有人给 A 加了 B 已经用过的变量名，
+ * 两边就会读到彼此的值，而且很难从报错里看出来。
+ *
+ * 现存的 cd（clockDigital / countdown）是历史遗留，列入白名单；
+ * 新增 widget 必须使用唯一前缀，命名约定见 docs/architecture/styles.md#变量前缀。
+ *
+ * 覆盖边界（都刻意放宽过，别退回去）：
+ *   - 引号：单引号 / 双引号 / 模板串都认（只认单引号时，写成 "--nt-x-y" 会静默漏检）
+ *   - 目录：递归扫 widget 子目录（子组件里注入的变量同样算这个 widget 的）
+ *   - 跳过：__tests__ 等 SKIP_DIRS，否则测试文件里的变量串会被当成一个 widget
+ *   - 命中即可疑：会连注释/字符串里提到的变量名一起算，宁可误报不漏报
+ */
+const WIDGET_VAR_PREFIX_ALLOWLIST = new Map<string, string[]>([
+  // 前缀 → 允许共用它的 widget 目录。加白名单需要在 docs 里写原因，不要静默扩充。
+  ['cd', ['clockDigital', 'countdown']],
+])
+
+/** :style 键里的变量名（三种引号） */
+const WIDGET_VAR_PATTERN = /['"`]--nt-([a-z][a-z0-9]*)-[A-Za-z0-9-]+['"`]/g
+
+function checkWidgetVarPrefixes(): Violation[] {
+  const violations: Violation[] = []
+  const widgetsDir = resolve(ROOT, 'src/newtab/widgets')
+
+  if (!existsSync(widgetsDir)) return violations
+
+  const prefixOwners = new Map<
+    string,
+    { dirs: Set<string>; first: { file: string; line: number } }
+  >()
+
+  const widgetDirs = readdirSync(widgetsDir, { withFileTypes: true })
+    .filter(
+      (e) =>
+        e.isDirectory() && !SKIP_DIRS.has(e.name) && !e.name.startsWith('.'),
+    )
+    .map((e) => e.name)
+
+  for (const dir of widgetDirs) {
+    const vueFiles = collectFiles(resolve(widgetsDir, dir)).filter((f) =>
+      f.endsWith('.vue'),
+    )
+
+    for (const file of vueFiles) {
+      let content: string
+      try {
+        content = readFileSync(file, 'utf-8')
+      } catch {
+        continue
+      }
+
+      const lines = content.split('\n')
+      for (let i = 0; i < lines.length; i++) {
+        // 匹配 :style 对象里的键：'--nt-xxx-name'
+        for (const m of lines[i].matchAll(WIDGET_VAR_PATTERN)) {
+          const prefix = m[1]
+          const existing = prefixOwners.get(prefix)
+          if (existing) {
+            existing.dirs.add(dir)
+          } else {
+            prefixOwners.set(prefix, {
+              dirs: new Set([dir]),
+              first: { file, line: i + 1 },
+            })
+          }
+        }
+      }
+    }
+  }
+
+  for (const [prefix, info] of prefixOwners) {
+    if (info.dirs.size < 2) continue
+    const allowed = WIDGET_VAR_PREFIX_ALLOWLIST.get(prefix)
+    if (allowed && [...info.dirs].every((d) => allowed.includes(d))) continue
+
+    violations.push({
+      file: info.first.file,
+      line: info.first.line,
+      message: `--nt-${prefix}-* 前缀被多个 widget 共用（${[...info.dirs].join(' / ')}），请改用唯一前缀，见 docs/architecture/styles.md`,
+    })
+  }
+
+  return violations
+}
+
 // --- main ---
 const args = process.argv.slice(2)
 const targetDirs = args.length > 0 ? args.map((a) => resolve(ROOT, a)) : [SRC]
@@ -252,6 +343,9 @@ for (const file of files) {
 
 // 额外检查：Reka 组件 z-index
 allViolations = allViolations.concat(checkRekaZIndex())
+
+// 额外检查：widget 变量前缀唯一性
+allViolations = allViolations.concat(checkWidgetVarPrefixes())
 
 if (allViolations.length > 0) {
   console.error('\n发现以下代码模式违规:\n')

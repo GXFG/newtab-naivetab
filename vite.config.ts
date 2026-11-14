@@ -24,8 +24,11 @@ export const sharedConfig: UserConfig = {
     __APP_NAME__: JSON.stringify(packageJson.name),
     __APP_VERSION__: JSON.stringify(packageJson.version),
   },
-  // CSS 不再经过 postcss-preset-env：浏览器基线（Chrome 112+ / Firefox gecko 130+）
-  // 已原生支持 CSS 嵌套，构建期降级反而按无人配置的默认 browserslist 盲目改写产物。
+  // CSS 不再经过 postcss-preset-env：manifest 要求最低 Chrome 130 / Firefox 130
+  // （见 browser_specific_settings.gecko.strict_min_version），已原生支持 CSS 嵌套，
+  // 构建期降级反而按无人配置的默认 browserslist 盲目改写产物。
+  // 注意别把基线写成 Chrome 112：112–119 只支持以 & / .class / #id 开头的嵌套，
+  // 本仓库有裸 type 选择器的嵌套（.foo { span {} }），需要放宽后的语法（Chrome 120+）。
   // 若未来引入需要降级的特性，先在 manifest 里收紧基线，再选带明确 browserslist 的工具。
   plugins: [
     Vue({
@@ -106,7 +109,11 @@ export default defineConfig(({ command }) => ({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: 'happy-dom',
+    // Vitest 5 起该默认值改为 true（每个测试前清空 mock 调用历史）。
+    // setup.ts 的 vi.restoreAllMocks() 已做更强清理，这里显式写出以钉住语义：
+    // 后续版本若再改默认值，测试行为不会静默漂移。
+    clearMocks: true,
     setupFiles: ['../test/setup.ts'],
     coverage: {
       reportsDirectory: '../coverage',

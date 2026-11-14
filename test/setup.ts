@@ -142,12 +142,12 @@ globalThis.window.$loadingBar = {} as any
 
 // ── Browser API Polyfills ──
 
-// jsdom 的 Blob 没有可用的 .stream()，整体替换为 Node 原生 Blob
-// 注意：这会影响 jsdom 中所有 Blob 相关操作，但测试环境不受影响
+// 测试环境的 Blob 统一替换为 Node 原生实现：保证 stream() 等 API 稳定可用，
+// 不依赖 DOM 模拟库（happy-dom）的实现细节，避免随其版本升级而失效
 import { Blob as NodeBlob } from 'node:buffer'
 globalThis.Blob = NodeBlob as any
 
-// CompressionStream / DecompressionStream 在 jsdom 中不可用，从 Node 导入
+// CompressionStream / DecompressionStream 在测试环境中可能缺失，缺失时从 Node 补齐
 if (typeof globalThis.CompressionStream === 'undefined') {
   globalThis.CompressionStream = CompressionStream as any
 }

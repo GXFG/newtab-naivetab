@@ -470,7 +470,7 @@ describe('isInInputElement', () => {
   it('returns true when document.designMode is on', () => {
     const nonInput = document.createElement('div')
     withActiveElement(nonInput)
-    // jsdom 中 designMode 默认是 'off'，需要模拟
+    // happy-dom 中 designMode 是 undefined（jsdom 为 'off'），需要显式模拟
     Object.defineProperty(document, 'designMode', {
       value: 'on',
       configurable: true,

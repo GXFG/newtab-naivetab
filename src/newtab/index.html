@@ -5,8 +5,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover" />
   <!--
-    首屏背景色：JS 执行前立即生效，与默认配置一致（#e8ecf1 / #1a1a2e），
-    消除浏览器默认白/黑背景跳变。JS 加载后 --nt-bg-main 变量通过 global.css 覆盖此值。
+    首屏背景色，与默认配置一致（#e8ecf1 / #1a1a2e）。
+
+    实际生效范围要说清，否则很容易被当成"JS 执行前的兜底"误改：
+    global.css 里 body{background-color:var(--nt-bg-main)} 与本规则同特异性、
+    但 link 排在后面，正常加载时**本规则必输**；而 JS 未跑时 --nt-bg-main 未定义，
+    那条声明的计算结果退回 transparent（实测 BODY_BG=rgba(0,0,0,0)）。
+    所以这条只在"样式包没加载/加载失败"时才真正兜住底色。
+
+    不白闪不是它的功劳：实测（Chrome 130）首帧落在模块脚本执行之后，dom.ts 早已把变量
+    写到 body，所以没有"无底色"的中间帧。别指望它在慢设备上也成立。
+    要让它重新真正生效，得在 global.css 写 var(--nt-bg-main, #e8ecf1)，
+    加 !important 没用 —— 变量未求值时整条声明无效，与权重无关。
   -->
   <style>body{background-color:#e8ecf1}@media(prefers-color-scheme:dark){body{background-color:#1a1a2e}}</style>
 </head>

@@ -3,7 +3,6 @@ import globals from 'globals'
 import { defineConfig } from 'eslint/config'
 import eslintPluginVue from 'eslint-plugin-vue'
 import typescriptEslint from 'typescript-eslint'
-import prettierRecommended from 'eslint-plugin-prettier/recommended'
 import prettierConfig from 'eslint-config-prettier'
 
 export default defineConfig(
@@ -102,8 +101,8 @@ export default defineConfig(
    * prettier 配置，会合并根目录下的prettier.config.js 文件
    * @see https://prettier.io/docs/en/options
    */
-  // eslint-plugin-prettier 将 Prettier 规则作为 ESLint 规则运行
-  // eslint-config-prettier 禁用与 Prettier 冲突的 ESLint 规则
+  // 只保留 eslint-config-prettier：关闭与 Prettier 冲突的 ESLint 规则。
+  // 格式检查交给独立的 prettier --check（pnpm format:check），
+  // 不再用 eslint-plugin-prettier 把格式化当成 lint 规则跑。
   prettierConfig,
-  prettierRecommended,
 )
