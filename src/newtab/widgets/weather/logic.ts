@@ -42,6 +42,11 @@ const defaultWeatherState = {
     pubTime: '',
     so2: '',
   },
+  // 空桶：没有 getIndicesData，updateWeather / refreshWeather 都不拉生活指数，
+  // 因此 weatherIndicesInfo 恒为空字符串，NowWeather 里以它为显示条件的悬停弹层
+  // 永远不会出现。停用节点有史可查：v1.8（79e1bf9）注释掉调用、未留原因，
+  // v1.27（afd58c9）重构时删掉注释代码，原本是 4 小时桶。结构与 API 封装先保留，
+  // 见 api/weather.ts 中 getWeatherIndices 的注释。
   indices: { syncTime: 0, list: [] as IndicesItem[] },
   warning: { syncTime: 0, list: [] as WarningItem[] },
   forecast: { syncTime: 0, list: [] as ForecastItem[] },

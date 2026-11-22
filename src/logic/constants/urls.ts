@@ -17,8 +17,6 @@ export const URL_FIREFOX_STORE =
   'https://addons.mozilla.org/zh-CN/firefox/addon/naivetab-%E5%8F%AF%E8%A7%86%E5%8C%96%E9%94%AE%E7%9B%98%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5/'
 
 export const URL_GITHUB_HOME = 'https://github.com/GXFG/newtab-naivetab'
-export const URL_GITHUB_ISSUSE =
-  'https://github.com/GXFG/newtab-naivetab/issues'
 
 export const URL_NAIVETAB_HOME = 'https://naivetab.gxfg.cc/'
 

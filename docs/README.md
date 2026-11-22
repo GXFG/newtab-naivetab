@@ -54,6 +54,9 @@
 |------|----------|
 | [widget-dev.md](widgets/widget-dev.md) | Widget 生命周期、WidgetWrap、定时任务 |
 | [calendar-widget.md](widgets/calendar-widget.md) | 农历与黄历适配、节假日订阅 |
+| [news-widget.md](widgets/news-widget.md) | 多来源热榜：三份状态、来源键白名单、HTML 解析的代价 |
+| [weather-widget.md](widgets/weather-widget.md) | 四份缓存的独立过期、共享 API Key 与配额、指数为空的原因 |
+| [search-widget.md](widgets/search-widget.md) | 引擎标识的双重身份、自定义引擎的无校验边界、跨域联想 |
 
 ### 规范
 

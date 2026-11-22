@@ -618,11 +618,7 @@ describe('loadRemoteKeyboardConfig', () => {
 })
 
 // ── setupPageConfigSync ──
-
-describe('setupPageConfigSync', () => {
-  it('exports the function', async () => {
-    vi.resetModules()
-    const mod = await import('@/logic/config/sync/loader')
-    expect(typeof mod.setupPageConfigSync).toBe('function')
-  })
-})
+// 调用顺序契约见 `sync-setup.test.ts`：它需要 mock 掉 loader 的五个协作者，
+// 与本文件「全部用真实现」的环境冲突，故独立成文件。
+// 原先这里只有 `expect(typeof mod.setupPageConfigSync).toBe('function')`，
+// 把顺序调乱、少调一步都拦不住，已移除。

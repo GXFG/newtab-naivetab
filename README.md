@@ -53,7 +53,7 @@ Say goodbye to layers of clicks — manage your browser with a familiar keyboard
 | Folder Bookmarks | Grid view for bookmark folders      |
 | Memo             | Notes & to-do lists                 |
 | Year Progress    | Percentage + dot grid visualization |
-| Weather          | Temp, wind, humidity, daily indices |
+| Weather          | Temp, wind, humidity                |
 | News             | Multi-platform trending aggregation |
 
 ### Core Capabilities

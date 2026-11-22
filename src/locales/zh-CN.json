@@ -475,6 +475,7 @@
     "suggestion": "建议列表",
     "searchEngine": "搜索引擎",
     "customEngine": "自定义引擎",
+    "missingQueryPlaceholder": "自定义引擎地址缺少查询占位符，搜索词无法传入。正确格式示例：",
     "placeholder": "占位文本",
     "icon": "搜索按钮",
     "searchEngineIcon": "搜索引擎图标",

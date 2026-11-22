@@ -44,6 +44,9 @@ export const getSearchSuggestion = async (
     return []
   }
 
+  // 这里用 replace 而非 replaceAll，和 search/logic.ts（用户输入的模板，走 replaceAll）
+  // 不同：suggestUrl 是 constants/search.ts 里的内建常量，每条只出现一次占位符，
+  // 用户无法改写。哪天允许自定义建议接口，需要一并换成 replaceAll。
   const url = suggestUrl.replace('{query}', encodeURIComponent(keyword))
 
   // Bing / Google / Sogou: ["query", ["词1", "词2", ...], ...]

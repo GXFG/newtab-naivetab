@@ -39,7 +39,7 @@ Say goodbye to layers of clicks — manage your browser with a familiar keyboard
    📁 Folder Bookmarks Grid view for bookmark folders
    📝 Memo             Notes and to-do lists
    📊 Year Progress    Percentage + dot grid visualization
-   🌤️ Weather          Temperature, wind, humidity, daily indices, alerts
+   🌤️ Weather          Temperature, wind, humidity, alerts
    📰 News             Multi-platform trending aggregation
 
 

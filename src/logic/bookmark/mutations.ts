@@ -1,11 +1,11 @@
 /**
- * 书签变更操作 — chrome.bookmarks API 写操作（添加前缀、移除前缀、交换、删除）。
+ * 书签变更操作 — chrome.bookmarks API 写操作（交换、删除）。
  *
- * @dependencies bookmark/parser.ts（findBookmarkByUrl、findFolderByPath）
+ * @dependencies bookmark/parser.ts（findFolderByPath）
  * @consumers keyboard/bookmark-export.ts、components/BaseSystemBookmarkManager.vue
  */
 
-import { findBookmarkByUrl, findFolderByPath } from './parser'
+import { findFolderByPath } from './parser'
 
 /**
  * 在 sourceFolder 中查找 `[X]` 前缀书签
@@ -20,42 +20,6 @@ const findPrefixedBookmarkInFolder = (
     if (child.url && child.title?.startsWith(prefix)) return child
   }
   return null
-}
-
-/**
- * 为指定 URL 的浏览器书签添加 `[X] ` 前缀
- */
-export const addBookmarkPrefix = async (
-  code: string,
-  url: string,
-  name?: string,
-): Promise<void> => {
-  const tree = await chrome.bookmarks.getTree()
-  const bookmark = findBookmarkByUrl(tree, url)
-  if (!bookmark) return
-
-  if (/^\[([^\]]+)\]\s*/.test(bookmark.title || '')) return
-
-  const prefix = `[${code}] `
-  const newName = name || bookmark.title || ''
-  await chrome.bookmarks.update(bookmark.id, {
-    title: `${prefix}${newName}`,
-  })
-}
-
-/**
- * 移除指定书签的 `[X] ` 前缀
- */
-export const removeBookmarkPrefix = async (url: string): Promise<void> => {
-  const tree = await chrome.bookmarks.getTree()
-  const bookmark = findBookmarkByUrl(tree, url)
-  if (!bookmark) return
-
-  const title = bookmark.title || ''
-  const cleaned = title.replace(/^\[([^\]]+)\]\s*/, '')
-  if (cleaned !== title) {
-    await chrome.bookmarks.update(bookmark.id, { title: cleaned })
-  }
 }
 
 /**

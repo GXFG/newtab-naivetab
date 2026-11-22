@@ -357,6 +357,11 @@ export const handleWatchLocalConfigChange = () => {
   // 注意：这些 watch 从未返回清理函数。当前只在 newtab/options 的 onMounted 中
   // 调用一次（每个页面上下文独立），不会累积。如果未来新增动态调用场景，需要
   // 返回 watch 句柄并在组件 unmount 时清理。
+  //
+  // 每个配置字段单独一个 deep watcher（字段是 ConfigField 的固定枚举），deep 遍历
+  // 的只是该字段自己的配置对象，成本可忽略。不要「优化」成监听整个 localConfig：
+  // 那会让任一字段变化都触发全部字段的指纹计算与上传判定，把低成本遍历换成
+  // 全量哈希。2026-11-21 复核，非问题。
   const fieldList = Object.keys(localConfig) as ConfigField[]
   for (const field of fieldList) {
     const uploadConfigFnLocal = genWatchUploadConfigFn(field)
@@ -393,6 +398,11 @@ export const flushConfigSync = async (field: ConfigField): Promise<boolean> => {
 }
 
 export const handleMissedUploadConfig = async () => {
+  // 串行 await 是有意的，不是漏写的 Promise.all：写限流用的 writeHistory 跨字段
+  // 共享（见上方 checkWriteRate 注释），串行让写入顺序可预期，也避免启动瞬间向
+  // chrome.storage.sync 打出一串并发 set。代价是耗时随脏字段数线性累加——去重分支
+  // 每个字段还固定等 100ms，脏字段多时（首次安装、导入配置后）首屏键盘会明显延后。
+  // 这是已知取舍：补救上传次数远低于限流告警阈值，不值得为它引入并发风险。
   for (const field of Object.keys(
     localState.value.isUploadConfigStatusMap,
   ) as ConfigField[]) {

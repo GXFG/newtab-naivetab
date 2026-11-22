@@ -94,7 +94,7 @@ interface BookmarkItem {
 |------|---------|
 | `bookmark/api.ts` | `getChromeBookmark`、`getBrowserBookmark`、`getFaviconFromUrl` |
 | `bookmark/parser.ts` | `parseBookmarkTitle`、`findFolderByPath`、`findBookmarkByUrl`、`extractDomainName`、`parseBookmarkFolder` |
-| `bookmark/mutations.ts` | `addBookmarkPrefix`、`removeBookmarkPrefix`、`swapBookmarksInSourceFolder`、`removeBookmarkFromSourceFolder` |
+| `bookmark/mutations.ts` | `swapBookmarksInSourceFolder`、`removeBookmarkFromSourceFolder` |
 | `keyboard/bookmark-state.ts` | `getSystemBookmarkForKeyboard`、`initKeyboardData`、`switchLayer`、`refreshKeyboardData` |
 | `keyboard/bookmark-export.ts` | `exportKeymapToBrowser`、`addBookmarkToSourceFolder`、`updateBookmarkInSourceFolder`、`createLayerBookmarkFolders` |
 

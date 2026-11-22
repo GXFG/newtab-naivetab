@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { mergeState } from '@/logic/config/merge'
+import { compareLeftVersionLessThanRightVersions } from '@/logic/config/version'
 
 /**
  * sync-flow.test.ts — 测试 sync/core.ts 中的 loadRemoteConfig 同步分支
@@ -9,6 +11,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  *
  * 策略：所有字段都提供云端数据，测试中只修改目标字段的同步状态
  * 来触发不同分支，其他字段保持 syncId 一致（被跳过）。
+ *
+ * 合并与版本比较一律用真实实现（`mergeState`、`compareLeftVersionLessThanRightVersions`
+ * 都是零依赖纯函数）。这里曾经逐字复制过一份 mergeState 当桩，副本不随实现更新，
+ * 多设备场景实际验证的是副本而非产品代码。
  */
 
 const mockLog = vi.fn()
@@ -118,15 +124,6 @@ function setupChromeSync(cloudData: Record<string, string>) {
 
 vi.doMock('@/logic/utils/util', () => ({
   log: mockLog,
-  compareLeftVersionLessThanRightVersions: (left: string, right: string) => {
-    const l = left.split('.').map(Number)
-    const r = right.split('.').map(Number)
-    for (let i = 0; i < Math.max(l.length, r.length); i++) {
-      if ((l[i] || 0) < (r[i] || 0)) return true
-      if ((l[i] || 0) > (r[i] || 0)) return false
-    }
-    return false
-  },
   sleep: vi.fn(),
 }))
 
@@ -155,46 +152,9 @@ vi.doMock('@/logic/config/defaults', () => ({
   },
 }))
 
-// Recursive merge helper (cannot reference vi.doMock factory's own name)
-const mockMergeState = (state: unknown, acceptState: unknown): unknown => {
-  if (acceptState === undefined || acceptState === null) return state
-  if (
-    Object.prototype.toString.call(state) !==
-    Object.prototype.toString.call(acceptState)
-  )
-    return state
-  if (
-    typeof acceptState === 'string' ||
-    typeof acceptState === 'number' ||
-    typeof acceptState === 'boolean'
-  ) {
-    return acceptState
-  }
-  if (Object.prototype.toString.call(acceptState) !== '[object Object]')
-    return acceptState
-  const acceptObj = acceptState as Record<string, unknown>
-  const stateObj = state as Record<string, unknown>
-  const hasKeymapPattern = Object.keys(acceptObj).some(
-    (key) =>
-      key.startsWith('Key') ||
-      key.startsWith('Digit') ||
-      key.startsWith('Numpad'),
-  )
-  if (hasKeymapPattern) return acceptState
-  const filterState: Record<string, unknown> = {}
-  for (const f of Object.keys(stateObj)) {
-    if (Object.prototype.hasOwnProperty.call(acceptObj, f)) {
-      filterState[f] = mockMergeState(stateObj[f], acceptObj[f])
-    } else {
-      filterState[f] = stateObj[f]
-    }
-  }
-  return filterState
-}
-
-vi.doMock('@/logic/config/merge', () => ({
-  mergeState: mockMergeState,
-}))
+// 不 mock `@/logic/config/merge`：mergeState 是零依赖纯函数，这里原来逐字复制了
+// 一份实现当桩，改 merge.ts 时副本不会跟着变，测试就变成「验证副本」而不是验证
+// 合并行为。真实实现直接加载即可。
 
 const mockUpdateSetting = vi.fn().mockResolvedValue(true)
 
@@ -569,7 +529,7 @@ describe('multi-device sync scenarios', () => {
     }
   }
 
-  // 简化版 mergeConfigWithVersionAwareness（不依赖 mock，直接用纯函数逻辑）
+  // 复用真实的版本感知合并逻辑（见文件头说明：不维护副本）
   function doMergeWithVersionAwareness(
     localData: Record<string, any>,
     remoteData: Record<string, any>,
@@ -579,22 +539,15 @@ describe('multi-device sync scenarios', () => {
     if (localVersion === remoteVersion) {
       return remoteData
     }
-    const isLocalNewer = compareVersion(remoteVersion, localVersion)
+    const isLocalNewer = compareLeftVersionLessThanRightVersions(
+      remoteVersion,
+      localVersion,
+    )
     if (isLocalNewer) {
-      return mockMergeState(localData, remoteData) as Record<string, any>
+      return mergeState(localData, remoteData) as Record<string, any>
     } else {
-      return mockMergeState(remoteData, localData) as Record<string, any>
+      return mergeState(remoteData, localData) as Record<string, any>
     }
-  }
-
-  function compareVersion(left: string, right: string): boolean {
-    const l = left.split('.').map(Number)
-    const r = right.split('.').map(Number)
-    for (let i = 0; i < Math.max(l.length, r.length); i++) {
-      if ((l[i] || 0) < (r[i] || 0)) return true
-      if ((l[i] || 0) > (r[i] || 0)) return false
-    }
-    return false
   }
 
   interface DeviceState {

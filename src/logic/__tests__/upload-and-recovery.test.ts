@@ -133,9 +133,9 @@ vi.doMock('@/logic/config/defaults', () => ({
   },
 }))
 
-vi.doMock('@/logic/config/merge', () => ({
-  mergeState: vi.fn((s: unknown, a: unknown) => a ?? s),
-}))
+// 不 mock `@/logic/config/merge`：这里原来用 `(s, a) => a ?? s` 当桩，
+// 等于「全量替换、不递归」，与真实的模板过滤语义相反，配置字段的补全/丢弃行为
+// 在这份测试里根本没有被验证。mergeState 是零依赖纯函数，直接用真实现。
 
 vi.doMock('@/logic/config/update', () => ({
   handleStateResetAndUpdate: vi.fn(),

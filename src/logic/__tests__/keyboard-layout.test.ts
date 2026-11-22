@@ -34,7 +34,13 @@ function setupMocks(overrides?: {
       keyboardCommon: { keyboardType, keyboardWklMode, splitSpace },
     },
   }))
-  vi.doMock('@/logic/keyboard/keyboard-constants', () => ({
+  // 只钉住与断言相关的三个导出，其余用真实实现。
+  // 原来这里是整模块枚举 mock，被测模块一旦新增一个 import 就会抛
+  // 「No "XXX" export is defined on the mock」——与被测行为无关，却必须改测试。
+  vi.doMock('@/logic/keyboard/keyboard-constants', async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import('@/logic/keyboard/keyboard-constants')
+    >()),
     EMPHASIS_ONE_KEYS: ['Escape', 'Enter'],
     EMPHASIS_TWO_KEYS: ['Space'],
     DEFAULT_LAYER_SOURCE_FOLDER: 'NaiveTab',

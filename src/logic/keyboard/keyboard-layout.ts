@@ -8,7 +8,11 @@
  */
 import { isMacOS } from '@/env'
 import { localConfig } from '@/logic/config/state'
-import { EMPHASIS_ONE_KEYS, EMPHASIS_TWO_KEYS } from './keyboard-constants'
+import {
+  EMPHASIS_ONE_KEYS,
+  EMPHASIS_TWO_KEYS,
+  SPACE_KEYCODE_LIST,
+} from './keyboard-constants'
 import * as layouts from './layouts'
 
 // ── 布局注册表 ─────────────────────────────────────────────
@@ -60,10 +64,7 @@ function applySpaceSplit(
   if (!spaceKey) return keys
 
   const filtered = keys.filter(
-    (k) =>
-      !(
-        k.y === maxY && ['Space', 'SpaceSplit1', 'SpaceSplit2'].includes(k.code)
-      ),
+    (k) => !(k.y === maxY && SPACE_KEYCODE_LIST.includes(k.code)),
   )
 
   let currentX = spaceKey.x

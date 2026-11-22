@@ -149,6 +149,15 @@ export const loadRemoteConfig = () => {
               localState.value.isUploadConfigStatusMap[field].syncStatus =
                 'idle'
             } else if (localModifiedTime > targetSyncTime) {
+              // 冲突判定用「本机修改时刻」对比「云端记录的上传时刻」。两个时间戳
+              // 来自不同设备的系统时钟，严格说不可直接比较：本机偏快时本地修改总
+              // 被判为更新（会覆盖另一台设备的修改），偏慢时反之（本地修改被合并掉）。
+              //
+              // 没有现成的更好替代——chrome.storage.sync 不提供服务器时间，payload
+              // 里只有上传方自己的 Date.now()。根治需要引入设备序号或逻辑时钟，
+              // 会同时改动上传/拉取两端的 payload 结构与迁移。2026-11-21 复核后
+              // 仍决定暂不动，此处记录以免下次被当成新发现的 bug 重复排查。
+              // 实际触发需要「两台设备在时钟偏差窗口内修改同一字段」，属低频场景。
               log(
                 `Config-${field} upload local (local newer: ${localModifiedTime} > ${targetSyncTime})`,
               )

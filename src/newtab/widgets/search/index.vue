@@ -11,8 +11,10 @@ import { isDragMode } from '@/logic/moveable'
 import { localConfig } from '@/logic/config/state'
 import { globalState } from '@/logic/store/state'
 import { getStyleField } from '@/logic/store/style'
+import { showToast } from '@/common/toast'
 import WidgetWrap from '../WidgetWrap.vue'
 import { WIDGET_CODE } from './config'
+import { buildSearchUrl } from './logic'
 
 const customFontFamily = getStyleField(WIDGET_CODE, 'fontFamily')
 const customFontColor = getStyleField(WIDGET_CODE, 'fontColor')
@@ -114,8 +116,19 @@ const onSearch = () => {
   if (state.searchValue.length === 0) {
     return
   }
-  const encodeText = encodeURIComponent(state.searchValue)
-  const searchUrl = localConfig.search.urlValue.replace('{query}', encodeText)
+  // 构建地址时判定模板合法性：自定义引擎的 urlValue 由用户自由输入，设置面板不校验。
+  // 漏写占位符或填了空串都会让关键词被丢弃（后者还会让 location.href = '' 重载页面），
+  // 原来是完全静默的，用户只会觉得「搜索坏了」。这里给出提示并中止。
+  const searchUrl = buildSearchUrl(
+    localConfig.search.urlValue,
+    state.searchValue,
+  )
+  if (!searchUrl) {
+    showToast.error(
+      `${window.$t('search.missingQueryPlaceholder')} https://example.com/search?q={query}`,
+    )
+    return
+  }
   state.isSuggestVisible = false
   state.isSuggestSelecting = false
   state.currSuggestIndex = -1

@@ -6,8 +6,6 @@ import {
   findBookmarkByUrl,
 } from '@/logic/bookmark/parser'
 import {
-  addBookmarkPrefix,
-  removeBookmarkPrefix,
   swapBookmarksInSourceFolder,
   removeBookmarkFromSourceFolder,
 } from '@/logic/bookmark/mutations'
@@ -360,78 +358,6 @@ describe('findBookmarkByUrl', () => {
   it('找不到返回 null', () => {
     const tree = [folder('NaiveTab', [])]
     expect(findBookmarkByUrl(tree, 'https://unknown.com')).toBeNull()
-  })
-})
-
-describe('addBookmarkPrefix', () => {
-  it('为书签添加 [X] 前缀', async () => {
-    const mockBookmark = bookmark('Google', 'https://google.com')
-    const tree = [folder('NaiveTab', [mockBookmark])]
-    ;(globalThis.chrome as any).bookmarks = {
-      getTree: vi.fn(() => Promise.resolve(tree)),
-      update: vi.fn(() => Promise.resolve({})),
-    }
-
-    await addBookmarkPrefix('KeyQ', 'https://google.com', 'Google')
-
-    expect(chrome.bookmarks.update).toHaveBeenCalledWith(mockBookmark.id, {
-      title: '[KeyQ] Google',
-    })
-  })
-
-  it('已有前缀则跳过', async () => {
-    const mockBookmark = bookmark('[KeyW] GitHub', 'https://github.com')
-    const tree = [folder('NaiveTab', [mockBookmark])]
-    ;(globalThis.chrome as any).bookmarks = {
-      getTree: vi.fn(() => Promise.resolve(tree)),
-      update: vi.fn(() => Promise.resolve({})),
-    }
-
-    await addBookmarkPrefix('KeyQ', 'https://github.com', 'GitHub')
-
-    expect(chrome.bookmarks.update).not.toHaveBeenCalled()
-  })
-
-  it('书签不存在则跳过', async () => {
-    const tree = [folder('NaiveTab', [])]
-    ;(globalThis.chrome as any).bookmarks = {
-      getTree: vi.fn(() => Promise.resolve(tree)),
-      update: vi.fn(() => Promise.resolve({})),
-    }
-
-    await addBookmarkPrefix('KeyQ', 'https://missing.com', 'Missing')
-
-    expect(chrome.bookmarks.update).not.toHaveBeenCalled()
-  })
-})
-
-describe('removeBookmarkPrefix', () => {
-  it('移除书签的 [X] 前缀', async () => {
-    const mockBookmark = bookmark('[KeyQ] Google', 'https://google.com')
-    const tree = [folder('NaiveTab', [mockBookmark])]
-    ;(globalThis.chrome as any).bookmarks = {
-      getTree: vi.fn(() => Promise.resolve(tree)),
-      update: vi.fn(() => Promise.resolve({})),
-    }
-
-    await removeBookmarkPrefix('https://google.com')
-
-    expect(chrome.bookmarks.update).toHaveBeenCalledWith(mockBookmark.id, {
-      title: 'Google',
-    })
-  })
-
-  it('无前缀则跳过', async () => {
-    const mockBookmark = bookmark('Google', 'https://google.com')
-    const tree = [folder('NaiveTab', [mockBookmark])]
-    ;(globalThis.chrome as any).bookmarks = {
-      getTree: vi.fn(() => Promise.resolve(tree)),
-      update: vi.fn(() => Promise.resolve({})),
-    }
-
-    await removeBookmarkPrefix('https://google.com')
-
-    expect(chrome.bookmarks.update).not.toHaveBeenCalled()
   })
 })
 

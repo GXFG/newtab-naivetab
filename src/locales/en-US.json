@@ -475,6 +475,7 @@
     "suggestion": "Suggestions",
     "searchEngine": "Search engine",
     "customEngine": "Custom engine",
+    "missingQueryPlaceholder": "Custom engine URL is missing the query placeholder, so the keyword can't be passed. Expected format:",
     "placeholder": "Placeholder",
     "icon": "Icon",
     "searchEngineIcon": "Search engine icon",

@@ -15,6 +15,7 @@ import {
   IMAGE_NETWORK_SOURCE,
   BACKGROUND_IMAGE_SOURCE,
 } from '@/logic/image/constants'
+import type { BackgroundImageSource } from '@/logic/image/constants'
 import type { TShimmerEffect } from '@/logic/shimmer-bg/constants'
 import pkg from '../../../package.json'
 
@@ -49,7 +50,7 @@ const generalConfig = {
   focusVisibleWidgetMap: defaultFocusVisibleWidgetMap,
   isBackgroundImageEnabled: true,
   backgroundImageSource:
-    BACKGROUND_IMAGE_SOURCE.NETWORK as (typeof BACKGROUND_IMAGE_SOURCE)[keyof typeof BACKGROUND_IMAGE_SOURCE],
+    BACKGROUND_IMAGE_SOURCE.NETWORK as BackgroundImageSource,
   backgroundImageList: [
     { networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS, name: '19161535' },
     { networkSourceType: IMAGE_NETWORK_SOURCE.PEXELS, name: '36873465' },

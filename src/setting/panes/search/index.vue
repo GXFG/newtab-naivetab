@@ -119,7 +119,12 @@ const searchEngineList = computed(() => {
           v-if="localConfig.search.urlName === 'custom'"
           :label="$t('search.customEngine')"
         >
-          <!-- 自定义搜索引擎 URL 示例，无需 i18n -->
+          <!-- 自定义搜索引擎 URL 示例，无需 i18n。
+               这里有意不做实时校验：v-model 每次按键都会写回 urlValue，用户输入
+               "https://a.com/?q=" 的过程中必然缺 {query}，实时报错会一路闪红；何况
+               urlValue 还来自配置导入与云同步，面板校验也拦不住那两条来源。
+               合法性统一在提交路径判定（newtab/widgets/search/logic.ts 的
+               isValidSearchTemplate），不合法时由搜索组件弹 toast 说明原因。 -->
           <NTInput
             v-model:value="localConfig.search.urlValue"
             type="text"
